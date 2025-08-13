@@ -31,7 +31,7 @@
         }
 
         html, body {
-            height: 100%;
+            min-height: 100%;
             margin: 0;
             padding: 0;
             font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
@@ -203,7 +203,7 @@
         .cta a { display: inline-block; padding: 10px 14px; border-radius: 10px; background: rgba(20,184,166,0.15); border: 1px solid rgba(34,211,238,0.25); box-shadow: 0 8px 22px rgba(20,184,166,0.15); }
 
         /* Projects grid (cards) */
-        main { max-width: 1100px; margin: 0 auto; padding: 24px 18px 60px; position: relative; z-index: 60; }
+        main { max-width: 1100px; margin: 0 auto; padding: 24px 18px 80px; position: relative; z-index: 60; }
         .project-card { 
             background: linear-gradient(180deg, rgba(17,24,39,0.95), rgba(17,24,39,0.90)); 
             border: 1px solid var(--border); 
@@ -218,7 +218,7 @@
         .project-card p { margin: 0 16px 10px; color: var(--muted); position: relative; z-index: 80; }
         .project-card iframe { 
             width: 100%; 
-            height: 520px; 
+            height: 620px; 
             border: 0; 
             border-top: 1px solid var(--border); 
             background: #0b0b0f; 
@@ -615,7 +615,7 @@
         }
 
         /* Responsive */
-        @media (max-width: 740px){ .project-card iframe { height: 460px; } }
+        @media (max-width: 740px){ .project-card iframe { height: 560px; } }
         @media (max-width: 768px) { .nav-menu { display: none; } }
 </style>
 </head>
@@ -662,14 +662,14 @@
         <iframe src="your-game.html" title="HTML Game Demo"></iframe>
     </section>
     <section class="project-card">
-        <h2>Media Visualizer</h2>
-        <p>Real-time audio and visual effects showcasing dynamic data visualization and creative coding techniques.</p>
-        <iframe src="my-visualizer.html" title="Media Visualizer"></iframe>
+        <h2>AI Tools Mastery Showcase</h2>
+        <p>Interactive carousel demonstrating expertise across AI platforms including ChatGPT, Claude, Midjourney, and automation tools.</p>
+        <iframe src="ai-tools-showcase-carousel.html" title="AI Tools Showcase"></iframe>
     </section>
     <section class="project-card">
-        <h2>Slideshow / Documents</h2>
-        <p>Interactive presentation system with smooth transitions and document management capabilities.</p>
-        <iframe src="your-slideshow.html" title="Document Slideshow"></iframe>
+        <h2>Media Visualizer</h2>
+        <p>Advanced audio visualization system with real-time frequency analysis and dynamic visual effects.</p>
+        <iframe src="my-visualizer.html" title="Media Visualizer"></iframe>
     </section>
 </main>
 
