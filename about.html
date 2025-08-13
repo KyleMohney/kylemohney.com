@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Kyle J. Mohney - About | Product Documentation &amp; Knowledge Operations</title>
+<meta content="About Kyle Mohney – Product Documentation &amp; Knowledge Operations leader with enterprise Sprout Social experience, AI automation, and support ops." name="description"/>
+<style>
+
+        /* ==============================
+         * KYLE MOHNEY RESUME STYLES
+         * ==============================
+         */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: #2d3748;
+            background: #fdfcf7;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 15% 25%, rgba(152, 229, 142, 0.03) 0%, transparent 40%),
+                radial-gradient(circle at 85% 75%, rgba(0, 107, 64, 0.02) 0%, transparent 35%);
+            pointer-events: none;
+            z-index: -2;
+        }
+
+        /* Subtle Circuit Animation */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(90deg, rgba(152, 229, 142, 0.03) 1px, transparent 1px),
+                linear-gradient(0deg, rgba(152, 229, 142, 0.03) 1px, transparent 1px);
+            background-size: 80px 80px;
+            animation: circuitFlow 20s linear infinite;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        /* Floating Data Nodes */
+        .floating-nodes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .data-node {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: radial-gradient(circle, rgba(152, 229, 142, 0.6) 0%, rgba(0, 107, 64, 0.3) 100%);
+            border-radius: 50%;
+            animation: nodeFloat 15s ease-in-out infinite;
+        }
+
+        .data-node:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+        .data-node:nth-child(2) { top: 60%; left: 85%; animation-delay: 3s; }
+        .data-node:nth-child(3) { top: 80%; left: 25%; animation-delay: 6s; }
+        .data-node:nth-child(4) { top: 30%; left: 70%; animation-delay: 9s; }
+
+        /* Enhanced Card Breathing Effect */
+        .experience-card,
+        .sidebar-card {
+            animation: cardBreathe 4s ease-in-out infinite;
+        }
+
+        .experience-card:nth-child(even) {
+            animation-delay: 2s;
+        }
+
+        .sidebar-card:nth-child(even) {
+            animation-delay: 1s;
+        }
+
+        /* Icon Rotation on Hover */
+        .section-icon,
+        .sidebar-icon {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .section-header:hover .section-icon,
+        .sidebar-title:hover .sidebar-icon {
+            transform: rotate(5deg) scale(1.1);
+        }
+
+        /* Enhanced Sprout Highlight */
+        .sprout-highlight {
+            background: linear-gradient(135deg, #006b40 0%, #98e58e 100%);
+            color: white;
+            padding: 32px;
+            border-radius: 16px;
+            margin: 24px 0;
+            box-shadow: 
+                0 12px 40px rgba(0, 107, 64, 0.2),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sprout-highlight::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        *:focus {
+            outline: 2px solid #98e58e;
+            outline-offset: 2px;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            loading: lazy;
+        }
+
+        /* Header Navigation */
+        .header {
+            padding: 24px 0;
+            position: sticky;
+            top: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(152, 229, 142, 0.1);
+            box-shadow: 0 2px 20px rgba(0, 107, 64, 0.05);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .profile-logo {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            border: 2px solid #98e58e;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            object-fit: cover;
+        }
+
+        .logo-text {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 40px;
+        }
+
+        .nav-menu a {
+            color: #2d3748;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1em;
+            padding: 12px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-menu a:hover {
+            color: #006b40;
+            background: rgba(152, 229, 142, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .nav-menu a.current {
+            color: #006b40;
+            background: rgba(152, 229, 142, 0.15);
+            box-shadow: 0 4px 12px rgba(152, 229, 142, 0.2);
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background-color: #1e3a8a;
+            position: relative;
+            overflow: hidden;
+            padding: 4rem 2rem;
+        }
+
+        /* Main Content */
+        .resume-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+            flex: 1 0 auto;
+        }
+
+        .main-content {
+            background: white;
+            border-radius: 24px;
+            padding: 48px;
+            box-shadow: 0 20px 60px rgba(0, 107, 64, 0.08);
+            border: 1px solid rgba(152, 229, 142, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #006b40, #98e58e);
+        }
+
+        /* About Sections */
+        .about-section {
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(152, 229, 142, 0.1);
+        }
+
+        .about-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .about-section h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #006b40;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .about-section h2 {
+            font-size: 1.8em;
+            font-weight: 600;
+            color: #006b40;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .about-section h2::before {
+            content: '';
+            width: 4px;
+            height: 1.5em;
+            background: linear-gradient(135deg, #006b40, #98e58e);
+            border-radius: 2px;
+        }
+
+        .about-section p {
+            font-size: 1.1em;
+            line-height: 1.7;
+            color: #4a5568;
+            margin-bottom: 1rem;
+        }
+
+        /* HEMA Section with Image */
+        .hema-section {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 2.5rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, rgba(248, 251, 248, 0.3) 0%, rgba(235, 249, 235, 0.3) 100%);
+            border-radius: 16px;
+            border: 1px solid rgba(152, 229, 142, 0.2);
+        }
+
+        .hema-section::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 61%;
+            transform: translate(-50%, -50%);
+            width: 410px;
+            height: 410px;
+            background: radial-gradient(circle, rgba(37, 99, 235, 0.15) 0%, transparent 80%);
+            filter: blur(60px);
+            z-index: 0;
+        }
+
+        .hema-text {
+            flex: 1;
+            min-width: 280px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hema-image {
+            flex: 1;
+            min-width: 280px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hema-image img {
+            max-width: 120%;
+            height: auto;
+            border-radius: 8px;
+            background: transparent;
+            transform: scale(1.05);
+            position: relative;
+            left: -40px;
+        }
+
+        /* Quick Facts Section */
+        .quick-facts-section {
+            background: linear-gradient(135deg, rgba(248, 251, 248, 0.5) 0%, rgba(235, 249, 235, 0.5) 100%);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin: 2.5rem 0;
+            border: 2px solid rgba(152, 229, 142, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quick-facts-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #006b40, #98e58e);
+        }
+
+        .quick-facts-section h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2.2em;
+            color: #006b40;
+        }
+
+        .quick-facts-intro {
+            text-align: center;
+            font-size: 1.1em;
+            color: #4a5568;
+            margin-bottom: 2rem;
+            font-style: italic;
+        }
+
+        .quick-facts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .quick-fact-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border-left: 4px solid #98e58e;
+            box-shadow: 0 4px 12px rgba(0, 107, 64, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .quick-fact-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 107, 64, 0.15);
+        }
+
+        .quick-fact-label {
+            font-weight: 700;
+            color: #006b40;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .quick-fact-value {
+            color: #4a5568;
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+
+        /* Recruiter FAQ */
+        .recruiter-faq {
+            margin-top: 4rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, rgba(248, 251, 248, 0.5) 0%, rgba(235, 249, 235, 0.5) 100%);
+            border-radius: 16px;
+            border: 2px solid rgba(152, 229, 142, 0.2);
+        }
+
+        .recruiter-faq h2 {
+            color: #006b40;
+            margin-bottom: 1.5rem;
+            font-size: 2em;
+            text-align: center;
+        }
+
+        .faq-item {
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 107, 64, 0.05);
+            border-left: 4px solid #98e58e;
+        }
+
+        .faq-question {
+            color: #006b40;
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-bottom: 0.75rem;
+        }
+
+        .faq-answer {
+            color: #4a5568;
+            line-height: 1.6;
+        }
+
+        /* Professional Footer */
+        .resume-footer {
+            width: 100%;
+            padding: 40px 0;
+            text-align: center;
+            background: linear-gradient(90deg, #003b2f, #001c44);
+            color: white;
+            font-style: italic;
+            margin-top: auto;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hema-section {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .hema-image img {
+                left: 0;
+                transform: scale(1);
+                max-width: 100%;
+            }
+
+            .main-content {
+                padding: 32px;
+            }
+
+            .quick-facts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+
+            .hema-section {
+                padding: 1.5rem;
+            }
+
+            .main-content {
+                padding: 24px;
+            }
+
+            .about-section h1 {
+                font-size: 2em;
+            }
+
+            .about-section h2 {
+                font-size: 1.5em;
+            }
+
+            .quick-facts-section {
+                padding: 1.5rem;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+
+            .header,
+            .resume-footer {
+                display: none;
+            }
+
+            .resume-content {
+                box-shadow: none;
+                margin: 0;
+                padding: 20px;
+            }
+
+            .main-content,
+            .quick-facts-section {
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+        }
+
+        @keyframes circuitFlow {
+            0% { transform: translate3d(0, 0, 0); opacity: 0.5; }
+            25% { transform: translate3d(-20px, -10px, 0); opacity: 0.8; }
+            50% { transform: translate3d(-40px, 0, 0); opacity: 1; }
+            75% { transform: translate3d(-20px, 10px, 0); opacity: 0.8; }
+            100% { transform: translate3d(0, 0, 0); opacity: 0.5; }
+        }
+
+        @keyframes nodeFloat {
+            0%, 100% { 
+                transform: translate3d(0, 0, 0) scale(1); 
+                opacity: 0.6;
+            }
+            25% { 
+                transform: translate3d(30px, -40px, 0) scale(1.3); 
+                opacity: 1;
+            }
+            50% { 
+                transform: translate3d(-20px, 30px, 0) scale(0.8); 
+                opacity: 0.8;
+            }
+            75% { 
+                transform: translate3d(40px, 15px, 0) scale(1.2); 
+                opacity: 0.9;
+            }
+        }
+
+        @keyframes cardBreathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+    
+</style>
+</head>
+<body style="background: #f8faf9; overflow-x: hidden; position: relative;">
+
+<!-- Background Effects -->
+<div id="background-effects">
+<canvas id="particle-canvas"></canvas>
+<div class="floating-nodes"></div>
+<div class="circuit-lines"></div>
+</div>
+
+<style>
+#background-effects {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+#particle-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+.floating-nodes, .circuit-lines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    opacity: 0.25;
+}
+.floating-nodes {
+    background-image: radial-gradient(circle, rgba(0,107,64,0.3) 2px, transparent 2px);
+    background-size: 50px 50px;
+}
+.circuit-lines {
+    background-image: linear-gradient(90deg, rgba(0,107,64,0.15) 1px, transparent 1px),
+                      linear-gradient(rgba(0,107,64,0.15) 1px, transparent 1px);
+    background-size: 60px 60px;
+}
+/* Semi-transparent cards */
+.contact-card, .glass-card, .sidebar-card, .experience-card, .about-card {
+    background-color: rgba(255, 255, 255, 0.85) !important;
+    position: relative;
+    z-index: 1;
+}
+</style>
+
+<script>
+// Simple particle effect
+function initParticleCanvas() {
+    const canvas = document.getElementById('particle-canvas');
+    if (!canvas) return; // Safety check
+    
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    
+    function initParticles() {
+        particles = [];
+        for (let i = 0; i < 80; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 2 + 1,
+                dx: (Math.random() - 0.5) * 0.5,
+                dy: (Math.random() - 0.5) * 0.5
+            });
+        }
+    }
+    
+    function drawParticles() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "rgba(0,107,64,0.6)";
+        particles.forEach(p => {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            ctx.fill();
+            p.x += p.dx;
+            p.y += p.dy;
+            if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
+            if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+        });
+        requestAnimationFrame(drawParticles);
+    }
+    
+    initParticles();
+    drawParticles();
+}
+
+// Initialize particles when DOM is ready
+document.addEventListener('DOMContentLoaded', initParticleCanvas);
+</script>
+
+<!-- Floating Data Nodes -->
+<div class="floating-nodes">
+<div class="data-node"></div>
+<div class="data-node"></div>
+<div class="data-node"></div>
+<div class="data-node"></div>
+</div>
+
+<!-- Header Navigation -->
+<header class="header" role="banner">
+<nav aria-label="Main navigation" class="nav-container" role="navigation">
+<div class="logo">
+<img alt="Kyle Mohney Professional Photo" class="profile-logo" height="52" src="assets/kyle.png" width="52"/>
+<span class="logo-text">Kyle Mohney</span>
+</div>
+<ul class="nav-menu">
+<li><a href="index.html">Home</a></li>
+<li><a href="resume.html">Resume</a></li>
+<li><a aria-current="page" class="current" href="about.html">About</a></li>
+<li><a href="projects.html">Projects</a></li>
+<li><a href="articles.html">Articles</a></li>
+<li><a href="contact.html">Contact</a></li>
+</ul>
+</nav>
+</header>
+
+<!-- Hero Section -->
+<section class="hero-section" style="background-color: #1e3a8a; position: relative; overflow: hidden; padding: 4rem 2rem;">
+<!-- Floating Data Nodes -->
+<div class="floating-nodes">
+<div class="data-node"></div>
+<div class="data-node"></div>
+<div class="data-node"></div>
+<div class="data-node"></div>
+</div>
+<!-- Circuitry overlay -->
+<div style="position:absolute; top:0; left:0; width:100%; height:100%; background-image:
+        linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+        background-size:40px 40px; z-index:0;"></div>
+<div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; position:relative; z-index:1; max-width:1200px; margin:0 auto;">
+<div style="flex:1; min-width:280px; color:#fff; padding-right:2rem;">
+<h1 style="font-size:2.5rem; margin-bottom:1rem;">About Me</h1>
+<p style="font-size:1.125rem; line-height:1.6;">
+                From the small town of Columbiana to the forefront of AI-powered innovation, I've built a career on mastery, precision, and relentless dedication.
+                This is my story — where tradition meets technology, and passion fuels progress.
+            </p>
+</div>
+<div style="flex:1; min-width:280px; text-align:center;">
+<img alt="About Me" src="assets/about.png" style="max-width:100%; height:auto; border-radius:8px; box-shadow:0 0 25px rgba(37, 99, 235, 0.8);">
+</img></div>
+</div>
+</section>
+
+<!-- Content -->
+<div class="resume-content">
+<main class="main-content">
+<article class="about-me-article">
+
+<!-- Section 1: Introduction -->
+<section class="about-section">
+<h1>About Kyle Mohney</h1>
+<p>
+    Born and raised in the small town of Columbiana, Ohio, I carry with me the values of hard work, integrity, and community that defined my upbringing in a close-knit, middle-class family. 
+    Those early lessons are the compass by which I navigate life — as a devoted husband, proud father, and dedicated professional.
+</p>
+</section>
+
+<!-- Section 2: Family -->
+<section class="about-section">
+<h2>Family First</h2>
+<p>
+    At the heart of everything I do is my family — my remarkable wife, our curious and spirited 4-year-old son, and our bright, joyful 1-year-old daughter. 
+    They are my greatest pride, my truest inspiration, and the reason I strive for excellence in every endeavor.
+</p>
+</section>
+
+<!-- Section 3: Professional Journey -->
+<section class="about-section">
+<h2>A Professional Journey with Purpose</h2>
+<p>
+    My most recent chapter was at Thumbtack, where I found not just a job, but a mission. I thrived in building systems that empowered teams, improved processes, and created clarity for customers. 
+    I loved the work, cherished the people, and took pride in the impact we made together. The closure of my department was not a reflection of our success, but a change in company direction — an ending beyond my control, yet one that leaves me deeply proud of all we accomplished.
+</p>
+</section>
+
+<!-- Quick Facts Section (integrated into main content) -->
+<section class="quick-facts-section">
+<h2>Quick Professional Facts</h2>
+<p class="quick-facts-intro">
+    "So tell me, what are some key things that define your professional approach?"
+</p>
+<div class="quick-facts-grid">
+    <div class="quick-fact-card">
+        <div class="quick-fact-label">Sprout Social Expertise</div>
+        <div class="quick-fact-value">Enterprise review & sentiment workflows that saved Thumbtack's App Store presence</div>
+    </div>
+    <div class="quick-fact-card">
+        <div class="quick-fact-label">AI Toolkit Mastery</div>
+        <div class="quick-fact-value">100+ specialized tools organized by use case for maximum efficiency</div>
+    </div>
+    <div class="quick-fact-card">
+        <div class="quick-fact-label">Operations Superpowers</div>
+        <div class="quick-fact-value">BigQuery automation, Python scripting, and governance frameworks</div>
+    </div>
+    <div class="quick-fact-card">
+        <div class="quick-fact-label">Cross-Functional Leadership</div>
+        <div class="quick-fact-value">Support × Product × Operations alignment across 100+ team members</div>
+    </div>
+    <div class="quick-fact-card">
+        <div class="quick-fact-label">Crisis Resolution Expert</div>
+        <div class="quick-fact-value">Ensured App Store compliance by implementing systematic review response workflow for 2,000+ reviews</div>
+    </div>
+    <div class="quick-fact-card">
+        <div class="quick-fact-label">Process Innovation</div>
+        <div class="quick-fact-value">Reduced refund research time and review tabulation time by 90% using BigQuery automation</div>
+    </div>
+</div>
+</section>
+
+<!-- Section 4: HEMA Passion -->
+<section class="hema-section">
+<div class="hema-text">
+<h2>Passions Beyond the Office</h2>
+<p>
+    I am a dedicated Historical European Martial Arts (HEMA) instructor, preserving centuries-old martial traditions while making them accessible and engaging for modern students. 
+    In the salle, I teach discipline, history, and skill — lessons as relevant in life as they are on the fencing floor.
+</p>
+<p>
+    A trophy-winning rapier fencer, I also teach and coach in broadsword, longsword, messer, side-sword, saber, dagger, and melee weapon grappling — each with its own history, techniques, and tactical philosophy.
+</p>
+<p>
+    Music has been another lifelong pursuit. I have lived and performed in Nashville, collaborated with renowned musicians, and once shared intimate acoustic performances with my wife before our children were born — moments that taught me the art of connection through creativity.
+</p>
+</div>
+<div class="hema-image">
+<img alt="HEMA sword training" src="assets/sword.png"/>
+</div>
+</section>
+
+<!-- Section 5: AI Innovation -->
+<section class="about-section">
+<h2>The Frontier of AI-Powered Creation</h2>
+<p>
+    In recent years, I have embraced a new passion: harnessing the potential of artificial intelligence to expand what is possible in creative and operational work. 
+<!-- Section 5: AI Innovation -->
+<section class="about-section">
+<h2>The Frontier of AI-Powered Creation</h2>
+<p>
+    In recent years, I have embraced a new passion: harnessing the potential of artificial intelligence to expand what is possible in creative and operational work. 
+    From building immersive, JavaScript-driven video games with responsive AI-driven characters, to designing intelligent knowledge systems that adapt in real time, to crafting dynamic, AI-assisted content strategies — my work at the intersection of technology and creativity has been some of the most rewarding of my career.
+</p>
+<p>
+    These projects are more than technical exercises; they are explorations of how human ingenuity and machine intelligence can work in concert to build experiences that are richer, more personal, and more impactful than ever before.
+</p>
+</section>
+
+<!-- Section 6: What Drives Me -->
+<section class="about-section">
+<h2>What Drives Me</h2>
+<p>
+    Whether in the boardroom, the classroom, the studio, or the code editor, I am guided by a singular belief: that excellence is not an act, but a habit — forged through dedication, sharpened by curiosity, and sustained by a commitment to those we serve. 
+    My story is still being written, and I approach each chapter with the same determination that has carried me from small-town beginnings to the forefront of AI-powered innovation.
+</p>
+</section>
+
+</article>
+
+<!-- Recruiter FAQ Section -->
+<section class="recruiter-faq">
+<h2>Recruiter FAQ</h2>
+
+<div class="faq-item">
+<h3 class="faq-question">Q: Tell me about a time you solved a difficult problem under pressure.</h3>
+<p class="faq-answer">At Thumbtack, my primary role was handling escalations and documentation. But when the platform faced compliance concerns due to outstanding unresolved negative reviews, leadership turned to me — the company's go-to cross-department problem-solver — even though no system for this existed.
+I partnered with our legal team to draft a library of approved templates covering a range of issues. I then onboarded Thumbtack to Sprout Social, where I built a custom system of tags and sorting to auto-filter reviews and produce accurate sentiment and root cause reporting.
+Using Sprout's tools, I generated monthly sentiment reports and used them to match the right template to each review. The result? I cleared the entire backlog by responding to over 2000 reviews, reversed the negative trend, and left behind a scalable framework that an entire team could adopt for ongoing maintenance.</p>
+</div>
+
+<div class="faq-item">
+<h3 class="faq-question">Q: What's a project you're proud of?</h3>
+<p class="faq-answer">Building an AI-assisted public review workflow that saved Thumbtack's App Store presence. By integrating sentiment tagging with operational scripts, we responded to over 2,000 reviews in record time and reversed a negative trend that threatened our mobile ranking.</p>
+</div>
+
+<div class="faq-item">
+<h3 class="faq-question">Q: How do you approach integrating AI into your work?</h3>
+<p class="faq-answer">I treat AI as a force multiplier — a way to amplify human judgment and creativity. My goal isn't to replace people, but to give them sharper tools and faster feedback so they can focus on high-value work.</p>
+</div>
+
+<div class="faq-item">
+<h3 class="faq-question">Q: How do you keep your skills sharp?</h3>
+<p class="faq-answer">I split my time between hands-on technical projects and disciplines that sharpen focus and timing, like Historical European Martial Arts. On the tech side, I build AI-powered tools, refine game engines, and experiment with workflow automation. On the physical side, I train with sword and grappling to keep my mind sharp and adaptive.</p>
+</div>
+
+<div class="faq-item">
+<h3 class="faq-question">Q: Tell me something unique about you.</h3>
+<p class="faq-answer">I'm a trophy-winning rapier fencer and lifelong musician. I've played in Nashville, collaborated with major artists, and even performed acoustic sets with my wife. Those experiences taught me rhythm, connection, and how to engage an audience — skills I bring to my professional work as well.</p>
+</div>
+
+</section>
+
+</main>
+</div>
+
+<!-- Professional Footer (matching resume.html) -->
+<footer class="resume-footer">
+"The way to get started is to quit talking and begin doing." — Walt Disney
+</footer>
+
+<!-- JavaScript (animation controller) -->
+<script>
+class ResumeAnimationController {
+    constructor() { 
+        this.observers = []; 
+        this.init(); 
+    }
+    
+    init() {
+        this.setupIntersectionObservers();
+        this.setupMouseTracking();
+        this.setupScrollEffects();
+        this.initializeAnimations();
+    }
+    
+    setupIntersectionObservers() {
+        const options = { threshold: 0.1, rootMargin: '0px 0px -10% 0px' };
+        
+        const metricObserver = new IntersectionObserver((entries) => { 
+            entries.forEach(entry => { 
+                if (entry.isIntersecting) { 
+                    entry.target.classList.add('animate'); 
+                    this.animateCounter(entry.target); 
+                }
+            }) 
+        }, options);
+        
+        document.querySelectorAll('.metric-number').forEach(el => metricObserver.observe(el));
+        
+        const skillObserver = new IntersectionObserver((entries) => { 
+            entries.forEach(entry => { 
+                if (entry.isIntersecting) { 
+                    entry.target.classList.add('animate'); 
+                } 
+            }) 
+        }, options);
+        
+        document.querySelectorAll('.tech-category').forEach(el => skillObserver.observe(el));
+        this.observers.push(metricObserver, skillObserver);
+    }
+    
+    animateCounter(element) { 
+        const text = element.textContent;
+        const isPercentage = text.includes('%');
+        const isRange = text.includes('→');
+        const isDollar = text.includes(');
+        
+        if (isPercentage) { 
+            const number = parseInt(text); 
+            this.countUp(element, 0, number, 2000, '%');
+        } else if (isRange || isDollar) {
+            element.style.animation = 'countUp 1.5s ease-out forwards';
+        } else if (!isNaN(parseInt(text))) {
+            const number = parseInt(text); 
+            this.countUp(element, 0, number, 1500, '+');
+        }
+    }
+    
+    countUp(element, start, end, duration, suffix='') { 
+        const range = end - start; 
+        const stepTime = Math.abs(Math.floor(duration / (range || 1)));
+        const timer = setInterval(() => { 
+            start += Math.ceil(range / 50);
+            if (start >= end) { 
+                start = end; 
+                clearInterval(timer); 
+            }
+            element.textContent = start + suffix;
+        }, stepTime || 16);
+    }
+    
+    setupMouseTracking() {
+        const cards = document.querySelectorAll('.faq-item, .quick-fact-card');
+        cards.forEach(card => { 
+            card.addEventListener('mouseenter', () => card.classList.add('magnetic'));
+            card.addEventListener('mouseleave', () => { 
+                card.classList.remove('magnetic'); 
+                card.style.transform = ''; 
+            });
+            card.addEventListener('mousemove', (e) => { 
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left; 
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2; 
+                const centerY = rect.height / 2;
+                const rotateX = (y - centerY) / 10; 
+                const rotateY = (centerX - x) / 10;
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(20px)`;
+            });
+        });
+    }
+    
+    setupScrollEffects() {
+        let scrollTimeout;
+        window.addEventListener('scroll', () => { 
+            const scrollY = window.scrollY;
+            const resumeContent = document.querySelector('.resume-content');
+            if (scrollY > 100) { 
+                resumeContent?.classList.add('scrolled'); 
+            } else { 
+                resumeContent?.classList.remove('scrolled'); 
+            }
+            
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => { 
+                document.querySelectorAll('.quick-fact-card').forEach((card, index) => {
+                    setTimeout(() => { 
+                        card.classList.add('float');
+                        setTimeout(() => card.classList.remove('float'), 800);
+                    }, index * 200);
+                });
+            }, 150);
+        });
+    }
+    
+    initializeAnimations() { 
+        const elements = document.querySelectorAll('.faq-item, .about-section, .quick-fact-card');
+        elements.forEach((el, index) => { 
+            el.style.opacity = '0'; 
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+            setTimeout(() => { 
+                el.style.opacity = '1'; 
+                el.style.transform = 'translateY(0)'; 
+            }, index * 200 + 500);
+        });
+    }
+    
+    destroy() { 
+        this.observers.forEach(observer => observer.disconnect()); 
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => new ResumeAnimationController());
+</script>
+
+</body>
+</html>

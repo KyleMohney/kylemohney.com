@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kyle J. Mohney - Articles | Product Documentation & Knowledge Operations</title>
+    <meta name="description" content="Articles and insights from Kyle Mohney on AI automation, documentation strategy, Sprout Social implementations, and knowledge operations best practices.">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Use will-change for animated elements */
+        .floating-nodes,
+        .data-node,
+        .circuit-connector,
+        .signal-line,
+        .signal-vertical {
+            will-change: transform, opacity;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: #2d3748;
+            background: #f8faf9;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Enhanced background glow */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 15% 25%, rgba(152, 229, 142, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 85% 75%, rgba(0, 107, 64, 0.06) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, rgba(152, 229, 142, 0.03) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: -2;
+            animation: backgroundPulse 8s ease-in-out infinite;
+        }
+
+        @keyframes backgroundPulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        /* Enhanced Circuit Animation with dynamic flowing lines like index.html */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(90deg, rgba(152, 229, 142, 0.1) 2px, transparent 2px),
+                linear-gradient(0deg, rgba(152, 229, 142, 0.1) 2px, transparent 2px),
+                linear-gradient(45deg, rgba(152, 229, 142, 0.06) 1px, transparent 1px),
+                linear-gradient(-45deg, rgba(152, 229, 142, 0.06) 1px, transparent 1px);
+            background-size: 60px 60px, 60px 60px, 30px 30px, 30px 30px;
+            animation: circuitPulse 6s ease-in-out infinite;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.8;
+        }
+
+        @keyframes circuitPulse {
+            0%, 100% { opacity: 0.2; transform: scale(1); }
+            25% { opacity: 0.4; transform: scale(1.02); }
+            50% { opacity: 0.3; transform: scale(1); }
+            75% { opacity: 0.35; transform: scale(0.98); }
+        }
+
+        /* Dynamic Signal Lines System - matching index.html exactly */
+        .signal-lines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        .signal-line {
+            position: absolute;
+            height: 3px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(152, 229, 142, 0.8) 20%, 
+                #98e58e 50%, 
+                rgba(152, 229, 142, 0.8) 80%, 
+                transparent 100%);
+            border-radius: 2px;
+            animation: signalFlow 4s linear infinite;
+            box-shadow: 0 0 10px rgba(152, 229, 142, 0.5);
+        }
+
+        .signal-line:nth-child(1) { 
+            top: 20%; left: 0; width: 100%; 
+            animation-delay: 0s; 
+            transform: rotate(0deg);
+        }
+        .signal-line:nth-child(2) { 
+            top: 50%; left: 0; width: 100%; 
+            animation-delay: 1.5s; 
+            transform: rotate(0deg);
+        }
+        .signal-line:nth-child(3) { 
+            top: 75%; left: 0; width: 100%; 
+            animation-delay: 3s; 
+            transform: rotate(0deg);
+        }
+
+        /* Vertical signal lines */
+        .signal-vertical {
+            position: absolute;
+            width: 3px;
+            background: linear-gradient(0deg, 
+                transparent 0%, 
+                rgba(152, 229, 142, 0.6) 20%, 
+                #98e58e 50%, 
+                rgba(152, 229, 142, 0.6) 80%, 
+                transparent 100%);
+            border-radius: 2px;
+            animation: signalFlowVertical 5s linear infinite;
+            box-shadow: 0 0 8px rgba(152, 229, 142, 0.4);
+        }
+
+        .signal-vertical:nth-child(4) { 
+            left: 25%; top: 0; height: 100%; 
+            animation-delay: 0.5s; 
+        }
+        .signal-vertical:nth-child(5) { 
+            left: 60%; top: 0; height: 100%; 
+            animation-delay: 2s; 
+        }
+        .signal-vertical:nth-child(6) { 
+            left: 85%; top: 0; height: 100%; 
+            animation-delay: 3.5s; 
+        }
+
+        @keyframes signalFlow {
+            0% { transform: translateX(-100%) scaleX(0); opacity: 0; }
+            20% { transform: translateX(-50%) scaleX(1); opacity: 1; }
+            80% { transform: translateX(50%) scaleX(1); opacity: 1; }
+            100% { transform: translateX(100%) scaleX(0); opacity: 0; }
+        }
+
+        @keyframes signalFlowVertical {
+            0% { transform: translateY(-100%) scaleY(0); opacity: 0; }
+            20% { transform: translateY(-50%) scaleY(1); opacity: 1; }
+            80% { transform: translateY(50%) scaleY(1); opacity: 1; }
+            100% { transform: translateY(100%) scaleY(0); opacity: 0; }
+        }
+
+        .tech-connectors {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .circuit-connector {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, rgba(152, 229, 142, 0.6), transparent);
+            height: 2px;
+            animation: pulseData 4s ease-in-out infinite;
+        }
+
+        .circuit-connector:nth-child(1) { top: 25%; left: 0; width: 100%; animation-delay: 0s; }
+        .circuit-connector:nth-child(2) { top: 50%; left: 0; width: 100%; animation-delay: 1s; }
+        .circuit-connector:nth-child(3) { top: 75%; left: 0; width: 100%; animation-delay: 2s; }
+
+        .circuit-connector.vertical {
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(0deg, transparent, rgba(152, 229, 142, 0.6), transparent);
+        }
+
+        .circuit-connector.vertical:nth-child(4) { left: 20%; top: 0; animation-delay: 0.5s; }
+        .circuit-connector.vertical:nth-child(5) { left: 50%; top: 0; animation-delay: 1.5s; }
+        .circuit-connector.vertical:nth-child(6) { left: 80%; top: 0; animation-delay: 2.5s; }
+
+        @keyframes pulseData {
+            0%, 100% { opacity: 0.2; transform: scaleX(1); }
+            50% { opacity: 0.8; transform: scaleX(1.05); }
+        }
+
+        /* Enhanced Floating Data Nodes - More particles for high-tech look */
+        .floating-nodes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .data-node {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: radial-gradient(circle, rgba(152, 229, 142, 0.9) 0%, rgba(0, 107, 64, 0.6) 100%);
+            border-radius: 50%;
+            animation: nodeFloat 15s ease-in-out infinite;
+            box-shadow: 
+                0 0 20px rgba(152, 229, 142, 0.4),
+                0 0 40px rgba(152, 229, 142, 0.2);
+            opacity: 0.8;
+        }
+
+        /* Add 12 data nodes for more high-tech appearance */
+        .data-node:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+        .data-node:nth-child(2) { top: 60%; left: 85%; animation-delay: 2s; }
+        .data-node:nth-child(3) { top: 80%; left: 25%; animation-delay: 4s; }
+        .data-node:nth-child(4) { top: 30%; left: 70%; animation-delay: 6s; }
+        .data-node:nth-child(5) { top: 15%; left: 45%; animation-delay: 8s; }
+        .data-node:nth-child(6) { top: 75%; left: 60%; animation-delay: 10s; }
+        .data-node:nth-child(7) { top: 40%; left: 15%; animation-delay: 12s; }
+        .data-node:nth-child(8) { top: 65%; left: 90%; animation-delay: 14s; }
+        .data-node:nth-child(9) { top: 5%; left: 75%; animation-delay: 1s; }
+        .data-node:nth-child(10) { top: 90%; left: 35%; animation-delay: 3s; }
+        .data-node:nth-child(11) { top: 45%; left: 95%; animation-delay: 5s; }
+        .data-node:nth-child(12) { top: 85%; left: 5%; animation-delay: 7s; }
+
+        @keyframes nodeFloat {
+            0%, 100% { 
+                transform: translate3d(0, 0, 0) scale(1); 
+                opacity: 0.6;
+                box-shadow: 0 0 20px rgba(152, 229, 142, 0.4);
+            }
+            25% { 
+                transform: translate3d(30px, -40px, 0) scale(1.3); 
+                opacity: 1;
+                box-shadow: 0 0 30px rgba(152, 229, 142, 0.6);
+            }
+            50% { 
+                transform: translate3d(-20px, 30px, 0) scale(0.8); 
+                opacity: 0.8;
+                box-shadow: 0 0 25px rgba(152, 229, 142, 0.5);
+            }
+            75% { 
+                transform: translate3d(40px, 15px, 0) scale(1.2); 
+                opacity: 0.9;
+                box-shadow: 0 0 35px rgba(152, 229, 142, 0.7);
+            }
+        }
+
+        /* Header Navigation */
+        .header {
+            padding: 24px 0;
+            position: sticky;
+            top: 0;
+            background: rgba(248, 250, 249, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(152, 229, 142, 0.1);
+            box-shadow: 0 2px 20px rgba(0, 107, 64, 0.05);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .profile-logo {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            border: 2px solid #98e58e;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            object-fit: cover;
+        }
+
+        .logo-text {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 40px;
+        }
+
+        .nav-menu a {
+            color: #2d3748;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1em;
+            padding: 12px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-menu a:hover {
+            color: #006b40;
+            background: rgba(152, 229, 142, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .nav-menu a.current {
+            color: #006b40 !important;
+            background: rgba(152, 229, 142, 0.15) !important;
+            box-shadow: 0 4px 12px rgba(152, 229, 142, 0.2) !important;
+        }
+
+        /* Articles Hero Section */
+        .articles-hero {
+            background: linear-gradient(135deg, #0a1528 0%, #1a2e45 25%, #0f1f35 50%, #162b42 75%, #0a1528 100%);
+            padding: 100px 0;
+            position: relative;
+            margin-bottom: 60px;
+            overflow: hidden;
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .articles-title {
+            font-size: 4.5em;
+            font-weight: 800;
+            margin-bottom: 16px;
+            color: white;
+            line-height: 1.1;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .articles-subtitle {
+            font-size: 1.8em;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 32px;
+            font-weight: 400;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Main Content Area */
+        .articles-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 80px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .coming-soon-section {
+            text-align: center;
+            padding: 100px 0;
+        }
+
+        .coming-soon-card {
+            background: rgba(255, 255, 255, 0.45);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 80px 48px;
+            box-shadow: 0 20px 60px rgba(0, 107, 64, 0.08);
+            border: 1px solid rgba(152, 229, 142, 0.3);
+            position: relative;
+            overflow: hidden;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .coming-soon-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #006b40, #98e58e);
+        }
+
+        .coming-soon-icon {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #006b40, #98e58e);
+            border-radius: 50%;
+            margin: 0 auto 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            color: white;
+            box-shadow: 0 20px 60px rgba(0, 107, 64, 0.2);
+            animation: iconPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes iconPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .coming-soon-title {
+            font-size: 3.2em;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 32px;
+        }
+
+        .coming-soon-description {
+            font-size: 1.4em;
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 48px;
+        }
+
+        .preview-topics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+
+        .topic-card {
+            background: linear-gradient(135deg, rgba(248, 251, 248, 0.5) 0%, rgba(235, 249, 235, 0.5) 100%);
+            backdrop-filter: blur(8px);
+            border: 2px solid rgba(152, 229, 142, 0.4);
+            padding: 32px;
+            border-radius: 16px;
+            text-align: left;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .topic-card:hover {
+            transform: translateY(-4px);
+            background: linear-gradient(135deg, rgba(240, 249, 240, 0.6) 0%, rgba(232, 245, 232, 0.6) 100%);
+            box-shadow: 0 15px 40px rgba(0, 107, 64, 0.15);
+        }
+
+        .topic-card[onclick] {
+            cursor: pointer;
+        }
+
+        .topic-card[onclick]:hover {
+            transform: translateY(-6px) scale(1.02);
+            border-color: #006b40;
+            box-shadow: 0 20px 50px rgba(0, 107, 64, 0.2);
+        }
+
+        .topic-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #006b40, #98e58e);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            color: white;
+        }
+
+        .topic-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #006b40;
+            margin-bottom: 12px;
+        }
+
+        .topic-description {
+            color: #4a5568;
+            line-height: 1.5;
+        }
+
+        .newsletter-signup {
+            background: linear-gradient(135deg, #006b40, #98e58e);
+            color: white;
+            padding: 48px;
+            border-radius: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .newsletter-title {
+            font-size: 2.2em;
+            font-weight: 700;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .newsletter-description {
+            font-size: 1.2em;
+            margin-bottom: 32px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .newsletter-form {
+            display: flex;
+            gap: 16px;
+            max-width: 500px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .newsletter-input {
+            flex: 1;
+            padding: 16px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            background: rgba(255, 255, 255, 0.9);
+            color: #2d3748;
+        }
+
+        .newsletter-button {
+            background: white;
+            color: #006b40;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .newsletter-button:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-2px);
+        }
+
+        /* Footer Particle Background */
+        #particles-js-footer {
+          position: absolute;
+          width: 100%;
+          height: 200px;
+          bottom: 0;
+          left: 0;
+          z-index: 0;
+          pointer-events: none;
+        }
+        .footer-container {
+          position: relative;
+          z-index: 1;
+        }
+
+        /* Sticky footer styles */
+        html, body { 
+          height: 100%; 
+          min-height: 100vh; 
+        }
+        body { 
+          display: flex; 
+          flex-direction: column; 
+          min-height: 100vh; 
+        }
+        .sticky-footer { 
+          margin-top: auto !important; 
+          font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+          z-index: 10;
+          position: relative;
+          width: 100vw; /* Force viewport width */
+          padding: 40px 0 24px 0;
+          text-align: center;
+          background: linear-gradient(90deg, #003b2f, #001c44);
+          color: white;
+          font-style: italic;
+        }
+        /* Responsive */
+        @media (max-width: 768px) {
+            .articles-title {
+                font-size: 3em;
+            }
+
+            .nav-menu {
+                display: none;
+            }
+
+            .coming-soon-card {
+                padding: 48px 24px;
+            }
+
+            .coming-soon-title {
+                font-size: 2.2em;
+            }
+
+            .preview-topics {
+                grid-template-columns: 1fr;
+            }
+
+            .newsletter-form {
+                flex-direction: column;
+            }
+
+            .newsletter-input,
+            .newsletter-button {
+                width: 100%;
+            }
+        }
+
+        html, body {
+          height: 100%;
+          margin: 0;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .content-wrapper {
+          flex: 1;
+        }
+
+        footer {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          padding: 20px;
+          text-align: center;
+          background: linear-gradient(90deg, #003b2f, #001c44);
+          color: white;
+          font-style: italic;
+          z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <!-- Dynamic Signal Lines System -->
+    <div class="signal-lines">
+        <div class="signal-line"></div>
+        <div class="signal-line"></div>
+        <div class="signal-line"></div>
+        <div class="signal-vertical"></div>
+        <div class="signal-vertical"></div>
+        <div class="signal-vertical"></div>
+    </div>
+
+    <!-- Tech Connectors -->
+    <div class="tech-connectors">
+        <div class="circuit-connector"></div>
+        <div class="circuit-connector"></div>
+        <div class="circuit-connector"></div>
+        <div class="circuit-connector vertical"></div>
+        <div class="circuit-connector vertical"></div>
+        <div class="circuit-connector vertical"></div>
+    </div>
+
+    <!-- Enhanced Floating Data Nodes -->
+    <div class="floating-nodes">
+        <div class="data-node"></div>
+        <div class="data-node"></div>
+        <div class="data-node"></div>
+        <div class="data-node"></div>
+        <div class="data-node"></div>
+        <div class="data-node"></div>
+        <div class="data-node"></div>
+        <div class="data-node"></div>
+        <div class="data-node"></div>
+        <div class="data-node"></div>
+        <div class="data-node"></div>
+        <div class="data-node"></div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="header" role="banner">
+        <nav class="nav-container" role="navigation" aria-label="Main navigation">
+            <div class="logo">
+                <img src="assets/kyle.png" alt="Kyle Mohney Professional Photo" class="profile-logo" width="52" height="52">
+                <span class="logo-text">Kyle Mohney</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="resume.html">Resume</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="projects.html">Projects</a></li>
+                <li><a href="articles.html" class="current" aria-current="page">Articles</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Articles Hero Section -->
+    <section class="articles-hero">
+        <div class="hero-container">
+            <h1 class="articles-title">Articles & Insights</h1>
+            <p class="articles-subtitle">Deep dives into AI automation, documentation strategy, and the future of knowledge operations</p>
+        </div>
+    </section>
+
+    <!-- Main Content Wrapper -->
+    <div class="content-wrapper" style="max-width: 1200px; margin: 0 auto;">
+        <!-- Main Articles Content -->
+        <div class="articles-content">
+            <section class="coming-soon-section">
+                <div class="coming-soon-card">
+                    <div class="coming-soon-icon">
+                        <img src="assets/documentation-icon.png" alt="Documentation" style="width: 80px; height: 80px; object-fit: contain; filter: brightness(0) invert(1);" />
+                    </div>
+                    <h2 class="coming-soon-title">Articles & Blogs</h2>
+                    <p class="coming-soon-description">Deep dives into AI-powered documentation, enterprise Sprout Social implementations, and knowledge operations that deliver measurable results.</p>
+                    
+                    <div class="preview-topics">
+                        <div class="topic-card" style="cursor: pointer;" onclick="window.location.href='assets/article-assets/sprout-social-review-strategy.html'">
+                            <div class="topic-icon">
+                                <img src="assets/sprout_logo.png" alt="Sprout Social" style="width: 28px; height: 28px; object-fit: contain;" />
+                            </div>
+                            <h3 class="topic-title">Sprout Social Enterprise Mastery</h3>
+                            <p class="topic-description">How I prevented App Store delisting through strategic social media management and systematic review response workflows.</p>
+                            <div style="margin-top: 16px;">
+                                <span style="background: linear-gradient(135deg, #006b40, #98e58e); color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.85em; font-weight: 600;">READ NOW →</span>
+                            </div>
+                        </div>
+                        
+                        <div class="topic-card" style="cursor: pointer;" onclick="window.location.href='assets/article-assets/ai-customer-support-revolution.html'">
+                            <div class="topic-icon">
+                                <img src="assets/ai.png" alt="AI" style="width: 32px; height: 32px; object-fit: contain; filter: brightness(0) invert(1);" />
+                            </div>
+                            <h3 class="topic-title">AI-Enhanced Customer Support</h3>
+                            <p class="topic-description">How strategic AI integration transforms support operations, achieving 30% faster resolution times and scalable excellence.</p>
+                            <div style="margin-top: 16px;">
+                                <span style="background: linear-gradient(135deg, #4338ca, #8b5cf6); color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.85em; font-weight: 600;">READ NOW →</span>
+                            </div>
+                        </div>
+                        
+    <div class="topic-card" style="cursor: pointer;" onclick="window.location.href='assets/article-assets/automated-job-search-bot.html'">
+        <div class="topic-icon">
+            <img src="assets/escalation-timer-icon.png" alt="Automated Job Search Bot" style="width: 32px; height: 32px; object-fit: contain; filter: brightness(0) invert(1);" />
+        </div>
+        <h3 class="topic-title">Automated Job Search Bot</h3>
+        <p class="topic-description">How I built my first AI-powered job search bot in under 8 hours — no coding required, using advanced AI prompting and automation.</p>
+        <div style="margin-top: 16px;">
+            <!-- THIS IS THE PILL -->
+            <span style="background: linear-gradient(135deg, #1f3b8a, #3f5eb8, #1e3a8a); color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.85em; font-weight: 600;">READ NOW →</span>
+        </div>
+    </div>
+                        
+    <div class="topic-card" style="cursor: pointer;" onclick="window.location.href='assets/article-assets/from-layoff-to-liftoff.html'">
+        <div class="topic-icon">
+            <img src="assets/key-achievements-icon.png" alt="From Layoff to Liftoff" style="width: 32px; height: 32px; object-fit: contain; filter: brightness(0) invert(1);" />
+        </div>
+        <h3 class="topic-title">From Layoff to Liftoff</h3>
+        <p class="topic-description">My first 30 days after a layoff—shipping AI projects, earning certifications, and building momentum with modern tech.</p>
+        <div style="margin-top: 16px;">
+            <span style="background: linear-gradient(135deg, #d4a017, #b8860b); color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.85em; font-weight: 600;">READ NOW →</span>
+        </div>
+    </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Sticky Footer -->
+    <footer>"Vision without action is hallucination." – Thomas Edison</footer>
+
+
+    <script>
+        // Newsletter form functionality
+        document.getElementById('newsletterForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = this.querySelector('.newsletter-input').value;
+            
+            if (email) {
+                // Create mailto link for now - you can integrate with a real newsletter service later
+                const subject = encodeURIComponent('Article Notifications - Kyle Mohney');
+                const body = encodeURIComponent(`Please add ${email} to the articles notification list.`);
+                window.location.href = `mailto:Kyle.Mohney@hotmail.com?subject=${subject}&body=${body}`;
+                
+                // Show confirmation
+                alert('Thank you! I\'ll notify you when new articles are published.');
+                this.reset();
+            }
+        });
+
+        // Loading animation for topic cards
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.topic-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'all 0.6s ease';
+                
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 200 + 500);
+            });
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Error handling for images
+        document.querySelectorAll('img').forEach(img => {
+            img.addEventListener('error', function() {
+                console.warn('Image failed to load:', this.src);
+            });
+        });
+    </script>
+</body>
+</html>

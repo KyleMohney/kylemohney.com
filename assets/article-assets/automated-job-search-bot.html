@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How I Built My First Automated Job Search Bot in Under 8 Hours — No Coding Knowledge Required, Powered by Advanced AI Prompting | Kyle J. Mohney</title>
+    <meta name="description" content="A story-driven walkthrough of how I built a fully automated job search bot in under 8 hours using AI prompting, public data, and smart scheduling—no traditional coding required.">
+    <meta name="author" content="Kyle J. Mohney">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.7;
+            color: #2d3748;
+            background: #f8faf9;
+            min-height: 100vh;
+        }
+
+        /* Subtle Sprout-style background with darker mood */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(circle at 15% 25%, rgba(0, 107, 64, 0.10) 0%, transparent 50%),
+                radial-gradient(circle at 85% 75%, rgba(0, 28, 68, 0.10) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, rgba(0, 167, 86, 0.05) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: -2;
+            animation: backgroundPulse 8s ease-in-out infinite;
+        }
+
+        @keyframes backgroundPulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        /* Particle/circuit lines */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(90deg, rgba(152, 229, 142, 0.10) 2px, transparent 2px),
+                linear-gradient(0deg, rgba(152, 229, 142, 0.10) 2px, transparent 2px),
+                linear-gradient(45deg, rgba(0, 182, 91, 0.06) 1px, transparent 1px),
+                linear-gradient(-45deg, rgba(0, 28, 68, 0.06) 1px, transparent 1px);
+            background-size: 60px 60px, 60px 60px, 30px 30px, 30px 30px;
+            animation: circuitPulse 10s ease-in-out infinite;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        @keyframes circuitPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        /* -----------------------
+           HEADER (IDENTICAL)
+           ----------------------- */
+        .header {
+            padding: 24px 0;
+            position: sticky;
+            top: 0;
+            background: rgba(248, 250, 249, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(152, 229, 142, 0.1);
+            box-shadow: 0 2px 20px rgba(0, 107, 64, 0.05);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .profile-logo {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            border: 2px solid #98e58e;
+            object-fit: cover;
+        }
+
+        .logo-text {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 40px;
+        }
+
+        .nav-menu a {
+            color: #2d3748;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1em;
+            padding: 12px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-menu a:hover {
+            color: #006b40;
+            background: rgba(152, 229, 142, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .nav-menu a.current {
+            color: #006b40;
+            background: rgba(152, 229, 142, 0.15);
+            box-shadow: 0 4px 12px rgba(152, 229, 142, 0.2);
+        }
+
+        /* Article Hero (darker mood, same palette) */
+        .article-hero {
+            background: linear-gradient(135deg,
+                #0a1528 0%,
+                #1a2e45 25%,
+                #0f1f35 50%,
+                #162b42 75%,
+                #0a1528 100%);
+            padding: 120px 0 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .article-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(152, 229, 142, 0.20) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(98, 229, 142, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 50% 20%, rgba(0, 182, 91, 0.18) 0%, transparent 60%);
+            z-index: 0;
+            animation: holographicHeroShimmer 10s ease-in-out infinite;
+        }
+
+        .article-hero::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(90deg, rgba(152, 229, 142, 0.10) 2px, transparent 2px),
+                linear-gradient(0deg, rgba(98, 229, 142, 0.08) 2px, transparent 2px),
+                linear-gradient(45deg, rgba(0, 182, 91, 0.06) 1px, transparent 1px);
+            background-size: 100px 100px, 100px 100px, 50px 50px;
+            animation: holographicGrid 12s linear infinite;
+            z-index: 0;
+            opacity: 0.4;
+        }
+
+        @keyframes holographicHeroShimmer {
+            0%, 100% { opacity: 1; filter: brightness(1); }
+            50% { opacity: 0.9; filter: brightness(1.05); }
+        }
+
+        @keyframes holographicGrid {
+            0% { transform: translateX(0) translateY(0); }
+            100% { transform: translateX(50px) translateY(50px); }
+        }
+
+        .hero-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .article-category {
+            display: inline-block;
+            background: linear-gradient(135deg, #98e58e, #006b40);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 0.9em;
+            font-weight: 600;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 0 20px rgba(152, 229, 142, 0.3);
+        }
+
+        .article-title {
+            font-size: 3.0em;
+            font-weight: 800;
+            margin-bottom: 24px;
+            color: white;
+            line-height: 1.15;
+            text-shadow:
+                0 4px 20px rgba(0, 0, 0, 0.3),
+                0 0 30px rgba(152, 229, 142, 0.35),
+                0 0 60px rgba(98, 229, 142, 0.18);
+        }
+
+        .article-subtitle {
+            font-size: 1.4em;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 40px;
+            max-width: 880px;
+            margin-left: auto;
+            margin-right: auto;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+        }
+
+        /* Main Article Content */
+        .article-content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 80px 20px;
+        }
+
+        .article-body {
+            background: rgba(255, 255, 255, 0.50);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 60px;
+            box-shadow: 0 20px 60px rgba(0, 107, 64, 0.08);
+            border: 1px solid rgba(152, 229, 142, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .article-body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #006b40, #98e58e);
+            border-radius: 24px 24px 0 0;
+        }
+
+        .article-body h1 {
+            font-size: 2.4em;
+            font-weight: 800;
+            color: #2d3748;
+            margin-bottom: 32px;
+            line-height: 1.2;
+        }
+
+        .article-body h2 {
+            font-size: 1.9em;
+            font-weight: 700;
+            color: #006b40;
+            margin: 48px 0 16px 0;
+            position: relative;
+        }
+
+        .article-body h3 {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #006b40;
+            margin: 40px 0 16px 0;
+        }
+
+        .article-body p {
+            font-size: 1.08em;
+            line-height: 1.8;
+            margin-bottom: 22px;
+            color: #4a5568;
+        }
+
+        .article-body strong {
+            color: #006b40;
+            font-weight: 700;
+        }
+
+        /* Article Images */
+        .article-image {
+            width: 100%;
+            height: auto;
+            border-radius: 16px;
+            margin: 28px 0 8px;
+            box-shadow: 0 12px 40px rgba(0, 107, 64, 0.15);
+            border: 2px solid rgba(152, 229, 142, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .article-image:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 16px 50px rgba(0, 107, 64, 0.2);
+        }
+
+        .image-caption {
+            text-align: center;
+            font-style: italic;
+            color: #718096;
+            font-size: 0.9em;
+            margin: 6px 0 24px;
+        }
+
+        /* Footer */
+        .footer {
+            width: 100%;
+            padding: 40px 0;
+            text-align: center;
+            background: linear-gradient(90deg, #003b2f, #001c44);
+            color: white;
+            font-style: italic;
+            margin-top: 80px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .article-title { font-size: 2.2em; }
+            .nav-menu { display: none; }
+            .article-body { padding: 40px 28px; }
+            .article-body h1 { font-size: 2em; }
+            .article-body h2 { font-size: 1.5em; }
+        }
+
+        @media print {
+            body { background: white; color: black; }
+            .header, .article-hero::before, .article-hero::after { display: none; }
+            .article-body { box-shadow: none; border: 1px solid #ddd; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Navigation (IDENTICAL) -->
+    <header class="header" role="banner">
+        <nav class="nav-container" role="navigation" aria-label="Main navigation">
+            <div class="logo">
+                <img src="../../assets/Kyle.png" alt="Kyle Mohney Professional Photo" class="profile-logo" width="52" height="52">
+                <span class="logo-text">Kyle Mohney</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="../../index.html">Home</a></li>
+                <li><a href="../../resume.html">Resume</a></li>
+                <li><a href="../../about.html">About</a></li>
+                <li><a href="../../projects.html">Projects</a></li>
+                <li><a href="../../articles.html" class="current" aria-current="page">Articles</a></li>
+                <li><a href="../../contact.html">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Article Hero -->
+    <section class="article-hero">
+        <div class="hero-container">
+            <div class="article-category">Automation</div>
+            <h1 class="article-title">How I Built My First Automated Job Search Bot in Under 8 Hours — No Coding Knowledge Required, Powered by Advanced AI Prompting</h1>
+            <p class="article-subtitle">A story of constraints, leverage, and ethical automation—shipped in a single afternoon.</p>
+        </div>
+    </section>
+
+    <!-- Main Article Content -->
+    <article class="article-content">
+        <div class="article-body">
+            <h1>The 8‑Hour Bet</h1>
+            <p>It started as a dare to myself: eight hours on the clock, zero “real” coding experience, and one ambitious goal—ship a working, fully automated job‑search bot. Sixty‑five minutes later, I was staring at my inbox… with a clean, formatted report of roles tailored to my skills and salary targets. The bot worked on the first run.</p>
+
+            <h2>Constraint as a Superpower</h2>
+            <p>I didn’t know Python beyond copy‑paste and curiosity. But the modern stack rewards a different muscle: delegation. Instead of brute‑forcing syntax, I broke the problem into small, testable steps and used AI prompting like a power tool. When I got stuck, I asked better questions—about logic, structure, and edge cases—then glued the answers together.</p>
+
+            <h2>The Toolkit That Made It Click</h2>
+            <p>I opened Visual Studio Code and built a minimal workspace. With AI as my copilot, I stitched together:</p>
+            <ul style="margin-left: 1.2rem; color:#4a5568; line-height:1.8;">
+                <li><strong>Python</strong> for the scriptable glue and reliable libraries</li>
+                <li><strong>Open APIs &amp; RSS feeds</strong> from job boards for public listings</li>
+                <li><strong>Local filtering</strong> to match skills and salary ranges</li>
+                <li><strong>Email automation</strong> to package results into a weekly digest</li>
+            </ul>
+
+            <img src="../../assets/linkedin2-top.png" alt="First successful job feed email summary" class="article-image">
+            <p class="image-caption">First pass, first win—clean, relevant listings delivered to my inbox.</p>
+
+            <h2>Guardrails First: Automation With Respect</h2>
+            <p>This wasn’t “scrape and pray.” I only touched <strong>public data</strong> and respected platform terms. No rate‑limit hammering, no TOS gray areas. If automation is going to earn trust, it has to behave like a good citizen.</p>
+
+            <h2>The Build: From Noise to Signal</h2>
+            <p>The first successful run felt like catching a wave. The bot:</p>
+            <ul style="margin-left: 1.2rem; color:#4a5568; line-height:1.8;">
+                <li><strong>Fetched</strong> roles from multiple trusted sources</li>
+                <li><strong>Filtered locally</strong> by skills and salary targets</li>
+                <li><strong>Deduplicated</strong> the overlap across sources</li>
+                <li><strong>Emailed</strong> a clean, scannable report</li>
+            </ul>
+
+            <h2>Set It and Forget It</h2>
+            <p>I wanted reliability, not another tool I had to babysit. So I wired it into <strong>Windows Task Scheduler</strong> to run <strong>weekly</strong>. Now, every seven days, I get a curated list of roles that actually fit.</p>
+            <img src="../../assets/linkedin2-task.png" alt="Windows Task Scheduler set for weekly bot run" class="article-image">
+            <p class="image-caption">Hands‑off consistency: a weekly run that keeps opportunity flowing.</p>
+
+            <h2>The Payoff</h2>
+            <p>By the end of day one, I wasn’t “learning to code”—I was <strong>shipping value</strong>. My inbox started delivering <strong>70+ relevant remote roles weekly</strong>, ready to review and prioritize. No doom‑scrolling, no wasted clicks—just leverage.</p>
+
+            <h2>What I Learned (That Isn’t Just “Coding”)</h2>
+            <ul style="margin-left: 1.2rem; color:#4a5568; line-height:1.8;">
+                <li><strong>Delegate to AI</strong> for speed, but keep the logic yours</li>
+                <li><strong>Use public data respectfully</strong>—trust beats hacks</li>
+                <li><strong>Filter locally</strong> to turn firehoses into streams</li>
+                <li><strong>Schedule it</strong> so the system works even when you don’t</li>
+            </ul>
+
+            <h2>The Future of Work, Today</h2>
+            <p>This project wasn’t about flexing tools. It was about <strong>owning a problem</strong> and solving it with a modern toolkit. That’s the future of work: proactive, ethical automation that removes drudgery and amplifies focus.</p>
+        </div>
+    </article>
+
+    <!-- Footer -->
+    <footer class="footer">
+        "Well done is better than well said." – Benjamin Franklin
+    </footer>
+
+    <script>
+        // Simple entrance animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const articleBody = document.querySelector('.article-body');
+            articleBody.style.opacity = '0';
+            articleBody.style.transform = 'translateY(24px)';
+            articleBody.style.transition = 'all 0.9s ease';
+            setTimeout(() => {
+                articleBody.style.opacity = '1';
+                articleBody.style.transform = 'translateY(0)';
+            }, 250);
+        });
+    </script>
+</body>
+</html>

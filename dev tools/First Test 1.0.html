@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kyle J. Mohney - Resume</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+    body {
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        line-height: 1.5;
+        color: #083f3f;
+        background: #f3f4f4;
+        padding: 20px;
+    }
+
+    .resume-container {
+        max-width: 8.5in;
+        margin: 0 auto;
+        background: white;
+        box-shadow: 0 8px 32px rgba(8, 63, 63, 0.1);
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid #dee1e1;
+    }
+
+    .sprout-header {
+        background: linear-gradient(135deg, #083f3f 0%, #0a2960 100%);
+        color: white;
+        padding: 28px 32px;
+        position: relative;
+        display: grid;
+        grid-template-columns: auto auto 1fr auto;
+        gap: 20px;
+        align-items: center;
+    }
+
+    .sprout-header::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #006b40, #98e58e, #0c3f89, #a1c2f8);
+    }
+
+    .sprout-logo {
+        width: 48px;
+        height: 48px;
+        background: white;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        padding: 4px;
+    }
+
+    .sprout-logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .name-section {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+    }
+
+    .name {
+        font-size: 2.4em;
+        font-weight: 700;
+        margin-bottom: 4px;
+        letter-spacing: -0.5px;
+        line-height: 1.1;
+    }
+
+    .title {
+        font-size: 1.2em;
+        color: #98e58e;
+        margin-bottom: 8px;
+        font-weight: 400;
+        line-height: 1.2;
+    }
+
+    .sprout-badge {
+        display: inline-flex;
+        align-items: center;
+        background: #006b40;
+        color: white;
+        padding: 6px 14px;
+        border-radius: 16px;
+        font-size: 0.8em;
+        font-weight: 600;
+        width: fit-content;
+    }
+
+    .profile-image {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        border: 3px solid #98e58e;
+        object-fit: cover;
+        flex-shrink: 0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .contact-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        font-size: 0.85em;
+        flex-shrink: 0;
+    }
+
+    .contact-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 8px 12px;
+        border-radius: 6px;
+        backdrop-filter: blur(10px);
+    }
+
+    .main-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 0;
+    }
+
+    .primary-content {
+        padding: 32px;
+        background: white;
+    }
+
+    .sidebar {
+        background: #f3f4f4;
+        padding: 32px 24px;
+        border-left: 1px solid #dee1e1;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .section-title {
+        font-size: 1.5em;
+        font-weight: 700;
+        color: #083f3f;
+        margin: 0;
+    }
+
+    .section-icon {
+        width: 24px;
+        height: 24px;
+        background: linear-gradient(135deg, #006b40, #98e58e);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 0.8em;
+    }
+
+    .value-proposition {
+        background: linear-gradient(135deg, #083f3f 0%, #006b40 100%);
+        color: white;
+        padding: 24px;
+        border-radius: 12px;
+        margin-bottom: 32px;
+        font-size: 1.05em;
+        line-height: 1.6;
+    }
+
+    .value-proposition strong {
+        color: #98e58e;
+    }
+
+    .competency-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+
+    .competency-card {
+        background: white;
+        border: 2px solid #dee1e1;
+        padding: 12px 16px;
+        border-radius: 8px;
+        text-align: center;
+        font-size: 0.9em;
+        font-weight: 600;
+        color: #083f3f;
+        transition: all 0.3s ease;
+    }
+
+    .competency-card:hover {
+        border-color: #006b40;
+        background: #ebf9eb;
+    }
+
+    .experience-timeline {
+        position: relative;
+        padding-left: 24px;
+    }
+
+    .experience-timeline::before {
+        content: '';
+        position: absolute;
+        left: 8px;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: linear-gradient(180deg, #006b40, #083f3f);
+    }
+
+    .experience-card {
+        position: relative;
+        background: white;
+        border: 1px solid #dee1e1;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 24px;
+        box-shadow: 0 4px 12px rgba(8, 63, 63, 0.08);
+    }
+
+    .experience-card::before {
+        content: '';
+        position: absolute;
+        left: -32px;
+        top: 20px;
+        width: 16px;
+        height: 16px;
+        background: #006b40;
+        border: 3px solid white;
+        border-radius: 50%;
+        box-shadow: 0 0 0 2px #006b40;
+    }
+
+    .company-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+
+    .company-name {
+        font-size: 1.3em;
+        font-weight: 700;
+        color: #083f3f;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .sprout-indicator {
+        background: linear-gradient(135deg, #006b40, #98e58e);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 16px;
+        font-size: 0.7em;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .location {
+        color: #515e5f;
+        font-style: italic;
+        font-size: 0.9em;
+    }
+
+    .position {
+        font-size: 1.1em;
+        font-weight: 600;
+        color: #0a2960;
+        margin-bottom: 4px;
+    }
+
+    .duration {
+        color: #515e5f;
+        font-size: 0.9em;
+        margin-bottom: 16px;
+    }
+
+    .success-highlight {
+        background: linear-gradient(135deg, #006b40 0%, #98e58e 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 16px 0;
+        border-left: 4px solid #083f3f;
+    }
+
+    .success-highlight h4 {
+        margin-bottom: 8px;
+        font-size: 1.1em;
+    }
+
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+        margin: 20px 0;
+    }
+
+    .metric-card {
+        background: #ebf9eb;
+        border: 1px solid #98e58e;
+        padding: 16px;
+        border-radius: 8px;
+        text-align: center;
+    }
+
+    .metric-number {
+        font-size: 1.4em;
+        font-weight: 700;
+        color: #006b40;
+        margin-bottom: 4px;
+    }
+
+    .metric-label {
+        font-size: 0.85em;
+        color: #083f3f;
+        font-weight: 500;
+    }
+
+    .achievement-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .achievement-list li {
+        position: relative;
+        padding-left: 24px;
+        margin-bottom: 12px;
+        line-height: 1.5;
+    }
+
+    .achievement-list li::before {
+        content: '▶';
+        position: absolute;
+        left: 0;
+        top: 2px;
+        color: #006b40;
+        font-weight: bold;
+        font-size: 1.1em;
+    }
+
+    .f-pattern-hook {
+        font-weight: 700;
+        color: #006b40;
+    }
+
+    .scan-friendly {
+        font-weight: 600;
+        color: #083f3f;
+    }
+
+    .highlight-metric {
+        background: linear-gradient(135deg, #083f3f, #006b40);
+        color: white;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-weight: 700;
+        font-size: 0.9em;
+    }
+
+    .sidebar-section {
+        margin-bottom: 28px;
+    }
+
+    .sidebar-title {
+        font-size: 1.2em;
+        font-weight: 700;
+        color: #083f3f;
+        margin-bottom: 16px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #006b40;
+    }
+
+    .tech-grid {
+        display: grid;
+        gap: 16px;
+    }
+
+    .tech-category {
+        background: white;
+        border: 1px solid #dee1e1;
+        border-radius: 8px;
+        padding: 16px;
+    }
+
+    .tech-category h4 {
+        font-size: 0.9em;
+        font-weight: 700;
+        color: #083f3f;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .tech-category p {
+        font-size: 0.85em;
+        line-height: 1.4;
+        color: #515e5f;
+    }
+
+    .sprout-emphasis {
+        color: #006b40;
+        font-weight: 700;
+    }
+
+    .innovation-spotlight {
+        background: linear-gradient(135deg, #0a2960 0%, #a1c2f8 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 12px;
+        margin: 20px 0;
+    }
+
+    .innovation-title {
+        font-size: 1.1em;
+        font-weight: 700;
+        margin-bottom: 12px;
+    }
+
+    .innovation-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .innovation-list li {
+        padding: 4px 0;
+        font-size: 0.9em;
+        position: relative;
+        padding-left: 16px;
+    }
+
+    .innovation-list li::before {
+        content: '→';
+        position: absolute;
+        left: 0;
+        color: #a1c2f8;
+        font-weight: bold;
+    }
+
+    .brand-statement {
+        background: linear-gradient(135deg, #083f3f 0%, #0a2960 100%);
+        color: white;
+        padding: 24px;
+        text-align: center;
+        font-style: italic;
+        font-size: 1.1em;
+        line-height: 1.6;
+        margin-top: 0;
+    }
+
+    .certification-item {
+        background: white;
+        border: 1px solid #dee1e1;
+        padding: 12px;
+        border-radius: 6px;
+        margin-bottom: 8px;
+        font-size: 0.85em;
+    }
+
+    .cert-title {
+        font-weight: 600;
+        color: #083f3f;
+    }
+
+    .cert-details {
+        color: #515e5f;
+        font-size: 0.9em;
+    }
+
+    @media print {
+        body {
+            background: white;
+            padding: 0;
+        }
+        .resume-container {
+            box-shadow: none;
+            border-radius: 0;
+        }
+    }
+</style>
+</head>
+<body>
+    <div class="resume-container">
+        <div class="sprout-header">
+            <div class="left-stack">
+                <div style="display: flex; flex-direction: row; align-items: center; gap: 8px; margin-bottom: 10px; justify-content: center; margin-left: 15px;">
+                    <div class="sprout-logo">
+                        <img src="sprout_logo.png" alt="Sprout Social" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                        <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; font-size:2em;">🌱</div>
+                    </div>
+                    <img src="Kyle.png" alt="Kyle Mohney" class="profile-image" />
+                </div>
+                <div class="sprout-badge">APPLICANT |<br>Enterprise Sprout Social<br>Implementation Specialist</div>
+            </div>
+            <div class="name-section">
+                <div class="name">Kyle J. Mohney</div>
+                <div class="title">Product Documentation & Knowledge Operations Leader</div>
+            </div>
+            <div class="contact-grid">
+                <div class="contact-item">📍 Niles, OH</div>
+                <div class="contact-item">📞 (720) 877-7466</div>
+                <div class="contact-item">✉️ Kyle.Mohney@hotmail.com</div>
+                <div class="contact-item">🔗 LinkedIn Profile</div>
+            </div>
+        </div>
+    <div class="main-grid">
+        <div class="primary-content">
+            <div class="value-proposition">
+                <strong>Product Documentation & Knowledge Operations specialist</strong> with <strong>6+ years in Support Operations and Supervisory roles</strong>, including <strong>2+ years mastering AI prompt engineering and automation systems</strong>. <strong>Proven enterprise experience with Sprout Social platform</strong>, having implemented comprehensive review management system that <strong>prevented platform delisting and saved millions in potential revenue loss</strong>. Expert in documentation strategy, content governance, and AI-powered workflows that reduce resolution times by <strong>95%</strong> while scaling operations across <strong>100+ team members</strong>.
+            </div>
+
+            <div class="sprout-section">
+                <div class="section-header">
+                    <div class="section-icon">C</div>
+                    <h2 class="section-title">Core Competencies</h2>
+                </div>
+                <div class="competency-grid">
+                    <div class="competency-card">Documentation Strategy & Governance</div>
+                    <div class="competency-card">AI-Powered Workflow Design</div>
+                    <div class="competency-card">Cross-Functional Leadership</div>
+                    <div class="competency-card">Performance Analytics & KPI Optimization</div>
+                    <div class="competency-card"><span class="sprout-emphasis">Sprout Social Enterprise Implementation</span></div>
+                    <div class="competency-card">Content Management Systems</div>
+                </div>
+            </div>
+
+            <div class="sprout-section">
+                <div class="section-header">
+                    <div class="section-icon">E</div>
+                    <h2 class="section-title">Professional Experience</h2>
+                </div>
+                
+                <div class="experience-timeline">
+                    <div class="experience-card">
+                        <div class="company-header">
+                            <div class="company-name">
+                                THUMBTACK
+                                <span class="sprout-indicator">SPROUT SOCIAL SUCCESS</span>
+                            </div>
+                            <div class="location">Remote</div>
+                        </div>
+                        <div class="position">Operations Consultant | Escalations & Knowledge Lead</div>
+                        <div class="duration">April 2022 - July 2025</div>
+                        
+                        <div class="success-highlight">
+                            <h4><img src="sprout_logo.png" style="width:20px; height:20px; vertical-align:middle; margin-right:8px;" alt="Sprout"> ENTERPRISE SPROUT SOCIAL IMPLEMENTATION</h4>
+                            <p>Strategically implemented Sprout Social platform to address critical App Store reputation crisis. Built comprehensive tagging library and metrics tracking system, personally managing 2,000+ negative reviews through systematic response strategy. <strong>Successfully prevented platform delisting, safeguarding millions in potential revenue loss.</strong></p>
+                        </div>
+
+                        <div class="metrics-grid">
+                            <div class="metric-card">
+                                <div class="metric-number">95%</div>
+                                <div class="metric-label">Resolution Time Reduction</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-number">40+</div>
+                                <div class="metric-label">Knowledge Base Articles</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-number">100+</div>
+                                <div class="metric-label">Agents Supported</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-number">$30K</div>
+                                <div class="metric-label">Per Case Fraud Prevention</div>
+                            </div>
+                        </div>
+
+                        <ul class="achievement-list">
+                            <li>Built comprehensive BigQuery automation script analyzing complete user financial history, <span class="highlight-metric">reducing courtesy refund decisions from 60 minutes to 2 minutes</span></li>
+                            <li>Designed AI-powered fraud detection system using image analysis, <span class="highlight-metric">preventing $10K-$30K+ losses per case</span></li>
+                            <li>Created automated ROI roadmap generator <span class="highlight-metric">adopted by Sales and Pro Recruitment teams</span></li>
+                            <li>Developed instant review calculator reducing agent research from <span class="highlight-metric">20 minutes to 20 seconds</span></li>
+                            <li>Built AI-enhanced training library improving performance across <span class="highlight-metric">100+ support staff</span></li>
+                            <li>Established company-wide tone and voice standards with messaging templates used across all touchpoints</li>
+                        </ul>
+                    </div>
+
+                    <div class="experience-card">
+                        <div class="company-header">
+                            <div class="company-name">HOMEADVISOR / ANGI</div>
+                            <div class="location">Golden, CO / Remote</div>
+                        </div>
+                        <div class="position">Tier 4 Supervisor, Business Engagement & Retention</div>
+                        <div class="duration">2018 - 2021</div>
+                        
+                        <ul class="achievement-list">
+                            <li><span class="f-pattern-hook">Promoted 3 times in 12 months</span> from frontline to Enterprise Engagement Team</li>
+                            <li><span class="f-pattern-hook">Successfully transitioned enterprise operations</span> to fully remote during COVID while maintaining top CSAT scores</li>
+                            <li><span class="f-pattern-hook">Designed national onboarding scripts</span> and internal documentation systems streamlining agent training</li>
+                            <li><span class="f-pattern-hook">Managed five-to-six figure accounts,</span> regularly increasing spending by <span class="highlight-metric">$100K+ monthly</span></li>
+                            <li><span class="f-pattern-hook">Created retention-focused SOPs</span> and knowledge content reducing customer churn significantly</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Key Achievements</h3>
+                <ul class="achievement-list" style="font-size: 0.9em;">
+                    <li><strong>Platform Crisis Management:</strong> <span class="f-pattern-hook">Prevented App Store delisting</span> using Sprout Social</li>
+                    <li><strong>Operational Excellence:</strong> <span class="f-pattern-hook">95% reduction</span> in escalation resolution times</li>
+                    <li><strong>AI Innovation Leadership:</strong> <span class="f-pattern-hook">Tools adopted across 40+ teams</span> company-wide</li>
+                    <li><strong>Cost Optimization:</strong> <span class="f-pattern-hook">$6,000+ savings</span> through strategic automation</li>
+                    <li><strong>Risk Mitigation:</strong> <span class="f-pattern-hook">Hundreds of thousands</span> in fraud prevention</li>
+                </ul>
+            </div>
+
+            <div class="innovation-spotlight">
+                <div class="innovation-title">AI Innovation Leadership</div>
+                <ul class="innovation-list">
+                    <li>Curated library of 100+ AI tools by use-case</li>
+                    <li>Published thought leadership on AI-enhanced support</li>
+                    <li>Built custom applications and automation tools</li>
+                    <li>Created public training materials for AI implementation</li>
+                    <li>Developed educational content for business functions</li>
+                </ul>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Technical Proficiencies</h3>
+                <div class="tech-grid">
+                    <div class="tech-category">
+                        <h4>Documentation Platforms</h4>
+                        <p><span class="sprout-emphasis">Sprout Social</span>, Confluence, Zendesk Guide, Notion, Coda</p>
+                    </div>
+                    <div class="tech-category">
+                        <h4>AI & Analytics</h4>
+                        <p>100+ AI Tools Library, BigQuery, Tableau, Expert Prompt Engineering</p>
+                    </div>
+                    <div class="tech-category">
+                        <h4>Development</h4>
+                        <p>Python, GitHub, Google Workspace Admin (SuperAdmin)</p>
+                    </div>
+                    <div class="tech-category">
+                        <h4>CRM Systems</h4>
+                        <p>Salesforce, Jira, HubSpot, Zapier, Airtable</p>
+                    </div>
+                    <div class="tech-category">
+                        <h4>Creative Suite</h4>
+                        <p>AI-Enhanced Design, Illustrator, Photoshop, Video Editing</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Certifications</h3>
+                <div class="certification-item">
+                    <div class="cert-title">HubSpot Academy</div>
+                    <div class="cert-details">Service Hub, Revenue Operations, SEO I & II</div>
+                </div>
+                <div class="certification-item">
+                    <div class="cert-title">Google Cloud Skills Boost</div>
+                    <div class="cert-details">Generative AI (ID: 513749)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="brand-statement">
+        "I transform operational chaos into scalable, AI-enhanced systems that drive measurable business growth. With proven enterprise experience implementing Sprout Social at scale, I deliver immediate impact across technical development, creative design, and knowledge operations."
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ... (previous head content remains the same) ... -->
+    <style>
+        /* Add this to your existing styles */
+        .testimonial-carousel {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            padding: 0 40px;
+        }
+
+        .carousel-container {
+            position: relative;
+            overflow: hidden;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+
+        .carousel-slide {
+            flex: 0 0 100%;
+            min-width: 100%;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+
+        .carousel-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            background: #006b40;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 2;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .carousel-button:hover {
+            background: #98e58e;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .carousel-button.prev {
+            left: 0;
+        }
+
+        .carousel-button.next {
+            right: 0;
+        }
+
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .carousel-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ddd;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .carousel-dot.active {
+            background: #006b40;
+            transform: scale(1.2);
+        }
+
+        .testimonial-test-card {
+            text-align: left;
+        }
+
+        .testimonial-test-card p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-style: italic;
+            color: #2d3748;
+        }
+
+        .testimonial-test-card .author {
+            font-weight: 700;
+            color: #006b40;
+            margin-bottom: 5px;
+        }
+
+        .testimonial-test-card .role {
+            color: #4a5568;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <!-- ... (previous content remains the same until testimonials section) ... -->
+    
+    <div class="cert-test-section">
+        <div class="cert-particle-bg"></div>
+        <h2>Trusted By Industry Leaders</h2>
+        <p class="section-sub glow-text" style="color: #006b40;">Proven expertise backed by globally recognized certifications</p>
+        <div class="cert-test-grid">
+            <!-- ... (certification cards remain the same) ... -->
+        </div>
+        <h2>What My Peers Say</h2>
+        <p class="section-sub glow-text" style="color: #006b40;">Real words from colleagues who know my work best</p>
+        <div class="testimonial-carousel">
+            <div class="carousel-container">
+                <div class="carousel-track">
+                    <div class="glass-card testimonial-test-card carousel-slide">
+                        <p>"Keep pushing and experimenting with new tech, your journey is real inspiring."</p>
+                        <div class="author">Oleg Zankov</div>
+                        <div class="role">Co-Founder & Product Owner | Latenode.com | Debexpert.com</div>
+                    </div>
+                    <div class="glass-card testimonial-test-card carousel-slide">
+                        <p>"Kyle is one of the most dedicated and passionate people I've worked with... helping shape better processes and policies that benefit both our teams and our end users at Thumbtack."</p>
+                        <div class="author">Ma. Christina Reyes-Caacoy</div>
+                        <div class="role">People Leader | Service Operations | Thumbtack (Former)</div>
+                    </div>
+                    <div class="glass-card testimonial-test-card carousel-slide">
+                        <p>"Kyle is one of the smartest and most passionate people I've worked with when it comes to Customer Experience. Any team would be lucky to have his dedication and insight."</p>
+                        <div class="author">Oliver Rempillo II</div>
+                        <div class="role">Head of Service Operations | Thumbtack (Former)</div>
+                    </div>
+                </div>
+                <button class="carousel-button prev">&lt;</button>
+                <button class="carousel-button next">&gt;</button>
+                <div class="carousel-dots"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Updated JavaScript for carousel functionality -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const track = document.querySelector('.carousel-track');
+            const slides = Array.from(track.children);
+            const nextButton = document.querySelector('.carousel-button.next');
+            const prevButton = document.querySelector('.carousel-button.prev');
+            const dotsContainer = document.querySelector('.carousel-dots');
+
+            // Create dot indicators
+            slides.forEach((_, index) => {
+                const dot = document.createElement('button');
+                dot.classList.add('carousel-dot');
+                if (index === 0) dot.classList.add('active');
+                dotsContainer.appendChild(dot);
+            });
+
+            const dots = Array.from(document.querySelectorAll('.carousel-dot'));
+
+            // Set up initial positions
+            slides.forEach((slide, index) => {
+                slide.style.transform = `translateX(${100 * index}%)`;
+            });
+
+            let currentSlide = 0;
+            let isMoving = false;
+
+            function moveToSlide(targetIndex) {
+                if (isMoving) return;
+                isMoving = true;
+                
+                track.style.transform = `translateX(-${targetIndex * 100}%)`;
+                
+                // Update active dot
+                dots.forEach(dot => dot.classList.remove('active'));
+                dots[targetIndex].classList.add('active');
+                
+                currentSlide = targetIndex;
+
+                // Reset isMoving after transition
+                setTimeout(() => {
+                    isMoving = false;
+                }, 500);
+            }
+
+            // Next button click
+            nextButton.addEventListener('click', () => {
+                const nextIndex = (currentSlide + 1) % slides.length;
+                moveToSlide(nextIndex);
+            });
+
+            // Previous button click
+            prevButton.addEventListener('click', () => {
+                const prevIndex = (currentSlide - 1 + slides.length) % slides.length;
+                moveToSlide(prevIndex);
+            });
+
+            // Dot click
+            dots.forEach((dot, index) => {
+                dot.addEventListener('click', () => {
+                    moveToSlide(index);
+                });
+            });
+
+            // Auto-advance every 5 seconds
+            let autoAdvance = setInterval(() => {
+                const nextIndex = (currentSlide + 1) % slides.length;
+                moveToSlide(nextIndex);
+            }, 5000);
+
+            // Pause auto-advance on hover
+            track.addEventListener('mouseenter', () => {
+                clearInterval(autoAdvance);
+            });
+
+            // Resume auto-advance when mouse leaves
+            track.addEventListener('mouseleave', () => {
+                autoAdvance = setInterval(() => {
+                    const nextIndex = (currentSlide + 1) % slides.length;
+                    moveToSlide(nextIndex);
+                }, 5000);
+            });
+        });
+    </script>
+
+    <!-- ... (remaining content remains the same) ... -->
+</body>
+</html>

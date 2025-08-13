@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>From Layoff to Lift‑Off: 30 Days, 15 AI Projects, and a Holographic Skill Sprint | Kyle J. Mohney</title>
+  <meta name="description" content="A story of resilience and rapid upskilling after a layoff—how I shipped 15+ AI-powered projects in 30 days, from resumes and certifications to apps, automations, and a live media visualizer." />
+  <meta name="author" content="Kyle J. Mohney" />
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      line-height: 1.75;
+      color: #2d3748;
+      background: #ffffff;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* === HOLOGRAPHIC BACKGROUND (greens, blues, yellow, purple) === */
+    .holo-bg::before, .holo-bg::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -2;
+    }
+    .holo-bg::before {
+      background:
+        radial-gradient(60vw 60vw at 10% 15%, rgba(152, 229, 142, 0.35), transparent 60%),
+        radial-gradient(40vw 40vw at 85% 20%, rgba(67, 56, 202, 0.20), transparent 70%),
+        radial-gradient(55vw 55vw at 20% 80%, rgba(14, 165, 233, 0.22), transparent 60%),
+        radial-gradient(45vw 45vw at 75% 80%, rgba(234, 179, 8, 0.15), transparent 65%),
+        radial-gradient(80vw 80vw at 50% -10%, rgba(168, 85, 247, 0.18), transparent 70%);
+      filter: blur(0.5px);
+      animation: holoGlow 12s ease-in-out infinite;
+    }
+    .holo-bg::after {
+      background-image:
+        linear-gradient(90deg, rgba(152, 229, 142, 0.12) 2px, transparent 2px),
+        linear-gradient(0deg, rgba(56, 189, 248, 0.12) 2px, transparent 2px),
+        linear-gradient(45deg, rgba(168, 85, 247, 0.10) 1px, transparent 1px),
+        linear-gradient(-45deg, rgba(234, 179, 8, 0.10) 1px, transparent 1px);
+      background-size: 72px 72px, 72px 72px, 36px 36px, 36px 36px;
+      opacity: 0.55;
+      animation: circuitDrift 14s linear infinite;
+      z-index: -1;
+    }
+    @keyframes holoGlow {
+      0%, 100% { opacity: 0.8; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.02); }
+    }
+    @keyframes circuitDrift {
+      0% { transform: translateX(0) translateY(0); }
+      100% { transform: translateX(48px) translateY(48px); }
+    }
+
+    /* === HEADER (IDENTICAL STRUCTURE) === */
+    .header {
+      padding: 24px 0;
+      position: sticky;
+      top: 0;
+      background: rgba(248, 250, 249, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      border-bottom: 1px solid rgba(152, 229, 142, 0.1);
+      box-shadow: 0 2px 20px rgba(0, 107, 64, 0.05);
+    }
+    .nav-container {
+      max-width: 1200px; margin: 0 auto; padding: 0 20px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo { display: flex; align-items: center; gap: 12px; }
+    .profile-logo {
+      width: 52px; height: 52px; border-radius: 50%;
+      border: 2px solid #98e58e; object-fit: cover;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+    .logo-text { font-size: 1.5em; font-weight: 700; color: #2d3748; }
+    .nav-menu { display: flex; list-style: none; gap: 40px; }
+    .nav-menu a {
+      color: #2d3748; text-decoration: none; font-weight: 600;
+      font-size: 1.1em; padding: 12px 20px; border-radius: 8px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    .nav-menu a:hover {
+      color: #006b40;
+      background: rgba(152, 229, 142, 0.1);
+      transform: translateY(-2px);
+    }
+    .nav-menu a.current {
+      color: #006b40 !important;
+      background: rgba(152, 229, 142, 0.15) !important;
+      box-shadow: 0 4px 12px rgba(152, 229, 142, 0.2) !important;
+    }
+
+    /* === HOLOGRAPHIC HERO === */
+    .article-hero {
+      padding: 120px 0 84px;
+      position: relative; overflow: hidden;
+      background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.95));
+    }
+    .hero-container { max-width: 1050px; margin: 0 auto; padding: 0 20px; text-align: center; position: relative; z-index: 1; }
+    .holo-chip {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 10px 18px; border-radius: 999px;
+      background: radial-gradient(120% 140% at 30% 30%, rgba(99, 102, 241, 0.25), rgba(34, 197, 94, 0.20), rgba(56, 189, 248, 0.20));
+      border: 1px solid rgba(152, 229, 142, 0.6);
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.18), 0 0 0 6px rgba(152, 229, 142, 0.08);
+      font-weight: 700; color: #0b3050; letter-spacing: 0.6px;
+      text-transform: uppercase; font-size: 0.85rem;
+    }
+    .article-title {
+      font-size: 3em; font-weight: 900; color: #0a1a2b;
+      margin: 22px auto 14px; line-height: 1.15;
+      text-shadow: 0 2px 14px rgba(99, 102, 241, 0.12);
+      max-width: 1000px;
+    }
+    .article-subtitle {
+      font-size: 1.2em; color: #334155; max-width: 900px;
+      margin: 0 auto; opacity: 0.9;
+    }
+    .hero-orbs {
+      position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(600px 400px at 10% 90%, rgba(99, 102, 241, 0.12), transparent 60%),
+        radial-gradient(700px 600px at 85% 15%, rgba(34, 197, 94, 0.14), transparent 65%),
+        radial-gradient(700px 600px at 40% -20%, rgba(56, 189, 248, 0.14), transparent 65%),
+        radial-gradient(700px 600px at 100% 80%, rgba(234, 179, 8, 0.10), transparent 70%),
+        radial-gradient(900px 700px at 0% 0%, rgba(168, 85, 247, 0.12), transparent 70%);
+      animation: orbsDrift 14s ease-in-out infinite;
+    }
+    @keyframes orbsDrift {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-8px) scale(1.02); }
+    }
+
+    /* === ARTICLE CONTENT CARD === */
+    .article-content { max-width: 980px; margin: 0 auto; padding: 84px 20px; }
+    .article-body {
+      position: relative;
+      background: rgba(255,255,255,0.75);
+      border: 1px solid rgba(99, 102, 241, 0.18);
+      border-radius: 26px;
+      padding: 56px;
+      box-shadow:
+        0 30px 80px rgba(0, 107, 64, 0.10),
+        0 10px 30px rgba(99, 102, 241, 0.12),
+        inset 0 0 0 1px rgba(255,255,255,0.6);
+      overflow: hidden;
+    }
+    .article-body::before {
+      content: '';
+      position: absolute; inset: -1px;
+      background: linear-gradient(135deg, rgba(152,229,142,0.0) 0%, rgba(99,102,241,0.08) 33%, rgba(56,189,248,0.08) 66%, rgba(168,85,247,0.08) 100%);
+      filter: blur(6px); z-index: -1;
+    }
+    .article-body h2 { font-size: 1.8em; color: #0b3050; margin: 36px 0 12px; }
+    .article-body p { font-size: 1.05em; color: #334155; margin-bottom: 18px; }
+    .article-body ul { margin: 8px 0 18px 1.2rem; color: #334155; }
+    .callout {
+      background: radial-gradient(120% 140% at 30% 30%, rgba(34, 197, 94, 0.12), rgba(56, 189, 248, 0.1), rgba(168, 85, 247, 0.10));
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      padding: 18px 18px; border-radius: 16px; font-weight: 600; color: #0b3050;
+      box-shadow: 0 10px 30px rgba(56, 189, 248, 0.12);
+    }
+
+    /* Images */
+    .article-image {
+      width: 70%; height: auto; border-radius: 16px; margin: 20px auto 8px;
+      border: 2px solid rgba(56, 189, 248, 0.2);
+      box-shadow: 0 20px 50px rgba(99, 102, 241, 0.15);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      display: block;
+    }
+    .article-image:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 26px 60px rgba(99, 102, 241, 0.22);
+    }
+    .image-caption {
+      text-align: center; font-style: italic; color: #64748b; font-size: 0.92em; margin-bottom: 8px;
+    }
+
+    /* Footer Quote */
+    .footer {
+      margin-top: 84px; padding: 40px 0 24px 0;
+      background: linear-gradient(90deg, #003b2f, #001c44);
+      text-align: center; color: white; font-weight: 700; font-style: italic;
+      position: relative; z-index: 10;
+    }
+
+    @media (max-width: 768px) {
+      .article-title { font-size: 2.2em; }
+      .article-body { padding: 36px 26px; }
+    }
+  </style>
+</head>
+<body class="holo-bg">
+  <!-- IDENTICAL HEADER -->
+  <!-- Header Navigation -->
+<header class="header" role="banner">
+    <nav class="nav-container" role="navigation" aria-label="Main navigation">
+        <div class="logo">
+            <img src="../../assets/Kyle.png" alt="Kyle Mohney Professional Photo" class="profile-logo" width="52" height="52">
+            <span class="logo-text">Kyle Mohney</span>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="../../index.html">Home</a></li>
+            <li><a href="../../resume.html">Resume</a></li>
+            <li><a href="../../about.html">About</a></li>
+            <li><a href="../../projects.html">Projects</a></li>
+            <li><a href="../../articles.html" class="current" aria-current="page">Articles</a></li>
+            <li><a href="../../contact.html">Contact</a></li>
+        </ul>
+    </nav>
+</header>
+
+  <!-- HOLOGRAPHIC HERO -->
+  <section class="article-hero">
+    <div class="hero-orbs" aria-hidden="true"></div>
+    <div class="hero-container">
+      <span class="holo-chip">Growth Log • AI & Career Strategy</span>
+      <h1 class="article-title">From Layoff to Lift‑Off: 30 Days, 15 AI Projects, and a Holographic Skill Sprint</h1>
+      <p class="article-subtitle">I turned an unexpected layoff into a focused 9‑to‑5 upskilling sprint—shipping real projects, earning certifications, and building momentum with modern AI.</p>
+    </div>
+  </section>
+
+  <!-- CONTENT -->
+  <main class="article-content">
+    <article class="article-body">
+      <h2>Day One: Reframe the Story</h2>
+      <p>Earlier this month, my team and I were laid off from Thumbtack. I gave myself a rule for the next 30 days: treat 9–5 like a job I own. No doom‑scrolling. No drifting. Just daily reps on the skills that matter.</p>
+
+      <div class="callout">Momentum is a choice. I decided to build—every single day.</div>
+
+      <h2>Build the Engine, Not Just the Résumé</h2>
+      <p>Instead of sending the same PDF everywhere, I built <strong>AI‑powered, role‑specific resumes</strong> and started logging my work in public. I set up two websites to sharpen front‑end fundamentals and wrote draft copy with AI, then edited everything for my voice.</p>
+
+      <!-- Fix Broken Images -->
+<img src="../../assets/linkedin3-quinn.png" alt="Quinn's Quest title art" class="article-image" />
+<p class="image-caption">Side projects that teach: rebuilding game UX sharpened my design and systems thinking.</p>
+
+      <h2>Stack the Skills</h2>
+      <p>I mapped a curriculum and shipped at least one artifact per day:</p>
+      <ul>
+        <li>Earned HubSpot certifications in <em>Inbound Marketing</em>, <em>Service Hub</em>, <em>Revenue Operations</em>, and <em>SEO</em>.</li>
+        <li>Completed Google Cloud Skills Boost’s <em>Introduction to Generative AI</em> badge.</li>
+        <li>Drafted <strong>40+ knowledge base articles</strong> to help businesses win with online advertising.</li>
+        <li>Compiled a <strong>catalog of 100 AI tools</strong>—with use cases, pros, and cons.</li>
+        <li>Built a <strong>Python ROI calculator</strong> for service pros.</li>
+        <li>Created an <strong>AI‑powered media visualizer</strong> synced to music with interactive controls.</li>
+      </ul>
+
+      <!-- Fix Broken Images -->
+<img src="../../assets/linkedin3-any.png" alt="AI-powered media visualizer screenshot" class="article-image" />
+<p class="image-caption">A living instrument: the visualizer responds to audio and user input in real time.</p>
+
+<img src="../../assets/linkedin3-middle.png" alt="Work-in-progress dashboard and brand experiments" class="article-image" />
+<p class="image-caption">Design studies and dashboards—small bricks that make big walls.</p>
+
+<img src="../../assets/linkedin3-top.png" alt="Top-level dashboard experiments" class="article-image" />
+<p class="image-caption">High-level dashboard experiments showcasing AI integration.</p>
+
+      <h2>Ship Words, Too</h2>
+      <p>I drafted a LinkedIn article on weaving AI into support and tech roles, plus a longer essay on the <em>hidden costs of layoffs</em> and the ROI of reskilling. Writing clarified the frameworks I was building.</p>
+
+      <h2>Operate Like a Team of One</h2>
+      <p>I built lightweight workflows for content and project management, kept a personal knowledge system, and iterated on brand experiments using Photoshop, Illustrator, and AI tools. Consistency beat intensity.</p>
+
+      <h2>What Changed</h2>
+      <p>This month wasn’t just about skills; it was about posture. I became faster at scoping, better at prompts, and calmer under ambiguity. I practiced conversational AI and voice interfaces, experimented with social/blog automation, and strengthened time management in an unstructured environment.</p>
+
+      <h2>Call to Build</h2>
+      <p>If you’re hiring: I’m bringing this momentum, playbook, and energy to the next team I join. If you’re exploring AI, digital marketing, or emerging tech—let’s talk. I’m happy to share templates, prompts, and systems.</p>
+    </article>
+  </main>
+
+  <footer class="footer">
+    “Audentes fortuna iuvat.” (Fortune favors the bold) – Fiore dei Liberi
+  </footer>
+
+  <script>
+    // Subtle entrance
+    document.addEventListener('DOMContentLoaded', () => {
+      const body = document.querySelector('.article-body');
+      body.style.opacity = '0';
+      body.style.transform = 'translateY(20px)';
+      body.style.transition = 'all 800ms ease';
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          body.style.opacity = '1';
+          body.style.transform = 'translateY(0)';
+        }, 150);
+      });
+    });
+  </script>
+</body>
+</html>

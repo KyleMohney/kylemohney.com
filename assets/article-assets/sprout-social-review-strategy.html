@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Building a Review Engine with Sprout Social | Kyle J. Mohney</title>
+    <meta name="description" content="How Kyle Mohney used Sprout Social to build a scalable, insight-driven review response system that transformed customer feedback into operational wins.">
+    <meta name="author" content="Kyle J. Mohney">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.7;
+            color: #2d3748;
+            background: #f8faf9;
+            min-height: 100vh;
+        }
+
+        /* Subtle background effects */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 15% 25%, rgba(152, 229, 142, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 85% 75%, rgba(0, 107, 64, 0.06) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, rgba(152, 229, 142, 0.03) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: -2;
+            animation: backgroundPulse 8s ease-in-out infinite;
+        }
+
+        @keyframes backgroundPulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        /* Enhanced Circuit Animation */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(90deg, rgba(152, 229, 142, 0.1) 2px, transparent 2px),
+                linear-gradient(0deg, rgba(152, 229, 142, 0.1) 2px, transparent 2px),
+                linear-gradient(45deg, rgba(152, 229, 142, 0.06) 1px, transparent 1px),
+                linear-gradient(-45deg, rgba(152, 229, 142, 0.06) 1px, transparent 1px);
+            background-size: 60px 60px, 60px 60px, 30px 30px, 30px 30px;
+            animation: circuitPulse 6s ease-in-out infinite;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.8;
+        }
+
+        @keyframes circuitPulse {
+            0%, 100% { opacity: 0.2; transform: scale(1); }
+            25% { opacity: 0.4; transform: scale(1.02); }
+            50% { opacity: 0.3; transform: scale(1); }
+            75% { opacity: 0.35; transform: scale(0.98); }
+        }
+
+        /* Header Navigation */
+        .header {
+            padding: 24px 0;
+            position: sticky;
+            top: 0;
+            background: rgba(248, 250, 249, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(152, 229, 142, 0.1);
+            box-shadow: 0 2px 20px rgba(0, 107, 64, 0.05);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .profile-logo {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            border: 2px solid #98e58e;
+            object-fit: cover;
+        }
+
+        .logo-text {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 40px;
+        }
+
+        .nav-menu a {
+            color: #2d3748;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1em;
+            padding: 12px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-menu a:hover {
+            color: #006b40;
+            background: rgba(152, 229, 142, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .nav-menu a.current {
+            color: #006b40;
+            background: rgba(152, 229, 142, 0.15);
+            box-shadow: 0 4px 12px rgba(152, 229, 142, 0.2);
+        }
+
+        /* Article Hero - Dark holographic theme */
+        .article-hero {
+            background: linear-gradient(135deg, 
+                #0a1528 0%, 
+                #1a2e45 25%,
+                #0f1f35 50%,
+                #162b42 75%,
+                #0a1528 100%);
+            padding: 120px 0 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .article-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(152, 229, 142, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(98, 229, 142, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 50% 20%, rgba(0, 182, 91, 0.18) 0%, transparent 60%),
+                radial-gradient(circle at 30% 80%, rgba(0, 167, 86, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 70% 40%, rgba(152, 229, 142, 0.25) 0%, transparent 45%);
+            z-index: 0;
+            animation: holographicHeroShimmer 10s ease-in-out infinite;
+        }
+
+        .article-hero::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(90deg, rgba(152, 229, 142, 0.1) 2px, transparent 2px),
+                linear-gradient(0deg, rgba(98, 229, 142, 0.08) 2px, transparent 2px),
+                linear-gradient(45deg, rgba(0, 182, 91, 0.06) 1px, transparent 1px);
+            background-size: 100px 100px, 100px 100px, 50px 50px;
+            animation: holographicGrid 12s linear infinite;
+            z-index: 0;
+            opacity: 0.4;
+        }
+
+        @keyframes holographicHeroShimmer {
+            0%, 100% { 
+                opacity: 1; 
+                filter: hue-rotate(0deg) brightness(1);
+            }
+            25% { 
+                opacity: 0.8; 
+                filter: hue-rotate(10deg) brightness(1.1);
+            }
+            50% { 
+                opacity: 0.9; 
+                filter: hue-rotate(-5deg) brightness(0.95);
+            }
+            75% { 
+                opacity: 1.1; 
+                filter: hue-rotate(15deg) brightness(1.05);
+            }
+        }
+
+        @keyframes holographicGrid {
+            0% { transform: translateX(0) translateY(0); }
+            100% { transform: translateX(50px) translateY(50px); }
+        }
+
+        .hero-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .article-category {
+            display: inline-block;
+            background: linear-gradient(135deg, #98e58e, #006b40);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 0.9em;
+            font-weight: 600;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 0 20px rgba(152, 229, 142, 0.3);
+        }
+
+        .article-title {
+            font-size: 3.5em;
+            font-weight: 800;
+            margin-bottom: 24px;
+            color: white;
+            line-height: 1.1;
+            text-shadow: 
+                0 4px 20px rgba(0, 0, 0, 0.3),
+                0 0 30px rgba(152, 229, 142, 0.4),
+                0 0 60px rgba(98, 229, 142, 0.2);
+            background: linear-gradient(135deg, 
+                #ffffff 0%, 
+                #98e58e 30%, 
+                #006b40 50%, 
+                #ffffff 80%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: titleGlow 6s ease-in-out infinite;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% { 
+                filter: brightness(1) hue-rotate(0deg);
+            }
+            50% { 
+                filter: brightness(1.2) hue-rotate(10deg);
+            }
+        }
+
+        .article-subtitle {
+            font-size: 1.4em;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 40px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Main Article Content */
+        .article-content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 80px 20px;
+        }
+
+        .article-body {
+            background: rgba(255, 255, 255, 0.45);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 60px;
+            box-shadow: 0 20px 60px rgba(0, 107, 64, 0.08);
+            border: 1px solid rgba(152, 229, 142, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .article-body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #006b40, #98e58e);
+            border-radius: 24px 24px 0 0;
+        }
+
+        .article-body h1 {
+            font-size: 2.8em;
+            font-weight: 800;
+            color: #2d3748;
+            margin-bottom: 32px;
+            line-height: 1.2;
+        }
+
+        .article-body h2 {
+            font-size: 2.2em;
+            font-weight: 700;
+            color: #006b40;
+            margin: 60px 0 32px 0;
+            position: relative;
+        }
+
+        .article-body h2:first-of-type {
+            margin-top: 40px;
+        }
+
+        .article-body h3 {
+            font-size: 1.6em;
+            font-weight: 600;
+            color: #006b40;
+            margin: 40px 0 24px 0;
+        }
+
+        .article-body p {
+            font-size: 1.15em;
+            line-height: 1.8;
+            margin-bottom: 28px;
+            color: #4a5568;
+        }
+
+        .article-body strong {
+            color: #006b40;
+            font-weight: 700;
+        }
+
+        /* Enhanced Sprout Highlight */
+        .sprout-highlight {
+            background: linear-gradient(135deg, #006b40 0%, #98e58e 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            margin: 48px 0;
+            box-shadow: 
+                0 12px 40px rgba(0, 107, 64, 0.2),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sprout-highlight::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+            animation: shimmer 4s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .sprout-highlight p {
+            color: rgba(255, 255, 255, 0.95);
+            position: relative;
+            z-index: 1;
+            margin-bottom: 24px;
+        }
+
+        .sprout-highlight p:last-child {
+            margin-bottom: 0;
+        }
+
+        .sprout-highlight strong {
+            color: white;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Article Images */
+        .article-image {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            border-radius: 16px;
+            margin: 40px 0;
+            box-shadow: 0 12px 40px rgba(0, 107, 64, 0.15);
+            border: 2px solid rgba(152, 229, 142, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .article-image:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 50px rgba(0, 107, 64, 0.2);
+        }
+
+        .image-caption {
+            text-align: center;
+            font-style: italic;
+            color: #718096;
+            font-size: 0.9em;
+            margin-top: 12px;
+            margin-bottom: 32px;
+        }
+
+        /* Footer */
+        .footer {
+            width: 100%;
+            padding: 40px 0;
+            text-align: center;
+            background: linear-gradient(90deg, #003b2f, #001c44);
+            color: white;
+            font-style: italic;
+            margin-top: 80px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .article-title {
+                font-size: 2.5em;
+            }
+
+            .nav-menu {
+                display: none;
+            }
+
+            .article-body {
+                padding: 40px 32px;
+            }
+
+            .article-body h1 {
+                font-size: 2.2em;
+            }
+
+            .article-body h2 {
+                font-size: 1.8em;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+
+            .header,
+            .article-hero::before,
+            .article-hero::after {
+                display: none;
+            }
+
+            .article-body {
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Navigation -->
+    <header class="header" role="banner">
+        <nav class="nav-container" role="navigation" aria-label="Main navigation">
+            <div class="logo">
+                <img src="../../assets/Kyle.png" alt="Kyle Mohney Professional Photo" class="profile-logo" width="52" height="52">
+                <span class="logo-text">Kyle Mohney</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="../../index.html">Home</a></li>
+                <li><a href="../../resume.html">Resume</a></li>
+                <li><a href="../../about.html">About</a></li>
+                <li><a href="../../projects.html">Projects</a></li>
+                <li><a href="../../articles.html" class="current" aria-current="page">Articles</a></li>
+                <li><a href="../../contact.html">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Article Hero -->
+    <section class="article-hero">
+        <div class="hero-container">
+            <div class="article-category">Operational Excellence</div>
+            <h1 class="article-title">Building a Review Engine with Sprout Social</h1>
+            <p class="article-subtitle">How I transformed thousands of customer voices into actionable intelligence and operational wins</p>
+        </div>
+    </section>
+
+    <!-- Main Article Content -->
+    <article class="article-content">
+        <div class="article-body">
+            
+            <h1>Operational Excellence in Action: How I Built a Review Management Powerhouse with Sprout Social</h1>
+            
+            <p>When Thumbtack needed a rapid, enterprise-level solution to manage and transform customer feedback at scale, I stepped into the arena. The mission: create a system to handle thousands of reviews—across app stores, Google Play, and social channels—with speed, precision, and insight.</p>
+            
+            <p>There was no time for committees or trial runs. This was about building a high-functioning machine from the ground up, and doing it fast.</p>
+
+            <h2>Building the Command Center</h2>
+            
+            <p>With administrator access to Sprout Social, I designed the backbone of our new review response system. Every review—no matter where it lived—was now funneled into a single, streamlined dashboard.</p>
+
+            <img src="../../assets/sprout1.png" alt="Sprout Social Dashboard Interface" class="article-image">
+            <p class="image-caption">The Sprout Social command center - where all customer feedback converges into actionable intelligence</p>
+            
+            <p>The key innovation? I engineered a <strong>root-cause tagging framework</strong> that instantly identified the "why" behind negative sentiment. Each root cause got its own optimized, legally-approved template—ready to deploy with a click.</p>
+
+            <img src="../../assets/sprout-ai.png" alt="AI-Powered Review Management System" class="article-image">
+            <p class="image-caption">One source connecting everything - how AI and automation transform scattered feedback into unified insights</p>
+
+            <div class="sprout-highlight">
+                <p><strong>The Technical Architecture:</strong> I built a comprehensive tagging taxonomy covering sentiment analysis, issue categorization, and response prioritization. This wasn't just organization—it was operational intelligence.</p>
+            </div>
+
+            <h2>Turning Data into Action</h2>
+            
+            <p>As I worked through the backlog of <strong>more than 2,000 unaddressed reviews</strong>, Sprout's tag analytics began painting a crystal-clear picture. Trends emerged. Patterns revealed themselves. The noise became a signal.</p>
+
+            <img src="../../assets/sprout-reviews.png" alt="Thumbtack App Store Reviews Dashboard" class="article-image">
+            <p class="image-caption">Before and after: Transforming a chaotic review backlog into organized, actionable customer intelligence</p>
+            
+            <p>Within a week, I transformed a mountain of concerns into structured, actionable intelligence—complete with drag-and-drop charts that leaders could use to guide product and policy decisions. That intelligence didn't gather dust; <strong>many of my recommendations were implemented, directly improving customer experience</strong>.</p>
+
+            <h2>Making It Last</h2>
+            
+            <p>Speed was critical, but sustainability was the real goal. I documented every process step, from triaging sentiment to escalating critical cases, creating a repeatable Standard Operating Procedure. Then I trained the incoming team—walking them through every workflow until they could run it flawlessly.</p>
+
+            <div class="sprout-highlight">
+                <p><strong>The Scalable Framework:</strong> What started as crisis management became a template for enterprise social media operations—a system that could grow with the business and adapt to new challenges.</p>
+            </div>
+
+            <h2>The Outcome</h2>
+            
+            <p>What started as a massive operational gap became a scalable, insight-driven review management engine. Sprout Social became more than a listening tool—it became a proactive customer satisfaction platform, powered by a system I designed, deployed, and handed off fully operational.</p>
+            
+            <p><strong>In short:</strong> I didn't just manage reviews. I built an enterprise-grade solution that turned thousands of voices into a roadmap for better products, happier customers, and a stronger brand.</p>
+
+        </div>
+    </article>
+
+    <!-- Footer -->
+    <footer class="footer">
+        "Success is not final, failure is not fatal: It is the courage to continue that counts" – Winston Churchill
+    </footer>
+
+    <script>
+        // Loading animation for article content
+        document.addEventListener('DOMContentLoaded', function() {
+            const articleBody = document.querySelector('.article-body');
+            articleBody.style.opacity = '0';
+            articleBody.style.transform = 'translateY(30px)';
+            articleBody.style.transition = 'all 1s ease';
+            
+            setTimeout(() => {
+                articleBody.style.opacity = '1';
+                articleBody.style.transform = 'translateY(0)';
+            }, 300);
+        });
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
