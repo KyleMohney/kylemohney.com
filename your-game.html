@@ -126,8 +126,12 @@
     </style>
 </head>
 <body>
-    <div class="game-container">
+    <div class="game-container" id="gameContainer" tabindex="0">
         <div class="stars" id="stars"></div>
+        <div class="click-to-start" id="clickToStart">
+            <div>CLICK TO START GAME</div>
+            <div style="font-size: 14px; margin-top: 10px;">Arrow Keys = Move • Space = Shoot</div>
+        </div>
         <div class="hud">
             <div>Score: <span id="score">0</span></div>
             <div>Lives: <span id="lives">3</span></div>
@@ -135,7 +139,7 @@
         <canvas id="gameCanvas"></canvas>
         <div class="game-over" id="gameOver">
             <div>GAME OVER</div>
-            <div style="font-size: 16px; margin-top: 10px;">Press SPACE to restart</div>
+            <div style="font-size: 16px; margin-top: 10px;">Click to restart</div>
         </div>
         <div class="controls">
             Use ARROW KEYS to move • SPACEBAR to shoot • Defend Earth from the alien invasion!
@@ -149,6 +153,13 @@
         const scoreElement = document.getElementById('score');
         const livesElement = document.getElementById('lives');
         const gameOverElement = document.getElementById('gameOver');
+        const gameContainer = document.getElementById('gameContainer');
+        const clickToStartElement = document.getElementById('clickToStart');
+        
+        let gameStarted = false;
+        let score = 0;
+        let lives = 3;
+        let gameRunning = false;
         
         // Set canvas size responsively
         function resizeCanvas() {
@@ -167,9 +178,36 @@
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
         
-        let score = 0;
-        let lives = 3;
-        let gameRunning = true;
+        // Focus management for iframe
+        function startGame() {
+            if (!gameStarted) {
+                gameStarted = true;
+                gameRunning = true;
+                clickToStartElement.style.display = 'none';
+                gameContainer.focus();
+                
+                // Start with some enemies
+                setTimeout(() => {
+                    for (let i = 0; i < 3; i++) {
+                        setTimeout(() => createEnemy(), i * 1000);
+                    }
+                }, 1000);
+            }
+        }
+        
+        // Click to start/focus
+        gameContainer.addEventListener('click', (e) => {
+            e.preventDefault();
+            gameContainer.focus();
+            if (!gameStarted) {
+                startGame();
+            }
+        });
+        
+        // Ensure focus when mouse enters
+        gameContainer.addEventListener('mouseenter', () => {
+            gameContainer.focus();
+        });
         
         // Create starfield
         function createStars() {
@@ -199,23 +237,46 @@
         // Enemy array
         const enemies = [];
         
-        // Input handling
+        // Input handling - attached to game container
         const keys = {};
         
-        document.addEventListener('keydown', (e) => {
+        gameContainer.addEventListener('keydown', (e) => {
+            e.preventDefault();
             keys[e.code] = true;
             if (e.code === 'Space') {
-                e.preventDefault();
-                if (!gameRunning) {
+                if (!gameRunning && gameStarted) {
                     restartGame();
-                } else {
+                } else if (gameRunning) {
                     shoot();
                 }
             }
         });
         
-        document.addEventListener('keyup', (e) => {
+        gameContainer.addEventListener('keyup', (e) => {
+            e.preventDefault();
             keys[e.code] = false;
+        });
+        
+        // Also listen on document as fallback
+        document.addEventListener('keydown', (e) => {
+            if (gameStarted) {
+                e.preventDefault();
+                keys[e.code] = true;
+                if (e.code === 'Space') {
+                    if (!gameRunning && gameStarted) {
+                        restartGame();
+                    } else if (gameRunning) {
+                        shoot();
+                    }
+                }
+            }
+        });
+        
+        document.addEventListener('keyup', (e) => {
+            if (gameStarted) {
+                e.preventDefault();
+                keys[e.code] = false;
+            }
         });
         
         // Create enemy
@@ -363,4 +424,32 @@
             player.x = canvas.width / 2 - 25;
             scoreElement.textContent = score;
             livesElement.textContent = lives;
-            gameOverElement.style.display = 'none'
+            gameOverElement.style.display = 'none';
+            gameContainer.focus();
+        }
+        
+        // Game loop
+        function gameLoop() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Update and draw
+            update();
+            drawPlayer();
+            drawEnemies();
+            drawBullets();
+            
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Initialize game
+        createStars();
+        gameLoop();
+        
+        // Make sure the game container can receive focus when page loads
+        setTimeout(() => {
+            gameContainer.focus();
+        }, 100);
+    </script>
+</body>
+</html>
