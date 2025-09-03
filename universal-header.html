@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kyle Mohney's Portfolio</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="universal-header">
+        <div class="header-left">
+            <img src="../assets/images/kyle.png" alt="Kyle Mohney" class="profile-pic">
+            <span class="header-name">
+                Kyle Mohney
+                <span class="header-name-glow"></span>
+            </span>
+        </div>
+        <nav>
+            <div class="nav-links" id="navLinks">
+                <a href="index.html" class="nav-link active">Home</a>
+                <a href="resume.html" class="nav-link">Resume</a>
+                <a href="about.html" class="nav-link">About</a>
+                <a href="projects.html" class="nav-link">Projects</a>
+                <a href="articles.html" class="nav-link">Articles</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+            </div>
+            <div class="header-icons">
+                <button class="header-icon-btn" title="Settings"><span>&#9881;</span></button>
+                <button class="header-icon-btn" title="Help"><span>?</span></button>
+                <button class="header-icon-btn" title="Language">EN</button>
+            </div>
+            <div class="hamburger" id="hamburger" aria-label="Open navigation" tabindex="0">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+    <script>
+        var hamburger = document.getElementById('hamburger');
+        var navLinks = document.getElementById('navLinks');
+        hamburger.addEventListener('click', function() {
+            navLinks.classList.toggle('open');
+        });
+        hamburger.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') navLinks.classList.toggle('open');
+        });
+    </script>
+</body>
+</html>
+

@@ -5,6 +5,7 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Kyle J. Mohney - Resume | Product Documentation &amp; Knowledge Operations Specialist</title>
 <meta content="Kyle Mohney's professional resume - Enterprise Sp..., AI automation, and knowledge management." name="description"/>
+<link rel="stylesheet" href="styles.css">
 <style>
         /* ==============================
          * KYLE MOHNEY RESUME STYLES
@@ -20,7 +21,7 @@
         :root {
             --primary: #1f2937; /* slate-800 */
             --accent: #14b8a6;  /* teal-500 */
-            --muted: #6b7280;  /* gray-500 */
+            --muted: #fff;  /* white */
             --bg: #0b0b0f;     /* deep slate */
             --card: #111827;   /* slate-900 */
             --border: #374151; /* slate-700 */
@@ -34,7 +35,7 @@
             min-height: 100%;
             margin: 0;
             padding: 0;
-            font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+            /* font-family removed; now controlled by styles.css */
             background: 
                 /* Deep space base */
                 radial-gradient(ellipse at 20% 10%, rgba(75, 0, 130, 0.6) 0%, transparent 50%),
@@ -156,8 +157,8 @@
             }
         }
 
-        a { color: var(--link); text-decoration: none; }
-        a:hover { text-decoration: underline; }
+    a { color: var(--link); text-decoration: none; }
+    a:hover { text-decoration: none; }
 
         /* Header / Nav - EXACTLY MATCH OTHER PAGES */
         header {
@@ -169,7 +170,7 @@
             z-index: 1000;
             border-bottom: 1px solid rgba(152, 229, 142, 0.1);
             box-shadow: 0 2px 20px rgba(0, 107, 64, 0.05);
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif !important;
+            /* font-family removed; now controlled by styles.css */
         }
         .nav-container {
             max-width: 1200px;
@@ -178,14 +179,15 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif !important;
+            /* font-family removed; now controlled by styles.css */
         }
         .logo { display: flex; align-items: center; gap: 12px; }
         .profile-logo { width: 52px; height: 52px; border-radius: 50%; border: 2px solid #98e58e; box-shadow: 0 8px 24px rgba(0,0,0,0.4); object-fit: cover; }
-        .logo-text { font-size: 1.5em; font-weight: 700; color: #2d3748; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif !important; }
+    .logo-text { font-size: 1.5em; font-weight: 700; color: #222; }
+    .header-name { font-size: 1.12rem; font-weight: 700; color: #222; font-family: 'Montserrat', 'Times New Roman', Times, serif; letter-spacing: 0.5px; white-space: nowrap; position: relative; z-index: 1; }
 
         .nav-menu { display: flex; list-style: none; gap: 40px; margin: 0; padding: 0; }
-        .nav-menu a { color: #2d3748; text-decoration: none; font-weight: 600; font-size: 1.1em; padding: 12px 20px; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif !important; position: relative; transition: all 0.3s ease; border-radius: 8px; }
+        .nav-menu a { color: #2d3748; text-decoration: none; font-weight: 600; font-size: 1.1em; padding: 12px 20px; position: relative; transition: all 0.3s ease; border-radius: 8px; }
         .nav-menu a:hover { color: #006b40; background: rgba(152, 229, 142, 0.1); text-decoration: none; transform: translateY(-2px); }
         .nav-menu a.current { color: #006b40; background: rgba(152, 229, 142, 0.15); box-shadow: 0 4px 12px rgba(152, 229, 142, 0.2); }
 
@@ -202,6 +204,7 @@
         .hero .cta { margin-top: 14px; }
         .cta a { display: inline-block; padding: 10px 14px; border-radius: 10px; background: rgba(20,184,166,0.15); border: 1px solid rgba(34,211,238,0.25); box-shadow: 0 8px 22px rgba(20,184,166,0.15); }
 
+    /* Quinn's Quest Play Button Style removed for consistency with .github-btn */
         /* Projects grid (cards) */
         main { max-width: 1100px; margin: 0 auto; padding: 24px 18px 80px; position: relative; z-index: 60; }
         .project-card { 
@@ -620,34 +623,58 @@
 </style>
 </head>
 <body>
+    <!-- Universal Header Removed -->
 <canvas id="particle-canvas"></canvas>
 <div class="floating-nodes"></div>
 <div class="circuit-lines"></div>
 
-<!-- Header - EXACTLY MATCH OTHER PAGES -->
-<header class="header" role="banner">
-    <nav aria-label="Main navigation" class="nav-container" role="navigation">
-        <div class="logo">
-            <img alt="Kyle Mohney Professional Photo" class="profile-logo" height="52" src="assets/kyle.png" width="52"/>
-            <span class="logo-text">Kyle Mohney</span>
-        </div>
-        <ul class="nav-menu">
-            <li><a href="index.html">Home</a></li>
-            <li><a href="resume.html">Resume</a></li>
-            <li><a href="about.html">About</a></li>
-            <li><a class="current" href="projects.html" aria-current="page">Projects</a></li>
-            <li><a href="articles.html">Articles</a></li>
-            <li><a href="contact.html">Contact</a></li>
-        </ul>
-    </nav>
-</header>
+<!-- Header removed for redesign -->
 
 <div class="hero">
+    <header class="universal-header">
+        <div class="header-left">
+            <img src="../assets/images/kyle.png" alt="Kyle Mohney" class="profile-pic">
+            <span class="header-name">
+                Kyle Mohney
+                <span class="header-name-glow"></span>
+            </span>
+        </div>
+        <nav>
+            <div class="nav-links" id="navLinks">
+                <a href="index.html" class="nav-link active">Home</a>
+                <a href="resume.html" class="nav-link">Resume</a>
+                <a href="about.html" class="nav-link">About</a>
+                <a href="projects.html" class="nav-link">Projects</a>
+                <a href="articles.html" class="nav-link">Articles</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+            </div>
+            <div class="header-icons">
+                <button class="header-icon-btn" title="Settings"><span>&#9881;</span></button>
+                <button class="header-icon-btn" title="Help"><span>?</span></button>
+                <button class="header-icon-btn" title="Language">EN</button>
+            </div>
+            <div class="hamburger" id="hamburger" aria-label="Open navigation" tabindex="0">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+    <script>
+        var hamburger = document.getElementById('hamburger');
+        var navLinks = document.getElementById('navLinks');
+        hamburger.addEventListener('click', function() {
+            navLinks.classList.toggle('open');
+        });
+        hamburger.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') navLinks.classList.toggle('open');
+        });
+    </script>
+    <!-- Universal header inserted above -->
     <div class="hero-inner">
         <div>
             <h1>Interactive Demos &amp; Sandbox</h1>
-            <p>Mini projects to showcase UI, graphics, and automation.</p>
-            <div class="cta"><a href="#projects">Jump to projects ↓</a></div>
+                <p>Projects to showcase AI, project management, and coordination skills.</p>
         </div>
     </div>
 </div>
@@ -656,29 +683,349 @@
 <div class="circuit-lines"></div>
 
 <main>
-    <section class="project-card">
-        <h2>Interactive HTML Game</h2>
-        <p>A browser-based game demonstrating interactive UI elements and responsive design principles.</p>
-        <iframe src="your-game.html" title="HTML Game Demo"></iframe>
+
+    <section class="project-card" style="background:rgba(34,211,238,0.08);box-shadow:none;border:1.5px dashed #22d3ee;margin-bottom:18px;">
+            <div style="display:flex;align-items:center;justify-content:center;flex-direction:row;padding:24px 12px 18px 12px;gap:32px;">
+                <div style="display:flex;flex-direction:column;align-items:center;text-align:center;">
+                    <h2 style="color:#22d3ee;margin:0 0 8px 0;font-size:1.3em;">See the Code Behind the Magic</h2>
+                    <p style="color:#93c5fd;font-size:1em;margin:0 0 10px 0;max-width:420px;text-align:center;opacity:0.85;">Curious how this website and the games were built? Even though I didn’t know a single line of code when I started, the code under the hood looks just as good as what you see on top. Visit my GitHub to explore the source code, assets, and modular architecture powering every project.</p>
+                    <a href="https://github.com/KyleMohney" target="_blank" class="github-btn" style="margin-top:4px;">View on GitHub</a>
+                </div>
+                <img src="assets/logos/github1.png" alt="GitHub Logo" style="width:202px;height:96px;opacity:0.8;">
+            </div>
+    </section>
+    <section class="project-card" id="quinn-card">
+    <h2 style="color:#fff;text-align:left;margin-top:24px;margin-bottom:12px;">Legend of Quinn (Quinn's Quest)</h2>
+    <img src="assets/images/quinns-quest.png" alt="Legend of Quinn Thumbnail" style="width:100%;max-width:420px;display:block;margin-top:0;margin-bottom:12px;margin-left:auto;margin-right:auto;border-radius:12px;box-shadow:0 4px 18px rgba(34,211,238,0.18);">
+        <p style="margin-top:14px;">Quinn’s Quest is the crown jewel of my AI project management journey—a fully modular, hand-crafted browser game built from scratch. Every asset and line of code is original, meticulously organized, and clearly documented for total transparency. Visual assets were created using a combination of Illustrator, Photoshop, and ChatGPT. Sound effects were sourced from royalty-free sites like Pixabay and others, while all voice recordings were performed by my 4-year-old son and I. This project highlights advanced self-taught game development, AI-powered learning, and project management skills—demonstrating that with determination and the right technology, even the impossible becomes reality.</p>
+        <div style="display:flex;justify-content:center;">
+            <button id="quinn-overlay" class="github-btn" style="margin-bottom:8px;cursor:pointer;font-size:1.1em;min-width:180px;max-width:320px;" onclick="loadGame('quinn')">Click to play</button>
+        </div>
+        <div id="quinn-iframe-container" style="position:relative;"></div>
+        <div id="quinn-fs-overlay" style="display:none;position:absolute;bottom:18px;right:18px;z-index:10;cursor:pointer;background:rgba(24,24,32,0.7);border-radius:6px;padding:8px;transition:opacity 0.2s;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h7V2H2v9h2V4zm16 0h-7V2h9v9h-2V4zm0 16h-7v2h9v-9h-2v7zm-16 0h7v2H2v-9h2v7z"/></svg>
+        </div>
+    </section>
+
+        <!-- Quinn's Quest Modal -->
+        <div id="quinn-modal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(12,12,24,0.92);z-index:9999;align-items:center;justify-content:center;">
+            <button id="quinn-modal-close" style="position:fixed;top:32px;right:48px;font-size:2.5em;background:#22d3ee;color:#fff;border:3px solid #fff;border-radius:12px;padding:12px 24px;cursor:pointer;z-index:2147483647;pointer-events:auto;box-shadow:0 0 24px #22d3ee;">&times;</button>
+            <div id="quinn-modal-content" style="position:relative;display:inline-block;padding:0;width:auto;height:auto;background:#181826;border-radius:18px;box-shadow:0 0 40px #22d3ee;">
+            </div>
+        <script>
+        // Reliable direct event handler for Quinn modal close
+        document.getElementById('quinn-modal-close').onclick = function() {
+            var modal = document.getElementById('quinn-modal');
+            var iframe = document.getElementById('quinn-modal-iframe');
+            if (iframe) iframe.remove();
+            modal.style.transition = 'opacity 0.15s';
+            modal.style.opacity = '0';
+            setTimeout(function() {
+                modal.style.display = 'none';
+                modal.style.opacity = '1';
+                document.body.style.overflow = '';
+            }, 150);
+        };
+        </script>
+        </div>
+    <section class="project-card" id="galaxy-card">
+    <h2 style="color:#fff;text-align:left;margin-top:24px;margin-bottom:12px;">Galaxy Conquerers</h2>
+    <img src="assets/images/galaxy.png" alt="Galaxy Conquerers Thumbnail" style="width:100%;max-width:420px;display:block;margin-top:0;margin-bottom:12px;margin-left:auto;margin-right:auto;border-radius:12px;box-shadow:0 4px 18px rgba(34,211,238,0.18);">
+        <p style="margin-top:14px;">Galaxy Conquerers is a browser-based game built in a single night as a test of rapid deployment and creative problem-solving. All game assets were quickly assembled using ChatGPT, while every sound effect was sourced royalty-free from Pixabay. The game was coded using Claude AI, with final polish and finishing touches completed in VS Code. This project demonstrates how a complete, interactive game can be taken from concept to launch in just one evening—proving that with the right AI tools and workflow, rapid game development is possible. Mission accomplished.</p>
+        <div style="display:flex;justify-content:center;">
+        <button id="galaxy-overlay" class="github-btn" style="margin-bottom:8px;cursor:pointer;font-size:1.1em;min-width:180px;max-width:320px;" onclick="loadGalaxyGame()">Click to play</button>
+        </div>
+<!-- Galaxy Conquerers Modal (moved to be direct child of body) -->
+</section>
+<div id="galaxy-modal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(12,12,24,0.92);z-index:99999;align-items:center;justify-content:center;">
+    <button id="galaxy-modal-close" style="position:fixed;top:32px;right:48px;font-size:2.5em;background:#22d3ee;color:#fff;border:3px solid #fff;border-radius:12px;padding:12px 24px;cursor:pointer;z-index:100000;pointer-events:auto;box-shadow:0 0 24px #22d3ee;">&times;</button>
+    <div id="galaxy-modal-content" style="position:relative;display:inline-block;padding:0;width:auto;height:auto;background:#181826;border-radius:18px;box-shadow:0 0 40px #22d3ee;z-index:100001;"></div>
+</div>
+        </div>
+        <ul style="margin-top:12px;margin-bottom:0;font-size:1em;color:#93c5fd;">
+        </ul>
     </section>
     <section class="project-card">
-        <h2>AI Tools Mastery Showcase</h2>
-        <p>Interactive carousel demonstrating expertise across AI platforms including ChatGPT, Claude, Midjourney, and automation tools.</p>
-        <iframe src="ai-tools-showcase-carousel.html" title="AI Tools Showcase"></iframe>
+    <h2 style="color:#fff;text-align:left;margin-top:24px;margin-bottom:12px;">AI Tools Mastery Showcase</h2>
+        <div style="display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;">
+            <div style="width:100%;max-width:100%;display:block;margin:0 0 12px 0;border-radius:12px;box-shadow:0 4px 18px rgba(34,211,238,0.18);overflow:hidden;background:#0b0b0f;text-align:left;">
+                <iframe src="https://gamma.app/embed/lw5qsl3jagypjo9" style="width:100%;min-width:320px;max-width:100%;height:450px;border:0;background:#0b0b0f;display:block;text-align:left;" allow="fullscreen" title="The Ultimate Guide to AI Tools: Your Complete Resource"></iframe>
+            </div>
+            <p style="margin:14px 16px 10px 16px;color:#fff;line-height:1.5;text-align:left;">
+                When I first started exploring AI, I built a master list of 100 different tools, organized by use case, to help guide my own projects and learning. The carousel below features a small selection from that list—chosen to be helpful for anyone just beginning their own journey with AI. These are practical starting points, not a complete library, and meant to make it easier for others to discover useful platforms as they get started.
+            </p>
+        </div>
     </section>
     <section class="project-card">
-        <h2>Media Visualizer</h2>
-        <p>Advanced audio visualization system with real-time frequency analysis and dynamic visual effects.</p>
-        <iframe src="my-visualizer.html" title="Media Visualizer"></iframe>
+    <h2 style="color:#fff;text-align:left;margin-top:24px;margin-bottom:12px;">Media Visualizer</h2>
+        <iframe src="projects/my-visualizer.html" title="Media Visualizer"></iframe>
+        <p style="margin-top:14px;">This Media Visualizer was my first project working specifically with HTML. I set out to learn how to build a standalone page featuring interactive visual elements, experimenting with on-screen toggles and controls to manipulate audio-driven graphics in real time. The result is an advanced audio visualization system with real-time frequency analysis and dynamic visual effects—a hands-on introduction to web development and creative coding.</p>
     </section>
+    <section class="project-card">
+    <h2 style="color:#fff;text-align:left;margin-top:24px;margin-bottom:12px;">Claude Can Draw</h2>
+        <div id="claude-carousel" style="position:relative;width:100%;max-width:680px;height:420px;margin:18px auto 0 auto  ;background:#0b0b0f;border-radius:18px;box-shadow:0 8px 32px 0 rgba(34,211,238,0.32), 0 0 48px 0 rgba(34,211,238,0.22);overflow:visible;">
+            <button id="claude-carousel-prev" class="historical-carousel-btn left">❮</button>
+            <img id="claude-carousel-img" src="assets/images/starfield-claude1.png" alt="Starfield by Claude AI" class="historical-carousel-img">
+            <button id="claude-carousel-next" class="historical-carousel-btn right">❯</button>
+        </div>
+        <p style="margin-top:14px;">Discover the breakthrough where Claude AI transcends its limits and becomes a true digital artist. By engineering a persistent memory system—using a running notepad document to capture every creative insight—I empowered Claude to learn, adapt, and master advanced graphic techniques. Leveraging cutting-edge CSS, pixel manipulation, and ingenious layering strategies, Claude now creates cosmic star fields and near-photorealistic visuals, rivaling traditional design tools. This project proves that, with the right code and visionary guidance, AI can achieve artistry once thought impossible—turning pure code into breathtaking digital masterpieces.</p>
+        <div style="height:32px;"></div>
+<style>
+        .historical-carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            color: #22d3ee;
+            border: none;
+            font-size: 2.6em;
+            cursor: pointer;
+            z-index: 2;
+            transition: color 0.2s;
+            padding: 0 8px;
+        }
+        .historical-carousel-btn:hover, .historical-carousel-btn:focus {
+            color: #14b8a6;
+            outline: none;
+        }
+        .historical-carousel-btn.left {
+            left: -40px;
+        }
+        .historical-carousel-btn.right {
+            right: -40px;
+        }
+        .historical-carousel-img {
+            width: 100%;
+            aspect-ratio: 16/9;
+            height: 420px;
+            object-fit: cover;
+        }
+</style>
+        <!-- Add demo, image, or link here if needed -->
+    </section>
+    <div style="margin-bottom:8px;margin-left:4px;color:#fff;font-size:1.05em;text-align:left;max-width:600px;opacity:0.92;">Background created with Claude, using CSS, Java, and HTML.</div>
 </main>
 
-<!-- Footer - EXACTLY MATCH OTHER PAGES -->
-<footer>
-    "The best way to predict the future is to invent it." — Alan Kay
-</footer>
+    <div style="display:flex;flex-wrap:wrap;gap:32px;justify-content:center;margin-bottom:32px;">
+        <section class="project-card" style="flex:1 1 380px;max-width:480px;min-width:280px;background:var(--card);box-shadow:0 2px 16px var(--shadow);padding:2rem 1.5rem;border-radius:18px;display:flex;flex-direction:column;align-items:center;gap:1rem;">
+            <h2 style="font-size:1.5em;margin-bottom:0.5em;text-align:center;letter-spacing:1px;text-shadow:0 2px 8px #000;">Podcast Feature: A Dwarf's Tale</h2>
+            <div style="font-size:1.12em;line-height:1.8;text-align:center;margin-bottom:0.5em;font-family:'Georgia',serif;color:var(--highlight);text-shadow:0 1px 8px #0e3a3a;">
+                <strong>In a city shrouded in shadow, where hope is a fading ember...</strong><br>
+                <span style="font-size:1.18em;font-weight:bold;">A Dwarf's Tale</span> invites you to District 104—a land sealed from the world, where crops wither, monsters prowl, and the last light of life flickers.<br><br>
+                <em>Meet Angvald and Skar</em>, two unruly dwarves whose laughter echoes through the mountains. Their journey will take you from haunted ruins to sunlit valleys, battling beasts and unraveling the secrets of a city on the edge.<br>
+                <span style="display:block;margin:1em 0 0.5em 0;">Together, they race across the vast city in search of an ancient order that may hold the keys to saving their home.</span><br>
+                This is a saga of brotherhood, courage, and discovery—where every step is a fight for survival, and every legend is forged in the fires of friendship.<br><br>
+                <span style="font-size:1.08em;font-style:italic;">If you crave epic quests, ancient mysteries, and the spirit of adventure, this Lord of the Rings-meets-The Witcher tale will sweep you away.</span>
+                <span style="display:block;margin:1em 0 0.5em 0;">From the thunderous clash of steel and spell to the quiet moments of reflection, every chapter is a celebration of courage, friendship, and the enduring spirit of the dwarves. The fate of District 104 hangs in the balance—and the adventure is just beginning.</span>
+            </div>
+            <iframe data-testid="embed-iframe" style="border-radius:12px;width:100%;max-width:400px;height:260px;" src="https://open.spotify.com/embed/episode/5qlUaRyK0OSXbYkWAP1OTe?utm_source=generator" frameBorder="0" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        </section>
+        <section class="project-card" style="flex:1 1 380px;max-width:480px;min-width:280px;background:var(--card);box-shadow:0 2px 16px var(--shadow);padding:2rem 1.5rem;border-radius:18px;display:flex;flex-direction:column;align-items:center;gap:1rem;">
+            <h2 style="font-size:1.35em;margin-bottom:0.5em;text-align:center;letter-spacing:1px;text-shadow:0 2px 8px #000;">YouTube Feature: McCamey HEMA</h2>
+            <div style="font-size:1.12em;line-height:1.8;text-align:center;margin-bottom:0.5em;color:var(--highlight);text-shadow:0 1px 8px #0e3a3a;">
+                <strong>Step into the arena—where steel clashes, legends awaken, and history comes alive.</strong><br>
+                <span style="font-size:1.18em;font-weight:bold;">McCamey HEMA</span> is your gateway to the world of real sword fighting combat, performed by professionals and passionate athletes.<br><br>
+                Witness the art and science of battle as we wield longsword, broadsword, messer, rapier, saber, dagger, and more—each weapon with its own story, each duel a test of skill and spirit.<br><br>
+                Journey through centuries of martial tradition, guided by the wisdom of legendary masters: Fiore De Liberi, Joachim Meyer, Charles Roworth, Johannas Lichtenauer, and others.<br><br>
+                From my humble, self-taught beginnings during COVID, to the thrill of tournament victory and the honor of coaching and instructing, every video is a chapter in a living legacy.<br><br>
+                <b>Enjoy over 300 fighting videos</b>—from cinematic battles and technical breakdowns to educational deep-dives and pure entertainment.<br><br>
+                If you crave epic duels, historical adventure, and the pulse of real combat, this channel will ignite your imagination and challenge your courage. <span style="font-size:1.08em;font-style:italic;">Step in, and let the story begin.</span>
+                <br><br><br>
+            </div>
+            <iframe style="border-radius:12px;width:100%;max-width:400px;height:225px;" src="https://www.youtube.com/embed/CHwrwaiixvI?si=4p3Ts84zf2qHTO8D" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </section>
+    </div>
+
+<!-- Footer removed for redesign -->
 
 <script>
+// Reliable direct event handler for Galaxy modal close
+document.getElementById('galaxy-modal-close').onclick = function() {
+    var modal = document.getElementById('galaxy-modal');
+    var iframe = document.getElementById('galaxy-modal-iframe');
+    if (iframe) iframe.remove();
+    modal.style.transition = 'opacity 0.15s';
+    modal.style.opacity = '0';
+    setTimeout(function() {
+        modal.style.display = 'none';
+        modal.style.opacity = '1';
+        document.body.style.overflow = '';
+    }, 150);
+};
+function loadGalaxyGame() {
+    var modal = document.getElementById('galaxy-modal');
+    var content = document.getElementById('galaxy-modal-content');
+    // Remove any previous iframe
+    var oldIframe = document.getElementById('galaxy-modal-iframe');
+    if (oldIframe) oldIframe.remove();
+    // Create new iframe only when play is clicked
+    var iframe = document.createElement('iframe');
+    iframe.id = 'galaxy-modal-iframe';
+    iframe.src = 'projects/space-game.html';
+    iframe.title = 'Galaxy Conquerers';
+    iframe.allowFullscreen = true;
+    iframe.style = 'width:85vw;max-width:1400px;height:80vh;max-height:900px;border:0;background:#0b0b0f;border-radius:12px;display:block;pointer-events:auto;z-index:2147483647;';
+    content.appendChild(iframe);
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+// Claude Can Draw carousel logic
+const claudeImages = [
+    'assets/images/starfield-claude1.png',
+    'assets/images/starfield-claude2.png',
+    'assets/images/starfield-claude3.png'
+];
+let claudeCurrentIndex = 0;
+window.addEventListener('DOMContentLoaded', function() {
+    const claudeCarouselImg = document.getElementById('claude-carousel-img');
+    const prevBtn = document.getElementById('claude-carousel-prev');
+    const nextBtn = document.getElementById('claude-carousel-next');
+    if (!claudeCarouselImg || !prevBtn || !nextBtn) {
+        console.error('Carousel elements not found.');
+        return;
+    }
+    prevBtn.onclick = function() {
+        claudeCurrentIndex = (claudeCurrentIndex - 1 + claudeImages.length) % claudeImages.length;
+        claudeCarouselImg.src = claudeImages[claudeCurrentIndex];
+    };
+    nextBtn.onclick = function() {
+        claudeCurrentIndex = (claudeCurrentIndex + 1) % claudeImages.length;
+        claudeCarouselImg.src = claudeImages[claudeCurrentIndex];
+    };
+});
+// Click-to-play game loader
+function loadGame(game) {
+    if (game === 'quinn') {
+        // Show modal overlay for Quinn's Quest
+        var modal = document.getElementById('quinn-modal');
+        var content = document.getElementById('quinn-modal-content');
+        // Remove any previous iframe
+        var oldIframe = document.getElementById('quinn-modal-iframe');
+        if (oldIframe) oldIframe.remove();
+        // Create new iframe only when play is clicked
+    var iframe = document.createElement('iframe');
+    iframe.id = 'quinn-modal-iframe';
+    iframe.src = 'projects/QuinnsQuest/index.html';
+    iframe.title = 'Legend of Quinn';
+    iframe.allowFullscreen = true;
+    iframe.style = 'width:85vw;max-width:1400px;height:80vh;max-height:900px;border:0;background:#0b0b0f;border-radius:12px;display:block;pointer-events:none;';
+    content.appendChild(iframe);
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+        // Ensure close handler is attached every time modal is shown
+        if (typeof attachQuinnModalClose === 'function') {
+            attachQuinnModalClose();
+        }
+    } else if (game === 'galaxy') {
+// Fullscreen function for Quinn's Quest
+function fullscreenQuinnGame() {
+    var iframe = document.getElementById('quinn-iframe');
+    if (!iframe) {
+        alert('Game must be loaded before entering fullscreen.');
+        return;
+    }
+    // Try to request fullscreen on the iframe or its parent container
+    if (iframe.requestFullscreen) {
+        iframe.requestFullscreen().catch(function() {
+            alert('Fullscreen request was denied by the browser.');
+        });
+    } else if (iframe.mozRequestFullScreen) { // Firefox
+        iframe.mozRequestFullScreen();
+    } else if (iframe.webkitRequestFullscreen) { // Chrome, Safari, Opera
+        iframe.webkitRequestFullscreen();
+    } else if (iframe.msRequestFullscreen) { // IE/Edge
+        iframe.msRequestFullscreen();
+    } else {
+        alert('Fullscreen is not supported in this browser.');
+    }
+}
+
+// Quinn's Quest Modal close logic
+// Direct close fallback for Quinn modal
+// Last-resort: global click event for Quinn modal close
+document.addEventListener('click', function(e) {
+    var btn = document.getElementById('quinn-modal-close');
+    var modal = document.getElementById('quinn-modal');
+    var iframe = document.getElementById('quinn-modal-iframe');
+    if (btn && modal && e.target === btn) {
+        console.log('Global event: Quinn modal close triggered');
+        if (iframe) iframe.remove();
+        modal.style.transition = 'opacity 0.15s';
+        modal.style.opacity = '0';
+        setTimeout(function() {
+            modal.style.display = 'none';
+            modal.style.opacity = '1';
+            document.body.style.overflow = '';
+        }, 150);
+    }
+});
+function quinnModalDirectClose() {
+    console.log('Direct Quinn modal close triggered');
+    var modal = document.getElementById('quinn-modal');
+    var iframe = document.getElementById('quinn-modal-iframe');
+    if (iframe) iframe.remove();
+    modal.style.transition = 'opacity 0.15s';
+    modal.style.opacity = '0';
+    setTimeout(function() {
+        modal.style.display = 'none';
+        modal.style.opacity = '1';
+        document.body.style.overflow = '';
+    }, 150);
+}
+function attachQuinnModalClose() {
+    var closeBtn = document.getElementById('quinn-modal-close');
+    var modal = document.getElementById('quinn-modal');
+    var content = document.getElementById('quinn-modal-content');
+    function closeModal() {
+        // Remove the iframe instantly
+        var iframe = document.getElementById('quinn-modal-iframe');
+        if (iframe) {
+            iframe.remove();
+        }
+        // Blur focus from modal and iframe
+        if (document.activeElement) document.activeElement.blur();
+        // Fast fade-out for feedback
+        modal.style.transition = 'opacity 0.15s';
+        modal.style.opacity = '0';
+        setTimeout(function() {
+            modal.style.display = 'none';
+            modal.style.opacity = '1';
+            document.body.style.overflow = '';
+        }, 150);
+    }
+    if (closeBtn && modal) {
+        closeBtn.onclick = closeModal;
+        closeBtn.addEventListener('click', closeModal);
+        console.log('Quinn modal close button attached.');
+    } else {
+        console.warn('Quinn modal close button or modal not found.');
+    }
+    // Listen for Escape key to close modal
+    document.addEventListener('keydown', function(e) {
+        if (modal && modal.style.display === 'flex' && (e.key === 'Escape' || e.key === 'Esc')) {
+            closeModal();
+        }
+    });
+}
+// Attach on DOMContentLoaded and also after showing modal
+document.addEventListener('DOMContentLoaded', attachQuinnModalClose);
+// Also call after showing modal in loadGame
+    } else if (game === 'galaxy') {
+        var btn = document.getElementById('galaxy-overlay');
+        var container = document.getElementById('galaxy-iframe-container');
+        if (btn.dataset.opened !== 'true') {
+            // Open the game
+            container.innerHTML = '<iframe id="galaxy-iframe" src="projects/space-game.html" title="Galaxy Conquerers" style="width:100%;height:620px;border:0;background:#0b0b0f;"></iframe>';
+            btn.textContent = 'Click to close';
+            btn.dataset.opened = 'true';
+        } else {
+            // Close the game
+            container.innerHTML = '';
+            btn.textContent = 'Click to play';
+            btn.dataset.opened = 'false';
+        }
+    }
+}
 // ULTIMATE PARTICLE SYSTEM - Orbital clusters + radiation
 const canvas = document.getElementById('particle-canvas');
 const ctx = canvas.getContext('2d');
@@ -822,6 +1169,10 @@ function initStars(){
     const soloCount = count - stars.length;
     for (let i = 0; i < soloCount; i++) {
         stars.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            radius: Math.random() * 2 + 0.3,
+            baseAlpha: Math.random() * 0.4 + 0.3,
             x: Math.random() * canvas.width,
             y: Math.random() * canvas.height,
             radius: Math.random() * 2 + 0.3,
@@ -1022,5 +1373,87 @@ setTimeout(() => {
 
 console.log('ULTIMATE PARTICLE SYSTEM ACTIVATED');
 </script>
+<!-- Universal Share Card -->
+<div style="display:flex;justify-content:center;align-items:flex-start;gap:24px;margin-bottom:32px;flex-wrap:wrap;margin-left:-18px;">
+    <div class="universal-share-card" style="--share-card-color:var(--highlight);background:var(--card);color:var(--highlight);border:2px solid var(--highlight);margin:0;">
+      <h3 class="universal-share-title">Share this page</h3>
+      <div class="share-links">
+          <a href="https://facebook.com/sharer/sharer.php?u=https://kylemohney.com/projects.html" target="_blank" rel="noopener">
+              <img src="assets/icons/facebook.png" alt="Share on Facebook" class="share-icon" />
+          </a>
+          <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://kylemohney.com/projects.html" target="_blank" rel="noopener">
+              <img src="assets/icons/in.png" alt="Share on LinkedIn" class="share-icon" />
+          </a>
+          <a href="https://x.com/intent/tweet?url=https://kylemohney.com/projects.html" target="_blank" rel="noopener">
+              <img src="assets/icons/x.png" alt="Share on X" class="share-icon" />
+          </a>
+          <a href="#" onclick="navigator.clipboard.writeText(window.location.href);alert('Page link copied!');return false;">
+              <img src="assets/icons/direct-icon.png" alt="Copy Direct Link" class="share-icon" />
+          </a>
+      </div>
+  </div>
+    <div class="universal-contact-card" style="--contact-card-color:var(--highlight);background:var(--card);color:var(--highlight);border:2px solid var(--highlight);margin:0;">
+      <h3 class="universal-contact-title">Connect with me</h3>
+      <div class="contact-links">
+          <a href="https://linkedin.com/in/kyle-mohney" target="_blank" rel="noopener" title="LinkedIn">
+              <img src="assets/icons/in.png" alt="LinkedIn" class="contact-icon" />
+          </a>
+          <a href="mailto:kyle.mohney@hotmail.com" title="Email">
+              <img src="assets/icons/mail.png" alt="Email" class="contact-icon" />
+          </a>
+          <a href="https://kmohney.youcanbook.me" target="_blank" rel="noopener" title="Schedule a Meeting">
+              <img src="assets/icons/ycbm-icon.png" alt="You Can Book Me" class="contact-icon" />
+          </a>
+      </div>
+  </div>
+</div>
+<!-- Universal Bottom Navigation - Quick Navigation Only -->
+<style>
+        .bottom-navigation {
+            background: var(--card) !important;
+            border-top-color: var(--highlight) !important;
+        }
+        .bottom-nav-title {
+            color: var(--highlight) !important;
+        }
+        .bottom-nav-link {
+            color: var(--highlight) !important;
+        }
+        .bottom-nav-link.active {
+            color: var(--highlight) !important;
+            font-weight: 600 !important;
+        }
+        .bottom-nav-link:hover {
+            background: rgba(52, 144, 220, 0.18) !important;
+            border-color: var(--highlight) !important;
+            color: var(--highlight) !important;
+        }
+        .quote-author {
+            color: var(--highlight) !important;
+        }
+</style>
+<section class="bottom-navigation">
+    <div class="bottom-nav-container">
+        <!-- Quick Navigation Only -->
+        <div class="bottom-nav-section">
+            <div class="bottom-nav-title">Quick Navigation</div>
+            <div class="bottom-nav-links">
+                <a href="index.html" class="bottom-nav-link">Home</a>
+                <a href="resume.html" class="bottom-nav-link">Resume</a>
+                <a href="about.html" class="bottom-nav-link">About</a>
+                <a href="projects.html" class="bottom-nav-link active">Projects</a>
+                <a href="articles.html" class="bottom-nav-link">Articles</a>
+                <a href="contact.html" class="bottom-nav-link">Contact</a>
+            </div>
+        </div>
+        <!-- Inspirational Quote -->
+        <div class="bottom-nav-section">
+            <blockquote class="article-quote">
+                <span>"Remember to look up at the stars and not down at your feet."</span><br>
+                <span class="quote-author">— Stephen Hawking</span>
+            </blockquote>
+        </div>
+    </div>
+</section>
 </body>
 </html>

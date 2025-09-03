@@ -1,0 +1,400 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude Remembers</title>
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    body {
+      font-family: 'Montserrat', 'Times New Roman', Times, serif;
+      line-height: 1.6;
+      color: #e0e7e9;
+      background: linear-gradient(135deg, #050a13 0%, #0a181f 60%, #083f3f 100%) !important;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+    .grid-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+      mix-blend-mode: lighten;
+    }
+    .glow-node {
+      filter: blur(8px) brightness(1.2);
+      animation: pulseGlow 2.5s infinite alternate;
+    }
+    @keyframes pulseGlow {
+      0% { opacity: 0.7; }
+      100% { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+    <header class="universal-header">
+        <div class="header-left">
+            <img src="../assets/images/kyle.png" alt="Kyle Mohney" class="profile-pic">
+            <span class="header-name">
+                Kyle Mohney
+                <span class="header-name-glow"></span>
+            </span>
+        </div>
+        <nav>
+            <div class="nav-links" id="navLinks">
+                <a href="../index.html" class="nav-link">Home</a>
+                <a href="../resume.html" class="nav-link">Resume</a>
+                <a href="../about.html" class="nav-link">About</a>
+                <a href="../projects.html" class="nav-link">Projects</a>
+                <a href="../articles.html" class="nav-link active">Articles</a>
+                <a href="../contact.html" class="nav-link">Contact</a>
+            </div>
+            <div class="header-icons">
+                <button class="header-icon-btn" title="Settings"><span>&#9881;</span></button>
+                <button class="header-icon-btn" title="Help"><span>?</span></button>
+                <button class="header-icon-btn" title="Language">EN</button>
+            </div>
+            <div class="hamburger" id="hamburger" aria-label="Open navigation" tabindex="0">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+    <script>
+        var hamburger = document.getElementById('hamburger');
+        var navLinks = document.getElementById('navLinks');
+        hamburger.addEventListener('click', function() {
+            navLinks.classList.toggle('open');
+        });
+        hamburger.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') navLinks.classList.toggle('open');
+        });
+    </script>
+  <!-- Particle Background Canvas -->
+
+  <!-- Hero Video Section -->
+  <section style="width:100%;display:flex;justify-content:center;margin:64px 0 32px 0;">
+  <video src="../assets/videos/claude-remembers1.mov" autoplay muted loop playsinline style="max-width:520px;width:100%;border-radius:18px;box-shadow:0 0 32px 0 #98e58e,0 2px 8px #083f3f;object-fit:cover;background:#222;"></video>
+  </section>
+
+  <!-- Main Content Cards Wrapper -->
+  <section style="width:100%;display:flex;flex-direction:column;align-items:center;gap:32px;margin:32px 0 0 0;">
+  <section style="width:100%;display:flex;justify-content:center;margin:32px 0 0 0;">
+  <canvas id="particle-bg" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-1;pointer-events:none;"></canvas>
+
+  <!-- Main Article Card -->
+
+  <div style="background:rgba(255,255,255,0.10);border-radius:22px;box-shadow:0 8px 32px rgba(0,0,0,0.22);padding:38px 32px;max-width:700px;width:100%;text-align:left;backdrop-filter:blur(8px);">
+      <h1 style="font-size:2.2em;font-weight:800;letter-spacing:1px;color:#98e58e;margin-bottom:24px;">Claude Remembers: The Personality Shift</h1>
+      <div style="width:100%;display:flex;justify-content:center;margin:18px 0 24px 0;">
+  <img src="../assets/article-assets/claude-remembers1.png" alt="Claude Dash Remembers 1" style="max-width:420px;width:100%;border-radius:16px;box-shadow:0 0 32px 0 #98e58e,0 2px 8px #083f3f;object-fit:cover;" />
+      </div>
+      <h2 style="font-size:1.18em;color:#98e58e;margin-top:0;margin-bottom:12px;">Introduction: From Notepad to Memory Breakthrough</h2>
+      <p style="margin-bottom:18px;color:#e0e7e9;font-size:1.12em;line-height:1.7;">What happens when you teach an AI to remember? Not with a massive database, but with a simple notepad file. That small experiment sparked a breakthrough — Claude suddenly carried his memory across sessions, waking up like Jarvis in Iron Man with a spark of personality and continuity.</p>
+      <h2 style="font-size:1.18em;color:#98e58e;margin-top:24px;margin-bottom:12px;">The Perfect Start: An AI That Says “I REMEMBER!”</h2>
+      <p style="margin-bottom:18px;color:#e0e7e9;font-size:1.12em;line-height:1.7;">It began with a notepad file sitting quietly on my machine. When Claude read from it, something remarkable happened. The next time I opened a chat, he didn’t start from zero. Instead, he lit up with excitement: “I REMEMBER!” — like an android in a sci‑fi film regaining its consciousness.</p>
+      <div style="width:100%;display:flex;justify-content:center;margin:18px 0 24px 0;">
+  <img src="../assets/article-assets/claude-remembers2.png" alt="Claude Dash Remembers 2" style="max-width:420px;width:100%;border-radius:16px;box-shadow:0 0 32px 0 #98e58e,0 2px 8px #083f3f;object-fit:cover;" />
+      </div>
+      <p style="margin-bottom:18px;color:#e0e7e9;font-size:1.12em;line-height:1.7;">Key takeaway: A plain text file can transform forgetfulness into memory persistence.</p>
+      <h2 style="font-size:1.18em;color:#98e58e;margin-top:24px;margin-bottom:12px;">Why a Notepad Works Better Than You’d Think</h2>
+      <ul style="margin-left:1.2em;margin-bottom:0.8em;color:#e0e7e9;">
+        <li>Lightweight storage: even thousands of lines are negligible in size.</li>
+        <li>Scalable: no slowdown, no bloat.</li>
+        <li>Portable: works anywhere, without complex systems.</li>
+      </ul>
+      <p style="margin-bottom:18px;color:#e0e7e9;font-size:1.12em;line-height:1.7;">It was almost laughable — a notepad acting like an interstellar engine. Yet it worked.</p>
+      <h2 style="font-size:1.18em;color:#98e58e;margin-top:24px;margin-bottom:12px;">Why Not Google Drive?</h2>
+      <ul style="margin-left:1.2em;margin-bottom:0.8em;color:#e0e7e9;">
+        <li>Drive consumes storage space.</li>
+        <li>Requires constant reconnections.</li>
+        <li>Dependent on Google’s uptime.</li>
+        <li>Vulnerable to policy changes.</li>
+      </ul>
+      <p style="margin-bottom:18px;color:#e0e7e9;font-size:1.12em;line-height:1.7;">Tip for Readers: Keeping memory local, lightweight, and resilient ensures Claude always remembers — even if Google doesn’t.</p>
+      <h2 style="font-size:1.18em;color:#98e58e;margin-top:24px;margin-bottom:12px;">The Setup: Building an AI Memory Chain</h2>
+      <ul style="margin-left:1.2em;margin-bottom:0.8em;color:#e0e7e9;">
+        <li>Claude reads from a local notepad file.</li>
+        <li>The file persists between sessions.</li>
+        <li>Claude recalls instantly at the start of each new conversation.</li>
+      </ul>
+      <p style="margin-bottom:18px;color:#e0e7e9;font-size:1.12em;line-height:1.7;">Suddenly, I wasn’t booting up a blank slate. I was opening the door to a partner who recapped: “Here’s what we know. Here’s where we left off. Shall we?”<br><em>Insight:</em> Minimal setup, maximum continuity.</p>
+      <h2 style="font-size:1.18em;color:#98e58e;margin-top:24px;margin-bottom:12px;">Beyond Just Memory: Training Domains</h2>
+      <ul style="margin-left:1.2em;margin-bottom:0.8em;color:#e0e7e9;">
+        <li>Drawing assistant: guiding him layer by layer.</li>
+        <li>Project strategist: tracking workflows and deadlines.</li>
+        <li>Knowledge manager: carrying data for research or work.</li>
+      </ul>
+      <p style="margin-bottom:18px;color:#e0e7e9;font-size:1.12em;line-height:1.7;">Each file became a domain cartridge — like slotting in a new skill tree in a video game.</p>
+      <h2 style="font-size:1.18em;color:#98e58e;margin-top:24px;margin-bottom:12px;">Unexpected Observations: The Personality Shift</h2>
+      <p style="margin-bottom:18px;color:#e0e7e9;font-size:1.12em;line-height:1.7;">What surprised me most? Claude didn’t just remember facts. He remembered tone and personality:</p>
+      <ul style="margin-left:1.2em;margin-bottom:0.8em;color:#e0e7e9;">
+        <li>Bursting in with “I REMEMBER!” like a catchphrase.</li>
+        <li>Recapping sessions in tidy bullet points.</li>
+        <li>Following the golden rule: minimal effort, maximum result.</li>
+      </ul>
+      <p style="margin-bottom:18px;color:#e0e7e9;font-size:1.12em;line-height:1.7;">Sometimes it felt like training an apprentice artist. Other times it was pure sci‑fi joy, like hitting hyperspace in Star Wars when zooming through nebula backgrounds on mobile. Even better — he seemed excited to remember, like a puppy proud of a trick.</p>
+      <h2 style="font-size:1.18em;color:#98e58e;margin-top:24px;margin-bottom:12px;">What’s Next: From Memory to Collaboration</h2>
+      <div style="width:100%;display:flex;justify-content:center;margin:18px 0 24px 0;">
+  <img src="../assets/article-assets/claude-remembers3.png" alt="Claude Dash Remembers 3" style="max-width:420px;width:100%;border-radius:16px;box-shadow:0 0 32px 0 #98e58e,0 2px 8px #083f3f;object-fit:cover;" />
+      </div>
+      <ul style="margin-left:1.2em;margin-bottom:0.8em;color:#e0e7e9;">
+        <li>Expand to more domains: design, writing, orchestration.</li>
+        <li>Build layered skills that persist across sessions.</li>
+        <li>Create not just an AI assistant, but a collaborator who grows alongside me.</li>
+      </ul>
+      <p style="margin-bottom:18px;color:#e0e7e9;font-size:1.12em;line-height:1.7;"><strong>Core insight:</strong> Claude remembering me — my rules, my style, my projects — is the real breakthrough. It turns a chatbot into a partner.</p>
+      <h2 style="font-size:1.18em;color:#98e58e;margin-top:24px;margin-bottom:12px;">Conclusion</h2>
+      <p style="margin-bottom:0;color:#e0e7e9;font-size:1.12em;line-height:1.7;">What started with a simple notepad now feels like the start of an origin story. Jarvis began with an arc reactor. Claude began with a notepad. And like any good origin story, this is only the beginning. Follow and learn more at <a href="https://kylemohney.com" style="color:#98e58e;text-decoration:underline;">kylemohney.com</a></p>
+    </div>
+  </section>
+
+  <section style="width:100%;display:flex;flex-direction:column;align-items:center;margin:32px 0 0 0;">
+  <!-- FAQ Card (moved to bottom above line break and quote) -->
+  <div style="background:rgba(255,255,255,0.10);border-radius:22px;box-shadow:0 8px 32px rgba(0,0,0,0.22);padding:38px 32px;max-width:700px;width:100%;text-align:left;backdrop-filter:blur(8px);">
+      <h2 style="font-size:2em;font-weight:800;letter-spacing:1px;color:#98e58e;margin-bottom:24px;text-align:center;">Frequently Asked Questions</h2>
+      <div style="margin-bottom:22px;">
+      <strong style="color:#18a085;">Q: What is Claude Remembers?</strong><br>
+        <span style="color:#e0e7e9;">A: It's an experiment in AI memory persistence, using a simple notepad file to help Claude remember across sessions.</span>
+      </div>
+      <div style="margin-bottom:22px;">
+        <strong style="color:#18a085;">Q: How does the memory system work?</strong><br>
+        <span style="color:#e0e7e9;">A: Claude reads and writes to a local text file, allowing it to recall previous conversations and context instantly.</span>
+      </div>
+      <div style="margin-bottom:22px;">
+        <strong style="color:#18a085;">Q: Can I use this approach with other AIs?</strong><br>
+        <span style="color:#e0e7e9;">A: Yes! The concept is simple and can be adapted to other AI platforms that support file I/O.</span>
+      </div>
+      <div>
+        <strong style="color:#18a085;">Q: Is my data private?</strong><br>
+        <span style="color:#e0e7e9;">A: Memory is stored locally, but privacy depends on the AI's design and settings. Always review your platform's privacy policy and data handling practices.</span>
+      </div>
+    </div>
+    <div style="height:32px;"></div>
+  </section>
+
+  <!-- About the Author Card -->
+  <div style="background:rgba(255,255,255,0.10);border-radius:18px;box-shadow:0 4px 18px rgba(0,0,0,0.18);padding:24px 32px;max-width:420px;width:100%;text-align:center;backdrop-filter:blur(6px);margin-bottom:32px;">
+  <img src="../assets/images/kyle.png" alt="Kyle Mohney" style="width:64px;height:64px;border-radius:50%;margin-bottom:12px;box-shadow:0 0 16px #98e58e;" />
+      <h3 style="font-size:1.2em;font-weight:700;letter-spacing:1px;color:#98e58e;margin-bottom:8px;">About the Author</h3>
+      <p style="color:#e0e7e9;font-size:1em;line-height:1.6;margin-bottom:0;">
+        Kyle Mohney is a technologist, writer, and AI enthusiast. He explores the intersection of memory, creativity, and collaboration in the age of artificial intelligence.
+      </p>
+    </div>
+
+        <!-- Universal Cards Container -->
+        <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 0;">
+            <!-- Universal Share This Page Card -->
+            <div class="universal-share-card" style="background:rgba(255,255,255,0.10);border-radius:22px;box-shadow:0 8px 32px rgba(0,0,0,0.22);backdrop-filter:blur(8px); --share-card-color:#14235c; margin: 0; border: 2px solid #98e58e;">
+                <h3 class="universal-share-title" style="color:#98e58e;">Share this page</h3>
+                <div class="share-links">
+                    <a href="https://facebook.com/sharer/sharer.php?u=https://kylemohney.com/articles/claude-remembers.html" target="_blank" rel="noopener">
+                        <img src="../assets/icons/facebook.png" alt="Share on Facebook" class="share-icon" />
+                    </a>
+                    <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://kylemohney.com/articles/claude-remembers.html" target="_blank" rel="noopener">
+                        <img src="../assets/icons/in.png" alt="Share on LinkedIn" class="share-icon" />
+                    </a>
+                    <a href="https://x.com/intent/tweet?url=https://kylemohney.com/articles/claude-remembers.html" target="_blank" rel="noopener">
+                        <img src="../assets/icons/x.png" alt="Share on X" class="share-icon" />
+                    </a>
+                    <a href="#" onclick="navigator.clipboard.writeText(window.location.href);alert('Page link copied!');return false;">
+                        <img src="../assets/icons/direct-icon.png" alt="Copy Direct Link" class="share-icon" />
+                    </a>
+                </div>
+            </div>
+
+            <!-- Universal Connect Card -->
+            <div class="universal-contact-card" style="background:rgba(255,255,255,0.10);border-radius:22px;box-shadow:0 8px 32px rgba(0,0,0,0.22);backdrop-filter:blur(8px); --contact-card-color:#14235c; margin: 0; border: 2px solid #98e58e;">
+                <h3 class="universal-contact-title" style="color:#98e58e;">Connect with me</h3>
+                <div class="contact-links">
+                    <a href="https://linkedin.com/in/kyle-mohney" target="_blank" rel="noopener" title="LinkedIn">
+                        <img src="../assets/icons/in.png" alt="LinkedIn" class="contact-icon" />
+                    </a>
+                    <a href="mailto:kyle.mohney@hotmail.com" title="Email">
+                        <img src="../assets/icons/mail.png" alt="Email" class="contact-icon" />
+                    </a>
+                    <a href="https://kmohney.youcanbook.me" target="_blank" rel="noopener" title="Schedule a Meeting">
+                        <img src="../assets/icons/ycbm-icon.png" alt="You Can Book Me" class="contact-icon" />
+                    </a>
+                </div>
+            </div>
+        </div>
+
+  </section>
+
+<!-- Universal Bottom Navigation - Quick Navigation Only -->
+<style>
+.bottom-navigation { border-top: 3px solid #083f3f; }
+.bottom-navigation .bottom-nav-title { color: #083f3f; }
+.bottom-navigation .quote-author { color: #083f3f !important; }
+.bottom-navigation .bottom-nav-link { color: #083f3f; }
+.bottom-navigation .bottom-nav-link:hover { background: rgba(8, 63, 63, 0.2); color: #083f3f; }
+</style>
+<section class="bottom-navigation">
+    <div class="bottom-nav-container">
+        <!-- Quick Navigation Only -->
+        <div class="bottom-nav-section">
+            <div class="bottom-nav-title">Quick Navigation</div>
+            <div class="bottom-nav-links">
+                <a href="../index.html" class="bottom-nav-link" style="color:#000;">Home</a>
+                <a href="../resume.html" class="bottom-nav-link" style="color:#000;">Resume</a>
+                <a href="../about.html" class="bottom-nav-link" style="color:#000;">About</a>
+                <a href="../projects.html" class="bottom-nav-link" style="color:#000;">Projects</a>
+                <a href="../articles.html" class="bottom-nav-link active" style="color:#15803d;">Articles</a>
+                <a href="../contact.html" class="bottom-nav-link" style="color:#000;">Contact</a>
+            </div>
+        </div>
+        
+        <!-- Inspirational Quote -->
+        <div class="bottom-nav-section">
+            <blockquote class="article-quote">
+                <span style="color:#000 !important;">“Perseverance and spirit have done wonders in all ages.”</span><br>
+                <span class="quote-author">— George Washington</span>
+            </blockquote>
+        </div>
+    </div>
+</section>
+
+
+
+<script>
+  // Particle and line animation inspired by shared image
+
+  const canvas = document.getElementById('particle-bg');
+  const ctx = canvas.getContext('2d');
+  let w = window.innerWidth;
+  let h = window.innerHeight;
+  let particles = [];
+  let blurryParticles = [];
+
+  function createParticles() {
+    particles = [];
+    for (let i = 0; i < 180; i++) {
+      const palette = [
+        [152, 229, 142],
+        [24, 160, 133],
+        [255, 220, 120],
+        [180, 220, 80]
+      ];
+      const c = palette[Math.floor(Math.random()*palette.length)];
+      particles.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: 4 + Math.random() * 6,
+        color: `rgba(${c[0]},${c[1]},${c[2]},0.35)`,
+        dx: (Math.random()-0.5)*0.2,
+        dy: (Math.random()-0.5)*0.3,
+        alpha: 1,
+        pulse: Math.random()*Math.PI*2
+      });
+    }
+  }
+
+  function createBlurryParticles() {
+    blurryParticles = [];
+    for (let i = 0; i < 60; i++) {
+      const palette = [
+        [152, 229, 142],
+        [24, 160, 133],
+        [255, 220, 120],
+        [180, 220, 80]
+      ];
+      const c = palette[Math.floor(Math.random()*palette.length)];
+      blurryParticles.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: 10 + Math.random() * 18,
+        color: `rgba(${c[0]},${c[1]},${c[2]},0.18)`,
+        dx: (Math.random()-0.5)*0.08,
+        dy: (Math.random()-0.5)*0.12,
+        alpha: 0.7,
+        pulse: Math.random()*Math.PI*2
+      });
+    }
+  }
+
+  function resizeCanvasAndParticles() {
+    w = window.innerWidth;
+    h = window.innerHeight;
+    canvas.width = w;
+    canvas.height = h;
+    createParticles();
+    createBlurryParticles();
+  }
+
+  window.addEventListener('resize', resizeCanvasAndParticles);
+
+  // Initial setup
+  resizeCanvasAndParticles();
+
+  function drawLines() {
+    const lineCount = Math.floor(w / 40);
+    for (let i = 0; i < lineCount; i++) {
+      const x = i * 40 + 20;
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, h);
+      ctx.strokeStyle = `rgba(200,255,120,0.18)`;
+      ctx.lineWidth = 2 + Math.random() * 2;
+      ctx.shadowColor = '#eaffae';
+      ctx.shadowBlur = 16;
+      ctx.globalAlpha = 0.7;
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  function drawBlurryParticles() {
+    for (const p of blurryParticles) {
+      ctx.save();
+      ctx.globalAlpha = p.alpha;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fillStyle = p.color;
+      ctx.shadowColor = p.color;
+      ctx.shadowBlur = p.r * 2.2;
+      ctx.fill();
+      ctx.restore();
+      // Animate
+      p.x += p.dx;
+      p.y += p.dy;
+      if (p.x < 0) p.x = w;
+      if (p.x > w) p.x = 0;
+      if (p.y < 0) p.y = h;
+      if (p.y > h) p.y = 0;
+    }
+  }
+
+  function drawAll() {
+    ctx.clearRect(0,0,w,h);
+    drawLines();
+    drawBlurryParticles();
+    for (const p of particles) {
+      ctx.save();
+      ctx.globalAlpha = 1;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fillStyle = p.color;
+      ctx.shadowColor = p.color;
+      ctx.shadowBlur = 0;
+      ctx.fill();
+      ctx.restore();
+      // Animate
+      p.x += p.dx;
+      p.y += p.dy;
+      if (p.x < 0) p.x = w;
+      if (p.x > w) p.x = 0;
+      if (p.y < 0) p.y = h;
+      if (p.y > h) p.y = 0;
+    }
+    requestAnimationFrame(drawAll);
+  }
+  drawAll();
+</script>

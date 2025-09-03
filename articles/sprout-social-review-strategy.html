@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<style>
+		.article-hero {
+			background: linear-gradient(135deg, #0a1528 0%, #1a2e45 25%, #0f1f35 50%, #162b42 75%, #0a1528 100%) !important;
+			padding: 80px 0 60px !important;
+			position: relative;
+			overflow: hidden;
+		}
+		.article-hero::before {
+			content: '';
+			position: absolute;
+			top: 0; left: 0; right: 0; bottom: 0;
+			background: 
+				radial-gradient(circle at 20% 30%, rgba(152,229,142,0.2) 0%, transparent 50%),
+				radial-gradient(circle at 80% 70%, rgba(98,229,142,0.15) 0%, transparent 40%),
+				radial-gradient(circle at 50% 20%, rgba(0,182,91,0.18) 0%, transparent 60%),
+				radial-gradient(circle at 30% 80%, rgba(0,167,86,0.12) 0%, transparent 50%),
+				radial-gradient(circle at 70% 40%, rgba(152,229,142,0.25) 0%, transparent 45%);
+			z-index: 0;
+			animation: holographicHeroShimmer 10s ease-in-out infinite;
+		}
+		.article-hero::after {
+			content: '';
+			position: absolute;
+			top: 0; left: 0; right: 0; bottom: 0;
+			background-image: 
+				linear-gradient(90deg, rgba(152,229,142,0.1) 2px, transparent 2px),
+				linear-gradient(0deg, rgba(98,229,142,0.08) 2px, transparent 2px),
+				linear-gradient(45deg, rgba(0,182,91,0.06) 1px, transparent 1px);
+			background-size: 100px 100px, 100px 100px, 50px 50px;
+			animation: holographicGrid 12s linear infinite;
+			z-index: 0;
+			opacity: 0.4;
+		}
+		@keyframes holographicHeroShimmer {
+			0%,100% { opacity: 1; filter: hue-rotate(0deg) brightness(1); }
+			25% { opacity: 0.8; filter: hue-rotate(10deg) brightness(1.1); }
+			50% { opacity: 0.9; filter: hue-rotate(-5deg) brightness(0.95); }
+			75% { opacity: 1.1; filter: hue-rotate(15deg) brightness(1.05); }
+		}
+		@keyframes holographicGrid {
+			0% { transform: translateX(0) translateY(0); }
+			100% { transform: translateX(50px) translateY(50px); }
+		}
+		.hero-container {
+			max-width: 1000px !important;
+			margin: 0 auto !important;
+			padding: 0 20px !important;
+			position: relative;
+			z-index: 1;
+			display: flex !important;
+			flex-direction: row !important;
+			align-items: center !important;
+			justify-content: space-between !important;
+			gap: 40px !important;
+		}
+		.hero-text-content {
+			flex: 1;
+			text-align: left;
+			align-self: flex-start;
+		}
+		.hero-logo {
+			flex-shrink: 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			align-self: flex-start;
+			position: relative;
+		}
+		.hero-logo .article-category {
+			position: absolute;
+			bottom: -10px;
+			right: -10px;
+			z-index: 2;
+		}
+		.hero-logo img {
+			max-width: 100%;
+			height: auto;
+		}
+		@media (max-width: 768px) {
+			.hero-container {
+				flex-direction: column !important;
+				text-align: center !important;
+				gap: 20px !important;
+				justify-content: center !important;
+				align-items: center !important;
+			}
+			.hero-text-content {
+				text-align: center !important;
+				align-self: center !important;
+			}
+			.hero-logo {
+				align-self: center !important;
+			}
+			.hero-logo img {
+				height: 300px !important;
+			}
+			.hero-logo .article-category {
+				position: static;
+				margin-top: 15px;
+			}
+		}
+		.article-category {
+			display: inline-block;
+			background: linear-gradient(135deg, #98e58e, #006b40) !important;
+			color: white;
+			padding: 8px 20px !important;
+			border-radius: 25px !important;
+			font-size: 0.9em;
+			font-weight: 600;
+			margin-bottom: 24px;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			box-shadow: 0 0 20px rgba(152,229,142,0.3) !important;
+		}
+		.article-title {
+			font-size: 3.5em !important;
+			font-weight: 800;
+			color: #e6f7fa !important;
+			margin-bottom: 32px !important;
+			letter-spacing: 1px;
+			text-shadow: 0 2px 12px rgba(56,178,172,0.18) !important;
+		}
+		.article-subtitle {
+			color: #b2e3e3 !important;
+			font-size: 1.25em !important;
+			font-weight: 500;
+			max-width: 700px;
+			margin: 0 auto 0 auto;
+		}
+	</style>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Sprout Social Review | Kyle Mohney</title>
+	<link rel="stylesheet" href="../styles.css">
+	<link rel="stylesheet" href="../assets/header-cleaned.css">
+</head>
+<body>
+    <header class="universal-header">
+        <div class="header-left">
+            <img src="../assets/images/kyle.png" alt="Kyle Mohney" class="profile-pic">
+            <span class="header-name">
+                Kyle Mohney
+                <span class="header-name-glow"></span>
+            </span>
+        </div>
+        <nav>
+            <div class="nav-links" id="navLinks">
+                <a href="../index.html" class="nav-link">Home</a>
+                <a href="../resume.html" class="nav-link">Resume</a>
+                <a href="../about.html" class="nav-link">About</a>
+                <a href="../projects.html" class="nav-link">Projects</a>
+                <a href="../articles.html" class="nav-link active">Articles</a>
+                <a href="../contact.html" class="nav-link">Contact</a>
+            </div>
+            <div class="header-icons">
+                <button class="header-icon-btn" title="Settings"><span>&#9881;</span></button>
+                <button class="header-icon-btn" title="Help"><span>?</span></button>
+                <button class="header-icon-btn" title="Language">EN</button>
+            </div>
+            <div class="hamburger" id="hamburger" aria-label="Open navigation" tabindex="0">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+    <script>
+        var hamburger = document.getElementById('hamburger');
+        var navLinks = document.getElementById('navLinks');
+        hamburger.addEventListener('click', function() {
+            navLinks.classList.toggle('open');
+        });
+        hamburger.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') navLinks.classList.toggle('open');
+        });
+    </script>
+    <style>
+        /* Override bottom navigation colors for this page */
+        .bottom-nav-link:hover {
+            color: #000000 !important;
+            background: rgba(0, 107, 64, 0.2) !important;
+            border-color: #006b40 !important;
+            transform: translateY(-1px) !important;
+        }
+    </style>
+		<section class="article-hero">
+			<div class="hero-container" style="max-width: 1000px; margin: 0 auto; padding: 0 12px; position: relative; z-index: 1; display: flex; flex-direction: column; justify-content: center; height: 100%; align-items: center;">
+				<div>
+					<h1 class="article-title">Building a Review Engine with Sprout Social</h1>
+					<p class="article-subtitle">How I transformed thousands of customer voices into actionable intelligence and operational wins</p>
+				</div>
+				<div>
+					<img src="../assets/logos/sprout_logo.png" alt="Sprout Social Logo" style="height:420px;width:auto;box-shadow:0 4px 32px #98e58e99;border-radius:32px;" />
+					<div class="article-category">Operational Excellence</div>
+				</div>
+			</div>
+		</section>
+		<article class="article-content">
+			<div class="article-body" style="background:rgba(255,255,255,0.45);backdrop-filter:blur(12px);border-radius:24px;padding:60px;box-shadow:0 20px 60px rgba(0,107,64,0.08);border:1px solid rgba(152,229,142,0.3);position:relative;overflow:hidden;max-width:900px;margin:0 auto;">
+				<h1 style="color:#2d3748;margin-bottom:32px;">Operational Excellence in Action: How I Built a Review Management Powerhouse with Sprout Social</h1>
+				<p style="margin-bottom:28px;color:#4a5568;">When Thumbtack needed a rapid, enterprise-level solution to manage and transform customer feedback at scale, I stepped into the arena. The mission: create a system to handle thousands of reviews—across app stores, Google Play, and social channels—with speed, precision, and insight.</p>
+				<p style="margin-bottom:28px;color:#4a5568;">There was no time for committees or trial runs. This was about building a high-functioning machine from the ground up, and doing it fast.</p>
+				<h2 style="color:#006b40;margin:60px 0 32px 0;position:relative;">Building the Command Center</h2>
+				<p style="margin-bottom:28px;color:#4a5568;">With administrator access to Sprout Social, I designed the backbone of our new review response system. Every review—no matter where it lived—was now funneled into a single, streamlined dashboard.</p>
+				<img src="../assets/article-assets/sprout1.png" alt="Sprout Social Dashboard Interface" style="width:100%;max-width:100%;height:auto;border-radius:16px;margin:40px 0;box-shadow:0 12px 40px rgba(0,107,64,0.15);border:2px solid rgba(152,229,142,0.2);transition:all 0.3s ease;" />
+				<p style="text-align:center;font-style:italic;color:#718096;margin-top:12px;margin-bottom:32px;">The Sprout Social command center - where all customer feedback converges into actionable intelligence</p>
+				<p style="margin-bottom:28px;color:#4a5568;">The key innovation? I engineered a <strong style="color:#006b40;font-weight:700;">root-cause tagging framework</strong> that instantly identified the "why" behind negative sentiment. Each root cause got its own optimized, legally-approved template—ready to deploy with a click.</p>
+				<img src="../assets/article-assets/sprout-ai.png" alt="AI-Powered Review Management System" style="width:100%;max-width:100%;height:auto;border-radius:16px;margin:40px 0;box-shadow:0 12px 40px rgba(0,107,64,0.15);border:2px solid rgba(152,229,142,0.2);transition:all 0.3s ease;" />
+				<p style="text-align:center;font-style:italic;color:#718096;margin-top:12px;margin-bottom:32px;">One source connecting everything - how AI and automation transform scattered feedback into unified insights</p>
+				<div style="background:linear-gradient(135deg,#006b40 0%,#98e58e 100%);color:white;padding:40px;border-radius:20px;margin:48px 0;box-shadow:0 12px 40px rgba(0,107,64,0.2),0 0 0 1px rgba(255,255,255,0.1);position:relative;overflow:hidden;">
+					<p style="color:rgba(255,255,255,0.95);position:relative;z-index:1;margin-bottom:24px;"><strong style="color:white;text-shadow:0 0 10px rgba(255,255,255,0.3);">The Technical Architecture:</strong> I built a comprehensive tagging taxonomy covering sentiment analysis, issue categorization, and response prioritization. This wasn't just organization—it was operational intelligence.</p>
+				</div>
+				<h2 style="color:#006b40;margin:60px 0 32px 0;position:relative;">Turning Data into Action</h2>
+				<p style="margin-bottom:28px;color:#4a5568;">As I worked through the backlog of <strong style="color:#006b40;font-weight:700;">more than 2,000 unaddressed reviews</strong>, Sprout's tag analytics began painting a crystal-clear picture. Trends emerged. Patterns revealed themselves. The noise became a signal.</p>
+				<img src="../assets/article-assets/sprout-reviews.png" alt="Thumbtack App Store Reviews Dashboard" style="width:100%;max-width:100%;height:auto;border-radius:16px;margin:40px 0;box-shadow:0 12px 40px rgba(0,107,64,0.15);border:2px solid rgba(152,229,142,0.2);transition:all 0.3s ease;" />
+				<p style="margin-bottom:28px;color:#4a5568;">Within a week, I transformed a mountain of concerns into structured, actionable intelligence—complete with drag-and-drop charts that leaders could use to guide product and policy decisions. That intelligence didn't gather dust; <strong style="color:#006b40;font-weight:700;">many of my recommendations were implemented, directly improving customer experience</strong>.</p>
+				<h2 style="color:#006b40;margin:60px 0 32px 0;position:relative;">Making It Last</h2>
+				<p style="margin-bottom:28px;color:#4a5568;">Speed was critical, but sustainability was the real goal. I documented every process step, from triaging sentiment to escalating critical cases, creating a repeatable Standard Operating Procedure. Then I trained the incoming team—walking them through every workflow until they could run it flawlessly.</p>
+				<div style="background:linear-gradient(135deg,#006b40 0%,#98e58e 100%);color:white;padding:40px;border-radius:20px;margin:48px 0;box-shadow:0 12px 40px rgba(0,107,64,0.2),0 0 0 1px rgba(255,255,255,0.1);position:relative;overflow:hidden;">
+					<p style="color:rgba(255,255,255,0.97);position:relative;z-index:1;margin-bottom:24px;"><strong style="color:white;text-shadow:0 0 10px rgba(255,255,255,0.3);">The Scalable Framework:</strong> What started as crisis management became a template for enterprise social media operations—a system that could grow with the business and adapt to new challenges.</p>
+				</div>
+				<h2 style="color:#006b40;margin:60px 0 32px 0;position:relative;">The Outcome</h2>
+				<p style="margin-bottom:28px;color:#4a5568;">What started as a massive operational gap became a scalable, insight-driven review management engine. Sprout Social became more than a listening tool—it became a proactive customer satisfaction platform, powered by a system I designed, deployed, and handed off fully operational.</p>
+				<p style="margin-bottom:28px;color:#4a5568;"><strong style="color:#006b40;font-weight:700;">In short:</strong> I didn't just manage reviews. I built an enterprise-grade solution that turned thousands of voices into a roadmap for better products, happier customers, and a stronger brand.</p>
+			</div>
+		</article>
+
+						<div style="height:48px;"></div>
+						<!-- About the Author Card -->
+						<div style="background:rgba(255,255,255,0.10);border-radius:18px;box-shadow:0 4px 18px rgba(0,0,0,0.18);padding:24px 32px;max-width:420px;width:100%;text-align:center;backdrop-filter:blur(6px);margin-bottom:32px;margin:0 auto;">
+							<img src="../assets/images/kyle.png" alt="Kyle Mohney" style="width:64px;height:64px;border-radius:50%;margin-bottom:12px;box-shadow:0 0 16px #8b5cf6;" />
+							<h3 style="font-size:1.2em;font-weight:700;letter-spacing:1px;color:#006b40;margin-bottom:8px;">About the Author</h3>
+							<p style="color:#000000;font-size:1em;line-height:1.6;margin-bottom:0;">
+								Kyle Mohney is a technologist, writer, and AI enthusiast. He explores the intersection of memory, creativity, and collaboration in the age of artificial intelligence.
+							</p>
+						</div>
+
+						<div style="height:48px;"></div>
+
+  <!-- Universal Cards Container -->
+  <div style="display: flex; justify-content: center; align-items: flex-start; gap: 2px; flex-wrap: wrap; max-width: 520px; margin: 0 auto;">
+    <!-- Universal Share Card -->
+    <div class="universal-share-card" style="--share-card-color:#006b40;">
+      <h3 class="universal-share-title">Share this article</h3>
+      <div class="share-links">
+        <a href="https://facebook.com/sharer/sharer.php?u=https://your-domain.com/articles/sprout-social-review-strategy.html" target="_blank" rel="noopener">
+          <img src="../assets/icons/facebook.png" alt="Share on Facebook" class="share-icon" />
+        </a>
+        <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://your-domain.com/articles/sprout-social-review-strategy.html&title=Building%20a%20Review%20Engine%20with%20Sprout%20Social" target="_blank" rel="noopener">
+          <img src="../assets/icons/in.png" alt="Share on LinkedIn" class="share-icon" />
+        </a>
+        <a href="https://x.com/intent/tweet?url=https://your-domain.com/articles/sprout-social-review-strategy.html&text=Building%20a%20Review%20Engine%20with%20Sprout%20Social" target="_blank" rel="noopener">
+          <img src="../assets/icons/x.png" alt="Share on X" class="share-icon" />
+        </a>
+        <a href="#" onclick="navigator.clipboard.writeText(window.location.href);alert('Article link copied!');return false;">
+          <img src="../assets/icons/direct-icon.png" alt="Copy Direct Link" class="share-icon" />
+        </a>
+      </div>
+    </div>
+
+    <!-- Universal Contact Card -->
+    <div class="universal-contact-card" style="--contact-card-color:#006b40;">
+      <h3 class="universal-contact-title">Connect with me</h3>
+      <div class="contact-links">
+        <a href="https://www.linkedin.com/in/kyle-m-ab0822214" target="_blank" rel="noopener" title="LinkedIn">
+          <img src="../assets/icons/in.png" alt="LinkedIn" class="contact-icon" />
+        </a>
+        <a href="mailto:Kyle.Mohney@hotmail.com" title="Email">
+          <img src="../assets/icons/mail.png" alt="Email" class="contact-icon" />
+        </a>
+        <a href="https://kmohney.youcanbook.me" target="_blank" rel="noopener" title="Schedule a Meeting">
+          <img src="../assets/icons/ycbm-icon.png" alt="You Can Book Me" class="contact-icon" />
+        </a>
+      </div>
+    </div>
+  </div>
+
+<section class="bottom-navigation" style="margin-top: 60px;">
+    <div class="bottom-nav-container">
+        <!-- Quick Navigation Only -->
+        <div class="bottom-nav-section">
+            <div class="bottom-nav-title" style="color: #006b40 !important;">Quick Navigation</div>
+            <div class="bottom-nav-links">
+                <a href="../index.html" class="bottom-nav-link" style="color: #000000 !important; border-color: transparent !important;">Home</a>
+                <a href="../resume.html" class="bottom-nav-link" style="color: #000000 !important; border-color: transparent !important;">Resume</a>
+                <a href="../about.html" class="bottom-nav-link" style="color: #000000 !important; border-color: transparent !important;">About</a>
+                <a href="../projects.html" class="bottom-nav-link" style="color: #000000 !important; border-color: transparent !important;">Projects</a>
+                <a href="../articles.html" class="bottom-nav-link active" style="color: #006b40 !important; font-weight: 600 !important;">Articles</a>
+                <a href="../contact.html" class="bottom-nav-link" style="color: #000000 !important; border-color: transparent !important;">Contact</a>
+            </div>
+        </div>
+
+        <!-- Inspirational Quote -->
+        <div class="bottom-nav-section">
+            <blockquote class="article-quote">
+                <span>"Success is not final, failure is not fatal: It is the courage to continue that counts"</span><br>
+                <span class="quote-author" style="color: #006b40 !important;">– Winston Churchill</span>
+            </blockquote>
+        </div>
+    </div>
+</section>
+</body>
+</html>

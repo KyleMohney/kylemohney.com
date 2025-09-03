@@ -1,1039 +1,1143 @@
 <!DOCTYPE html>
-
 <html lang="en">
-<head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Kyle J. Mohney - About | Product Documentation &amp; Knowledge Operations</title>
-<meta content="About Kyle Mohney – Product Documentation &amp; Knowledge Operations leader with enterprise Sprout Social experience, AI automation, and support ops." name="description"/>
-<style>
-
-        /* ==============================
-         * KYLE MOHNEY RESUME STYLES
-         * ==============================
-         */
+    <head>
+        <style>
+        .hero-section .hero-grid-animated {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.10) 1.5px, transparent 1.5px),
+                linear-gradient(90deg, rgba(255,255,255,0.10) 1.5px, transparent 1.5px),
+                linear-gradient(rgba(7,90,122,0.13) 2.5px, transparent 2.5px),
+                linear-gradient(90deg, rgba(7,90,122,0.13) 2px, transparent 2px);
+            background-size: 40px 40px, 40px 40px, 80px 80px, 80px 80px;
+            animation: gridPulse 6s ease-in-out infinite;
+        }
+        @keyframes gridPulse {
+            0%, 100% { opacity: 0.9; filter: brightness(1); }
+            50% { opacity: 1; filter: brightness(1.12); }
+        }
         
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        /* Full Page Animated Grid Background */
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            line-height: 1.6;
-            color: #2d3748;
-            background: #fdfcf7;
-            min-height: 100vh;
-            overflow-x: hidden;
             position: relative;
-            display: flex;
-            flex-direction: column;
+            overflow-x: hidden;
         }
-
+        
+        /* Performance Optimized Grid */
         body::before {
             content: '';
             position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            background: 
-                radial-gradient(circle at 15% 25%, rgba(152, 229, 142, 0.03) 0%, transparent 40%),
-                radial-gradient(circle at 85% 75%, rgba(0, 107, 64, 0.02) 0%, transparent 35%);
-            pointer-events: none;
-            z-index: -2;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-image:
+                linear-gradient(rgba(128,128,128,0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(128,128,128,0.06) 1px, transparent 1px),
+                linear-gradient(rgba(30,58,138,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(30,58,138,0.04) 1px, transparent 1px);
+            background-size: 50px 50px, 50px 50px, 100px 100px, 100px 100px;
+            animation: gridShimmer 15s ease-in-out infinite;
+            will-change: background-position;
+            contain: layout style paint;
         }
-
-        /* Subtle Circuit Animation */
+        
         body::after {
             content: '';
             position: fixed;
             top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: 
-                linear-gradient(90deg, rgba(152, 229, 142, 0.03) 1px, transparent 1px),
-                linear-gradient(0deg, rgba(152, 229, 142, 0.03) 1px, transparent 1px);
-            background-size: 80px 80px;
-            animation: circuitFlow 20s linear infinite;
-            pointer-events: none;
-            z-index: -1;
-            opacity: 0.6;
-        }
-
-        /* Floating Data Nodes */
-        .floating-nodes {
-            position: fixed;
-            top: 0;
-            left: 0;
+            left: -100%;
             width: 100%;
             height: 100%;
-            pointer-events: none;
             z-index: -1;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                rgba(255,255,255,0.15) 20%,
+                rgba(255,255,255,0.3) 50%,
+                rgba(255,255,255,0.15) 80%,
+                transparent 100%
+            );
+            animation: sheenSweep 8s ease-in-out infinite;
         }
-
-        .data-node {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: radial-gradient(circle, rgba(152, 229, 142, 0.6) 0%, rgba(0, 107, 64, 0.3) 100%);
-            border-radius: 50%;
-            animation: nodeFloat 15s ease-in-out infinite;
-        }
-
-        .data-node:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
-        .data-node:nth-child(2) { top: 60%; left: 85%; animation-delay: 3s; }
-        .data-node:nth-child(3) { top: 80%; left: 25%; animation-delay: 6s; }
-        .data-node:nth-child(4) { top: 30%; left: 70%; animation-delay: 9s; }
-
-        /* Enhanced Card Breathing Effect */
-        .experience-card,
-        .sidebar-card {
-            animation: cardBreathe 4s ease-in-out infinite;
-        }
-
-        .experience-card:nth-child(even) {
-            animation-delay: 2s;
-        }
-
-        .sidebar-card:nth-child(even) {
-            animation-delay: 1s;
-        }
-
-        /* Icon Rotation on Hover */
-        .section-icon,
-        .sidebar-icon {
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .section-header:hover .section-icon,
-        .sidebar-title:hover .sidebar-icon {
-            transform: rotate(5deg) scale(1.1);
-        }
-
-        /* Enhanced Sprout Highlight */
-        .sprout-highlight {
-            background: linear-gradient(135deg, #006b40 0%, #98e58e 100%);
-            color: white;
-            padding: 32px;
-            border-radius: 16px;
-            margin: 24px 0;
-            box-shadow: 
-                0 12px 40px rgba(0, 107, 64, 0.2),
-                0 0 0 1px rgba(255, 255, 255, 0.1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .sprout-highlight::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
-            animation: shimmer 3s ease-in-out infinite;
-        }
-
-        @keyframes shimmer {
-            0%, 100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-            50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
-        }
-
-        *:focus {
-            outline: 2px solid #98e58e;
-            outline-offset: 2px;
-        }
-
-        img {
-            max-width: 100%;
-            height: auto;
-            loading: lazy;
-        }
-
-        /* Header Navigation */
-        .header {
-            padding: 24px 0;
-            position: sticky;
-            top: 0;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            border-bottom: 1px solid rgba(152, 229, 142, 0.1);
-            box-shadow: 0 2px 20px rgba(0, 107, 64, 0.05);
-        }
-
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .profile-logo {
-            width: 52px;
-            height: 52px;
-            border-radius: 50%;
-            border: 2px solid #98e58e;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-            object-fit: cover;
-        }
-
-        .logo-text {
-            font-size: 1.5em;
-            font-weight: 700;
-            color: #2d3748;
-        }
-
-        .nav-menu {
-            display: flex;
-            list-style: none;
-            gap: 40px;
-        }
-
-        .nav-menu a {
-            color: #2d3748;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1.1em;
-            padding: 12px 20px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .nav-menu a:hover {
-            color: #006b40;
-            background: rgba(152, 229, 142, 0.1);
-            transform: translateY(-2px);
-        }
-
-        .nav-menu a.current {
-            color: #006b40;
-            background: rgba(152, 229, 142, 0.15);
-            box-shadow: 0 4px 12px rgba(152, 229, 142, 0.2);
-        }
-
-        /* Hero Section */
-        .hero-section {
-            background-color: #1e3a8a;
-            position: relative;
-            overflow: hidden;
-            padding: 4rem 2rem;
-        }
-
-        /* Main Content */
-        .resume-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px 40px;
-            flex: 1 0 auto;
-        }
-
-        .main-content {
-            background: white;
-            border-radius: 24px;
-            padding: 48px;
-            box-shadow: 0 20px 60px rgba(0, 107, 64, 0.08);
-            border: 1px solid rgba(152, 229, 142, 0.1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .main-content::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #006b40, #98e58e);
-        }
-
-        /* About Sections */
-        .about-section {
-            margin-bottom: 2.5rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 1px solid rgba(152, 229, 142, 0.1);
-        }
-
-        .about-section:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-        }
-
-        .about-section h1 {
-            font-size: 2.5em;
-            font-weight: 700;
-            color: #006b40;
-            margin-bottom: 1.5rem;
-            text-align: center;
-        }
-
-        .about-section h2 {
-            font-size: 1.8em;
-            font-weight: 600;
-            color: #006b40;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .about-section h2::before {
-            content: '';
-            width: 4px;
-            height: 1.5em;
-            background: linear-gradient(135deg, #006b40, #98e58e);
-            border-radius: 2px;
-        }
-
-        .about-section p {
-            font-size: 1.1em;
-            line-height: 1.7;
-            color: #4a5568;
-            margin-bottom: 1rem;
-        }
-
-        /* HEMA Section with Image */
-        .hema-section {
-            display: flex;
-            align-items: center;
-            gap: 2rem;
-            flex-wrap: wrap;
-            position: relative;
-            overflow: hidden;
-            margin-bottom: 2.5rem;
-            padding: 2rem;
-            background: linear-gradient(135deg, rgba(248, 251, 248, 0.3) 0%, rgba(235, 249, 235, 0.3) 100%);
-            border-radius: 16px;
-            border: 1px solid rgba(152, 229, 142, 0.2);
-        }
-
-        .hema-section::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 61%;
-            transform: translate(-50%, -50%);
-            width: 410px;
-            height: 410px;
-            background: radial-gradient(circle, rgba(37, 99, 235, 0.15) 0%, transparent 80%);
-            filter: blur(60px);
-            z-index: 0;
-        }
-
-        .hema-text {
-            flex: 1;
-            min-width: 280px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .hema-image {
-            flex: 1;
-            min-width: 280px;
-            text-align: center;
-            position: relative;
-            z-index: 1;
-        }
-
-        .hema-image img {
-            max-width: 120%;
-            height: auto;
-            border-radius: 8px;
-            background: transparent;
-            transform: scale(1.05);
-            position: relative;
-            left: -40px;
-        }
-
-        /* Quick Facts Section */
-        .quick-facts-section {
-            background: linear-gradient(135deg, rgba(248, 251, 248, 0.5) 0%, rgba(235, 249, 235, 0.5) 100%);
-            border-radius: 20px;
-            padding: 2.5rem;
-            margin: 2.5rem 0;
-            border: 2px solid rgba(152, 229, 142, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .quick-facts-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #006b40, #98e58e);
-        }
-
-        .quick-facts-section h2 {
-            text-align: center;
-            margin-bottom: 2rem;
-            font-size: 2.2em;
-            color: #006b40;
-        }
-
-        .quick-facts-intro {
-            text-align: center;
-            font-size: 1.1em;
-            color: #4a5568;
-            margin-bottom: 2rem;
-            font-style: italic;
-        }
-
-        .quick-facts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1.5rem;
-        }
-
-        .quick-fact-card {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            border-left: 4px solid #98e58e;
-            box-shadow: 0 4px 12px rgba(0, 107, 64, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .quick-fact-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(0, 107, 64, 0.15);
-        }
-
-        .quick-fact-label {
-            font-weight: 700;
-            color: #006b40;
-            font-size: 0.9em;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 0.5rem;
-        }
-
-        .quick-fact-value {
-            color: #4a5568;
-            line-height: 1.6;
-            font-size: 0.95em;
-        }
-
-        /* Recruiter FAQ */
-        .recruiter-faq {
-            margin-top: 4rem;
-            padding: 2rem;
-            background: linear-gradient(135deg, rgba(248, 251, 248, 0.5) 0%, rgba(235, 249, 235, 0.5) 100%);
-            border-radius: 16px;
-            border: 2px solid rgba(152, 229, 142, 0.2);
-        }
-
-        .recruiter-faq h2 {
-            color: #006b40;
-            margin-bottom: 1.5rem;
-            font-size: 2em;
-            text-align: center;
-        }
-
-        .faq-item {
-            margin-bottom: 1.5rem;
-            padding: 1.5rem;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 107, 64, 0.05);
-            border-left: 4px solid #98e58e;
-        }
-
-        .faq-question {
-            color: #006b40;
-            font-weight: 600;
-            font-size: 1.1em;
-            margin-bottom: 0.75rem;
-        }
-
-        .faq-answer {
-            color: #4a5568;
-            line-height: 1.6;
-        }
-
-        /* Professional Footer */
-        .resume-footer {
-            width: 100%;
-            padding: 40px 0;
-            text-align: center;
-            background: linear-gradient(90deg, #003b2f, #001c44);
-            color: white;
-            font-style: italic;
-            margin-top: auto;
-        }
-
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .hema-section {
-                flex-direction: column;
-                text-align: center;
+        
+        @keyframes gridShimmer {
+            0% {
+                background-position: 0 0, 0 0, 0 0, 0 0;
+                opacity: 0.7;
+                filter: brightness(1) contrast(1);
             }
-
-            .hema-image img {
-                left: 0;
-                transform: scale(1);
-                max-width: 100%;
+            25% {
+                background-position: 25px 25px, 25px 25px, 50px 50px, 50px 50px;
+                opacity: 1;
+                filter: brightness(1.1) contrast(1.1);
             }
-
-            .main-content {
-                padding: 32px;
+            50% {
+                background-position: 50px 50px, 50px 50px, 100px 100px, 100px 100px;
+                opacity: 0.8;
+                filter: brightness(0.9) contrast(0.9);
             }
-
-            .quick-facts-grid {
-                grid-template-columns: 1fr;
+            75% {
+                background-position: 25px 25px, 25px 25px, 50px 50px, 50px 50px;
+                opacity: 1;
+                filter: brightness(1.2) contrast(1.2);
+            }
+            100% {
+                background-position: 0 0, 0 0, 0 0, 0 0;
+                opacity: 0.7;
+                filter: brightness(1) contrast(1);
             }
         }
-
-        @media (max-width: 768px) {
-            .nav-menu {
-                display: none;
+        
+        @keyframes sheenSweep {
+            0% {
+                left: -100%;
+                opacity: 0;
             }
-
-            .hema-section {
-                padding: 1.5rem;
-            }
-
-            .main-content {
-                padding: 24px;
-            }
-
-            .about-section h1 {
-                font-size: 2em;
-            }
-
-            .about-section h2 {
-                font-size: 1.5em;
-            }
-
-            .quick-facts-section {
-                padding: 1.5rem;
-            }
-        }
-
-        @media print {
-            body {
-                background: white;
-                color: black;
-            }
-
-            .header,
-            .resume-footer {
-                display: none;
-            }
-
-            .resume-content {
-                box-shadow: none;
-                margin: 0;
-                padding: 20px;
-            }
-
-            .main-content,
-            .quick-facts-section {
-                box-shadow: none;
-                border: 1px solid #ddd;
-            }
-        }
-
-        @keyframes circuitFlow {
-            0% { transform: translate3d(0, 0, 0); opacity: 0.5; }
-            25% { transform: translate3d(-20px, -10px, 0); opacity: 0.8; }
-            50% { transform: translate3d(-40px, 0, 0); opacity: 1; }
-            75% { transform: translate3d(-20px, 10px, 0); opacity: 0.8; }
-            100% { transform: translate3d(0, 0, 0); opacity: 0.5; }
-        }
-
-        @keyframes nodeFloat {
-            0%, 100% { 
-                transform: translate3d(0, 0, 0) scale(1); 
-                opacity: 0.6;
-            }
-            25% { 
-                transform: translate3d(30px, -40px, 0) scale(1.3); 
+            10% {
                 opacity: 1;
             }
-            50% { 
-                transform: translate3d(-20px, 30px, 0) scale(0.8); 
+            90% {
+                opacity: 1;
+            }
+            100% {
+                left: 100%;
+                opacity: 0;
+            }
+        }
+        
+        /* Performance Optimized Animations */
+        .hero-section {
+            animation: heroGlow 8s ease-in-out infinite alternate;
+            will-change: box-shadow;
+        }
+        
+        .about-hero-title {
+            animation: titleFloat 6s ease-in-out infinite;
+            will-change: transform;
+            transform: translateZ(0);
+            font-family: 'Montserrat', 'Times New Roman', Times, serif;
+        }
+        
+        .about-hero-name {
+            animation: nameShimmer 4s ease-in-out infinite;
+            background: linear-gradient(45deg, #ffffff, #87ceeb, #ffffff);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            will-change: background-position;
+            font-family: 'Montserrat', 'Times New Roman', Times, serif;
+        }
+        
+        .about-hero-desc {
+            animation: descFade 10s ease-in-out infinite;
+            will-change: opacity, transform;
+            font-family: 'Montserrat', 'Times New Roman', Times, serif;
+        }
+        
+        .floating-nodes .data-node {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: radial-gradient(circle, rgba(135, 206, 235, 0.8), rgba(30, 58, 138, 0.4));
+            border-radius: 50%;
+            animation: nodeFloat 12s ease-in-out infinite;
+            will-change: transform, opacity;
+            transform: translateZ(0); /* Force hardware acceleration */
+        }
+        
+        .floating-nodes .data-node:nth-child(1) {
+            top: 20%;
+            left: 15%;
+            animation-delay: 0s;
+        }
+        
+        .floating-nodes .data-node:nth-child(2) {
+            top: 60%;
+            left: 80%;
+            animation-delay: 3s;
+        }
+        
+        .floating-nodes .data-node:nth-child(3) {
+            top: 40%;
+            left: 60%;
+            animation-delay: 6s;
+        }
+        
+        .floating-nodes .data-node:nth-child(4) {
+            top: 80%;
+            left: 25%;
+            animation-delay: 9s;
+        }
+        
+        .floating-nodes .data-node:nth-child(5) {
+            top: 15%;
+            left: 70%;
+            animation-delay: 1.5s;
+            width: 6px;
+            height: 6px;
+        }
+        
+        .floating-nodes .data-node:nth-child(6) {
+            top: 70%;
+            left: 45%;
+            animation-delay: 4.5s;
+            width: 10px;
+            height: 10px;
+        }
+        
+        .floating-nodes .data-node:nth-child(7) {
+            top: 35%;
+            left: 85%;
+            animation-delay: 7.5s;
+            width: 5px;
+            height: 5px;
+        }
+        
+        .floating-nodes .data-node:nth-child(8) {
+            top: 55%;
+            left: 10%;
+            animation-delay: 10.5s;
+            width: 7px;
+            height: 7px;
+        }
+        
+        .floating-nodes .data-node:nth-child(9) {
+            top: 25%;
+            left: 40%;
+            animation-delay: 2s;
+            width: 6px;
+            height: 6px;
+        }
+        
+        .floating-nodes .data-node:nth-child(10) {
+            top: 45%;
+            left: 75%;
+            animation-delay: 5s;
+            width: 9px;
+            height: 9px;
+        }
+        
+        .floating-nodes .data-node:nth-child(11) {
+            top: 65%;
+            left: 35%;
+            animation-delay: 8s;
+            width: 5px;
+            height: 5px;
+        }
+        
+        .floating-nodes .data-node:nth-child(12) {
+            top: 30%;
+            left: 90%;
+            animation-delay: 11s;
+            width: 8px;
+            height: 8px;
+        }
+        
+        .floating-nodes .data-node:nth-child(13) {
+            top: 75%;
+            left: 55%;
+            animation-delay: 3.5s;
+            width: 7px;
+            height: 7px;
+        }
+        
+        .floating-nodes .data-node:nth-child(14) {
+            top: 10%;
+            left: 20%;
+            animation-delay: 6.5s;
+            width: 6px;
+            height: 6px;
+        }
+        
+        .floating-nodes .data-node:nth-child(15) {
+            top: 50%;
+            left: 5%;
+            animation-delay: 9.5s;
+            width: 8px;
+            height: 8px;
+        }
+        
+        @keyframes heroGlow {
+            0% {
+                box-shadow: inset 0 0 50px rgba(30, 58, 138, 0.1), 0 0 20px rgba(30, 58, 138, 0.2);
+            }
+            100% {
+                box-shadow: inset 0 0 100px rgba(30, 58, 138, 0.2), 0 0 40px rgba(30, 58, 138, 0.4);
+            }
+        }
+        
+        @keyframes titleFloat {
+            0%, 100% {
+                transform: translateY(0px) scale(1);
+            }
+            50% {
+                transform: translateY(-5px) scale(1.01);
+            }
+        }
+        
+        @keyframes nameShimmer {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+        
+        @keyframes descFade {
+            0%, 100% {
+                opacity: 0.9;
+                transform: translateX(0px);
+            }
+            50% {
+                opacity: 1;
+                transform: translateX(2px);
+            }
+        }
+        
+        @keyframes nodeFloat {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0.6;
+            }
+            25% {
+                transform: translate(15px, -10px) scale(1.1);
+                opacity: 1;
+            }
+            50% {
+                transform: translate(-8px, 15px) scale(0.9);
                 opacity: 0.8;
             }
-            75% { 
-                transform: translate3d(40px, 15px, 0) scale(1.2); 
+            75% {
+                transform: translate(-15px, -8px) scale(1.05);
                 opacity: 0.9;
             }
         }
-
-        @keyframes cardBreathe {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-        }
-    
-</style>
-</head>
-<body style="background: #f8faf9; overflow-x: hidden; position: relative;">
-
-<!-- Background Effects -->
-<div id="background-effects">
-<canvas id="particle-canvas"></canvas>
-<div class="floating-nodes"></div>
-<div class="circuit-lines"></div>
-</div>
-
-<style>
-#background-effects {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-    pointer-events: none;
-}
-#particle-canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
-.floating-nodes, .circuit-lines {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-size: cover;
-    opacity: 0.25;
-}
-.floating-nodes {
-    background-image: radial-gradient(circle, rgba(0,107,64,0.3) 2px, transparent 2px);
-    background-size: 50px 50px;
-}
-.circuit-lines {
-    background-image: linear-gradient(90deg, rgba(0,107,64,0.15) 1px, transparent 1px),
-                      linear-gradient(rgba(0,107,64,0.15) 1px, transparent 1px);
-    background-size: 60px 60px;
-}
-/* Semi-transparent cards */
-.contact-card, .glass-card, .sidebar-card, .experience-card, .about-card {
-    background-color: rgba(255, 255, 255, 0.85) !important;
-    position: relative;
-    z-index: 1;
-}
-</style>
-
-<script>
-// Simple particle effect
-function initParticleCanvas() {
-    const canvas = document.getElementById('particle-canvas');
-    if (!canvas) return; // Safety check
-    
-    const ctx = canvas.getContext('2d');
-    let particles = [];
-    
-    function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    }
-    
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-    
-    function initParticles() {
-        particles = [];
-        for (let i = 0; i < 80; i++) {
-            particles.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                radius: Math.random() * 2 + 1,
-                dx: (Math.random() - 0.5) * 0.5,
-                dy: (Math.random() - 0.5) * 0.5
-            });
-        }
-    }
-    
-    function drawParticles() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "rgba(0,107,64,0.6)";
-        particles.forEach(p => {
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-            ctx.fill();
-            p.x += p.dx;
-            p.y += p.dy;
-            if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
-            if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
-        });
-        requestAnimationFrame(drawParticles);
-    }
-    
-    initParticles();
-    drawParticles();
-}
-
-// Initialize particles when DOM is ready
-document.addEventListener('DOMContentLoaded', initParticleCanvas);
-</script>
-
-<!-- Floating Data Nodes -->
-<div class="floating-nodes">
-<div class="data-node"></div>
-<div class="data-node"></div>
-<div class="data-node"></div>
-<div class="data-node"></div>
-</div>
-
-<!-- Header Navigation -->
-<header class="header" role="banner">
-<nav aria-label="Main navigation" class="nav-container" role="navigation">
-<div class="logo">
-<img alt="Kyle Mohney Professional Photo" class="profile-logo" height="52" src="assets/kyle.png" width="52"/>
-<span class="logo-text">Kyle Mohney</span>
-</div>
-<ul class="nav-menu">
-<li><a href="index.html">Home</a></li>
-<li><a href="resume.html">Resume</a></li>
-<li><a aria-current="page" class="current" href="about.html">About</a></li>
-<li><a href="projects.html">Projects</a></li>
-<li><a href="articles.html">Articles</a></li>
-<li><a href="contact.html">Contact</a></li>
-</ul>
-</nav>
-</header>
-
-<!-- Hero Section -->
-<section class="hero-section" style="background-color: #1e3a8a; position: relative; overflow: hidden; padding: 4rem 2rem;">
-<!-- Floating Data Nodes -->
-<div class="floating-nodes">
-<div class="data-node"></div>
-<div class="data-node"></div>
-<div class="data-node"></div>
-<div class="data-node"></div>
-</div>
-<!-- Circuitry overlay -->
-<div style="position:absolute; top:0; left:0; width:100%; height:100%; background-image:
-        linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
-        background-size:40px 40px; z-index:0;"></div>
-<div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; position:relative; z-index:1; max-width:1200px; margin:0 auto;">
-<div style="flex:1; min-width:280px; color:#fff; padding-right:2rem;">
-<h1 style="font-size:2.5rem; margin-bottom:1rem;">About Me</h1>
-<p style="font-size:1.125rem; line-height:1.6;">
-                From the small town of Columbiana to the forefront of AI-powered innovation, I've built a career on mastery, precision, and relentless dedication.
-                This is my story — where tradition meets technology, and passion fuels progress.
-            </p>
-</div>
-<div style="flex:1; min-width:280px; text-align:center;">
-<img alt="About Me" src="assets/about.png" style="max-width:100%; height:auto; border-radius:8px; box-shadow:0 0 25px rgba(37, 99, 235, 0.8);">
-</img></div>
-</div>
-</section>
-
-<!-- Content -->
-<div class="resume-content">
-<main class="main-content">
-<article class="about-me-article">
-
-<!-- Section 1: Introduction -->
-<section class="about-section">
-<h1>About Kyle Mohney</h1>
-<p>
-    Born and raised in the small town of Columbiana, Ohio, I carry with me the values of hard work, integrity, and community that defined my upbringing in a close-knit, middle-class family. 
-    Those early lessons are the compass by which I navigate life — as a devoted husband, proud father, and dedicated professional.
-</p>
-</section>
-
-<!-- Section 2: Family -->
-<section class="about-section">
-<h2>Family First</h2>
-<p>
-    At the heart of everything I do is my family — my remarkable wife, our curious and spirited 4-year-old son, and our bright, joyful 1-year-old daughter. 
-    They are my greatest pride, my truest inspiration, and the reason I strive for excellence in every endeavor.
-</p>
-</section>
-
-<!-- Section 3: Professional Journey -->
-<section class="about-section">
-<h2>A Professional Journey with Purpose</h2>
-<p>
-    My most recent chapter was at Thumbtack, where I found not just a job, but a mission. I thrived in building systems that empowered teams, improved processes, and created clarity for customers. 
-    I loved the work, cherished the people, and took pride in the impact we made together. The closure of my department was not a reflection of our success, but a change in company direction — an ending beyond my control, yet one that leaves me deeply proud of all we accomplished.
-</p>
-</section>
-
-<!-- Quick Facts Section (integrated into main content) -->
-<section class="quick-facts-section">
-<h2>Quick Professional Facts</h2>
-<p class="quick-facts-intro">
-    "So tell me, what are some key things that define your professional approach?"
-</p>
-<div class="quick-facts-grid">
-    <div class="quick-fact-card">
-        <div class="quick-fact-label">Sprout Social Expertise</div>
-        <div class="quick-fact-value">Enterprise review & sentiment workflows that saved Thumbtack's App Store presence</div>
-    </div>
-    <div class="quick-fact-card">
-        <div class="quick-fact-label">AI Toolkit Mastery</div>
-        <div class="quick-fact-value">100+ specialized tools organized by use case for maximum efficiency</div>
-    </div>
-    <div class="quick-fact-card">
-        <div class="quick-fact-label">Operations Superpowers</div>
-        <div class="quick-fact-value">BigQuery automation, Python scripting, and governance frameworks</div>
-    </div>
-    <div class="quick-fact-card">
-        <div class="quick-fact-label">Cross-Functional Leadership</div>
-        <div class="quick-fact-value">Support × Product × Operations alignment across 100+ team members</div>
-    </div>
-    <div class="quick-fact-card">
-        <div class="quick-fact-label">Crisis Resolution Expert</div>
-        <div class="quick-fact-value">Ensured App Store compliance by implementing systematic review response workflow for 2,000+ reviews</div>
-    </div>
-    <div class="quick-fact-card">
-        <div class="quick-fact-label">Process Innovation</div>
-        <div class="quick-fact-value">Reduced refund research time and review tabulation time by 90% using BigQuery automation</div>
-    </div>
-</div>
-</section>
-
-<!-- Section 4: HEMA Passion -->
-<section class="hema-section">
-<div class="hema-text">
-<h2>Passions Beyond the Office</h2>
-<p>
-    I am a dedicated Historical European Martial Arts (HEMA) instructor, preserving centuries-old martial traditions while making them accessible and engaging for modern students. 
-    In the salle, I teach discipline, history, and skill — lessons as relevant in life as they are on the fencing floor.
-</p>
-<p>
-    A trophy-winning rapier fencer, I also teach and coach in broadsword, longsword, messer, side-sword, saber, dagger, and melee weapon grappling — each with its own history, techniques, and tactical philosophy.
-</p>
-<p>
-    Music has been another lifelong pursuit. I have lived and performed in Nashville, collaborated with renowned musicians, and once shared intimate acoustic performances with my wife before our children were born — moments that taught me the art of connection through creativity.
-</p>
-</div>
-<div class="hema-image">
-<img alt="HEMA sword training" src="assets/sword.png"/>
-</div>
-</section>
-
-<!-- Section 5: AI Innovation -->
-<section class="about-section">
-<h2>The Frontier of AI-Powered Creation</h2>
-<p>
-    In recent years, I have embraced a new passion: harnessing the potential of artificial intelligence to expand what is possible in creative and operational work. 
-<!-- Section 5: AI Innovation -->
-<section class="about-section">
-<h2>The Frontier of AI-Powered Creation</h2>
-<p>
-    In recent years, I have embraced a new passion: harnessing the potential of artificial intelligence to expand what is possible in creative and operational work. 
-    From building immersive, JavaScript-driven video games with responsive AI-driven characters, to designing intelligent knowledge systems that adapt in real time, to crafting dynamic, AI-assisted content strategies — my work at the intersection of technology and creativity has been some of the most rewarding of my career.
-</p>
-<p>
-    These projects are more than technical exercises; they are explorations of how human ingenuity and machine intelligence can work in concert to build experiences that are richer, more personal, and more impactful than ever before.
-</p>
-</section>
-
-<!-- Section 6: What Drives Me -->
-<section class="about-section">
-<h2>What Drives Me</h2>
-<p>
-    Whether in the boardroom, the classroom, the studio, or the code editor, I am guided by a singular belief: that excellence is not an act, but a habit — forged through dedication, sharpened by curiosity, and sustained by a commitment to those we serve. 
-    My story is still being written, and I approach each chapter with the same determination that has carried me from small-town beginnings to the forefront of AI-powered innovation.
-</p>
-</section>
-
-</article>
-
-<!-- Recruiter FAQ Section -->
-<section class="recruiter-faq">
-<h2>Recruiter FAQ</h2>
-
-<div class="faq-item">
-<h3 class="faq-question">Q: Tell me about a time you solved a difficult problem under pressure.</h3>
-<p class="faq-answer">At Thumbtack, my primary role was handling escalations and documentation. But when the platform faced compliance concerns due to outstanding unresolved negative reviews, leadership turned to me — the company's go-to cross-department problem-solver — even though no system for this existed.
-I partnered with our legal team to draft a library of approved templates covering a range of issues. I then onboarded Thumbtack to Sprout Social, where I built a custom system of tags and sorting to auto-filter reviews and produce accurate sentiment and root cause reporting.
-Using Sprout's tools, I generated monthly sentiment reports and used them to match the right template to each review. The result? I cleared the entire backlog by responding to over 2000 reviews, reversed the negative trend, and left behind a scalable framework that an entire team could adopt for ongoing maintenance.</p>
-</div>
-
-<div class="faq-item">
-<h3 class="faq-question">Q: What's a project you're proud of?</h3>
-<p class="faq-answer">Building an AI-assisted public review workflow that saved Thumbtack's App Store presence. By integrating sentiment tagging with operational scripts, we responded to over 2,000 reviews in record time and reversed a negative trend that threatened our mobile ranking.</p>
-</div>
-
-<div class="faq-item">
-<h3 class="faq-question">Q: How do you approach integrating AI into your work?</h3>
-<p class="faq-answer">I treat AI as a force multiplier — a way to amplify human judgment and creativity. My goal isn't to replace people, but to give them sharper tools and faster feedback so they can focus on high-value work.</p>
-</div>
-
-<div class="faq-item">
-<h3 class="faq-question">Q: How do you keep your skills sharp?</h3>
-<p class="faq-answer">I split my time between hands-on technical projects and disciplines that sharpen focus and timing, like Historical European Martial Arts. On the tech side, I build AI-powered tools, refine game engines, and experiment with workflow automation. On the physical side, I train with sword and grappling to keep my mind sharp and adaptive.</p>
-</div>
-
-<div class="faq-item">
-<h3 class="faq-question">Q: Tell me something unique about you.</h3>
-<p class="faq-answer">I'm a trophy-winning rapier fencer and lifelong musician. I've played in Nashville, collaborated with major artists, and even performed acoustic sets with my wife. Those experiences taught me rhythm, connection, and how to engage an audience — skills I bring to my professional work as well.</p>
-</div>
-
-</section>
-
-</main>
-</div>
-
-<!-- Professional Footer (matching resume.html) -->
-<footer class="resume-footer">
-"The way to get started is to quit talking and begin doing." — Walt Disney
-</footer>
-
-<!-- JavaScript (animation controller) -->
-<script>
-class ResumeAnimationController {
-    constructor() { 
-        this.observers = []; 
-        this.init(); 
-    }
-    
-    init() {
-        this.setupIntersectionObservers();
-        this.setupMouseTracking();
-        this.setupScrollEffects();
-        this.initializeAnimations();
-    }
-    
-    setupIntersectionObservers() {
-        const options = { threshold: 0.1, rootMargin: '0px 0px -10% 0px' };
         
-        const metricObserver = new IntersectionObserver((entries) => { 
-            entries.forEach(entry => { 
-                if (entry.isIntersecting) { 
-                    entry.target.classList.add('animate'); 
-                    this.animateCounter(entry.target); 
-                }
-            }) 
-        }, options);
-        
-        document.querySelectorAll('.metric-number').forEach(el => metricObserver.observe(el));
-        
-        const skillObserver = new IntersectionObserver((entries) => { 
-            entries.forEach(entry => { 
-                if (entry.isIntersecting) { 
-                    entry.target.classList.add('animate'); 
-                } 
-            }) 
-        }, options);
-        
-        document.querySelectorAll('.tech-category').forEach(el => skillObserver.observe(el));
-        this.observers.push(metricObserver, skillObserver);
-    }
-    
-    animateCounter(element) { 
-        const text = element.textContent;
-        const isPercentage = text.includes('%');
-        const isRange = text.includes('→');
-        const isDollar = text.includes(');
-        
-        if (isPercentage) { 
-            const number = parseInt(text); 
-            this.countUp(element, 0, number, 2000, '%');
-        } else if (isRange || isDollar) {
-            element.style.animation = 'countUp 1.5s ease-out forwards';
-        } else if (!isNaN(parseInt(text))) {
-            const number = parseInt(text); 
-            this.countUp(element, 0, number, 1500, '+');
-        }
-    }
-    
-    countUp(element, start, end, duration, suffix='') { 
-        const range = end - start; 
-        const stepTime = Math.abs(Math.floor(duration / (range || 1)));
-        const timer = setInterval(() => { 
-            start += Math.ceil(range / 50);
-            if (start >= end) { 
-                start = end; 
-                clearInterval(timer); 
-            }
-            element.textContent = start + suffix;
-        }, stepTime || 16);
-    }
-    
-    setupMouseTracking() {
-        const cards = document.querySelectorAll('.faq-item, .quick-fact-card');
-        cards.forEach(card => { 
-            card.addEventListener('mouseenter', () => card.classList.add('magnetic'));
-            card.addEventListener('mouseleave', () => { 
-                card.classList.remove('magnetic'); 
-                card.style.transform = ''; 
-            });
-            card.addEventListener('mousemove', (e) => { 
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left; 
-                const y = e.clientY - rect.top;
-                const centerX = rect.width / 2; 
-                const centerY = rect.height / 2;
-                const rotateX = (y - centerY) / 10; 
-                const rotateY = (centerX - x) / 10;
-                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(20px)`;
-            });
-        });
-    }
-    
-    setupScrollEffects() {
-        let scrollTimeout;
-        window.addEventListener('scroll', () => { 
-            const scrollY = window.scrollY;
-            const resumeContent = document.querySelector('.resume-content');
-            if (scrollY > 100) { 
-                resumeContent?.classList.add('scrolled'); 
-            } else { 
-                resumeContent?.classList.remove('scrolled'); 
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            .floating-nodes .data-node {
+                animation-duration: 8s; /* Slower on mobile for better performance */
             }
             
-            clearTimeout(scrollTimeout);
-            scrollTimeout = setTimeout(() => { 
-                document.querySelectorAll('.quick-fact-card').forEach((card, index) => {
-                    setTimeout(() => { 
-                        card.classList.add('float');
-                        setTimeout(() => card.classList.remove('float'), 800);
-                    }, index * 200);
+            .floating-nodes .data-node:nth-child(n+8) {
+                display: none; /* Hide some nodes on mobile for performance */
+            }
+            
+            .hero-section {
+                padding: 1rem 1rem 1.5rem 1rem; /* Reduce padding on mobile */
+            }
+        }
+        
+        /* Micro-interactions */
+        .about-hero-title:hover {
+            transform: translateY(-2px) scale(1.005);
+            transition: transform 0.3s ease;
+        }
+        
+        .about-hero-desc:hover {
+            opacity: 1;
+            transform: translateX(1px);
+            transition: all 0.3s ease;
+        }
+        
+        /* Improved focus states for accessibility */
+        .about-hero-title:focus,
+        .about-hero-desc:focus {
+            outline: 2px solid rgba(30, 58, 138, 0.5);
+            outline-offset: 4px;
+        }
+
+        /* --- Historical Carousel Styles migrated from styles.css --- */
+        #music-carousel-image {
+          object-position: top;
+        }
+        #music-carousel-image[src*="mtb"] {
+          object-position: center 20%;
+        }
+        #music-carousel-image[src*="violent-offense"] {
+          object-position: center 25%;
+        }
+        #music-carousel {
+          transform: scale(0.85);
+          transform-origin: top left;
+          max-width: 700px;
+          margin: 48px 0 0 0;
+          position: relative;
+          background: #f4f7fb;
+          border-radius: 18px;
+          box-shadow: 0 4px 24px #1e3a8a33, 0 2px 8px #1e3a8a22;
+          border: 2px solid #1e3a8a;
+          display: flex;
+          align-items: center;
+          justify-content: flex-start;
+          z-index: 2;
+        }
+        #music-carousel-image {
+          width: 100%;
+          aspect-ratio: 16/9;
+          height: 520px;
+          object-fit: cover;
+          border-radius: 10px;
+          box-shadow: 0 4px 24px #1e3a8a44;
+          background: transparent;
+          margin: 0 auto;
+          display: block;
+        }
+        #carousel-image[src*="mccamey2"] {
+          object-position: center 100%;
+        }
+        #carousel-image[src*="mccamey"] {
+          object-position: top;
+        }
+        .historical-carousel-wrapper {
+          transform: scale(0.85);
+          transform-origin: top left;
+          max-width: 700px;
+          margin: 48px 0 0 0;
+          position: relative;
+          background: #f4f7fb;
+          border-radius: 18px;
+          box-shadow: 0 4px 24px #1e3a8a33, 0 2px 8px #1e3a8a22;
+          border: 2px solid #1e3a8a;
+          display: flex;
+          align-items: center;
+          justify-content: flex-start;
+          z-index: 2;
+        }
+        .historical-carousel-btn {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          background: none;
+          color: #000;
+          border: none;
+          font-size: 2em;
+          cursor: pointer;
+          z-index: 2;
+          transition: color 0.2s;
+        }
+        .historical-carousel-btn:hover, .historical-carousel-btn:focus {
+          color: #006b40;
+          outline: none;
+        }
+        .historical-carousel-btn.left {
+          left: -30px;
+        }
+        .historical-carousel-btn.right {
+          right: -30px;
+        }
+        .historical-carousel-img {
+          width: 100%;
+          aspect-ratio: 16/9;
+          height: 520px;
+          object-fit: cover;
+          border-radius: 10px;
+          box-shadow: 0 4px 24px #1e3a8a44;
+          background: transparent;
+          margin: 0 auto;
+          display: block;
+        }
+
+        /* --- Quick Facts Styles migrated from styles.css --- */
+        .quick-facts-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+          gap: 1.2rem;
+          margin: 1.5rem auto 2.5rem auto;
+          max-width: 700px;
+          justify-items: center;
+        }
+        .quick-fact-card {
+          background: #fff;
+          border-radius: 12px;
+          box-shadow: 0 2px 16px #1e3a8a66, 0 0 12px #1e3a8a44;
+          border: 2px solid #1e3a8a;
+          padding: 1.1em 1em 1em 1em;
+          min-width: 0;
+          max-width: 210px;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          justify-content: flex-start;
+          gap: 0.5em;
+          transition: box-shadow 0.18s, transform 0.18s;
+        }
+        .quick-fact-card:hover, .quick-fact-card:focus {
+          box-shadow: 0 6px 24px #075a7a44, 0 0 16px #4cae4f44;
+          transform: translateY(-2px) scale(1.04);
+          z-index: 2;
+        }
+        .quick-fact-label {
+          font-size: 1.05em;
+          font-weight: 700;
+          color: #1e3a8a;
+          margin-bottom: 0.2em;
+          letter-spacing: 0.5px;
+        }
+        .quick-fact-value {
+          font-size: 0.98em;
+          color: #222;
+          font-weight: 500;
+          line-height: 1.5;
+        }
+
+        /* --- About Section Title migrated from styles.css --- */
+        .about-section-title {
+          font-size: 1.3rem;
+          color: #1e3a8a !important;
+          margin-top: 2rem;
+          font-weight: 700;
+          font-family: 'Montserrat', 'Segoe UI', system-ui, -apple-system, sans-serif;
+          letter-spacing: 0.5px;
+        }
+
+        /* --- Blue Button Styles migrated from styles.css --- */
+        .blue-btn {
+          background: #1e3a8a !important;
+          color: #fff !important;
+          border: 3px solid #14235c !important;
+          box-shadow: 0 2px 8px #1e3a8a22 !important;
+        }
+        .blue-btn:hover, .blue-btn:focus {
+          background: #fff !important;
+          color: #1e3a8a !important;
+          border-color: #1e3a8a !important;
+          box-shadow: 0 2px 12px #1e3a8a55 !important;
+          transform: translateY(-2px) scale(1.04) !important;
+        }
+        </style>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>About | Kyle J. Mohney</title>
+    <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+
+<!-- Left side bright blue gas cloud effect -->
+<div style="position: fixed; left: 0; top: 0; width: 70vw; height: 100vh; background: radial-gradient(ellipse at 20% 30%, rgba(30, 58, 138, 0.10) 0%, transparent 50%), radial-gradient(ellipse at 30% 70%, rgba(40, 68, 148, 0.08) 0%, transparent 60%), radial-gradient(ellipse at 10% 50%, rgba(50, 78, 158, 0.06) 0%, transparent 70%); pointer-events: none; z-index: 0;"></div>
+<!-- Right side blue gas cloud effect -->
+<div style="position: fixed; right: 0; top: 0; width: 70vw; height: 100vh; background: radial-gradient(ellipse at 80% 30%, rgba(30, 58, 138, 0.08) 0%, transparent 50%), radial-gradient(ellipse at 70% 70%, rgba(40, 68, 148, 0.06) 0%, transparent 60%), radial-gradient(ellipse at 90% 50%, rgba(50, 78, 158, 0.04) 0%, transparent 70%); pointer-events: none; z-index: 0;"></div>
+
+<!-- Animated Data Streams and Geometric Overlays -->
+<svg class="bg-streams" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:0;pointer-events:none;">
+			<defs>
+				<linearGradient id="streamBlue" x1="0" y1="0" x2="1" y2="1">
+					<stop offset="0%" stop-color="#075a7a33" />
+					<stop offset="100%" stop-color="#fff0" />
+				</linearGradient>
+				<linearGradient id="streamGold" x1="0" y1="0" x2="1" y2="1">
+					<stop offset="0%" stop-color="#fff68e22" />
+					<stop offset="100%" stop-color="#fff0" />
+				</linearGradient>
+			</defs>
+				<!-- Animated circuit/data streams only -->
+				<path d="M 0 120 Q 320 180 640 120 T 1280 120" stroke="url(#streamBlue)" stroke-width="6" fill="none" opacity="0.18">
+					<animate attributeName="d" values="M 0 120 Q 320 180 640 120 T 1280 120; M 0 140 Q 320 160 640 140 T 1280 140; M 0 120 Q 320 180 640 120 T 1280 120" dur="8s" repeatCount="indefinite" />
+				</path>
+				<path d="M 0 320 Q 320 380 640 320 T 1280 320" stroke="url(#streamGold)" stroke-width="5" fill="none" opacity="0.13">
+					<animate attributeName="d" values="M 0 320 Q 320 380 640 320 T 1280 320; M 0 340 Q 320 360 640 340 T 1280 340; M 0 320 Q 320 380 640 320 T 1280 320" dur="10s" repeatCount="indefinite" />
+				</path>
+				<path d="M 0 220 Q 220 260 440 220 T 1280 220" stroke="url(#streamBlue)" stroke-width="4" fill="none" opacity="0.13">
+					<animate attributeName="d" values="M 0 220 Q 220 260 440 220 T 1280 220; M 0 240 Q 220 240 440 240 T 1280 240; M 0 220 Q 220 260 440 220 T 1280 220" dur="12s" repeatCount="indefinite" />
+				</path>
+				<path d="M 0 420 Q 220 460 440 420 T 1280 420" stroke="url(#streamGold)" stroke-width="3" fill="none" opacity="0.10">
+					<animate attributeName="d" values="M 0 420 Q 220 460 440 420 T 1280 420; M 0 440 Q 220 440 440 440 T 1280 440; M 0 420 Q 220 460 440 420 T 1280 420" dur="14s" repeatCount="indefinite" />
+				</path>
+				<!-- Faint grid overlay for connectivity -->
+				<rect x="0" y="0" width="100%" height="100%" fill="none" stroke="#075a7a22" stroke-width="1" opacity="0.08" />
+				<rect x="0" y="0" width="100%" height="100%" fill="none" stroke="#fff68e22" stroke-width="1" opacity="0.05" />
+				<!-- Subtle static network fog/clouds -->
+				<!-- removed pastel fills: keep subtle shapes but transparent to avoid color spots -->
+				<ellipse cx="40%" cy="80%" rx="320" ry="120" fill="transparent" opacity="0.0" />
+				<ellipse cx="80%" cy="20%" rx="180" ry="80" fill="transparent" opacity="0.0" />
+	</svg>
+
+    <header class="universal-header">
+        <div class="header-left">
+            <img src="assets/images/kyle.png" alt="Kyle Mohney" class="profile-pic">
+            <span class="header-name">
+                Kyle Mohney
+                <span class="header-name-glow"></span>
+            </span>
+        </div>
+        <nav>
+            <div class="nav-links" id="navLinks">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="resume.html" class="nav-link">Resume</a>
+                <a href="about.html" class="nav-link active">About</a>
+                <a href="projects.html" class="nav-link">Projects</a>
+                <a href="articles.html" class="nav-link">Articles</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+            </div>
+            <div class="header-icons">
+                <button class="header-icon-btn" title="Settings"><span>&#9881;</span></button>
+                <button class="header-icon-btn" title="Help"><span>?</span></button>
+                <button class="header-icon-btn" title="Language">EN</button>
+            </div>
+            <div class="hamburger" id="hamburger" aria-label="Open navigation" tabindex="0">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+    <script>
+        var hamburger = document.getElementById('hamburger');
+        var navLinks = document.getElementById('navLinks');
+        hamburger.addEventListener('click', function() {
+            navLinks.classList.toggle('open');
+        });
+        hamburger.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') navLinks.classList.toggle('open');
+        });
+    </script>
+        <!-- Hero Section -->
+    <section class="hero-section" style="background-color: #14235c; position: relative; overflow: hidden; padding: 1.5rem 2rem 2.5rem 2rem;">
+            <!-- Floating Data Nodes -->
+            <div class="floating-nodes">
+                <div class="data-node"></div>
+                <div class="data-node"></div>
+                <div class="data-node"></div>
+                <div class="data-node"></div>
+                <div class="data-node"></div>
+                <div class="data-node"></div>
+                <div class="data-node"></div>
+                <div class="data-node"></div>
+                <div class="data-node"></div>
+                <div class="data-node"></div>
+                <div class="data-node"></div>
+                <div class="data-node"></div>
+                <div class="data-node"></div>
+                <div class="data-node"></div>
+                <div class="data-node"></div>
+            </div>
+            <!-- Circuitry overlay -->
+            <div class="hero-grid-animated"></div>
+            <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; position:relative; z-index:1; max-width:1200px; margin:0 auto;">
+                <div style="flex:1; min-width:280px; color:#fff; padding-right:2rem;">
+                    <h1 class="about-hero-title" style="font-size: 3.4rem; margin-bottom: 1.2rem; color: #fff; font-weight: 900; font-family: 'Montserrat', 'Segoe UI', system-ui, sans-serif; letter-spacing: 1.5px;">About<br><span class="about-hero-name" style="display: block; font-size: 2.2rem; font-weight: 700; color: #fff; margin-top: 0.2em; letter-spacing: 1px;">Kyle J. Mohney</span></h1>
+                    <p class="about-hero-desc" style="font-size: 1.45rem; line-height: 1.8; font-weight: 600; color: #fff; font-family: 'Montserrat', 'Segoe UI', system-ui, sans-serif; margin-bottom: 0; text-align: left;">
+                        Bridging tradition and technology, Kyle Mohney leads with integrity, clarity, and a passion for operational excellence. His journey blends family values, community, and AI-driven innovation—serving as a trusted steward for people and organizations in a rapidly evolving world.
+                    </p>
+                </div>
+                <div style="flex:1; min-width:280px; text-align:center;">
+                    <img alt="Kyle J. Mohney Presidential Portrait" src="assets/images/about.png" style="width:420px; max-width:95%; height:auto; border-radius:10px; box-shadow:0 0 48px 0 #0a1420, 0 0 32px rgba(37, 99, 235, 0.9);">
+                    </img>
+                </div>
+            </div>
+        </section>
+
+        <style>
+            /* About page hero responsive styles */
+            @media (max-width: 900px) {
+                .hero-section { padding: 1rem !important; }
+                .hero-section > div[style], .hero-section > div {
+                    flex-direction: column !important;
+                    gap: 16px;
+                    align-items: center;
+                }
+                .hero-section img { 
+                    max-width: 100% !important; 
+                    height: auto !important; 
+                    box-shadow: 0 0 32px 0 #0a1420; 
+                }
+                .about-hero-title { 
+                    font-size: 1.6rem !important; 
+                    text-align: center !important; 
+                }
+                .about-hero-desc { 
+                    font-size: 0.95rem !important; 
+                }
+            }
+            
+            @media (max-width: 768px) {
+                .hero-section { padding: 1rem !important; }
+                .hero-section > div { 
+                    flex-direction: column !important; 
+                    gap: 16px; 
+                    align-items: center; 
+                }
+                .hero-section img { 
+                    max-width: 100% !important; 
+                    height: auto !important; 
+                }
+            }
+            
+            @media (max-width: 420px) {
+                .hero-section { padding: 0.75rem !important; }
+                .about-hero-title { font-size: 1.25rem !important; }
+                .about-hero-desc { font-size: 0.9rem !important; }
+            }
+        </style>
+
+        <!-- Backgrounds and Foundations Title Card -->
+        <section class="page-title-wrap" aria-labelledby="backgrounds-heading" style="margin-top: 1rem;">
+            <div style="width:100%;display:flex;justify-content:center;align-items:center;margin-bottom:0;">
+                <h1 id="backgrounds-heading" style="text-align:center; font-size:2.2em; font-weight:800; letter-spacing:1px; display:flex; align-items:center; justify-content:center; gap:18px; background:#14235c; color:#fff; border-radius:16px; box-shadow:0 2px 16px #14235c44; position:relative; padding:18px 0; width:100%; max-width:800px; margin:0 auto; align-items:center; font-family: 'Montserrat', 'Times New Roman', Times, serif;">
+                    <span style="color:#fff; display:flex; align-items:center;">
+                        <span style="display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;margin-right:12px;box-sizing:border-box;">
+                            <img src="assets/icons/foundation-icon.png" alt="Backgrounds Icon" style="width:100%;height:100%;object-fit:contain;filter:brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg);" />
+                        </span>
+                    </span>
+                    BACKGROUNDS AND FOUNDATIONS
+                </h1>
+            </div>
+            <div style="height:32px;"></div>
+        </section>
+        <!-- About Kyle Mohney Card (merged main content) -->
+        <section class="about-section" style="background:#fff; border-radius:10px; box-shadow:0 2px 16px rgba(30,58,138,0.08); margin:0.5rem auto; max-width:700px; padding:1rem 2rem 2rem 2rem;">
+            <!-- Fun 3 Video Embed -->
+            <div style="max-width:700px; margin:0 0 32px 0; display:flex; justify-content:flex-start; align-items:flex-start;">
+                <video id="fun3-video" width="560" height="315" controls poster="assets/images/fun-3-thumbnail.png" style="border-radius:10px; box-shadow:0 4px 24px #1e3a8a22; margin-left:0;">
+                    <source src="assets/videos/fun3.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <script>
+                // Autoplay Fun 3 video on mouse movement over the video area
+                const fun3Video = document.getElementById('fun3-video');
+                let hasPlayedFun3 = false;
+                fun3Video.addEventListener('mousemove', function() {
+                    if (!hasPlayedFun3) {
+                        fun3Video.play();
+                        hasPlayedFun3 = true;
+                    }
                 });
-            }, 150);
-        });
-    }
-    
-    initializeAnimations() { 
-        const elements = document.querySelectorAll('.faq-item, .about-section, .quick-fact-card');
-        elements.forEach((el, index) => { 
-            el.style.opacity = '0'; 
-            el.style.transform = 'translateY(30px)';
-            el.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
-            setTimeout(() => { 
-                el.style.opacity = '1'; 
-                el.style.transform = 'translateY(0)'; 
-            }, index * 200 + 500);
-        });
-    }
-    
-    destroy() { 
-        this.observers.forEach(observer => observer.disconnect()); 
-    }
-}
+                </script>
+            </div>
+            <p style="font-size:1.1rem; color:#222; line-height:1.7;">
+                <p class="about-section-intro">
+                Born and raised in the small town of Columbiana, Ohio, Kyle Mohney carries with him the values of hard work, integrity, and community that defined his upbringing in a close-knit, middle-class family. 
+                These early lessons became the compass by which he navigates life — as a devoted husband, proud father, and dedicated professional.
+                 </p>
+            <div style="display: flex; align-items: flex-start; gap: 32px;">
+              <div style="flex: 1; min-width: 0;">
+                                <h2 class="about-section-title" style="font-size:1.6rem;">Family First</h2>
+                                <p class="about-section-intro">
+                                    At the heart of everything Kyle does is his family — his remarkable wife, their curious and spirited 4-year-old son, and their bright, joyful 1-year-old daughter. 
+                                    They are his greatest pride, truest inspiration, and the reason he strives for excellence in every endeavor.
+                                </p>
+              </div>
+              <img src="assets/images/family-man.png" alt="Family Man" style="width:220px; max-width:100%; border-radius:18px; box-shadow:0 4px 32px rgba(30,60,90,0.12); margin-top:16px;" />
+            </div>
+            <h2 class="about-section-title" style="font-size:1.6rem;">A Professional Journey with Purpose</h2>
+            <p style="font-size:1.05rem; color:#222; line-height:1.7;">
+                <p class="about-section-intro">
+                 Kyle's most recent chapter was at Thumbtack, where he found not just a job, but a mission. He thrived in building systems that empowered teams, improved processes, and created clarity for customers. 
+                 He loved the work, cherished the people, and took pride in the impact made together. The closure of his department was not a reflection of their success, but a change in company direction — an ending beyond his control, yet one that leaves him deeply proud of all they accomplished.
+            </p>
+            <h2 class="about-section-title" style="font-size:1.6rem;">Quick Professional Facts</h2>
+            <div class="quick-facts-grid">
+                <div class="quick-fact-card">
+                    <div class="quick-fact-label">Sprout Social Expertise</div>
+                    <div class="quick-fact-value">Enterprise review & sentiment workflows that saved Thumbtack's App Store presence</div>
+                </div>
+                <div class="quick-fact-card">
+                    <div class="quick-fact-label">AI Toolkit Mastery</div>
+                    <div class="quick-fact-value">100+ specialized tools organized by use case for maximum efficiency</div>
+                </div>
+                <div class="quick-fact-card">
+                    <div class="quick-fact-label">Operations Superpowers</div>
+                    <div class="quick-fact-value">BigQuery automation, Python scripting, and governance frameworks</div>
+                </div>
+                <div class="quick-fact-card">
+                    <div class="quick-fact-label">Cross-Functional Leadership</div>
+                    <div class="quick-fact-value">Support × Product × Operations alignment across 100+ team members</div>
+                </div>
+                <div class="quick-fact-card">
+                    <div class="quick-fact-label">Crisis Resolution Expert</div>
+                    <div class="quick-fact-value">Ensured App Store compliance by implementing systematic review response workflow for 2,000+ reviews</div>
+                </div>
+                <div class="quick-fact-card">
+                    <div class="quick-fact-label">Process Innovation</div>
+                    <div class="quick-fact-value">Reduced refund research time and review tabulation time by 90% using BigQuery automation</div>
+                </div>
+            </div>
+        </section>
 
-document.addEventListener('DOMContentLoaded', () => new ResumeAnimationController());
-</script>
+        <!-- Passions Beyond the Office Title Card -->
+        <section class="page-title-wrap" aria-labelledby="passions-heading" style="margin-top: 1rem;">
+            <div style="width:100%;display:flex;justify-content:center;align-items:center;margin-bottom:0;">
+                <h1 id="passions-heading" style="text-align:center; font-size:2.2em; font-weight:800; letter-spacing:1px; display:flex; align-items:center; justify-content:center; gap:18px; background:#14235c; color:#fff; border-radius:16px; box-shadow:0 2px 16px #14235c44; position:relative; padding:18px 0; width:100%; max-width:800px; margin:0 auto; align-items:center; font-family: 'Montserrat', 'Times New Roman', Times, serif;">
+                    <span style="color:#fff; display:flex; align-items:center;">
+                        <span style="display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;margin-right:12px;box-sizing:border-box;">
+                            <img src="assets/icons/passion-icon.png" alt="Passions Icon" style="width:100%;height:100%;object-fit:contain;filter:brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg);" />
+                        </span>
+                    </span>
+                    PASSIONS BEYOND THE OFFICE
+                </h1>
+            </div>
+        </section>
 
-</body>
+        <!-- Passions and Interests Card -->
+        <section class="about-section" style="background:#fff; border-radius:10px; box-shadow:0 2px 16px rgba(30,58,138,0.08); margin:0 auto; max-width:700px; padding:1rem 2rem 2rem 2rem;">
+            <div style="display: flex; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
+                <div style="flex:2; min-width:260px;">
+                    <h3 class="about-section-title" style="font-size:1.6rem;">The Historical Fencer</h3>
+                    <p class="about-section-intro"><strong>Origins in Denver:</strong><br>
+                    Kyle Mohney’s journey in historical fencing began in the scolding hot summers of Denver, Colorado, during the Covid lockdown—when the world stood still and there was nothing else to do. He picked up a sword, a historical manual, and started studying.
+                    </p>
+                    <p class="about-section-intro"><strong>Leviathan Martial Arts:</strong><br>
+                    An endeavor born of curiosity and self-reliance. With no formal instructor, Kyle turned to the wisdom of books, manuscripts, and the shared determination of a handful of fellow fencers, each new to the art and driven by a hunger to learn. Together, they forged their skills in the crucible of self-teaching, guided only by the written word and the spirit of discovery.
+                    </p>
+                    <p class="about-section-intro"><strong>Krieg School:</strong><br>
+                    As their passion grew, so did their need for refinement. The group joined the Krieg School, where the lessons of solitary study met the practical education of seasoned instructors. Under expert guidance, their techniques sharpened, their understanding deepened, and camaraderie flourished. The Krieg School became more than a place of learning—it was a proving ground, where self-taught ambition was honed into disciplined skill.
+                    </p>
+                    <p class="about-section-intro"><strong>Youngstown Historical Fencing:</strong><br>
+                    When Kyle moved to Ohio, a new chapter began. He joined Youngstown Historical Fencing, stepping into a community defined by excellence and tradition. Here, his journey reached new heights: Kyle became a first-place tournament winner, an instructor, and a coach. In the classroom and on the tournament floor, he found his calling—not only to compete, but to teach, to mentor, and to inspire the next generation of fencers. The lessons of Leviathan and Krieg shaped his foundation; Youngstown allowed him to build upon it, transforming personal achievement into shared success.
+                    </p>
+                    <p class="about-section-intro"><strong>Growth & Community:</strong><br>
+                    This story is not merely one of medals or matches—though Kyle has fought in more than 1,500, each a test of discipline and resolve. It is a story of growth, of community, and of the relentless pursuit of mastery. From the solitude of self-study to the fellowship of teams, Kyle has learned that greatness is forged not alone, but together.
+                    </p>
+                    <p class="about-section-intro" style="margin-top:1.2em;"><strong>Sharing the Journey:</strong><br>
+                    For the past five years and counting, Kyle has also run the <a href="https://www.youtube.com/@McCameyHEMA" target="_blank" rel="noopener">McCamey HEMA</a> YouTube channel, where he has shared hundreds ofvideos documenting his fights, training, and tournament experiences for the world to see.
+                    </p>
+                </div>
+                <div class="hema-image">
+                    <img alt="HEMA sword training" src="assets/images/sword1.png" style="max-width:320px; border-radius:10px;"/>
+                    <img alt="YRRA dot" src="assets/images/yrra.png" style="width:220px; margin:12px auto 0 auto; border-radius:0; box-shadow:0 4px 12px #1e3a8a33; display:block; object-fit:contain;"/>
+                    <img alt="Leviathan" src="assets/images/leviathan.png" style="width:220px; margin:12px auto 0 auto; border-radius:0; box-shadow:0 4px 12px #1e3a8a33; display:block; object-fit:contain;"/>
+                    <img alt="Krieg" src="assets/images/krieg.png" style="width:220px; margin:12px auto 0 auto; border-radius:0; box-shadow:0 4px 12px #1e3a8a33; display:block; object-fit:contain;"/>
+                </div>
+            </div>
+            <!-- Photo Carousel: Historical Fencer Gallery -->
+            <div id="photo-carousel" class="historical-carousel-wrapper">
+                <button id="carousel-prev" class="historical-carousel-btn left">❮</button>
+                <img id="carousel-image" src="assets/images/castle.png" alt="Carousel Photo" class="historical-carousel-img">
+                <button id="carousel-next" class="historical-carousel-btn right">❯</button>
+            </div>
+            <!-- Embedded YouTube Video: Historical Fencer -->
+            <div style="max-width:700px;margin:24px auto 0 auto;display:flex;justify-content:flex-start;">
+                    <video width="560" height="315" controls poster="assets/images/the-road-so-far-thumbnail.png" style="border-radius:10px;box-shadow:0 4px 24px #1e3a8a22;">
+                        <source src="assets/videos/the-road-so-far.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+            </div>
+        </section>
+
+        <!-- Musician Section Card -->
+        <section class="about-section" style="background:#fff; border-radius:10px; box-shadow:0 2px 16px rgba(30,58,138,0.08); margin:0.5rem auto; max-width:700px; padding:1rem 2rem 2rem 2rem;">
+            <div style="margin-top:24px; display: flex; align-items: flex-start; gap: 2rem; flex-wrap: wrap;">
+                <div style="flex:2; min-width:260px;">
+                    <h3 class="about-section-title" style="font-size:1.6rem;">The Musician</h3>
+                                                                                                    <p class="about-section-intro">
+                                                                                                        In the heartland of Columbiana, Ohio, a young Kyle Mohney first discovered the transformative power of music. In junior high, he picked up a bass guitar and, with a handful of friends, formed a garage band that would go on to headline the local fair—an early testament to his ability to inspire and unite those around him.
+                                                                                                    </p>
+                                                                                                    <p class="about-section-intro">
+                                                                                                        As he entered high school, Kyle’s musical ambitions grew. He transitioned to guitar and co-founded Violent Offense, a hardcore band that toured the eastern United States and earned a place on the Ohio’s Best compilation in 2006. His leadership and creative vision propelled the group to regional acclaim.
+                                                                                                    </p>
+                                                                                                    <p class="about-section-intro">
+                                                                                                        After graduation, Kyle reunited with his original bandmates to form Silent Impulse, a hard rock-metal ensemble featured on FuzeTV’s Slave To Metal show in 2008. Each performance was marked by discipline, energy, and a relentless pursuit of excellence.
+                                                                                                    </p>
+                                                                                                    <p class="about-section-intro">
+                                                                                                        Kyle’s journey next led him to the Academy of Art University, and soon after, to Nashville, Tennessee, where he joined Meant To Bleed—a band blending rock and pop influences. Living with his bandmates, he collaborated with industry leaders such as 3 Doors Down and River-Gate Studios, and performed on Nashville radio. These years were defined by artistic growth and the forging of lifelong connections.
+                                                                                                    </p>
+                                                                                                    <p class="about-section-intro">
+                                                                                                        Following this chapter, Kyle took a brief respite from the stage, working at Guitar Center and deepening his understanding of music’s technical foundations. He returned to his roots, embracing acoustic music and sharing his talents in more intimate settings.
+                                                                                                    </p>
+                                                                                                    <p class="about-section-intro">
+                                                                                                        It was during this period that Kyle met his future wife, a gifted musician in her own right. Together, they performed acoustic shows across Ohio and Colorado, their partnership a harmonious blend of talent and devotion. As their family grew, music became a cherished part of home life—songs now played for their children, with the next generation already showing promise at the piano. Through every stage, Kyle’s musical legacy has been one of connection, creativity, and enduring love.
+                                                                                                    </p>
+                                    </div>
+                                                                            <div style="display:flex; flex-direction:column; align-items:center;">
+                                                                                <img src="assets/images/agora.png" alt="Agora" style="width:260px; height:400px; margin:12px auto 0 auto; border-radius:0; box-shadow:0 4px 12px #1e3a8a33; display:block; object-fit:cover;" />
+                                                                                <img src="assets/images/guitarcenter.png" alt="Guitar Center" style="width:220px; margin:12px auto 0 auto; border-radius:0; box-shadow:0 4px 12px #1e3a8a33; display:block; object-fit:contain;" />
+                                                                            </div>
+                                </div>
+                    <!-- Music Photo Carousel -->
+                    <div id="music-carousel" style="max-width:700px;margin:24px auto 0 auto;position:relative;">
+                        <button id="music-carousel-prev" class="historical-carousel-btn left">❮</button>
+                        <img id="music-carousel-image" src="assets/images/music1.png" alt="Music Photo" class="historical-carousel-img">
+                        <button id="music-carousel-next" class="historical-carousel-btn right">❯</button>
+                    </div>
+                    <!-- Music Video: Lay Me Down -->
+                    <div style="max-width:700px;margin:24px auto 0 auto;display:flex;justify-content:flex-start;">
+                        <video width="560" height="315" controls poster="assets/images/lay-me-down-thumbnail.png" style="border-radius:10px;box-shadow:0 4px 24px #184d4722;">
+                            <source src="assets/videos/lay-me-down.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    <script>
+                    const musicCarouselImages = [
+                        'assets/images/music1.png',
+                        'assets/images/music3.png',
+                        'assets/images/music4.png',
+                        'assets/images/music5.png',
+                        'assets/images/music6.png',
+                        'assets/images/music7.png',
+                        'assets/images/music8.png',
+                        'assets/images/music9.png',
+                        'assets/images/music10.png',
+                        'assets/images/music11.png',
+                        'assets/images/mtb.png',
+                        'assets/images/violent-offense.png'
+                    ];
+                    let musicCurrentIndex = 0;
+                    const musicCarouselImg = document.getElementById('music-carousel-image');
+                    document.getElementById('music-carousel-prev').onclick = function() {
+                        musicCurrentIndex = (musicCurrentIndex - 1 + musicCarouselImages.length) % musicCarouselImages.length;
+                        musicCarouselImg.src = musicCarouselImages[musicCurrentIndex];
+                    };
+                    document.getElementById('music-carousel-next').onclick = function() {
+                        musicCurrentIndex = (musicCurrentIndex + 1) % musicCarouselImages.length;
+                        musicCarouselImg.src = musicCarouselImages[musicCurrentIndex];
+                    };
+                    </script>
+                </div>
+            <script>
+            const carouselImages = [
+                'assets/images/castle.png',
+                'assets/images/cleveland.png',
+                'assets/images/group.png',
+                'assets/images/lakewood.png',
+                'assets/images/mccamey.png',
+                'assets/images/mccamey2.png',
+                'assets/images/paladin.png',
+                'assets/images/paladin2.png',
+                'assets/images/penguine.png',
+                'assets/images/sharp.png',
+                'assets/images/teach.png'
+            ];
+            let currentIndex = 0;
+            const carouselImg = document.getElementById('carousel-image');
+            document.getElementById('carousel-prev').onclick = function() {
+                currentIndex = (currentIndex - 1 + carouselImages.length) % carouselImages.length;
+                carouselImg.src = carouselImages[currentIndex];
+            };
+            document.getElementById('carousel-next').onclick = function() {
+                currentIndex = (currentIndex + 1) % carouselImages.length;
+                carouselImg.src = carouselImages[currentIndex];
+            };
+            </script>
+        </section>
+
+        <!-- Future Vision & Purpose Title Card -->
+        <section class="page-title-wrap" aria-labelledby="future-heading" style="margin-top: 1rem;">
+            <div style="width:100%;display:flex;justify-content:center;align-items:center;margin-bottom:0;">
+                <h1 id="future-heading" style="text-align:center; font-size:2.2em; font-weight:800; letter-spacing:1px; display:flex; align-items:center; justify-content:center; gap:18px; background:#14235c; color:#fff; border-radius:16px; box-shadow:0 2px 16px #14235c44; position:relative; padding:18px 0; width:100%; max-width:800px; margin:0 auto; align-items:center; font-family: 'Montserrat', 'Times New Roman', Times, serif;">
+                    <span style="color:#fff; display:flex; align-items:center;">
+                        <span style="display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;margin-right:12px;box-sizing:border-box;">
+                            <img src="assets/icons/specialist-icon.png" alt="Future Vision Icon" style="width:100%;height:100%;object-fit:contain;filter:brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg);" />
+                        </span>
+                    </span>
+                    FUTURE VISION & PURPOSE
+                </h1>
+            </div>
+            <div style="height:32px;"></div>
+        </section>
+
+        <!-- What Drives Me & AI Section Card -->
+        <section class="about-section" style="background:#fff; border-radius:10px; box-shadow:0 2px 16px rgba(30,58,138,0.08); margin:0.5rem auto; max-width:700px; padding:1rem 2rem 2rem 2rem;">
+            <h2 class="about-section-title" style="font-size:1.6rem;">The Frontier of AI-Powered Creation</h2>
+                <p class="about-section-intro">
+                    In recent years, Kyle has embraced a new passion: harnessing the potential of artificial intelligence to expand what is possible in creative and operational work. 
+                    From building immersive, JavaScript-driven video games with responsive AI-driven characters, to designing intelligent knowledge systems that adapt in real time, to crafting dynamic, AI-assisted content strategies — his work at the intersection of technology and creativity has been among the most rewarding of his career.
+                </p>
+                <p class="about-section-intro">
+                    These projects are more than technical exercises; they represent explorations of how human ingenuity and machine intelligence can work in concert to build experiences that are richer, more personal, and more impactful than ever before.
+                </p>
+            <!-- Projects Page Reminder Pill -->
+            <div style="display:flex;justify-content:center;margin:32px 0;">
+                <button class="btn" style="background: #14235c; border-color: #14235c; color: #fff;" 
+                        onmouseover="this.style.background='#fff'; this.style.color='#14235c'; this.style.borderColor='#14235c';"
+                        onmouseout="this.style.background='#14235c'; this.style.color='#fff'; this.style.borderColor='#14235c';"
+                        onclick="window.location.href='projects.html'">Explore My Projects</button>
+            </div>
+            <!-- Contact Page Reminder Pill -->
+            <h2 class="about-section-title" style="font-size:1.6rem;">What Drives Me</h2>
+                <p class="about-section-intro">
+                    Whether in the office, the classroom, the studio, the sport-club, or the code editor, Kyle is guided by a singular belief: that excellence is not an act, but a habit — forged through dedication, sharpened by curiosity, and sustained by a commitment to those he serves. 
+                    His story is still being written, and each chapter is approached with the same determination that has carried him from small-town beginnings to the forefront of AI-powered innovation.
+                </p>
+            <div style="display:flex;justify-content:center;margin:32px 0;">
+                <button class="btn" style="background: #14235c; border-color: #14235c; color: #fff;" 
+                        onmouseover="this.style.background='#fff'; this.style.color='#14235c'; this.style.borderColor='#14235c';"
+                        onmouseout="this.style.background='#14235c'; this.style.color='#fff'; this.style.borderColor='#14235c';"
+                        onclick="window.location.href='articles.html'">Explore My Articles</button>
+            </div>
+        </div>
+        </section>
+
+        <!-- Recruiter FAQ Title Card -->
+        <section class="page-title-wrap" aria-labelledby="recruiter-faq-heading" style="margin-top: 1rem;">
+            <div style="width:100%;display:flex;justify-content:center;align-items:center;margin-bottom:0;">
+                <h1 id="recruiter-faq-heading" style="text-align:center; font-size:2.2em; font-weight:800; letter-spacing:1px; display:flex; align-items:center; justify-content:center; gap:18px; background:#14235c; color:#fff; border-radius:16px; box-shadow:0 2px 16px #14235c44; position:relative; padding:18px 0; width:100%; max-width:800px; margin:0 auto; align-items:center; font-family: 'Montserrat', 'Times New Roman', Times, serif;">
+                    <span style="color:#fff; display:flex; align-items:center;">
+                        <span style="display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;margin-right:12px;box-sizing:border-box;">
+                            <img src="assets/icons/contact-icon.png" alt="Recruiter FAQ Icon" style="width:100%;height:100%;object-fit:contain;filter:brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg);" />
+                        </span>
+                    </span>
+                    RECRUITER FAQ
+                </h1>
+            </div>
+            <div style="height:32px;"></div>
+        </section>
+
+        <!-- Recruiter FAQ Section -->
+        <section style="margin:0.5rem auto; max-width:700px;">
+            <div class="recruiter-faq">
+                <div class="faq-item">
+                    <h3 class="faq-question">Tell me about a time you solved a difficult problem under pressure</h3>
+                    <p class="faq-answer">
+                        At Thumbtack, I was responsible for escalations and documentation. When unresolved negative reviews threatened platform compliance, leadership turned to me—despite no existing system for this challenge.<br><br>
+                        I partnered with legal to draft a library of approved response templates, then onboarded Thumbtack to Sprout Social and built a custom tagging and sorting system to auto-filter reviews and generate accurate sentiment reports.<br><br>
+                        By matching templates to each review and responding to over 2,000 cases, I cleared the backlog, reversed the negative trend, and left behind a scalable framework for ongoing success.
+                    </p>
+                </div>
+                <div class="faq-item">
+                    <h3 class="faq-question">What's a project you're proud of?</h3>
+                        <p class="faq-answer">
+                            I created an in-depth training module to help our support advocates guide customers in understanding and measuring their return on investment with our product. This initiative led to a dramatic increase in customer satisfaction and contributed directly to higher sales.
+                        </p>
+                </div>
+                <div class="faq-item">
+                    <h3 class="faq-question">How do you approach integrating AI into your work?</h3>
+                    <p class="faq-answer">
+                        I treat AI as a force multiplier — a way to amplify human judgment and creativity. My goal isn't to replace people, but to give them sharper tools and faster feedback so they can focus on high-value work.
+                    </p>
+                </div>
+                <div class="faq-item">
+                    <h3 class="faq-question">How do you keep your skills sharp?</h3>
+                    <p class="faq-answer">
+                        I split my time between hands-on technical projects and disciplines that sharpen focus and timing, like Historical European Martial Arts. On the tech side, I build AI-powered tools, programs, and experiment with workflow automation. On the physical side, I train with sword and grappling to keep my mind sharp and adaptive.
+                    </p>
+                </div>
+                <div class="faq-item">
+                    <h3 class="faq-question">Tell me something unique about you</h3>
+                    <p class="faq-answer">
+                        I'm a lifelong learner who thrives at the intersection of creativity and technology. Whether I'm building AI-powered games, coaching historical fencing, or composing music with my family, I seek out challenges that blend tradition with innovation—and I bring that same energy to every professional project.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    <div style="display: flex; justify-content: center; align-items: flex-start; gap: 1px; flex-wrap: wrap; max-width: 470px; margin: 48px auto; padding: 0 24px;">
+        <div class="universal-share-card" style="--share-card-color:#1e3a8a;">
+            <h3 class="universal-share-title">Share this page</h3>
+            <div class="share-links">
+                <a href="https://facebook.com/sharer/sharer.php?u=https://yourdomain.com/about.html" target="_blank" rel="noopener">
+                    <img src="assets/icons/facebook.png" alt="Share on Facebook" class="share-icon" />
+                </a>
+                <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://yourdomain.com/about.html" target="_blank" rel="noopener">
+                    <img src="assets/icons/in.png" alt="Share on LinkedIn" class="share-icon" />
+                </a>
+                <a href="https://x.com/intent/tweet?url=https://yourdomain.com/about.html" target="_blank" rel="noopener">
+                    <img src="assets/icons/x.png" alt="Share on X" class="share-icon" />
+                </a>
+                <a href="#" onclick="navigator.clipboard.writeText(window.location.href);alert('Page link copied!');return false;">
+                    <img src="assets/icons/direct-icon.png" alt="Copy Direct Link" class="share-icon" />
+                </a>
+            </div>
+        </div>
+        
+        <div class="universal-contact-card" style="--contact-card-color:#1e3a8a;">
+            <h3 class="universal-contact-title">Connect with me</h3>
+            <div class="contact-links">
+                <a href="https://linkedin.com/in/kyle-mohney" target="_blank" rel="noopener" title="LinkedIn">
+                    <img src="assets/icons/in.png" alt="LinkedIn" class="contact-icon" />
+                </a>
+                <a href="mailto:kyle.mohney@hotmail.com" title="Email">
+                    <img src="assets/icons/mail.png" alt="Email" class="contact-icon" />
+                </a>
+                                <a href="https://kmohney.youcanbook.me" target="_blank" rel="noopener" title="Schedule a Meeting">
+                    <img src="assets/icons/ycbm-icon.png" alt="You Can Book Me" class="contact-icon" />
+                </a>
+            </div>
+        </div>
+    </div>
+
+<!-- Universal Bottom Navigation - Quick Navigation Only -->
+<section class="bottom-navigation">
+    <div class="bottom-nav-container">
+        <!-- Quick Navigation Only -->
+        <div class="bottom-nav-section">
+            <div class="bottom-nav-title">Quick Navigation</div>
+            <div class="bottom-nav-links">
+                <a href="index.html" class="bottom-nav-link" style="color: #111 !important;">Home</a>
+                <a href="resume.html" class="bottom-nav-link" style="color: #111 !important;">Resume</a>
+                <a href="about.html" class="bottom-nav-link active" style="color: #1e3a8a !important;">About</a>
+                <a href="projects.html" class="bottom-nav-link" style="color: #111 !important;">Projects</a>
+                <a href="articles.html" class="bottom-nav-link" style="color: #111 !important;">Articles</a>
+                <a href="contact.html" class="bottom-nav-link" style="color: #111 !important;">Contact</a>
+            </div>
+        </div>
+
+        <!-- Inspirational Quote -->
+        <div class="bottom-nav-section">
+            <blockquote class="article-quote" style="color: #111 !important;">
+                <span>"The way to get started is to quit talking and begin doing."</span><br>
+                <span class="quote-author">- Walt Disney</span>
+            </blockquote>
+        </div>
+    </div>
+</section>
+    </body>
+</html>
+            </div>
+    </div>
+    
+    <!-- Performance Optimization Script -->
+    <script>
+    // Performance monitoring and optimization
+    (function() {
+        // Lazy load animations when elements come into view
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '50px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationPlayState = 'running';
+                }
+            });
+        }, observerOptions);
+        
+        // Observe floating nodes for lazy loading
+        document.querySelectorAll('.data-node').forEach(node => {
+            node.style.animationPlayState = 'paused';
+            observer.observe(node);
+        });
+        
+        // Performance monitoring
+        let frameCount = 0;
+        let lastTime = performance.now();
+        
+        function monitorPerformance() {
+            frameCount++;
+            const currentTime = performance.now();
+            
+            if (currentTime - lastTime >= 1000) {
+                const fps = Math.round((frameCount * 1000) / (currentTime - lastTime));
+                
+                // Reduce animation complexity if FPS drops below 30
+                if (fps < 30) {
+                    document.documentElement.style.setProperty('--animation-duration', '2s');
+                }
+                
+                frameCount = 0;
+                lastTime = currentTime;
+            }
+            
+            requestAnimationFrame(monitorPerformance);
+        }
+        
+        // Start performance monitoring
+        monitorPerformance();
+        
+        // Reduce motion for users who prefer it
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            document.documentElement.style.setProperty('--animation-duration', '0s');
+        }
+    })();
+    </script>
+    
+    </body>
 </html>

@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kyle J. Mohney - AI Operations & Knowledge Systems Specialist</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.4;
+            color: #2c3e50;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .resume-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            border-radius: 12px;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            min-height: calc(100vh - 40px);
+        }
+
+        /* LEFT COLUMN */
+        .left-column {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 40px 30px;
+            position: relative;
+        }
+
+        .profile-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .profile-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 4px solid #3498db;
+            margin: 0 auto 20px;
+            background: #34495e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: #3498db;
+        }
+
+        .name {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .title {
+            font-size: 16px;
+            color: #3498db;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .contact-info {
+            margin-bottom: 40px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .contact-icon {
+            width: 20px;
+            margin-right: 15px;
+            color: #3498db;
+            text-align: center;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #3498db;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 8px;
+        }
+
+        .skills-list {
+            list-style: none;
+        }
+
+        .skill-item {
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .skill-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .skill-bar {
+            height: 4px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .skill-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent 0%, rgba(52, 152, 219, 0.1) 50%, transparent 100%);
+            animation: skillShimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes skillShimmer {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        .skill-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #2980b9, #3498db);
+            background-size: 200% 100%;
+            border-radius: 2px;
+            animation: fillBar 2s ease-out, skillGlow 4s ease-in-out infinite;
+            position: relative;
+            z-index: 2;
+        }
+
+        @keyframes skillGlow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        @keyframes fillBar {
+            from { width: 0; }
+        }
+
+        .cert-item {
+            background: rgba(255,255,255,0.1);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 4px solid #3498db;
+        }
+
+        .cert-name {
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .cert-org {
+            font-size: 11px;
+            opacity: 0.8;
+            margin-top: 4px;
+        }
+
+        /* RIGHT COLUMN */
+        .right-column {
+            padding: 40px 45px;
+            background: white;
+        }
+
+        .header-section {
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .main-title {
+            font-size: 36px;
+            font-weight: 800;
+            color: #2c3e50;
+            margin-bottom: 12px;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            font-size: 20px;
+            color: #3498db;
+            font-weight: 600;
+            margin-bottom: 25px;
+        }
+
+        .summary {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #555;
+            text-align: left;
+            padding: 25px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+            border-left: 5px solid #3498db;
+            position: relative;
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, #3498db22, #3498db11);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-header {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            position: relative;
+            padding-left: 35px;
+        }
+
+        .section-header::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 25px;
+            height: 25px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            border-radius: 50%;
+        }
+
+        .experience-item {
+            margin-bottom: 35px;
+            position: relative;
+            padding-left: 25px;
+            border-left: 2px solid #e9ecef;
+        }
+
+        .experience-item::before {
+            content: '';
+            position: absolute;
+            left: -6px;
+            top: 0;
+            width: 12px;
+            height: 12px;
+            background: #3498db;
+            border-radius: 50%;
+        }
+
+        .company-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .company-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .date-range {
+            font-size: 14px;
+            color: #7f8c8d;
+            font-weight: 500;
+        }
+
+        .job-title {
+            font-size: 16px;
+            color: #3498db;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .achievement {
+            margin-bottom: 10px;
+            font-size: 14px;
+            line-height: 1.5;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .achievement::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        .metric {
+            color: #e74c3c;
+            font-weight: 700;
+        }
+
+        .competencies-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .competency-card {
+            background: linear-gradient(135deg, #f8f9fa, #ffffff);
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .competency-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(52, 152, 219, 0.2);
+        }
+
+        .competency-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #3498db;
+        }
+
+        .competency-title {
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .competency-desc {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+
+        .project-highlight {
+            background: linear-gradient(135deg, #3498db11, #2980b922);
+            border: 1px solid #3498db44;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px 0;
+            position: relative;
+        }
+
+        .project-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 12px;
+        }
+
+        .project-desc {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #555;
+        }
+
+        .award-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            
+            body {
+                background: white !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            
+            .resume-container {
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                min-height: auto !important;
+                display: grid !important;
+                grid-template-columns: 1fr 2fr !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 !important;
+                page-break-inside: auto;
+            }
+
+            .left-column {
+                background: linear-gradient(135deg, #2c3e50, #34495e) !important;
+                color: white !important;
+                padding: 20px !important;
+                page-break-inside: auto;
+            }
+
+            .right-column {
+                padding: 20px !important;
+                background: white !important;
+                page-break-inside: auto;
+            }
+
+            .experience-item {
+                page-break-inside: auto;
+                break-inside: auto;
+                margin-bottom: 15px !important;
+            }
+
+            .project-highlight {
+                page-break-inside: auto;
+                break-inside: auto;
+                margin: 8px 0 !important;
+            }
+
+            .section {
+                page-break-inside: auto;
+                break-inside: auto;
+                margin-bottom: 15px !important;
+            }
+
+            .competencies-grid {
+                page-break-inside: auto;
+                break-inside: auto;
+            }
+
+            @page {
+                size: letter;
+                margin: 0.5in;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .resume-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .competencies-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="resume-container">
+        <!-- LEFT COLUMN -->
+        <div class="left-column">
+            <div class="profile-section">
+                <div class="profile-image">
+                    <img src="assets/kyle.png" alt="Kyle J. Mohney" style="width: 100%; height: 100%; object-fit: cover; object-position: center; border-radius: 50%;" />
+                </div>
+                <div class="name">Kyle J. Mohney</div>
+                <div class="title">AI Operations & Knowledge Systems Specialist</div>
+            </div>
+
+            <div class="contact-info">
+                <div class="contact-item">
+                    <div class="contact-icon">•</div>
+                    <div>Niles, OH</div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">•</div>
+                    <div>Kyle.Mohney@hotmail.com</div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">•</div>
+                    <div>(720) 877-7466</div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">•</div>
+                    <div><a href="https://kylemohney.com/" style="color: inherit; text-decoration: none;">kylemohney.com</a></div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">•</div>
+                    <div><a href="https://www.linkedin.com/in/kyle-m-ab0822214" style="color: inherit; text-decoration: none;">LinkedIn Profile</a></div>
+                </div>
+            </div>
+
+            <div class="section-title">Core Technologies</div>
+            <ul class="skills-list">
+                <li class="skill-item">
+                    <div class="skill-name">Multi-AI Orchestration</div>
+                    <div class="skill-bar"><div class="skill-progress" style="width: 95%"></div></div>
+                </li>
+                <li class="skill-item">
+                    <div class="skill-name">Sprout Social Enterprise</div>
+                    <div class="skill-bar"><div class="skill-progress" style="width: 90%"></div></div>
+                </li>
+                <li class="skill-item">
+                    <div class="skill-name">Knowledge Base Design</div>
+                    <div class="skill-bar"><div class="skill-progress" style="width: 92%"></div></div>
+                </li>
+                <li class="skill-item">
+                    <div class="skill-name">Process Automation</div>
+                    <div class="skill-bar"><div class="skill-progress" style="width: 88%"></div></div>
+                </li>
+                <li class="skill-item">
+                    <div class="skill-name">Documentation Strategy</div>
+                    <div class="skill-bar"><div class="skill-progress" style="width: 94%"></div></div>
+                </li>
+                <li class="skill-item">
+                    <div class="skill-name">BigQuery & Analytics</div>
+                    <div class="skill-bar"><div class="skill-progress" style="width: 85%"></div></div>
+                </li>
+            </ul>
+
+            <div class="section-title">Certifications</div>
+            <div class="cert-item">
+                <div class="cert-name">HubSpot Inbound Certification</div>
+                <div class="cert-org">HubSpot Academy</div>
+            </div>
+            <div class="cert-item">
+                <div class="cert-name">Google Generative AI</div>
+                <div class="cert-org">Google Cloud Skills</div>
+            </div>
+            <div class="cert-item">
+                <div class="cert-name">ServiceHub Software</div>
+                <div class="cert-org">HubSpot Academy</div>
+            </div>
+            <div class="cert-item">
+                <div class="cert-name">Sprout Social Platform Mastery</div>
+                <div class="cert-org">Enterprise Implementation</div>
+            </div>
+
+            <div class="section-title">Technical Stack</div>
+            <div style="font-size: 14px; line-height: 1.5; margin-bottom: 25px;">
+                <strong>AI & Automation:</strong> ChatGPT, Claude, Gemini, Zapier, Make.com<br><br>
+                <strong>Analytics:</strong> BigQuery, Tableau, Google Analytics, Observe.AI<br><br>
+                <strong>CRM/Support:</strong> Salesforce, Zendesk, HubSpot, Jira, Linear<br><br>
+                <strong>Knowledge Mgmt:</strong> Confluence, Notion, Coda, Help Centers<br><br>
+                <strong>Development:</strong> HTML, CSS, JavaScript, Python, VS Code
+            </div>
+
+            <div class="section-title">Core Competencies</div>
+            <div style="font-size: 13px; line-height: 1.4; margin-bottom: 25px;">
+                <div style="margin-bottom: 15px; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 6px; border-left: 4px solid #3498db;">
+                    <div style="font-weight: 700; margin-bottom: 4px;">AI Implementation</div>
+                    <div style="font-size: 11px; opacity: 0.8; line-height: 1.3;">Support-Bot Platform Evaluation & Enterprise Adoption</div>
+                </div>
+                <div style="margin-bottom: 15px; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 6px; border-left: 4px solid #3498db;">
+                    <div style="font-weight: 700; margin-bottom: 4px;">Multi-AI Orchestration</div>
+                    <div style="font-size: 11px; opacity: 0.8; line-height: 1.3;">Coordinating AI Teams Like Human Project Management</div>
+                </div>
+                <div style="margin-bottom: 15px; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 6px; border-left: 4px solid #3498db;">
+                    <div style="font-weight: 700; margin-bottom: 4px;">Knowledge Architecture</div>
+                    <div style="font-size: 11px; opacity: 0.8; line-height: 1.3;">Self-Service Systems & Documentation Strategy</div>
+                </div>
+                <div style="margin-bottom: 15px; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 6px; border-left: 4px solid #3498db;">
+                    <div style="font-weight: 700; margin-bottom: 4px;">Process Automation</div>
+                    <div style="font-size: 11px; opacity: 0.8; line-height: 1.3;">Workflow Optimization & Policy Compliance</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div class="right-column">
+            <div class="header-section">
+                <div class="main-title">AI OPERATIONS SPECIALIST</div>
+                <div class="subtitle">Multi-AI Orchestration • Enterprise Documentation • Knowledge Systems</div>
+            </div>
+
+            <div class="summary">
+                <span class="highlight">AI Implementation & Knowledge Operations Specialist</span> with <span class="highlight">6+ years in support operations</span> and <span class="highlight">2+ years mastering multi-AI orchestration</span>. At Thumbtack, led <span class="highlight">AI support-bot evaluation</span> (Decagon, Maven, Yellow, Gemini) while creating <span class="highlight">AI-powered systems for Refunds, Trust & Safety, and frontline teams</span>. Creator of <span class="highlight">"AI symphony" methodology</span> delivering complete solutions from knowledge platforms to applications.
+            </div>
+
+            <div class="project-highlight">
+                <div class="project-title">AI PROJECT MANAGEMENT — "SYMPHONY" METHODOLOGY</div>
+                <div class="project-desc">
+                    Developed systematic methodology for coordinating multiple AI platforms as unified project teams with distinct specialized roles (architecture, development, QA, content, design). Successfully orchestrated delivery of complete websites, automation systems, and applications through structured project management principles.
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">Professional Experience</div>
+                
+                <div class="experience-item">
+                    <div class="company-header">
+                        <div class="company-name">THUMBTACK <span class="award-badge">SPROUT SUCCESS</span></div>
+                        <div class="date-range">2022 - 2025</div>
+                    </div>
+                    <div class="job-title">Operations Consultant | AI Implementation & Knowledge Systems</div>
+                    
+                    <div class="project-highlight">
+                        <div class="project-title">ENTERPRISE AI SUPPORT-BOT EVALUATION</div>
+                        <div class="project-desc">
+                            Led comprehensive piloting and evaluation of enterprise support-bot platforms (Gemini, Decagon, Maven, Yellow), testing functionality, documenting limitations, and delivering strategic adoption recommendations to executive leadership for customer-facing AI integration decisions.
+                        </div>
+                    </div>
+                    
+                    <div class="achievement">Architected comprehensive <span class="metric">Sprout Social enterprise implementation</span> - tagging system, sentiment tracking, review response workflow preventing App Store delisting and preserving <span class="metric">millions in potential revenue</span></div>
+                    
+                    <div class="achievement">Built independent AI-driven systems: Refunds Team (accelerated processing), Trust & Safety (case triage), Support Teams (knowledge base automation, policy updates, training materials)</div>
+                    
+                    <div class="achievement">Reduced escalation resolution time from <span class="metric">2-3 business days to <1 hour</span> through systematic SOP redesign and AI-enhanced workflow automation</div>
+                    
+                    <div class="achievement">Developed AI-powered content libraries adopted by <span class="metric">5+ support teams</span> - canned responses, Help Center articles, compliance documentation improving accuracy and customer experience</div>
+                    
+                    <div class="achievement">Built comprehensive documentation framework training AI copilots deployed to <span class="metric">100+ support advocates</span>, providing real-time answers from structured knowledge systems</div>
+                    
+                    <div class="achievement">Created instant review calculator and BigQuery automation tools, streamlining agent research workflows from <span class="metric">20 minutes to 20 seconds</span></div>
+                    
+                    <div class="achievement">Provided cross-functional AI coordination across Product, Legal, Trust & Safety teams, enabling scalable operations and systematic process improvements</div>
+                </div>
+
+                <div class="experience-item">
+                    <div class="company-header">
+                        <div class="company-name">FREELANCE CONSULTANT</div>
+                        <div class="date-range">2025 - Present</div>
+                    </div>
+                    <div class="job-title">AI Coordination & Knowledge Systems Specialist</div>
+                    
+                    <div class="achievement">Provide comprehensive pre-launch backend support for startup client including technical infrastructure and operational systems setup</div>
+                    
+                    <div class="achievement">Created comprehensive knowledge base with <span class="metric">40+ articles and guides</span> covering operational procedures, policy documentation, and user guidance systems</div>
+                    
+                    <div class="achievement">Delivered full-scale branding and design consultation including visual identity development and brand positioning strategy</div>
+                    
+                    <div class="achievement">Lead website design and development initiatives coordinating technical implementation with business requirements</div>
+                    
+                    <div class="achievement">Architect policy documentation framework and compliance systems ensuring regulatory alignment and operational clarity</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">Professional Authority & Thought Leadership</div>
+                <div class="project-highlight">
+                    <div class="project-title">COMPREHENSIVE PROFESSIONAL PROFILE</div>
+                    <div class="project-desc">
+                        Detailed case studies, methodology documentation, complete project portfolio, and full work history available at <strong><a href="https://kylemohney.com/" style="color: #2c3e50; text-decoration: none;">kylemohney.com</a></strong> | Connect on <strong><a href="https://www.linkedin.com/in/kyle-m-ab0822214" style="color: #2c3e50; text-decoration: none;">LinkedIn</a></strong> for industry insights
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
