@@ -370,17 +370,17 @@
             width: 95%;
         }
 
-        .left-column {
-            width: 100%;
-            min-width: unset;
-            padding: 20px 15px;
-            order: 2; /* Move left column below right column on mobile */
-        }
+    .left-column {
+      width: 100%;
+      min-width: unset;
+      padding: 20px 15px;
+      order: 1; /* Move left column above right column on mobile */
+    }
 
-        .right-column {
-            padding: 20px 15px;
-            order: 1; /* Move right column above left column on mobile */
-        }
+    .right-column {
+      padding: 20px 15px;
+      order: 2; /* Move right column below left column on mobile */
+    }
 
         /* Typography scaling for mobile */
         .left-column .name {
@@ -731,6 +731,24 @@
   <div class="circuit-dot" style="top: 10%; left: 58%;"></div>
   <div class="circuit-dot" style="top: 30%; left: 40%;"></div>
   </div>
+<script>
+// Add margin-bottom to Other Work Experience container on mobile for spacing
+document.addEventListener('DOMContentLoaded', function() {
+  function addMarginToOtherWorkExperienceContainer() {
+    var otherHeader = Array.from(document.querySelectorAll('.carousel-header')).find(h => h.textContent.trim() === 'OTHER WORK EXPERIENCE');
+    if (otherHeader) {
+      var container = otherHeader.closest('.carousel-hidden');
+      if (window.innerWidth <= 768 && container) {
+        container.style.marginBottom = '40px';
+      } else if (container) {
+        container.style.marginBottom = '';
+      }
+    }
+  }
+  addMarginToOtherWorkExperienceContainer();
+  window.addEventListener('resize', addMarginToOtherWorkExperienceContainer);
+});
+</script>
 
 <!-- Left side bright blue gas cloud effect -->
 <div style="position: fixed; left: 0; top: 0; width: 70vw; height: 100vh; background: radial-gradient(ellipse at 20% 30%, rgba(30, 58, 138, 0.10) 0%, transparent 50%), radial-gradient(ellipse at 30% 70%, rgba(40, 68, 148, 0.08) 0%, transparent 60%), radial-gradient(ellipse at 10% 50%, rgba(50, 78, 158, 0.06) 0%, transparent 70%); pointer-events: none; z-index: 0;"></div>
@@ -969,10 +987,14 @@
   <!-- Resume Title Card -->
   <section class="page-title-wrap" aria-labelledby="resume-heading" style="margin-top: 1rem; margin-bottom: 10px;">
     <div style="width:100%;display:flex;justify-content:center;align-items:center;margin-bottom:0;">
-      <h1 id="resume-heading" style="text-align:center; font-size:1.8em; font-weight:800; letter-spacing:1px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; background:#0f1b4a; color:#fff; border-radius:16px; box-shadow:0 2px 16px #0f1b4a44; position:relative; padding:18px 0; width:100%; max-width:800px; margin:0 auto 30px auto; white-space: nowrap;">
-        <span style="display:block;" class="title-gradient">BUSINESS OPERATIONS & SYSTEMS LEADER</span>
-        <span style="font-size:0.6em; font-weight:600; display:block;">Process Optimization • Documentation • Enablement • Automation</span>
-      </h1>
+      <div class="resume-title-card" style="text-align:center; font-size:2.2em; font-weight:800; letter-spacing:1px; display:flex; align-items:center; justify-content:center; gap:18px; background:#14235c; color:#fff; border-radius:16px; box-shadow:0 2px 16px #14235c44; position:relative; padding:18px 0; width:100%; max-width:800px; margin:0 auto 30px auto; font-family: 'Montserrat', 'Times New Roman', Times, serif;">
+        <div style="display:flex;flex-direction:column;align-items:center;width:100%;">
+          <span class="title-gradient" style="font-size:1.05em; font-weight:800; letter-spacing:1px; display:block;">OPERATIONS &amp; SYSTEMS LEADER</span>
+          <span class="subtitle" style="font-size:0.5em; font-weight:600; display:inline-block; margin-top:6px; letter-spacing:0.5px;">
+            Process Optimization &bull; Documentation &bull; Enablement &bull; Automation
+          </span>
+        </div>
+      </div>
     </div>
     <div style="height:16px;"></div>
   </section>
@@ -1582,10 +1604,10 @@
     });
   </script>
   <div class="section" style="margin-top: 20px;">
-    <h2 style="text-align:center; font-size:2.2em; font-weight:800; letter-spacing:1px; display:flex; align-items:center; justify-content:center; gap:18px; background:#14235c; color:#fff; border-radius:16px; box-shadow:0 2px 16px #14235c44; position:relative; padding:18px 0; width:100%; max-width:800px; margin:0 auto 30px auto; align-items:center;">
-      <img src="assets/icons/escalation-timer-icon.png" alt="Escalation Timer Icon" style="width:44px; height:44px; object-fit:contain; margin-right: 10px; vertical-align: middle; filter: brightness(0) saturate(100%) invert(100%);">
-      PROFESSIONAL EXPERIENCE
-    </h2>
+    <div class="resume-title-card" style="text-align:center; font-size:2.2em; font-weight:800; letter-spacing:1px; display:flex; align-items:center; justify-content:center; gap:18px; background:#14235c; color:#fff; border-radius:16px; box-shadow:0 2px 16px #14235c44; position:relative; padding:18px 0; width:100%; max-width:800px; margin:0 auto 30px auto; font-family: 'Montserrat', 'Times New Roman', Times, serif;">
+  <img src="assets/icons/escalation-timer-icon.png" alt="Escalation Timer Icon" style="width:32px; height:32px; object-fit:contain; margin-right:2px; vertical-align:middle; filter:brightness(0) saturate(100%) invert(100%);">
+  <span style="font-size: .5em; font-weight:800; letter-spacing:1px;">PROFESSIONAL EXPERIENCE</span>
+    </div>
     <div class="experience-item" style="margin-bottom: 35px; position: relative; padding-left: 25px; border-left: 2px solid #e9ecef;">
       <div class="company-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
         <div class="company-name" style="display:flex; align-items:center; font-size:18px; font-weight:700; color:#000000;">
@@ -1642,6 +1664,73 @@
       <button class="carousel-btn next" aria-label="Next slide">❯</button>
       </div>  <!-- carousel-container -->
       </div>  <!-- carousel-section -->
+      <script>
+        // Only for Thumbtack carousel, expand height on mobile so all bullet points are visible
+        document.addEventListener('DOMContentLoaded', function() {
+          function expandThumbtackCarouselHeight() {
+            if (window.innerWidth <= 768) {
+              var thumbtackSection = document.querySelector('.company-name span');
+              if (thumbtackSection && thumbtackSection.textContent.trim() === 'THUMBTACK') {
+                var carouselWrapper = thumbtackSection.closest('.experience-item').querySelector('.carousel-wrapper');
+                var carouselCards = carouselWrapper ? carouselWrapper.querySelectorAll('.carousel-card') : [];
+                carouselWrapper.style.height = 'auto';
+                carouselCards.forEach(function(card) {
+                  card.style.height = 'auto';
+                });
+              }
+            }
+          }
+          expandThumbtackCarouselHeight();
+          window.addEventListener('resize', expandThumbtackCarouselHeight);
+        // Absolutely position Thumbtack carousel indicators below carousel on mobile
+        function positionThumbtackIndicators() {
+          var thumbtackSection = document.querySelector('.company-name span');
+          if (thumbtackSection && thumbtackSection.textContent.trim() === 'THUMBTACK') {
+            var experienceItem = thumbtackSection.closest('.experience-item');
+            var indicators = experienceItem.querySelector('.carousel-indicators');
+            var wrapper = experienceItem.querySelector('.carousel-wrapper');
+            if (window.innerWidth <= 768 && indicators && wrapper) {
+              indicators.style.position = 'absolute';
+              indicators.style.top = (wrapper.offsetTop + wrapper.offsetHeight + 10) + 'px';
+              indicators.style.left = '50%';
+              indicators.style.transform = 'translateX(-50%)';
+              indicators.style.marginTop = '0';
+              indicators.style.marginBottom = '0';
+              indicators.style.zIndex = '20';
+            } else if (indicators) {
+              indicators.style.position = 'relative';
+              indicators.style.top = '';
+              indicators.style.left = 'auto';
+              indicators.style.transform = 'translateX(-18px)';
+              indicators.style.marginTop = '50px';
+              indicators.style.marginBottom = '15px';
+              indicators.style.zIndex = '';
+            }
+          }
+        }
+        positionThumbtackIndicators();
+        window.addEventListener('resize', positionThumbtackIndicators);
+        // Expand Other Work Experience carousel height on mobile
+        function expandOtherWorkExperienceCarouselHeight() {
+          if (window.innerWidth <= 768) {
+            var otherHeader = Array.from(document.querySelectorAll('.carousel-header')).find(h => h.textContent.trim() === 'OTHER WORK EXPERIENCE');
+            if (otherHeader) {
+              var experienceSection = otherHeader.closest('.carousel-hidden');
+              if (experienceSection) {
+                var carouselWrapper = experienceSection.querySelector('.carousel-wrapper');
+                var carouselCards = carouselWrapper ? carouselWrapper.querySelectorAll('.carousel-card') : [];
+                if (carouselWrapper) carouselWrapper.style.height = 'auto';
+                carouselCards.forEach(function(card) {
+                  card.style.height = 'auto';
+                });
+              }
+            }
+          }
+        }
+        expandOtherWorkExperienceCarouselHeight();
+        window.addEventListener('resize', expandOtherWorkExperienceCarouselHeight);
+        });
+      </script>
     </div>
 
     <button id="see-more-carousel-btn" class="see-more-btn" style="display: block; margin: 15px 0 50px 0;">See more...</button>
@@ -1709,17 +1798,31 @@
         </div>
       </div>
       <!-- Carousel Indicators -->
-      <div class="carousel-indicators" role="tablist" aria-label="Slide indicators" style="position: relative; margin-top: 50px; margin-bottom: 15px; justify-content: center; left: auto; transform: translateX(-18px);">
+      <div class="carousel-indicators homeadvisor-indicators" role="tablist" aria-label="Slide indicators" style="position: relative; margin-top: 50px; margin-bottom: 15px; justify-content: center; left: auto; transform: translateX(-18px);">
         <div class="carousel-indicator active" data-slide="0" role="tab" aria-selected="true" aria-label="Go to slide 1"></div>
         <div class="carousel-indicator" data-slide="1" role="tab" aria-selected="false" aria-label="Go to slide 2"></div>
       </div>
     <button class="carousel-btn next" aria-label="Next slide">❯</button>
     </div>  <!-- carousel-container -->
+    <style>
+    @media (max-width: 768px) {
+      .homeadvisor-indicators {
+        position: absolute !important;
+        left: 50% !important;
+        top: 100% !important;
+        transform: translateX(-50%) !important;
+        margin-top: 10px !important;
+        margin-bottom: 0 !important;
+        z-index: 20 !important;
+        width: auto !important;
+      }
+    }
+    </style>
   </div>
-  <h2 style="text-align:center; font-size:2.2em; font-weight:800; letter-spacing:1px; display:flex; align-items:center; justify-content:center; gap:18px; background:#14235c; color:#fff; border-radius:16px; box-shadow:0 2px 16px #14235c44; position:relative; padding:18px 0; width:100%; max-width:800px; margin:30px auto 15px auto; align-items:center;">
-    <img src="assets/icons/key-achievements-icon.png" alt="Key Achievements Icon" style="width:44px; height:44px; object-fit:contain; margin-right: 10px; vertical-align: middle; filter: brightness(0) saturate(100%) invert(100%);">
-    ADDITIONAL ACHIEVEMENTS
-  </h2>
+  <div class="resume-title-card" style="text-align:center; font-size:2.2em; font-weight:800; letter-spacing:1px; display:flex; align-items:center; justify-content:center; gap:18px; background:#14235c; color:#fff; border-radius:16px; box-shadow:0 2px 16px #14235c44; position:relative; padding:18px 0; width:100%; max-width:800px; margin:0 auto 30px auto; font-family: 'Montserrat', 'Times New Roman', Times, serif;">
+  <img src="assets/icons/key-achievements-icon.png" alt="Key Achievements Icon" style="width:32px; height:32px; object-fit:contain; margin-right:2px; vertical-align:middle; filter:brightness(0) saturate(100%) invert(100%);">
+  <span style="font-size:0.5em; font-weight:800; letter-spacing:1px;">ADDITIONAL ACHIEVEMENTS</span>
+  </div>
     <div class="section" style="margin-bottom: 35px; position: relative; padding-left: 25px; border-left: 2px solid #e9ecef;">
         <ul>
           <li class="chip-bullet" style="position: relative; padding-left: 24px; margin-bottom: 10px; font-size: 15px; line-height: 1.7; color: #000000; list-style: none;"><span class="achievement-bullet">▸</span>Self-taught in web development, building interactive websites and custom graphics/animations using HTML, CSS, and JavaScript</li>
@@ -1731,10 +1834,10 @@
           <li class="chip-bullet" style="position: relative; padding-left: 24px; margin-bottom: 10px; font-size: 15px; line-height: 1.7; color: #000000; list-style: none;"><span class="achievement-bullet">▸</span>Managed a youtube channel for five years, creating content and editing videos.</li>
         </ul>
     </div>
-  <h2 style="text-align:center; font-size:2.2em; font-weight:800; letter-spacing:1px; display:flex; align-items:center; justify-content:center; gap:18px; background:#14235c; color:#fff; border-radius:16px; box-shadow:0 2px 16px #14235c44; position:relative; padding:18px 0; width:100%; max-width:800px; margin:30px auto 30px auto; align-items:center;">
-    <img src="assets/icons/contact-icon.png" alt="Contact Icon" style="width:48px; height:48px; object-fit:contain; margin-right: 10px; vertical-align: middle; filter: brightness(0) saturate(100%) invert(100%);">
-    RECRUITER FAQ
-  </h2>
+  <div class="resume-title-card" style="text-align:center; font-size:2.2em; font-weight:800; letter-spacing:1px; display:flex; align-items:center; justify-content:center; gap:18px; background:#14235c; color:#fff; border-radius:16px; box-shadow:0 2px 16px #14235c44; position:relative; padding:18px 0; width:100%; max-width:800px; margin:0 auto 30px auto; font-family: 'Montserrat', 'Times New Roman', Times, serif;">
+  <img src="assets/icons/contact-icon.png" alt="Contact Icon" style="width:32px; height:32px; object-fit:contain; margin-right:2px; vertical-align:middle; filter:brightness(0) saturate(100%) invert(100%);">
+  <span style="font-size:0.5em; font-weight:800; letter-spacing:1px;">RECRUITER FAQ</span>
+  </div>
       <div class="section">
     <div style="margin-bottom: 20px; background: linear-gradient(135deg, #0f1b4a11, #2980b922); border: 1px solid #0f1b4a44; border-radius: 12px; padding: 25px;">
       <div style="font-weight: 600; color: #0f1b4a; margin-bottom: 8px; font-size: 15px;">What makes you unique as a candidate?</div>
@@ -1756,8 +1859,8 @@
     </div>
     <div style="text-align: center; margin-bottom: 20px; font-size: 15px; color: #000000; font-weight: 600;">Discover my latest projects and in-depth articles for more insights and innovation.</div>
     <div style="display: flex; justify-content: center; gap: 18px; margin-bottom: 0;">
-  <a href="projects.html" class="nav-link" style="margin: 0 8px; color: #fff; border: 2px solid #1e3a8a; background: #1e3a8a; transition: all 0.2s ease;">Projects</a>
-  <a href="articles.html" class="nav-link" style="margin: 0 8px; color: #fff; border: 2px solid #1e3a8a; background: #1e3a8a; transition: all 0.2s ease;">Articles</a>
+    <a href="projects.html" class="nav-link" style="margin: 0 8px; color: #fff !important; border: 2px solid #1e3a8a; background: #1e3a8a; transition: all 0.2s ease;" onmouseover="this.style.color='#14235c'" onmouseout="this.style.color='#fff'">Projects</a>
+    <a href="articles.html" class="nav-link" style="margin: 0 8px; color: #fff !important; border: 2px solid #1e3a8a; background: #1e3a8a; transition: all 0.2s ease;" onmouseover="this.style.color='#14235c'" onmouseout="this.style.color='#fff'">Articles</a>
     </div>
     </div>
     <div style="display: flex; justify-content: center; align-items: flex-start; gap: 1px; flex-wrap: wrap; max-width: 470px; margin: 48px auto; padding: 0 24px;">
@@ -1805,7 +1908,7 @@
     <div class="bottom-nav-container">
         <!-- Quick Navigation Only -->
         <div class="bottom-nav-section">
-            <div class="bottom-nav-title">Quick Navigation</div>
+            <div class="bottom-nav-title" style="color:#14235c;">Quick Navigation</div>
             <div class="bottom-nav-links" style="color: #111 !important;">
                 <a href="index.html" class="bottom-nav-link" style="color: #111 !important;">Home</a>
                 <a href="resume.html" class="bottom-nav-link active" style="color: #1e3a8a !important;">Resume</a>
@@ -1820,7 +1923,7 @@
         <div class="bottom-nav-section">
             <blockquote class="article-quote" style="color: #111 !important;">
                 <span>"Victory is not won by force, but by skill, measure, and timing."</span><br>
-                <span class="quote-author">— Joachim Meyer</span>
+                <span class="quote-author" style="color:#14235c;">— Joachim Meyer</span>
             </blockquote>
         </div>
     </div>

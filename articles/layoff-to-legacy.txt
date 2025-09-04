@@ -1,0 +1,167 @@
+FROM LAYOFF TO LEGACY
+
+From Layoff to Legacy: How I Built Quinn’s Quest and Rebuilt My Website Into an Enterprise-Grade Platform
+
+When I was laid off, I thought I knew how the story would go.
+
+A few months of rest. Some video games. Then a job search when the money started to run out.
+
+But this time was different. My bank account was draining quickly, my family depended on me, and I couldn’t afford costly certifications or bootcamps. The clock was ticking.
+
+Instead of buying my way forward, I decided to build it.
+
+Building My Own Bootcamp
+
+I created what I now call my AI-powered bootcamp.
+
+It wasn’t formal, but it was relentless. I devoured free certifications. I published articles documenting what I was learning (AI Coordination Methodology, From Layoff to Liftoff, Claude Remembers, AI Support Revolution). And I gave myself projects big enough to test whether I could truly manage complex systems without formal training.
+
+That’s where Quinn’s Quest and kylemohney.com v2 were born.
+
+Quinn’s Quest: A Legacy Project and Case Study
+
+Quinn’s Quest began as both a challenge and a gift.
+
+My son’s birthday was approaching, and money was tight. Months earlier, he’d looked at his “Team Quinn” t-shirt and told me it looked like a video game character. That stuck with me.
+
+So I decided to give him something no one else could: a video game where he was the hero, with his own voice locked in time at age four.
+
+The result was a storybook adventure game with:
+
+Six levels and multiple bosses.
+
+A full arc where Quinn rescues his baby sister from bandits and zombies.
+
+Custom sprites, sounds, and animations.
+
+Narration voiced by Quinn and me.
+
+I managed it like a dev project:
+
+ChatGPT → assets and sprites.
+
+Claude → bug hunting.
+
+Grok → modular, efficient code.
+
+Copilot → support and refinements.
+And me? The architect, project manager, and QA lead.
+
+I learned to catch syntax errors, restructure functions, and validate every push. Kids who playtested Quinn’s Quest begged to play it again and again — even while a giant water-bounce castle sat right behind them.
+
+Quinn’s Quest proved I could orchestrate AI resources, manage quality assurance, and deliver a polished product under pressure.
+
+Website 2.0: From Patchwork to Enterprise
+
+My first website was built in 48 hours. It worked, but it was patchwork: headers didn’t match, fonts were inconsistent, and every page felt like a different site.
+
+Instead of patching, I tore it down and rebuilt it from scratch.
+
+kylemohney.com v2 is a modular, enterprise-grade, mobile-responsive platform:
+
+Universal headers, footers, and stylesheets ensure consistency.
+
+Custom icon library and unique assets differentiate the design.
+
+The resume page demonstrates knowledge management in action: collapsible sections, carousels, and downloadable two-page PDFs tailored to specific roles.
+
+The contact page is polished enough to stand as a portfolio piece on its own.
+
+This rebuild is not vibe coding. Every function is notated. Every file modular. The CSS alone could stand as a professional case study in clarity and maintainability.
+
+The site itself became proof of concept: a living case study in AI orchestration and disciplined project management.
+
+Explore Website 2.0 → kylemohney.com
+
+Lessons Learned
+
+From these projects, I learned lessons no classroom could have given me:
+
+Backup every win. Preserve progress after every breakthrough.
+
+Root cause everything. Don’t chase symptoms — fix the source.
+
+Document relentlessly. Notation is the difference between experiments and professional systems.
+
+Consistency matters. Cohesion across every page, every function, every line.
+
+These lessons now shape how I approach every build.
+
+The Force Multiplier
+
+Every day on LinkedIn, I see posts from people terrified that AI will replace them. I don’t share that fear.
+
+AI didn’t replace me — layoffs did. What I’ve learned is that AI is not a replacement. It’s a force multiplier.
+
+Handled well, it doesn’t eliminate jobs; it amplifies them. It turns one employee into a complete production crew. It makes people more valuable, not less.
+
+That’s what Quinn’s Quest and Website 2.0 showed me. I wasn’t just creating projects — I was proving a repeatable, scalable methodology.
+
+I realized I could take someone who has never used AI and, within 30 days, have them building their own game or their own website. For the first time, the power didn’t sit in the hands of the employer who laid me off. It sat in mine.
+
+I may be unemployed. My bank account may be dwindling. I may lie awake at night wondering when the other shoe will drop. But at the same time, I feel more empowered than ever.
+
+Because I’ve proven I can take nothing but a $200 laptop, a willingness to grind, and AI tools — and build enterprise-grade systems, games, and platforms that shouldn’t exist under those circumstances.
+
+That’s the story. Not just what I built, but what it means: the methodology works. It’s not a fluke. It’s repeatable. It’s scalable. And it’s ready to transform how teams and organizations operate.
+
+What AI Coordination Really Means
+
+When people hear “AI,” they think of magic prompts or black boxes. What I practice is different.
+
+It’s orchestration. It’s project management.
+
+Like a toolbox: some tools are hammers, some are wrenches. The key is knowing which to use, when, and for what.
+
+My AI Coordination Methodology is simple but powerful:
+
+Define the task.
+
+Select the right AI for each role.
+
+Assign responsibilities.
+
+Manage outputs, QA rigorously, and integrate into a finished product.
+
+That is how I built Quinn’s Quest, Website 2.0, and everything else on my portfolio — without formal coding or design training.
+
+Professional Identity and Resilience
+
+These projects revealed more than technical capability. They revealed identity.
+
+I hold myself to high standards and won’t ship work I’m not proud of.
+
+I create solutions from nothing, even with no prior experience in the field.
+
+I learn rapidly, ask questions, and adapt immediately.
+
+I refuse to settle at “I don’t know.”
+
+Since my layoff, I’ve worked twelve- to fourteen-hour days, seven days a week. Not out of fear, but from a drive to prove — to myself, my family, and future employers — that I could transform this moment into a foundation.
+
+The Recruiter Takeaway
+
+Quinn’s Quest demonstrates creativity, modular coding, and disciplined QA.
+Website 2.0 demonstrates enterprise branding, scalability, and knowledge management.
+
+Together, they show something bigger: a methodology that turns scattered resources into enterprise-grade systems.
+
+I am actively seeking full-time or consulting opportunities in AI operations, knowledge management, and project leadership.
+
+If you need someone who can optimize systems, orchestrate AI into real results, and transform processes into enterprise-ready solutions, let’s connect.
+
+Contact me → kylemohney.com/contact
+
+Closing
+
+From layoff to legacy.
+From patchwork to enterprise.
+From survival mode to professional reinvention.
+
+This is what disciplined AI coordination can achieve.
+
+And it’s only the beginning.
+
+This version is SEO-optimized (keywords: AI coordination, AI operations, project management, knowledge management, enterprise-grade, scalable, modular, QA, resilience), F-pattern friendly (scannable headings, short paragraphs, bolded phrases), and recruiter-polished.
+
+Would you like me to also create a condensed LinkedIn-native article version (~700 words) so you have both the long portfolio-quality piece and a tight version perfect for posting in-feed?
