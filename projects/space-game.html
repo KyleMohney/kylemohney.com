@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -138,6 +138,89 @@
 </head>
 <body>
     <canvas id="gameCanvas"></canvas>
+    <!-- Mobile Touch Controls Overlay -->
+    <div id="joystick-container">
+        <div id="joystick-base">
+            <div id="joystick-stick"></div>
+        </div>
+    </div>
+    <button id="shoot-btn">Shoot</button>
+    <style>
+        #joystick-container {
+            position: fixed;
+            left: 12vw;
+            bottom: 10vh;
+            width: 72px;
+            height: 72px;
+            z-index: 1000;
+            touch-action: none;
+            user-select: none;
+            display: none;
+            opacity: 0.65;
+        }
+        #joystick-base {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, #23272b 60%, #444a52 100%);
+            border-radius: 50%;
+            position: relative;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 1.5px 0 #fff2 inset;
+            border: 2.5px solid #3af0ff;
+        }
+        #joystick-stick {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(145deg, #e0e0e0 60%, #b0b0b0 100%);
+            border-radius: 50%;
+            position: absolute;
+            left: 18.5px;
+            top: 18.5px;
+            transition: left 0.05s, top 0.05s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.25), 0 0 0 3px #3af0ff inset;
+            border: 2px solid #fff;
+        }
+        #shoot-btn {
+            position: fixed;
+            left: 62vw;
+            bottom: 10vh;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #ff4444 60%, #b80000 100%);
+            color: #fff;
+            font-size: 1em;
+            font-family: inherit;
+            border: none;
+            z-index: 1000;
+            opacity: 0.65;
+            display: none;
+            box-shadow: 0 6px 24px rgba(255,0,0,0.25), 0 2px 0 #fff2 inset;
+            border: 3px solid #fff;
+            outline: 2px solid #3af0ff;
+            outline-offset: -6px;
+            transition: background 0.15s, box-shadow 0.15s;
+        }
+        #shoot-btn:active {
+            background: linear-gradient(145deg, #ff8888 60%, #ff4444 100%);
+            box-shadow: 0 2px 8px rgba(255,0,0,0.18), 0 0 0 6px #fff2 inset;
+        }
+        #shoot-btn::after {
+            content: '';
+            display: block;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 60px;
+            height: 60px;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background: radial-gradient(circle at 60% 40%, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.01) 80%);
+            pointer-events: none;
+        }
+        @media (pointer: coarse) {
+            #joystick-container, #shoot-btn { display: block; }
+        }
+    </style>
     
     <div class="hud">
         <div class="score">Score: <span id="scoreValue">0</span></div>
@@ -170,6 +253,70 @@
     </div>
 
     <script>
+    // --- Virtual Joystick Logic ---
+    const joystickContainer = document.getElementById('joystick-container');
+    const joystickBase = document.getElementById('joystick-base');
+    const joystickStick = document.getElementById('joystick-stick');
+    let joystickActive = false;
+    let startX, startY;
+    let moveX = 0, moveY = 0;
+
+    function getDirection(dx, dy) {
+        // Normalize and threshold for 4-way movement
+        const threshold = 20;
+        let dir = { up: false, down: false, left: false, right: false };
+        if (dy < -threshold) dir.up = true;
+        if (dy > threshold) dir.down = true;
+        if (dx < -threshold) dir.left = true;
+        if (dx > threshold) dir.right = true;
+        return dir;
+    }
+
+    joystickBase.addEventListener('touchstart', function(e) {
+        joystickActive = true;
+        const touch = e.targetTouches[0];
+        startX = touch.clientX;
+        startY = touch.clientY;
+        joystickStick.style.left = '30px';
+        joystickStick.style.top = '30px';
+    });
+    joystickBase.addEventListener('touchmove', function(e) {
+        if (!joystickActive) return;
+        const touch = e.targetTouches[0];
+        moveX = touch.clientX - startX;
+        moveY = touch.clientY - startY;
+        // Clamp to 40px radius
+        const dist = Math.sqrt(moveX*moveX + moveY*moveY);
+        if (dist > 40) {
+            const angle = Math.atan2(moveY, moveX);
+            moveX = Math.cos(angle) * 40;
+            moveY = Math.sin(angle) * 40;
+        }
+        joystickStick.style.left = (30 + moveX) + 'px';
+        joystickStick.style.top = (30 + moveY) + 'px';
+        // Send direction to game logic
+        const dir = getDirection(moveX, moveY);
+        window.dispatchEvent(new CustomEvent('joystickMove', { detail: dir }));
+        e.preventDefault();
+    }, { passive: false });
+    joystickBase.addEventListener('touchend', function(e) {
+        joystickActive = false;
+        joystickStick.style.left = '30px';
+        joystickStick.style.top = '30px';
+        window.dispatchEvent(new CustomEvent('joystickMove', { detail: { up: false, down: false, left: false, right: false } }));
+    });
+
+    // --- Shoot Button Logic ---
+    const shootBtn = document.getElementById('shoot-btn');
+    shootBtn.addEventListener('touchstart', function(e) {
+        window.dispatchEvent(new Event('shootButtonPressed'));
+        shootBtn.style.background = '#ff8888';
+        e.preventDefault();
+    }, { passive: false });
+    shootBtn.addEventListener('touchend', function(e) {
+        shootBtn.style.background = '#ff4444';
+        e.preventDefault();
+    });
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         
@@ -259,12 +406,27 @@
         // Player movement
         function updatePlayer() {
             if (!gameState.gameRunning) return;
-            
             let speed = player.speed;
             player.boosting = gameState.keys['shift'];
             if (player.boosting) speed *= 1.8;
-            
-            // Movement
+
+            // Touch joystick movement
+            if (window.joystickDirection) {
+                if (window.joystickDirection.left) {
+                    player.x = Math.max(0, player.x - speed);
+                }
+                if (window.joystickDirection.right) {
+                    player.x = Math.min(canvas.width - player.width, player.x + speed);
+                }
+                if (window.joystickDirection.up) {
+                    player.y = Math.max(0, player.y - speed);
+                }
+                if (window.joystickDirection.down) {
+                    player.y = Math.min(canvas.height - player.height, player.y + speed);
+                }
+            }
+
+            // Keyboard movement
             if (gameState.keys['a'] || gameState.keys['arrowleft']) {
                 player.x = Math.max(0, player.x - speed);
             }
@@ -1095,6 +1257,15 @@ images.blast_powerup.src = '../assets/galaxy conquerers/blast_powerup.png';
             }
         }
         
+        // --- Touch Events Integration ---
+        window.joystickDirection = { up: false, down: false, left: false, right: false };
+        window.addEventListener('joystickMove', function(e) {
+            window.joystickDirection = e.detail;
+        });
+        window.addEventListener('shootButtonPressed', function() {
+            shoot();
+        });
+
         // Initialize and start game
         initStars();
         gameLoop();

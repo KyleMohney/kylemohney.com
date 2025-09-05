@@ -56,6 +56,11 @@
 			display: block;
 			box-shadow: 0 0 32px 0 #98e58e99, 0 2px 12px #075a7a22;
 		}
+
+		/* Keep article buttons aligned across rows */
+		.article-card .btn {
+			margin-top: auto;
+		}
 	</style>
 </head>
 <body style="background: linear-gradient(120deg, #fcfcfa 60%, #f5f6f3 100%); min-height: 100vh; position: relative; overflow-x: hidden;">
@@ -151,10 +156,16 @@
 	</section>
 
 	<section class="articles-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:32px; max-width:1200px; margin:48px auto; padding:0 24px; position:relative;z-index:10;">
+	<a href="articles/smart-under-the-hood.html" class="article-card">
+			<img src="assets/article-assets/pretty-under-the-hood-hero.png" alt="Pretty on the Surface. Smarter Under the Hood" class="article-card-img" />
+			<h2 class="article-card-title">Pretty on the Surface. Smarter Under the Hood.</h2>
+			<p class="article-card-desc">How I refactored a bloated stylesheet into a modular, annotated system — show, don't tell.</p>
+			<button class="btn" type="button" onmouseover="this.style.background='#fff'; this.style.color='#15803d'; this.style.borderColor='#15803d';" onmouseout="this.style.background='#15803d'; this.style.color='#fff'; this.style.borderColor='#15803d';">Read Article</button>
+	</a>
 	<a href="articles/ai-coordination-methodology.html" class="article-card">
 	 		<img src="assets/article-assets/workflow.png" alt="AI Coordination Methodology" class="article-card-img" />
-	 		<h2 class="article-card-title">AI Coordination Methodology</h2>
-	 		<p class="article-card-desc">A deep dive into strategies for coordinating AI systems and teams for maximum efficiency.</p>
+		 	<h2 class="article-card-title">AI Coordination Methodology</h2>
+		 	<p class="article-card-desc" style="margin-bottom:14px; padding-bottom:6px;">A deep dive into strategies for coordinating AI systems and teams for maximum efficiency.</p>
 	 		<button class="btn" type="button" 
 				style="background:#15803d; color:#fff; border:2px solid #15803d; font-weight:700; font-size:1.08em; border-radius:8px; padding:12px 32px; margin:8px 0; cursor:pointer; transition:background 0.2s, color 0.2s, border-color 0.2s;"
 			style="background:#15803d; color:#fff; border:2px solid #15803d; font-weight:700; font-size:1.08em; border-radius:8px; padding:12px 32px; margin:8px 0; cursor:pointer; transition:background 0.2s, color 0.2s, border-color 0.2s;"
@@ -170,7 +181,7 @@
 	 		        onmouseout="this.style.background='#15803d'; this.style.color='#fff'; this.style.borderColor='#15803d';">Read Article</button>
 		</a>
 	<a href="articles/wheeze-to-warp-speed.html" class="article-card">
-	<img src="assets/article-assets/link-post-laptop.png" alt="Wheeze to Warp Speed" class="article-card-img" />
+	<img src="assets/article-assets/wheeze-hero1.png" alt="Wheeze to Warp Speed" class="article-card-img" />
 	<h2 class="article-card-title" style="font-size:1.18em;line-height:1.12;max-height:2.3em;overflow:hidden;">Wheeze to Warp Speed</h2>
 	<p class="article-card-desc">A story of rapid transformation—leaping from struggle to breakthrough in the age of AI.</p>
 	<button class="btn" type="button"
@@ -420,11 +431,6 @@
     }
 
     /* Bottom navigation mobile */
-    .bottom-nav-links {
-        flex-direction: column;
-        gap: 8px;
-    }
-
     .bottom-nav-link {
         padding: 10px 16px;
         font-size: 0.9em;

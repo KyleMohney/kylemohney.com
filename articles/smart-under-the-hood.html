@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Under the Hood</title>
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    body {
+      font-family: 'Montserrat', 'Times New Roman', Times, serif;
+      line-height: 1.6;
+      color: #e0e7e9;
+      background: linear-gradient(135deg, #050a13 0%, #0a181f 60%, #083f3f 100%) !important;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+    .grid-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+      mix-blend-mode: lighten;
+    }
+    .glow-node {
+      filter: blur(8px) brightness(1.2);
+      animation: pulseGlow 2.5s infinite alternate;
+    }
+    @keyframes pulseGlow {
+      0% { opacity: 0.7; }
+      100% { opacity: 1; }
+    }
+
+    /* Ensure header name is black */
+    .header-name {
+      color: #111 !important;
+    }
+  </style>
+</head>
+<body>
+    <header class="universal-header">
+        <div class="header-left">
+            <img src="../assets/images/kyle.png" alt="Kyle Mohney" class="profile-pic">
+            <span class="header-name">
+                Kyle Mohney
+                <span class="header-name-glow"></span>
+            </span>
+        </div>
+        <nav>
+            <div class="nav-links" id="navLinks">
+                <a href="../index.html" class="nav-link">Home</a>
+                <a href="../resume.html" class="nav-link">Resume</a>
+                <a href="../about.html" class="nav-link">About</a>
+                <a href="../projects.html" class="nav-link">Projects</a>
+                <a href="../articles.html" class="nav-link active">Articles</a>
+                <a href="../contact.html" class="nav-link">Contact</a>
+            </div>
+            <div class="header-icons">
+                <button class="header-icon-btn" title="Settings"><span>&#9881;</span></button>
+                <button class="header-icon-btn" title="Help"><span>?</span></button>
+                <button class="header-icon-btn" title="Language">EN</button>
+            </div>
+            <div class="hamburger" id="hamburger" aria-label="Open navigation" tabindex="0">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+    <script>
+        var hamburger = document.getElementById('hamburger');
+        var navLinks = document.getElementById('navLinks');
+        hamburger.addEventListener('click', function() {
+            navLinks.classList.toggle('open');
+        });
+        hamburger.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') navLinks.classList.toggle('open');
+        });
+    </script>
+
+    <!-- Article Hero (standalone image with green glow) -->
+    <div class="article-hero" style="text-align:center; max-width:900px; margin: 24px auto; background: transparent; box-shadow: none;">
+        <img src="../assets/article-assets/Linkedin Posts/css.PNG" alt="CSS Engineering – Pretty Under the Hood" style="max-width:100%; height:auto; display:block; margin:0 auto; border-radius:0; background:transparent; box-shadow: 0 0 40px rgba(20,184,166,0.20);">
+    </div>
+
+    <!-- Article Content (card) -->
+    <article class="article-content" style="max-width: 900px; margin: 24px auto 40px auto; padding: 36px; background: rgba(255,255,255,0.05); border: 1px solid #16a34a; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.28); backdrop-filter: blur(6px);">
+    <h1 style="color: #16a34a; text-align: center; margin-bottom: 30px; font-size: 2.5em; font-weight: 700;">Pretty on the Surface. Smarter Under the Hood.</h1>
+        
+        <p style="font-size: 1.1em; line-height: 1.7; margin-bottom: 20px;">
+            When people hear "AI built my website", the default assumption is messy spaghetti code: something that looks fine in the browser but falls apart the moment you inspect the source.
+        </p>
+        
+        <p style="font-size: 1.1em; line-height: 1.7; margin-bottom: 20px;">
+            That's not what I built.
+        </p>
+        
+        <p style="font-size: 1.1em; line-height: 1.7; margin-bottom: 30px;">
+            What I created is a site that's just as gorgeous under the hood as it is on the surface. And that's no accident. It came from months of project-stacking, a relentless focus on modularity, and one guiding principle I carried from writing a 700-page novel into the world of coding and design: <strong>Show, don't tell.</strong>
+        </p>
+
+        <h2 style="color: #fff; margin-top: 40px; margin-bottom: 20px;">In This Article, You'll Learn</h2>
+        <ul style="margin-bottom: 30px;">
+            <li>How I refactored a bloated 3,000-line stylesheet into a lean, modular 1,000-line system</li>
+            <li>Why "Show, don't tell" isn't just for writing fiction — it's also a coding and design philosophy</li>
+            <li>The skill-stacking journey that turned projects like Quinn's Quest and Claude's "drawing lessons" into the foundation of my website</li>
+            <li>How modularity, annotation, and documentation transformed AI-assisted code into enterprise-grade craftsmanship</li>
+            <li>What makes this styles.css readable, maintainable, and just as pretty under the hood as the site above</li>
+        </ul>
+
+        <h2 style="color: #fff; margin-top: 40px; margin-bottom: 20px;">Ferrari under the hood</h2>
+        <h3 style="color: #fff; margin-bottom: 15px;">Where "Show, Don't Tell" Began</h3>
+        <p style="font-size: 1.1em; line-height: 1.7; margin-bottom: 20px;">
+            In my novel, I learned that readers don't want you to say a character is brave — they want to see bravery in action. That lesson became my creative north star.
+        </p>
+        <div style="margin: 18px 0; display:flex; justify-content:center;">
+            <iframe data-testid="embed-iframe" style="border-radius:12px; max-width:100%;" src="https://open.spotify.com/embed/show/58qTBMHvlh9GP7zN6kdMsE?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        </div>
+        
+        <p style="font-size: 1.1em; line-height: 1.7; margin-bottom: 20px;">
+            When I pivoted into AI projects, I carried it with me. I realized the same principle applied everywhere:
+        </p>
+        
+        <ul style="margin-bottom: 20px;">
+            <li>Don't tell a recruiter you can design a clean, functional resume — show them with a live, modular, interactive one.</li>
+            <li>Don't tell someone you can document code — show them by opening styles.css and letting the annotations walk them through it like a manual.</li>
+            <li>Don't tell people your site is scalable and efficient — show them by refactoring 3,000 lines of CSS into a lean, modular 1,000 lines.</li>
+        </ul>
+        
+        <p style="font-size: 1.1em; line-height: 1.7; margin-bottom: 30px;">
+            Every element of my website — from the code, to the design, to the resume — was built on that philosophy.
+        </p>
+
+        <h2 style="color: #fff; margin-top: 40px; margin-bottom: 20px;">From Monster Stylesheet to Modular Masterpiece</h2>
+        <p style="font-size: 1.1em; line-height: 1.7; margin-bottom: 20px;">
+            My first attempt at a universal stylesheet ballooned into a 3,000-line monster. Fonts, headers, page-specific quirks, experimental code — it was all jumbled together. Debugging became painful. Every change risked breaking something across the site.
+        </p>
+        
+        <p style="font-size: 1.1em; line-height: 1.7; margin-bottom: 20px;">
+            So I refactored.
+        </p>
+        
+        <ul style="margin-bottom: 20px;">
+            <li>Universal rules (fonts, colors, button logic, headers, footers) were pulled into one lean master stylesheet.</li>
+            <li>Page-specific rules were broken out into their own modules. Each page now has its own identity without polluting the whole site.</li>
+            <li>Annotation became non-negotiable. Every section is documented, every block labeled. Even someone who doesn't know CSS could scroll through and understand what each part does.</li>
+            <li>Efficiency first: Teaching Claude to "draw" with CSS taught me that fewer lines can do more. The refactored sheet is one-third the size, but twice as powerful.</li>
+        </ul>
+        
+        <p style="font-size: 1.1em; line-height: 1.7; margin-bottom: 30px;">
+            Now, instead of a tangled mess, the code reads like a book — organized chapters, a table of contents at the top, and a changelog at the bottom.
+        </p>
+        
+        <p style="font-size: 1.1em; line-height: 1.7; margin-bottom: 20px;">
+            It's not just functional. It's readable. It's maintainable. It's beautiful.
+        </p>
+
+        <h2 style="color: #fff; margin-top: 40px; margin-bottom: 20px;">Lessons That Stacked</h2>
+        <p style="font-size: 1.1em; line-height: 1.7; margin-bottom: 20px;">
+            This didn't happen in a vacuum. Each project taught me something I carried into the next:
+        </p>
+        
+        <ul style="margin-bottom: 20px;">
+            <li>Standalone Media Visualizer → HTML basics</li>
+            <li>Quinn's Quest 2.0 → Modularity, notation, and debugging discipline</li>
+            <li>Knowledge Library Consulting → How to structure documentation at scale</li>
+            <li>Branding Work → Cohesive, recognizable design rules</li>
+            <li>Job Search Bot → Taught the importance and benefits of automation</li>
+            <li>Claude Remembers → Documentation as memory; how to teach AI continuity</li>
+            <li>Claude Draws → Maximizing output with minimal lines of CSS</li>
+            <li>Walmart Laptop Optimization → Efficiency and performance are survival; minimize waste, maximize output on limited resources</li>
+            <li>Website 1.0 → First full attempt; bloated but functional</li>
+            <li>Website 2.0 → Refactored mastery; modular, efficient, annotated, and scalable</li>
+        </ul>
+        
+        <p style="font-size: 1.1em; line-height: 1.7; margin-bottom: 20px;">
+            And over all of it — the discipline of "Show, don't tell."
+        </p>
+        
+        <p style="font-size: 1.1em; line-height: 1.7; margin-bottom: 18px;">
+            You can read articles detailing each project here on LinkedIn or by visiting <a href="../articles.html" style="color: #22d3ee;">kylemohney.com/articles</a>.
+        </p>
+        <div style="text-align:center; margin: 12px 0 28px 0;">
+            <img src="../assets/article-assets/Linkedin Posts/project.PNG" alt="Project showcase" style="max-width:100%; height:auto; display:inline-block; box-shadow: 0 0 36px rgba(20,184,166,0.18); border-radius:6px;">
+        </div>
+
+        <h2 style="color: #fff; margin-top: 40px; margin-bottom: 20px;">What Makes This Code Different</h2>
+        <p style="font-size: 1.1em; line-height: 1.7; margin-bottom: 20px;">
+            Here's what you'd see if you opened my styles.css:
+        </p>
+        
+        <ul style="margin-bottom: 20px;">
+            <li>Table of Contents → Navigate sections instantly</li>
+            <li>Modular Sections → Headers, footers, fonts, colors, buttons all isolated</li>
+            <li>Expert Annotation → Every rule explained in plain language</li>
+            <li>Changelog → Every update logged like a technical release note</li>
+            <li>Readable Structure → The code doesn't just work — it teaches anyone who reads it</li>
+        </ul>
+        <div style="text-align:center; margin: 12px 0 24px 0;">
+            <img src="../assets/article-assets/Linkedin Posts/scale.PNG" alt="Scale & Mobile" style="max-width:480px; width:100%; height:auto; display:inline-block; box-shadow: 0 0 36px rgba(20,184,166,0.18); border-radius:6px;">
+        </div>
+
+        <h2 style="color: #fff; margin-top: 40px; margin-bottom: 20px;">The Takeaway</h2>
+        <p style="font-size: 1.1em; line-height: 1.7; margin-bottom: 20px;">
+            Anyone can make a website that looks good on the surface. Few can make one that's just as elegant behind the scenes.
+        </p>
+        
+        <p style="font-size: 1.1em; line-height: 1.7; margin-bottom: 20px;">
+            I learned that from writing fiction, from debugging a video game, from teaching AI to remember and to draw, and from pushing myself project after project.
+        </p>
+        
+        <p style="font-size: 1.1em; line-height: 1.7; margin-bottom: 20px;">
+            The result is a methodology — AI Coordination Methodology — that turns AI into a team of specialists and produces products that "show, don't tell."
+        </p>
+        
+        <p style="font-size: 1.1em; line-height: 1.7; margin-bottom: 20px;">
+            And that's the difference. AI didn't replace me. AI made me a builder, a documenter, and a systems designer.
+        </p>
+        
+        <p style="font-size: 1.1em; line-height: 1.7; margin-bottom: 20px;">
+            A link to my GitHub repository available at <a href="../projects.html" style="color: #22d3ee;">kylemohney.com/projects</a>
+        </p>
+    </article>
+</article>
+
+    <!-- FAQ Card -->
+    <section class="faq-card" style="max-width:900px; margin: 24px auto 56px; padding: 24px; background: rgba(255,255,255,0.04); border: 1px solid #16a34a; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2);">
+        <h2 style="color:#fff; margin-top:0; margin-bottom:12px;">FAQ</h2>
+        <div style="display:grid; gap:14px;">
+            <div>
+                <strong>Q: Isn’t AI-built code usually messy and unreliable?</strong>
+                <p style="margin:6px 0 0 0; color:#e6eee9;">Not if you hold it to standards. My AI copilots weren’t allowed to “vibe code.” I structured everything into modular sections, required expert notation, and tracked changes in a detailed changelog. The result is clean, documented, and scalable.</p>
+            </div>
+
+            <div>
+                <strong>Q: Why spend so much time on notation and modularity?</strong>
+                <p style="margin:6px 0 0 0; color:#e6eee9;">Because without it, debugging turns into a nightmare. With it, even someone who’s never touched CSS could open my file and understand what every section does. It future-proofs the site.</p>
+            </div>
+
+            <div>
+                <strong>Q: What role did past projects play in this build?</strong>
+                <p style="margin:6px 0 0 0; color:#e6eee9;">Every project stacked lessons onto the next — HTML basics from my visualizer, modularity from Quinn’s Quest, documentation from consulting, efficiency from Claude’s “art lessons,” and branding from design work. All of it converged here.</p>
+            </div>
+
+            <div>
+                <strong>Q: What’s the recruiter takeaway?</strong>
+                <p style="margin:6px 0 0 0; color:#e6eee9;">This isn’t just a pretty website. It’s a demonstration of AI Coordination Methodology: the ability to turn AI into a team of specialists and produce enterprise-grade results.</p>
+            </div>
+        </div>
+    </section>
+</article>
+
+    <!-- Universal Contact & Share (side-by-side) -->
+    <section class="universal-components-container" aria-label="Contact and Share" style="max-width:900px; margin: 24px auto 56px; gap:6px; justify-content:center; align-items:flex-start;">
+    <div class="universal-share-card" style="--share-card-color:#16a34a; margin:0; background:transparent;">
+            <h3 class="universal-share-title" style="color:#16a34a; text-shadow: 0 0 8px rgba(22,163,74,0.12);">Share this article</h3>
+            <div class="share-links">
+                <a href="https://facebook.com/sharer/sharer.php?u=https://kylemohney.com/articles/smart-under-the-hood.html" target="_blank" rel="noopener">
+                    <img src="../assets/icons/facebook.png" alt="Share on Facebook" class="share-icon" />
+                </a>
+                <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://kylemohney.com/articles/smart-under-the-hood.html" target="_blank" rel="noopener">
+                    <img src="../assets/icons/in.png" alt="Share on LinkedIn" class="share-icon" />
+                </a>
+                <a href="https://x.com/intent/tweet?url=https://kylemohney.com/articles/smart-under-the-hood.html" target="_blank" rel="noopener">
+                    <img src="../assets/icons/x.png" alt="Share on X" class="share-icon" />
+                </a>
+                <a href="#" onclick="navigator.clipboard.writeText(window.location.href);alert('Page link copied!');return false;">
+                    <img src="../assets/icons/direct-icon.png" alt="Copy Direct Link" class="share-icon" />
+                </a>
+            </div>
+        </div>
+
+    <div class="universal-contact-card" style="--contact-card-color:#16a34a; margin:0; background:transparent;">
+            <h3 class="universal-contact-title" style="color:#16a34a; text-shadow: 0 0 8px rgba(22,163,74,0.12);">Connect with me</h3>
+            <div class="contact-links">
+                <a href="https://linkedin.com/in/kyle-mohney" target="_blank" rel="noopener" title="LinkedIn">
+                    <img src="../assets/icons/in.png" alt="LinkedIn" class="contact-icon" />
+                </a>
+                <a href="mailto:kyle.mohney@hotmail.com" title="Email">
+                    <img src="../assets/icons/mail.png" alt="Email" class="contact-icon" />
+                </a>
+                <a href="https://kmohney.youcanbook.me" target="_blank" rel="noopener" title="Schedule a Meeting">
+                    <img src="../assets/icons/ycbm-icon.png" alt="You Can Book Me" class="contact-icon" />
+                </a>
+            </div>
+        </div>
+    </section>
+
+</body>
+</html>
+
+<!-- Universal Bottom Navigation - Quick Navigation Only (inline copy) -->
+<section class="bottom-navigation" style="border-top-color: green !important;">
+    <div class="bottom-nav-container">
+        <!-- Quick Navigation Only -->
+        <div class="bottom-nav-section">
+            <div class="bottom-nav-title">Quick Navigation</div>
+            <div class="bottom-nav-links">
+                <a href="../index.html" class="bottom-nav-link" style="color: #111 !important;">Home</a>
+                <a href="../resume.html" class="bottom-nav-link" style="color: #111 !important;">Resume</a>
+                <a href="../about.html" class="bottom-nav-link" style="color: #111 !important;">About</a>
+                <a href="../projects.html" class="bottom-nav-link" style="color: #111 !important;">Projects</a>
+                <a href="../articles.html" class="bottom-nav-link active" style="color: #15803d !important;">Articles</a>
+                <a href="../contact.html" class="bottom-nav-link" style="color: #111 !important;">Contact</a>
+            </div>
+        </div>
+
+        <!-- Inspirational Quote -->
+        <div class="bottom-nav-section">
+            <blockquote class="article-quote" style="color: #111 !important;">
+                <span>"Simplicity is the ultimate sophistication."</span><br>
+                <span class="quote-author">– Leonardo da Vinci</span>
+            </blockquote>
+        </div>
+    </div>
+</section>
+
+<style>
+/* Page-specific green theme for bottom navigation (article page) */
+.bottom-nav-link:hover {
+    background: rgba(21, 128, 61, 0.2) !important;
+    border-color: #15803d !important;
+}
+.bottom-nav-link.active {
+    color: #15803d !important;
+}
+.bottom-nav-title {
+    color: #15803d !important;
+}
+.bottom-nav-section:last-child .quote-author {
+    color: #15803d !important;
+}
+</style>

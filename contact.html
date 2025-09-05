@@ -93,7 +93,47 @@
 	   <div style="position: fixed; left: 0; top: 0; width: 70vw; height: 100vh; background: radial-gradient(ellipse at 20% 30%, rgba(255, 165, 0, 0.08) 0%, transparent 50%), radial-gradient(ellipse at 30% 70%, rgba(255, 140, 0, 0.06) 0%, transparent 60%), radial-gradient(ellipse at 10% 50%, rgba(255, 120, 0, 0.04) 0%, transparent 70%); pointer-events: none; z-index: 0;"></div>
 	   <!-- Right side green gas cloud effect -->
 	   <div style="position: fixed; right: 0; top: 0; width: 70vw; height: 100vh; background: radial-gradient(ellipse at 80% 30%, rgba(152, 229, 142, 0.08) 0%, transparent 50%), radial-gradient(ellipse at 70% 70%, rgba(120, 200, 120, 0.06) 0%, transparent 60%), radial-gradient(ellipse at 90% 50%, rgba(100, 180, 100, 0.04) 0%, transparent 70%); pointer-events: none; z-index: 0;"></div>
-	   <div id="header-container"></div>
+	   <div id="header-container">
+<header class="universal-header">
+    <div class="header-left">
+        <img src="assets/images/kyle.png" alt="Kyle Mohney" class="profile-pic">
+        <span class="header-name">
+            Kyle Mohney
+            <span class="header-name-glow"></span>
+        </span>
+    </div>
+    <nav>
+        <div class="nav-links" id="navLinks">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="resume.html" class="nav-link">Resume</a>
+            <a href="about.html" class="nav-link">About</a>
+            <a href="projects.html" class="nav-link">Projects</a>
+            <a href="articles.html" class="nav-link">Articles</a>
+            <a href="contact.html" class="nav-link active">Contact</a>
+        </div>
+        <div class="header-icons">
+            <button class="header-icon-btn" title="Settings"><span>&#9881;</span></button>
+            <button class="header-icon-btn" title="Help"><span>?</span></button>
+            <button class="header-icon-btn" title="Language">EN</button>
+        </div>
+        <div class="hamburger" id="hamburger" aria-label="Open navigation" tabindex="0">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+</header>
+<script>
+    var hamburger = document.getElementById('hamburger');
+    var navLinks = document.getElementById('navLinks');
+    hamburger.addEventListener('click', function() {
+        navLinks.classList.toggle('open');
+    });
+    hamburger.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') navLinks.classList.toggle('open');
+    });
+</script>
+</div>
 	   <section class="contact-hero" style="position: relative; width: 100vw; min-width: 100vw; left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw; padding: 0; min-height: 65vh; height: 65vh; max-height: 75vh; overflow: hidden; display: flex; align-items: center; justify-content: center;">
 		<img src="assets/images/contact_top.png" alt="Contact Hero" style="width: 100vw; height: 100%; object-fit: cover; display: block; position: absolute; top: 0; left: 0; z-index: 1; filter: none;" />
 	   <div id="hero-particles" style="position:absolute; left:0; top:0; width:100%; height:100%; pointer-events:none; z-index:1;"></div>
@@ -101,7 +141,6 @@
 			   <div class="hero-text" style="background: rgba(0, 0, 0, 0.32); border-radius: 24px; padding: 32px; max-width: 420px; margin-right: 48px; text-align: left;">
 				   <h1 style="color: #fff; font-size: 2em; font-weight: 800; margin-bottom: 14px; line-height: 1.04; text-shadow: 0 4px 24px rgba(0, 0, 0, 0.38);">Let's Build Something Worth Talking About</h1>
 				   <p style="color: #fff; font-size: 1em; line-height: 1.5; margin-bottom: 22px; text-shadow: 0 2px 12px rgba(0, 0, 0, 0.28);">Transforming knowledge operations and AI workflows into scalable, ROI-driving systems that set the gold standard for enterprise performance.</p>
-				   <a href="#contact-form" class="hero-cta" style="display: inline-block; padding: 10px 28px; font-size: 1.08em; font-weight: 700; color: #fff; background: #15803d; border-radius: 8px; text-decoration: none; box-shadow: 0 2px 8px rgba(21,128,61,0.28), 0 0 0 4px rgba(21,128,61,0.08); border: 2px solid #15803d; transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.1s; position: relative;">Start the Conversation</a>
 			   </div>
 		   </div>
 	   </section>
@@ -197,27 +236,7 @@
 						showSlide(currentSlide);
 					</script>
 		</section>
-	<script>
-		fetch('universal-header.html')
-			.then(response => response.text())
-			.then(data => {
-				const parser = new DOMParser();
-				const doc = parser.parseFromString(data, 'text/html');
-				const header = doc.querySelector('.universal-header');
-				if (header) {
-					document.getElementById('header-container').appendChild(header);
-					// Set active nav-link for Contact page
-					const navLinks = header.querySelectorAll('.nav-link');
-					navLinks.forEach(link => {
-						link.classList.remove('active');
-						if (link.textContent.trim() === 'Articles') link.setAttribute('href', 'articles.html');
-						if (link.textContent.trim() === 'Contact') link.setAttribute('href', 'contact.html');
-					});
-					const contactLink = Array.from(navLinks).find(link => link.getAttribute('href') === 'contact.html');
-					if (contactLink) contactLink.classList.add('active');
-				}
-			});
-	</script>
+
 	<script>
 		(function() {
 			const hero = document.querySelector('.contact-hero');
