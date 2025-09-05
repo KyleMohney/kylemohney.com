@@ -192,7 +192,7 @@
         .nav-menu a.current { color: #006b40; background: rgba(152, 229, 142, 0.15); box-shadow: 0 4px 12px rgba(152, 229, 142, 0.2); }
 
         .hero {
-            position: relative; overflow: hidden;
+            position: relative;
             background: radial-gradient(1000px 500px at 10% -20%, rgba(20,184,166,0.08), transparent 60%),
                         radial-gradient(800px 300px at 120% 0%, rgba(34,211,238,0.10), transparent 50%),
                         linear-gradient(180deg, rgba(11,11,15,0.9), rgba(11,11,15,0.3));
@@ -618,6 +618,26 @@
         }
 
         /* Responsive */
+        @media (max-width: 1024px) {
+            .header-name { font-size: 1.1em; }
+        }
+        @media (max-width: 768px) {
+            .header-name { font-size: 1em; }
+        }
+        @media (max-width: 700px) {
+            .header-name { font-size: 0.9em; }
+            .profile-pic { width: 48px; height: 48px; }
+            .hamburger span { width: 26px; height: 3px; }
+        }
+        @media (max-width: 560px) {
+            .header-name { font-size: 0.85em; }
+            .profile-pic { width: 44px; height: 44px; }
+            .hamburger span { width: 24px; height: 3px; }
+        }
+        @media (max-width: 420px) {
+            .profile-pic { width: 40px; height: 40px; }
+            .hamburger span { width: 22px; height: 3px; }
+        }
         @media (max-width: 740px){ .project-card iframe { height: 560px; } }
         @media (max-width: 768px) { .nav-menu { display: none; } }
 </style>
@@ -629,48 +649,46 @@
 <div class="circuit-lines"></div>
 
 <!-- Header removed for redesign -->
-
-<div class="hero">
-    <header class="universal-header">
-        <div class="header-left">
-            <img src="../assets/images/kyle.png" alt="Kyle Mohney" class="profile-pic">
-            <span class="header-name">
-                Kyle Mohney
-                <span class="header-name-glow"></span>
-            </span>
+<header class="universal-header">
+    <div class="header-left">
+        <img src="../assets/images/kyle.png" alt="Kyle Mohney" class="profile-pic">
+        <span class="header-name">
+            Kyle Mohney
+            <span class="header-name-glow"></span>
+        </span>
+    </div>
+    <nav>
+        <div class="nav-links" id="navLinks">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="resume.html" class="nav-link">Resume</a>
+                <a href="about.html" class="nav-link">About</a>
+                <a href="projects.html" class="nav-link active">Projects</a>
+                <a href="articles.html" class="nav-link">Articles</a>
+                <a href="contact.html" class="nav-link">Contact</a>
         </div>
-        <nav>
-            <div class="nav-links" id="navLinks">
-                    <a href="index.html" class="nav-link">Home</a>
-                    <a href="resume.html" class="nav-link">Resume</a>
-                    <a href="about.html" class="nav-link">About</a>
-                    <a href="projects.html" class="nav-link active">Projects</a>
-                    <a href="articles.html" class="nav-link">Articles</a>
-                    <a href="contact.html" class="nav-link">Contact</a>
-            </div>
-            <div class="header-icons">
-                <button class="header-icon-btn" title="Settings"><span>&#9881;</span></button>
-                <button class="header-icon-btn" title="Help"><span>?</span></button>
-                <button class="header-icon-btn" title="Language">EN</button>
-            </div>
-            <div class="hamburger" id="hamburger" aria-label="Open navigation" tabindex="0">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </nav>
-    </header>
-    <script>
-        var hamburger = document.getElementById('hamburger');
-        var navLinks = document.getElementById('navLinks');
-        hamburger.addEventListener('click', function() {
-            navLinks.classList.toggle('open');
-        });
-        hamburger.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') navLinks.classList.toggle('open');
-        });
-    </script>
-    <!-- Universal header inserted above -->
+        <div class="header-icons">
+            <button class="header-icon-btn" title="Settings"><span>&#9881;</span></button>
+            <button class="header-icon-btn" title="Help"><span>?</span></button>
+            <button class="header-icon-btn" title="Language">EN</button>
+        </div>
+        <div class="hamburger" id="hamburger" aria-label="Open navigation" tabindex="0">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+</header>
+<script>
+    var hamburger = document.getElementById('hamburger');
+    var navLinks = document.getElementById('navLinks');
+    hamburger.addEventListener('click', function() {
+        navLinks.classList.toggle('open');
+    });
+    hamburger.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') navLinks.classList.toggle('open');
+    });
+</script>
+<div class="hero">
     <div class="hero-inner">
         <div>
             <h1>Interactive Demos &amp; Sandbox</h1>
@@ -909,7 +927,10 @@ function loadGame(game) {
     iframe.src = 'projects/QuinnsQuest/index.html';
     iframe.title = 'Legend of Quinn';
     iframe.allowFullscreen = true;
-    iframe.style = 'width:85vw;max-width:1400px;height:80vh;max-height:900px;border:0;background:#0b0b0f;border-radius:12px;display:block;pointer-events:none;';
+    // Allow pointer events so clicks and controls inside the iframe work
+    iframe.style = 'width:85vw;max-width:1400px;height:80vh;max-height:900px;border:0;background:#0b0b0f;border-radius:12px;display:block;pointer-events:auto;z-index:2147483647;';
+    // Allow fullscreen and autoplay inside the iframe
+    iframe.setAttribute('allow', 'autoplay; fullscreen');
     content.appendChild(iframe);
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
