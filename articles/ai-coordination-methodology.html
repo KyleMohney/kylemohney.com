@@ -338,14 +338,19 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
     <script>
-        var hamburger = document.getElementById('hamburger');
-        var navLinks = document.getElementById('navLinks');
-        hamburger.addEventListener('click', function() {
-            navLinks.classList.toggle('open');
-        });
-        hamburger.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') navLinks.classList.toggle('open');
-        });
+// Hamburger menu logic (cleaned up and robust)
+document.addEventListener('DOMContentLoaded', function() {
+  var hamburger = document.getElementById('hamburger');
+  var navLinks = document.getElementById('navLinks');
+  if (hamburger && navLinks) {
+    hamburger.addEventListener('click', function() {
+      navLinks.classList.toggle('open');
+    });
+    hamburger.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') navLinks.classList.toggle('open');
+    });
+  }
+});
     </script>
     <header class="universal-header">
         <div class="header-left">

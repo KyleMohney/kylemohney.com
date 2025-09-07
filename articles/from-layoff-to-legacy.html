@@ -1,0 +1,458 @@
+<!-- ======================== -->
+<!-- From Layoff to Legacy   -->
+<!-- ======================== -->
+<!--
+  This article uses the universal header and references styles.css for all styling and scaling.
+  All code is notated per system prompt.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<!-- Override hero title color to white -->
+	<style>
+	.hero h1 {
+		background: none !important;
+		-webkit-background-clip: initial !important;
+		-webkit-text-fill-color: #fff !important;
+		background-clip: initial !important;
+		color: #fff !important;
+	}
+	</style>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>From Layoff to Legacy</title>
+	<!-- Link to global stylesheet for all scaling, font, and layout rules -->
+	<link rel="stylesheet" href="../styles.css">
+	<style>html,body{box-sizing:border-box;}*{box-sizing:inherit;}</style>
+	<!-- Responsive override for share/contact cards: stack vertically on mobile -->
+	<style>
+	@media (max-width: 700px) {
+		.w2ws-share-contact-row {
+			display: flex !important;
+			flex-direction: column !important;
+			align-items: stretch !important;
+			gap: 18px !important;
+			max-width: 420px !important;
+			margin: 32px auto 0 auto !important;
+		}
+		.universal-share-card,
+		.universal-contact-card {
+			max-width: 100% !important;
+			width: 100% !important;
+			margin: 0 auto !important;
+		}
+	}
+	
+
+	/* Responsive override for hero section containment */
+	@media (max-width: 900px) {
+		.hero > div {
+			max-width: 98vw !important;
+			padding-left: 8px !important;
+			padding-right: 8px !important;
+		}
+		.hero img {
+			max-width: 44vw !important;
+			min-width: 90px !important;
+		}
+	}
+	@media (max-width: 700px) {
+		.hero > div {
+			flex-direction: column !important;
+			gap: 18px !important;
+			align-items: center !important;
+			max-width: 99vw !important;
+		}
+		.hero img {
+			max-width: 80vw !important;
+			margin: 0 auto !important;
+		}
+		.hero h1 {
+			font-size: 1.5em !important;
+			max-width: 99vw !important;
+			padding-right: 0 !important;
+		}
+	}
+	@media (max-width: 480px) {
+		.hero > div {
+			padding-left: 2px !important;
+			padding-right: 2px !important;
+		}
+		.hero img {
+			max-width: 96vw !important;
+		}
+	}
+	</style>
+</head>
+<body style="background:#181c24;">
+	<!-- Universal Header Include -->
+	<!-- Begin Universal Header -->
+	<header class="universal-header">
+		<div class="header-left">
+			<img src="../assets/images/kyle.png" alt="Kyle Mohney" class="profile-pic">
+			<span class="header-name">
+				Kyle Mohney
+				<span class="header-name-glow"></span>
+			</span>
+		</div>
+		<nav>
+			<div class="nav-links" id="navLinks">
+				<a href="../index.html" class="nav-link">Home</a>
+				<a href="../resume.html" class="nav-link">Resume</a>
+				<a href="../about.html" class="nav-link">About</a>
+				<a href="../projects.html" class="nav-link">Projects</a>
+				<a href="../articles.html" class="nav-link">Articles</a>
+				<a href="../contact.html" class="nav-link">Contact</a>
+			</div>
+			<div class="header-icons">
+				<button class="header-icon-btn" id="settings-btn" title="Settings"><span>&#9881;</span></button>
+				<button class="header-icon-btn" id="help-btn" title="Help"><span>?</span></button>
+				<button class="header-icon-btn" id="lang-btn" title="Language">EN</button>
+			</div>
+			<div class="hamburger" id="hamburger" aria-label="Open navigation" tabindex="0">
+				<span></span>
+				<span></span>
+				<span></span>
+			</div>
+		</nav>
+	</header>
+	<!-- End Universal Header -->
+	<!-- Blank Hero Section Placeholder -->
+	<section class="hero" style="min-height:32vh; display:flex; align-items:center; justify-content:center; background:linear-gradient(120deg, #133a5c 0%, #1b5e4b 100%); margin-bottom:32px;">
+	<div style="position:relative;display:flex;flex-direction:row;align-items:center;justify-content:center;width:100%;gap:32px;flex-wrap:wrap;">
+			<div style="display:flex;flex-direction:column;align-items:flex-start;justify-content:center;max-width:420px;z-index:2;">
+				<h1 style="
+					font-size:2.5em;
+					font-weight:700;
+					letter-spacing:0.015em;
+					background:linear-gradient(90deg,#4cae4f 10%,#22d3ee 90%);
+					-webkit-background-clip:text;
+					-webkit-text-fill-color:transparent;
+					background-clip:text;
+					margin:0 0 10px 0;
+					position:relative;
+					text-align:left;
+					line-height:1.22;
+					text-shadow:0 2px 8px #181c2499;
+					word-break:break-word;
+					max-width:420px;
+					padding-right:8px;
+				">
+					<span style="display:block;white-space:nowrap;">From Layoff to Legacy:</span>
+					<span style="display:block;font-size:1.08em;font-weight:800;letter-spacing:0.01em;">
+						Building Quinn’s Quest and Website 2.0
+					</span>
+				</h1>
+			</div>
+			<img src="../assets/article-assets/ai-header.png" alt="AI Bootcamp Header" style="max-width:220px;width:38vw;min-width:120px;height:auto;border-radius:12px;box-shadow:0 0 32px 6px #22d3ee88,0 0 0 4px #4cae4faa,0 2px 16px #133a5c33;z-index:2;" loading="lazy">
+		</div>
+	</section>
+
+	<!-- Article Body Card (blank, lighter gray for visibility) -->
+	<main style="display:flex; justify-content:center; align-items:flex-start; min-height:40vh;">
+		<section class="article-body-card" style="background:#232a36; border-radius:18px; box-shadow:0 4px 24px rgba(0,0,0,0.18); padding:40px 32px; min-width:320px; max-width:720px; width:100%; margin-bottom:48px; border:2.5px solid #4cae4f;">
+			<!-- In This Article, You’ll Learn Card -->
+			<div style="background:#1b2330; border-radius:12px; box-shadow:0 2px 12px #133a5c22; padding:22px 20px 16px 20px; margin-bottom:28px; border-left:5px solid #4cae4f;">
+				<div style="font-weight:700; color:#4cae4f; margin-bottom:10px; font-size:1.08em;">In This Article, You’ll Learn</div>
+				<ul style="margin:0 0 0 18px; padding:0; color:#e0e7e9; font-size:1.04em; line-height:1.6;">
+					<li>How Quinn’s Quest evolved from a passion project for my son into a living case study in AI orchestration and modular design.</li>
+					<li>Why I rebuilt my entire website from scratch — and how I transformed it into an enterprise-grade, mobile-responsive platform.</li>
+					<li>The notation and modularization practices that keep my code as clean under the hood as it is on the surface.</li>
+					<li>How lessons stacked across projects — from a $200 Walmart laptop overhaul to teaching Claude to “draw” with CSS — shaped my AI Coordination Methodology.</li>
+					<li>The professional identity I discovered in the process: resilience, high standards, and the ability to create solutions from nothing.</li>
+				</ul>
+			</div>
+			<!-- ARTICLE BODY: Content to be added here -->
+			<div style="margin-bottom:18px;color:#e0e7e9;font-size:1.13em;line-height:1.7;">
+				I've been laid off once before, so when this recent layoff happened, I thought I knew how the story would go. A few months of rest, some time focusing on hobbies and then a job search when the money started to run out, to get back to the status quo
+				<br><br>
+				But this time was different. My bank account was draining quickly, my family depended on me, and I couldn’t afford costly certifications or bootcamps. The clock was ticking. It still is.
+				<br><br>
+				I'm good at standardized tests and aced the free certifications I picked up, but without any capital and my bank quickly diminishing, I couldn't afford to pay for bigger, better certifications or courses. Instead of buying a way forward, I decided to build one.
+			</div>
+
+            <hr style="border:none;border-top:2px solid #4cae4f;border-radius:2px;margin:32px 0 28px 0;opacity:0.35;">
+
+			<!-- Main Article Content -->
+			<div style="margin-bottom:18px;color:#e0e7e9;font-size:1.13em;line-height:1.7;">
+				<strong style="color:#4cae4f;">Building My Own Bootcamp</strong><br>
+				I created what I now call my AI-powered bootcamp.<br><br>
+				<ul style="margin:0 0 18px 22px; padding:0; color:#e0e7e9; font-size:1em; line-height:1.6;">
+					<li>Completed free certifications wherever I could find them.</li>
+					<li>Published articles documenting my methodology (AI Coordination Methodology, From Layoff to Liftoff, Claude Remembers, AI Support Revolution).</li>
+					<li>Designed projects large enough to challenge me and prove I could deliver enterprise-grade work without a coding background.</li>
+				</ul>
+				That is how Quinn’s Quest and kylemohney.com v2 were born.
+			<div style="text-align:center;margin:28px 0 0 0;">
+				<img src="../assets/article-assets/ai-boot.png" alt="AI Bootcamp" style="max-width:96%;height:auto;border-radius:10px;box-shadow:0 2px 16px #133a5c33;">
+			</div>
+			</div>
+
+            <hr style="border:none;border-top:2px solid #4cae4f;border-radius:2px;margin:32px 0 28px 0;opacity:0.35;">
+
+			<div style="margin-bottom:18px;color:#e0e7e9;font-size:1.13em;line-height:1.7;">
+				<strong style="color:#4cae4f;">Quinn’s Quest: A Legacy Project and Case Study</strong><br>
+				Quinn’s Quest started as both a challenge and a gift. With my son’s birthday approaching, I wanted to give him something unique — a game where he was the hero, with his own voice preserved at age four.<br><br>
+				The result was a complete storybook adventure game:
+				<ul style="margin:0 0 18px 22px; padding:0; color:#e0e7e9; font-size:1em; line-height:1.6;">
+					<li>Six levels with multiple bosses.</li>
+					<li>A narrative arc where Quinn rescues his baby sister from bandits and zombies.</li>
+					<li>Custom sprites, sounds, and animations.</li>
+					<li>Family voices integrated throughout.</li>
+				</ul>
+				I managed the project like a professional dev team:<br>
+				<ul style="margin:0 0 18px 22px; padding:0; color:#e0e7e9; font-size:1em; line-height:1.6;">
+					<li>ChatGPT handled assets and sprites.</li>
+					<li>Claude specialized in bug hunting.</li>
+					<li>Grok provided modular, efficient code.</li>
+					<li>Copilot offered support and refinements.</li>
+					<li>My role: architect, project manager, and QA lead.</li>
+				</ul>
+				I learned to catch syntax errors, restructure functions, and systematically test every build. Kids who play-tested Quinn’s Quest were so engaged they asked to play again and again — even while a giant water-bounce castle was available right behind them.<br><br>
+				Quinn’s Quest demonstrated my ability to orchestrate AI resources, manage quality assurance, and deliver a polished product under pressure.
+			</div>
+
+            <hr style="border:none;border-top:2px solid #4cae4f;border-radius:2px;margin:32px 0 28px 0;opacity:0.35;">
+
+			<div style="margin-bottom:18px;color:#e0e7e9;font-size:1.13em;line-height:1.7;">
+				<strong style="color:#4cae4f;">Website 2.0: From Patchwork to Enterprise-Grade</strong><br>
+				The first version of my website was built in 48 hours. It worked, but it was patchwork. Headers didn’t match, fonts were inconsistent, and each page looked like a separate site.<br><br>
+				Instead of patching, I rebuilt it from the ground up.<br><br>
+				<span style="color:#4cae4f;">kylemohney.com v2</span> is a modular, enterprise-grade, mobile-responsive platform:
+				<ul style="margin:0 0 18px 22px; padding:0; color:#e0e7e9; font-size:1em; line-height:1.6;">
+					<li>Universal headers, footers, and stylesheets ensure consistency.</li>
+					<li>Custom icon libraries and unique assets differentiate the design.</li>
+					<li>The resume page demonstrates knowledge management: carousels, expandable sections, and downloadable two-page role-specific PDFs.</li>
+					<li>The contact page is a polished experience in its own right.</li>
+				</ul>
+				This rebuild is not vibe coding. Every line is notated, every function documented, and every component modular. The CSS alone could stand as an industry case study in clarity and maintainability.<br><br>
+				The site itself is the project — a living example of AI orchestration and project management applied at scale.<br>
+			</div>
+
+			<div style="text-align:center;margin:28px 0 0 0;">
+				<img src="../assets/article-assets/Linkedin Posts/cs-top.png" alt="Website 2.0 - Custom Styles" style="max-width:96%;height:auto;border-radius:10px;box-shadow:0 2px 16px #133a5c33;margin-bottom:18px;">
+				<img src="../assets/article-assets/Linkedin Posts/contact-hero.png" alt="Website 2.0 - Contact Hero" style="max-width:96%;height:auto;border-radius:10px;box-shadow:0 2px 16px #133a5c33;">
+			</div>
+
+            <hr style="border:none;border-top:2px solid #4cae4f;border-radius:2px;margin:32px 0 28px 0;opacity:0.35;">
+
+			<div style="margin-bottom:18px;color:#e0e7e9;font-size:1.13em;line-height:1.7;">
+				<strong style="color:#4cae4f;">Lessons Learned</strong><br>
+				<ul style="margin:0 0 18px 22px; padding:0; color:#e0e7e9; font-size:1em; line-height:1.6;">
+					<li>Backup every win. Preserve hard-earned progress.</li>
+					<li>Root cause everything. Never chase symptoms without identifying the source.</li>
+					<li>Notation is essential. Documentation ensures long-term maintainability.</li>
+					<li>Consistency is non-negotiable. Professional presentation requires discipline at every level.</li>
+				</ul>
+			</div>
+
+            <hr style="border:none;border-top:2px solid #4cae4f;border-radius:2px;margin:32px 0 28px 0;opacity:0.35;">
+
+			<div style="margin-bottom:18px;color:#e0e7e9;font-size:1.13em;line-height:1.7;">
+				<strong style="color:#4cae4f;">The AI Coordination Methodology</strong><br>
+				Not all AI tools are created equal. Like any toolbox, each has its specialty.<br><br>
+				<ul style="margin:0 0 18px 22px; padding:0; color:#e0e7e9; font-size:1em; line-height:1.6;">
+					<li>Define the task.</li>
+					<li>Select the right AI for the role.</li>
+					<li>Assign responsibilities.</li>
+					<li>Manage, QA, and integrate outputs.</li>
+				</ul>
+				This disciplined orchestration is what I call my AI Coordination Methodology. It ensures not just results, but results that scale.
+			<div style="text-align:center;margin:28px 0 0 0;">
+				<img src="../assets/article-assets/workflow.png" alt="AI Coordination Methodology Workflow" style="max-width:96%;height:auto;border-radius:10px;box-shadow:0 2px 16px #133a5c33;">
+			</div>
+			</div>
+
+            <hr style="border:none;border-top:2px solid #4cae4f;border-radius:2px;margin:32px 0 28px 0;opacity:0.35;">
+
+			<div style="margin-bottom:18px;color:#e0e7e9;font-size:1.13em;line-height:1.7;">
+				<strong style="color:#4cae4f;">Professional Identity and Resilience</strong><br>
+				These projects revealed more than technical capability. They revealed identity.<br><br>
+				<ul style="margin:0 0 18px 22px; padding:0; color:#e0e7e9; font-size:1em; line-height:1.6;">
+					<li>I hold myself to high standards and refuse to ship work that I am not proud of.</li>
+					<li>I create solutions from nothing, even without prior resources or expertise.</li>
+					<li>I learn rapidly by asking questions and pushing for understanding.</li>
+					<li>I do not settle at “I don’t know.”</li>
+				</ul>
+				Since my layoff, I have worked twelve- to fourteen-hour days, seven days a week, building skills and projects that prove value beyond a resume. This is resilience, not complacency.
+			</div>
+
+             <hr style="border:none;border-top:2px solid #4cae4f;border-radius:2px;margin:32px 0 28px 0;opacity:0.35;">
+
+			<div style="margin-bottom:18px;color:#e0e7e9;font-size:1.13em;line-height:1.7;">
+				<strong style="color:#4cae4f;">Recruiter Takeaway</strong><br>
+				Quinn’s Quest shows creativity, modular engineering, and QA discipline. Website 2.0 shows branding, scalability, and knowledge management. Both projects demonstrate AI orchestration, project leadership, and enterprise delivery.<br><br>
+				I am actively seeking full-time or consulting opportunities in AI operations, knowledge management, and project leadership.<br><br>
+				If you need someone who can turn scattered resources into enterprise-grade systems and results, let’s connect.<br><br>
+				<a href="https://kylemohney.com/contact" class="main-btn" style="display:inline-block;margin-left:12px;padding:12px 28px;background:#4cae4f;color:#fff;font-weight:700;border-radius:8px;text-decoration:none;transition:background 0.2s,color 0.2s;box-shadow:0 2px 8px #133a5c22;vertical-align:middle;"
+				   onmouseover="this.style.background='#fff';this.style.color='#4cae4f';" onmouseout="this.style.background='#4cae4f';this.style.color='#fff';">
+					Contact Page
+				</a>
+			</div>
+
+            <hr style="border:none;border-top:2px solid #4cae4f;border-radius:2px;margin:32px 0 28px 0;opacity:0.35;">
+
+			<div style="margin-bottom:0;color:#e0e7e9;font-size:1.13em;line-height:1.7;">
+				<strong style="color:#4cae4f;">Closing</strong><br>
+				From layoff to legacy. From patchwork to enterprise. From survival mode to professional reinvention.<br><br>
+				This is what AI coordination and disciplined project management can achieve.<br><br>
+				And this is just the beginning.
+			</div>
+			</div>
+		</section>
+	</main>
+
+	<!-- Frequently Asked Questions Card (blank) -->
+	<section class="faq-card" style="background:#232a36; border-radius:18px; box-shadow:0 4px 24px rgba(0,0,0,0.18); padding:32px 28px; min-width:320px; max-width:720px; width:100%; margin:0 auto 48px auto; border:2.5px solid #4cae4f;">
+	<h2 style="margin-top:0; margin-bottom:18px; font-size:1.35em; font-weight:800; color:#4cae4f; letter-spacing:0.01em;">Frequently Asked Questions</h2>
+		<div style="display:grid;gap:18px;">
+			<div>
+				<strong style="color:#4cae4f;">Q: You’re not a coder or web designer — how did you manage this?</strong>
+				<p style="margin:6px 0 0 0;color:#fff;">A: By applying my AI Coordination Methodology. I don’t just “ask AI for code.” I assign roles, enforce notation, QA every push, and integrate outputs into modular, maintainable systems.</p>
+			</div>
+			<div>
+				<strong style="color:#4cae4f;">Q: Isn’t this just “vibe coding”?</strong>
+				<p style="margin:6px 0 0 0;color:#fff;">A: No. Every line is intentional. My CSS is fully documented, broken into sections with a table of contents and changelog. It can be picked up by anyone and understood immediately — that’s not vibe coding, that’s professional orchestration.</p>
+			</div>
+			<div>
+				<strong style="color:#4cae4f;">Q: Why rebuild instead of patching the old site?</strong>
+				<p style="margin:6px 0 0 0;color:#fff;">A: Efficiency. After fighting header, font, and branding inconsistencies, I realized patching would waste more time than a ground-up rebuild. The modular approach now saves time on every future edit.</p>
+			</div>
+			<div>
+				<strong style="color:#4cae4f;">Q: What does this prove to recruiters or employers?</strong>
+				<p style="margin:6px 0 0 0;color:#fff;">A: It proves that I can create enterprise-grade solutions from zero resources. Even without a coding background, I can direct AI into producing systems that are scalable, maintainable, and professional.</p>
+			</div>
+			<div>
+				<strong style="color:#4cae4f;">Q: What’s next?</strong>
+				<p style="margin:6px 0 0 0;color:#fff;">A: Continuing to refine mobile scaling, building more automation, and leveraging these skills into AI operations, technical project management, knowledge management, and education/training opportunities.</p>
+			</div>
+		</div>
+	</section>
+
+	<!-- About the Author Card -->
+	<section class="about-author-card" style="background:#232a36;border-radius:18px;padding:28px 28px 22px 28px;margin:0 auto 32px auto;max-width:720px;box-shadow:0 4px 24px rgba(0,0,0,0.18);display:flex;align-items:center;gap:22px;color:#e0e7e9;border:2.5px solid #4cae4f;">
+		<img src="../assets/images/kyle.png" alt="Kyle Mohney" style="width:64px;height:64px;border-radius:50%;object-fit:cover;box-shadow:0 2px 12px rgba(34,211,238,0.10);border:2px solid #1b5e4b;">
+		<div>
+			<h3 style="margin:0 0 8px 0;font-size:1.13em;font-weight:700;color:#4cae4f;letter-spacing:0.1px;text-shadow:0 0 12px #1b5e4b88, 0 0 24px #133a5c44;">About the Author</h3>
+			<div style="color:#e0e7e9;font-size:1em;line-height:1.7;">Kyle J. Mohney is an operations consultant and AI solutions architect with a passion for automating complex workflows and empowering teams. He specializes in bridging the gap between business needs and technical solutions, using AI as a co-pilot for rapid, repeatable results.</div>
+		</div>
+	</section>
+
+	<!-- Universal Share and Contact Cards -->
+	<div class="w2ws-share-contact-row" style="display:flex;justify-content:center;align-items:flex-start;gap:18px;margin:40px auto 0 auto;max-width:720px;">
+		<div class="universal-share-card" style="--share-card-color:#22d3ee;background:#232a36;color:#e0e7e9;border:2.5px solid #4cae4f;margin:0;flex:1 1 0;min-width:220px;max-width:320px;border-radius:16px;padding:22px 18px 18px 18px;box-shadow:0 2px 12px rgba(34,211,238,0.10);display:flex;flex-direction:column;align-items:center;">
+			<h3 class="universal-share-title" style="color:#4cae4f;text-shadow:0 0 12px #1b5e4b88, 0 0 24px #133a5c44;margin:0 0 14px 0;font-size:1.13em;font-weight:700;letter-spacing:0.1px;">Share this page</h3>
+			<div class="share-links" style="display:flex;gap:16px;align-items:center;justify-content:center;">
+				<a href="#" target="_blank" rel="noopener" title="Share on Facebook">
+					<img src="../assets/icons/facebook.png" alt="Share on Facebook" class="share-icon" style="width:28px;height:28px;transition:filter 0.2s;filter:brightness(0.95);" />
+				</a>
+				<a href="#" target="_blank" rel="noopener" title="Share on LinkedIn">
+					<img src="../assets/icons/in.png" alt="Share on LinkedIn" class="share-icon" style="width:28px;height:28px;transition:filter 0.2s;filter:brightness(0.95);" />
+				</a>
+				<a href="#" target="_blank" rel="noopener" title="Share on X">
+					<img src="../assets/icons/x.png" alt="Share on X" class="share-icon" style="width:28px;height:28px;transition:filter 0.2s;filter:brightness(0.95);" />
+				</a>
+				<a href="#" onclick="navigator.clipboard.writeText(window.location.href);alert('Page link copied!');return false;" title="Copy Direct Link">
+					<img src="../assets/icons/direct-icon.png" alt="Copy Direct Link" class="share-icon" style="width:28px;height:28px;transition:filter 0.2s;filter:brightness(0.95);" />
+				</a>
+			</div>
+		</div>
+		<div class="universal-contact-card" style="--contact-card-color:#22d3ee;background:#232a36;color:#e0e7e9;border:2.5px solid #4cae4f;margin:0;flex:1 1 0;min-width:220px;max-width:320px;border-radius:16px;padding:22px 18px 18px 18px;box-shadow:0 2px 12px rgba(34,211,238,0.10);display:flex;flex-direction:column;align-items:center;">
+			<h3 class="universal-contact-title" style="color:#4cae4f;text-shadow:0 0 12px #1b5e4b88, 0 0 24px #133a5c44;margin:0 0 14px 0;font-size:1.13em;font-weight:700;letter-spacing:0.1px;">Connect with me</h3>
+			<div class="contact-links" style="display:flex;gap:16px;align-items:center;justify-content:center;">
+				<a href="https://linkedin.com/in/kyle-mohney" target="_blank" rel="noopener" title="LinkedIn">
+					<img src="../assets/icons/in.png" alt="LinkedIn" class="contact-icon" style="width:28px;height:28px;transition:filter 0.2s;filter:brightness(0.95);" />
+				</a>
+				<a href="mailto:kyle.mohney@hotmail.com" title="Email">
+					<img src="../assets/icons/mail.png" alt="Email" class="contact-icon" style="width:28px;height:28px;transition:filter 0.2s;filter:brightness(0.95);" />
+				</a>
+				<a href="https://kmohney.youcanbook.me" target="_blank" rel="noopener" title="Schedule a Meeting">
+					<img src="../assets/icons/ycbm-icon.png" alt="You Can Book Me" class="contact-icon" style="width:28px;height:28px;transition:filter 0.2s;filter:brightness(0.95);" />
+				</a>
+			</div>
+		</div>
+	</div>
+	</section>
+	</section>
+
+    	<!-- Universal Bottom Navigation (Quick Nav) -->
+	<!-- Universal Bottom Navigation - Quick Navigation Only -->
+	<section class="bottom-navigation" style="color:#e0e7e9 !important; background:#181c24; border-top:3px solid #1b5e4b; margin-top:48px;">
+		<div class="bottom-nav-container" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;max-width:900px;margin:0 auto;padding:32px 0 18px 0;gap:24px;">
+			<!-- Quick Navigation Only -->
+			<div class="bottom-nav-section" style="flex:1 1 320px;min-width:220px;">
+				<div class="bottom-nav-title" style="color:#4cae4f;font-weight:700;font-size:1.08em;margin-bottom:10px;">Quick Navigation</div>
+				<div class="bottom-nav-links" style="color:#e0e7e9 !important; display:flex;flex-wrap:wrap;gap:12px 18px;">
+					<a href="../index.html" class="bottom-nav-link" style="color:#e0e7e9 !important; text-decoration:none;">Home</a>
+					<a href="../resume.html" class="bottom-nav-link" style="color:#e0e7e9 !important; text-decoration:none;">Resume</a>
+					<a href="../about.html" class="bottom-nav-link" style="color:#e0e7e9 !important; text-decoration:none;">About</a>
+					<a href="../projects.html" class="bottom-nav-link" style="color:#e0e7e9 !important; text-decoration:none;">Projects</a>
+					<a href="../articles.html" class="bottom-nav-link" style="color:#4cae4f !important; font-weight:700; text-decoration:none;">Articles</a>
+					<a href="../contact.html" class="bottom-nav-link" style="color:#e0e7e9 !important; text-decoration:none;">Contact</a>
+				</div>
+				<div style="width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:24px 0 0 0;">
+					<span style="display:block;color:#e0e7e9 !important;font-size:1.08em;text-align:center;max-width:480px;">"We can do anything we set our minds to, if we stick to it long enough."</span>
+					<span class="quote-author" style="color:#4cae4f;display:block;text-align:center;margin-top:4px;">— Betsy Ross</span>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Modals for Settings and Help -->
+	<div id="settings-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(24,28,36,0.65); z-index:2000; align-items:center; justify-content:center;">
+		<div style="background:#232a36; padding:32px 40px; border-radius:18px; box-shadow:0 8px 32px rgba(0,0,0,0.25); min-width:320px; max-width:90vw; text-align:center;">
+			<h2 style="font-size:1.3em; font-weight:800; margin-bottom:18px;">Settings</h2>
+			<p style="font-size:1.08em; margin-bottom:18px;">Settings coming soon.</p>
+			<button onclick="closeModal('settings-modal')" style="background:#181c24; color:#e0e7e9; border:none; border-radius:6px; padding:8px 18px; font-weight:700; cursor:pointer;">Close</button>
+		</div>
+	</div>
+	<div id="help-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(24,28,36,0.65); z-index:2000; align-items:center; justify-content:center;">
+		<div style="background:#232a36; padding:32px 40px; border-radius:18px; box-shadow:0 8px 32px rgba(0,0,0,0.25); min-width:320px; max-width:90vw; text-align:center;">
+			<h2 style="font-size:1.3em; font-weight:800; margin-bottom:18px;">Help & Support</h2>
+			<p style="font-size:1.08em; margin-bottom:18px;">Help content coming soon.</p>
+			<button onclick="closeModal('help-modal')" style="background:#181c24; color:#e0e7e9; border:none; border-radius:6px; padding:8px 18px; font-weight:700; cursor:pointer;">Close</button>
+		</div>
+	</div>
+	<script>
+		// Hamburger menu
+		var hamburger = document.getElementById('hamburger');
+		var navLinks = document.getElementById('navLinks');
+		hamburger.addEventListener('click', function() {
+			navLinks.classList.toggle('open');
+		});
+		hamburger.addEventListener('keypress', function(e) {
+			if (e.key === 'Enter') navLinks.classList.toggle('open');
+		});
+
+		// Settings & Help modal logic
+		document.getElementById('settings-btn').onclick = function(e) {
+			e.stopPropagation();
+			document.getElementById('settings-modal').style.display = 'flex';
+		};
+		document.getElementById('help-btn').onclick = function(e) {
+			e.stopPropagation();
+			document.getElementById('help-modal').style.display = 'flex';
+		};
+		function closeModal(id) {
+			document.getElementById(id).style.display = 'none';
+		}
+		document.addEventListener('click', function(e) {
+			if (document.getElementById('settings-modal').style.display === 'flex') document.getElementById('settings-modal').style.display = 'none';
+			if (document.getElementById('help-modal').style.display === 'flex') document.getElementById('help-modal').style.display = 'none';
+		});
+		document.getElementById('settings-modal').onclick = function(e) { e.stopPropagation(); };
+		document.getElementById('help-modal').onclick = function(e) { e.stopPropagation(); };
+
+		// Language dropdown (simple toggle)
+		const langBtn = document.getElementById('lang-btn');
+		langBtn.addEventListener('click', function(e) {
+			e.stopPropagation();
+			// Example: cycle through languages
+			const langs = ['EN', 'ES', 'FR', 'DE', 'ZH'];
+			let current = langs.indexOf(langBtn.textContent.trim());
+			langBtn.textContent = langs[(current + 1) % langs.length];
+		});
+	</script>
+<!-- End of body and html -->
+</body>
+</html>

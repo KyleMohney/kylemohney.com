@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Improved Refund Processing – No SQL</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+        <!-- Animated Diagonal Lines Background Layer -->
+        <div id="circuit-bg" style="position:fixed;z-index:0;top:0;left:0;width:100vw;height:100vh;pointer-events:none;overflow:hidden;">
+            <svg id="circuit-svg" width="100%" height="100%" viewBox="0 0 1920 1080" preserveAspectRatio="none" style="width:100vw;height:100vh;">
+                <g id="lines-group">
+                    <line x1="0" y1="100" x2="1920" y2="-100" stroke="#4cae4f22" stroke-width="3"/>
+                    <line x1="0" y1="300" x2="1920" y2="100" stroke="#4cae4f22" stroke-width="2.5"/>
+                    <line x1="0" y1="500" x2="1920" y2="300" stroke="#4cae4f22" stroke-width="2"/>
+                    <line x1="0" y1="700" x2="1920" y2="500" stroke="#4cae4f22" stroke-width="2.5"/>
+                    <line x1="0" y1="900" x2="1920" y2="700" stroke="#4cae4f22" stroke-width="3"/>
+                    <!-- Add subtle circuit nodes -->
+                    <circle cx="400" cy="220" r="7" fill="#4cae4f33">
+                        <animate attributeName="r" values="7;11;7" dur="2.2s" repeatCount="indefinite"/>
+                        <animate attributeName="opacity" values="0.5;1;0.5" dur="2.2s" repeatCount="indefinite"/>
+                    </circle>
+                    <circle cx="1200" cy="420" r="5" fill="#4cae4f33">
+                        <animate attributeName="r" values="5;9;5" dur="2.8s" repeatCount="indefinite"/>
+                        <animate attributeName="opacity" values="0.4;0.9;0.4" dur="2.8s" repeatCount="indefinite"/>
+                    </circle>
+                    <circle cx="800" cy="650" r="6" fill="#4cae4f33">
+                        <animate attributeName="r" values="6;10;6" dur="2.5s" repeatCount="indefinite"/>
+                        <animate attributeName="opacity" values="0.4;0.8;0.4" dur="2.5s" repeatCount="indefinite"/>
+                    </circle>
+                </g>
+            </svg>
+        </div>
+    <header class="universal-header" style="position:relative;z-index:2;">
+        <div class="header-left">
+            <img src="../assets/images/kyle.png" alt="Kyle Mohney" class="profile-pic">
+            <span class="header-name">
+                Kyle Mohney
+                <span class="header-name-glow"></span>
+            </span>
+        </div>
+        <nav>
+            <div class="nav-links" id="navLinks">
+                <a href="../index.html" class="nav-link">Home</a>
+                <a href="../resume.html" class="nav-link">Resume</a>
+                <a href="../about.html" class="nav-link">About</a>
+                <a href="../projects.html" class="nav-link">Projects</a>
+                <a href="../articles.html" class="nav-link active">Articles</a>
+                <a href="../contact.html" class="nav-link">Contact</a>
+            </div>
+            <div class="header-icons">
+                <button class="header-icon-btn" title="Settings"><span>&#9881;</span></button>
+                <button class="header-icon-btn" title="Help"><span>?</span></button>
+                <button class="header-icon-btn" title="Language">EN</button>
+            </div>
+            <div class="hamburger" id="hamburger" aria-label="Open navigation" tabindex="0">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+    <section class="hero-card" style="width:100vw;position:relative;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;padding:48px 0 40px 0;background:linear-gradient(90deg,#4cae4f 0%,#256029 100%);box-shadow:0 8px 32px 0 rgba(76,174,79,0.10), 0 0 48px 0 rgba(76,174,79,0.08);display:flex;flex-direction:column;align-items:center;gap:18px;border-bottom-left-radius:32px;border-bottom-right-radius:32px;border-top:none;z-index:2;">
+    <img src="../assets/article-assets/bq-1-top.png" alt="BigQuery Refund Automation" style="max-width:340px;width:90vw;height:auto;margin:0 0 28px 0;border-radius:14px;box-shadow:0 0 32px 8px #4cae4faa,0 0 0 4px #fff2 inset;filter:brightness(1.08);" loading="lazy">
+    <h1 style="font-size:2.1em;font-weight:800;margin:0 0 0 0;color:#fff;line-height:1.15;text-align:center;text-shadow:0 2px 16px #25602999,0 1px 0 #256029;">How I Cut Refund Processing Time by 98% at Thumbtack with AI and BigQuery</h1>
+    </section>
+    <div class="body-card" style="max-width:680px;margin:32px auto 0 auto;padding:28px 22px;background:#f7f7f7;border-radius:14px;box-shadow:0 4px 16px 0 rgba(0,0,0,0.06);color:#222;font-size:1.15rem;line-height:1.7;min-height:220px;border:2px solid #4cae4f;position:relative;z-index:2;">
+        <div style="margin-bottom:22px;padding:18px 18px 14px 18px;background:#eafbe7;border-radius:10px;border-left:5px solid #4cae4f;box-shadow:0 2px 12px #4cae4f11;">
+            <div style="font-weight:700;color:#256029;margin-bottom:8px;">In This Article You'll Learn</div>
+            <ul style="margin:0 0 0 18px;padding:0 0 0 0;color:#256029;font-size:1.04em;line-height:1.6;">
+                <li>How refund processing was a major bottleneck in customer support.</li>
+                <li>How AI and BigQuery were used together to build a solution outside of traditional skill boundaries.</li>
+                <li>How a process that once took up to 20 minutes was cut down to 20 seconds — a 98% reduction.</li>
+                <li>The transferable methodology: hunt, iterate, tether, optimize.</li>
+                <li>Why the AI-Coordination Methodology is about overriding “no way” moments and delivering results anyway.</li>
+            </ul>
+        </div>
+            <hr style="border:none;border-top:2px solid #b6e2b7;border-radius:2px;margin:32px 0 28px 0;opacity:0.55;">
+                <p>At Thumbtack, refunds were the number one driver of customer support volume. Every day, thousands of calls circled back to the same request: “I want my money back.”</p>
+
+                <p>The process was painfully slow:</p>
+                <ul style="margin-bottom:18px;">
+                    <li>A pro spent five to ten minutes venting to an advocate.</li>
+                    <li>The advocate checked permissions they almost never had.</li>
+                    <li>Cases escalated into Slack, where supervisors like me had to weigh in.</li>
+                    <li>We dug manually through refund history, spend history, and credits before making a decision.</li>
+                </ul>
+                <p>Each case ate fifteen to twenty minutes. Supervisors were buried. Refund decisions dragged. Customer frustration mounted.</p>
+
+                <p>And here’s the truth: the majority of the time, those refunds were rightfully declined. Most users didn’t fully understand how the app or program worked. My role was to help fill that knowledge gap — but as any seasoned supervisor knows, you can’t start with explanation. It’s refund first, gap-fill second; otherwise, you’re talking to a brick wall. Even with advanced conversation skills, breaking through resistance in that moment was a challenge.</p>
+       
+                <div style="text-align:center;margin:32px 0 18px 0;">
+                <img src="../assets/article-assets/bq-refund-1.png" alt="BigQuery Refund Script Screenshot" style="max-width:98%;border-radius:8px;box-shadow:0 2px 12px #4cae4f22;border:2px solid #b6e2b7;">
+                 </div>
+
+    <hr style="border:none;border-top:2px solid #b6e2b7;border-radius:2px;margin:32px 0 28px 0;opacity:0.55;">
+
+                <h2 style="margin-top:2em;color:#4cae4f;font-size:1.18em;">The Spark</h2>
+                <p>One day, the bottleneck was too much. Refunds were piling up, supervisors were drowning, and customers were losing patience. We needed a better system that day.</p>
+                <p>So I asked a simple question: We already use BigQuery to track ads being turned on and off. Why can’t it tell us refund history, too?</p>
+                <p>I wasn’t a data engineer. I wasn’t supposed to touch SQL. But I had two assets: curiosity and an AI co-pilot.</p>
+                <p>That was the reality override: even if it was outside my skillset, the job had to get done.</p>
+
+    <hr style="border:none;border-top:2px solid #b6e2b7;border-radius:2px;margin:32px 0 28px 0;opacity:0.55;">
+
+                <h2 style="margin-top:2em;color:#4cae4f;font-size:1.18em;">Into the Haystack</h2>
+                <p>BigQuery is a haystack of haystacks — directories upon directories of corporate data.</p>
+                <p>The AI guided me: “Look for a directory with XYZ files.”</p>
+                <p>So I searched. Screenshot. Ask. Test. Fail. Refine.</p>
+                <p>“Is this it?” Maybe. Try it. Nope. Wrong one.<br>Back into the haystack. Another directory. Another test.</p>
+                <p>I repeated that cycle again and again until I struck the right source data.</p>
+
+    <hr style="border:none;border-top:2px solid #b6e2b7;border-radius:2px;margin:32px 0 28px 0;opacity:0.55;">
+
+                <h2 style="margin-top:2em;color:#4cae4f;font-size:1.18em;">Building the Query</h2>
+                <p>Finding the data was only step one. The real challenge was stitching it together. BigQuery script confinements meant I had to be creative — tethering a dozen smaller scripts into a single powerhouse.</p>
+                <p>The final readout gave us everything we needed in seconds:</p>
+                <ul style="margin-bottom:18px;">
+                    <li>Lifetime refunds in dollars</li>
+                    <li>Refund-to-spend ratio</li>
+                    <li>Total refunds requested</li>
+                    <li>Total refunds approved in policy</li>
+                    <li>Total refunds approved as courtesy</li>
+                    <li>Date of last courtesy credit</li>
+                    <li>Eligible for Promotional Balance Increase (PBI): Y/N</li>
+                </ul>
+                <p>The entire process was reduced to:</p>
+                <ul style="margin-bottom:18px;">
+                    <li>Paste the code once.</li>
+                    <li>Paste the account ID once.</li>
+                    <li>Get instant results.</li>
+                </ul>
+                <p>The query was so light it outperformed every other script in the national database — even if you chopped theirs in half.</p>
+
+    <hr style="border:none;border-top:2px solid #b6e2b7;border-radius:2px;margin:32px 0 28px 0;opacity:0.55;">
+
+                <h2 style="margin-top:2em;color:#4cae4f;font-size:1.18em;">The Impact</h2>
+                <p>What once took 15–20 minutes now took 20 seconds — a 98% reduction in processing time.</p>
+                <ul style="margin-bottom:18px;">
+                    <li>Supervisors weren’t chained to Slack.</li>
+                    <li>Refund advocates had instant clarity.</li>
+                    <li>Customers got faster, more consistent answers.</li>
+                    <li>Leadership adopted the tool as the new standard.</li>
+                </ul>
+                <p>Most importantly, it gave us back time and headspace to educate pros — to explain policies, set expectations, and close the gap between what users thought the platform did and how it actually worked.</p>
+                <p>And it all came together in a single day, because that’s what reality demanded.</p>
+
+    <hr style="border:none;border-top:2px solid #b6e2b7;border-radius:2px;margin:32px 0 28px 0;opacity:0.55;">
+
+                <h2 style="margin-top:2em;color:#4cae4f;font-size:1.18em;">What I Learned</h2>
+                <p>The real lesson wasn’t just about refunds — it was about solving problems in messy, complex systems.</p>
+                <ul style="margin-bottom:18px;">
+                    <li>How to navigate massive datasets and zero in on the right one.</li>
+                    <li>How to recognize false leads and keep iterating until I hit gold.</li>
+                    <li>How to use AI as a co-pilot for SQL and data analysis.</li>
+                    <li>How to build modular, optimized scripts that deliver enterprise-level insights.</li>
+                </ul>
+                <p>That methodology carried into future projects: knowledge base automation, sentiment analysis, escalation tracking. Once I understood the pattern — hunt, iterate, tether, optimize — I could deliver impact across the business.</p>
+
+    <hr style="border:none;border-top:2px solid #b6e2b7;border-radius:2px;margin:32px 0 28px 0;opacity:0.55;">
+
+                <h2 style="margin-top:2em;color:#4cae4f;font-size:1.18em;">How I Did It — And You Can Too</h2>
+                <p>I wasn’t hired to write queries. I wasn’t trained as a data engineer. But by pairing curiosity with AI, I built a system that reshaped how a national company handled its number one support driver — on the fly, in one day, because it had to be done.</p>
+                <p>That’s the AI-Coordination Methodology: when reality says “no way,” you say, “we’re in charge.”</p>
+                <p>If you’re facing messy processes or overwhelming data, you can do the same. Curiosity plus AI is all it takes.</p>
+    </div>
+
+    <section class="faq-card" style="max-width:680px; margin: 32px auto 56px; padding: 24px; background:#f7f7f7; border:2px solid #4cae4f; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.06); min-height:120px; color:#222;">
+        <h2 style="color:#4cae4f; margin-top:0; margin-bottom:18px; text-shadow:0 0 12px #4cae4f88, 0 0 24px #4cae4f44;">Frequently Asked Questions</h2>
+        <div style="display:grid;gap:18px;">
+            <div>
+                <strong>Was this really built in one day?</strong>
+                <p style="margin:6px 0 0 0;">Yes. The first working version came together in a single day because the need was urgent and AI accelerated the process.</p>
+            </div>
+            <div>
+                <strong>Did you have SQL or data engineering training?</strong>
+                <p style="margin:6px 0 0 0;">No. The solution was created with AI assistance, persistence, and curiosity — not a formal data background.</p>
+            </div>
+            <div>
+                <strong>What made this query different from others at Thumbtack?</strong>
+                <p style="margin:6px 0 0 0;">It was optimized for speed and simplicity, pulling only what was needed. It outperformed larger, heavier queries in the national database.</p>
+            </div>
+            <div>
+                <strong>Why not just explain policies instead of automating refunds?</strong>
+                <p style="margin:6px 0 0 0;">Because refunds were a brick-wall moment. Automation gave us the clarity to make quick decisions, which then opened the door for education and expectation-setting.</p>
+            </div>
+            <div>
+                <strong>How does this apply beyond refunds?</strong>
+                <p style="margin:6px 0 0 0;">The same methodology has since been applied to knowledge base automation, sentiment analysis, reviews calculation, ROI tabulation and escalation management. Once you know how to navigate messy datasets with AI, the possibilities scale across operations.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="about-author-card" style="background:#f7f7f7;border-radius:18px;padding:28px 28px 22px 28px;margin:0 auto 32px auto;max-width:680px;box-shadow:0 4px 24px rgba(0,0,0,0.06);border:2px solid #4cae4f;display:flex;align-items:center;gap:22px;color:#222;">
+        
+    <img src="../assets/images/kyle.png" alt="Kyle Mohney" style="width:64px;height:64px;border-radius:50%;object-fit:cover;box-shadow:0 2px 12px rgba(34,211,238,0.10);border:2px solid #4cae4f;">
+        <div>
+            <h3 style="margin:0 0 8px 0;font-size:1.13em;font-weight:700;color:#4cae4f;letter-spacing:0.1px;text-shadow:0 0 12px #4cae4f88, 0 0 24px #4cae4f44;">About the Author</h3>
+            <div style="color:#222;font-size:1em;line-height:1.7;">Kyle J. Mohney is an operations consultant and AI solutions architect with a passion for automating complex workflows and empowering teams. He specializes in bridging the gap between business needs and technical solutions, using AI as a co-pilot for rapid, repeatable results.</div>
+        </div>
+    </section>
+
+    <div class="w2ws-share-contact-row" style="display:flex;justify-content:center;align-items:flex-start;gap:18px;margin-top:40px;">
+            <div class="universal-share-card" style="--share-card-color:#22d3ee;background:#f7f7f7;color:#222;border:2px solid #4cae4f;margin:0;">
+            <h3 class="universal-share-title" style="color:#4cae4f;text-shadow:0 0 12px #4cae4f88, 0 0 24px #4cae4f44;">Share this page</h3>
+                <div class="share-links">
+            <a href="#" target="_blank" rel="noopener">
+                <img src="../assets/icons/facebook.png" alt="Share on Facebook" class="share-icon" />
+            </a>
+            <a href="#" target="_blank" rel="noopener">
+                <img src="../assets/icons/in.png" alt="Share on LinkedIn" class="share-icon" />
+            </a>
+            <a href="#" target="_blank" rel="noopener">
+                <img src="../assets/icons/x.png" alt="Share on X" class="share-icon" />
+            </a>
+            <a href="#" onclick="navigator.clipboard.writeText(window.location.href);alert('Page link copied!');return false;">
+                <img src="../assets/icons/direct-icon.png" alt="Copy Direct Link" class="share-icon" />
+            </a>
+        </div>
+      </div>
+    <div class="universal-contact-card" style="--contact-card-color:#22d3ee;background:#f7f7f7;color:#222;border:2px solid #4cae4f;margin:0;">
+    <h3 class="universal-contact-title" style="color:#4cae4f;text-shadow:0 0 12px #4cae4f88, 0 0 24px #4cae4f44;">Connect with me</h3>
+    <div class="contact-links">
+            <a href="https://linkedin.com/in/kyle-mohney" target="_blank" rel="noopener" title="LinkedIn">
+                <img src="../assets/icons/in.png" alt="LinkedIn" class="contact-icon" />
+            </a>
+            <a href="mailto:kyle.mohney@hotmail.com" title="Email">
+                <img src="../assets/icons/mail.png" alt="Email" class="contact-icon" />
+            </a>
+            <a href="https://kmohney.youcanbook.me" target="_blank" rel="noopener" title="Schedule a Meeting">
+                <img src="../assets/icons/ycbm-icon.png" alt="You Can Book Me" class="contact-icon" />
+            </a>
+        </div>
+      </div>
+    </div>
+
+    <section class="bottom-navigation" style="border-top: 3px solid #4cae4f;">
+        <div class="bottom-nav-container">
+            <!-- Quick Navigation Only -->
+            <div class="bottom-nav-section">
+                <div class="bottom-nav-title" style="color:#4cae4f;">Quick Navigation</div>
+                <div class="bottom-nav-links">
+                    <a href="../index.html" class="bottom-nav-link" style="color:#111;">Home</a>
+                    <a href="../resume.html" class="bottom-nav-link" style="color:#111;">Resume</a>
+                    <a href="../about.html" class="bottom-nav-link" style="color:#111;">About</a>
+                    <a href="../projects.html" class="bottom-nav-link" style="color:#111;">Projects</a>
+                    <a href="../articles.html" class="bottom-nav-link" style="color:#4cae4f;font-weight:700;">Articles</a>
+                    <a href="../contact.html" class="bottom-nav-link" style="color:#111;">Contact</a>
+                </div>
+            </div>
+            <!-- Inspirational Quote -->
+            <div class="bottom-nav-section">
+                <blockquote class="article-quote">
+                    <span>“There are two educations. One should teach us how to make a living and the other how to live.”</span><br>
+                    <span class="quote-author" style="color:#4cae4f;">— John Adams</span>
+                </blockquote>
+            </div>
+        </div>
+    </section>
+    <script>
+        var hamburger = document.getElementById('hamburger');
+        var navLinks = document.getElementById('navLinks');
+        hamburger.addEventListener('click', function() {
+            navLinks.classList.toggle('open');
+        });
+        hamburger.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') navLinks.classList.toggle('open');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Training Module: Customer Support</title>
+	<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+	<!-- HIGH-TECH BACKGROUND SVG LAYER START -->
+	<div style="position:fixed;z-index:-1;top:0;left:0;width:100vw;height:100vh;pointer-events:none;overflow:hidden;background:transparent;display:flex;align-items:center;justify-content:center;">
+		<svg width="100vw" height="100vh" viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100vw;height:100vh;max-width:100vw;max-height:100vh;" preserveAspectRatio="xMidYMid slice">
+			<rect width="1920" height="1080" fill="white"/>
+			<g opacity="0.13">
+				<rect x="0" y="0" width="1920" height="1080" fill="url(#grid)"/>
+				<g stroke="#1e3a8a" stroke-width="1">
+					<rect x="100" y="100" width="300" height="200" rx="18"/>
+					<rect x="600" y="200" width="400" height="300" rx="28"/>
+					<rect x="1200" y="400" width="500" height="300" rx="38"/>
+					<path d="M200 800 Q400 900 800 700 T1600 900" fill="none"/>
+					<circle cx="400" cy="300" r="40"/>
+					<circle cx="1500" cy="700" r="60"/>
+				</g>
+				<g stroke="#1e3a8a" stroke-width="0.5">
+					<rect x="900" y="100" width="120" height="80" rx="10"/>
+					<rect x="300" y="900" width="200" height="100" rx="16"/>
+					<circle cx="1700" cy="200" r="30"/>
+				</g>
+			</g>
+			<defs>
+				<pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+					<rect x="0" y="0" width="60" height="60" fill="white"/>
+					<path d="M60 0V60M0 60H60" stroke="#1e3a8a" stroke-width="0.5"/>
+				</pattern>
+			</defs>
+		</svg>
+	</div>
+	<!-- UNIVERSAL HEADER START -->
+	<header class="universal-header">
+		<div class="header-left">
+			<img src="../assets/images/kyle.png" alt="Kyle Mohney" class="profile-pic">
+			<span class="header-name">
+				Kyle Mohney
+				<span class="header-name-glow"></span>
+			</span>
+		</div>
+		<nav>
+			<div class="nav-links" id="navLinks">
+				<a href="../index.html" class="nav-link">Home</a>
+				<a href="../resume.html" class="nav-link">Resume</a>
+				<a href="../about.html" class="nav-link">About</a>
+				<a href="../projects.html" class="nav-link">Projects</a>
+				<a href="../articles.html" class="nav-link active">Articles</a>
+				<a href="../contact.html" class="nav-link">Contact</a>
+			</div>
+			<div class="header-icons">
+				<button class="header-icon-btn" id="settings-btn" title="Settings"><span>&#9881;</span></button>
+				<button class="header-icon-btn" id="help-btn" title="Help"><span>?</span></button>
+				<button class="header-icon-btn" id="lang-btn" title="Language">EN</button>
+			</div>
+			<div class="hamburger" id="hamburger" aria-label="Open navigation" tabindex="0">
+				<span></span>
+				<span></span>
+				<span></span>
+			</div>
+		</nav>
+	</header>
+	<!-- UNIVERSAL HEADER END -->
+
+	<!-- CAROUSEL -->
+	 <!-- SUPPORT MODULE IMAGE CAROUSEL START -->
+	 <section class="support-carousel" style="width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:38px 0 0 0;">
+		 <div class="carousel-wrapper" style="max-width:820px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:0;box-shadow:0 4px 24px 0 rgba(34,42,60,0.10);border-radius:18px;background:#faf8ff;padding:40px 36px 44px 36px;width:100%;">
+			 <button class="carousel-button prev-button" aria-label="Previous image" style="font-size:2em;background:none;border:none;cursor:pointer;align-self:stretch;display:flex;align-items:center;color:#1e3a8a;">❮</button>
+			 <div class="carousel-container" style="overflow:hidden;flex:1;">
+						 <div class="support-slide active" style="display:block;text-align:center;">
+							 <img src="../projects/Support Module/m1.PNG" alt="Support Module Image 1" style="width:100%;max-width:720px;max-height:420px;object-fit:contain;border-radius:14px;box-shadow:0 2px 16px #1e3a8a22;" />
+				 </div>
+						 <div class="support-slide" style="display:none;text-align:center;">
+							 <img src="../projects/Support Module/m2.PNG" alt="Support Module Image 2" style="width:100%;max-width:720px;max-height:420px;object-fit:contain;border-radius:14px;box-shadow:0 2px 16px #1e3a8a22;" />
+				 </div>
+						 <div class="support-slide" style="display:none;text-align:center;">
+							 <img src="../projects/Support Module/m3.PNG" alt="Support Module Image 3" style="width:100%;max-width:720px;max-height:420px;object-fit:contain;border-radius:14px;box-shadow:0 2px 16px #1e3a8a22;" />
+				 </div>
+						 <div class="support-slide" style="display:none;text-align:center;">
+							 <img src="../projects/Support Module/m4.PNG" alt="Support Module Image 4" style="width:100%;max-width:720px;max-height:420px;object-fit:contain;border-radius:14px;box-shadow:0 2px 16px #1e3a8a22;" />
+				 </div>
+						 <div class="support-slide" style="display:none;text-align:center;">
+							 <img src="../projects/Support Module/m5.PNG" alt="Support Module Image 5" style="width:100%;max-width:720px;max-height:420px;object-fit:contain;border-radius:14px;box-shadow:0 2px 16px #1e3a8a22;" />
+				 </div>
+						 <div class="support-slide" style="display:none;text-align:center;">
+							 <img src="../projects/Support Module/m6.PNG" alt="Support Module Image 6" style="width:100%;max-width:720px;max-height:420px;object-fit:contain;border-radius:14px;box-shadow:0 2px 16px #1e3a8a22;" />
+				 </div>
+						 <div class="support-slide" style="display:none;text-align:center;">
+							 <img src="../projects/Support Module/m8.PNG" alt="Support Module Image 8" style="width:100%;max-width:720px;max-height:420px;object-fit:contain;border-radius:14px;box-shadow:0 2px 16px #1e3a8a22;" />
+				 </div>
+						 <div class="support-slide" style="display:none;text-align:center;">
+							 <img src="../projects/Support Module/m10.PNG" alt="Support Module Image 10" style="width:100%;max-width:720px;max-height:420px;object-fit:contain;border-radius:14px;box-shadow:0 2px 16px #1e3a8a22;" />
+				 </div>
+						 <div class="support-slide" style="display:none;text-align:center;">
+							 <img src="../projects/Support Module/m11.PNG" alt="Support Module Image 11" style="width:100%;max-width:720px;max-height:420px;object-fit:contain;border-radius:14px;box-shadow:0 2px 16px #1e3a8a22;" />
+				 </div>
+						 <div class="support-slide" style="display:none;text-align:center;">
+							 <img src="../projects/Support Module/m12.PNG" alt="Support Module Image 12" style="width:100%;max-width:720px;max-height:420px;object-fit:contain;border-radius:14px;box-shadow:0 2px 16px #1e3a8a22;" />
+				 </div>
+						 <div class="support-slide" style="display:none;text-align:center;">
+							 <img src="../projects/Support Module/m13.PNG" alt="Support Module Image 13" style="width:100%;max-width:720px;max-height:420px;object-fit:contain;border-radius:14px;box-shadow:0 2px 16px #1e3a8a22;" />
+				 </div>
+						 <div class="support-slide" style="display:none;text-align:center;">
+							 <img src="../projects/Support Module/m14.PNG" alt="Support Module Image 14" style="width:100%;max-width:720px;max-height:420px;object-fit:contain;border-radius:14px;box-shadow:0 2px 16px #1e3a8a22;" />
+				 </div>
+						 <div class="support-slide" style="display:none;text-align:center;">
+							 <img src="../projects/Support Module/m15.PNG" alt="Support Module Image 15" style="width:100%;max-width:720px;max-height:420px;object-fit:contain;border-radius:14px;box-shadow:0 2px 16px #1e3a8a22;" />
+				 </div>
+						 <div class="support-slide" style="display:none;text-align:center;">
+							 <img src="../projects/Support Module/m16.PNG" alt="Support Module Image 16" style="width:100%;max-width:720px;max-height:420px;object-fit:contain;border-radius:14px;box-shadow:0 2px 16px #1e3a8a22;" />
+				 </div>
+						 <div class="support-slide" style="display:none;text-align:center;">
+							 <img src="../projects/Support Module/m17.PNG" alt="Support Module Image 17" style="width:100%;max-width:720px;max-height:420px;object-fit:contain;border-radius:14px;box-shadow:0 2px 16px #1e3a8a22;" />
+				 </div>
+			 </div>
+			 <button class="carousel-button next-button" aria-label="Next image" style="font-size:2em;background:none;border:none;cursor:pointer;align-self:stretch;display:flex;align-items:center;color:#1e3a8a;">❯</button>
+		 </div>
+		 <div class="carousel-nav" style="text-align:center;margin-top:18px;">
+			 <div class="carousel-dot active" tabindex="0" aria-label="Go to image 1" style="display:inline-block;width:14px;height:14px;border-radius:50%;background:#1e3a8a;margin:0 6px;box-shadow:0 0 8px #1e3a8a88;"></div>
+			 <div class="carousel-dot" tabindex="0" aria-label="Go to image 2" style="display:inline-block;width:14px;height:14px;border-radius:50%;background:#dbeafe;margin:0 6px;box-shadow:0 0 4px #1e3a8a44;"></div>
+			 <div class="carousel-dot" tabindex="0" aria-label="Go to image 3" style="display:inline-block;width:14px;height:14px;border-radius:50%;background:#dbeafe;margin:0 6px;box-shadow:0 0 4px #1e3a8a44;"></div>
+			 <div class="carousel-dot" tabindex="0" aria-label="Go to image 4" style="display:inline-block;width:14px;height:14px;border-radius:50%;background:#dbeafe;margin:0 6px;box-shadow:0 0 4px #1e3a8a44;"></div>
+			 <div class="carousel-dot" tabindex="0" aria-label="Go to image 5" style="display:inline-block;width:14px;height:14px;border-radius:50%;background:#dbeafe;margin:0 6px;box-shadow:0 0 4px #1e3a8a44;"></div>
+			 <div class="carousel-dot" tabindex="0" aria-label="Go to image 6" style="display:inline-block;width:14px;height:14px;border-radius:50%;background:#dbeafe;margin:0 6px;box-shadow:0 0 4px #1e3a8a44;"></div>
+			 <div class="carousel-dot" tabindex="0" aria-label="Go to image 7" style="display:inline-block;width:14px;height:14px;border-radius:50%;background:#dbeafe;margin:0 6px;box-shadow:0 0 4px #1e3a8a44;"></div>
+			 <div class="carousel-dot" tabindex="0" aria-label="Go to image 8" style="display:inline-block;width:14px;height:14px;border-radius:50%;background:#dbeafe;margin:0 6px;box-shadow:0 0 4px #1e3a8a44;"></div>
+			 <div class="carousel-dot" tabindex="0" aria-label="Go to image 9" style="display:inline-block;width:14px;height:14px;border-radius:50%;background:#dbeafe;margin:0 6px;box-shadow:0 0 4px #1e3a8a44;"></div>
+			 <div class="carousel-dot" tabindex="0" aria-label="Go to image 10" style="display:inline-block;width:14px;height:14px;border-radius:50%;background:#dbeafe;margin:0 6px;box-shadow:0 0 4px #1e3a8a44;"></div>
+			 <div class="carousel-dot" tabindex="0" aria-label="Go to image 11" style="display:inline-block;width:14px;height:14px;border-radius:50%;background:#dbeafe;margin:0 6px;box-shadow:0 0 4px #1e3a8a44;"></div>
+			 <div class="carousel-dot" tabindex="0" aria-label="Go to image 12" style="display:inline-block;width:14px;height:14px;border-radius:50%;background:#dbeafe;margin:0 6px;box-shadow:0 0 4px #1e3a8a44;"></div>
+			 <div class="carousel-dot" tabindex="0" aria-label="Go to image 13" style="display:inline-block;width:14px;height:14px;border-radius:50%;background:#dbeafe;margin:0 6px;box-shadow:0 0 4px #1e3a8a44;"></div>
+			 <div class="carousel-dot" tabindex="0" aria-label="Go to image 14" style="display:inline-block;width:14px;height:14px;border-radius:50%;background:#dbeafe;margin:0 6px;box-shadow:0 0 4px #1e3a8a44;"></div>
+			 <div class="carousel-dot" tabindex="0" aria-label="Go to image 15" style="display:inline-block;width:14px;height:14px;border-radius:50%;background:#dbeafe;margin:0 6px;box-shadow:0 0 4px #1e3a8a44;"></div>
+			 <div class="carousel-dot" tabindex="0" aria-label="Go to image 16" style="display:inline-block;width:14px;height:14px;border-radius:50%;background:#dbeafe;margin:0 6px;box-shadow:0 0 4px #1e3a8a44;"></div>
+			 <div class="carousel-dot" tabindex="0" aria-label="Go to image 17" style="display:inline-block;width:14px;height:14px;border-radius:50%;background:#dbeafe;margin:0 6px;box-shadow:0 0 4px #1e3a8a44;"></div>
+		 </div>
+		 <script>
+			 const supportSlides = document.querySelectorAll('.support-slide');
+			 const supportDots = document.querySelectorAll('.support-carousel .carousel-dot');
+			 let supportCurrent = 0;
+			 function showSupportSlide(idx) {
+				 supportSlides.forEach((slide, i) => {
+					 slide.style.display = i === idx ? 'block' : 'none';
+					 supportDots[i].classList.toggle('active', i === idx);
+					 supportDots[i].style.background = i === idx ? '#1e3a8a' : '#dbeafe';
+					 supportDots[i].style.boxShadow = i === idx ? '0 0 8px #1e3a8a88' : '0 0 4px #1e3a8a44';
+				 });
+			 }
+			 document.querySelector('.support-carousel .prev-button').onclick = function() {
+				 supportCurrent = (supportCurrent - 1 + supportSlides.length) % supportSlides.length;
+				 showSupportSlide(supportCurrent);
+			 };
+			 document.querySelector('.support-carousel .next-button').onclick = function() {
+				 supportCurrent = (supportCurrent + 1) % supportSlides.length;
+				 showSupportSlide(supportCurrent);
+			 };
+			 supportDots.forEach((dot, i) => {
+				 dot.onclick = function() {
+					 supportCurrent = i;
+					 showSupportSlide(supportCurrent);
+				 };
+			 });
+			 showSupportSlide(supportCurrent);
+		 </script>
+	 </section>
+
+	<!-- ARTICLE BODY CARD START -->
+	<main class="article-body" style="background:#fff; border-radius:18px; box-shadow:0 4px 24px 0 rgba(34,42,60,0.10); max-width:820px; margin:40px auto 32px auto; padding:40px 36px 44px 36px; min-height:320px; display:flex; flex-direction:column; align-items:flex-start; justify-content:flex-start;">
+				<h1 style="color:#1e3a8a;font-size:2.1em;font-weight:800;letter-spacing:0.5px;margin:0 0 24px 0;line-height:1.13;text-shadow:0 2px 12px #1e3a8a22;">Training Module: Consultative Conversations for Support Advocates</h1>
+
+						<section style="width:100%;margin-bottom:32px;">
+							<div style="background:#f8fafc;border-radius:14px;padding:22px 26px 18px 26px;box-shadow:0 2px 12px #1e3a8a11;border:2px solid #1e3a8a33;max-width:420px;margin:0 0 0 0;">
+								<h2 style="color:#1e3a8a;font-size:1.13em;font-weight:800;margin:0 0 10px 0;letter-spacing:0.1px;">In This Module You’ll Learn</h2>
+								<ul style="margin-left:1.2em;margin-bottom:0;line-height:1.7;font-size:1em;">
+									<li>Why consultative conversations in customer support matter</li>
+									<li>Consultative vs. transactional support approaches</li>
+									<li>Techniques to strengthen conversations with customers:</li>
+									<li>How these techniques power the RRA Framework (Repeat, Reaffirm, Acknowledge)</li>
+									<li>Structured call flow (if–then logic) for handling pushbacks in support interactions</li>
+									<li>Common outcomes and graceful closings in customer service</li>
+								</ul>
+							</div>
+						</section>
+
+						<!-- MODULE TOP IMAGE INSERTED BELOW LEARNING OBJECTIVES -->
+						<section style="width:100%;margin-bottom:32px;">
+						<h2 style="color:#1e3a8a;font-size:1.13em;font-weight:700;margin-bottom:10px;">Introduction</h2>
+						<div style="width:100%;display:flex;justify-content:center;margin-bottom:24px;">
+							<img src="../assets/article-assets/Linkedin Posts/module2.png" alt="Module 2" style="max-width:720px;width:100%;border-radius:14px;box-shadow:0 2px 16px #1e3a8a22;" />
+						</div>
+						<p style="margin-bottom:18px;">I didn’t start my career as a trainer, or even as a supervisor. I started exactly where many of you are now — as a frontline customer support representative.</p>
+					<p style="margin-bottom:18px;">At HomeAdvisor, I worked directly with professionals and customers, handling their questions, frustrations, and urgent needs. Within a year, I was promoted to Supervisor of Escalations and Engagement, where I learned firsthand how quickly a poorly handled support conversation could snowball — and how much value could be created when a rep slowed down and built trust instead of just closing tickets.</p>
+					<p style="margin-bottom:18px;">Later, at Thumbtack, I was hired into support and immediately promoted into leadership. From there, I joined the Operations Consultant team, where each of us covered different areas of the business. My primary responsibility was escalations management — and for two full years, I was the sole manager of Thumbtack’s national escalation workflow. Every single time a customer across the country said, “I want a supervisor,” that call came directly to me.</p>
+					<p style="margin-bottom:18px;">For the first half of every shift, I lived in those conversations — handling, resolving, and learning from the toughest customer moments the company faced. For the second half, I switched hats: training reps, coaching supervisors, solving cross-team problems, writing SOPs, building knowledge base content, and even pulling SQL queries to track support trends and root causes.</p>
+					<p style="margin-bottom:18px;">Eventually, I trained others to assist and spread out the workload until a full escalation team was established. Ironically, that very success led to my layoff — once the system was built and the team was in place, they no longer needed me in the role. A victim of my own success, and a reminder that building strong, repeatable support operations systems is both the goal and the risk of operations.</p>
+					<p style="margin-bottom:18px;">Across both HomeAdvisor and Thumbtack, I’ve spent the last six years training support advocates, supervisors, and trainers on how to navigate difficult conversations with confidence. What you’ll see here is a blend of frontline customer service practice and system-level support strategy — the real frameworks that turn tense conversations into opportunities for customer trust and long-term value.</p>
+					<p style="margin-bottom:18px;">This article will not share industry secrets, but instead will highlight my own reflections paired with support industry standards, customer experience best practices, and training insights that apply to any modern support organization.</p>
+				</section>
+
+					<hr style="border:none;border-top:2.5px solid #1e3a8a22;width:96%;margin:0 auto;" />
+
+				<section style="width:100%;margin-bottom:32px;">
+					<h2 style="color:#1e3a8a;font-size:1.13em;font-weight:700;margin-bottom:10px;">1. Importance of Consultative Conversations</h2>
+					<div style="width:100%;display:flex;justify-content:center;margin-bottom:24px;">
+						<img src="../assets/article-assets/Linkedin Posts/module3.png" alt="Module 3" style="max-width:720px;width:100%;border-radius:14px;box-shadow:0 2px 16px #1e3a8a22;" />
+					</div>
+					<ul style="margin-left:1.2em;margin-bottom:18px;line-height:1.7;">
+						<li>Builds trust, reduces escalations, creates long-term customer value</li>
+						<li>Shifts from “transactional support” to relationship-driven customer service</li>
+					</ul>
+					<p style="margin-bottom:18px;">When I first started taking calls, I thought my job was simple: solve the problem, close the ticket, move on. That’s the transactional mindset most new support reps fall into — it feels efficient, but it’s short-sighted.</p>
+					<p style="margin-bottom:18px;">I learned quickly that a transactional support conversation often creates more work down the line. You might close the ticket, but the customer leaves frustrated, calls back again, or worse — leaves the platform entirely. The issue is “resolved” in the system, but the customer relationship is broken.</p>
+					<p style="margin-bottom:18px;">Escalations taught me the difference. By the time a call reached me, the customer had already been through one or two reps. They weren’t just upset about the issue — they were upset because they didn’t feel heard. If all I did was repeat the same answer faster or louder, the call would spiral.</p>
+					<p style="margin-bottom:18px;">The only way to shift the outcome was to slow down and go consultative in your support approach:</p>
+					<ul style="margin-left:1.2em;margin-bottom:18px;line-height:1.7;">
+						<li>Listen actively for the real pain point</li>
+						<li>Acknowledge their frustration with empathy</li>
+						<li>Guide them toward resolution, even if that resolution wasn’t what they originally wanted</li>
+					</ul>
+					<p style="margin-bottom:18px;">That shift changed everything. Instead of dreading escalations, I started to view them as opportunities: opportunities to build trust, protect the company’s reputation, and uncover systemic issues we needed to fix at a higher level.</p>
+					<p style="margin-bottom:18px;">A consultative customer support conversation doesn’t just resolve today’s issue — it makes tomorrow easier, for both the customer and the company.</p>
+				</section>
+
+                	<hr style="border:none;border-top:2.5px solid #1e3a8a22;width:96%;margin:0 auto;" />
+
+				<section style="width:100%;margin-bottom:32px;">
+					<h2 style="color:#1e3a8a;font-size:1.13em;font-weight:700;margin-bottom:10px;">2. Tricks / Techniques</h2>
+					<div style="width:100%;display:flex;justify-content:center;margin-bottom:24px;">
+						<img src="../assets/article-assets/Linkedin Posts/module4.png" alt="Module 4" style="max-width:720px;width:100%;border-radius:14px;box-shadow:0 2px 16px #1e3a8a22;" />
+					</div>
+					<ul style="margin-left:1.2em;margin-bottom:18px;line-height:1.7;">
+						<li>Active Listening in Customer Support → pain points, filter noise, 80/20 rule, reflect, use silence strategically</li>
+						<li>Open-Ended Probes in Support Calls → uncover deeper needs before applying RRA</li>
+						<li>Empathy vs. Sympathy in Customer Service → professionalism vs. over-identification</li>
+						<li>Common Empathy Phrases for De-escalation → toolkit for rapport</li>
+						<li>Educate & Guide Customers → set context, act as advisor</li>
+						<li>Over the Pencil (Voice Projection for Confidence) → project authority in escalations</li>
+						<li>Posture + Smile (not over the top) → confidence + warmth in customer interactions</li>
+						<li>Speak Clearly / Match Caller Rate → clarity & rapport in support calls</li>
+						<li>Tone Matching & Emotional Cues → adapt to caller’s cadence and emotional state</li>
+						<li>Ask to Ask → asking permission before giving detailed responses</li>
+					</ul>
+					<p style="margin-bottom:18px;">When you’re on the phone with a customer, every small detail in how you listen and how you speak changes the outcome. Over the years, I picked up a set of techniques that turned out to be the foundation for successful consultative conversations in customer service.</p>
+				</section>
+					<div style="width:100%;display:flex;justify-content:center;margin-bottom:24px;">
+						<img src="../assets/article-assets/Linkedin Posts/module6.png" alt="Module 6" style="max-width:720px;width:100%;border-radius:14px;box-shadow:0 2px 16px #1e3a8a22;" />
+					</div>
+				<section style="width:100%;margin-bottom:32px;">
+					<h3 style="color:#1e3a8a;font-size:1.08em;font-weight:700;margin-bottom:10px;">Active Listening</h3>
+					<p style="margin-bottom:18px;">Early on, I learned that customers often tell you ten things before they get to the real problem. “My brother had a baby, the nurse was rude, I saw a charge on my account, and now I have to go to the DMV.” Out of all of that, only one is your job: the charge. The rest is context.</p>
+					<p style="margin-bottom:18px;">Active listening in support conversations means filtering the noise, finding the signal, and then using the extra details to show empathy rather than getting lost in them.</p>
+
+					<h3 style="color:#1e3a8a;font-size:1.08em;font-weight:700;margin-bottom:10px;">Empathy vs. Sympathy</h3>
+					<p style="margin-bottom:18px;">It’s tempting to slip into sympathy — to apologize for everything the customer has said. But that often sounds hollow or puts the company at fault for things outside our control. Instead, empathy keeps it professional:</p>
+					<ul style="margin-left:1.2em;margin-bottom:18px;line-height:1.7;">
+						<li>“I can hear how frustrating that must feel.”</li>
+						<li>“I understand this is important to you.”</li>
+					</ul>
+					<p style="margin-bottom:18px;">Empathy builds rapport without making promises you can’t keep.</p>
+
+					<h3 style="color:#1e3a8a;font-size:1.08em;font-weight:700;margin-bottom:10px;">Common Empathy Phrases</h3>
+					<p style="margin-bottom:18px;">I kept a mental library of customer service empathy statements I knew worked in tough calls:</p>
+					<ul style="margin-left:1.2em;margin-bottom:18px;line-height:1.7;">
+						<li>“That makes sense, thank you for explaining.”</li>
+						<li>“I can see why that would be frustrating.”</li>
+						<li>“I understand where you’re coming from.”</li>
+					</ul>
+					<p style="margin-bottom:18px;">These statements don’t solve the problem, but they solve something more important first — the feeling of not being heard.</p>
+					<p style="margin-bottom:18px;">Imagine you’re speaking to someone in person. If you’re standing face-to-face, you’re opposite them — and psychologically, you’re at odds. Even if you agree on the topic, the conversation can feel like a debate. But when you stand side-by-side, it triggers a same-team mentality, shifting the conversation into collaboration and friendliness.</p>
+					<p style="margin-bottom:18px;">Empathy statements are your way to stand side-by-side with the customer — even over the phone or in writing.</p>
+					<p style="margin-bottom:18px;">But it’s important not to overdo empathy. You shouldn’t agree with them in a way that throws your company under the bus, like saying, “Yeah, my company is wrong, how dare they!” Instead, keep it professional and constructive: “I understand your situation, and I’m here to help.” The goal is alignment, not blame.</p>
+
+					<h3 style="color:#1e3a8a;font-size:1.08em;font-weight:700;margin-bottom:10px;">Open-Ended Probes</h3>
+					<p style="margin-bottom:18px;">Sometimes the customer’s first version of the story isn’t the full picture. Asking, “Can you walk me through what led to this?” or “What would an ideal resolution look like for you?” not only gathers detail, but shows the customer you’re invested in understanding them fully before acting.</p>
+
+					<h3 style="color:#1e3a8a;font-size:1.08em;font-weight:700;margin-bottom:10px;">Educate & Guide</h3>
+					<p style="margin-bottom:18px;">Being consultative means you’re not just a problem-solver — you’re also a guide. If I knew a refund request didn’t fit the policy, I didn’t stop at “We can’t do that.”</p>
+					<p style="margin-bottom:18px;">I explained why the policy existed, what the options were, and what other reps might not have told them yet. Educating customers builds understanding, and understanding lowers resistance.</p>
+					<p style="margin-bottom:18px;">When education alone wasn’t enough, I would guide the caller to a conversation about their overall experience to shift their perspective and build value even in the face of that one refund they couldn’t receive.</p>
+
+					<h3 style="color:#1e3a8a;font-size:1.08em;font-weight:700;margin-bottom:10px;">Posture & Smile</h3>
+					<p style="margin-bottom:18px;">This one sounds simple, but it’s real. If you’re hunched over your desk, your voice will sound flat. If you sit upright with your head level and shoulders back, your tone projects confidence and authority. Add a slight smile, and warmth comes through naturally.</p>
+					<p style="margin-bottom:18px;">Broadcasters and actors are trained the same way — they’re taught that posture isn’t just body language, it’s vocal language. Think of a news anchor: upright, balanced, confident, every word carrying weight. They know that how you sit and breathe directly shapes how your voice lands.</p>
+					<p style="margin-bottom:18px;">The trick is balance. A slight, genuine smile adds friendliness. But too much turns into the “fake customer service voice” that customers can smell from a mile away. Upright posture plus a natural half-smile equals confident and approachable — the exact tone escalated conversations require.</p>
+
+					<h3 style="color:#1e3a8a;font-size:1.08em;font-weight:700;margin-bottom:10px;">Over the Pencil</h3>
+					<p style="margin-bottom:18px;">This technique actually comes from the music world. Imagine a pencil one inch in front of your lips. If your voice projects under it, you’ll sound weak and lack conviction. If you project over it, your voice comes out clear and confident.</p>
+					<p style="margin-bottom:18px;">It was made famous by vocal coach Melissa Cross, who used it in her training program “The Zen of Screaming.” She’s worked with major artists like Corey Taylor (Slipknot/Stone Sour), Phil Labonte (All That Remains), Aaron Lewis (Staind), the Goo Goo Dolls, and countless more.</p>
+					<p style="margin-bottom:18px;">If it works for professional singers who have to project through stadium speakers, it works for us in customer support escalation management too.</p>
+					<p style="margin-bottom:18px;">In escalations, this trick kept my voice steady no matter how heated the call got — delivering clarity and authority without raising my volume.</p>
+
+					<h3 style="color:#1e3a8a;font-size:1.08em;font-weight:700;margin-bottom:10px;">Speak Clearly & Match Pace</h3>
+					<p style="margin-bottom:18px;">Mumbling, talking too fast, or shouting all erode credibility. Clear speech at a steady pace matters. At the same time, I’d subtly match the customer’s cadence.</p>
+					<p style="margin-bottom:18px;">If they were fast because they were anxious, I slowed slightly to calm them. If they were slow because they were uncertain, I mirrored enough to show patience.</p>
+
+					<h3 style="color:#1e3a8a;font-size:1.08em;font-weight:700;margin-bottom:10px;">Tone Matching & Emotional Cues</h3>
+					<p style="margin-bottom:18px;">Beyond pace, I paid attention to their emotional signals. A sharp tone meant they felt unheard — I’d soften mine. A resigned tone meant they were near acceptance — I’d stay steady and respectful.</p>
+					<p style="margin-bottom:18px;">Reading those cues often mattered more than the words they were saying.</p>
+
+					<h3 style="color:#1e3a8a;font-size:1.08em;font-weight:700;margin-bottom:10px;">Ask to Ask</h3>
+					<p style="margin-bottom:18px;">This is huge. No one likes unsolicited advice — even if they called you for help. Before giving a big explanation or policy rundown, ask permission first:</p>
+					<ul style="margin-left:1.2em;margin-bottom:18px;line-height:1.7;">
+						<li>“Do you mind if I explain how this policy works?”</li>
+						<li>“Would it be okay if I walk you through the process on our end?”</li>
+					</ul>
+							<p style="margin-bottom:18px;">Once the customer says yes, they’ve given you psychological permission to speak. They’re far more likely to listen without interrupting — because they feel like they invited the explanation.</p>
+
+					<hr style="border:none;border-top:2.5px solid #1e3a8a22;width:96%;margin:0 auto;" />
+
+							<section style="width:100%;margin-bottom:32px;">
+								<h2 style="color:#1e3a8a;font-size:1.13em;font-weight:700;margin-bottom:10px;">3. Putting It All Together: RRA Framework</h2>
+								<div style="width:100%;display:flex;justify-content:center;margin-bottom:24px;">
+									<img src="../assets/article-assets/Linkedin Posts/module7.png" alt="Module 7" style="max-width:720px;width:100%;border-radius:14px;box-shadow:0 2px 16px #1e3a8a22;" />
+								</div>
+								<p style="margin-bottom:18px;"><strong>Repeat. Reaffirm. Acknowledge.</strong></p>
+								<p style="margin-bottom:18px;">If there’s one technique that changed my career — and frankly, saved me in the fire of daily escalations — it’s this: the RRA customer service framework.</p>
+								<p style="margin-bottom:18px;">For two years, I was the sole escalation manager for Thumbtack nationwide. Every time someone said, “I want a supervisor,” they got me. And I can tell you: when a call lands on your desk at that level, the customer doesn’t just want answers. They want to feel heard. That’s where RRA shines.</p>
+
+								<h3 style="color:#1e3a8a;font-size:1.08em;font-weight:700;margin-bottom:10px;">Repeat</h3>
+								<p style="margin-bottom:18px;">The first step is to mirror back their pain point in their own words.</p>
+								<p style="margin-bottom:18px;">If they said, “I was charged after I canceled,” I’d start with:</p>
+								<blockquote style="margin:0 0 18px 0;padding:12px 18px;background:#f1f5fb;border-left:4px solid #1e3a8a;color:#232a36;">“You’re calling because you were charged even though you canceled, is that right?”</blockquote>
+								<p style="margin-bottom:18px;"><span style="color:#1e3a8a;font-weight:700;">🔑 Trainer’s Note:</span> Always be specific to their pain point. Avoid vague fillers like “That must be frustrating.” The moment you make a generalized statement, you lose them.</p>
+								<p style="margin-bottom:18px;">Instead, take their exact pain point and recite it back — condensed if necessary, but unmistakably theirs.</p>
+								<p style="margin-bottom:18px;"><span style="color:#c0392b;">❌ Wrong:</span> “That must be frustrating.” <span style="color:#15803d;">✅ Right:</span> “Unexpected charges are frustrating — I can see why you’d feel that way.”</p>
+
+								<h3 style="color:#1e3a8a;font-size:1.08em;font-weight:700;margin-bottom:10px;">Reaffirm</h3>
+								<p style="margin-bottom:18px;">Next, you layer empathy on top. Not sympathy, not blame-shifting — but professional empathy in customer support.</p>
+								<p style="margin-bottom:18px;">Example:</p>
+								<blockquote style="margin:0 0 18px 0;padding:12px 18px;background:#f1f5fb;border-left:4px solid #1e3a8a;color:#232a36;">“I understand. No one likes unexpected charges, especially when you believe you canceled.”</blockquote>
+								<p style="margin-bottom:18px;">This is where the conversation shifts from face-to-face (opposition) to side-by-side (same team). You’re no longer debating. You’re collaborating.</p>
+								<p style="margin-bottom:18px;"><span style="color:#1e3a8a;font-weight:700;">🔑 Trainer’s Note:</span> Use positive company language without slipping into “sales pitch” territory. You’re building trust, not making a pitch. And don’t apologize unless your company is directly at fault. Over-apologizing can weaken your authority and imply guilt where none exists.</p>
+
+								<h3 style="color:#1e3a8a;font-size:1.08em;font-weight:700;margin-bottom:10px;">Acknowledge</h3>
+								<p style="margin-bottom:18px;">Finally, you acknowledge action steps — without overpromising.</p>
+								<p style="margin-bottom:18px;">The best phrasing here is almost universal:</p>
+								<blockquote style="margin:0 0 18px 0;padding:12px 18px;background:#f1f5fb;border-left:4px solid #1e3a8a;color:#232a36;">“Let’s review your account and see what we can learn about those unexpected charges.”<br>“Let’s review the situation together and see what we can do to help.”</blockquote>
+								<p style="margin-bottom:18px;"><span style="color:#1e3a8a;font-weight:700;">🔑 Trainer’s Note:</span> The key is to offer to review the problem — not to promise a solution outright, unless you already know it’s within your power and policy to resolve immediately. Many situations are ambiguous and require investigation. Acknowledge what you will do next (review, research, escalate if needed) without setting false expectations.</p>
+
+								<h3 style="color:#1e3a8a;font-size:1.08em;font-weight:700;margin-bottom:10px;">The Perfect RRA</h3>
+								<p style="margin-bottom:18px;">A perfect RRA happens in 1–2 sentences:</p>
+								<ul style="margin-left:1.2em;margin-bottom:18px;line-height:1.7;">
+									<li>Repeat their specific pain point, then pause.</li>
+									<li>Let them confirm or correct you. This proves you listened and ensures alignment.</li>
+									<li>Deliver Reaffirm and Acknowledge together.</li>
+								</ul>
+								<p style="margin-bottom:18px;">It’s acceptable to do all three at once in clear-cut cases, or when call duration is a factor.</p>
+								<p style="margin-bottom:18px;">Example:</p>
+								<blockquote style="margin:0 0 18px 0;padding:12px 18px;background:#f1f5fb;border-left:4px solid #1e3a8a;color:#232a36;">“You’re calling because of an unexpected charge? I completely understand! No one likes being charged without realizing it. Let’s take a look at this situation together and see what I can do to help out!”<br><span style="color:#15803d;">👉 Repeat + Reaffirm + Acknowledge in one tight exchange. Fast, specific, empathetic, and actionable. That’s consultative customer support at its peak.</span></blockquote>
+								<p styl
+                                
+                                <hr style="border:none;border-top:2.5px solid #1e3a8a22;width:96%;margin:0 auto;" />
+
+							<section style="width:100%;margin-bottom:32px;">
+								<h2 style="color:#1e3a8a;font-size:1.13em;font-weight:700;margin-bottom:10px;">4. Call Flow (If–Then Logic for Support Conversations)</h2>
+								<div style="width:100%;display:flex;justify-content:center;margin-bottom:24px;">
+									<img src="../assets/article-assets/Linkedin Posts/module8.png" alt="Module 8" style="max-width:720px;width:100%;border-radius:14px;box-shadow:0 2px 16px #1e3a8a22;" />
+								</div>
+								<p style="margin-bottom:18px;">Every customer support call follows a rhythm. Consultative conversations in customer service aren’t about memorizing scripts — they’re about knowing the flow of support conversations so you don’t get lost when pressure rises.</p>
+								<p style="margin-bottom:18px;">Think of it as a decision tree for customer support: if the customer goes one way, you know exactly how to respond; if they go another, you’re still prepared. This structured approach prevents scrambling and ensures consistency in escalation management and de-escalation strategy.</p>
+
+								<h3 style="color:#1e3a8a;font-size:1.08em;font-weight:700;margin-bottom:10px;">Step 1: Customer Shares a Pain Point</h3>
+								<ul style="margin-left:1.2em;margin-bottom:18px;line-height:1.7;">
+									<li>Listen fully before jumping in.</li>
+									<li>Don’t cut them off — sometimes they’ll vent for 30–60 seconds before stating the actual problem.</li>
+								</ul>
+								<p style="margin-bottom:18px;"><span style="color:#1e3a8a;font-weight:700;">🔑 Note:</span> This is where active listening in customer support matters most. You’re not just waiting to talk — you’re absorbing context, emotion, and signals.</p>
+
+								<h3 style="color:#1e3a8a;font-size:1.08em;font-weight:700;margin-bottom:10px;">Step 2: Apply RRA (Repeat, Reaffirm, Acknowledge)</h3>
+								<ul style="margin-left:1.2em;margin-bottom:18px;line-height:1.7;">
+									<li>Repeat their specific pain point.</li>
+									<li>Pause and let them confirm or correct you.</li>
+									<li>Reaffirm with empathy.</li>
+									<li>Acknowledge next steps with a review (not a promise).</li>
+								</ul>
+								<p style="margin-bottom:18px;">This step ensures the customer feels heard and understood, which lowers escalation risk dramatically.</p>
+
+								<h3 style="color:#1e3a8a;font-size:1.08em;font-weight:700;margin-bottom:10px;">Step 3: Provide First Answer</h3>
+								<ul style="margin-left:1.2em;margin-bottom:18px;line-height:1.7;">
+									<li>Deliver your explanation or resolution.</li>
+									<li>Keep it short, clear, and neutral.</li>
+								</ul>
+								<p style="margin-bottom:18px;">This is your chance to resolve the issue on the first pass without unnecessary complexity.</p>
+
+								<h3 style="color:#1e3a8a;font-size:1.08em;font-weight:700;margin-bottom:10px;">Step 3b: Add Guiding Insight</h3>
+								<ul style="margin-left:1.2em;margin-bottom:18px;line-height:1.7;">
+									<li>Educate and guide them through the “why” behind the answer.</li>
+									<li>Use Ask to Ask before diving in:</li>
+								</ul>
+								<p style="margin-bottom:18px;">Once they say yes, they’re far more likely to hear you out without interruption. This transforms the conversation from transactional support to consultative customer education.</p>
+
+								<h3 style="color:#1e3a8a;font-size:1.08em;font-weight:700;margin-bottom:10px;">If Pushback 1 → Explain in More Detail</h3>
+								<ul style="margin-left:1.2em;margin-bottom:18px;line-height:1.7;">
+									<li>Break the answer down step-by-step.</li>
+									<li>Use simple, relatable language.</li>
+									<li>Keep your tone calm, steady, and professional.</li>
+								</ul>
+
+								<h3 style="color:#1e3a8a;font-size:1.08em;font-weight:700;margin-bottom:10px;">If Pushback 2 → Reaffirm & Redirect</h3>
+								<ul style="margin-left:1.2em;margin-bottom:18px;line-height:1.7;">
+									<li>Restate the answer concisely.</li>
+									<li>Try to pivot the conversation toward ROI or overall experience:</li>
+								</ul>
+								<p style="margin-bottom:18px;">This keeps focus on long-term customer value instead of a single pain point.</p>
+
+								<h3 style="color:#1e3a8a;font-size:1.08em;font-weight:700;margin-bottom:10px;">If Pushback 3 → Final Answer + Gratitude</h3>
+								<ul style="margin-left:1.2em;margin-bottom:18px;line-height:1.7;">
+									<li>Thank them for their feedback.</li>
+									<li>Reiterate that the answer will not change.</li>
+									<li>Attempt one last redirect toward value/experience.</li>
+								</ul>
+								<p style="margin-bottom:18px;">At this point, the consultative approach has maximized trust, even if the resolution isn’t what they hoped for.</p>
+
+								<h3 style="color:#1e3a8a;font-size:1.08em;font-weight:700;margin-bottom:10px;">If Redirect Declined → Wrap Up</h3>
+								<ul style="margin-left:1.2em;margin-bottom:18px;line-height:1.7;">
+									<li>Confirm that the final answer has been given.</li>
+									<li>Thank them again for their time and feedback.</li>
+									<li>End the call per company SOP: clear, polite, professional.</li>
+								</ul>
+
+								<h3 style="color:#1e3a8a;font-size:1.08em;font-weight:700;margin-bottom:10px;">If Supervisor Requested → Escalation</h3>
+								<ul style="margin-left:1.2em;margin-bottom:18px;line-height:1.7;">
+									<li>Follow company-specific escalation protocol.</li>
+									<li>Remain professional — don’t frame it as “giving in.”</li>
+									<li>Frame it as:</li>
+								</ul>
+								<p style="margin-bottom:18px;">This protects brand reputation and prevents the handoff from feeling like a failure.</p>
+
+								<p style="margin-bottom:18px;"><span style="color:#1e3a8a;font-weight:700;">🔑 Trainer’s Note:</span> This flow keeps you in control. Customers feel heard and respected at every stage, but you’re never improvising or scrambling. Whether they accept your first answer, push three times, or request a supervisor, you’ve got a clear escalation playbook.</p>
+							</section>
+
+                            	<hr style="border:none;border-top:2.5px solid #1e3a8a22;width:96%;margin:0 auto;" />
+
+                            <section style="width:100%;margin-bottom:32px;">
+					<h2 style="color:#1e3a8a;font-size:1.13em;font-weight:700;margin-bottom:10px;">5. Outcomes of Consultative Conversations</h2>
+					<div style="width:100%;display:flex;justify-content:center;margin-bottom:24px;">
+						<img src="../assets/article-assets/Linkedin Posts/module10.png" alt="Module 10" style="max-width:720px;width:100%;border-radius:14px;box-shadow:0 2px 16px #1e3a8a22;" />
+					</div>
+					<p style="margin-bottom:18px;">Not every customer support call ends with the customer walking away happy — and that’s okay. Consultative conversations in customer service are not about magically fixing every situation. They’re about maximizing trust, reducing escalations, and minimizing damage when outcomes aren’t ideal.</p>
+					<p style="margin-bottom:18px;">Here are the three most common outcomes in consultative support and escalation management:</p>
+
+					<h3 style="color:#1e3a8a;font-size:1.08em;font-weight:700;margin-bottom:10px;">Best Case: Redirect to ROI / Value Conversation</h3>
+					<p style="margin-bottom:18px;">The customer accepts your answer and is open to discussing their overall experience.</p>
+					<p style="margin-bottom:18px;">This is where you can shift the focus from the pain point to the big picture:</p>
+					<blockquote style="margin:0 0 18px 0;padding:12px 18px;background:#f1f5fb;border-left:4px solid #1e3a8a;color:#232a36;">“I understand this charge was frustrating. But overall, are you seeing the kind of results you were hoping for on the platform?”</blockquote>
+					<p style="margin-bottom:18px;">These conversations often uncover:</p>
+					<ul style="margin-left:1.2em;margin-bottom:18px;line-height:1.7;">
+						<li>Upsell opportunities</li>
+						<li>Churn risks</li>
+						<li>Systemic issues that can be addressed at the organizational level</li>
+					</ul>
+
+					<h3 style="color:#1e3a8a;font-size:1.08em;font-weight:700;margin-bottom:10px;">Middle Case: Acceptance Without Engagement</h3>
+					<p style="margin-bottom:18px;">The customer accepts your explanation begrudgingly.</p>
+					<ul style="margin-left:1.2em;margin-bottom:18px;line-height:1.7;">
+						<li>They may not want to talk about ROI or success, and that’s fine.</li>
+						<li>The key here is to stay professional and positive:</li>
+					</ul>
+					<p style="margin-bottom:18px;">The call ends without escalation, which is still a customer support win — you’ve avoided unnecessary friction while preserving professionalism.</p>
+
+					<h3 style="color:#1e3a8a;font-size:1.08em;font-weight:700;margin-bottom:10px;">Escalation: Supervisor or Higher-Level Team</h3>
+					<p style="margin-bottom:18px;">Sometimes no amount of consultative skill will prevent escalation.</p>
+					<ul style="margin-left:1.2em;margin-bottom:18px;line-height:1.7;">
+						<li>If the customer insists:</li>
+						<li>Follow escalation protocol without defensiveness.</li>
+						<li>Keep the handoff professional:</li>
+					</ul>
+					<p style="margin-bottom:18px;">By maintaining composure and empathy, you set the next rep or manager up for success instead of handing them a volatile situation.</p>
+
+					<p style="margin-bottom:18px;"><span style="color:#1e3a8a;font-weight:700;">🔑 Trainer’s Note</span><br>A “successful outcome” in customer support isn’t about avoiding escalations at all costs. It’s about:</p>
+					<ul style="margin-left:1.2em;margin-bottom:18px;line-height:1.7;">
+						<li>Keeping control of the call</li>
+						<li>Leaving the customer feeling heard and respected</li>
+						<li>Reducing tension so the next conversation (if there is one) starts at a lower boil</li>
+					</ul>
+					<p style="margin-bottom:18px;">If you follow the consultative support framework, you’ve done your job — even if the final outcome isn’t what the caller was hoping for.</p>
+				</section>
+
+                	<hr style="border:none;border-top:2.5px solid #1e3a8a22;width:96%;margin:0 auto;" />
+
+				<section style="width:100%;margin-bottom:0;">
+					<h2 style="color:#1e3a8a;font-size:1.13em;font-weight:700;margin-bottom:10px;">6. In Closing</h2>
+					<p style="margin-bottom:18px;">Consultative conversations in customer support aren’t just about solving a ticket. They’re about transforming what could have been a negative interaction into an opportunity to build customer trust and loyalty.</p>
+					<p style="margin-bottom:18px;">A transactional approach to customer service might close the ticket faster, but it leaves the customer feeling dismissed. A consultative support approach slows down just enough to:</p>
+					<ul style="margin-left:1.2em;margin-bottom:18px;line-height:1.7;">
+						<li>Listen for the real problem beneath the noise</li>
+						<li>Show empathy without over-apologizing</li>
+						<li>Guide the customer toward understanding, even when the answer isn’t what they wanted</li>
+					</ul>
+					<p style="margin-bottom:18px;">When done well, these conversations:</p>
+					<ul style="margin-left:1.2em;margin-bottom:18px;line-height:1.7;">
+						<li>Reduce escalations and repeat contacts</li>
+						<li>Protect the company’s brand reputation</li>
+						<li>Turn frustrated customers into advocates</li>
+					</ul>
+					<p style="margin-bottom:18px;">And here’s the best part: consultative conversations don’t take more time — they take more intentionality. A perfect RRA, for example, happens in just 1–2 sentences. With practice, these techniques become second nature, and you’ll find yourself spending less time de-escalating and more time having constructive, even positive conversations.</p>
+					<p style="margin-bottom:18px;">At the end of the day, your role as a support advocate is more than solving problems. It’s about creating trust, consistency, and long-term success for both the customer and the company.</p>
+				</section>
+		<style>
+			/* Brand Blue border for both cards */
+			.article-body, .about-author-card {
+				border: 2.5px solid #1e3a8a !important;
+			}
+		</style>
+
+	</main>
+
+	<!-- FAQ CARD START -->
+	<section class="faq-card" style="background:#fff; border-radius:18px; box-shadow:0 4px 24px 0 rgba(34,42,60,0.10); max-width:820px; margin:0 auto 32px auto; padding:36px 36px 32px 36px; display:flex; flex-direction:column; align-items:flex-start; border:2.5px solid #1e3a8a;">
+		<h2 style="color:#1e3a8a;font-size:1.35em;font-weight:800;letter-spacing:0.2px;margin:0 0 18px 0;">Frequently Asked Questions</h2>
+		<div style="width:100%;">
+			<div style="margin-bottom:22px;">
+				<strong style="color:#1e3a8a;">Q1: What if the customer keeps repeating themselves?</strong><br>
+				<span>A: The call flow addresses this. Answer their concern directly through RRA. If they repeat, answer again with more detail. If they keep repeating, reaffirm the final answer and transition to ROI/experience. After the third cycle, you give a resolute final answer: “I’ve given you the full information available, and this is the final answer.” At that point, you either redirect or escalate per SOP.</span>
+			</div>
+			<div style="margin-bottom:22px;">
+				<strong style="color:#1e3a8a;">Q2: Should I always apologize?</strong><br>
+				<span>A: Only when your company or an employee is actually at fault. Empathy does not mean apologizing. Nothing loses a caller faster than someone who over-apologizes. Say: “I understand why that would be frustrating,” instead of “Sorry, sorry, sorry.” Professional empathy builds trust; hollow apologies destroy it.</span>
+			</div>
+			<div style="margin-bottom:22px;">
+				<strong style="color:#1e3a8a;">Q3: What if I don’t know the answer?</strong><br>
+				<span>A: Don’t be afraid to admit it. Callers can tell when you’re stalling, rambling, or dodging. If you don’t know, be honest: “That’s a great question — let me find out for you.” Then do it. Customers respect honesty, and this often builds rapport. In fact, some of my best calls came from this — sometimes I’d even pretend not to know, just to “go and find out” and then come back with the answer, letting the victory infect them.</span>
+			</div>
+			<div style="margin-bottom:22px;">
+				<strong style="color:#1e3a8a;">Q4: What if the customer interrupts me?</strong><br>
+				<span>A: Pause before speaking, don’t try to talk over them. If they keep interrupting, use Ask to Ask: “May I share something that might help?” If they still won’t stop, place them on hold: “Would you mind holding while I check into this for you?” Wait just long enough (10–30 seconds), then return and deliver the answer immediately — the one they wouldn’t let you give. Aside from that, keep calm and stay patient; don’t let their urgency push you into rushing or fumbling.</span>
+			</div>
+			<div style="margin-bottom:22px;">
+				<strong style="color:#1e3a8a;">Q5: What if the customer is just angry and won’t calm down?</strong><br>
+				<span>A: Don’t let it get to you. The moment you show cracks, an angry caller will exploit them like a shark smelling blood. Remember: you can always ask them to hold — sometimes silence cools the heat. Other times, they just need to vent. Let them. Once the storm passes, give a serious, empathetic response. If the timing feels right, you can even use a touch of levity or humor to shift the energy.</span>
+			</div>
+			<div style="margin-bottom:22px;">
+				<strong style="color:#1e3a8a;">Q6: When should I use consultative techniques?</strong><br>
+				<span>A: Every day. Every call. Every conversation. This isn’t just for escalations — it works in routine support, too. Watch how your interactions evolve into something entirely new once you use these tools consistently.</span>
+			</div>
+			<div style="margin-bottom:0;">
+				<span style="color:#15803d;font-weight:700;">👉 These aren’t theoretical answers. They’re the exact strategies I used handling thousands of escalations, where every word mattered. Follow them, and you’ll not only survive tough calls — you’ll master them.</span>
+			</div>
+		</div>
+	</section>
+	<!-- FAQ CARD END -->
+
+	<!-- About the Author Card -->
+	<section class="about-author-card" style="background:#fff;border-radius:18px;padding:28px 28px 22px 28px;margin:0 auto 32px auto;max-width:720px;box-shadow:0 4px 24px 0 rgba(34,42,60,0.10);display:flex;align-items:center;gap:22px;color:#232a36;border:2.5px solid #4cae4f;">
+	<img src="../assets/images/kyle.png" alt="Kyle Mohney" style="width:64px;height:64px;border-radius:50%;object-fit:cover;box-shadow:0 2px 16px #1e3a8a66;border:2px solid #1e3a8a;">
+		<div>
+			<h3 style="margin:0 0 8px 0;font-size:1.13em;font-weight:700;color:#1e3a8a;letter-spacing:0.1px;text-shadow:0 0 12px #1e3a8a44, 0 0 24px #1e3a8a22;">About the Author</h3>
+			<div style="color:#232a36;font-size:1em;line-height:1.7;">Kyle J. Mohney is an operations consultant and AI solutions architect with a passion for automating complex workflows and empowering teams. He specializes in bridging the gap between business needs and technical solutions, using AI as a co-pilot for rapid, repeatable results.</div>
+		</div>
+	</section>
+
+	<!-- Universal Share and Contact Cards -->
+	<div class="w2ws-share-contact-row" style="display:flex;justify-content:center;align-items:flex-start;gap:18px;margin:40px auto 32px auto;max-width:720px;">
+		<div class="universal-share-card" style="background:#fff;color:#232a36;border:2.5px solid #1e3a8a;margin:0;flex:1 1 0;min-width:220px;max-width:320px;border-radius:16px;padding:24px 20px 20px 20px;box-shadow:0 4px 24px 0 rgba(30,58,138,0.10);display:flex;flex-direction:column;align-items:center;">
+			<h3 class="universal-share-title" style="color:#1e3a8a;text-shadow:0 0 12px #1e3a8a22, 0 0 24px #1e3a8a11;margin:0 0 14px 0;font-size:1.13em;font-weight:700;letter-spacing:0.1px;">Share this page</h3>
+			<div class="share-links" style="display:flex;gap:16px;align-items:center;justify-content:center;">
+				<a href="#" target="_blank" rel="noopener" title="Share on Facebook">
+					<img src="../assets/icons/facebook.png" alt="Share on Facebook" class="share-icon" style="width:28px;height:28px;transition:filter 0.2s;filter:brightness(0.95);" />
+				</a>
+				<a href="#" target="_blank" rel="noopener" title="Share on LinkedIn">
+					<img src="../assets/icons/in.png" alt="Share on LinkedIn" class="share-icon" style="width:28px;height:28px;transition:filter 0.2s;filter:brightness(0.95);" />
+				</a>
+				<a href="#" target="_blank" rel="noopener" title="Share on X">
+					<img src="../assets/icons/x.png" alt="Share on X" class="share-icon" style="width:28px;height:28px;transition:filter 0.2s;filter:brightness(0.95);" />
+				</a>
+				<a href="#" onclick="navigator.clipboard.writeText(window.location.href);alert('Page link copied!');return false;" title="Copy Direct Link">
+					<img src="../assets/icons/direct-icon.png" alt="Copy Direct Link" class="share-icon" style="width:28px;height:28px;transition:filter 0.2s;filter:brightness(0.95);" />
+				</a>
+			</div>
+		</div>
+		<div class="universal-contact-card" style="background:#fff;color:#232a36;border:2.5px solid #1e3a8a;margin:0;flex:1 1 0;min-width:220px;max-width:320px;border-radius:16px;padding:24px 20px 20px 20px;box-shadow:0 4px 24px 0 rgba(30,58,138,0.10);display:flex;flex-direction:column;align-items:center;">
+			<h3 class="universal-contact-title" style="color:#1e3a8a;text-shadow:0 0 12px #1e3a8a22, 0 0 24px #1e3a8a11;margin:0 0 14px 0;font-size:1.13em;font-weight:700;letter-spacing:0.1px;">Connect with me</h3>
+			<div class="contact-links" style="display:flex;gap:16px;align-items:center;justify-content:center;">
+				<a href="https://linkedin.com/in/kyle-mohney" target="_blank" rel="noopener" title="LinkedIn">
+					<img src="../assets/icons/in.png" alt="LinkedIn" class="contact-icon" style="width:28px;height:28px;transition:filter 0.2s;filter:brightness(0.95);" />
+				</a>
+				<a href="mailto:kyle.mohney@hotmail.com" title="Email">
+					<img src="../assets/icons/mail.png" alt="Email" class="contact-icon" style="width:28px;height:28px;transition:filter 0.2s;filter:brightness(0.95);" />
+				</a>
+				<a href="https://kmohney.youcanbook.me" target="_blank" rel="noopener" title="Schedule a Meeting">
+					<img src="../assets/icons/ycbm-icon.png" alt="You Can Book Me" class="contact-icon" style="width:28px;height:28px;transition:filter 0.2s;filter:brightness(0.95);" />
+				</a>
+			</div>
+		</div>
+
+	<!-- UNIVERSAL HEADER SCRIPTS -->
+	<div id="settings-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(24,28,36,0.65); z-index:2000; align-items:center; justify-content:center;">
+		<div style="background:#232a36; padding:32px 40px; border-radius:18px; box-shadow:0 8px 32px rgba(0,0,0,0.25); min-width:320px; max-width:90vw; text-align:center;">
+			<h2 style="font-size:1.3em; font-weight:800; margin-bottom:18px;">Settings</h2>
+			<p style="font-size:1.08em; margin-bottom:18px;">Settings coming soon.</p>
+			<button onclick="closeModal('settings-modal')" style="background:#181c24; color:#e0e7e9; border:none; border-radius:6px; padding:8px 18px; font-weight:700; cursor:pointer;">Close</button>
+		</div>
+	</div>
+	<div id="help-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(24,28,36,0.65); z-index:2000; align-items:center; justify-content:center;">
+		<div style="background:#232a36; padding:32px 40px; border-radius:18px; box-shadow:0 8px 32px rgba(0,0,0,0.25); min-width:320px; max-width:90vw; text-align:center;">
+			<h2 style="font-size:1.3em; font-weight:800; margin-bottom:18px;">Help & Support</h2>
+			<p style="font-size:1.08em; margin-bottom:18px;">Help content coming soon.</p>
+			<button onclick="closeModal('help-modal')" style="background:#181c24; color:#e0e7e9; border:none; border-radius:6px; padding:8px 18px; font-weight:700; cursor:pointer;">Close</button>
+		</div>
+	</div>
+	<script>
+		// Hamburger menu
+		var hamburger = document.getElementById('hamburger');
+		var navLinks = document.getElementById('navLinks');
+		hamburger.addEventListener('click', function() {
+			navLinks.classList.toggle('open');
+		});
+		hamburger.addEventListener('keypress', function(e) {
+			if (e.key === 'Enter') navLinks.classList.toggle('open');
+		});
+
+		// Settings & Help modal logic
+		document.getElementById('settings-btn').onclick = function(e) {
+			e.stopPropagation();
+			document.getElementById('settings-modal').style.display = 'flex';
+		};
+		document.getElementById('help-btn').onclick = function(e) {
+			e.stopPropagation();
+			document.getElementById('help-modal').style.display = 'flex';
+		};
+		function closeModal(id) {
+			document.getElementById(id).style.display = 'none';
+		}
+		document.addEventListener('click', function(e) {
+			if (document.getElementById('settings-modal').style.display === 'flex') document.getElementById('settings-modal').style.display = 'none';
+			if (document.getElementById('help-modal').style.display === 'flex') document.getElementById('help-modal').style.display = 'none';
+		});
+		document.getElementById('settings-modal').onclick = function(e) { e.stopPropagation(); };
+		document.getElementById('help-modal').onclick = function(e) { e.stopPropagation(); };
+
+		// Language dropdown (simple toggle)
+		const langBtn = document.getElementById('lang-btn');
+		langBtn.addEventListener('click', function(e) {
+			e.stopPropagation();
+			// Example: cycle through languages
+			const langs = ['EN', 'ES', 'FR', 'DE', 'ZH'];
+			let current = langs.indexOf(langBtn.textContent.trim());
+			langBtn.textContent = langs[(current + 1) % langs.length];
+		});
+	</script>
+
+
+</div> <!-- close w2ws-share-contact-row -->
+
+<!-- Universal Bottom Navigation - Quick Navigation Only -->
+<section class="bottom-navigation" style="margin-top: 0;">
+<style>
+	/* Page-specific override: bottom nav link text color black, except Articles is blue */
+	.bottom-navigation .bottom-nav-link {
+		color: #181c24 !important;
+	}
+	.bottom-navigation .bottom-nav-link.active {
+		color: #1e3a8a !important;
+	}
+</style>
+	<div class="bottom-nav-container">
+		<div class="bottom-nav-section">
+			<div class="bottom-nav-title" style="color:#1e3a8a;">Quick Navigation</div>
+			<div class="bottom-nav-links">
+				<a href="../index.html" class="bottom-nav-link">Home</a>
+				<a href="../resume.html" class="bottom-nav-link">Resume</a>
+				<a href="../about.html" class="bottom-nav-link">About</a>
+				<a href="../projects.html" class="bottom-nav-link">Projects</a>
+				<a href="../articles.html" class="bottom-nav-link active">Articles</a>
+				<a href="../contact.html" class="bottom-nav-link">Contact</a>
+			</div>
+		</div>
+		<div class="bottom-nav-section">
+			<blockquote class="article-quote">
+				<span>"Success is not final, failure is not fatal: it is the courage to continue that counts."</span><br>
+				<span class="quote-author" style="color:#1e3a8a;">— Marie Curie</span>
+			</blockquote>
+		</div>
+	</div>
+</section>
+</body>
+</html>

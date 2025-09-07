@@ -215,7 +215,7 @@ nav {
         z-index: 998;
         border: 1.5px solid #e0e0e0;
         padding: 8px 0 8px 0;
-        margin-top: 2px;
+    margin-top: 18px;
     }
 
     .nav-links.open {
@@ -243,9 +243,13 @@ nav {
             margin-bottom: 4px;
         }
 
+
     .header-icons {
         margin-left: 8px;
         gap: 8px;
+    }
+    .header-icon-btn {
+        display: none;
     }
 
     .hamburger {
@@ -722,6 +726,19 @@ body {
     font-family: 'Montserrat', 'Times New Roman', Times, serif;
     margin: 0;
     /* color: #111; */
+    font-weight: 400;
+    line-height: 1.7;
+    letter-spacing: 0.01em;
+}
+p {
+    line-height: 1.7;
+    letter-spacing: 0.01em;
+}
+h2, h3 {
+    font-family: 'Montserrat', 'Times New Roman', Times, serif;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: 0.01em;
 }
 
 /* ===========================================
@@ -866,9 +883,9 @@ body {
 }
 
 .article-body p {
-    font-size: 0.9em;
+    font-size: 1.01em;
     /* color: #fff; */
-    line-height: 1.6;
+    line-height: 1.7;
 }
 
 
