@@ -53,6 +53,9 @@ Secondary Green
 -Pope John Paul II
 -John Adams
 -Eleanor Rosevelt
+-Betsy Ross
+-Marie Curie
+-Peter Drucker
 
 //Notes For Coordinator
 -Degredation begins between 10-20 prompts per chat, depending on complexity of the prompts and how many images/context files were shared.
