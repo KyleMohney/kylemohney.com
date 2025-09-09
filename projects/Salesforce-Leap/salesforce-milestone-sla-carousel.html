@@ -1,0 +1,509 @@
+</style>
+<style>
+    /* Custom color for universal bottom elements */
+    .bottom-nav-title {
+        color: #15803dff !important;
+    }
+    .bottom-nav-section .quote-author {
+        color: #15803dff !important;
+        font-weight: bold;
+    }
+    .bottom-nav-link {
+        color: #111 !important;
+    }
+</style>
+</style>
+<style>
+    /* Custom color for universal bottom elements */
+    .bottom-nav-title {
+        color: #15803dff !important;
+    }
+    .bottom-nav-section .quote-author {
+        color: #15803dff !important;
+        font-weight: bold;
+    }
+</style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salesforce Milestone & SLA Workflows</title>
+    <link rel="stylesheet" href="../../styles.css">
+</head>
+<body>
+    <!-- Universal Header Start -->
+    <header class="universal-header">
+        <div class="header-left">
+            <img src="../../assets/images/kyle.png" alt="Kyle Mohney" class="profile-pic">
+            <span class="header-name">
+                Kyle Mohney
+                <span class="header-name-glow"></span>
+            </span>
+        </div>
+        <nav>
+            <div class="nav-links" id="navLinks">
+                <a href="../../index.html" class="nav-link active">Home</a>
+                <a href="../../resume.html" class="nav-link">Resume</a>
+                <a href="../../about.html" class="nav-link">About</a>
+                <a href="../../projects.html" class="nav-link">Projects</a>
+                <a href="../../articles.html" class="nav-link">Articles</a>
+                <a href="../../contact.html" class="nav-link">Contact</a>
+            </div>
+            <div class="header-icons">
+                <button class="header-icon-btn" id="settings-btn" title="Settings"><span>&#9881;</span></button>
+                <button class="header-icon-btn" id="help-btn" title="Help"><span>?</span></button>
+                <button class="header-icon-btn" id="lang-btn" title="Language">EN</button>
+            </div>
+            <div class="hamburger" id="hamburger" aria-label="Open navigation" tabindex="0">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+    <!-- Universal Header End -->
+        <!-- Hero Section (Leap style) -->
+        <section class="leap-hero-bg">
+            <div class="leap-hero-bg-pixel-gradient"></div>
+            <div class="leap-hero-bg-pixels"></div>
+            <div class="leap-hero-container">
+                <div class="leap-hero-badge">The Best Salesforce Milestone & SLA Workflows</div>
+                <h1 class="leap-hero-title">Maximize Milestones, Minimize SLA Breaches.</h1>
+                <p class="leap-hero-sub">Easily manage and visualize your Salesforce workflows for milestones, SLAs, and more. Streamline your support process and deliver on time, every time.</p>
+            </div>
+        </section>
+        <!-- End Hero Section -->
+        <main>
+            <div class="slide-container">
+                <!-- Slide 1 -->
+                <section class="slide-card">
+                    <img src="1.PNG" alt="Slide 1" />
+                </section>
+                <!-- Slide 2 -->
+                <section class="slide-card">
+                    <img src="2.PNG" alt="Slide 2" />
+                </section>
+                <!-- Slide 3 -->
+                <section class="slide-card">
+                    <img src="3.PNG" alt="Slide 3" />
+                </section>
+                <!-- Slide 4 -->
+                <section class="slide-card">
+                    <img src="4.PNG" alt="Slide 4" />
+                </section>
+                <!-- Slide 5 -->
+                <section class="slide-card">
+                    <img src="5.PNG" alt="Slide 5" />
+                </section>
+                <!-- Slide 6 -->
+                <section class="slide-card">
+                    <img src="6.PNG" alt="Slide 6" />
+                </section>
+                <!-- Slide 7 -->
+                <section class="slide-card">
+                    <img src="7.PNG" alt="Slide 7" />
+                </section>
+                <!-- Slide 8 -->
+                <section class="slide-card">
+                    <img src="8.PNG" alt="Slide 8" />
+                </section>
+                <!-- Slide 9 -->
+                <section class="slide-card">
+                    <img src="9.PNG" alt="Slide 9" />
+                </section>
+            </div>
+        </main>
+
+ 
+    <!-- Modals for Settings and Help -->
+    <div id="settings-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(24,28,36,0.65); z-index:2000; align-items:center; justify-content:center;">
+        <div style="background:#232a36; padding:32px 40px; border-radius:18px; box-shadow:0 8px 32px rgba(0,0,0,0.25); min-width:320px; max-width:90vw; text-align:center;">
+            <h2 style="font-size:1.3em; font-weight:800; margin-bottom:18px;">Settings</h2>
+            <p style="font-size:1.08em; margin-bottom:18px;">Settings coming soon.</p>
+            <button onclick="closeModal('settings-modal')" style="background:#181c24; color:#e0e7e9; border:none; border-radius:6px; padding:8px 18px; font-weight:700; cursor:pointer;">Close</button>
+        </div>
+    </div>
+    <div id="help-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(24,28,36,0.65); z-index:2000; align-items:center; justify-content:center;">
+        <div style="background:#232a36; padding:32px 40px; border-radius:18px; box-shadow:0 8px 32px rgba(0,0,0,0.25); min-width:320px; max-width:90vw; text-align:center;">
+            <h2 style="font-size:1.3em; font-weight:800; margin-bottom:18px;">Help & Support</h2>
+            <p style="font-size:1.08em; margin-bottom:18px;">Help content coming soon.</p>
+            <button onclick="closeModal('help-modal')" style="background:#181c24; color:#e0e7e9; border:none; border-radius:6px; padding:8px 18px; font-weight:700; cursor:pointer;">Close</button>
+        </div>
+    </div>
+        <style>
+            /* Leap-style hero pixel background (EXACT MATCH) */
+            .leap-hero-bg-pixel-gradient {
+                position: absolute;
+                top: 0; left: 0; right: 0; bottom: 0;
+                width: 100%; height: 100%;
+                z-index: 1;
+                pointer-events: none;
+                background-image: 
+                    radial-gradient(circle at 20px 20px, rgba(156, 163, 175, 0.15) 1px, transparent 1px),
+                    radial-gradient(circle at 60px 20px, rgba(156, 163, 175, 0.12) 1px, transparent 1px),
+                    radial-gradient(circle at 100px 20px, rgba(156, 163, 175, 0.15) 1px, transparent 1px),
+                    radial-gradient(circle at 140px 20px, rgba(156, 163, 175, 0.12) 1px, transparent 1px),
+                    radial-gradient(circle at 180px 20px, rgba(156, 163, 175, 0.15) 1px, transparent 1px),
+                    radial-gradient(circle at 220px 20px, rgba(156, 163, 175, 0.12) 1px, transparent 1px),
+                    radial-gradient(circle at 20px 60px, rgba(156, 163, 175, 0.12) 1px, transparent 1px),
+                    radial-gradient(circle at 80px 60px, rgba(156, 163, 175, 0.15) 1px, transparent 1px),
+                    radial-gradient(circle at 120px 60px, rgba(156, 163, 175, 0.12) 1px, transparent 1px),
+                    radial-gradient(circle at 160px 60px, rgba(156, 163, 175, 0.15) 1px, transparent 1px),
+                    radial-gradient(circle at 200px 60px, rgba(156, 163, 175, 0.12) 1px, transparent 1px),
+                    radial-gradient(circle at 40px 100px, rgba(156, 163, 175, 0.15) 1px, transparent 1px),
+                    radial-gradient(circle at 100px 100px, rgba(156, 163, 175, 0.12) 1px, transparent 1px),
+                    radial-gradient(circle at 140px 100px, rgba(156, 163, 175, 0.15) 1px, transparent 1px),
+                    radial-gradient(circle at 180px 100px, rgba(156, 163, 175, 0.12) 1px, transparent 1px);
+                background-size: 240px 120px;
+                background-repeat: repeat;
+            }
+            
+            /* Leap-style pixel block background */
+            .leap-hero-bg-pixels {
+                position: absolute;
+                top: 0; left: 0; right: 0; bottom: 0;
+                width: 100%; height: 100%;
+                z-index: 2;
+                pointer-events: none;
+            }
+            .leap-hero-pixel {
+                position: absolute;
+                width: 18px;
+                height: 18px;
+                background: #bcbcbc;
+                opacity: 0.13;
+                border-radius: 3px;
+                box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+                transition: opacity 0.2s;
+            }
+            @media (max-width: 700px) {
+                .leap-hero-pixel { width: 12px; height: 12px; }
+            }
+            
+            /* Leap-style Hero Section */
+            .leap-hero-bg {
+                position: relative;
+                background: #fff;
+                min-height: 18vh; /* Much shorter hero */
+                height: 320px;
+                max-height: 340px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+                border-bottom: 1px solid #e5e7eb;
+                padding-top: 48px; /* Ensure pill is visible below header */
+            }
+            
+            .leap-hero-container {
+                position: relative;
+                z-index: 10;
+                max-width: 700px;
+                margin: 0 auto;
+                text-align: center;
+                padding: 64px 16px 56px 16px;
+                background: transparent;
+            }
+            .leap-hero-badge {
+                display: inline-block;
+                background: #e5f7ee;
+                color: #1a7f5a;
+                font-weight: 700;
+                font-size: 1.05em;
+                border-radius: 22px;
+                padding: 7px 28px;
+                margin-bottom: 22px;
+                box-shadow: 0 2px 8px rgba(30, 180, 120, 0.07);
+            }
+            .leap-hero-title {
+                font-size: 2.7em;
+                font-weight: 900;
+                color: #181c24;
+                margin-bottom: 18px;
+                letter-spacing: -1px;
+            }
+            .leap-hero-sub {
+                font-size: 1.25em;
+                color: #232a36;
+                margin-bottom: 32px;
+                font-weight: 400;
+            }
+            .leap-hero-btns {
+                display: flex;
+                gap: 18px;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            .leap-btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.08em;
+                font-weight: 700;
+                border-radius: 10px;
+                padding: 13px 32px;
+                text-decoration: none;
+                transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+                box-shadow: 0 2px 8px rgba(30, 180, 220, 0.07);
+                border: none;
+                cursor: pointer;
+            }
+            .leap-btn-primary {
+                background: #2563eb;
+                color: #fff;
+                box-shadow: 0 2px 12px rgba(37,99,235,0.13);
+            }
+            .leap-btn-primary:hover {
+                background: #1a7f5a;
+                color: #fff;
+            }
+            .leap-btn-outline {
+                background: #fff;
+                color: #232a36;
+                border: 2px solid #232a36;
+            }
+            .leap-btn-outline:hover {
+                background: #e5f7ee;
+                color: #1a7f5a;
+                border-color: #1a7f5a;
+            }
+            @media (max-width: 600px) {
+                .leap-hero-title { font-size: 1.5em; }
+                .leap-hero-container { padding: 36px 6px 28px 6px; }
+            }
+        </style>
+        <style>
+          /* Slide Cards Styling */
+          .slide-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+          }
+          .slide-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(21,128,61,0.08), 0 2px 8px rgba(36,42,50,0.06);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+          }
+          .slide-card img {
+            width: 100%;
+            height: auto;
+            max-width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            object-fit: contain;
+          }
+          @media (max-width: 768px) {
+            .slide-container { padding: 20px 8px; gap: 20px; }
+            .slide-card { padding: 12px; min-height: 250px; }
+          }
+        </style>
+                <style>
+                    body, html {
+                        font-family: 'Inter', 'Segoe UI', 'Roboto', Arial, sans-serif;
+                        background: #fff;
+                        color: #232a36;
+                    }
+                    .leap-card-stack-container {
+                        max-width: 900px;
+                        margin: 0 auto;
+                        padding: 36px 16px 48px 16px;
+                        display: flex;
+                        flex-direction: column;
+                        gap: 32px;
+                    }
+                    .leap-card {
+                        background: #fff;
+                        border-radius: 22px;
+                        box-shadow: 0 4px 24px 0 rgba(21,128,61,0.08), 0 1.5px 6px 0 rgba(36,42,50,0.07);
+                        padding: 32px 28px 28px 28px;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: flex-start;
+                        position: relative;
+                        min-height: 180px;
+                    }
+                    .leap-card-visual {
+                        width: 100%;
+                        height: 70px;
+                        background: linear-gradient(90deg, #e5f7ee 30%, #fff 100%);
+                        border-radius: 14px;
+                        margin-bottom: 18px;
+                        box-shadow: 0 2px 8px 0 rgba(21,128,61,0.07);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: #b0b6be;
+                        font-size: 1.2em;
+                    }
+                    .leap-card-header {
+                        color: #15803d;
+                        font-size: 1.35em;
+                        font-weight: 800;
+                        margin-bottom: 12px;
+                        margin-top: 0;
+                        letter-spacing: -0.5px;
+                    }
+                    .leap-card p {
+                        font-size: 1.08em;
+                        margin: 0 0 0.5em 0;
+                        line-height: 1.6;
+                    }
+                    .leap-card-footer {
+                        margin-top: 18px;
+                        font-size: 0.98em;
+                        color: #6b7280;
+                        font-style: italic;
+                    }
+                    @media (max-width: 700px) {
+                        .leap-card-stack-container { padding: 18px 2vw 28px 2vw; }
+                        .leap-card { padding: 18px 8px 18px 8px; }
+                        .leap-card-visual { height: 44px; }
+                        .leap-card-header { font-size: 1.08em; }
+                    }
+                </style>
+        <script>
+    // Wait for DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- Leap-style pixel block background ---
+        (function() {
+            const container = document.querySelector('.leap-hero-bg-pixels');
+            if (!container) {
+                console.warn('Hero pixels container not found');
+                return;
+            }
+            const hero = document.querySelector('.leap-hero-bg');
+            if (!hero) {
+                console.warn('Hero background not found');
+                return;
+            }
+            
+            const width = hero.offsetWidth;
+            const height = hero.offsetHeight;
+            const cols = 32;
+            const rows = 8;
+            
+            console.log('Generating hero pixels...', { width, height, cols, rows });
+            
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    // Randomly skip some pixels for a scattered look
+                    if (Math.random() < 0.22 + 0.08 * (r/rows)) continue;
+                    const pixel = document.createElement('div');
+                    pixel.className = 'leap-hero-pixel';
+                    // X/Y position as percent for responsiveness
+                    const left = (c + Math.random()*0.3) / cols * 100;
+                    const top = (r + Math.random()*0.3) / rows * 100;
+                    pixel.style.left = left + '%';
+                    pixel.style.top = top + '%';
+                    // Fade out toward the top
+                    pixel.style.opacity = (0.18 + 0.7 * (r/(rows-1))) * (0.7 + 0.3*Math.random());
+                    // Randomize gray shade
+                    const gray = 180 + Math.floor(Math.random()*50);
+                    pixel.style.background = `rgb(${gray},${gray},${gray})`;
+                    container.appendChild(pixel);
+                }
+            }
+            console.log('Hero pixels generated successfully');
+        })();
+
+        // Hamburger menu
+        var hamburger = document.getElementById('hamburger');
+        var navLinks = document.getElementById('navLinks');
+        if (hamburger && navLinks) {
+            hamburger.addEventListener('click', function() {
+                navLinks.classList.toggle('open');
+            });
+            hamburger.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') navLinks.classList.toggle('open');
+            });
+        }
+
+        // Settings & Help modal logic
+        const settingsBtn = document.getElementById('settings-btn');
+        const helpBtn = document.getElementById('help-btn');
+        const settingsModal = document.getElementById('settings-modal');
+        const helpModal = document.getElementById('help-modal');
+        
+        if (settingsBtn && settingsModal) {
+            settingsBtn.onclick = function(e) {
+                e.stopPropagation();
+                settingsModal.style.display = 'flex';
+            };
+        }
+        
+        if (helpBtn && helpModal) {
+            helpBtn.onclick = function(e) {
+                e.stopPropagation();
+                helpModal.style.display = 'flex';
+            };
+        }
+        
+        // Close modal functions
+        window.closeModal = function(id) {
+            const modal = document.getElementById(id);
+            if (modal) modal.style.display = 'none';
+        };
+        
+        // Click outside to close modals
+        document.addEventListener('click', function(e) {
+            if (settingsModal && settingsModal.style.display === 'flex') settingsModal.style.display = 'none';
+            if (helpModal && helpModal.style.display === 'flex') helpModal.style.display = 'none';
+        });
+        
+        // Prevent modal content clicks from closing modal
+        if (settingsModal) {
+            settingsModal.onclick = function(e) { e.stopPropagation(); };
+        }
+        if (helpModal) {
+            helpModal.onclick = function(e) { e.stopPropagation(); };
+        }
+
+        // Language dropdown (simple toggle)
+        const langBtn = document.getElementById('lang-btn');
+        if (langBtn) {
+            langBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                // Example: cycle through languages
+                const langs = ['EN', 'ES', 'FR', 'DE', 'ZH'];
+                let current = langs.indexOf(langBtn.textContent.trim());
+                langBtn.textContent = langs[(current + 1) % langs.length];
+            });
+        }
+    });
+    </script>
+    <!-- Universal Bottom Navigation - Quick Navigation Only -->
+    <section class="bottom-navigation" style="margin-top: 0;">
+        <div class="bottom-nav-container">
+            <!-- Quick Navigation Only -->
+            <div class="bottom-nav-section">
+                <div class="bottom-nav-title">Quick Navigation</div>
+                <div class="bottom-nav-links">
+                    <a href="../../index.html" class="bottom-nav-link active">Home</a>
+                    <a href="../../resume.html" class="bottom-nav-link">Resume</a>
+                    <a href="../../about.html" class="bottom-nav-link">About</a>
+                    <a href="../../projects.html" class="bottom-nav-link">Projects</a>
+                    <a href="../../articles.html" class="bottom-nav-link">Articles</a>
+                    <a href="../../contact.html" class="bottom-nav-link">Contact</a>
+                </div>
+            </div>
+
+            <!-- Inspirational Quote -->
+            <div class="bottom-nav-section">
+                <blockquote class="article-quote">
+                    <span>“AI is not destiny. We must choose wisely. We must design intentionally. And we must keep humans at the centre of this revolution.”</span><br>
+                    <span class="quote-author">— Mark Benioff (CEO: <span style="color:#2563eb;font-weight:bold;">Salesforce</span>)</span>
+                </blockquote>
+            </div>
+        </div>
+    </section>
+</body>
+</html>
