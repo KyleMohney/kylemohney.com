@@ -1,0 +1,129 @@
+//========================
+// AI PROMPT LIBRARY CREATION SYSTEM
+//========================
+
+// === PROJECT OVERVIEW ===
+Create kylemohney.com/prompts - Enterprise-grade AI prompt library showcasing systematic impossibility coordination methodology. Target audience: $200k AI PM recruiters and C-suite executives evaluating AI coordination capabilities.
+
+// === DESIGN ARCHITECTURE ===
+
+Universal Components (READ ONLY from style.css):
+- Universal Header
+- Universal Share & Contact Card  
+- Universal Bottom Navigation
+- Font families, sizing, spacing, weight rules
+- Mobile scaling breakpoints
+
+Page-Specific Components (INLINE only):
+- Hero section with search functionality
+- Category filter bar
+- 3-column prompt card grid (desktop) / 1-column (mobile)
+- Modal popup for prompt preview
+- Color-coding system for prompt tiers
+
+// === VISUAL HIERARCHY ===
+
+Hero Section:
+- Page title: "AI Prompt Library"
+- Subtitle: "Enterprise-Grade Systematic Coordination Templates"
+- Search bar with real-time filtering
+- Complexity legend (●●● = Expert, ●● = Intermediate, ● = Standard)
+
+// === FILTER BAR ===
+All Files (default)
+Strategic (C-suite)
+Operational (Department)
+Financial (CFO/Finance)
+R&D/Competitive (Intel)
+Technical (Infrastructure)
+Lifestyle (Personal)
+
+// === COLOR CODING SYSTEM ===
+Tier Badges:
+Strategic: #8B5CF6 (Purple) - C-suite level prompts
+Operational: #3B82F6 (Blue) - Department head prompts
+Financial: #10B981 (Green) - CFO/finance team prompts
+R&D: #DC2626 (Red) - Competitive intelligence
+Technical: #6B7280 (Gray) - Infrastructure/systems
+Lifestyle: #F97316 (Orange) - Personal optimization
+
+Complexity Indicators:
+- Expert (●●●): #DC2626 (Red)
+- Intermediate (●●): #F59E0B (Orange)  
+- Standard (●): #10B981 (Green)
+
+// === CARD STRUCTURE ===
+
+Each prompt card contains:
+- Tier badge (top-left)
+- Complexity dots (top-right)
+- Prompt title (bold, 18px)
+- 2-line description (14px, muted)
+- Tag pills (small, rounded)
+- Action buttons: [PREVIEW] [COPY] [CUSTOMIZE]
+
+// === DATA STRUCTURE ===
+
+JSON format with required fields:
+- id: unique identifier
+- title: prompt name
+- tier: strategic/operational/financial/rd/technical
+- complexity: 1-3 (dots)
+- description: 2-sentence max
+- prompt: full template text
+- variables: array of customizable elements
+- tags: array for filtering
+- use_cases: array of applications
+
+// === INTERACTION PATTERNS ===
+
+Search Functionality:
+- Real-time filtering by title, description, tags
+- Category buttons toggle active state
+- Results counter shows filtered total
+
+Modal Behavior:
+- Preview opens full prompt with variables highlighted
+- Copy button provides clipboard functionality with success toast
+- Customize option allows variable editing before copy
+
+// === PROFESSIONAL STANDARDS ===
+
+Content Guidelines:
+- Every prompt must demonstrate enterprise-level thinking
+- Include context setting, structured outputs, validation protocols
+- Show systematic approach to complex business problems
+- Emphasize measurable outcomes and stakeholder communication
+
+Technical Requirements:
+- Mobile-first responsive design
+- Keyboard navigation support
+- Loading states for search
+- Accessible color contrast ratios
+- Clean, semantic HTML structure
+
+// === SUCCESS METRICS ===
+
+The library should communicate:
+- Sophisticated AI coordination methodology
+- Enterprise-scale systematic thinking  
+- Professional prompt engineering expertise
+- Strategic business problem-solving capability
+- Technical implementation competence
+
+// === CODING STANDARDS ===
+
+Follow existing system prompt rules:
+- Adequate code notation for all sections
+- Universal components drawn from style.css precisely
+- Inline color rules, no style.css modifications
+- Clean injection zones, no spaghetti code
+- Mobile scaling through existing style.css rules
+
+// === STRATEGIC POSITIONING ===
+
+This library serves dual purpose:
+1. Functional tool for AI coordination work
+2. Professional credibility demonstration for $200k AI PM roles
+
+Visual sophistication and systematic organization must reflect the caliber of professional who commands executive-level compensation for AI coordination expertise.

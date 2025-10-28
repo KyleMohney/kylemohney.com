@@ -1,0 +1,338 @@
+<!--
+╔════════════════════════════════════════════════════════════════════╗
+║  ROOTED VITALITY, INC.                                             ║
+║  File: articles/lead-followup-practices.html                       ║
+║  Purpose: Article — Best Practices for Lead Follow-Up              ║
+║  Holistic Wellness · Modern Connection Platform                    ║
+║  rootedvitality.com | 2025                                         ║
+╚════════════════════════════════════════════════════════════════════╝
+
+TABLE OF CONTENTS
+  1. HEAD: Metadata, Fonts & Styles
+  2. BODY: Article Structure
+  3. HERO: Lead Follow-Up Best Practices
+  4. SECTION 1: The Follow-Up Framework
+  5. SECTION 2: Communication Strategies
+  6. SECTION 3: Tracking & Optimization
+  7. SCRIPTS: Back Button Navigation
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lead Follow-Up Best Practices | Rooted Vitality Help Center</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700&family=Lora:wght@400&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --rooted-primary: #5c9a72;
+            --rooted-accent: #d4c47c;
+            --rooted-neutral: #f7f5f1;
+            --rooted-dark: #2e2b28;
+            --rooted-white: rgba(255, 255, 255, 0.70);
+        }
+        
+        html {
+            background: var(--rooted-neutral);
+            min-width: 360px;
+        }
+        
+        body {
+            font-family: 'Lora', serif;
+            color: var(--rooted-dark);
+            margin: 0;
+            padding: 0;
+            position: relative;
+        }
+        
+        /* Logo Watermark */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 1600px;
+            height: 1600px;
+            background: url('../assets/logo_large.png') center/contain no-repeat;
+            opacity: 0.08;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        /* Tablet: Scale down watermark */
+        @media (max-width: 1024px) {
+            body::before {
+                width: 1200px;
+                height: 1200px;
+                opacity: 0.10;
+                left: 50% !important;
+                transform: translate(-50%, -50%) !important;
+            }
+        }
+        
+        /* Mobile: Further scale and center it */
+        @media (max-width: 768px) {
+            body::before {
+                width: 900px;
+                height: 900px;
+                opacity: 0.12;
+                left: 50% !important;
+                transform: translate(-50%, -50%) !important;
+            }
+        }
+        
+        /* Small Mobile: Even tighter and center it */
+        @media (max-width: 480px) {
+            body::before {
+                width: 700px;
+                height: 700px;
+                opacity: 0.14;
+                left: 50% !important;
+                transform: translate(-50%, -50%) !important;
+            }
+        }
+        
+        h1, h2, h3 {
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+        }
+        
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Back Button */
+        .back-button {
+            display: inline-block;
+            padding: 0.6rem 1.2rem;
+            background: var(--rooted-white);
+            border: 2px solid var(--rooted-primary);
+            border-radius: 8px;
+            color: var(--rooted-primary);
+            text-decoration: none;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 2rem;
+        }
+        
+        .back-button:hover {
+            background: var(--rooted-primary);
+            color: var(--rooted-white);
+        }
+        
+        .back-button:focus {
+            outline: 2px solid var(--rooted-accent);
+            outline-offset: 2px;
+        }
+        
+        /* Article Header */
+        .article-header {
+            margin-bottom: 2rem;
+        }
+        
+        .article-title {
+            font-size: 2rem;
+            color: var(--rooted-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .article-meta {
+            font-size: 0.9rem;
+            color: #8a8a8a;
+            font-style: italic;
+        }
+        
+        /* Article Content */
+        .article-content {
+            background: var(--rooted-white);
+            border-radius: 12px;
+            padding: 2rem 1.5rem;
+            box-shadow: 0 2px 12px rgba(46,43,40,0.08);
+            line-height: 1.8;
+        }
+        
+        .article-content h2 {
+            color: var(--rooted-primary);
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .article-content h3 {
+            color: var(--rooted-accent);
+            font-size: 1.2rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.8rem;
+        }
+        
+        .article-content p {
+            margin-bottom: 1rem;
+            color: var(--rooted-dark);
+        }
+        
+        .article-content ul, .article-content ol {
+            margin-bottom: 1.5rem;
+            padding-left: 2rem;
+        }
+        
+        .article-content li {
+            margin-bottom: 0.8rem;
+            color: var(--rooted-dark);
+        }
+        
+        .highlight-box {
+            background: rgba(92,154,114,0.08);
+            border-left: 4px solid var(--rooted-primary);
+            padding: 1rem 1.2rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            font-style: italic;
+        }
+        
+        .timeline {
+            background: rgba(212,196,124,0.05);
+            border: 1px solid var(--rooted-accent);
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin: 1.5rem 0;
+        }
+        
+        .timeline h3 {
+            margin-top: 0;
+            color: var(--rooted-primary);
+        }
+        
+        .timeline-item {
+            margin-bottom: 1rem;
+            border-left: 3px solid var(--rooted-accent);
+            padding-left: 1rem;
+        }
+        
+        .timeline-item strong {
+            color: var(--rooted-primary);
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 1rem 0.5rem;
+            }
+            
+            .article-title {
+                font-size: 1.5rem;
+            }
+            
+            .article-content {
+                padding: 1.2rem 0.7rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="../index.html" class="back-button">← Back to Help Center</a>
+        
+        <div class="article-header">
+            <h1 class="article-title">Lead Follow-Up Best Practices</h1>
+            <div class="article-meta">Last updated: October 2025</div>
+        </div>
+        
+        <div class="article-content">
+            <h2>Why Follow-Up Matters</h2>
+            <p>In the pay-per-lead model, you've already paid for the lead. Now it's your responsibility to convert that lead into a consultation or client engagement. The quality of your follow-up directly impacts your ROI and your profitability.</p>
+            
+            <p>Research shows that practitioners who respond quickly and follow a structured follow-up sequence convert leads at rates 5-10x higher than those who don't.</p>
+            
+            <h2>The Golden Rule: Speed & Personalization</h2>
+            <p>Leads lose interest fast. When a potential client inquires about your services, they're often comparing you with other practitioners simultaneously. Being the first to respond, with a personalized message, gives you a significant advantage.</p>
+            
+            <div class="highlight-box">
+                <strong>Response Time Impact:</strong> Practitioners who respond within 1 hour convert 40% more leads than those who wait 24+ hours.
+            </div>
+            
+            <h2>Initial Contact Strategy</h2>
+            
+            <h3>1. Respond Immediately</h3>
+            <p>Aim to contact leads within 1 hour of receiving them. Use the communication method they prefer (phone, email, text, or in-app messaging). Show enthusiasm and professionalism.</p>
+            
+            <h3>2. Personalize Your Message</h3>
+            <p>Reference specific details from the lead's inquiry. For example: "Hi Sarah, I saw you're interested in stress management coaching—I specialize in working with healthcare professionals facing burnout. I'd love to chat about how I can help."</p>
+            
+            <h3>3. Offer Immediate Value</h3>
+            <p>Lead with what they'll get, not what you want. Share a brief insight, answer a question, or offer a free 15-minute consultation call to assess fit before they commit to anything.</p>
+            
+            <h3>4. Make Booking Easy</h3>
+            <p>Provide 2-3 specific time slots for a consultation. Reduce friction—every additional step a potential client must take decreases the likelihood they'll book.</p>
+            
+            <h2>Follow-Up Timeline</h2>
+            <div class="timeline">
+                <h3>Recommended Follow-Up Sequence</h3>
+                <div class="timeline-item">
+                    <strong>Within 1 Hour:</strong> Initial contact—respond to their inquiry with personalized message and offer to discuss their needs.
+                </div>
+                <div class="timeline-item">
+                    <strong>Within 24 Hours (if no response):</strong> Second touchpoint—send a brief follow-up message or call if appropriate.
+                </div>
+                <div class="timeline-item">
+                    <strong>3 Days Later (if still no response):</strong> Final attempt—try a different communication channel (e.g., if you emailed, try calling; if you called, try text).
+                </div>
+                <div class="timeline-item">
+                    <strong>After 3-5 days of no response:</strong> Move on—prioritize warm leads and new incoming leads. Document the attempt for your records.
+                </div>
+            </div>
+            
+            <h2>Conversation Tips</h2>
+            
+            <h3>Listen More Than You Sell</h3>
+            <p>Ask open-ended questions about their health goals, pain points, and past experiences. Understanding their situation helps you demonstrate how you're the right fit.</p>
+            
+            <h3>Qualify the Lead</h3>
+            <p>Early on, confirm they're a genuine fit. If they're not, be honest and gracious. Recommend another practitioner if possible. This builds trust and reputation.</p>
+            
+            <h3>Address Objections Calmly</h3>
+            <p>Common objections include: "I need to think about it," "I'm not sure about the cost," or "I don't have time now." Acknowledge these concerns and offer solutions, such as flexible scheduling or payment options.</p>
+            
+            <h3>Confirm Next Steps Clearly</h3>
+            <p>Whether they book, want to follow up later, or aren't ready yet—confirm the next step explicitly. For example: "Perfect! I've scheduled you for Tuesday at 2 PM. I'll send you a confirmation email with the Zoom link and my phone number."</p>
+            
+            <h2>Common Mistakes to Avoid</h2>
+            <ul>
+                <li><strong>Being too pushy:</strong> Pressure tactics damage trust. Give them space to decide.</li>
+                <li><strong>Generic messaging:</strong> "I saw your inquiry" feels cold. Use their name and reference their specific needs.</li>
+                <li><strong>Multiple channels at once:</strong> It's overwhelming. Pick one primary method and follow up through another only if needed.</li>
+                <li><strong>Not following up:</strong> Silence suggests disinterest. A structured follow-up sequence shows professionalism.</li>
+                <li><strong>Giving up too soon:</strong> Sometimes leads need 2-3 touchpoints. Persistence (not pushiness) often wins.</li>
+            </ul>
+            
+            <h2>Tracking & Optimization</h2>
+            <p>Keep notes on each lead interaction. Track:</p>
+            <ul>
+                <li>When you contacted them and by what method</li>
+                <li>Their response (booked, not interested, needs follow-up later)</li>
+                <li>Time to conversion (how long between first contact and booking)</li>
+                <li>Whether they became a repeat client</li>
+            </ul>
+            
+            <p>After 10-20 leads, review your data. Which follow-up approaches work best for you? Refine your strategy based on what converts.</p>
+            
+            <div class="highlight-box">
+                <strong>Remember:</strong> Every lead represents an investment on your part. Treat follow-up as a core business skill that directly impacts your bottom line.
+            </div>
+        </div>
+    </div>
+</body>
+</html>

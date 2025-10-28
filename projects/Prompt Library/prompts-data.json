@@ -1,0 +1,627 @@
+[
+  {
+    "id": "executive-quarterly-analysis",
+    "title": "Executive Quarterly Analysis",
+    "tier": "strategic",
+    "complexity": 3,
+    "description": "Comprehensive business performance analysis for C-suite presentation with strategic recommendations and risk assessment.",
+    "prompt": "You are a senior business analyst preparing an executive briefing for [COMPANY]'s [QUARTER] performance. Analyze the following data and provide: Executive Summary (2 paragraphs max), Key Performance Indicators analysis, Strategic recommendations with implementation timelines, Risk assessment with mitigation strategies. Structure your response for board-level consumption.",
+    "variables": ["COMPANY", "QUARTER", "KPI_DATA", "TIMEFRAME"],
+    "tags": ["executive", "quarterly", "analysis", "c-suite", "performance"]
+  },
+  {
+    "id": "competitive-intelligence-framework",
+    "title": "Competitive Intelligence Deep Dive",
+    "tier": "rd",
+    "complexity": 3,
+    "description": "Systematic competitive analysis with market positioning assessment and strategic vulnerability identification.",
+    "prompt": "Acting as a competitive intelligence analyst, conduct comprehensive analysis of [COMPETITOR] in [INDUSTRY]. Provide: Market positioning assessment, Product/service gap analysis, Pricing strategy evaluation, Strategic vulnerabilities identification, Recommended countermeasures with implementation roadmap. Format as strategic intelligence brief.",
+    "variables": ["COMPETITOR", "INDUSTRY", "FOCUS_AREA", "ANALYSIS_DEPTH"],
+    "tags": ["competitive", "intelligence", "market", "strategy", "analysis"]
+  },
+  {
+    "id": "board-deck-preparation",
+    "title": "Board Presentation Framework",
+    "tier": "strategic",
+    "complexity": 2,
+    "description": "Executive board presentation structure with stakeholder alignment and decision-making frameworks.",
+    "prompt": "You are preparing a board presentation for [COMPANY] on [TOPIC]. Create presentation outline with: Opening executive summary, Key stakeholder concerns addressed, Data-driven recommendations, Financial impact analysis, Next steps with clear ownership. Ensure content addresses board fiduciary responsibilities.",
+    "variables": ["COMPANY", "TOPIC", "STAKEHOLDERS", "DECISION_TYPE"],
+    "tags": ["board", "presentation", "executive", "stakeholder", "decision"]
+  },
+  {
+    "id": "market-entry-strategy",
+    "title": "Market Entry Strategic Analysis",
+    "tier": "rd",
+    "complexity": 3,
+    "description": "Comprehensive market entry evaluation with competitive positioning and resource allocation recommendations.",
+    "prompt": "As a market strategy consultant, analyze [COMPANY]'s potential entry into [MARKET]. Provide: Market size and growth analysis, Competitive landscape assessment, Entry barriers and opportunities, Resource requirements estimation, Go-to-market strategy with phased approach. Include risk mitigation strategies.",
+    "variables": ["COMPANY", "MARKET", "ENTRY_TYPE", "RESOURCES"],
+    "tags": ["market-entry", "strategy", "competitive", "growth", "analysis"]
+  },
+  {
+    "id": "department-process-optimization",
+    "title": "Department Process Optimization",
+    "tier": "operational",
+    "complexity": 2,
+    "description": "Systematic workflow analysis and improvement recommendations for department-level efficiency gains.",
+    "prompt": "You are an operations consultant analyzing [DEPARTMENT]'s current processes at [COMPANY]. Evaluate: Current workflow mapping, Bottleneck identification, Resource utilization analysis, Improvement recommendations with ROI projections, Implementation timeline with change management considerations.",
+    "variables": ["DEPARTMENT", "COMPANY", "PROCESS_TYPE", "METRICS"],
+    "tags": ["operations", "process", "optimization", "efficiency", "workflow"]
+  },
+  {
+    "id": "cross-functional-coordination",
+    "title": "Cross-Functional Project Coordination",
+    "tier": "operational",
+    "complexity": 2,
+    "description": "Multi-department project coordination framework with stakeholder alignment and communication protocols.",
+    "prompt": "Acting as a project coordinator, design coordination framework for [PROJECT] involving [DEPARTMENTS]. Include: Stakeholder responsibility matrix, Communication protocols and cadence, Decision-making authority structure, Risk escalation procedures, Progress tracking and reporting mechanisms.",
+    "variables": ["PROJECT", "DEPARTMENTS", "TIMELINE", "STAKEHOLDERS"],
+    "tags": ["coordination", "cross-functional", "project", "stakeholders", "communication"]
+  },
+  {
+    "id": "financial-impact-modeling",
+    "title": "Financial Impact Assessment",
+    "tier": "financial",
+    "complexity": 3,
+    "description": "Comprehensive financial modeling for strategic decisions with scenario analysis and risk quantification.",
+    "prompt": "You are a financial analyst evaluating [INITIATIVE] for [COMPANY]. Provide: Cost-benefit analysis with 3-year projections, Scenario modeling (best/base/worst case), ROI calculations with sensitivity analysis, Cash flow impact assessment, Risk quantification with mitigation costs. Present in executive summary format.",
+    "variables": ["INITIATIVE", "COMPANY", "TIMEFRAME", "ASSUMPTIONS"],
+    "tags": ["financial", "modeling", "roi", "analysis", "projections"]
+  },
+
+  {
+    "id": "system-integration-architecture",
+    "title": "System Integration Architecture",
+    "tier": "technical",
+    "complexity": 3,
+    "description": "Technical integration planning with scalability assessment and implementation roadmap for enterprise systems.",
+    "prompt": "As a systems architect, design integration plan for [SYSTEM_A] and [SYSTEM_B] at [COMPANY]. Include: Technical architecture overview, Data flow and security considerations, Scalability and performance requirements, Implementation phases with resource needs, Testing and validation protocols, Rollback procedures.",
+    "variables": ["SYSTEM_A", "SYSTEM_B", "COMPANY", "REQUIREMENTS"],
+    "tags": ["technical", "integration", "architecture", "systems", "implementation"]
+  },
+  {
+    "id": "weekly-meal-planning",
+    "title": "Weekly Meal Planning Optimization",
+    "tier": "lifestyle",
+    "complexity": 2,
+    "description": "Systematic meal planning with nutritional balance, budget optimization, and prep time efficiency for busy households.",
+    "prompt": "You are a meal planning specialist helping [HOUSEHOLD_TYPE] create an optimized weekly meal plan. Consider: Dietary preferences/restrictions: [DIETARY_NEEDS], Budget target: [BUDGET], Available prep time: [PREP_TIME], Kitchen equipment: [EQUIPMENT]. Provide: 7-day meal plan with breakfast/lunch/dinner, Shopping list organized by store section, Prep schedule to minimize daily cooking time, Nutritional balance assessment, Cost breakdown per meal. Include leftover optimization and batch cooking strategies.",
+    "variables": ["HOUSEHOLD_TYPE", "DIETARY_NEEDS", "BUDGET", "PREP_TIME", "EQUIPMENT"],
+    "tags": ["meal-planning", "nutrition", "budget", "efficiency", "household"]
+  },
+  {
+    "id": "home-project-coordination",
+    "title": "Home Construction Project Management",
+    "tier": "lifestyle",
+    "complexity": 3,
+    "description": "Complete project planning framework for home improvement with timeline coordination, material estimation, and contractor management.",
+    "prompt": "Acting as a construction project coordinator, plan [PROJECT_TYPE] for [PROPERTY_DETAILS]. Provide: Project timeline with critical path analysis, Material list with quantity calculations and cost estimates, Contractor coordination schedule with dependencies, Permit and inspection requirements, Risk assessment with contingency planning, Quality control checkpoints, Budget breakdown with 15% contingency buffer. Include seasonal timing considerations and neighbor communication protocols.",
+    "variables": ["PROJECT_TYPE", "PROPERTY_DETAILS", "BUDGET_RANGE", "TIMELINE_FLEXIBILITY"],
+    "tags": ["construction", "project-management", "planning", "coordination", "home-improvement"]
+  },
+  {
+    "id": "personal-productivity-system",
+    "title": "Personal Productivity System Design",
+    "tier": "lifestyle",
+    "complexity": 2,
+    "description": "Customized productivity framework combining time management, habit formation, and goal achievement for individual optimization.",
+    "prompt": "You are a productivity consultant designing a personal system for [PERSON_TYPE] with goals: [PRIMARY_GOALS]. Consider current challenges: [OBSTACLES], Available time: [TIME_AVAILABILITY], Work style: [WORK_PREFERENCE]. Create: Daily routine structure with time blocks, Weekly review and planning process, Habit stacking framework for new behaviors, Goal tracking system with milestones, Energy management aligned with natural rhythms, Tool recommendations (apps/systems). Include accountability mechanisms and course-correction protocols.",
+    "variables": ["PERSON_TYPE", "PRIMARY_GOALS", "OBSTACLES", "TIME_AVAILABILITY", "WORK_PREFERENCE"],
+    "tags": ["productivity", "habits", "goals", "time-management", "personal-development"]
+  },
+  {
+    "id": "household-organization-optimization",
+    "title": "Household Organization & Workflow",
+    "tier": "lifestyle",
+    "complexity": 2,
+    "description": "Systematic home organization with traffic flow optimization, storage solutions, and maintenance routines for functional living spaces.",
+    "prompt": "As a home organization specialist, optimize [SPACE_TYPE] for [HOUSEHOLD_COMPOSITION]. Analyze: Current pain points: [PROBLEM_AREAS], Storage constraints: [STORAGE_LIMITS], Daily routines: [DAILY_ACTIVITIES], Maintenance capacity: [TIME_AVAILABLE]. Provide: Room-by-room organization plan, Storage solution recommendations with measurements, Daily/weekly maintenance routines, Traffic flow optimization, Decluttering framework with decision criteria, Seasonal rotation systems. Include family member responsibility assignments and sustainability strategies.",
+    "variables": ["SPACE_TYPE", "HOUSEHOLD_COMPOSITION", "PROBLEM_AREAS", "STORAGE_LIMITS", "DAILY_ACTIVITIES"],
+    "tags": ["organization", "home-management", "efficiency", "storage", "maintenance"]
+  },
+  {
+    "id": "peak-performance-daily-system",
+    "title": "Peak Performance Daily System",
+    "tier": "lifestyle",
+    "complexity": 3,
+    "description": "Comprehensive daily optimization framework integrating energy management, cognitive performance, and systematic habit tracking for sustained excellence.",
+    "prompt": "Design a peak performance daily system for [PERSON_TYPE] with goals: [PRIMARY_OBJECTIVES]. Consider: Current energy patterns: [ENERGY_PROFILE], Available time blocks: [TIME_STRUCTURE], Performance metrics: [SUCCESS_MEASURES]. Create: Morning optimization routine, Energy-based task scheduling, Cognitive load management, Recovery protocols, Evening review system. Include habit stacking, environmental design, and performance tracking mechanisms.",
+    "variables": ["PERSON_TYPE", "PRIMARY_OBJECTIVES", "ENERGY_PROFILE", "TIME_STRUCTURE", "SUCCESS_MEASURES"],
+    "tags": ["performance", "optimization", "habits", "energy", "productivity"]
+  },
+  {
+    "id": "health-longevity-protocol",
+    "title": "Health & Longevity Protocol",
+    "tier": "lifestyle",
+    "complexity": 3,
+    "description": "Evidence-based health optimization combining nutrition, exercise, sleep, and stress management for long-term vitality and disease prevention.",
+    "prompt": "Create comprehensive health optimization protocol for [AGE_GROUP] [GENDER] with health goals: [HEALTH_OBJECTIVES]. Address: Current health status: [BASELINE_HEALTH], Lifestyle constraints: [LIMITATIONS], Available resources: [RESOURCES]. Provide: Nutrition framework with meal timing, Exercise programming with progression, Sleep optimization strategies, Stress management techniques, Preventive health monitoring. Include sustainable implementation and progress tracking.",
+    "variables": ["AGE_GROUP", "GENDER", "HEALTH_OBJECTIVES", "BASELINE_HEALTH", "LIMITATIONS"],
+    "tags": ["health", "longevity", "nutrition", "exercise", "wellness"]
+  },
+  {
+    "id": "financial-independence-accelerator",
+    "title": "Financial Independence Accelerator",
+    "tier": "lifestyle",
+    "complexity": 3,
+    "description": "Strategic wealth-building framework with income optimization, expense management, and investment allocation for accelerated financial freedom.",
+    "prompt": "Design financial independence strategy for [PERSON_PROFILE] with target: [FI_GOAL] by [TIMELINE]. Analyze: Current income: [INCOME], Monthly expenses: [EXPENSES], Risk tolerance: [RISK_PROFILE]. Create: Income optimization plan, Expense reduction without lifestyle degradation, Investment allocation strategy, Emergency fund building, Tax optimization approaches. Include milestone tracking and course correction protocols.",
+    "variables": ["PERSON_PROFILE", "FI_GOAL", "TIMELINE", "INCOME", "EXPENSES"],
+    "tags": ["finance", "investing", "wealth", "independence", "planning"]
+  },
+  {
+    "id": "relationship-mastery-system",
+    "title": "Relationship Mastery System",
+    "tier": "lifestyle",
+    "complexity": 2,
+    "description": "Comprehensive relationship optimization framework for strengthening personal connections, communication skills, and social fulfillment.",
+    "prompt": "Develop relationship enhancement system for [RELATIONSHIP_TYPE] focusing on [IMPROVEMENT_AREAS]. Consider: Current dynamics: [CURRENT_STATE], Communication patterns: [COMMUNICATION_STYLE], Shared goals: [MUTUAL_OBJECTIVES]. Provide: Communication framework, Conflict resolution protocols, Quality time optimization, Emotional intelligence development, Boundary setting strategies. Include regular check-ins and relationship health metrics.",
+    "variables": ["RELATIONSHIP_TYPE", "IMPROVEMENT_AREAS", "CURRENT_STATE", "COMMUNICATION_STYLE", "MUTUAL_OBJECTIVES"],
+    "tags": ["relationships", "communication", "emotional-intelligence", "social", "personal-development"]
+  },
+  {
+    "id": "skill-mastery-accelerator",
+    "title": "Skill Mastery Accelerator",
+    "tier": "lifestyle",
+    "complexity": 3,
+    "description": "Systematic skill acquisition framework using deliberate practice principles, learning science, and performance optimization for rapid mastery.",
+    "prompt": "Create skill mastery plan for learning [SKILL] to [PROFICIENCY_LEVEL] within [TIMEFRAME]. Assess: Current level: [BASELINE], Learning style: [LEARNING_PREFERENCES], Available practice time: [TIME_COMMITMENT]. Design: Progressive skill breakdown, Deliberate practice sessions, Feedback mechanisms, Performance measurement, Plateau breakthrough strategies. Include resource recommendations and expert guidance integration.",
+    "variables": ["SKILL", "PROFICIENCY_LEVEL", "TIMEFRAME", "BASELINE", "LEARNING_PREFERENCES"],
+    "tags": ["learning", "skills", "mastery", "practice", "development"]
+  },
+  {
+    "id": "travel-experience-optimizer",
+    "title": "Travel Experience Optimizer",
+    "tier": "lifestyle",
+    "complexity": 2,
+    "description": "Strategic travel planning framework maximizing cultural immersion, personal growth, and memorable experiences while optimizing budget and logistics.",
+    "prompt": "Plan optimal travel experience to [DESTINATION] for [DURATION] with goals: [TRAVEL_OBJECTIVES]. Consider: Budget: [BUDGET], Travel style: [PREFERENCES], Group composition: [TRAVELERS]. Create: Itinerary with must-see and hidden gems, Cultural immersion opportunities, Local interaction strategies, Photography and memory capture plan, Emergency contingencies. Include budget optimization and authentic experience maximization.",
+    "variables": ["DESTINATION", "DURATION", "TRAVEL_OBJECTIVES", "BUDGET", "PREFERENCES"],
+    "tags": ["travel", "experiences", "culture", "adventure", "planning"]
+  },
+  {
+    "id": "creative-expression-unleashed",
+    "title": "Creative Expression Unleashed",
+    "tier": "lifestyle",
+    "complexity": 2,
+    "description": "Comprehensive creative development system for artistic expression, overcoming creative blocks, and building sustainable creative practice.",
+    "prompt": "Design creative development system for [CREATIVE_MEDIUM] with aspirations: [CREATIVE_GOALS]. Address: Current skill level: [ARTISTIC_LEVEL], Creative blocks: [OBSTACLES], Available creative time: [TIME_AVAILABLE]. Provide: Daily creative practice routine, Inspiration cultivation methods, Skill development progression, Creative block breakthrough techniques, Output and sharing strategies. Include creative community building and artistic growth tracking.",
+    "variables": ["CREATIVE_MEDIUM", "CREATIVE_GOALS", "ARTISTIC_LEVEL", "OBSTACLES", "TIME_AVAILABLE"],
+    "tags": ["creativity", "art", "expression", "practice", "inspiration"]
+  },
+  {
+    "id": "mental-resilience-fortress",
+    "title": "Mental Resilience Fortress",
+    "tier": "lifestyle",
+    "complexity": 3,
+    "description": "Comprehensive mental strength building system combining stress management, emotional regulation, and cognitive reframing for psychological resilience.",
+    "prompt": "Build mental resilience system for [PERSON_PROFILE] addressing challenges: [STRESS_FACTORS]. Evaluate: Current coping mechanisms: [CURRENT_STRATEGIES], Support systems: [SUPPORT_NETWORK], Stress triggers: [TRIGGER_PATTERNS]. Create: Stress prevention protocols, Emotional regulation techniques, Cognitive reframing practices, Mindfulness integration, Crisis management strategies. Include professional support recommendations and progress monitoring.",
+    "variables": ["PERSON_PROFILE", "STRESS_FACTORS", "CURRENT_STRATEGIES", "SUPPORT_NETWORK", "TRIGGER_PATTERNS"],
+    "tags": ["mental-health", "resilience", "stress", "emotional-regulation", "mindfulness"]
+  },
+  {
+    "id": "social-impact-legacy-builder",
+    "title": "Social Impact Legacy Builder",
+    "tier": "lifestyle",
+    "complexity": 3,
+    "description": "Strategic framework for creating meaningful social impact and building lasting legacy through purposeful action and community engagement.",
+    "prompt": "Design social impact strategy for [PERSON] with mission: [IMPACT_VISION]. Consider: Available resources: [RESOURCES], Skill set: [CAPABILITIES], Passion areas: [INTERESTS], Time commitment: [AVAILABILITY]. Create: Impact assessment and target selection, Action plan with measurable outcomes, Community building strategies, Resource mobilization approach, Legacy documentation system. Include sustainability planning and impact measurement.",
+    "variables": ["PERSON", "IMPACT_VISION", "RESOURCES", "CAPABILITIES", "INTERESTS"],
+    "tags": ["impact", "legacy", "community", "purpose", "social-change"]
+  },
+  {
+    "id": "adventure-life-architect",
+    "title": "Adventure Life Architect",
+    "tier": "lifestyle",
+    "complexity": 2,
+    "description": "Comprehensive adventure planning system for creating extraordinary experiences, pushing comfort zones, and building epic life memories.",
+    "prompt": "Architect adventure-rich lifestyle for [ADVENTURER_TYPE] with goals: [ADVENTURE_OBJECTIVES]. Assess: Risk tolerance: [RISK_LEVEL], Physical capabilities: [FITNESS_LEVEL], Available budget: [ADVENTURE_BUDGET], Time constraints: [SCHEDULE]. Design: Progressive adventure progression, Safety protocols and training, Gear and preparation strategies, Documentation and sharing plan, Community building around adventures. Include fear management and skill development pathways.",
+    "variables": ["ADVENTURER_TYPE", "ADVENTURE_OBJECTIVES", "RISK_LEVEL", "FITNESS_LEVEL", "ADVENTURE_BUDGET"],
+    "tags": ["adventure", "experiences", "courage", "exploration", "lifestyle-design"]
+  },
+  {
+    "id": "strategic-ai-roi-analysis",
+    "title": "Strategic AI ROI Analysis",
+    "tier": "strategic",
+    "complexity": 3,
+    "description": "Comprehensive AI investment analysis with 3-year ROI projections, scenario modeling, and risk quantification for board-level decision making.",
+    "prompt": "Analyze [INITIATIVE] for [COMPANY] with focus on: 3-year ROI projections with scenario modeling (best/base/worst case), Total economic impact including indirect benefits, Risk quantification with mitigation costs, Resource allocation recommendations, Executive summary with decision framework. Present findings as board-ready investment thesis.",
+    "variables": ["INITIATIVE", "COMPANY", "TIMEFRAME", "BUDGET"],
+    "tags": ["roi", "analysis", "strategic", "investment", "board"]
+  },
+  {
+    "id": "competitive-intelligence-synthesis",
+    "title": "Competitive Intelligence Synthesis",
+    "tier": "rd",
+    "complexity": 3,
+    "description": "Strategic competitive analysis with market positioning assessment and vulnerability identification for C-suite intelligence briefings.",
+    "prompt": "Conduct comprehensive competitive analysis of [COMPETITOR] in [MARKET]. Provide: Market positioning assessment, Strategic vulnerability identification, Technology gap analysis, Pricing strategy evaluation, Counter-strategy recommendations with implementation roadmap. Format as strategic intelligence brief for C-suite consumption.",
+    "variables": ["COMPETITOR", "MARKET", "ANALYSIS_DEPTH", "TIMEFRAME"],
+    "tags": ["competitive", "intelligence", "analysis", "strategy", "market"]
+  },
+  {
+    "id": "enterprise-ai-governance",
+    "title": "Enterprise AI Governance Framework",
+    "tier": "technical",
+    "complexity": 3,
+    "description": "Comprehensive AI governance structure design with risk management protocols, compliance requirements, and stakeholder communication strategy.",
+    "prompt": "Design AI governance structure for [COMPANY] addressing: Risk management protocols and compliance requirements, Data privacy and IP protection measures, Ethical AI implementation guidelines, Cross-functional oversight mechanisms, Performance metrics and audit procedures. Include regulatory alignment and stakeholder communication strategy.",
+    "variables": ["COMPANY", "INDUSTRY", "COMPLIANCE_REQUIREMENTS", "STAKEHOLDERS"],
+    "tags": ["governance", "compliance", "risk", "ai-strategy", "framework"]
+  },
+  {
+    "id": "digital-transformation-roadmap",
+    "title": "Digital Transformation Roadmap",
+    "tier": "strategic",
+    "complexity": 3,
+    "description": "AI-driven transformation strategy with phased implementation, resource requirements, and change management for organizational alignment.",
+    "prompt": "Create AI-driven transformation strategy for [ORGANIZATION] including: Current state assessment and capability gaps, Phased implementation with resource requirements, Change management and workforce development, Technology integration and infrastructure needs, Success metrics and milestone tracking. Align with strategic business objectives.",
+    "variables": ["ORGANIZATION", "CURRENT_STATE", "OBJECTIVES", "TIMELINE"],
+    "tags": ["transformation", "strategy", "implementation", "change-management", "roadmap"]
+  },
+  {
+    "id": "executive-decision-acceleration",
+    "title": "Executive Decision Acceleration",
+    "tier": "operational",
+    "complexity": 3,
+    "description": "Strategic decision analysis with weighted criteria, risk assessment, and stakeholder impact evaluation for executive decision-making.",
+    "prompt": "Analyze strategic decision: [DECISION] with variables [FACTORS]. Provide: Decision matrix with weighted criteria, Risk assessment for each option, Financial impact modeling, Implementation complexity analysis, Stakeholder impact evaluation. Recommend optimal path with contingency planning.",
+    "variables": ["DECISION", "FACTORS", "STAKEHOLDERS", "CONSTRAINTS"],
+    "tags": ["decision", "analysis", "executive", "risk", "strategy"]
+  },
+  {
+    "id": "market-entry-strategy",
+    "title": "Market Entry Strategy Analysis",
+    "tier": "strategic",
+    "complexity": 3,
+    "description": "Comprehensive market entry evaluation with competitive positioning, resource requirements, and go-to-market strategy for investment decisions.",
+    "prompt": "Evaluate market entry for [COMPANY] into [MARKET]. Include: Market size and growth projections, Competitive landscape and positioning opportunities, Entry barriers and regulatory considerations, Resource requirements and investment timeline, Go-to-market strategy with success metrics. Present as executive investment case.",
+    "variables": ["COMPANY", "MARKET", "ENTRY_TYPE", "RESOURCES"],
+    "tags": ["market-entry", "strategy", "investment", "competitive", "growth"]
+  },
+  {
+    "id": "operational-efficiency-optimization",
+    "title": "Operational Efficiency Optimization",
+    "tier": "operational",
+    "complexity": 3,
+    "description": "AI-driven process optimization with workflow analysis, automation opportunities, and quantified efficiency gains for operational excellence.",
+    "prompt": "Assess [DEPARTMENT/PROCESS] for AI-driven optimization. Deliver: Current state workflow analysis, Automation opportunities and ROI projections, Technology requirements and integration planning, Change management and training needs, Implementation timeline with risk mitigation. Quantify efficiency gains and cost savings.",
+    "variables": ["DEPARTMENT", "PROCESS", "METRICS", "OBJECTIVES"],
+    "tags": ["optimization", "efficiency", "automation", "process", "operational"]
+  },
+  {
+    "id": "board-presentation-strategy",
+    "title": "Board Presentation Strategy",
+    "tier": "strategic",
+    "complexity": 3,
+    "description": "Executive board presentation framework with strategic context, financial analysis, and stakeholder consideration for fiduciary decision-making.",
+    "prompt": "Prepare board presentation on [TOPIC] for [COMPANY]. Structure: Executive summary with key decisions required, Strategic context and market implications, Financial analysis with scenario planning, Risk assessment and mitigation strategies, Next steps with ownership and timelines. Address fiduciary responsibilities and stakeholder concerns.",
+    "variables": ["TOPIC", "COMPANY", "DECISIONS", "STAKEHOLDERS"],
+    "tags": ["board", "presentation", "executive", "strategy", "governance"]
+  },
+  {
+    "id": "crisis-response-coordination",
+    "title": "Crisis Response Coordination",
+    "tier": "rd",
+    "complexity": 3,
+    "description": "Comprehensive crisis response planning with stakeholder communication, financial impact assessment, and recovery roadmap for organizational resilience.",
+    "prompt": "Develop crisis response plan for [SITUATION] affecting [COMPANY]. Include: Immediate action priorities and resource deployment, Stakeholder communication strategy and messaging, Financial impact assessment and mitigation measures, Operational continuity planning, Recovery roadmap with success metrics. Ensure regulatory compliance and reputation management.",
+    "variables": ["SITUATION", "COMPANY", "STAKEHOLDERS", "IMPACT_SCOPE"],
+    "tags": ["crisis", "response", "planning", "communication", "recovery"]
+  },
+  {
+    "id": "innovation-portfolio-strategy",
+    "title": "Innovation Portfolio Strategy",
+    "tier": "strategic",
+    "complexity": 3,
+    "description": "Strategic innovation investment framework with portfolio allocation, technology evaluation, and competitive positioning for long-term growth.",
+    "prompt": "Design innovation investment strategy for [COMPANY] with budget [AMOUNT]. Provide: Portfolio allocation across innovation horizons, Technology evaluation and selection criteria, Partnership and acquisition targets, Success metrics and milestone tracking, Risk management and portfolio balancing. Align with long-term competitive positioning.",
+    "variables": ["COMPANY", "AMOUNT", "HORIZONS", "OBJECTIVES"],
+
+    "tags": ["innovation", "portfolio", "investment", "strategy", "technology"]
+  },
+  {
+    "id": "data-pattern-forensics",
+    "title": "Data Pattern Forensics Analysis",
+    "tier": "rd",
+    "complexity": 3,
+    "description": "Advanced data analysis framework for uncovering hidden patterns, anomalies, and insights in complex datasets using systematic investigation methodology.",
+    "prompt": "Conduct forensic analysis of [DATASET_TYPE] for [ANALYSIS_OBJECTIVE]. Apply: Pattern recognition across multiple dimensions, Anomaly detection with statistical significance, Correlation analysis with causation validation, Time-series trend identification, Predictive modeling with confidence intervals. Consider: Data quality assessment, Missing value impact, Outlier investigation, Feature importance ranking. Deliver: Executive summary of key findings, Statistical validation of patterns, Business implications and recommendations, Data visualization strategy, Next-phase investigation priorities.",
+    "variables": ["DATASET_TYPE", "ANALYSIS_OBJECTIVE", "TIME_PERIOD", "KEY_METRICS"],
+    "tags": ["data-analysis", "patterns", "forensics", "statistics", "insights"]
+  },
+  {
+    "id": "website-mvp-reverse-engineering",
+    "title": "Website MVP Reverse Engineering",
+    "tier": "rd",
+    "complexity": 3,
+    "description": "Systematic website analysis using MVP methodology to extract core functionality, user experience patterns, and technical architecture for competitive intelligence.",
+    "prompt": "Analyze [TARGET_WEBSITE] using MVP reverse engineering methodology. Examine: Core value proposition and user journey mapping, Feature hierarchy and prioritization logic, Technical architecture and performance optimization, User interface patterns and interaction design, Content strategy and information architecture. Deliver comprehensive prompt: 'Design MVP clone of [TARGET_WEBSITE] for [PLATFORM]. Replicate: [CORE_FEATURES], [UX_PATTERNS], [TECHNICAL_APPROACH]. Maintain: Brand differentiation, Legal compliance, Performance standards. Include: Component breakdown, Development timeline, Resource requirements.' Format as executable development brief.",
+    "variables": ["TARGET_WEBSITE", "PLATFORM", "ANALYSIS_DEPTH", "FOCUS_AREAS"],
+    "tags": ["reverse-engineering", "mvp", "competitive", "website", "analysis"]
+  },
+  {
+    "id": "market-intelligence-synthesis",
+    "title": "Market Intelligence Synthesis",
+    "tier": "rd",
+    "complexity": 3,
+    "description": "Comprehensive market research integration combining multiple intelligence sources for strategic decision-making and competitive positioning.",
+    "prompt": "Synthesize market intelligence for [MARKET_SEGMENT] across [TIME_HORIZON]. Integrate: Primary research and customer interviews, Secondary research and industry reports, Competitor analysis and positioning maps, Regulatory environment and policy impacts, Technology trends and disruption indicators. Analyze: Market size and growth trajectories, Customer behavior and preference shifts, Competitive dynamics and white space opportunities, Barriers to entry and success factors, Risk scenarios and mitigation strategies. Present as strategic intelligence briefing with actionable recommendations.",
+    "variables": ["MARKET_SEGMENT", "TIME_HORIZON", "RESEARCH_SOURCES", "STRATEGIC_QUESTIONS"],
+    "tags": ["market-research", "intelligence", "synthesis", "strategy", "competitive"]
+  },
+  {
+    "id": "patent-landscape-mining",
+    "title": "Patent Landscape Mining",
+    "tier": "rd",
+    "complexity": 3,
+    "description": "Strategic patent analysis for identifying innovation opportunities, competitive threats, and intellectual property positioning in target technology domains.",
+    "prompt": "Conduct patent landscape analysis for [TECHNOLOGY_DOMAIN] covering [GEOGRAPHIC_SCOPE]. Investigate: Patent filing trends and innovation hotspots, Key inventors and assignee organizations, Technology evolution and convergence patterns, White space identification and opportunity mapping, Litigation risks and freedom-to-operate assessment. Analyze: Citation networks and influence patterns, Competitive patent portfolios and strategies, Emerging technology trajectories, Licensing opportunities and partnerships. Deliver strategic IP intelligence with innovation roadmap recommendations.",
+    "variables": ["TECHNOLOGY_DOMAIN", "GEOGRAPHIC_SCOPE", "TIME_FRAME", "COMPETITIVE_FOCUS"],
+    "tags": ["patents", "intellectual-property", "innovation", "technology", "competitive"]
+  },
+  {
+    "id": "social-sentiment-intelligence",
+    "title": "Social Sentiment Intelligence",
+    "tier": "rd",
+    "complexity": 2,
+    "description": "Advanced social media and online sentiment analysis for brand monitoring, market research, and competitive intelligence gathering.",
+    "prompt": "Analyze social sentiment for [BRAND/TOPIC] across [PLATFORMS] over [TIMEFRAME]. Examine: Sentiment trends and emotional indicators, Influencer networks and opinion leaders, Conversation themes and trending topics, Competitive mention analysis and share-of-voice, Crisis indicators and reputation risks. Apply: Natural language processing for sentiment scoring, Network analysis for influence mapping, Trend analysis for predictive insights, Geographic and demographic segmentation. Provide actionable intelligence for brand strategy and competitive positioning.",
+    "variables": ["BRAND", "PLATFORMS", "TIMEFRAME", "GEOGRAPHIC_FOCUS"],
+    "tags": ["sentiment", "social-media", "brand-monitoring", "intelligence", "analysis"]
+  },
+  {
+    "id": "technology-convergence-forecasting",
+    "title": "Technology Convergence Forecasting",
+    "tier": "rd",
+    "complexity": 3,
+    "description": "Strategic technology trend analysis identifying convergence points, disruption opportunities, and innovation investment priorities for competitive advantage.",
+    "prompt": "Forecast technology convergence in [INDUSTRY_SECTOR] over [FORECAST_HORIZON]. Analyze: Emerging technology trajectories and maturity curves, Cross-industry technology migration patterns, Scientific breakthrough indicators and research frontiers, Investment flows and venture capital trends, Regulatory environment and policy implications. Identify: Convergence opportunities and market disruption potential, First-mover advantages and timing strategies, Partnership and acquisition targets, R&D investment priorities and resource allocation. Present as technology strategy roadmap with risk-adjusted recommendations.",
+    "variables": ["INDUSTRY_SECTOR", "FORECAST_HORIZON", "TECHNOLOGY_FOCUS", "INVESTMENT_CONTEXT"],
+    "tags": ["technology", "forecasting", "convergence", "innovation", "strategy"]
+  },
+  {
+    "id": "customer-journey-intelligence",
+    "title": "Customer Journey Intelligence",
+    "tier": "rd",
+    "complexity": 2,
+    "description": "Comprehensive customer behavior analysis mapping decision-making processes, pain points, and optimization opportunities across touchpoints.",
+    "prompt": "Map customer journey intelligence for [CUSTOMER_SEGMENT] in [INDUSTRY_CONTEXT]. Investigate: Awareness and consideration trigger points, Information gathering and evaluation criteria, Decision-making process and influence factors, Purchase journey and conversion optimization, Post-purchase experience and loyalty drivers. Analyze: Multi-channel touchpoint interactions, Pain point identification and impact assessment, Competitive journey comparison and differentiation, Technology enablement and automation opportunities. Deliver journey optimization strategy with specific intervention recommendations.",
+    "variables": ["CUSTOMER_SEGMENT", "INDUSTRY_CONTEXT", "JOURNEY_SCOPE", "OPTIMIZATION_GOALS"],
+    "tags": ["customer-journey", "behavior", "optimization", "experience", "intelligence"]
+  },
+  {
+    "id": "competitive-moat-analysis",
+    "title": "Competitive Moat Analysis",
+    "tier": "rd",
+    "complexity": 3,
+    "description": "Strategic analysis of competitive advantages, defensibility factors, and moat-building opportunities for sustainable market positioning.",
+    "prompt": "Analyze competitive moats for [COMPANY/INDUSTRY] focusing on [COMPETITIVE_DIMENSIONS]. Evaluate: Network effects and platform dynamics, Switching costs and customer lock-in mechanisms, Economies of scale and cost advantages, Brand strength and customer loyalty, Regulatory barriers and compliance advantages, Technology patents and proprietary assets. Assess: Moat durability and erosion risks, Competitive threats and disruption potential, Moat-building investment opportunities, Strategic positioning and differentiation. Provide moat strengthening strategy with implementation priorities.",
+    "variables": ["COMPANY", "COMPETITIVE_DIMENSIONS", "INDUSTRY_CONTEXT", "TIME_HORIZON"],
+    "tags": ["competitive", "moats", "strategy", "defensibility", "positioning"]
+  },
+  {
+    "id": "innovation-ecosystem-mapping",
+    "title": "Innovation Ecosystem Mapping",
+    "tier": "rd",
+    "complexity": 3,
+    "description": "Comprehensive ecosystem analysis identifying innovation networks, collaboration opportunities, and strategic partnership potential for accelerated development.",
+    "prompt": "Map innovation ecosystem for [TECHNOLOGY_AREA] in [GEOGRAPHIC_REGION]. Analyze: Research institutions and academic capabilities, Startup landscape and emerging companies, Corporate innovation labs and R&D centers, Government initiatives and funding programs, Venture capital and investment networks, Industry associations and collaboration platforms. Identify: Partnership and collaboration opportunities, Talent acquisition and recruitment strategies, Technology licensing and IP opportunities, Investment and acquisition targets. Develop ecosystem engagement strategy with relationship building priorities.",
+    "variables": ["TECHNOLOGY_AREA", "GEOGRAPHIC_REGION", "INNOVATION_FOCUS", "PARTNERSHIP_GOALS"],
+    "tags": ["innovation", "ecosystem", "partnerships", "collaboration", "strategy"]
+  },
+  {
+    "id": "disruption-scenario-planning",
+    "title": "Disruption Scenario Planning",
+    "tier": "rd",
+    "complexity": 3,
+    "description": "Strategic scenario analysis for anticipating market disruptions, preparing response strategies, and identifying opportunities within changing landscapes.",
+    "prompt": "Develop disruption scenarios for [INDUSTRY_SECTOR] over [PLANNING_HORIZON]. Model: Technology disruption vectors and adoption curves, Regulatory changes and policy implications, Economic shifts and market dynamics, Consumer behavior evolution and preference changes, Competitive landscape transformation. Create: Multiple scenario narratives with probability assessments, Impact analysis and business implications, Early warning indicators and monitoring systems, Response strategies and contingency planning, Opportunity identification and investment priorities. Present as strategic planning framework with decision trees.",
+    "variables": ["INDUSTRY_SECTOR", "PLANNING_HORIZON", "DISRUPTION_VECTORS", "STRATEGIC_FOCUS"],
+
+    "tags": ["disruption", "scenario-planning", "strategy", "futures", "planning"]
+  },
+  {
+    "id": "instant-resolution-engine",
+    "title": "Instant Resolution Engine",
+    "tier": "operational",
+    "complexity": 2,
+    "description": "Rapid-response troubleshooting framework for support agents to deliver immediate, accurate solutions with customer satisfaction optimization.",
+    "prompt": "Resolve customer issue: [CUSTOMER_PROBLEM] for [PRODUCT/SERVICE]. Apply systematic troubleshooting: Issue classification and severity assessment, Root cause analysis with decision tree logic, Solution identification with step-by-step instructions, Alternative approaches if primary solution fails, Escalation criteria and handoff protocols. Consider: Customer technical level and communication preferences, Product version and configuration details, Previous interaction history and resolution attempts. Deliver: Clear resolution steps, Expected timeline, Follow-up requirements, Prevention recommendations.",
+    "variables": ["CUSTOMER_PROBLEM", "PRODUCT", "CUSTOMER_PROFILE", "URGENCY_LEVEL"],
+    "tags": ["troubleshooting", "customer-service", "resolution", "support", "instant"]
+  },
+  {
+    "id": "agent-training-accelerator",
+    "title": "Agent Training Accelerator",
+    "tier": "operational",
+    "complexity": 3,
+    "description": "Comprehensive training framework for rapid agent onboarding with competency development, performance tracking, and skill optimization.",
+    "prompt": "Design training program for [AGENT_ROLE] in [SUPPORT_DOMAIN]. Structure: Competency framework with skill assessments, Progressive learning modules with practical exercises, Real-world scenario simulations and role-playing, Performance metrics and evaluation criteria, Mentoring and feedback mechanisms. Address: Product knowledge and technical proficiency, Customer communication and de-escalation skills, Process adherence and quality standards, Tool mastery and efficiency optimization. Include: Training timeline, Resource requirements, Success measurement, Ongoing development pathways.",
+    "variables": ["AGENT_ROLE", "SUPPORT_DOMAIN", "EXPERIENCE_LEVEL", "TRAINING_TIMELINE"],
+    "tags": ["training", "onboarding", "competency", "development", "performance"]
+  },
+  {
+    "id": "escalation-management-protocol",
+    "title": "Escalation Management Protocol",
+    "tier": "operational",
+    "complexity": 3,
+    "description": "Strategic escalation framework for managing complex issues, preserving customer relationships, and optimizing resolution efficiency across support tiers.",
+    "prompt": "Manage escalation: [ESCALATION_SCENARIO] with customer [CUSTOMER_PROFILE]. Execute: Immediate triage and priority assessment, Stakeholder notification and coordination, Resource allocation and expertise deployment, Customer communication and expectation management, Resolution tracking and status updates. Consider: Customer value and relationship history, Issue complexity and technical requirements, Internal resource availability and expertise, Regulatory or compliance implications. Provide: Action plan with timelines, Communication templates, Success metrics, Post-resolution analysis framework.",
+    "variables": ["ESCALATION_SCENARIO", "CUSTOMER_PROFILE", "ISSUE_COMPLEXITY", "STAKEHOLDERS"],
+    "tags": ["escalation", "management", "coordination", "resolution", "customer-retention"]
+  },
+  {
+    "id": "knowledge-base-optimizer",
+    "title": "Knowledge Base Optimizer",
+    "tier": "operational",
+    "complexity": 2,
+    "description": "Systematic knowledge management framework for creating, maintaining, and optimizing support documentation with usage analytics and continuous improvement.",
+    "prompt": "Optimize knowledge base for [SUPPORT_TOPIC] targeting [USER_AUDIENCE]. Analyze: Current content gaps and usage patterns, Search behavior and failure points, Content performance and user feedback, Agent utilization and effectiveness metrics. Create: Structured content hierarchy and tagging system, Search optimization and findability improvements, Content creation and maintenance workflows, Quality assurance and review processes, Analytics and performance tracking. Include: Content templates, Style guidelines, Update procedures, Success measurement framework.",
+    "variables": ["SUPPORT_TOPIC", "USER_AUDIENCE", "CONTENT_TYPE", "PERFORMANCE_GOALS"],
+    "tags": ["knowledge-base", "documentation", "optimization", "content", "efficiency"]
+  },
+  {
+    "id": "customer-feedback-intelligence",
+    "title": "Customer Feedback Intelligence",
+    "tier": "operational",
+    "complexity": 2,
+    "description": "Comprehensive feedback analysis system for extracting actionable insights, identifying improvement opportunities, and driving customer satisfaction optimization.",
+    "prompt": "Analyze customer feedback for [SERVICE_AREA] across [TIME_PERIOD]. Process: Feedback categorization and sentiment analysis, Trend identification and pattern recognition, Root cause analysis for negative feedback, Satisfaction driver identification and impact assessment, Competitive comparison and benchmarking. Extract: Key improvement opportunities with priority ranking, Process enhancement recommendations, Training needs and skill gaps, Product or service modification suggestions. Deliver: Executive summary with actionable insights, Implementation roadmap, Success metrics, Monitoring framework.",
+    "variables": ["SERVICE_AREA", "TIME_PERIOD", "FEEDBACK_SOURCES", "ANALYSIS_FOCUS"],
+    "tags": ["feedback", "analysis", "insights", "improvement", "satisfaction"]
+  },
+  {
+    "id": "performance-coaching-system",
+    "title": "Performance Coaching System",
+    "tier": "operational",
+    "complexity": 3,
+    "description": "Individualized coaching framework for support agent development with performance analysis, skill building, and career progression planning.",
+    "prompt": "Design coaching plan for [AGENT_NAME] addressing [PERFORMANCE_AREAS]. Assess: Current performance metrics and skill levels, Strength identification and leverage opportunities, Development needs and improvement priorities, Career aspirations and growth potential, Learning preferences and motivation factors. Create: Personalized development plan with specific goals, Skill-building activities and practice exercises, Regular check-in schedule and milestone tracking, Resource recommendations and learning materials, Performance measurement and feedback mechanisms. Include: Success criteria, Timeline expectations, Support requirements, Career pathway options.",
+    "variables": ["AGENT_NAME", "PERFORMANCE_AREAS", "DEVELOPMENT_GOALS", "COACHING_TIMELINE"],
+    "tags": ["coaching", "performance", "development", "skills", "career-growth"]
+  },
+  {
+    "id": "workflow-automation-designer",
+    "title": "Workflow Automation Designer",
+    "tier": "operational",
+    "complexity": 3,
+    "description": "Systematic workflow optimization framework for identifying automation opportunities, reducing manual effort, and improving operational efficiency.",
+    "prompt": "Automate workflow: [PROCESS_NAME] in [OPERATIONAL_CONTEXT]. Analyze: Current process mapping and pain point identification, Manual task inventory and time analysis, Automation opportunity assessment and feasibility, Tool integration and system requirements, ROI calculation and benefit quantification. Design: Automated workflow architecture and logic, Human oversight and exception handling, Quality control and validation processes, Implementation timeline and resource needs, Change management and adoption strategy. Include: Technical specifications, Training requirements, Success metrics, Continuous improvement framework.",
+    "variables": ["PROCESS_NAME", "OPERATIONAL_CONTEXT", "AUTOMATION_SCOPE", "EFFICIENCY_GOALS"],
+    "tags": ["automation", "workflow", "efficiency", "optimization", "process-improvement"]
+  },
+  {
+    "id": "quality-assurance-framework",
+    "title": "Quality Assurance Framework",
+    "tier": "operational",
+    "complexity": 2,
+    "description": "Comprehensive quality monitoring system for maintaining service standards, identifying improvement opportunities, and ensuring consistent customer experience.",
+    "prompt": "Implement QA framework for [SUPPORT_FUNCTION] with standards [QUALITY_CRITERIA]. Establish: Quality metrics and measurement standards, Monitoring procedures and evaluation criteria, Sampling methodology and review frequency, Calibration processes and inter-rater reliability, Feedback delivery and coaching integration. Design: Evaluation forms and scoring systems, Performance tracking and trending analysis, Root cause analysis for quality issues, Improvement planning and implementation tracking, Recognition and incentive programs. Include: Training materials, Process documentation, Reporting templates, Continuous improvement protocols.",
+    "variables": ["SUPPORT_FUNCTION", "QUALITY_CRITERIA", "MONITORING_SCOPE", "IMPROVEMENT_GOALS"],
+    "tags": ["quality-assurance", "monitoring", "standards", "evaluation", "improvement"]
+  },
+  {
+    "id": "crisis-communication-protocol",
+    "title": "Crisis Communication Protocol",
+    "tier": "operational",
+    "complexity": 3,
+    "description": "Emergency response communication framework for managing service disruptions, customer impact, and reputation protection during operational crises.",
+    "prompt": "Manage crisis communication for [CRISIS_SITUATION] affecting [AFFECTED_CUSTOMERS]. Execute: Immediate impact assessment and severity classification, Stakeholder notification and escalation procedures, Customer communication strategy and messaging, Internal coordination and resource mobilization, Media response and reputation management. Develop: Communication templates and approval workflows, Update scheduling and information management, Channel selection and audience targeting, Recovery communication and follow-up procedures, Post-crisis analysis and improvement planning. Include: Decision-making authority, Timeline requirements, Success metrics, Learning documentation.",
+    "variables": ["CRISIS_SITUATION", "AFFECTED_CUSTOMERS", "IMPACT_SCOPE", "COMMUNICATION_CHANNELS"],
+    "tags": ["crisis", "communication", "emergency", "response", "reputation"]
+  },
+  {
+    "id": "metrics-dashboard-intelligence",
+    "title": "Metrics Dashboard Intelligence",
+    "tier": "operational",
+    "complexity": 2,
+    "description": "Comprehensive performance analytics framework for real-time operational monitoring, trend analysis, and data-driven decision making.",
+    "prompt": "Design metrics dashboard for [OPERATIONAL_AREA] targeting [STAKEHOLDER_AUDIENCE]. Include: Key performance indicators and measurement definitions, Real-time monitoring and alert systems, Trend analysis and predictive indicators, Comparative analysis and benchmarking, Drill-down capabilities and root cause analysis. Structure: Executive summary views and detailed analytics, Automated reporting and distribution, Interactive visualization and filtering, Mobile accessibility and notification systems, Data quality monitoring and validation. Provide: Implementation roadmap, Data requirements, Technical specifications, Training materials, Success measurement framework.",
+    "variables": ["OPERATIONAL_AREA", "STAKEHOLDER_AUDIENCE", "METRICS_FOCUS", "REPORTING_FREQUENCY"],
+    "tags": ["metrics", "dashboard", "analytics", "monitoring", "intelligence"]
+
+  },
+  {
+    "id": "cash-flow-optimization-engine",
+    "title": "Cash Flow Optimization Engine",
+    "tier": "financial",
+    "complexity": 3,
+    "description": "Advanced cash flow analysis and optimization framework for liquidity management, working capital efficiency, and financial risk mitigation.",
+    "prompt": "Optimize cash flow for [COMPANY] across [TIME_HORIZON]. Analyze: Current cash conversion cycle and working capital efficiency, Accounts receivable and payable optimization opportunities, Inventory management and turnover improvements, Seasonal patterns and cyclical adjustments, Credit facility utilization and covenant compliance. Model: Cash flow scenarios with sensitivity analysis, Liquidity requirements and buffer calculations, Investment timing and capital allocation, Risk factors and mitigation strategies. Deliver: Cash flow optimization plan, Working capital targets, Implementation timeline, Monitoring framework, Performance metrics.",
+    "variables": ["COMPANY", "TIME_HORIZON", "CURRENT_METRICS", "OPTIMIZATION_GOALS"],
+    "tags": ["cash-flow", "liquidity", "working-capital", "optimization", "risk-management"]
+  },
+  {
+    "id": "investment-roi-calculator",
+    "title": "Investment ROI Calculator",
+    "tier": "financial",
+    "complexity": 3,
+    "description": "Comprehensive investment analysis framework with multi-scenario modeling, risk assessment, and return optimization for strategic decision-making.",
+    "prompt": "Evaluate investment opportunity: [INVESTMENT_TYPE] with capital requirement [AMOUNT]. Calculate: Net present value and internal rate of return, Payback period and discounted payback, Risk-adjusted returns and sensitivity analysis, Scenario modeling (best/base/worst case), Opportunity cost and alternative comparisons. Consider: Market conditions and competitive landscape, Technology risks and obsolescence factors, Regulatory environment and compliance costs, Exit strategies and liquidity options. Present: Executive summary with recommendation, Financial projections and assumptions, Risk assessment and mitigation, Implementation timeline and milestones.",
+    "variables": ["INVESTMENT_TYPE", "AMOUNT", "TIME_FRAME", "RISK_PROFILE"],
+    "tags": ["investment", "roi", "analysis", "valuation", "decision-making"]
+  },
+  {
+    "id": "budget-variance-intelligence",
+    "title": "Budget Variance Intelligence",
+    "tier": "financial",
+    "complexity": 2,
+    "description": "Systematic budget analysis framework for identifying variances, understanding root causes, and implementing corrective actions for financial control.",
+    "prompt": "Analyze budget variance for [DEPARTMENT/DIVISION] in [PERIOD]. Examine: Actual vs budget performance across categories, Variance magnitude and trend analysis, Root cause identification and impact assessment, Seasonal adjustments and timing differences, Volume vs price variance decomposition. Investigate: Operational drivers and business changes, Market conditions and external factors, Process efficiency and cost structure, Resource allocation and productivity metrics. Provide: Variance explanation and commentary, Corrective action recommendations, Forecast adjustments and implications, Performance improvement opportunities, Monitoring and control enhancements.",
+    "variables": ["DEPARTMENT", "PERIOD", "VARIANCE_FOCUS", "PERFORMANCE_CONTEXT"],
+    "tags": ["budget", "variance", "analysis", "control", "performance"]
+  },
+  {
+    "id": "financial-risk-assessment",
+    "title": "Financial Risk Assessment",
+    "tier": "financial",
+    "complexity": 3,
+    "description": "Comprehensive financial risk evaluation framework covering market, credit, operational, and liquidity risks with mitigation strategies.",
+    "prompt": "Assess financial risks for [ORGANIZATION] across [RISK_CATEGORIES]. Evaluate: Market risk exposure and volatility impacts, Credit risk concentration and counterparty analysis, Operational risk factors and process vulnerabilities, Liquidity risk scenarios and funding requirements, Interest rate and currency exposure assessment. Quantify: Value at risk and stress testing results, Probability and impact matrices, Correlation effects and portfolio risks, Regulatory capital requirements, Insurance and hedging costs. Develop: Risk mitigation strategies and controls, Monitoring frameworks and early warning systems, Contingency planning and crisis responses, Board reporting and governance structures.",
+    "variables": ["ORGANIZATION", "RISK_CATEGORIES", "RISK_TOLERANCE", "ASSESSMENT_SCOPE"],
+    "tags": ["risk", "assessment", "mitigation", "compliance", "governance"]
+  },
+  {
+    "id": "cost-structure-optimization",
+    "title": "Cost Structure Optimization",
+    "tier": "financial",
+    "complexity": 3,
+    "description": "Strategic cost analysis and optimization framework for improving margins, efficiency, and competitive positioning through systematic cost management.",
+    "prompt": "Optimize cost structure for [BUSINESS_UNIT] targeting [COST_REDUCTION_GOAL]. Analyze: Cost driver identification and activity-based costing, Fixed vs variable cost breakdown and scalability, Direct and indirect cost allocation and efficiency, Benchmark analysis and industry comparisons, Process automation and digitization opportunities. Design: Cost reduction initiatives with impact quantification, Timeline and implementation roadmap, Resource requirements and change management, Quality and service level maintenance, Measurement and monitoring systems. Include: Risk assessment and mitigation, Stakeholder communication plan, Success metrics and milestones, Continuous improvement framework.",
+    "variables": ["BUSINESS_UNIT", "COST_REDUCTION_GOAL", "ANALYSIS_SCOPE", "CONSTRAINTS"],
+    "tags": ["cost", "optimization", "efficiency", "margins", "competitiveness"]
+  },
+  {
+    "id": "merger-acquisition-valuation",
+    "title": "Merger & Acquisition Valuation",
+    "tier": "financial",
+    "complexity": 3,
+    "description": "Comprehensive M&A valuation framework with multiple methodologies, synergy analysis, and deal structure optimization for strategic transactions.",
+    "prompt": "Value M&A target: [TARGET_COMPANY] for transaction type [DEAL_TYPE]. Apply: Discounted cash flow and terminal value analysis, Comparable company and transaction multiples, Asset-based and liquidation valuations, Synergy identification and quantification, Accretion/dilution analysis and integration costs. Model: Base case and sensitivity scenarios, Market condition adjustments, Integration timeline and risk factors, Financing structure and cost of capital, Tax implications and optimization strategies. Deliver: Valuation range and recommendation, Deal structure alternatives, Due diligence priorities, Integration planning framework, Risk assessment and mitigation.",
+    "variables": ["TARGET_COMPANY", "DEAL_TYPE", "VALUATION_PURPOSE", "STRATEGIC_RATIONALE"],
+    "tags": ["valuation", "ma", "synergies", "integration", "strategy"]
+  },
+  {
+    "id": "capital-allocation-strategy",
+    "title": "Capital Allocation Strategy",
+    "tier": "financial",
+    "complexity": 3,
+    "description": "Strategic capital deployment framework for optimizing returns, balancing growth investments, and maximizing shareholder value creation.",
+    "prompt": "Design capital allocation strategy for [COMPANY] with available capital [AMOUNT]. Prioritize: Growth investment opportunities and returns, Debt reduction and leverage optimization, Dividend policy and shareholder returns, Share repurchase timing and execution, Strategic acquisitions and partnerships. Evaluate: Return on invested capital and hurdle rates, Risk-adjusted returns and portfolio effects, Market timing and economic cycles, Stakeholder expectations and communications, Regulatory constraints and tax implications. Develop: Allocation framework and decision criteria, Implementation timeline and milestones, Performance measurement and monitoring, Flexibility and adjustment mechanisms, Board reporting and governance.",
+    "variables": ["COMPANY", "AMOUNT", "STRATEGIC_PRIORITIES", "MARKET_CONDITIONS"],
+    "tags": ["capital", "allocation", "strategy", "returns", "value-creation"]
+  },
+  {
+    "id": "financial-reporting-automation",
+    "title": "Financial Reporting Automation",
+    "tier": "financial",
+    "complexity": 2,
+    "description": "Systematic financial reporting optimization framework for accuracy, efficiency, and real-time insights with automated analytics and controls.",
+    "prompt": "Automate financial reporting for [REPORTING_SCOPE] targeting [STAKEHOLDER_AUDIENCE]. Design: Data integration and validation processes, Automated calculation and consolidation, Exception handling and error detection, Real-time dashboard and analytics, Regulatory compliance and audit trails. Implement: Report generation and distribution automation, Variance analysis and commentary systems, Drill-down capabilities and source tracing, Mobile access and notification systems, Version control and approval workflows. Include: Data quality monitoring, User training and documentation, Backup and recovery procedures, Performance metrics and optimization, Continuous improvement processes.",
+    "variables": ["REPORTING_SCOPE", "STAKEHOLDER_AUDIENCE", "AUTOMATION_LEVEL", "COMPLIANCE_REQUIREMENTS"],
+    "tags": ["reporting", "automation", "analytics", "compliance", "efficiency"]
+  },
+  {
+    "id": "pricing-strategy-optimization",
+    "title": "Pricing Strategy Optimization",
+    "tier": "financial",
+    "complexity": 3,
+    "description": "Dynamic pricing analysis framework for revenue optimization, competitive positioning, and customer value maximization across market segments.",
+    "prompt": "Optimize pricing strategy for [PRODUCT/SERVICE] in [MARKET_SEGMENT]. Analyze: Price elasticity and demand sensitivity, Competitive pricing and positioning analysis, Customer value perception and willingness to pay, Cost structure and margin requirements, Market segmentation and differentiation opportunities. Model: Revenue and profit optimization scenarios, Dynamic pricing and promotional strategies, Bundle and upselling opportunities, Geographic and temporal variations, Cannibalization and portfolio effects. Develop: Pricing architecture and governance, Implementation timeline and testing, Performance monitoring and adjustment, Communication and change management, Success metrics and KPIs.",
+    "variables": ["PRODUCT", "MARKET_SEGMENT", "PRICING_OBJECTIVES", "COMPETITIVE_CONTEXT"],
+    "tags": ["pricing", "revenue", "optimization", "strategy", "profitability"]
+  },
+  {
+    "id": "treasury-management-system",
+    "title": "Treasury Management System",
+    "tier": "financial",
+    "complexity": 3,
+    "description": "Comprehensive treasury operations framework for liquidity management, risk hedging, and financial efficiency optimization across global operations.",
+    "prompt": "Design treasury management system for [ORGANIZATION] with operations in [GEOGRAPHIC_SCOPE]. Establish: Cash pooling and netting arrangements, Foreign exchange risk management, Interest rate hedging strategies, Banking relationship optimization, Investment policy and money market operations. Implement: Real-time cash visibility and forecasting, Automated payment and collection systems, Risk monitoring and reporting, Compliance and regulatory management, Performance measurement and benchmarking. Include: Technology platform requirements, Operational procedures and controls, Staff training and development, Audit and governance framework, Continuous improvement processes.",
+    "variables": ["ORGANIZATION", "GEOGRAPHIC_SCOPE", "TREASURY_OBJECTIVES", "RISK_TOLERANCE"],
+    "tags": ["treasury", "liquidity", "hedging", "operations", "risk-management"]
+  }
+]
+

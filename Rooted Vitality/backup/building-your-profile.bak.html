@@ -1,0 +1,342 @@
+<!--
+╔════════════════════════════════════════════════════════════════════╗
+║  ROOTED VITALITY, INC.                                             ║
+║  File: articles/building-your-profile.html                         ║
+║  Purpose: Article — Importance of a Strong Practitioner Profile    ║
+║  Holistic Wellness · Modern Connection Platform                    ║
+║  rootedvitality.com | 2025                                         ║
+╚════════════════════════════════════════════════════════════════════╝
+
+TABLE OF CONTENTS
+  1. HEAD: Metadata, Fonts & Styles
+  2. BODY: Article Structure
+  3. HERO: Building Your Winning Profile
+  4. SECTION 1: Profile Essentials
+  5. SECTION 2: Making Your Profile Stand Out
+  6. SECTION 3: Optimization & Maintenance
+  7. SCRIPTS: Back Button Navigation
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Building Your Practitioner Profile | Rooted Vitality Help Center</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700&family=Lora:wght@400&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --rooted-primary: #5c9a72;
+            --rooted-accent: #d4c47c;
+            --rooted-neutral: #f7f5f1;
+            --rooted-dark: #2e2b28;
+            --rooted-white: rgba(255, 255, 255, 0.70);
+        }
+        
+        html {
+            background: var(--rooted-neutral);
+            min-width: 360px;
+        }
+        
+        body {
+            font-family: 'Lora', serif;
+            color: var(--rooted-dark);
+            margin: 0;
+            padding: 0;
+            position: relative;
+        }
+        
+        /* Logo Watermark */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 1600px;
+            height: 1600px;
+            background: url('../assets/logo_large.png') center/contain no-repeat;
+            opacity: 0.08;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        /* Tablet: Scale down watermark */
+        @media (max-width: 1024px) {
+            body::before {
+                width: 1200px;
+                height: 1200px;
+                opacity: 0.10;
+                left: 50% !important;
+                transform: translate(-50%, -50%) !important;
+            }
+        }
+        
+        /* Mobile: Further scale and center it */
+        @media (max-width: 768px) {
+            body::before {
+                width: 900px;
+                height: 900px;
+                opacity: 0.12;
+                left: 50% !important;
+                transform: translate(-50%, -50%) !important;
+            }
+        }
+        
+        /* Small Mobile: Even tighter and center it */
+        @media (max-width: 480px) {
+            body::before {
+                width: 700px;
+                height: 700px;
+                opacity: 0.14;
+                left: 50% !important;
+                transform: translate(-50%, -50%) !important;
+            }
+        }
+        
+        h1, h2, h3 {
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+        }
+        
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Back Button */
+        .back-button {
+            display: inline-block;
+            padding: 0.6rem 1.2rem;
+            background: var(--rooted-white);
+            border: 2px solid var(--rooted-primary);
+            border-radius: 8px;
+            color: var(--rooted-primary);
+            text-decoration: none;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 2rem;
+        }
+        
+        .back-button:hover {
+            background: var(--rooted-primary);
+            color: var(--rooted-white);
+        }
+        
+        .back-button:focus {
+            outline: 2px solid var(--rooted-accent);
+            outline-offset: 2px;
+        }
+        
+        /* Article Header */
+        .article-header {
+            margin-bottom: 2rem;
+        }
+        
+        .article-title {
+            font-size: 2rem;
+            color: var(--rooted-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .article-meta {
+            font-size: 0.9rem;
+            color: #8a8a8a;
+            font-style: italic;
+        }
+        
+        /* Article Content */
+        .article-content {
+            background: var(--rooted-white);
+            border-radius: 12px;
+            padding: 2rem 1.5rem;
+            box-shadow: 0 2px 12px rgba(46,43,40,0.08);
+            line-height: 1.8;
+        }
+        
+        .article-content h2 {
+            color: var(--rooted-primary);
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .article-content h3 {
+            color: var(--rooted-accent);
+            font-size: 1.2rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.8rem;
+        }
+        
+        .article-content p {
+            margin-bottom: 1rem;
+            color: var(--rooted-dark);
+        }
+        
+        .article-content ul {
+            margin-bottom: 1.5rem;
+            padding-left: 2rem;
+        }
+        
+        .article-content li {
+            margin-bottom: 0.8rem;
+            color: var(--rooted-dark);
+        }
+        
+        .highlight-box {
+            background: rgba(92,154,114,0.08);
+            border-left: 4px solid var(--rooted-primary);
+            padding: 1rem 1.2rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            font-style: italic;
+        }
+        
+        .checklist {
+            background: rgba(212,196,124,0.05);
+            border: 1px solid var(--rooted-accent);
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin: 1.5rem 0;
+        }
+        
+        .checklist h3 {
+            margin-top: 0;
+            color: var(--rooted-primary);
+        }
+        
+        .checklist ul {
+            margin-bottom: 0;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 1rem 0.5rem;
+            }
+            
+            .article-title {
+                font-size: 1.5rem;
+            }
+            
+            .article-content {
+                padding: 1.2rem 0.7rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ========== -->
+    <!-- 2. BODY: Article Structure -->
+    <!-- ========== -->
+    <div class="container">
+        <a href="../index.html" class="back-button">← Back to Help Center</a>
+        
+        <!-- ========== -->
+        <!-- 3. HERO: Building Your Winning Profile -->
+        <!-- ========== -->
+        <div class="article-header">
+            <h1 class="article-title">Building Your Winning Practitioner Profile</h1>
+            <div class="article-meta">Last updated: October 2025</div>
+        </div>
+        
+        <div class="article-content">
+            <!-- ========== -->
+            <!-- 4. SECTION 1: Profile Essentials -->
+            <!-- ========== -->
+            <h2>Why Your Profile Matters</h2>
+            <p>Your Rooted Vitality profile is your digital storefront. It's the first impression potential clients get of your expertise, services, and professionalism. A strong profile directly impacts:</p>
+            <ul>
+                <li>How often you receive qualified leads</li>
+                <li>The quality of matches between you and clients</li>
+                <li>Your perceived credibility and trust level</li>
+                <li>Lead conversion rates</li>
+            </ul>
+            
+            <div class="highlight-box">
+                <strong>Key Insight:</strong> Practitioners with complete, detailed profiles receive 3-4x more qualified leads than those with minimal profiles.
+            </div>
+            
+            <h2>Essential Profile Elements</h2>
+            
+            <h3>1. Professional Photo</h3>
+            <p>Use a high-quality, professional headshot or in-practice photo. Ensure good lighting and a clean background. Clients want to see the person they'll be working with—authenticity builds trust.</p>
+            
+            <h3>2. Bio & Background</h3>
+            <p>Write a clear, compelling bio that includes:</p>
+            <ul>
+                <li>Your credentials and certifications (years of experience)</li>
+                <li>Your specialization areas (e.g., acupuncture, herbal medicine, massage therapy)</li>
+                <li>Your treatment philosophy or approach</li>
+                <li>Unique value propositions (what sets you apart)</li>
+            </ul>
+            
+            <h3>3. Services Offered</h3>
+            <p>List each service clearly with a brief description and estimated consultation time. Be specific—"Wellness coaching" is less effective than "1-on-1 nutrition and lifestyle coaching for chronic stress management."</p>
+            
+            <h3>4. Availability</h3>
+            <p>Set your consulting hours accurately. Highlight flexibility if you offer evenings or weekends. Clients notice when availability aligns with their schedules.</p>
+            
+            <h3>5. Service Rates or Consultation Fees</h3>
+            <p>Be transparent about costs. If you offer free initial consultations, make this clear. Clients appreciate knowing the financial expectations upfront.</p>
+            
+            <h3>6. Testimonials & Social Proof</h3>
+            <p>Once you start working with clients, ask them to leave reviews. Positive feedback dramatically increases conversion rates from leads to bookings.</p>
+            
+            <h3>7. Credentials & Certifications</h3>
+            <p>Upload copies of relevant licenses, certifications, or continuing education documentation. Healthcare compliance and trust depend on verified credentials.</p>
+            
+            <h2>Profile Optimization Tips</h2>
+            
+            <h3>Be Authentic & Approachable</h3>
+            <p>Your writing should be warm and professional, not stiff or overly clinical. Use language your ideal clients use. Show personality while maintaining professionalism.</p>
+            
+            <h3>Focus on Client Outcomes</h3>
+            <p>Rather than listing what you do, explain the benefits clients receive. For example: "I help busy professionals manage stress through personalized acupuncture and lifestyle coaching" sounds better than "I offer acupuncture and lifestyle coaching."</p>
+            
+            <h3>Highlight Your Specialization</h3>
+            <p>If you focus on a specific population (athletes, pregnant women, seniors) or condition (anxiety, pain management, digestive health), make this prominent. Specificity attracts the right clients.</p>
+            
+            <h3>Update Regularly</h3>
+            <p>Keep your availability current. If your hours or services change, update immediately. Stale profiles hurt conversion rates.</p>
+            
+            <div class="checklist">
+                <h3>Profile Completeness Checklist</h3>
+                <ul>
+                    <li>☐ Professional photo uploaded</li>
+                    <li>☐ Detailed bio (100+ words)</li>
+                    <li>☐ At least 3 services listed with descriptions</li>
+                    <li>☐ Accurate availability/hours set</li>
+                    <li>☐ Pricing or consultation fees visible</li>
+                    <li>☐ Relevant credentials & licenses uploaded</li>
+                    <li>☐ Treatment philosophy clearly explained</li>
+                    <li>☐ Client specialization or focus areas noted</li>
+                </ul>
+            </div>
+            
+            <!-- ========== -->
+            <!-- 6. SECTION 3: Optimization & Maintenance -->
+            <!-- ========== -->
+            <h2>After Profile Launch</h2>
+            <p>Once your profile is live, monitor incoming leads and adjust your messaging based on client feedback. If leads consistently ask about a service you don't offer, consider adding it. If certain demographics aren't reaching out, refine your messaging to attract them.</p>
+            
+            <p>Your profile is a living document—invest in it, and it will drive consistent, qualified leads to your practice.</p>
+        </div>
+    </div>
+    
+    <!-- ========== -->
+    <!-- 7. SCRIPTS: Back Button Navigation -->
+    <!-- ========== -->
+</body>
+</html>

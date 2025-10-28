@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Prompt Library | Kyle Mohney</title>
+    <link rel="stylesheet" href="../../styles.css">
+    <style>
+        .filter-btn {
+          transition: background 0.18s, color 0.18s, box-shadow 0.18s, transform 0.12s;
+          box-shadow: 0 1px 4px rgba(30,58,138,0.06);
+        }
+        .filter-btn:hover, .filter-btn:focus {
+          filter: brightness(1.08) saturate(1.2);
+          box-shadow: 0 4px 16px rgba(59,130,246,0.18), 0 1.5px 8px rgba(30,58,138,0.10);
+          transform: translateY(-2px) scale(1.04);
+          outline: none;
+        }
+        .filter-btn:active {
+          filter: brightness(0.96) saturate(1.1);
+          box-shadow: 0 2px 8px rgba(30,58,138,0.18);
+          transform: scale(0.97);
+        }
+        /* Inline override for the bottom divider and quote author */
+        .bottom-navigation .quote-author {
+          color: #3B1976 !important;
+        }
+        .prompt-card-grid {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto 48px auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px 24px;
+            padding: 24px 0;
+            min-height: 320px;
+            background: none;
+            box-sizing: border-box;
+        }
+        @media (max-width: 1024px) {
+            .prompt-card-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 700px) {
+            html, body {
+                width: 100% !important;
+                overflow-x: hidden !important;
+            }
+            .prompt-hero {
+                width: 100%;
+                max-width: 100%;
+                padding: 32px 12px 18px 12px !important;
+                box-sizing: border-box !important;
+                margin: 0 auto !important;
+            }
+            .prompt-hero > h1 {
+                font-size: 2em !important;
+            }
+            .prompt-hero > div[style*='font-size:1.08em'] {
+                font-size: 0.98em !important;
+            }
+            .prompt-hero > div[style*='display:flex'] {
+                flex-direction: column !important;
+                gap: 8px !important;
+                max-width: 100% !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+                margin: 0 auto !important;
+            }
+            .prompt-hero input,
+            .prompt-hero select {
+                width: 100% !important;
+                min-width: 0 !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+            .prompt-filter-bar {
+                flex-wrap: wrap !important;
+                gap: 8px !important;
+                max-width: 100% !important;
+                padding: 10px 0 0 0 !important;
+                margin: 0 auto !important;
+            }
+            .filter-btn {
+                min-width: 110px !important;
+                font-size: 0.98em !important;
+                padding: 9px 0 !important;
+            }
+            .prompt-card-grid {
+                grid-template-columns: 1fr !important;
+                gap: 18px 0 !important;
+                padding: 12px 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+                margin: 0 auto 32px auto !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Universal Header Start -->
+    <header class="universal-header">
+        <div class="header-left">
+            <img src="../../assets/images/kyle.png" alt="Kyle Mohney" class="profile-pic">
+            <span class="header-name">
+                Kyle Mohney
+                <span class="header-name-glow"></span>
+            </span>
+        </div>
+        <nav>
+            <div class="nav-links" id="navLinks">
+                <a href="../../index.html" class="nav-link">Home</a>
+                <a href="../../resume.html" class="nav-link">Resume</a>
+                <a href="../../about.html" class="nav-link">About</a>
+                <a href="../../projects.html" class="nav-link active">Projects</a>
+                <a href="../../articles.html" class="nav-link">Articles</a>
+                <a href="../../contact.html" class="nav-link">Contact</a>
+            </div>
+            <div class="header-icons">
+                <button class="header-icon-btn" id="settings-btn" title="Settings"><span>&#9881;</span></button>
+                <button class="header-icon-btn" id="help-btn" title="Help"><span>?</span></button>
+                <button class="header-icon-btn" id="lang-btn" title="Language">EN</button>
+            </div>
+            <div class="hamburger" id="hamburger" aria-label="Open navigation" tabindex="0">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+    <!-- Universal Header End -->
+
+    <!-- Hero Section Start -->
+    <section class="prompt-hero" style="width:100vw; max-width:100%; background: linear-gradient(135deg, #f8fafc 60%, #e0e7ff 100%); margin: 0 auto 32px auto; padding: 48px 0 36px 0; display: flex; flex-direction: column; align-items: center; box-shadow: 0 2px 24px 0 rgba(30,58,138,0.06);">
+        <h1 style="font-size:2.6em; font-weight:800; margin-bottom:18px; color:#3B1976; letter-spacing:0.5px; text-align:center;">AI Prompt Library</h1>
+        <div style="font-size:1.08em; color:#64748b; font-weight:600; margin-bottom:18px; text-transform:lowercase; letter-spacing:0.5px;">kylemohney.com</div>
+        <div style="width:100%; max-width:420px; margin:0 auto; display:flex; gap:12px; align-items:center;">
+            <input id="search-prompts" type="text" placeholder="Search prompts..." style="width:100%; padding:16px 18px; border-radius:10px; border:2px solid #c7d2fe; font-size:1.1em; font-family:'Montserrat',sans-serif; box-shadow:0 2px 8px #1e3a8a11; outline:none; margin-top:8px;" />
+            <select id="complexity-filter" style="padding:14px 12px; border-radius:10px; border:2px solid #c7d2fe; font-size:1.05em; font-family:'Montserrat',sans-serif; background:#fff; color:#312e81; margin-top:8px; min-width:180px; width:180px; cursor:pointer;">
+                <option value="all">All Complexities</option>
+                <option value="1">Standard (●)</option>
+                <option value="2">Intermediate (●●)</option>
+                <option value="3">Expert (●●●)</option>
+            </select>
+        </div>
+        <!-- Filter & Category Bar Start -->
+        <nav class="prompt-filter-bar" style="width:100%; max-width:600px; background:none; border:none; box-shadow:none; display:flex; justify-content:center; align-items:center; gap:10px; padding:18px 0 0 0; margin:0;">
+            <button class="filter-btn active" data-filter="all" style="background:#111; color:#fff; border-radius:7px; border:none; font-weight:700; padding:10px 22px; font-size:1em; margin:0 2px; cursor:pointer; min-width:120px;">Full List</button>
+            <button class="filter-btn" data-filter="strategic" style="background:#8B5CF6; color:#fff; border-radius:7px; border:none; font-weight:700; padding:10px 22px; font-size:1em; margin:0 2px; cursor:pointer; min-width:120px;">Strategic</button>
+            <button class="filter-btn" data-filter="operational" style="background:#3B82F6; color:#fff; border-radius:7px; border:none; font-weight:700; padding:10px 22px; font-size:1em; margin:0 2px; cursor:pointer; min-width:120px;">Operational</button>
+            <button class="filter-btn" data-filter="financial" style="background:#10B981; color:#fff; border-radius:7px; border:none; font-weight:700; padding:10px 22px; font-size:1em; margin:0 2px; cursor:pointer; min-width:120px;">Financial</button>
+            <button class="filter-btn" data-filter="rd" style="background:#F59E0B; color:#fff; border-radius:7px; border:none; font-weight:700; padding:10px 22px; font-size:1em; margin:0 2px; cursor:pointer; min-width:120px;">R&amp;D</button>
+            <button class="filter-btn" data-filter="technical" style="background:#6B7280; color:#fff; border-radius:7px; border:none; font-weight:700; padding:10px 22px; font-size:1em; margin:0 2px; cursor:pointer; min-width:120px;">Technical</button>
+            <button class="filter-btn" data-filter="lifestyle" style="background:#F97316; color:#fff; border-radius:7px; border:none; font-weight:700; padding:10px 22px; font-size:1em; margin:0 2px; cursor:pointer; min-width:120px;">Lifestyle</button>
+            <button class="filter-btn" data-filter="hr" style="background:#DC2626; color:#fff; border-radius:7px; border:none; font-weight:700; padding:10px 22px; font-size:1em; margin:0 2px; cursor:pointer; min-width:120px;">HR</button>
+        </nav>
+        <!-- Filter & Category Bar End -->
+        <!-- HR Section Description Start -->
+        <!-- HR Section Description Removed -->
+        <!-- HR Section Description End -->
+    </section>
+    <!-- Hero Section End -->
+
+    <!-- Prompt Card Grid Start -->
+    <section id="prompts-grid" class="prompt-card-grid" style="width:100vw; max-width:1200px; margin:0 auto 48px auto; display:grid; grid-template-columns:repeat(3,1fr); gap:32px 24px; padding:24px 0; min-height:320px; background:none;">
+        <!-- Prompt cards will be dynamically injected here -->
+    </section>
+    <!-- Prompt Card Grid End -->
+
+    <!-- Universal Cards Row Start -->
+    <div class="universal-components-container" style="margin-top: 32px; gap: 8px !important; justify-content: center; align-items: flex-start; flex-wrap: wrap;">
+        <div class="universal-contact-card" style="--contact-card-color:#3B1976; border:2.5px solid #3B1976 !important; padding: 18px 10px; margin:0 !important;">
+            <h3 class="universal-contact-title" style="color:#3B1976;">Connect with me</h3>
+            <div class="contact-links">
+                <a href="https://linkedin.com/in/kyle-mohney" target="_blank" rel="noopener" title="LinkedIn">
+                    <img src="../../assets/icons/in.png" alt="LinkedIn" class="contact-icon" />
+                </a>
+                <a href="mailto:kyle.mohney@hotmail.com" title="Email">
+                    <img src="../../assets/icons/mail.png" alt="Email" class="contact-icon" />
+                </a>
+                <a href="https://kmohney.youcanbook.me" target="_blank" rel="noopener" title="Schedule a Meeting">
+                    <img src="../../assets/icons/ycbm-icon.png" alt="You Can Book Me" class="contact-icon" />
+                </a>
+            </div>
+        </div>
+        <div class="universal-share-card" style="--share-card-color:#3B1976; border:2.5px solid #3B1976 !important; padding: 18px 10px; margin:0 !important;">
+            <h3 class="universal-share-title" style="color:#3B1976;">Share this page</h3>
+            <div class="share-links">
+                <a href="https://facebook.com/sharer/sharer.php?u=https://yourdomain.com/projects/Prompt%20Library/index.html" target="_blank" rel="noopener">
+                    <img src="../../assets/icons/facebook.png" alt="Share on Facebook" class="share-icon" />
+                </a>
+                <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://yourdomain.com/projects/Prompt%20Library/index.html" target="_blank" rel="noopener">
+                    <img src="../../assets/icons/in.png" alt="Share on LinkedIn" class="share-icon" />
+                </a>
+                <a href="https://x.com/intent/tweet?url=https://yourdomain.com/projects/Prompt%20Library/index.html" target="_blank" rel="noopener">
+                    <img src="../../assets/icons/x.png" alt="Share on X" class="share-icon" />
+                </a>
+                <a href="#" onclick="navigator.clipboard.writeText(window.location.href);alert('Page link copied!');return false;">
+                    <img src="../../assets/icons/direct-icon.png" alt="Copy Direct Link" class="share-icon" />
+                </a>
+            </div>
+        </div>
+    </div>
+    <!-- Universal Cards Row End -->
+
+    <!-- Universal Bottom Navigation Start -->
+    <section class="bottom-navigation" style="border-top-color: #3B1976 !important;">
+        <div class="bottom-nav-container">
+            <!-- Quick Navigation Only -->
+            <div class="bottom-nav-section">
+                <div class="bottom-nav-title" style="color: #3B1976 !important;">Quick Navigation</div>
+                <div class="bottom-nav-links">
+                    <a href="../../index.html" class="bottom-nav-link" style="color: #111 !important;">Home</a>
+                    <a href="../../resume.html" class="bottom-nav-link" style="color: #111 !important;">Resume</a>
+                    <a href="../../about.html" class="bottom-nav-link" style="color: #111 !important;">About</a>
+                    <a href="../../projects.html" class="bottom-nav-link active" style="color: #3B1976 !important; font-weight: 700;">Projects</a>
+                    <a href="../../articles.html" class="bottom-nav-link" style="color: #111 !important;">Articles</a>
+                    <a href="../../contact.html" class="bottom-nav-link" style="color: #111 !important;">Contact</a>
+                </div>
+            </div>
+            <!-- Inspirational Quote -->
+            <div class="bottom-nav-section">
+                <blockquote class="article-quote" style="color: #111 !important;">
+                    <span>"What gets measured gets managed."</span><br>
+                    <span class="quote-author">- Peter Drucker</span>
+                </blockquote>
+            </div>
+        </div>
+    </section>
+    <!-- Universal Bottom Navigation End -->
+
+    <!-- Header Modals and Script -->
+    <div id="settings-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(24,28,36,0.65); z-index:2000; align-items:center; justify-content:center;">
+        <div style="background:#232a36; padding:32px 40px; border-radius:18px; box-shadow:0 8px 32px rgba(0,0,0,0.25); min-width:320px; max-width:90vw; text-align:center;">
+            <h2 style="font-size:1.3em; font-weight:800; margin-bottom:18px;">Settings</h2>
+            <p style="font-size:1.08em; margin-bottom:18px;">Settings coming soon.</p>
+            <button onclick="closeModal('settings-modal')" style="background:#181c24; color:#e0e7e9; border:none; border-radius:6px; padding:8px 18px; font-weight:700; cursor:pointer;">Close</button>
+        </div>
+    </div>
+    <div id="help-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(24,28,36,0.65); z-index:2000; align-items:center; justify-content:center;">
+        <div style="background:#232a36; padding:32px 40px; border-radius:18px; box-shadow:0 8px 32px rgba(0,0,0,0.25); min-width:320px; max-width:90vw; text-align:center;">
+            <h2 style="font-size:1.3em; font-weight:800; margin-bottom:18px;">Help & Support</h2>
+            <p style="font-size:1.08em; margin-bottom:18px;">Help content coming soon.</p>
+            <button onclick="closeModal('help-modal')" style="background:#181c24; color:#e0e7e9; border:none; border-radius:6px; padding:8px 18px; font-weight:700; cursor:pointer;">Close</button>
+        </div>
+    </div>
+    <script>
+        // Hamburger menu
+        var hamburger = document.getElementById('hamburger');
+        var navLinks = document.getElementById('navLinks');
+        hamburger.addEventListener('click', function() {
+            navLinks.classList.toggle('open');
+        });
+        hamburger.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') navLinks.classList.toggle('open');
+        });
+
+        // Settings & Help modal logic
+        document.getElementById('settings-btn').onclick = function(e) {
+            e.stopPropagation();
+            document.getElementById('settings-modal').style.display = 'flex';
+        };
+        document.getElementById('help-btn').onclick = function(e) {
+            e.stopPropagation();
+            document.getElementById('help-modal').style.display = 'flex';
+        };
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+        document.addEventListener('click', function(e) {
+            if (document.getElementById('settings-modal').style.display === 'flex') document.getElementById('settings-modal').style.display = 'none';
+            if (document.getElementById('help-modal').style.display === 'flex') document.getElementById('help-modal').style.display = 'none';
+        });
+        document.getElementById('settings-modal').onclick = function(e) { e.stopPropagation(); };
+        document.getElementById('help-modal').onclick = function(e) { e.stopPropagation(); };
+
+        // Language dropdown (simple toggle)
+        const langBtn = document.getElementById('lang-btn');
+        langBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            // Example: cycle through languages
+            const langs = ['EN', 'ES', 'FR', 'DE', 'ZH'];
+            let current = langs.indexOf(langBtn.textContent.trim());
+            langBtn.textContent = langs[(current + 1) % langs.length];
+        });
+    </script>
+    <script src="prompts.js"></script>
+</body>
+</html>

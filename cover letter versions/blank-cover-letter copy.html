@@ -1,0 +1,283 @@
+<!--
+Cresta Cover Letter
+====================
+- Uses the universal header as specified in the SYSTEM PROMPT
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cresta Cover Letter</title>
+  <link rel="stylesheet" href="../styles.css">
+  <!-- Print scaling for PDF output -->
+  <style>
+    @media print {
+      /* --- HEADER & NAVIGATION --- */
+      .universal-header {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        background: #fff !important;
+        box-shadow: none !important;
+        border-bottom: 1px solid #bbb !important;
+        padding: 8px 0 8px 0 !important;
+        margin-bottom: 12px !important;
+      }
+      .header-left {
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+      }
+      .profile-pic {
+        width: 36px !important;
+        height: 36px !important;
+        margin-right: 8px !important;
+      }
+      .header-name {
+        font-size: 1.1em !important;
+        font-weight: 700 !important;
+        color: #000 !important;
+      }
+      nav {
+        display: flex !important;
+        align-items: center !important;
+      }
+      .nav-links {
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 10px !important;
+        width: auto !important;
+        height: auto !important;
+        background: none !important;
+        box-shadow: none !important;
+        position: static !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .nav-link {
+        display: inline-block !important;
+        font-size: 11pt !important;
+        padding: 2px 8px !important;
+        color: #000 !important;
+        background: none !important;
+        border: none !important;
+        box-shadow: none !important;
+        text-decoration: underline !important;
+      }
+      .header-icons {
+        display: flex !important;
+        gap: 6px !important;
+      }
+      .header-icon-btn {
+        display: inline-block !important;
+        font-size: 10pt !important;
+        color: #000 !important;
+        background: none !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 2px 6px !important;
+      }
+      .hamburger {
+        display: none !important;
+      }
+
+      /* --- GENERAL LAYOUT --- */
+      body {
+        background: #fff !important;
+        color: #181c24 !important;
+        margin: 0;
+        padding: 0;
+        font-size: 12pt !important;
+        line-height: 1.5 !important;
+      }
+      .cover-letter-body, .blank-card, .bottom-navigation {
+        max-width: 100% !important;
+        width: 100% !important;
+        margin: 0 0 18px 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        page-break-inside: avoid !important;
+      }
+      .cover-letter-body {
+        padding: 18px 18px 18px 18px !important;
+        font-size: 12pt !important;
+      }
+      .blank-card {
+        min-height: 40px !important;
+        min-width: 0 !important;
+        background: #fff !important;
+        border: none !important;
+      }
+
+      /* --- BOTTOM NAVIGATION --- */
+      .bottom-navigation {
+        border-top: 1px solid #222 !important;
+        padding-top: 8px !important;
+        position: fixed !important;
+        left: 0 !important;
+        bottom: 0 !important;
+        width: 100vw !important;
+        background: #fff !important;
+        z-index: 1000 !important;
+        box-shadow: 0 -1px 6px rgba(0,0,0,0.04) !important;
+      }
+      body, .cover-letter-body {
+        padding-bottom: 80px !important;
+      }
+      .bottom-nav-link {
+        color: #000 !important;
+        background: none !important;
+        border: none !important;
+        box-shadow: none !important;
+        font-size: 10pt !important;
+        text-decoration: underline !important;
+        padding: 2px 6px !important;
+      }
+
+      /* --- QUOTES & LINKS --- */
+      .article-quote, .quote-author {
+        color: #222 !important;
+      }
+      a {
+        text-decoration: underline !important;
+        color: #000 !important;
+      }
+
+      /* --- PAGE SETTINGS --- */
+      @page {
+        margin: 0.5in;
+      }
+    }
+  </style>
+</head>
+<body style="display: flex; flex-direction: column; min-height: 100vh;">
+
+  <!-- Universal Header: Inserted from universal-header.html -->
+  <header class="universal-header">
+    <div class="header-left">
+      <img src="../assets/images/kyle.png" alt="Kyle Mohney" class="profile-pic">
+      <span class="header-name">
+        Kyle Mohney
+        <span class="header-name-glow"></span>
+      </span>
+    </div>
+    <nav>
+      <div class="nav-links" id="navLinks">
+              <a href="../index.html" class="nav-link active" style="color: #000 !important;">Home</a>
+              <a href="../resume.html" class="nav-link" style="color: #000 !important;">Resume</a>
+              <a href="../about.html" class="nav-link" style="color: #000 !important;">About</a>
+              <a href="../projects.html" class="nav-link" style="color: #000 !important;">Projects</a>
+              <a href="../articles.html" class="nav-link" style="color: #000 !important;">Articles</a>
+              <a href="../contact.html" class="nav-link" style="color: #000 !important;">Contact</a>
+      </div>
+      <div class="header-icons">
+              <button class="header-icon-btn" id="settings-btn" title="Settings" style="color: #000 !important;"><span>&#9881;</span></button>
+              <button class="header-icon-btn" id="help-btn" title="Help" style="color: #000 !important;"><span>?</span></button>
+              <button class="header-icon-btn" id="lang-btn" title="Language" style="color: #000 !important;">EN</button>
+      </div>
+      <div class="hamburger" id="hamburger" aria-label="Open navigation" tabindex="0">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </nav>
+  </header>
+  <!-- Blank Card: styled to match universal header buttons -->
+
+  <!-- Cover Letter Body: Main Content Card -->
+  <div class="cover-letter-body" style="max-width: 700px; margin: 40px auto 0 auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 16px rgba(0,0,0,0.06); padding: 36px 32px 32px 32px; border: 1.5px solid #e0e0e0; color: #181c24; font-size: 1.13rem; line-height: 1.7;">
+    <p>Dear [Hiring] Team,</p>
+    <p>This cover letter was built with AI automation — complete with working buttons that lead to my website, where you can see the scope of what I deliver. It’s a small demonstration of how I work: fast, functional, and hands-on.</p>
+    <p>I don’t just use AI — I orchestrate it. In one 48-hour sprint, I built my entire website 1.0 by coordinating eight AI agents across two computers and three monitors, each handling different tasks from icon design to system prompts. The result wasn’t theory — it was a live, branded product delivered under real constraints.</p>
+    <p>At HomeAdvisor I mastered operations under pressure; at Thumbtack I flipped that experience into AI-driven enablement, cutting resolution times from days to hours and training 100+ agents to work confidently with AI tools.</p>
+    <p>I move fast, translate ambiguity into clarity, and deliver systems people actually use.</p>
+    <p>Thank you for your time and consideration.</p>
+    <p style="margin-top: 32px;">Warm regards,<br>Kyle J. Mohney</p>
+  </div>
+
+  <!-- Universal Bottom Navigation - Quick Navigation Only -->
+  <section class="bottom-navigation" style="border-top-color: rgb(73, 73, 73) !important; margin-top: auto;">
+    <div class="bottom-nav-container">
+      <!-- Quick Navigation Only -->
+      <div class="bottom-nav-section">
+        <div class="bottom-nav-title">Quick Navigation</div> 
+        <div class="bottom-nav-links">
+          <a href="../index.html" class="bottom-nav-link active" style="color: #000 !important;">Home</a>
+          <a href="../resume.html" class="bottom-nav-link" style="color: #000 !important;">Resume</a>
+          <a href="../about.html" class="bottom-nav-link" style="color: #000 !important;">About</a>
+          <a href="../projects.html" class="bottom-nav-link" style="color: #000 !important;">Projects</a>
+          <a href="../articles.html" class="bottom-nav-link" style="color: #000 !important;">Articles</a>
+          <a href="../contact.html" class="bottom-nav-link" style="color: #000 !important;">Contact</a>
+        </div>
+      </div>
+
+      <!-- Inspirational Quote -->
+      <div class="bottom-nav-section">
+        <blockquote class="article-quote">
+          <span>"Practice, the master of all things."</span><br>
+          <span class="quote-author">— Augustus (Gaius Octavius)</span>
+        </blockquote>
+      </div>
+    </div>
+  </section>
+  <!-- Modals for Settings and Help -->
+  <div id="settings-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(24,28,36,0.65); z-index:2000; align-items:center; justify-content:center;">
+    <div style="background:#232a36; padding:32px 40px; border-radius:18px; box-shadow:0 8px 32px rgba(0,0,0,0.25); min-width:320px; max-width:90vw; text-align:center;">
+      <h2 style="font-size:1.3em; font-weight:800; margin-bottom:18px;">Settings</h2>
+      <p style="font-size:1.08em; margin-bottom:18px;">Settings coming soon.</p>
+      <button onclick="closeModal('settings-modal')" style="background:#181c24; color:#e0e7e9; border:none; border-radius:6px; padding:8px 18px; font-weight:700; cursor:pointer;">Close</button>
+    </div>
+  </div>
+  <div id="help-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(24,28,36,0.65); z-index:2000; align-items:center; justify-content:center;">
+    <div style="background:#232a36; padding:32px 40px; border-radius:18px; box-shadow:0 8px 32px rgba(0,0,0,0.25); min-width:320px; max-width:90vw; text-align:center;">
+      <h2 style="font-size:1.3em; font-weight:800; margin-bottom:18px;">Help & Support</h2>
+      <p style="font-size:1.08em; margin-bottom:18px;">Help content coming soon.</p>
+      <button onclick="closeModal('help-modal')" style="background:#181c24; color:#e0e7e9; border:none; border-radius:6px; padding:8px 18px; font-weight:700; cursor:pointer;">Close</button>
+    </div>
+  </div>
+  <script>
+    // Hamburger menu
+    var hamburger = document.getElementById('hamburger');
+    var navLinks = document.getElementById('navLinks');
+    hamburger.addEventListener('click', function() {
+      navLinks.classList.toggle('open');
+    });
+    hamburger.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') navLinks.classList.toggle('open');
+    });
+
+    // Settings & Help modal logic
+    document.getElementById('settings-btn').onclick = function(e) {
+      e.stopPropagation();
+      document.getElementById('settings-modal').style.display = 'flex';
+    };
+    document.getElementById('help-btn').onclick = function(e) {
+      e.stopPropagation();
+      document.getElementById('help-modal').style.display = 'flex';
+    };
+    function closeModal(id) {
+      document.getElementById(id).style.display = 'none';
+    }
+    document.addEventListener('click', function(e) {
+      if (document.getElementById('settings-modal').style.display === 'flex') document.getElementById('settings-modal').style.display = 'none';
+      if (document.getElementById('help-modal').style.display === 'flex') document.getElementById('help-modal').style.display = 'none';
+    });
+    document.getElementById('settings-modal').onclick = function(e) { e.stopPropagation(); };
+    document.getElementById('help-modal').onclick = function(e) { e.stopPropagation(); };
+
+    // Language dropdown (simple toggle)
+    const langBtn = document.getElementById('lang-btn');
+    langBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      // Example: cycle through languages
+      const langs = ['EN', 'ES', 'FR', 'DE', 'ZH'];
+      let current = langs.indexOf(langBtn.textContent.trim());
+      langBtn.textContent = langs[(current + 1) % langs.length];
+    });
+  </script>
+
+</body>
+</html>

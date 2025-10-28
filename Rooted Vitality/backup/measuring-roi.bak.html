@@ -1,0 +1,368 @@
+<!--
+╔════════════════════════════════════════════════════════════════════╗
+║  ROOTED VITALITY, INC.                                             ║
+║  File: articles/measuring-roi.html                                 ║
+║  Purpose: Article — Measuring ROI and Success Metrics              ║
+║  Holistic Wellness · Modern Connection Platform                    ║
+║  rootedvitality.com | 2025                                         ║
+╚════════════════════════════════════════════════════════════════════╝
+
+TABLE OF CONTENTS
+  1. HEAD: Metadata, Fonts & Styles
+  2. BODY: Article Structure
+  3. HERO: Measuring ROI & Success Metrics
+  4. SECTION 1: Key Performance Indicators
+  5. SECTION 2: Calculating Your ROI
+  6. SECTION 3: Optimization & Growth
+  7. SCRIPTS: Back Button Navigation
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Measuring Your ROI | Rooted Vitality Help Center</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700&family=Lora:wght@400&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --rooted-primary: #5c9a72;
+            --rooted-accent: #d4c47c;
+            --rooted-neutral: #f7f5f1;
+            --rooted-dark: #2e2b28;
+            --rooted-white: rgba(255, 255, 255, 0.70);
+        }
+        
+        html {
+            background: var(--rooted-neutral);
+            min-width: 360px;
+        }
+        
+        body {
+            font-family: 'Lora', serif;
+            color: var(--rooted-dark);
+            margin: 0;
+            padding: 0;
+            position: relative;
+        }
+        
+        /* Logo Watermark */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 1600px;
+            height: 1600px;
+            background: url('../assets/logo_large.png') center/contain no-repeat;
+            opacity: 0.08;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        /* Tablet: Scale down watermark */
+        @media (max-width: 1024px) {
+            body::before {
+                width: 1200px;
+                height: 1200px;
+                opacity: 0.10;
+                left: 50% !important;
+                transform: translate(-50%, -50%) !important;
+            }
+        }
+        
+        /* Mobile: Further scale and center it */
+        @media (max-width: 768px) {
+            body::before {
+                width: 900px;
+                height: 900px;
+                opacity: 0.12;
+                left: 50% !important;
+                transform: translate(-50%, -50%) !important;
+            }
+        }
+        
+        /* Small Mobile: Even tighter and center it */
+        @media (max-width: 480px) {
+            body::before {
+                width: 700px;
+                height: 700px;
+                opacity: 0.14;
+                left: 50% !important;
+                transform: translate(-50%, -50%) !important;
+            }
+        }
+        
+        h1, h2, h3 {
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+        }
+        
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Back Button */
+        .back-button {
+            display: inline-block;
+            padding: 0.6rem 1.2rem;
+            background: var(--rooted-white);
+            border: 2px solid var(--rooted-primary);
+            border-radius: 8px;
+            color: var(--rooted-primary);
+            text-decoration: none;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 2rem;
+        }
+        
+        .back-button:hover {
+            background: var(--rooted-primary);
+            color: var(--rooted-white);
+        }
+        
+        .back-button:focus {
+            outline: 2px solid var(--rooted-accent);
+            outline-offset: 2px;
+        }
+        
+        /* Article Header */
+        .article-header {
+            margin-bottom: 2rem;
+        }
+        
+        .article-title {
+            font-size: 2rem;
+            color: var(--rooted-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .article-meta {
+            font-size: 0.9rem;
+            color: #8a8a8a;
+            font-style: italic;
+        }
+        
+        /* Article Content */
+        .article-content {
+            background: var(--rooted-white);
+            border-radius: 12px;
+            padding: 2rem 1.5rem;
+            box-shadow: 0 2px 12px rgba(46,43,40,0.08);
+            line-height: 1.8;
+        }
+        
+        .article-content h2 {
+            color: var(--rooted-primary);
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .article-content h3 {
+            color: var(--rooted-accent);
+            font-size: 1.2rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.8rem;
+        }
+        
+        .article-content p {
+            margin-bottom: 1rem;
+            color: var(--rooted-dark);
+        }
+        
+        .article-content ul, .article-content ol {
+            margin-bottom: 1.5rem;
+            padding-left: 2rem;
+        }
+        
+        .article-content li {
+            margin-bottom: 0.8rem;
+            color: var(--rooted-dark);
+        }
+        
+        .highlight-box {
+            background: rgba(92,154,114,0.08);
+            border-left: 4px solid var(--rooted-primary);
+            padding: 1rem 1.2rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+        
+        .formula-box {
+            background: rgba(212,196,124,0.1);
+            border: 1px solid var(--rooted-accent);
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin: 1.5rem 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+        
+        .formula-box strong {
+            color: var(--rooted-primary);
+        }
+        
+        .metric-card {
+            background: rgba(92,154,114,0.05);
+            border-left: 3px solid var(--rooted-primary);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 6px;
+        }
+        
+        .metric-card strong {
+            color: var(--rooted-primary);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 1rem 0.5rem;
+            }
+            
+            .article-title {
+                font-size: 1.5rem;
+            }
+            
+            .article-content {
+                padding: 1.2rem 0.7rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="../index.html" class="back-button">← Back to Help Center</a>
+        
+        <div class="article-header">
+            <h1 class="article-title">Measuring Success: Your ROI Dashboard</h1>
+            <div class="article-meta">Last updated: October 2025</div>
+        </div>
+        
+        <div class="article-content">
+            <h2>Why ROI Matters</h2>
+            <p>ROI (Return on Investment) is the single most important metric for pay-per-lead practitioners. It tells you whether Rooted Vitality is actually making you money—or costing you money.</p>
+            
+            <p>Unlike a salaried job or flat monthly retainer, your income with pay-per-lead depends on conversion efficiency. Understanding your ROI helps you make data-driven decisions about where to invest your time and resources.</p>
+            
+            <h2>The Core ROI Formula</h2>
+            <div class="formula-box">
+                <strong>ROI = (Revenue from Conversions - Cost of Leads) / Cost of Leads × 100</strong>
+                <br><br>
+                Example:<br>
+                • Cost per lead: $50<br>
+                • Leads received this month: 20<br>
+                • Total cost: $1,000<br>
+                • Consultations booked: 10 (50% conversion)<br>
+                • Average client revenue: $150 per session<br>
+                • Total revenue: $1,500<br>
+                <strong>ROI = ($1,500 - $1,000) / $1,000 × 100 = 50% ROI</strong>
+            </div>
+            
+            <p>A 50% ROI means for every dollar you spend on leads, you make $1.50 in return—a solid margin.</p>
+            
+            <h2>Key Metrics to Track</h2>
+            
+            <div class="metric-card">
+                <strong>1. Cost Per Lead (CPL)</strong>
+                What Rooted Vitality charges you per lead. Fixed and transparent. Example: $50/lead.
+            </div>
+            
+            <div class="metric-card">
+                <strong>2. Conversion Rate</strong>
+                Percentage of leads that book a consultation. Formula: (Consultations Booked / Leads Received) × 100. Target: 20-40% for experienced practitioners.
+            </div>
+            
+            <div class="metric-card">
+                <strong>3. Average Client Revenue</strong>
+                Average income per client consultation. Includes initial consultations and follow-ups. Example: $150 per session.
+            </div>
+            
+            <div class="metric-card">
+                <strong>4. Customer Lifetime Value (CLV)</strong>
+                Total revenue from a lead that converts to a long-term client. Example: If a lead converts and becomes a repeat client with 5 sessions at $150 each = $750 CLV.
+            </div>
+            
+            <div class="metric-card">
+                <strong>5. Break-Even Point</strong>
+                Number of leads needed before you start making profit. Formula: Total Monthly Expenses / Average Revenue Per Converted Lead.
+            </div>
+            
+            <h2>Building Your Tracking System</h2>
+            
+            <h3>Simple Spreadsheet Method</h3>
+            <p>Use a basic spreadsheet to track:</p>
+            <ul>
+                <li>Date lead received</li>
+                <li>Lead contact info (anonymized if needed)</li>
+                <li>Date contacted / Follow-up dates</li>
+                <li>Outcome (Booked / Not Interested / Pending)</li>
+                <li>Revenue generated (if converted)</li>
+            </ul>
+            
+            <p>Update weekly and review monthly. This gives you real-time visibility into what's working.</p>
+            
+            <h3>Monthly ROI Calculation</h3>
+            <p>At the end of each month, calculate:</p>
+            <ol>
+                <li>Total leads received × cost per lead = Total Lead Cost</li>
+                <li>Total revenue from all converted leads = Total Revenue</li>
+                <li>Subtract lead costs from revenue = Net Profit</li>
+                <li>Divide net profit by lead costs, multiply by 100 = ROI %</li>
+            </ol>
+            
+            <h2>Healthy ROI Benchmarks</h2>
+            <p>What should you aim for?</p>
+            <ul>
+                <li><strong>0-25% ROI:</strong> You're breaking even or slightly profitable. Consider optimizing your conversion or rates.</li>
+                <li><strong>25-50% ROI:</strong> Good! You're making solid profit. This is sustainable.</li>
+                <li><strong>50-100% ROI:</strong> Excellent. You're converting well and commanding strong rates.</li>
+                <li><strong>100%+ ROI:</strong> Outstanding. You've mastered lead conversion or serve high-value clients.</li>
+            </ul>
+            
+            <div class="highlight-box">
+                <strong>Tip:</strong> Compare your PPL ROI to what you'd earn through traditional marketing (ads, website) or word-of-mouth. PPL often outperforms because leads are pre-qualified and low-risk for you.
+            </div>
+            
+            <h2>Improving Your ROI</h2>
+            
+            <h3>Increase Conversion Rate</h3>
+            <p>Improve follow-up, strengthen your profile, get testimonials, and refine your pitch. Even a 5% increase in conversion rate significantly improves ROI.</p>
+            
+            <h3>Increase Average Revenue Per Client</h3>
+            <p>Offer package deals (e.g., 5 sessions for discounted rate), upsell complementary services, or raise consultation rates slightly if demand is strong.</p>
+            
+            <h3>Reduce Cost Per Lead</h3>
+            <p>Negotiate volume discounts with Rooted Vitality if you're consistently converting well and ready to scale.</p>
+            
+            <h3>Focus on Repeat Clients</h3>
+            <p>A lead that converts to a 5-session client has 5x the lifetime value of a one-time consultation. Build strong relationships to encourage repeat bookings.</p>
+            
+            <h2>When to Scale</h2>
+            <p>Once you're consistently achieving 25%+ ROI and have capacity for more clients, consider requesting additional leads. Track your metrics closely during scaling—more leads doesn't always mean better overall ROI if your conversion rate drops.</p>
+            
+            <p>Scale gradually. Increase by 10-20% each month and monitor your conversion rate. If it holds steady, you've found a scalable model.</p>
+            
+            <div class="highlight-box">
+                <strong>Final Thought:</strong> Numbers don't lie. Your ROI tells you whether pay-per-lead is working for your practice. Track it consistently, optimize continuously, and adjust your strategy based on data, not assumptions.
+            </div>
+        </div>
+    </div>
+</body>
+</html>
