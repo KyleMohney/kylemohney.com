@@ -464,8 +464,8 @@ const RootedVitality = {
                 
                 // Navigate to appropriate dashboard
                 const targetUrl = newView === 'practitioner' 
-                    ? '/dashboard/pro/index.html' 
-                    : '/dashboard/client-dashboard.html';
+                    ? '/rooted-vitality/dashboard/pro/index.html' 
+                    : '/rooted-vitality/dashboard/client-dashboard.html';
                 
                 console.log(`[Rooted Vitality] Redirecting to: ${targetUrl}`);
                 window.location.href = targetUrl;
