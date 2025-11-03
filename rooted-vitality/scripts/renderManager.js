@@ -11,7 +11,7 @@ let currentTab = 'client';
 // ======================================================
 async function loadArticleData() {
   try {
-    const response = await fetch('/data/articles.json');
+    const response = await fetch('/rooted-vitality/data/articles.json');
     articleData = await response.json();
     console.log('Article data loaded successfully');
   } catch (error) {
