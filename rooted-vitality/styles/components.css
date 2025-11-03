@@ -1796,6 +1796,7 @@ label {
 @media (max-width: 768px) {
     .rv-header-inner {
         padding: 0.8rem 1rem;
+        gap: 1rem;
     }
 
     .rv-nav {
@@ -1810,11 +1811,11 @@ label {
         font-size: 1rem;
     }
 
-    .rv-nav-link {
+    .rv-header-public .rv-nav-link {
         padding: 0.5rem 1rem;
     }
 
-    .rv-btn-accent {
+    .rv-header-public .rv-btn-accent {
         padding: 0.5rem 0.9rem;
         font-size: 0.85rem;
     }
@@ -1824,7 +1825,7 @@ label {
 @media (max-width: 480px) {
     .rv-header-inner {
         padding: 0.7rem 0.75rem;
-        gap: 0.5rem;
+        gap: 0.3rem;
     }
 
     .rv-logo-public,
@@ -1834,18 +1835,18 @@ label {
     }
 
     .rv-logo-public .rv-logo-img,
-    .rv-logo-public .rv-logo-img {
+    .rv-logo-client .rv-logo-img {
         height: 40px;
     }
 
-    .rv-logo-public .rv-brand-text,
-    .rv-logo-client .rv-brand-text,
+    .rv-header-public .rv-brand-text,
+    .rv-header-client .rv-brand-text,
     .rv-brand-text {
         display: none;
     }
 
     .rv-nav {
-        gap: 0.5rem;
+        gap: 0.3rem;
         flex-wrap: wrap;
         justify-content: flex-end;
     }
@@ -1854,17 +1855,17 @@ label {
         font-size: 0.8rem;
     }
 
-    .rv-nav-link {
+    .rv-header-public .rv-nav-link {
         padding: 0.4rem 0.7rem;
         border-radius: 4px;
     }
 
-    .rv-btn-accent {
+    .rv-header-public .rv-btn-accent {
         padding: 0.4rem 0.8rem;
         font-size: 0.8rem;
     }
 
-    .rv-nav-login {
+    .rv-header-public .rv-nav-login {
         padding: 0.4rem 0.7rem !important;
         font-size: 0.8rem;
     }
@@ -1879,6 +1880,7 @@ label {
 @media (max-width: 320px) {
     .rv-header-inner {
         padding: 0.6rem 0.5rem;
+        gap: 0.2rem;
     }
 
     .rv-logo-public .rv-logo-img {
@@ -1886,19 +1888,19 @@ label {
     }
 
     .rv-nav {
-        gap: 0.3rem;
+        gap: 0.2rem;
     }
 
     .rv-nav a {
         font-size: 0.75rem;
     }
 
-    .rv-btn-accent {
+    .rv-header-public .rv-btn-accent {
         padding: 0.35rem 0.6rem;
         font-size: 0.75rem;
     }
 
-    .rv-nav-login {
+    .rv-header-public .rv-nav-login {
         padding: 0.35rem 0.6rem !important;
         font-size: 0.75rem;
     }
