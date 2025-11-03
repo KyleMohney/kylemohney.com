@@ -8,51 +8,61 @@
         <span class="rv-brand-name">Vitality</span>
       </span>
     </a>
+    
+    <!-- Mobile Menu Toggle -->
+    <button class="rv-menu-toggle" id="rvMenuToggle" aria-label="Toggle menu" aria-expanded="false" title="Toggle navigation menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
+    
     <nav class="rv-nav" aria-label="Practitioner Navigation">
       <!-- Main Navigation Buttons -->
       <a href="/rooted-vitality/dashboard/pro/index.html" class="rv-nav-link active">Clients</a>
       <a href="/rooted-vitality/dashboard/pro/inbox.html" class="rv-nav-link">Inbox</a>
       <a href="/rooted-vitality/dashboard/pro/match-settings.html" class="rv-nav-link">Match Settings</a>
       <a href="/rooted-vitality/dashboard/pro/profile.html" class="rv-nav-link">Profile</a>
-      
-      <!-- Notifications Bell -->
-      <div class="rv-notifications-menu">
-        <button class="rv-nav-icon-btn rv-notifications-btn" aria-label="Notifications" aria-haspopup="true" aria-expanded="false" title="Notifications">
-          <svg class="rv-bell-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-          </svg>
-          <span class="rv-notification-badge"></span>
-        </button>
-        <div class="rv-notifications-dropdown" role="menu">
-          <div class="rv-notifications-header">
-            <h3>Notifications</h3>
-          </div>
-          <div class="rv-notifications-list">
-            <p class="rv-notifications-empty">No notifications yet</p>
-          </div>
-          <div class="rv-notifications-footer">
-            <a href="#" class="rv-notifications-link">View all</a>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Avatar Menu -->
-      <div class="rv-avatar-menu">
-        <button class="rv-avatar-btn" aria-label="Account menu" aria-haspopup="true" aria-expanded="false">
-          <span class="rv-avatar-initial" id="rvAvatarInitial">U</span>
-        </button>
-        <div class="rv-avatar-dropdown" role="menu">
-          <a href="/rooted-vitality/dashboard/pro/analytics.html" role="menuitem" class="rv-dropdown-item">Analytics</a>
-          <a href="/rooted-vitality/dashboard/pro/calendar.html" role="menuitem" class="rv-dropdown-item">Calendar</a>
-          <a href="/rooted-vitality/dashboard/pro/billing.html" role="menuitem" class="rv-dropdown-item">Billing</a>
-          <a href="/rooted-vitality/dashboard/pro/settings.html" role="menuitem" class="rv-dropdown-item">Settings</a>
-          <a href="/rooted-vitality/help-center/" role="menuitem" class="rv-dropdown-item">Support</a>
-          <hr class="rv-dropdown-divider">
-          <a href="#" data-switch-view="client" role="menuitem" class="rv-dropdown-item">Client View</a>
-          <a href="/rooted-vitality/" role="menuitem" class="rv-dropdown-item rv-logout-item">Sign Out</a>
-        </div>
-      </div>
     </nav>
+    
+    <!-- Notifications Bell (Always Visible) -->
+    <div class="rv-notifications-menu">
+      <button class="rv-nav-icon-btn rv-notifications-btn" aria-label="Notifications" aria-haspopup="true" aria-expanded="false" title="Notifications">
+        <svg class="rv-bell-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+        </svg>
+        <span class="rv-notification-badge"></span>
+      </button>
+      <div class="rv-notifications-dropdown" role="menu">
+        <div class="rv-notifications-header">
+          <h3>Notifications</h3>
+        </div>
+        <div class="rv-notifications-list">
+          <p class="rv-notifications-empty">No notifications yet</p>
+        </div>
+        <div class="rv-notifications-footer">
+          <a href="#" class="rv-notifications-link">View all</a>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Avatar Menu (Always Visible) -->
+    <div class="rv-avatar-menu">
+      <button class="rv-avatar-btn" aria-label="Account menu" aria-haspopup="true" aria-expanded="false">
+        <span class="rv-avatar-initial" id="rvAvatarInitial">U</span>
+      </button>
+      <div class="rv-avatar-dropdown" role="menu">
+        <a href="/rooted-vitality/dashboard/pro/analytics.html" role="menuitem" class="rv-dropdown-item">Analytics</a>
+        <a href="/rooted-vitality/dashboard/pro/calendar.html" role="menuitem" class="rv-dropdown-item">Calendar</a>
+        <a href="/rooted-vitality/dashboard/pro/billing.html" role="menuitem" class="rv-dropdown-item">Billing</a>
+        <a href="/rooted-vitality/dashboard/pro/settings.html" role="menuitem" class="rv-dropdown-item">Settings</a>
+        <a href="/rooted-vitality/help-center/" role="menuitem" class="rv-dropdown-item">Support</a>
+        <hr class="rv-dropdown-divider">
+        <a href="#" data-switch-view="client" role="menuitem" class="rv-dropdown-item">Client View</a>
+        <a href="/rooted-vitality/" role="menuitem" class="rv-dropdown-item rv-logout-item">Sign Out</a>
+      </div>
+    </div>
   </div>
 </header>
