@@ -1447,6 +1447,11 @@ label {
 @media (max-width: 768px) {
     .rv-header-inner {
         padding: 0.8rem 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        flex-wrap: wrap;
     }
     
     .rv-logo-image {
@@ -1485,6 +1490,15 @@ label {
     
     .rv-menu-toggle {
         display: block;
+        order: 3;
+    }
+    
+    .rv-notifications-menu {
+        order: 1;
+    }
+    
+    .rv-avatar-menu {
+        order: 2;
     }
     
     .rv-nav .cta,
@@ -1787,129 +1801,3 @@ label {
     font-size: 0.9rem;
     color: var(--rooted-dark);
 }
-
-/* ======================================================
-   HEADER RESPONSIVE DESIGN
-   ====================================================== */
-
-/* Tablet (768px and below) */
-@media (max-width: 768px) {
-    .rv-header-inner {
-        padding: 0.8rem 1rem;
-        gap: 0.8rem;
-    }
-
-    .rv-nav {
-        gap: 0.8rem;
-        margin-left: auto;
-    }
-
-    .rv-nav a {
-        font-size: 0.85rem;
-    }
-
-    .rv-logo-public .rv-brand-name {
-        font-size: 1rem;
-    }
-
-    .rv-header-public .rv-nav-link {
-        padding: 0.5rem 0.9rem;
-    }
-
-    .rv-header-public .rv-btn-accent {
-        padding: 0.5rem 0.9rem;
-        font-size: 0.85rem;
-    }
-}
-
-/* Mobile (480px and below) */
-@media (max-width: 480px) {
-    .rv-header-inner {
-        padding: 0.7rem 0.5rem;
-        gap: 0.5rem;
-        justify-content: flex-start;
-    }
-
-    .rv-logo-public,
-    .rv-logo-client,
-    .rv-logo-container {
-        gap: 0.15rem;
-        flex-shrink: 0;
-    }
-
-    .rv-logo-public .rv-logo-img,
-    .rv-logo-client .rv-logo-img {
-        height: 40px;
-    }
-
-    .rv-header-public .rv-brand-text,
-    .rv-header-client .rv-brand-text,
-    .rv-brand-text {
-        display: none;
-    }
-
-    .rv-nav {
-        gap: 0.4rem;
-        margin-left: auto;
-        display: flex;
-        flex-wrap: nowrap;
-    }
-
-    .rv-nav a {
-        font-size: 0.75rem;
-    }
-
-    .rv-header-public .rv-nav-link {
-        padding: 0.35rem 0.6rem;
-        border-radius: 4px;
-        flex-shrink: 0;
-    }
-
-    .rv-header-public .rv-btn-accent {
-        padding: 0.35rem 0.6rem;
-        font-size: 0.75rem;
-        flex-shrink: 0;
-    }
-
-    .rv-header-public .rv-nav-login {
-        padding: 0.35rem 0.6rem !important;
-        font-size: 0.75rem;
-        flex-shrink: 0;
-    }
-
-    .rv-nav-link,
-    .rv-nav-login {
-        white-space: nowrap;
-    }
-}
-
-/* Extra small devices (320px and below) */
-@media (max-width: 320px) {
-    .rv-header-inner {
-        padding: 0.6rem 0.5rem;
-        gap: 0.2rem;
-    }
-
-    .rv-logo-public .rv-logo-img {
-        height: 35px;
-    }
-
-    .rv-nav {
-        gap: 0.2rem;
-    }
-
-    .rv-nav a {
-        font-size: 0.75rem;
-    }
-
-    .rv-header-public .rv-btn-accent {
-        padding: 0.35rem 0.6rem;
-        font-size: 0.75rem;
-    }
-
-    .rv-header-public .rv-nav-login {
-        padding: 0.35rem 0.6rem !important;
-        font-size: 0.75rem;
-    }
-}
-

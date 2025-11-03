@@ -352,6 +352,14 @@ const RootedVitality = {
                             console.log('[Rooted Vitality] Scheduling loadClientAvatar');
                             this.loadClientAvatar();
                         }
+                        
+                        // Initialize mobile menu toggle
+                        this.initMobileMenuToggle();
+                    }, 100);
+                } else if (role === 'public') {
+                    // For public header, also initialize mobile menu
+                    setTimeout(() => {
+                        this.initMobileMenuToggle();
                     }, 100);
                 }
             } else {
@@ -366,6 +374,55 @@ const RootedVitality = {
             this._headerRendering = false;
             this._headerRendered = true;
         }
+    },
+    
+    /**
+     * Initialize mobile menu toggle for responsive header
+     * Handles hamburger menu for screens smaller than 768px
+     */
+    initMobileMenuToggle: function() {
+        const toggle = document.querySelector('.rv-menu-toggle');
+        const nav = document.querySelector('.rv-nav');
+        
+        if (!toggle || !nav) {
+            console.log('[Rooted Vitality] Menu toggle or nav not found, skipping mobile menu init');
+            return;
+        }
+        
+        // Mobile menu toggle with keyboard support
+        toggle.addEventListener('click', () => {
+            nav.classList.toggle('open');
+            const isOpen = nav.classList.contains('open');
+            toggle.setAttribute('aria-expanded', isOpen);
+            console.log(`[Rooted Vitality] Mobile menu ${isOpen ? 'opened' : 'closed'}`);
+        });
+        
+        // Close mobile menu when hamburger nav links are clicked
+        nav.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                nav.classList.remove('open');
+                toggle.setAttribute('aria-expanded', 'false');
+            });
+        });
+        
+        // Close mobile menu on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && nav.classList.contains('open')) {
+                nav.classList.remove('open');
+                toggle.setAttribute('aria-expanded', 'false');
+                console.log('[Rooted Vitality] Mobile menu closed by Escape key');
+            }
+        });
+        
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!toggle.contains(e.target) && !nav.contains(e.target) && nav.classList.contains('open')) {
+                nav.classList.remove('open');
+                toggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+        
+        console.log('[Rooted Vitality] Mobile menu toggle initialized');
     },
     
     /**
