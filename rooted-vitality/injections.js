@@ -451,8 +451,15 @@ const RootedVitality = {
      * Looks for buttons with data-switch-view attribute and adds click handlers
      */
     attachViewSwitcher: function() {
+        console.log('[Rooted Vitality] attachViewSwitcher called, searching for [data-switch-view] elements...');
+        const elements = document.querySelectorAll('[data-switch-view]');
+        console.log(`[Rooted Vitality] Found ${elements.length} view switcher element(s)`);
+        
         document.querySelectorAll('[data-switch-view]').forEach(btn => {
+            console.log(`[Rooted Vitality] Attaching click handler to view switcher: ${btn.dataset.switchView}`);
+            
             btn.addEventListener('click', (e) => {
+                console.log('[Rooted Vitality] View switcher clicked!');
                 e.preventDefault();
                 
                 const newView = btn.dataset.switchView === 'practitioner' ? 'practitioner' : 'client';
@@ -461,6 +468,7 @@ const RootedVitality = {
                 
                 // Persist active view
                 localStorage.setItem('active_view', newView);
+                console.log(`[Rooted Vitality] Saved active_view to localStorage: ${newView}`);
                 
                 // Navigate to appropriate dashboard
                 const targetUrl = newView === 'practitioner' 
