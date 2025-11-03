@@ -22,7 +22,7 @@ console.log('[Rooted Vitality] injections.js loading...');
 const RootedVitality = {
     config: {
         siteName: 'Rooted Vitality',
-        siteUrl: '/',
+        siteUrl: '/rooted-vitality/',
         brandColor: '#5c9a72',
         accentGold: '#d4c47c',
         accentGreen: '#ebf6e8',
@@ -370,9 +370,9 @@ const RootedVitality = {
             return;
         }
         
-        let targetHref = '/index.html';
+        let targetHref = this.config.siteUrl + 'index.html';
         if (role === 'practitioner' && view === 'practitioner') {
-            targetHref = '/dashboard/pro/index.html';
+            targetHref = this.config.siteUrl + 'dashboard/pro/index.html';
         }
         
         logo.setAttribute('href', targetHref);

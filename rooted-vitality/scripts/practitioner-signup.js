@@ -287,7 +287,8 @@ async function registerPractitioner(event) {
         
         // Redirect to dashboard after 3 seconds
         setTimeout(() => {
-            window.location.href = '/dashboard/pro/';
+            const baseUrl = (typeof RootedVitality !== 'undefined' && RootedVitality.config.siteUrl) ? RootedVitality.config.siteUrl : '/rooted-vitality/';
+            window.location.href = baseUrl + 'dashboard/pro/';
         }, 3000);
         
         

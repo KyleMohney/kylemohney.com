@@ -163,12 +163,13 @@ window.authManager = {
             
             // Redirect based on role
             const finalRole = userRole || role;
+            const baseUrl = (typeof RootedVitality !== 'undefined' && RootedVitality.config.siteUrl) ? RootedVitality.config.siteUrl : '/rooted-vitality/';
             if (finalRole === 'practitioner') {
                 console.log('[Rooted Vitality] Redirecting to practitioner dashboard');
-                window.location.href = '/dashboard/pro/index.html';
+                window.location.href = baseUrl + 'dashboard/pro/index.html';
             } else if (finalRole === 'client') {
                 console.log('[Rooted Vitality] Redirecting to client dashboard');
-                window.location.href = '/dashboard/client-dashboard.html';
+                window.location.href = baseUrl + 'dashboard/client-dashboard.html';
             }
             
             return true;
@@ -193,8 +194,9 @@ window.authManager = {
         console.log('[Rooted Vitality] Password reset requested for:', email);
         
         try {
+            const baseUrl = (typeof RootedVitality !== 'undefined' && RootedVitality.config.siteUrl) ? RootedVitality.config.siteUrl : '/rooted-vitality/';
             const { error } = await window.supabaseClient.auth.resetPasswordForEmail(email, {
-                redirectTo: `${window.location.origin}/reset.html`
+                redirectTo: `${window.location.origin}${baseUrl}reset.html`
             });
             
             if (error) {
