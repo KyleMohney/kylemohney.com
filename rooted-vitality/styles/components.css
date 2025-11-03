@@ -666,10 +666,15 @@ label {
     display: none;
     background: none;
     border: none;
-    font-size: 1.7rem;
+    font-size: 1.5rem;
     color: #6b6359;
     cursor: pointer;
-    padding: 0.5rem;
+    padding: 0.625rem;
+    height: 40px;
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     transition: transform 0.3s ease, color 0.3s ease;
 }
 
@@ -899,8 +904,8 @@ label {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    height: 24px;
+    width: 40px;
+    height: 40px;
     stroke: #6b6359;
     color: #6b6359;
 }
@@ -1449,8 +1454,8 @@ label {
         padding: 0.8rem 1rem;
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        gap: 0.5rem;
+        justify-content: flex-start;
+        gap: 0.25rem;
         flex-wrap: wrap;
     }
     
@@ -1460,6 +1465,15 @@ label {
     
     .rv-brand-name {
         font-size: 1.28rem;
+    }
+    
+    .rv-logo,
+    .rv-logo-public,
+    .rv-logo-client,
+    .rv-logo-practitioner {
+        order: 0;
+        flex-shrink: 0;
+        margin-right: auto;
     }
     
     .rv-nav {
@@ -1490,15 +1504,15 @@ label {
     
     .rv-menu-toggle {
         display: block;
-        order: 3;
-    }
-    
-    .rv-notifications-menu {
         order: 1;
     }
     
-    .rv-avatar-menu {
+    .rv-notifications-menu {
         order: 2;
+    }
+    
+    .rv-avatar-menu {
+        order: 3;
     }
     
     .rv-nav .cta,

@@ -465,31 +465,18 @@ const RootedVitality = {
                 const newView = btn.dataset.switchView === 'practitioner' ? 'practitioner' : 'client';
                 
                 console.log(`[Rooted Vitality] View switch clicked: ${newView}`);
+                console.log(`[Rooted Vitality] Current pathname: ${window.location.pathname}`);
                 
                 // Persist active view
                 localStorage.setItem('active_view', newView);
                 console.log(`[Rooted Vitality] Saved active_view to localStorage: ${newView}`);
                 
-                // Navigate to appropriate dashboard using relative path
-                // Get current location to determine the correct relative path
-                const currentPath = window.location.pathname;
-                let basePath = './';
-                
-                // Determine how many levels up we need to go
-                if (currentPath.includes('/rooted-vitality/dashboard/pro/')) {
-                    basePath = '../../';
-                } else if (currentPath.includes('/rooted-vitality/dashboard/')) {
-                    basePath = '../';
-                } else if (currentPath.includes('/rooted-vitality/')) {
-                    basePath = './';
-                }
-                
+                // Navigate using relative path from current page
+                // From any page in /rooted-vitality/dashboard/pro/, go up one level then to client dashboard
                 const targetUrl = newView === 'practitioner' 
-                    ? basePath + 'dashboard/pro/index.html' 
-                    : basePath + 'dashboard/client-dashboard.html';
+                    ? './index.html'  // Stay in current pro directory
+                    : '../client-dashboard.html';  // Go up one level to dashboard, then to client-dashboard
                 
-                console.log(`[Rooted Vitality] Current path: ${currentPath}`);
-                console.log(`[Rooted Vitality] Base path: ${basePath}`);
                 console.log(`[Rooted Vitality] Redirecting to: ${targetUrl}`);
                 window.location.href = targetUrl;
             });
