@@ -20,7 +20,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     const confirmPassword = form.querySelector('#confirmPassword').value.trim();
     const age       = form.querySelector('#age').value || null;
     const sex       = form.querySelector('#sex').value || null;
-    const gender    = form.querySelector('#gender').value.trim() || null;
     const termsAccepted = form.querySelector('#terms').checked;
 
     // ============ 2. Validate Required Fields ============
@@ -102,7 +101,6 @@ window.addEventListener('DOMContentLoaded', async () => {
         phone,
         age: age ? parseInt(age) : null,
         sex: sex || null,
-        gender: gender || null,
         updated_at: new Date().toISOString()
       };
       
