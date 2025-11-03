@@ -1796,11 +1796,12 @@ label {
 @media (max-width: 768px) {
     .rv-header-inner {
         padding: 0.8rem 1rem;
-        gap: 1rem;
+        gap: 0.8rem;
     }
 
     .rv-nav {
-        gap: 1rem;
+        gap: 0.8rem;
+        margin-left: auto;
     }
 
     .rv-nav a {
@@ -1812,7 +1813,7 @@ label {
     }
 
     .rv-header-public .rv-nav-link {
-        padding: 0.5rem 1rem;
+        padding: 0.5rem 0.9rem;
     }
 
     .rv-header-public .rv-btn-accent {
@@ -1824,14 +1825,16 @@ label {
 /* Mobile (480px and below) */
 @media (max-width: 480px) {
     .rv-header-inner {
-        padding: 0.7rem 0.75rem;
-        gap: 0.3rem;
+        padding: 0.7rem 0.5rem;
+        gap: 0.5rem;
+        justify-content: flex-start;
     }
 
     .rv-logo-public,
     .rv-logo-client,
     .rv-logo-container {
         gap: 0.15rem;
+        flex-shrink: 0;
     }
 
     .rv-logo-public .rv-logo-img,
@@ -1846,28 +1849,32 @@ label {
     }
 
     .rv-nav {
-        gap: 0.3rem;
-        flex-wrap: wrap;
-        justify-content: flex-end;
+        gap: 0.4rem;
+        margin-left: auto;
+        display: flex;
+        flex-wrap: nowrap;
     }
 
     .rv-nav a {
-        font-size: 0.8rem;
+        font-size: 0.75rem;
     }
 
     .rv-header-public .rv-nav-link {
-        padding: 0.4rem 0.7rem;
+        padding: 0.35rem 0.6rem;
         border-radius: 4px;
+        flex-shrink: 0;
     }
 
     .rv-header-public .rv-btn-accent {
-        padding: 0.4rem 0.8rem;
-        font-size: 0.8rem;
+        padding: 0.35rem 0.6rem;
+        font-size: 0.75rem;
+        flex-shrink: 0;
     }
 
     .rv-header-public .rv-nav-login {
-        padding: 0.4rem 0.7rem !important;
-        font-size: 0.8rem;
+        padding: 0.35rem 0.6rem !important;
+        font-size: 0.75rem;
+        flex-shrink: 0;
     }
 
     .rv-nav-link,
