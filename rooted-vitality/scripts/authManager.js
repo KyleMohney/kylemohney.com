@@ -242,10 +242,8 @@ window.authManager = {
             console.log('[Rooted Vitality] Logout successful');
             alert('You have been signed out.');
             
-            // Redirect to home if on dashboard
-            if (window.location.pathname.includes('dashboard')) {
-                window.location.href = './index.html';
-            }
+            // Redirect to rooted vitality home
+            window.location.href = '/rooted-vitality/index.html';
             
             return true;
         } catch (error) {

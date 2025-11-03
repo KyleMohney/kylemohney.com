@@ -48,7 +48,7 @@ async function initializeAuth() {
         
         if (error || !user) {
             console.warn('[Signup] No active session, redirecting');
-            window.location.href = '../index.html';
+            window.location.href = '/rooted-vitality/index.html';
             return false;
         }
         

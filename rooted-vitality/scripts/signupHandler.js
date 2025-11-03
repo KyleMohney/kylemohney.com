@@ -52,12 +52,12 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     try {
       // ============ 4. Create Supabase Auth User ============
-      // emailRedirectTo sends user to welcome.html after email confirmation
+      // Since no email verification required, user goes straight to index
       const { data: authData, error: authError } = await window.supabaseClient.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/welcome.html`
+          emailRedirectTo: `${window.location.origin}/rooted-vitality/index.html`
         }
       });
 
@@ -124,8 +124,9 @@ window.addEventListener('DOMContentLoaded', async () => {
       console.log('✅ [Signup] Profile created successfully!');
 
       // ============ 6. Success: Show Message & Redirect ============
-      alert('Account created! Please check your email to verify your address and complete your registration.');
-      window.location.href = './verify.html';
+      // No email verification required - redirect straight to index
+      alert('Account created! Welcome to Rooted Vitality.');
+      window.location.href = '/rooted-vitality/index.html';
 
     } catch (error) {
       console.error('Signup error:', error);
