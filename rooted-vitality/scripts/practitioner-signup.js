@@ -39,21 +39,37 @@ let autoSaveTimeout;
 
 async function initializeAuth() {
     try {
+        // Wait a moment to ensure Supabase is fully initialized
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
         if (!window.supabaseClient) {
             console.error('[Signup] supabaseClient not available');
             return false;
         }
         
+        // Get the current authenticated user
         const { data: { user }, error } = await window.supabaseClient.auth.getUser();
         
+        console.log('[Signup] Auth check - user:', user?.email || 'none', 'error:', error?.message || 'none');
+        
         if (error || !user) {
-            console.warn('[Signup] No active session, redirecting');
+            console.warn('[Signup] No active session, redirecting to index');
             window.location.href = '/rooted-vitality/index.html';
             return false;
         }
         
+        // Store the authenticated user info
         state.session = user;
-        document.getElementById('email').value = user.email || '';
+        
+        // Populate the email field with the current user's email
+        const emailElement = document.getElementById('email');
+        if (emailElement) {
+            emailElement.value = user.email || '';
+            console.log('[Signup] Email field populated with:', user.email);
+        } else {
+            console.error('[Signup] Email element not found');
+        }
+        
         state.formData.email = user.email || '';
         
         loadDraft();
@@ -102,14 +118,16 @@ function loadDraft() {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
             const draft = JSON.parse(saved);
-            state.formData = { ...state.formData, ...draft };
+            // Don't restore email from draft - it should always be the current user's email
+            const { email, ...draftWithoutEmail } = draft;
+            state.formData = { ...state.formData, ...draftWithoutEmail };
             
-            Object.keys(draft).forEach(key => {
+            Object.keys(draftWithoutEmail).forEach(key => {
                 const field = document.getElementById(key);
-                if (field) field.value = draft[key];
+                if (field) field.value = draftWithoutEmail[key];
             });
             
-            console.log('[Signup] Draft loaded');
+            console.log('[Signup] Draft loaded (email preserved from current session)');
         }
     } catch (e) {
         console.warn('[Signup] Could not load draft');
