@@ -258,9 +258,10 @@ const RootedVitality = {
                 }
                 
                 // Replace absolute paths (/) with relative paths
+                // BUT: Don't replace paths that already contain /rooted-vitality/ (they're already correct)
                 headerHTML = headerHTML
-                    .replace(/href="\/([^"]+)"/g, `href="${replacementPrefix}$1"`)
-                    .replace(/src="\/([^"]+)"/g, `src="${replacementPrefix}$1"`);
+                    .replace(/href="\/(?!rooted-vitality\/)([^"]+)"/g, `href="${replacementPrefix}$1"`)
+                    .replace(/src="\/(?!rooted-vitality\/)([^"]+)"/g, `src="${replacementPrefix}$1"`);
                 
                 console.log(`[Rooted Vitality] Replaced paths with: ${replacementPrefix}`);
             }
@@ -279,6 +280,15 @@ const RootedVitality = {
                 
                 console.log(`[Rooted Vitality] ${role} header successfully injected`);
                 this.log(`${role.charAt(0).toUpperCase() + role.slice(1)} header loaded successfully`);
+                
+                // Hide "Become a Practitioner" button if user is already a practitioner in client view
+                if (role === 'practitioner' && view === 'client') {
+                    const becomePractitionerBtn = document.getElementById('becomePractitionerBtn');
+                    if (becomePractitionerBtn) {
+                        becomePractitionerBtn.style.display = 'none';
+                        console.log('[Rooted Vitality] Hidden "Become a Practitioner" button for practitioner in client view');
+                    }
+                }
                 
                 // Initialize logged-in header interactions if applicable
                 if (role === 'client' || role === 'practitioner') {

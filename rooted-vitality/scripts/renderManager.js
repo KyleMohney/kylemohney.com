@@ -104,13 +104,13 @@ function renderFeaturedHeros() {
     if (currentTab === 'client') {
       if (index === 0) {
         const img = document.createElement('img');
-        img.src = '/assets/hero2.PNG';
+        img.src = '/rooted-vitality/assets/hero2.PNG';
         img.alt = article.title;
         img.className = 'hero-image';
         heroSection.appendChild(img);
       } else {
         const img = document.createElement('img');
-        img.src = '/assets/hero1c.PNG';
+        img.src = '/rooted-vitality/assets/hero1c.PNG';
         img.alt = article.title;
         img.className = 'hero-image';
         heroSection.appendChild(img);
@@ -118,13 +118,13 @@ function renderFeaturedHeros() {
     } else if (currentTab === 'practitioner') {
       if (index === 0) {
         const img = document.createElement('img');
-        img.src = '/assets/phero1b.png';
+        img.src = '/rooted-vitality/assets/phero1b.png';
         img.alt = article.title;
         img.className = 'hero-image';
         heroSection.appendChild(img);
       } else {
         const img = document.createElement('img');
-        img.src = '/assets/phero2d.png';
+        img.src = '/rooted-vitality/assets/phero2d.png';
         img.alt = article.title;
         img.className = 'hero-image';
         heroSection.appendChild(img);

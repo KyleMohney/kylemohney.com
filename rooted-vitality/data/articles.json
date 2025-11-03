@@ -3,39 +3,39 @@
     "featured": [
       {
         "title": "What is Rooted Vitality?",
-        "url": "/articles/what-is-rooted-vitality.html",
+        "url": "/rooted-vitality/articles/what-is-rooted-vitality.html",
         "description": "Rooted Vitality connects you with holistic practitioners and alternative medicine experts to support your wellness journey. Our platform bridges the gap between those seeking meaningful natural healing and certified practitioners dedicated to transformative care."
       },
       {
         "title": "How to Book a Consultation",
-        "url": "/articles/how-to-book-consultation.html",
+        "url": "/rooted-vitality/articles/how-to-book-consultation.html",
         "description": "Finding the right practitioner is the foundation of your wellness journey. Our platform makes it easy to discover practitioners who align with your goals and schedule your first appointment seamlessly. Take the first step toward natural healing today."
       }
     ],
     "other": [
       {
         "title": "What Makes Holistic Medicine Different",
-        "url": "/articles/holistic-medicine-explained.html"
+        "url": "/rooted-vitality/articles/holistic-medicine-explained.html"
       },
       {
         "title": "Healing Plants to Keep Around Your Home",
-        "url": "/articles/healing-plants-home.html"
+        "url": "/rooted-vitality/articles/healing-plants-home.html"
       },
       {
         "title": "How to Find the Right Practitioner for You",
-        "url": "/articles/finding-right-practitioner.html"
+        "url": "/rooted-vitality/articles/finding-right-practitioner.html"
       },
       {
         "title": "Nutrition and Holistic Wellness",
-        "url": "/articles/nutrition-holistic-wellness.html"
+        "url": "/rooted-vitality/articles/nutrition-holistic-wellness.html"
       },
       {
         "title": "Mindfulness and Stress Relief",
-        "url": "/articles/mindfulness-stress-relief.html"
+        "url": "/rooted-vitality/articles/mindfulness-stress-relief.html"
       },
       {
         "title": "Seasonal Wellness and Natural Rhythms",
-        "url": "/articles/seasonal-wellness.html"
+        "url": "/rooted-vitality/articles/seasonal-wellness.html"
       }
     ]
   },
@@ -43,39 +43,39 @@
     "featured": [
       {
         "title": "Understanding the Pay-Per-Lead Model",
-        "url": "/articles/pay-per-lead-basics.html",
+        "url": "/rooted-vitality/articles/pay-per-lead-basics.html",
         "description": "Master the fundamentals of growing your holistic practice through qualified patient leads, proven lead generation strategies, and sustainable client acquisition on the Rooted Vitality platform."
       },
       {
         "title": "Building Your Winning Practitioner Profile",
-        "url": "/articles/building-your-profile.html",
+        "url": "/rooted-vitality/articles/building-your-profile.html",
         "description": "Create a compelling holistic practitioner profile that showcases your expertise, attracts ideal clients, and generates quality leads through strategic positioning and authentic patient testimonials."
       }
     ],
     "other": [
       {
         "title": "Lead Follow-Up Best Practices",
-        "url": "/articles/lead-followup-practices.html"
+        "url": "/rooted-vitality/articles/lead-followup-practices.html"
       },
       {
         "title": "Measuring Success: Your ROI Dashboard",
-        "url": "/articles/measuring-roi.html"
+        "url": "/rooted-vitality/articles/measuring-roi.html"
       },
       {
         "title": "Pricing Strategies and Rate Cards",
-        "url": "/articles/pricing-strategies.html"
+        "url": "/rooted-vitality/articles/pricing-strategies.html"
       },
       {
         "title": "Building Trust Through Client Reviews",
-        "url": "/articles/importance-of-reviews.html"
+        "url": "/rooted-vitality/articles/importance-of-reviews.html"
       },
       {
         "title": "Earning Credentials & Certifications",
-        "url": "/articles/earning-credentials.html"
+        "url": "/rooted-vitality/articles/earning-credentials.html"
       },
       {
         "title": "Setting Your Service Area & Expanding Your Reach",
-        "url": "/articles/coverage-area-services.html"
+        "url": "/rooted-vitality/articles/coverage-area-services.html"
       }
     ]
   }
