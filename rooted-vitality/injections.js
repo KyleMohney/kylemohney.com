@@ -470,11 +470,26 @@ const RootedVitality = {
                 localStorage.setItem('active_view', newView);
                 console.log(`[Rooted Vitality] Saved active_view to localStorage: ${newView}`);
                 
-                // Navigate to appropriate dashboard
-                const targetUrl = newView === 'practitioner' 
-                    ? '/rooted-vitality/dashboard/pro/index.html' 
-                    : '/rooted-vitality/dashboard/client-dashboard.html';
+                // Navigate to appropriate dashboard using relative path
+                // Get current location to determine the correct relative path
+                const currentPath = window.location.pathname;
+                let basePath = './';
                 
+                // Determine how many levels up we need to go
+                if (currentPath.includes('/rooted-vitality/dashboard/pro/')) {
+                    basePath = '../../';
+                } else if (currentPath.includes('/rooted-vitality/dashboard/')) {
+                    basePath = '../';
+                } else if (currentPath.includes('/rooted-vitality/')) {
+                    basePath = './';
+                }
+                
+                const targetUrl = newView === 'practitioner' 
+                    ? basePath + 'dashboard/pro/index.html' 
+                    : basePath + 'dashboard/client-dashboard.html';
+                
+                console.log(`[Rooted Vitality] Current path: ${currentPath}`);
+                console.log(`[Rooted Vitality] Base path: ${basePath}`);
                 console.log(`[Rooted Vitality] Redirecting to: ${targetUrl}`);
                 window.location.href = targetUrl;
             });
