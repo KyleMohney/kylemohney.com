@@ -1250,6 +1250,8 @@ label {
     overflow: hidden;
     padding: 3.5rem 0 1rem 0;
     margin-top: 0;
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
 }
 
 /* Reduce diagonal line visibility in footer */
@@ -1397,8 +1399,7 @@ label {
     text-align: center;
     padding-top: 2rem;
     border-top: 1px solid rgba(255, 255, 255, 0.2);
-    max-width: 1200px;
-    margin: 0 auto;
+    width: 100%;
     padding-left: 1.5rem;
     padding-right: 1.5rem;
     display: flex;
