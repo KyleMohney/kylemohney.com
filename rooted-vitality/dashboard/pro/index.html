@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Practitioner Dashboard | Rooted Vitality</title>
+  <link rel="stylesheet" href="/styles/styles.css">
+</head>
+<body class="pro-dashboard">
+  <script>
+    // Set practitioner view immediately before any scripts load
+    localStorage.setItem('active_view', 'practitioner');
+    console.log('[Rooted Vitality] Practitioner dashboard - active_view set to: practitioner');
+  </script>
+  <header id="header-inject"></header>
+
+  <!-- Main Content Container -->
+  <main id="pro-content" class="container-wide">
+    <!-- Clients -->
+    <section id="tab-clients" class="tab-panel active">
+      <h1>Clients</h1>
+      
+      <!-- Client Sub-tabs -->
+      <div class="clients-subtabs">
+        <button class="clients-tab active" data-clients-tab="new-clients">New Clients</button>
+        <button class="clients-tab" data-clients-tab="opportunities">Opportunities</button>
+      </div>
+
+      <!-- New Clients List -->
+      <div id="new-clients" class="clients-list active">
+        <!-- Client Card 1 -->
+        <div class="client-card">
+          <div class="card-header">
+            <img src="/assets/default-avatar.png" alt="Avatar" class="client-avatar">
+            <div class="client-info">
+              <h3 class="client-name">Sarah Mitchell</h3>
+              <p class="client-service">Acupuncture & Herbal Medicine</p>
+              <p class="client-location">📍 Denver, CO</p>
+            </div>
+          </div>
+          
+          <div class="card-divider"></div>
+          
+          <div class="message-preview-box">
+            <div class="message-text" id="msg-1">
+              <p>Hi! I've been dealing with chronic back pain and fatigue for months. Looking for someone who can help me explore natural remedies and lifestyle changes. Would love to discuss acupuncture options!</p>
+            </div>
+            <a href="#" class="read-more-toggle" data-msg="msg-1">Read more</a>
+          </div>
+          
+          <div class="card-divider"></div>
+          
+          <div class="card-actions">
+            <button class="btn-accent" data-action="accept">Accept</button>
+            <button class="btn-neutral" data-action="decline">Decline</button>
+            <button class="btn-neutral" data-action="decline-message">Decline w/ Message</button>
+            <button class="btn-danger" data-action="block">Block User</button>
+          </div>
+        </div>
+
+        <!-- Client Card 2 -->
+        <div class="client-card">
+          <div class="card-header">
+            <img src="/assets/default-avatar.png" alt="Avatar" class="client-avatar">
+            <div class="client-info">
+              <h3 class="client-name">Marcus Johnson</h3>
+              <p class="client-service">Nutritional Counseling</p>
+              <p class="client-location">📍 Remote</p>
+            </div>
+          </div>
+          
+          <div class="card-divider"></div>
+          
+          <div class="message-preview-box">
+            <div class="message-text" id="msg-2">
+              <p>I'm looking for help with my diet. Need someone experienced in holistic nutrition.</p>
+            </div>
+            <a href="#" class="read-more-toggle" data-msg="msg-2">Read more</a>
+          </div>
+          
+          <div class="card-divider"></div>
+          
+          <div class="card-actions">
+            <button class="btn-accent" data-action="accept">Accept</button>
+            <button class="btn-neutral" data-action="decline">Decline</button>
+            <button class="btn-neutral" data-action="decline-message">Decline w/ Message</button>
+            <button class="btn-danger" data-action="block">Block User</button>
+          </div>
+        </div>
+
+        <!-- Client Card 3 -->
+        <div class="client-card">
+          <div class="card-header">
+            <img src="/assets/default-avatar.png" alt="Avatar" class="client-avatar">
+            <div class="client-info">
+              <h3 class="client-name">Emily Chen</h3>
+              <p class="client-service">Yoga & Mindfulness</p>
+              <p class="client-location">📍 Portland, OR</p>
+            </div>
+          </div>
+          
+          <div class="card-divider"></div>
+          
+          <div class="message-preview-box">
+            <div class="message-text" id="msg-3">
+              <p>Interested in beginning a yoga and meditation practice to help with stress management. I'm a complete beginner but very motivated!</p>
+            </div>
+            <a href="#" class="read-more-toggle" data-msg="msg-3">Read more</a>
+          </div>
+          
+          <div class="card-divider"></div>
+          
+          <div class="card-actions">
+            <button class="btn-accent" data-action="accept">Accept</button>
+            <button class="btn-neutral" data-action="decline">Decline</button>
+            <button class="btn-neutral" data-action="decline-message">Decline w/ Message</button>
+            <button class="btn-danger" data-action="block">Block User</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Opportunities List -->
+      <div id="opportunities" class="clients-list">
+        <!-- Opportunity Card 1 -->
+        <div class="client-card">
+          <div class="card-header">
+            <img src="/assets/default-avatar.png" alt="Avatar" class="client-avatar">
+            <div class="client-info">
+              <h3 class="client-name">David Thompson</h3>
+              <p class="client-service">Massage Therapy & Bodywork</p>
+              <p class="client-location">📍 Boulder, CO</p>
+            </div>
+          </div>
+          
+          <div class="card-divider"></div>
+          
+          <div class="message-preview-box">
+            <div class="message-text" id="msg-opp-1">
+              <p>Previously worked with a practitioner who moved away. Looking for deep tissue massage and sports recovery work.</p>
+            </div>
+            <a href="#" class="read-more-toggle" data-msg="msg-opp-1">Read more</a>
+          </div>
+          
+          <div class="card-divider"></div>
+          
+          <div class="card-actions">
+            <button class="btn-accent" data-action="message">Message</button>
+            <button class="btn-neutral" data-action="skip">Skip</button>
+            <button class="btn-danger" data-action="block">Block User</button>
+          </div>
+        </div>
+
+        <!-- Opportunity Card 2 -->
+        <div class="client-card">
+          <div class="card-header">
+            <img src="/assets/default-avatar.png" alt="Avatar" class="client-avatar">
+            <div class="client-info">
+              <h3 class="client-name">Jessica Rodriguez</h3>
+              <p class="client-service">Energy Healing & Reiki</p>
+              <p class="client-location">📍 Austin, TX</p>
+            </div>
+          </div>
+          
+          <div class="card-divider"></div>
+          
+          <div class="message-preview-box">
+            <div class="message-text" id="msg-opp-2">
+              <p>Seeking Reiki and energy work sessions monthly. Interested in practitioners with 5+ years of experience.</p>
+            </div>
+            <a href="#" class="read-more-toggle" data-msg="msg-opp-2">Read more</a>
+          </div>
+          
+          <div class="card-divider"></div>
+          
+          <div class="card-actions">
+            <button class="btn-accent" data-action="message">Message</button>
+            <button class="btn-neutral" data-action="skip">Skip</button>
+            <button class="btn-danger" data-action="block">Block User</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Messages -->
+    <section id="tab-messages" class="tab-panel">
+      <h1>Inbox</h1>
+      <p>All accepted clients appear here for ongoing communication. Placeholder chat area.</p>
+    </section>
+
+    <!-- Match Settings -->
+    <section id="tab-match-settings" class="tab-panel">
+      <h1>Match Settings</h1>
+      <p>Placeholder targeting and coverage options.</p>
+    </section>
+
+    <!-- Profile -->
+    <section id="tab-profile" class="tab-panel">
+      <h1>Profile</h1>
+      <p>Placeholder practitioner profile editor.</p>
+    </section>
+  </main>
+
+  <footer id="footer-inject"></footer>
+  
+  <!-- Supabase JS Client Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Rooted Vitality Scripts (in order) -->
+  <script src="/scripts/config.js"></script>
+  <script src="/scripts/authManager.js"></script>
+  <script src="/scripts/authModal.js"></script>
+  <script src="/scripts/authHooks.js"></script>
+  <script src="/injections.js"></script>
+  <script src="/scripts/renderManager.js"></script>
+  <script src="/scripts/proDashboard.js"></script>
+</body>
+</html>

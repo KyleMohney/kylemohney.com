@@ -1,0 +1,58 @@
+<!-- PHASE 3: Practitioner (Logged-in) Header -->
+<header id="rvHeader" class="rv-header rv-header-practitioner">
+  <div class="rv-header-inner container-wide">
+    <a href="/dashboard/pro/index.html" class="rv-logo rv-logo-practitioner" aria-label="Rooted Vitality Practitioner Dashboard">
+      <img src="/assets/logo_trimmed.png" alt="Rooted Vitality" class="rv-logo-img">
+      <span class="rv-brand-text">
+        <span class="rv-brand-name">Rooted</span>
+        <span class="rv-brand-name">Vitality</span>
+      </span>
+    </a>
+    <nav class="rv-nav" aria-label="Practitioner Navigation">
+      <!-- Main Navigation Buttons -->
+      <a href="/dashboard/pro/index.html" class="rv-nav-link active">Clients</a>
+      <a href="/dashboard/pro/inbox.html" class="rv-nav-link">Inbox</a>
+      <a href="/dashboard/pro/match-settings.html" class="rv-nav-link">Match Settings</a>
+      <a href="/dashboard/pro/profile.html" class="rv-nav-link">Profile</a>
+      
+      <!-- Notifications Bell -->
+      <div class="rv-notifications-menu">
+        <button class="rv-nav-icon-btn rv-notifications-btn" aria-label="Notifications" aria-haspopup="true" aria-expanded="false" title="Notifications">
+          <svg class="rv-bell-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          <span class="rv-notification-badge"></span>
+        </button>
+        <div class="rv-notifications-dropdown" role="menu">
+          <div class="rv-notifications-header">
+            <h3>Notifications</h3>
+          </div>
+          <div class="rv-notifications-list">
+            <p class="rv-notifications-empty">No notifications yet</p>
+          </div>
+          <div class="rv-notifications-footer">
+            <a href="#" class="rv-notifications-link">View all</a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Avatar Menu -->
+      <div class="rv-avatar-menu">
+        <button class="rv-avatar-btn" aria-label="Account menu" aria-haspopup="true" aria-expanded="false">
+          <span class="rv-avatar-initial" id="rvAvatarInitial">U</span>
+        </button>
+        <div class="rv-avatar-dropdown" role="menu">
+          <a href="/dashboard/pro/analytics.html" role="menuitem" class="rv-dropdown-item">Analytics</a>
+          <a href="/dashboard/pro/calendar.html" role="menuitem" class="rv-dropdown-item">Calendar</a>
+          <a href="/dashboard/pro/billing.html" role="menuitem" class="rv-dropdown-item">Billing</a>
+          <a href="/dashboard/pro/settings.html" role="menuitem" class="rv-dropdown-item">Settings</a>
+          <a href="/help-center/" role="menuitem" class="rv-dropdown-item">Support</a>
+          <hr class="rv-dropdown-divider">
+          <a href="#" data-switch-view="client" role="menuitem" class="rv-dropdown-item">Client View</a>
+          <a href="/" role="menuitem" class="rv-dropdown-item rv-logout-item">Sign Out</a>
+        </div>
+      </div>
+    </nav>
+  </div>
+</header>

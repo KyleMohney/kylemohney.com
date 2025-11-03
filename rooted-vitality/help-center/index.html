@@ -1,0 +1,143 @@
+<!-- NOTE: This file was previously the root index.html (Help Center is now in /help-center/) -->
+
+<!--
++--------------------------------------------------------------------+
+│  ROOTED VITALITY, INC.                                             │
+│  File: index.html                                                  │
+│  Purpose: Home / Platform Hub - Client & Practitioner Portal      │
+│  Holistic Wellness · Modern Connection Platform                    │
+│  rootedvitality.com | 2025                                         │
++--------------------------------------------------------------------+
+
+TABLE OF CONTENTS
+  1. HEAD: Metadata, Fonts & SEO
+  2. BODY: Main Content Structure
+  3. TOGGLE: Client/Practitioner Tab Switcher
+  4. FEATURED HEROS: Hero Showcase Sections
+  5. SEARCH & ARTICLES: Discovery & Exploration
+  6. LEGAL LINKS: Policies & Standards
+  7. SCRIPTS: Module Imports & Initialization
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- ========================================== -->
+<!-- 1. HEAD: Metadata, Fonts & SEO -->
+<!-- ========================================== -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rooted Vitality - Holistic Wellness Platform</title>
+    
+    <meta name="description" content="Rooted Vitality - Connect with certified holistic practitioners and start your wellness journey with alternative medicine experts.">
+    <meta name="keywords" content="holistic wellness, alternative medicine, holistic practitioners, wellness platform, natural healing">
+    <meta name="author" content="Rooted Vitality">
+    <meta property="og:title" content="Rooted Vitality - Holistic Wellness Platform">
+    <meta property="og:description" content="Connect with certified holistic practitioners and alternative medicine experts.">
+    <meta property="og:type" content="website">
+    <link rel="canonical" href="https://rootedvitality.com/">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Lora:wght@400&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/styles/base.css">
+    <link rel="stylesheet" href="/styles/layout.css">
+    <link rel="stylesheet" href="/styles/components.css">
+    <link rel="stylesheet" href="/styles/pages.css">
+</head>
+
+<body>
+    <!-- ========================================== -->
+    <!-- 2. BODY: Main Content Structure -->
+    <!-- ========================================== -->
+    <main id="mainContent">
+        
+        <!-- ========================================== -->
+        <!-- 3. TOGGLE: Client/Practitioner Tab Switcher -->
+        <!-- ========================================== -->
+        <div class="container">
+            <section class="toggle-top-section">
+                <div class="tab-container-top">
+                    <button class="tab-btn active" id="clientTab" data-tab="client" aria-pressed="true" aria-controls="featuredHeros">Client</button>
+                    <button class="tab-btn" id="practitionerTab" data-tab="practitioner" aria-pressed="false" aria-controls="featuredHeros">Practitioner</button>
+                </div>
+            </section>
+        </div>
+        
+        <!-- ========================================== -->
+        <!-- 4. FEATURED HEROS: Hero Showcase Sections -->
+        <!-- ========================================== -->
+        <div class="featured-heros" id="featuredHeros" aria-live="polite" aria-label="Featured content for selected tab"></div>
+        
+        <!-- ========================================== -->
+        <!-- 5. SEARCH & ARTICLES: Discovery & Exploration -->
+        <!-- ========================================== -->
+        <div class="container">
+            <section class="search-articles-section">
+                <h2 id="articlesTitle">Explore More Articles</h2>
+                <div class="search-container">
+                    <input type="text" class="search-bar" id="searchInput" placeholder="Search help articles�" aria-label="Search help articles">
+                </div>
+                <div class="articles-grid" id="articleGrid" aria-live="polite" aria-label="Filtered articles list"></div>
+            </section>
+        </div>
+        
+        <!-- ========================================== -->
+        <!-- 6. LEGAL LINKS: Policies & Standards -->
+        <!-- ========================================== -->
+        <div class="container">
+            <section class="legal-section">
+                <h2>Rooted Vitality Policies and Standards</h2>
+                <div class="legal-caption">Transparency and trust are at the heart of holistic care.</div>
+                <div class="legal-links">
+                    <a href="/policies/terms-of-service.html">Terms of Service</a>
+                    <a href="/policies/privacy-policy.html">Privacy Policy</a>
+                    <a href="/policies/data-protection.html">Data Protection and HIPAA Notice</a>
+                    <a href="/policies/refund-policy.html">Refund Policy</a>
+                    <a href="/policies/code-of-conduct.html">Practitioner Code of Conduct</a>
+                    <a href="/policies/accessibility-statement.html">Accessibility Statement</a>
+                    <a href="/policies/cookie-policy.html">Cookie and Tracking Policy</a>
+                    <a href="/policies/contact-us.html">Contact Us</a>
+                </div>
+            </section>
+        </div>
+    </main>
+    
+    <!-- ========================================== -->
+    <!-- 7. SCRIPTS: Module Imports & Initialization -->
+    <!-- ========================================== -->
+    
+    <!-- Supabase JS Client Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Rooted Vitality Scripts (in order) -->
+    <script src="/scripts/config.js"></script>
+    <script src="/scripts/authManager.js"></script>
+    <script src="/scripts/authModal.js"></script>
+    <script src="/scripts/authHooks.js"></script>
+    <script src="/injections.js"></script>
+    <script src="/scripts/renderManager.js"></script>
+    <script src="/scripts/tabController.js"></script>
+    <script src="/scripts/searchHandler.js"></script>
+    <script src="/injections.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await window.renderManager.loadArticleData();
+                window.tabController.initTabListeners();
+                window.searchHandler.initSearchHandler();
+                window.renderManager.renderFeaturedHeros();
+                window.renderManager.renderArticles();
+            } catch (error) {
+                console.error('[Rooted Vitality] Initialization error:', error);
+            }
+        });
+    </script>
+    
+    <script src="/chatbot.js"></script>
+</body>
+
+</html>

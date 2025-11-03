@@ -1,0 +1,26 @@
+/*
+╔════════════════════════════════════════════════════════════════════╗
+║  ROOTED VITALITY, INC.                                             ║
+║  File: styles/styles.css                                           ║
+║  Purpose: Modular CSS Aggregator (Import Only)                     ║
+║  Holistic Wellness · Modern Connection Platform                    ║
+║  rootedvitality.com | 2025                                         ║
+╚════════════════════════════════════════════════════════════════════╝
+
+REFACTORED STRUCTURE (Per System Prompt.md #5)
+  - Styles.css MUST remain lightweight (universals only)
+  - Modular architecture for maintainability
+  - Each module serves a specific purpose
+  - Page-specific styles isolated to pages.css
+
+IMPORT ORDER
+  1. base.css      → Variables, resets, typography
+  2. layout.css    → Containers, grid, spacing
+  3. components.css → Buttons, cards, forms, modals
+  4. pages.css     → Page-specific styles
+*/
+
+@import url("base.css");
+@import url("layout.css");
+@import url("components.css");
+@import url("pages.css");

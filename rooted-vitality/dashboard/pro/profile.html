@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>My Profile | Rooted Vitality</title>
+  <meta name="description" content="Your professional practitioner profile on Rooted Vitality.">
+  
+  <link rel="stylesheet" href="/styles/styles.css">
+  <link rel="stylesheet" href="/styles/profile.css">
+</head>
+<body class="pro-dashboard">
+  <script>
+    localStorage.setItem('active_view', 'practitioner');
+  </script>
+  
+  <header id="header-inject"></header>
+
+  <main id="profile-container" class="profile-main">
+    <article class="profile-page">
+      
+      <!-- Profile Header Card -->
+      <div class="profile-header-card">
+        <div class="profile-avatar-container">
+          <img id="profile-avatar" src="/assets/default-avatar.png" alt="Your profile" class="profile-avatar">
+          <label class="avatar-upload-btn" title="Change profile photo">
+            <input type="file" id="avatar-input" accept="image/*" style="display: none;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+              <circle cx="12" cy="13" r="4"></circle>
+            </svg>
+          </label>
+        </div>
+        
+        <div class="profile-header-info">
+          <div class="profile-name-section">
+            <div class="profile-name-with-badge">
+              <div class="name-inputs-group">
+                <div class="name-field">
+                  <label>Legal Business Name</label>
+                  <input type="text" id="profile-name" class="profile-name-input" placeholder="Auto-populated from registration" value="" readonly>
+                </div>
+                <div class="name-field">
+                  <label>DBA Name (Display Name)</label>
+                  <input type="text" id="profile-dba-name" class="profile-name-input" placeholder="What customers will see (optional)" value="">
+                </div>
+              </div>
+              <div class="credentials-badges-showcase">
+                <div id="badge-licensed" class="credentials-badge badge-locked" title="Earned when you add professional licenses">
+                  <span class="badge-icon">✓</span>
+                  <span class="badge-text">Licensed</span>
+                </div>
+                <div id="badge-verified" class="credentials-badge badge-locked" title="Earned when you add licenses and certifications">
+                  <span class="badge-icon">✓</span>
+                  <span class="badge-text">Verified</span>
+                </div>
+                <div id="badge-certified" class="credentials-badge badge-locked" title="Earned when you add certifications">
+                  <span class="badge-icon">✓</span>
+                  <span class="badge-text">Certified</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="profile-meta-inputs">
+            <div class="meta-field">
+              <label>Location</label>
+              <input type="text" id="profile-location" placeholder="e.g., Denver, Colorado" value="">
+            </div>
+            <div class="meta-field">
+              <label>Years in Service</label>
+              <input type="number" id="profile-years" placeholder="e.g., 8" min="0" value="">
+            </div>
+            <div class="meta-field">
+              <label>Team Size</label>
+              <input type="text" id="profile-teamsize" placeholder="e.g., 1–10" value="">
+            </div>
+          </div>
+
+          <div class="header-action-group">
+            <button id="save-header-info" class="btn-header-save">Save</button>
+            <a href="#" id="view-public-profile" class="profile-preview-link">View Public Profile →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile Completeness Section -->
+      <div class="profile-completeness-section">
+        <!-- Profile Completeness Meter -->
+        <div class="profile-completeness-card">
+          <div class="completeness-content">
+            <div class="completeness-text">
+              <div class="completeness-header">
+                <h3>Profile Completeness</h3>
+              </div>
+              <p id="completeness-percentage">0%</p>
+            </div>
+            <div class="completeness-bar-container">
+              <div class="completeness-bar">
+                <div id="completeness-progress" class="completeness-progress" style="width: 0%;"></div>
+              </div>
+              <p class="completeness-label" id="completeness-label">Fill in sections to complete your profile</p>
+            </div>
+          </div>
+
+          <!-- Profile Completeness Info Card -->
+          <div class="completeness-tooltip-content">
+            <p><strong>Complete profiles are:</strong></p>
+            <div class="completeness-checklist">
+              <div class="checklist-item">✓ 3x more likely to be selected by clients</div>
+              <div class="checklist-item">✓ Featured higher in search results</div>
+              <div class="checklist-item">✓ More trusted with verified credentials</div>
+              <div class="checklist-item">✓ Receive more qualified leads</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile Sections Container -->
+      <div class="profile-sections-wrapper">
+
+        <!-- About Section -->
+        <section class="profile-section" data-section="about">
+          <div class="section-header">
+            <h2>About</h2>
+            <button class="section-save-btn" data-section="about">Save</button>
+            <button class="section-edit-btn" data-section="about" style="display: none;">Edit</button>
+          </div>
+          <div class="section-instruction">Tell clients about your background, experience, and what makes you different.</div>
+          <div class="section-tooltip">Share your story in 2-3 sentences. Include your credentials, years of experience, and what inspires your practice. Clients connect with practitioners who feel authentic and approachable.</div>
+          <textarea id="about-content" class="profile-textarea section-edit-field" data-section="about" placeholder="Tell us about yourself, your background, and your wellness philosophy..."></textarea>
+          <div id="about-display" class="section-display-text" style="display: none;"></div>
+        </section>
+
+        <!-- Approach & Philosophy Section -->
+        <section class="profile-section" data-section="approach">
+          <div class="section-header">
+            <h2>Approach & Philosophy</h2>
+            <button class="section-save-btn" data-section="approach">Save</button>
+            <button class="section-edit-btn" data-section="approach" style="display: none;">Edit</button>
+          </div>
+          <div class="section-instruction">Explain your treatment philosophy and what principles guide your practice.</div>
+          <div class="section-tooltip">Describe your methodology in simple terms. What makes your approach effective? How do you help clients feel heard and valued? This builds trust and sets expectations.</div>
+          <textarea id="approach-content" class="profile-textarea section-edit-field" data-section="approach" placeholder="Describe your treatment approach and core wellness philosophy..."></textarea>
+          <div id="approach-display" class="section-display-text" style="display: none;"></div>
+        </section>
+
+        <!-- Specialties & Modalities removed (managed in Match Settings) -->
+
+        <!-- Degrees Section -->
+        <section class="profile-section" data-section="degrees">
+          <div class="section-header">
+            <h2>Degrees & Education</h2>
+            <button class="section-save-btn" data-section="degrees">Save</button>
+          </div>
+          <div class="section-instruction">Add your formal education and academic credentials that qualify you as a practitioner.</div>
+          <div class="section-tooltip">List your degrees, the institution, and graduation year. Include any relevant academic honors or distinctions that build credibility.</div>
+          <div class="credentials-section-edit" id="degrees-edit" style="display: none;">
+            <div id="degrees-list" class="credentials-list"></div>
+            <button class="btn-add-credential" id="add-degree-btn" data-credential-type="degree">+ Add Degree</button>
+          </div>
+          <div class="credentials-section-display" id="degrees-display"></div>
+        </section>
+
+        <!-- Licenses Section -->
+        <section class="profile-section" data-section="licenses">
+          <div class="section-header">
+            <h2>Licenses</h2>
+            <button class="section-save-btn" data-section="licenses">Save</button>
+          </div>
+          <div class="section-instruction">Add your professional licenses, regulatory credentials, and state certifications.</div>
+          <div class="section-tooltip">Include license type, issuing state/authority, license number, and expiration date. This is critical for building client trust and regulatory compliance.</div>
+          <div class="credentials-section-edit" id="licenses-edit" style="display: none;">
+            <div id="licenses-list" class="credentials-list"></div>
+            <button class="btn-add-credential" id="add-license-btn" data-credential-type="license">+ Add License</button>
+          </div>
+          <div class="credentials-section-display" id="licenses-display"></div>
+        </section>
+
+        <!-- Certifications Section -->
+        <section class="profile-section" data-section="certifications">
+          <div class="section-header">
+            <h2>Certifications</h2>
+            <button class="section-save-btn" data-section="certifications">Save</button>
+          </div>
+          <div class="section-instruction">List professional certifications and specialized training programs you've completed.</div>
+          <div class="section-tooltip">Include certification name, issuing organization, credential number, and expiration date. Specialized certifications demonstrate expertise and commitment to professional development.</div>
+          <div class="credentials-section-edit" id="certifications-edit" style="display: none;">
+            <div id="certifications-list" class="credentials-list"></div>
+            <button class="btn-add-credential" id="add-certification-btn" data-credential-type="certification">+ Add Certification</button>
+          </div>
+          <div class="credentials-section-display" id="certifications-display"></div>
+        </section>
+
+        <!-- Continuing Education Section -->
+        <section class="profile-section" data-section="continuing-education">
+          <div class="section-header">
+            <h2>Continuing Education</h2>
+            <button class="section-save-btn" data-section="continuing-education">Save</button>
+            <button class="section-edit-btn" data-section="continuing-education" style="display: none;">Edit</button>
+          </div>
+          <div class="section-instruction">Show clients your commitment to staying current in your field.</div>
+          <div class="section-tooltip">Add professional development courses, workshops, and training programs completed in the last 2 years. This demonstrates your dedication to continuous learning and best practices.</div>
+          
+          <!-- Edit Mode (start open) -->
+          <div id="continuing-education-edit" class="continuing-education-edit" style="display: flex;">
+            <div id="continuing-education-list" class="continuing-education-list"></div>
+            <button class="btn-add-credential" id="add-ce-btn" data-ce-type="course">+ Add Course</button>
+          </div>
+          
+          <!-- Display Mode -->
+          <div id="continuing-education-display" class="continuing-education-display"></div>
+        </section>
+
+        <!-- Professional Photo Gallery Section -->
+        <section class="profile-section" data-section="photos">
+          <div class="section-header">
+            <h2>Professional Photos</h2>
+            <button class="section-save-btn" data-section="photos">Save</button>
+            <button class="section-edit-btn" data-section="photos" style="display: none;">Edit</button>
+          </div>
+          <div class="section-instruction">Upload professional photos that showcase your practice and build client confidence.</div>
+          <div class="section-tooltip">Add 4–6 professional photos including workspace, headshot, treatment areas, or team photos. High-quality images help clients feel comfortable and establish trust before booking.</div>
+          
+          <!-- Edit Mode (start open) -->
+          <div id="photos-edit" class="photos-edit" style="display: block;">
+            <div class="photos-upload-area">
+              <button class="btn-accent" id="add-photo-btn">+ Add Photo</button>
+              <p class="photos-upload-hint">Upload up to 6 photos • JPG, PNG, or WebP • 5MB max per file</p>
+            </div>
+            
+            <div id="photos-list" class="photos-list"></div>
+          </div>
+          
+          <!-- Display Mode -->
+          <div id="photos-display" class="photos-display"></div>
+        </section>
+
+        <!-- Social Media Section -->
+        <section class="profile-section" data-section="social">
+          <div class="section-header">
+            <h2>Social Media & Connect</h2>
+            <button class="section-save-btn" data-section="social">Save</button>
+          </div>
+          <div class="section-instruction">Share your social profiles and website to build your online presence.</div>
+          <div class="section-tooltip">Add links to your professional social profiles and website. This allows clients to follow you, learn more about your work, and reach out through multiple channels.</div>
+          <div class="social-inputs-grid">
+            <div class="social-input-field">
+              <label for="social-facebook">Facebook</label>
+              <input type="url" id="social-facebook" class="section-edit-field" data-section="social" placeholder="https://facebook.com/yourprofile" value="">
+            </div>
+            <div class="social-input-field">
+              <label for="social-instagram">Instagram</label>
+              <input type="url" id="social-instagram" class="section-edit-field" data-section="social" placeholder="https://instagram.com/yourprofile" value="">
+            </div>
+            <div class="social-input-field">
+              <label for="social-x">X (Twitter)</label>
+              <input type="url" id="social-x" class="section-edit-field" data-section="social" placeholder="https://x.com/yourprofile" value="">
+            </div>
+            <div class="social-input-field">
+              <label for="social-linkedin">LinkedIn</label>
+              <input type="url" id="social-linkedin" class="section-edit-field" data-section="social" placeholder="https://linkedin.com/in/yourprofile" value="">
+            </div>
+            <div class="social-input-field">
+              <label for="social-youtube">YouTube</label>
+              <input type="url" id="social-youtube" class="section-edit-field" data-section="social" placeholder="https://youtube.com/@yourprofile" value="">
+            </div>
+            <div class="social-input-field">
+              <label for="social-tiktok">TikTok</label>
+              <input type="url" id="social-tiktok" class="section-edit-field" data-section="social" placeholder="https://tiktok.com/@yourprofile" value="">
+            </div>
+            <div class="social-input-field">
+              <label for="social-pinterest">Pinterest</label>
+              <input type="url" id="social-pinterest" class="section-edit-field" data-section="social" placeholder="https://pinterest.com/yourprofile" value="">
+            </div>
+            <div class="social-input-field">
+              <label for="social-website">Your Website</label>
+              <input type="url" id="social-website" class="section-edit-field" data-section="social" placeholder="https://yourwebsite.com" value="">
+            </div>
+          </div>
+        </section>
+
+        <!-- Languages Section -->
+        <section class="profile-section" data-section="languages">
+          <div class="section-header">
+            <h2>Languages</h2>
+            <button class="section-save-btn" data-section="languages">Save</button>
+          </div>
+          <div class="section-instruction">List all languages you speak professionally with clients.</div>
+          <div class="section-tooltip">Multilingual practitioners can reach a broader client base. Add each language you're comfortable conducting sessions in professionally.</div>
+          <div class="languages-input-container">
+            <input 
+              type="text" 
+              id="language-input" 
+              class="language-text-input" 
+              placeholder="Type a language (e.g., English, Spanish, Mandarin) and press Enter"
+              data-section="languages"
+            >
+            <div id="languages-list" class="languages-list"></div>
+          </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="profile-section" data-section="faq">
+          <div class="section-header">
+            <h2>Frequently Asked Questions</h2>
+            <button class="section-save-btn" data-section="faq">Save</button>
+          </div>
+          <div class="section-instruction">Answer common questions clients ask about your services.</div>
+          <div class="section-tooltip">Pre-answering FAQs reduces booking friction and helps clients understand what to expect. Address common concerns like scheduling, payment, cancellation policies, and session format.</div>
+          <div id="faq-list" class="faq-list"></div>
+          <button class="btn-add-credential" id="add-faq-btn">+ Add Question</button>
+        </section>
+
+        <!-- Payment Types Section -->
+        <section class="profile-section" data-section="payment">
+          <div class="section-header">
+            <h2>Payment & Insurance</h2>
+            <button class="section-save-btn" data-section="payment">Save</button>
+          </div>
+          <div class="section-instruction">Tell clients what payment methods and insurance plans you accept.</div>
+          <div class="section-tooltip">Transparency about payment options and insurance billing builds client confidence and reduces booking friction. List all accepted payment methods and insurance providers you work with.</div>
+          
+          <div class="payment-types-container">
+            <!-- Insurance Accepted Section -->
+            <div class="insurance-section">
+              <div class="insurance-header">
+                <h3>Insurance Providers You Accept</h3>
+                <p class="insurance-hint">Select all insurance plans you bill directly</p>
+              </div>
+              
+              <!-- Edit Mode: Insurance Checkboxes -->
+              <div id="insurance-edit" class="insurance-edit" style="display: none;">
+                <div class="insurance-grid">
+                  <label class="insurance-checkbox-label">
+                    <input type="checkbox" class="insurance-checkbox" value="aetna" data-insurance="aetna">
+                    <span>Aetna</span>
+                  </label>
+                  <label class="insurance-checkbox-label">
+                    <input type="checkbox" class="insurance-checkbox" value="anthem" data-insurance="anthem">
+                    <span>Anthem / BlueCross</span>
+                  </label>
+                  <label class="insurance-checkbox-label">
+                    <input type="checkbox" class="insurance-checkbox" value="cigna" data-insurance="cigna">
+                    <span>Cigna</span>
+                  </label>
+                  <label class="insurance-checkbox-label">
+                    <input type="checkbox" class="insurance-checkbox" value="humana" data-insurance="humana">
+                    <span>Humana</span>
+                  </label>
+                  <label class="insurance-checkbox-label">
+                    <input type="checkbox" class="insurance-checkbox" value="united" data-insurance="united">
+                    <span>UnitedHealth / UnitedMed</span>
+                  </label>
+                  <label class="insurance-checkbox-label">
+                    <input type="checkbox" class="insurance-checkbox" value="bcbs" data-insurance="bcbs">
+                    <span>BCBS (Blue Cross Blue Shield)</span>
+                  </label>
+                  <label class="insurance-checkbox-label">
+                    <input type="checkbox" class="insurance-checkbox" value="tricare" data-insurance="tricare">
+                    <span>TRICARE / Military</span>
+                  </label>
+                  <label class="insurance-checkbox-label">
+                    <input type="checkbox" class="insurance-checkbox" value="medicaid" data-insurance="medicaid">
+                    <span>Medicaid</span>
+                  </label>
+                  <label class="insurance-checkbox-label">
+                    <input type="checkbox" class="insurance-checkbox" value="medicare" data-insurance="medicare">
+                    <span>Medicare</span>
+                  </label>
+                  <label class="insurance-checkbox-label">
+                    <input type="checkbox" class="insurance-checkbox" value="workers_comp" data-insurance="workers_comp">
+                    <span>Workers' Compensation</span>
+                  </label>
+                </div>
+              </div>
+              
+              <!-- Display Mode: Insurance Badges -->
+              <div id="insurance-display" class="insurance-display"></div>
+            </div>
+
+            <!-- Payment Methods Section -->
+            <div class="payment-methods-field">
+              <label for="payment-methods"><strong>Other Payment Methods</strong></label>
+              <p class="payment-methods-hint">Credit cards, digital wallets, cash, checks, etc.</p>
+              <textarea 
+                id="payment-methods" 
+                class="section-edit-field payment-methods-textarea" 
+                data-section="payment"
+                placeholder="e.g., Visa, Mastercard, Amex, PayPal, Venmo, Cash, Check, FSA/HSA"
+                rows="4"
+              ></textarea>
+            </div>
+          </div>
+        </section>
+
+        <!-- Pricing & Rates Section -->
+        <section class="profile-section" data-section="pricing">
+          <div class="section-header">
+            <h2>Pricing & Rates</h2>
+            <button class="section-edit-btn" onclick="enableSectionEdit('pricing')">Edit</button>
+          </div>
+
+          <div class="section-instruction">Set your session rates and pricing structure.</div>
+          <div class="section-tooltip">Transparent pricing helps clients decide if your services fit their budget. Offer fixed rates, ranges, or tiered options. Consider sliding scale for accessibility.</div>
+
+          <div id="pricing-edit" class="pricing-edit" style="display: none;">
+            <div class="pricing-container">
+              <div class="pricing-option">
+                <label class="pricing-radio">
+                  <input type="radio" name="pricing-type" value="fixed" checked>
+                  <span class="radio-label">Fixed Rate</span>
+                </label>
+                <div class="pricing-input-group">
+                  <span class="currency">$</span>
+                  <input type="number" id="pricing-fixed-rate" class="pricing-input" placeholder="Per session" min="0" step="0.01">
+                  <span class="period">/session</span>
+                </div>
+              </div>
+
+              <div class="pricing-option">
+                <label class="pricing-radio">
+                  <input type="radio" name="pricing-type" value="range">
+                  <span class="radio-label">Rate Range</span>
+                </label>
+                <div class="pricing-input-group range">
+                  <span class="currency">$</span>
+                  <input type="number" id="pricing-min-rate" class="pricing-input" placeholder="Min" min="0" step="0.01">
+                  <span class="separator">–</span>
+                  <span class="currency">$</span>
+                  <input type="number" id="pricing-max-rate" class="pricing-input" placeholder="Max" min="0" step="0.01">
+                </div>
+              </div>
+
+              <div class="pricing-option">
+                <label class="pricing-radio">
+                  <input type="radio" name="pricing-type" value="tiers">
+                  <span class="radio-label">Pricing Tiers</span>
+                </label>
+                <div class="pricing-tiers">
+                  <label class="tier-checkbox">
+                    <input type="checkbox" value="budget" class="tier-check">
+                    <span>Budget: $50–75/session</span>
+                  </label>
+                  <label class="tier-checkbox">
+                    <input type="checkbox" value="standard" class="tier-check">
+                    <span>Standard: $75–125/session</span>
+                  </label>
+                  <label class="tier-checkbox">
+                    <input type="checkbox" value="premium" class="tier-check">
+                    <span>Premium: $125+/session</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="pricing-option">
+                <label class="pricing-checkbox">
+                  <input type="checkbox" id="pricing-offer-sliding">
+                  <span>Offer sliding scale for those with financial constraints</span>
+                </label>
+              </div>
+
+              <div class="pricing-notes">
+                <label>Additional Notes</label>
+                <textarea id="pricing-notes-text" class="pricing-textarea" placeholder="e.g., package discounts, group rates, special offers, payment plans" rows="3"></textarea>
+              </div>
+            </div>
+
+            <button class="section-save-btn" onclick="saveSectionData('pricing')">Save</button>
+          </div>
+
+          <div id="pricing-display" class="pricing-display">
+            <div id="pricing-display-content"></div>
+          </div>
+        </section>
+
+        <!-- Professional Video Introduction Section -->
+        <section class="profile-section" data-section="video">
+          <div class="section-header">
+            <h2>Professional Video Introduction</h2>
+            <button class="section-edit-btn" onclick="enableSectionEdit('video')">Edit</button>
+          </div>
+
+          <div class="section-instruction">Record a brief professional introduction to help clients get to know you.</div>
+          <div class="section-tooltip">A 30–60 second video introduction helps build personal connection and trust. Show your personality, speak about your practice philosophy, and create a welcoming first impression.</div>
+
+          <div id="video-edit" class="video-edit" style="display: none;">
+            <div class="video-upload-area">
+              <div class="video-upload-guidance">
+                <p><strong>Upload a professional introduction video</strong></p>
+                <ul>
+                  <li>Duration: 30–60 seconds</li>
+                  <li>Format: MP4, WebM, or MOV</li>
+                  <li>Max size: 100 MB</li>
+                  <li>Keep it professional and engaging</li>
+                </ul>
+              </div>
+
+              <div class="video-input-wrapper">
+                <input type="file" id="video-input" accept="video/mp4,video/webm,video/quicktime" style="display: none;">
+                <button class="btn-upload" onclick="document.getElementById('video-input').click()">Choose Video File</button>
+                <span id="video-filename" class="video-filename"></span>
+              </div>
+
+              <div id="video-preview-section" class="video-preview-section" style="display: none;">
+                <label>Preview</label>
+                <video id="video-preview" class="video-preview" controls></video>
+                <div class="video-info">
+                  <span id="video-duration-info"></span>
+                  <button class="btn-remove" onclick="removeVideo()">Remove</button>
+                </div>
+              </div>
+            </div>
+
+            <button class="section-save-btn" onclick="saveSectionData('video')">Save</button>
+          </div>
+
+          <div id="video-display" class="video-display">
+            <video id="video-display-player" class="video-display-player" controls style="display: none;"></video>
+            <div id="video-display-placeholder" class="video-placeholder">No video added</div>
+          </div>
+        </section>
+
+        <!-- Background Check Section -->
+        <section class="profile-section profile-final">
+          <h2>Background Check & Verification</h2>
+          <div class="background-check-container">
+            <div class="background-check-info">
+              <p class="background-check-description">
+                A background check is required to verify your credentials and build trust with potential clients. 
+                This is a secure, one-time verification process.
+              </p>
+              <div id="background-check-status" class="background-check-status-placeholder"></div>
+            </div>
+            <button class="btn-accent" id="start-background-check">Start Background Check</button>
+          </div>
+        </section>
+
+        <!-- Practice Type/Setting Section -->
+        <section class="profile-section" data-section="practice">
+          <div class="section-header">
+            <h2>Practice Type & Setting</h2>
+            <button class="section-edit-btn" onclick="enableSectionEdit('practice')">Edit</button>
+          </div>
+
+          <div class="section-instruction">Describe your practice structure, location setting, and service delivery methods.</div>
+          <div class="section-tooltip">Let clients know if you work solo or in a group, whether sessions are in-person, virtual, or hybrid. Specify your location or availability for remote services.</div>
+
+          <div id="practice-edit" class="practice-edit" style="display: none;">
+            <div class="practice-container">
+              <div class="practice-group">
+                <h3>Practice Structure</h3>
+                <label class="practice-radio">
+                  <input type="radio" name="practice-structure" value="solo">
+                  <span>Solo Practice</span>
+                </label>
+                <label class="practice-radio">
+                  <input type="radio" name="practice-structure" value="group">
+                  <span>Group Practice</span>
+                </label>
+              </div>
+
+              <div class="practice-group">
+                <h3>Practice Setting</h3>
+                <label class="practice-radio">
+                  <input type="radio" name="practice-setting" value="private">
+                  <span>Private Practice</span>
+                </label>
+                <label class="practice-radio">
+                  <input type="radio" name="practice-setting" value="clinic">
+                  <span>Clinic/Center</span>
+                </label>
+                <label class="practice-radio">
+                  <input type="radio" name="practice-setting" value="hospital">
+                  <span>Hospital/Medical Facility</span>
+                </label>
+              </div>
+
+              <div class="practice-group">
+                <h3>Service Delivery</h3>
+                <label class="practice-checkbox">
+                  <input type="checkbox" id="practice-in-person">
+                  <span>In-Person Sessions</span>
+                </label>
+                <label class="practice-checkbox">
+                  <input type="checkbox" id="practice-virtual">
+                  <span>Virtual/Telehealth Sessions</span>
+                </label>
+                <label class="practice-checkbox">
+                  <input type="checkbox" id="practice-hybrid">
+                  <span>Hybrid (Both In-Person & Virtual)</span>
+                </label>
+              </div>
+            </div>
+
+            <button class="section-save-btn" onclick="saveSectionData('practice')">Save</button>
+          </div>
+
+          <div id="practice-display" class="practice-display">
+            <div id="practice-display-content"></div>
+          </div>
+        </section>
+
+        <!-- Conditions Treated Section -->
+        <section class="profile-section" data-section="conditions">
+          <div class="section-header">
+            <h2>Conditions & Specializations</h2>
+            <button class="section-edit-btn" onclick="enableSectionEdit('conditions')">Edit</button>
+          </div>
+
+          <div class="section-instruction">Select the health conditions and issues you specialize in treating.</div>
+          <div class="section-tooltip">Highlighting your specializations helps clients find the right practitioner for their needs. Check all conditions you have experience and training to treat professionally.</div>
+
+          <div id="conditions-edit" class="conditions-edit" style="display: none;">
+            <div class="conditions-container">
+              <div class="conditions-grid">
+                <label class="condition-checkbox">
+                  <input type="checkbox" name="condition" value="anxiety" data-category="mental-health">
+                  <span>Anxiety Disorders</span>
+                </label>
+                <label class="condition-checkbox">
+                  <input type="checkbox" name="condition" value="depression" data-category="mental-health">
+                  <span>Depression</span>
+                </label>
+                <label class="condition-checkbox">
+                  <input type="checkbox" name="condition" value="trauma" data-category="mental-health">
+                  <span>Trauma & PTSD</span>
+                </label>
+                <label class="condition-checkbox">
+                  <input type="checkbox" name="condition" value="bipolar" data-category="mental-health">
+                  <span>Bipolar Disorder</span>
+                </label>
+                <label class="condition-checkbox">
+                  <input type="checkbox" name="condition" value="ocd" data-category="mental-health">
+                  <span>OCD</span>
+                </label>
+                <label class="condition-checkbox">
+                  <input type="checkbox" name="condition" value="adhd" data-category="neurodevelopmental">
+                  <span>ADHD</span>
+                </label>
+                <label class="condition-checkbox">
+                  <input type="checkbox" name="condition" value="autism" data-category="neurodevelopmental">
+                  <span>Autism Spectrum</span>
+                </label>
+                <label class="condition-checkbox">
+                  <input type="checkbox" name="condition" value="sleep" data-category="wellness">
+                  <span>Sleep Disorders</span>
+                </label>
+                <label class="condition-checkbox">
+                  <input type="checkbox" name="condition" value="chronic-pain" data-category="wellness">
+                  <span>Chronic Pain Management</span>
+                </label>
+                <label class="condition-checkbox">
+                  <input type="checkbox" name="condition" value="stress" data-category="wellness">
+                  <span>Stress Management</span>
+                </label>
+                <label class="condition-checkbox">
+                  <input type="checkbox" name="condition" value="addiction" data-category="behavioral">
+                  <span>Addiction & Substance Use</span>
+                </label>
+                <label class="condition-checkbox">
+                  <input type="checkbox" name="condition" value="eating" data-category="behavioral">
+                  <span>Eating Disorders</span>
+                </label>
+                <label class="condition-checkbox">
+                  <input type="checkbox" name="condition" value="relationships" data-category="life">
+                  <span>Relationship Issues</span>
+                </label>
+                <label class="condition-checkbox">
+                  <input type="checkbox" name="condition" value="grief" data-category="life">
+                  <span>Grief & Loss</span>
+                </label>
+                <label class="condition-checkbox">
+                  <input type="checkbox" name="condition" value="career" data-category="life">
+                  <span>Career Counseling</span>
+                </label>
+                <label class="condition-checkbox">
+                  <input type="checkbox" name="condition" value="life-transitions" data-category="life">
+                  <span>Life Transitions</span>
+                </label>
+                <label class="condition-checkbox">
+                  <input type="checkbox" name="condition" value="family" data-category="life">
+                  <span>Family Therapy</span>
+                </label>
+                <label class="condition-checkbox">
+                  <input type="checkbox" name="condition" value="parenting" data-category="life">
+                  <span>Parenting Support</span>
+                </label>
+                <label class="condition-checkbox">
+                  <input type="checkbox" name="condition" value="self-esteem" data-category="wellness">
+                  <span>Self-Esteem & Confidence</span>
+                </label>
+                <label class="condition-checkbox">
+                  <input type="checkbox" name="condition" value="anger-management" data-category="behavioral">
+                  <span>Anger Management</span>
+                </label>
+              </div>
+            </div>
+
+            <button class="section-save-btn" onclick="saveSectionData('conditions')">Save</button>
+          </div>
+
+          <div id="conditions-display" class="conditions-display">
+            <div id="conditions-display-content"></div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Save Status -->
+      <div class="save-status" id="save-status"></div>
+
+    </article>
+  </main>
+
+  <!-- Profile Picture Upload Modal -->
+  <div id="profile-picture-modal" class="modal" style="display: none;">
+    <div class="modal-overlay" onclick="closeProfilePictureModal()"></div>
+    <div class="modal-content profile-picture-modal">
+      <div class="modal-header">
+        <h2>Upload Profile Picture</h2>
+        <button class="modal-close-btn" onclick="closeProfilePictureModal()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Drop Zone -->
+        <div id="upload-dropzone" class="upload-dropzone">
+          <div class="dropzone-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+          </div>
+          <h3>Drag and drop your photo here</h3>
+          <p>or</p>
+          <button class="browse-btn" onclick="document.getElementById('profile-picture-input').click()">Browse Files</button>
+          <input type="file" id="profile-picture-input" accept="image/jpeg,image/png,image/webp" style="display: none;">
+          <p class="dropzone-note">JPG, PNG or WebP • Max 5MB</p>
+        </div>
+
+        <!-- Preview Section -->
+        <div id="preview-section" class="preview-section" style="display: none;">
+          <div class="preview-image-container">
+            <img id="preview-image" src="" alt="Preview" class="preview-image">
+          </div>
+          <div class="preview-info">
+            <p id="preview-filename"></p>
+            <p id="preview-size"></p>
+          </div>
+        </div>
+
+        <!-- Upload Progress -->
+        <div id="upload-progress-section" class="upload-progress-section" style="display: none;">
+          <p>Uploading...</p>
+          <div class="progress-bar">
+            <div id="progress-fill" class="progress-fill"></div>
+          </div>
+          <p id="progress-percentage">0%</p>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeProfilePictureModal()">Cancel</button>
+        <button id="confirm-upload-btn" class="btn-primary" onclick="confirmProfilePictureUpload()" style="display: none;">Upload Photo</button>
+      </div>
+    </div>
+  </div>
+
+  <footer id="footer-inject"></footer>
+
+  <!-- Supabase JS Client Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Rooted Vitality Scripts -->
+  <script src="/scripts/config.js"></script>
+  <script src="/scripts/authManager.js"></script>
+  <script src="/scripts/authModal.js"></script>
+  <script src="/scripts/authHooks.js"></script>
+  <script src="/injections.js"></script>
+  <script src="/scripts/proDashboard.js"></script>
+  <script src="/scripts/proProfile.js"></script>
+</body>
+</html>

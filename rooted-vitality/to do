@@ -1,0 +1,12 @@
+Long Term: 
+-Swap out the login verification email for actual support workspace email. (Currently kylejmohney@gmail.com)
+-Re-activate sign-up email verification after purchasing supabase and setting up support@rooted-vitality.(whatever domain we end up with)
+
+Short Term: 
+Fix cross diagonal background elements to be behind cards/heros
+Replace all emoji with custom icons
+
+
+Remove verified status card and profile preview card. We already have verified badge, so its redundance. Move preview profile to being a link instead of button. It will be to the right of the top hero, beneath the Team Size and Years in service areas. 
+
+

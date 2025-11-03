@@ -1,0 +1,266 @@
+/*
+╔════════════════════════════════════════════════════════════════════╗
+║  ROOTED VITALITY, INC.                                             ║
+║  File: styles/base.css                                             ║
+║  Purpose: CSS Variables, Resets & Base Typography                  ║
+║  Holistic Wellness · Modern Connection Platform                    ║
+║  rootedvitality.com | 2025                                         ║
+╚════════════════════════════════════════════════════════════════════╝
+
+TABLE OF CONTENTS
+  1. CSS VARIABLES & DESIGN TOKENS
+  2. ANIMATIONS & KEYFRAMES
+  3. GLOBAL RESETS
+  4. TYPOGRAPHY HIERARCHY
+  5. ACCESSIBILITY & FOCUS STATES
+
+Extracted from: styles_legacy.css (lines 1-890)
+*/
+
+/* ========================================== */
+/* 1. CSS VARIABLES & DESIGN TOKENS */
+/* ========================================== */
+:root {
+    /* Brand Palette */
+    --rooted-primary: #5c9a72;
+    --rooted-accent: #d4c47c;
+    --rooted-neutral: #f7f5f1;
+    --rooted-sage: #e9ede8;
+    --rooted-dark: #2e2b28;
+    --rooted-light: #ffffff;
+    
+    /* Legacy Support */
+    --color-hero-green: #ebf6e8;
+    --color-hero-cream: #fbf7ec;
+    --color-hero-peach: #fae2ca;
+    --color-hover: #fde8a9;
+    --color-button: #5c9a72;
+    
+    /* Text Colors */
+    --color-text: #2e2b28;
+    --color-text-light: #4a4540;
+    --color-text-muted: #888888;
+    --color-white: #ffffff;
+    
+    /* Shadow System */
+    --shadow-minimal: 0 2px 8px rgba(46, 43, 40, 0.08);
+    --shadow-light: 0 8px 24px rgba(46, 43, 40, 0.10);
+    --shadow-medium: 0 8px 24px rgba(92, 154, 114, 0.08);
+    --shadow-elevated: 0 24px 48px rgba(46, 43, 40, 0.15);
+    
+    /* Spacing */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2rem;
+    --spacing-xl: 3rem;
+    
+    /* Border Radius */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    
+    /* Typography */
+    --font-sans: 'Inter', sans-serif;
+    --font-serif: 'Lora', serif;
+    --font-weight-normal: 400;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    
+    /* Glass-morphism */
+    --glass-white: rgba(255, 255, 255, 0.65);
+    --glass-light: rgba(255, 255, 255, 0.80);
+    --glass-overlay: rgba(255, 255, 255, 0.95);
+}
+
+/* ========================================== */
+/* 2. ANIMATIONS & KEYFRAMES */
+/* ========================================== */
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes gentleScale {
+    from { transform: scale(1); }
+    to { transform: scale(1.015); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ========================================== */
+/* 3. GLOBAL RESETS */
+/* ========================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    background: linear-gradient(135deg, var(--rooted-neutral) 0%, var(--rooted-sage) 100%);
+    background-attachment: fixed;
+    width: 100%;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+}
+
+body {
+    font-family: var(--font-serif);
+    color: var(--color-text);
+    line-height: 1.6;
+    position: relative;
+    width: 100%;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Logo Watermark */
+body::before {
+    content: '';
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 1600px;
+    height: 1600px;
+    background: url('../assets/logo_large.png') center/contain no-repeat;
+    opacity: 0.05;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Animated Glassmorphism Diagonal Lines (Subtle Background) */
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 80px,
+            rgba(255, 255, 255, 0.15) 80px,
+            rgba(255, 255, 255, 0.15) 82px
+        ),
+        repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 120px,
+            rgba(212, 196, 124, 0.12) 120px,
+            rgba(212, 196, 124, 0.12) 122px
+        );
+    pointer-events: none;
+    z-index: 0;
+    animation: diagonalFloat 60s ease-in-out infinite;
+}
+
+@keyframes diagonalFloat {
+    0%, 100% { transform: translate(0, 0); }
+    25% { transform: translate(3px, -3px); }
+    50% { transform: translate(0px, 3px); }
+    75% { transform: translate(-3px, 0px); }
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* ========================================== */
+/* 4. TYPOGRAPHY HIERARCHY */
+/* ========================================== */
+
+/* DEFAULT TEXT COLOR - ALL ELEMENTS */
+body,
+p, span, div, li, td, th, label, 
+article, section, aside, footer, header, nav,
+.article-card, .article-card *, 
+.box-highlight, .box-plant, .checklist-box,
+.timeline, .timeline-item {
+    color: var(--color-text);
+}
+
+/* HEADINGS - Green for page titles */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-sans);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: 0.02em;
+    color: var(--rooted-primary);
+}
+
+h1 { font-size: 2rem; line-height: 1.2; }
+h2 { font-size: 1.5rem; line-height: 1.3; font-weight: var(--font-weight-semibold); }
+h3 { font-size: 1.2rem; line-height: 1.4; font-weight: var(--font-weight-semibold); }
+
+p {
+    margin-bottom: 1rem;
+    color: var(--color-text);
+    letter-spacing: 0.01em;
+}
+
+a {
+    color: var(--color-button);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+a:hover:not(.hero-cta):not(.btn):not(.btn-primary):not(.btn-secondary):not(.back-button) {
+    color: var(--rooted-primary);
+}
+
+/* ========================================== */
+/* 5. ACCESSIBILITY & FOCUS STATES */
+/* ========================================== */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+    outline: 2px solid var(--rooted-accent);
+    outline-offset: 2px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* High contrast */
+@media (prefers-contrast: high) {
+    :root {
+        --shadow-minimal: 0 2px 8px rgba(0, 0, 0, 0.20);
+        --shadow-light: 0 8px 24px rgba(0, 0, 0, 0.25);
+        --shadow-medium: 0 8px 24px rgba(0, 0, 0, 0.20);
+    }
+    .glass-white, .glass-light { background: rgba(255, 255, 255, 0.95); }
+}
+
+/* Responsive Watermark Scaling */
+@media (max-width: 1024px) {
+    body::before { width: 1200px; height: 1200px; opacity: 0.06; }
+}
+
+@media (max-width: 768px) {
+    body::before { width: 900px; height: 900px; opacity: 0.07; }
+}
+
+@media (max-width: 480px) {
+    body::before { width: 700px; height: 700px; opacity: 0.08; }
+}

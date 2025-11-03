@@ -207,7 +207,7 @@ FEATURES:
     // ========== CHATBOT STATE ==========
     let isOpen = false; // Chat starts closed
     let conversationHistory = [];
-    let currentTab = 'patient'; // Default context
+    let currentTab = 'client'; // Default context
 
     // ========== UTILITY FUNCTIONS ==========
     
@@ -372,15 +372,15 @@ FEATURES:
 
     function detectCurrentContext() {
         // Check if we're on the index page with tabs
-        const patientTab = document.getElementById('patient-tab');
+        const clientTab = document.getElementById('client-tab');
         const practitionerTab = document.getElementById('practitioner-tab');
         
-        if (patientTab && practitionerTab) {
+        if (clientTab && practitionerTab) {
             // Set initial context
-            currentTab = patientTab.classList.contains('active') ? 'patient' : 'practitioner';
+            currentTab = clientTab.classList.contains('active') ? 'client' : 'practitioner';
             
             // Listen for tab changes
-            patientTab.addEventListener('click', () => { currentTab = 'patient'; });
+            clientTab.addEventListener('click', () => { currentTab = 'client'; });
             practitionerTab.addEventListener('click', () => { currentTab = 'practitioner'; });
         }
     }
