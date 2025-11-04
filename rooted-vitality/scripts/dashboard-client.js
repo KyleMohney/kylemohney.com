@@ -117,7 +117,6 @@ function populateDashboardForms(userData) {
         document.getElementById('phone').value = userData.phone || '';
         document.getElementById('age').value = userData.age || '';
         document.getElementById('sex').value = userData.sex || '';
-        document.getElementById('gender').value = userData.gender || '';
         
         // Load avatar if available
         if (userData.avatar_url) {
@@ -290,7 +289,6 @@ async function handleAccountFormSubmit(e) {
             phone: formData.phone,
             age: parseInt(formData.age) || null,
             sex: formData.sex,
-            gender: formData.gender,
             updated_at: new Date().toISOString()
         };
 
