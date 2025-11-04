@@ -598,15 +598,16 @@ const RootedVitality = {
             });
         });
         
-        // Show "Practitioner View" link only if user is a practitioner
+        // Show "Practitioner View" link only if user is a practitioner AND currently in client view
         const switchToPractitionerBtn = document.getElementById('switchToPractitioner');
         if (switchToPractitionerBtn) {
             try {
                 if (typeof window.authManager !== 'undefined') {
                     const userData = window.authManager.getCurrentUser();
-                    if (userData && userData.role === 'practitioner') {
+                    const activeView = localStorage.getItem('active_view') || 'client';
+                    if (userData && userData.role === 'practitioner' && activeView === 'client') {
                         switchToPractitionerBtn.style.display = 'block';
-                        console.log('[Rooted Vitality] Showing "Practitioner View" link for practitioner user');
+                        console.log('[Rooted Vitality] Showing "Practitioner View" link for practitioner user in client view');
                     }
                 }
             } catch (error) {
