@@ -666,7 +666,7 @@ label {
     display: none;
     background: none;
     border: none;
-    font-size: 1.5rem;
+    font-size: 2rem;
     color: #6b6359;
     cursor: pointer;
     padding: 0.625rem;
@@ -904,8 +904,8 @@ label {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
     stroke: #6b6359;
     color: #6b6359;
 }
