@@ -45,7 +45,7 @@ async function initializeDashboard() {
         
         if (!session && !userData) {
             console.warn('[Dashboard] No active session, redirecting to home');
-            window.location.href = '../index.html';
+            window.location.href = '/rooted-vitality/index.html';
             return;
         }
 

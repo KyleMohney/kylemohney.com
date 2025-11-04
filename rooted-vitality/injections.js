@@ -259,9 +259,10 @@ const RootedVitality = {
                 
                 // Replace absolute paths (/) with relative paths
                 // BUT: Don't replace paths that already contain /rooted-vitality/ (they're already correct)
+                // Keep all /rooted-vitality/ paths as absolute root paths
                 headerHTML = headerHTML
-                    .replace(/href="\/(?!rooted-vitality\/)([^"]+)"/g, `href="${replacementPrefix}$1"`)
-                    .replace(/src="\/(?!rooted-vitality\/)([^"]+)"/g, `src="${replacementPrefix}$1"`);
+                    .replace(/href="\/(?!rooted-vitality)([^"]+)"/g, `href="${replacementPrefix}$1"`)
+                    .replace(/src="\/(?!rooted-vitality)([^"]+)"/g, `src="${replacementPrefix}$1"`);
                 
                 console.log(`[Rooted Vitality] Replaced paths with: ${replacementPrefix}`);
             }
@@ -297,8 +298,9 @@ const RootedVitality = {
                         // Attach logo behavior for dynamic routing
                         this.attachLogoBehavior(role, view);
                         
-                        // Attach view switcher for practitioners
+                        // Attach view switcher for practitioners (regardless of current view)
                         if (role === 'practitioner') {
+                            console.log('[Rooted Vitality] Attaching view switcher for practitioner user');
                             this.attachViewSwitcher();
                         }
                         
@@ -471,12 +473,18 @@ const RootedVitality = {
                 localStorage.setItem('active_view', newView);
                 console.log(`[Rooted Vitality] Saved active_view to localStorage: ${newView}`);
                 
-                // Navigate using relative path from current page
-                const targetUrl = newView === 'practitioner' 
-                    ? '../pro/index.html'  // Go from client-dashboard to pro/index.html
-                    : '../client-dashboard.html';  // Go from pro/* to client-dashboard
+                // Navigate using absolute path from rooted-vitality root
+                const currentPath = window.location.pathname;
+                console.log('[Rooted Vitality] Current path:', currentPath);
                 
-                console.log(`[Rooted Vitality] Redirecting to: ${targetUrl}`);
+                let targetUrl = '';
+                if (newView === 'practitioner') {
+                    targetUrl = '/rooted-vitality/dashboard/pro/index.html';
+                } else {
+                    targetUrl = '/rooted-vitality/dashboard/client-dashboard.html';
+                }
+                
+                console.log(`[Rooted Vitality] Redirecting to absolute path: ${targetUrl}`);
                 window.location.href = targetUrl;
             });
         });
@@ -600,14 +608,21 @@ const RootedVitality = {
         
         // Show "Practitioner View" link only if user is a practitioner AND currently in client view
         const switchToPractitionerBtn = document.getElementById('switchToPractitioner');
+        console.log('[Rooted Vitality] Checking practitioner view switcher button...');
+        console.log('[Rooted Vitality] Button element found:', !!switchToPractitionerBtn);
+        
         if (switchToPractitionerBtn) {
             try {
                 if (typeof window.authManager !== 'undefined') {
                     const userData = window.authManager.getCurrentUser();
                     const activeView = localStorage.getItem('active_view') || 'client';
+                    console.log('[Rooted Vitality] User role:', userData?.role, 'Active view:', activeView);
+                    
                     if (userData && userData.role === 'practitioner' && activeView === 'client') {
                         switchToPractitionerBtn.style.display = 'block';
-                        console.log('[Rooted Vitality] Showing "Practitioner View" link for practitioner user in client view');
+                        console.log('[Rooted Vitality] ✓ Showing "Practitioner View" link for practitioner user in client view');
+                    } else {
+                        console.log('[Rooted Vitality] ✗ NOT showing Practitioner View link - role:', userData?.role, 'view:', activeView);
                     }
                 }
             } catch (error) {
