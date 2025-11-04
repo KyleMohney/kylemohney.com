@@ -455,16 +455,18 @@ const RootedVitality = {
     attachViewSwitcher: function() {
         console.log('[Rooted Vitality] attachViewSwitcher called, searching for [data-switch-view] elements...');
         const elements = document.querySelectorAll('[data-switch-view]');
-        console.log(`[Rooted Vitality] Found ${elements.length} view switcher element(s)`);
+        console.log(`[Rooted Vitality] Found ${elements.length} view switcher element(s)`, elements);
         
         document.querySelectorAll('[data-switch-view]').forEach(btn => {
-            console.log(`[Rooted Vitality] Attaching click handler to view switcher: ${btn.dataset.switchView}`);
+            const switchValue = btn.dataset.switchView;
+            console.log(`[Rooted Vitality] Attaching click handler to view switcher:`, btn, `data-switch-view="${switchValue}"`);
             
             btn.addEventListener('click', (e) => {
-                console.log('[Rooted Vitality] View switcher clicked!');
+                console.log('[Rooted Vitality] View switcher clicked!', btn);
                 e.preventDefault();
                 
                 const newView = btn.dataset.switchView === 'practitioner' ? 'practitioner' : 'client';
+                console.log(`[Rooted Vitality] newView determined as: ${newView} (btn.dataset.switchView="${btn.dataset.switchView}")`);
                 
                 console.log(`[Rooted Vitality] View switch clicked: ${newView}`);
                 console.log(`[Rooted Vitality] Current pathname: ${window.location.pathname}`);
@@ -480,11 +482,13 @@ const RootedVitality = {
                 let targetUrl = '';
                 if (newView === 'practitioner') {
                     targetUrl = '/rooted-vitality/dashboard/pro/index.html';
+                    console.log('[Rooted Vitality] Practitioner view selected, targetUrl set to:', targetUrl);
                 } else {
                     targetUrl = '/rooted-vitality/dashboard/client-dashboard.html';
+                    console.log('[Rooted Vitality] Client view selected, targetUrl set to:', targetUrl);
                 }
                 
-                console.log(`[Rooted Vitality] Redirecting to absolute path: ${targetUrl}`);
+                console.log(`[Rooted Vitality] About to redirect to: ${targetUrl}`);
                 window.location.href = targetUrl;
             });
         });
