@@ -36,16 +36,60 @@ class MatchSettingsManager {
       const { data, error } = await this.supabase
         .from('practitioner_match_settings')
         .select('*')
-        .eq('practitioner_id', this.practitionerId)
-        .single();
+        .eq('practitioner_id', this.practitionerId);
 
       if (error) throw error;
-      this.matchSettings = data;
-      console.log('[MatchSettingsManager] Match settings loaded:', data);
-      return data;
+
+      // If no record exists, create one with defaults
+      if (!data || data.length === 0) {
+        console.log('[MatchSettingsManager] No match settings found, creating new record');
+        return await this.createDefaultMatchSettings();
+      }
+
+      this.matchSettings = data[0];
+      console.log('[MatchSettingsManager] Match settings loaded:', data[0]);
+      return data[0];
     } catch (error) {
       console.error('[MatchSettingsManager] Error loading match settings:', error);
       return null;
+    }
+  }
+
+  /**
+   * Create default match settings record
+   */
+  async createDefaultMatchSettings() {
+    try {
+      const defaultSettings = {
+        practitioner_id: this.practitionerId,
+        is_matching_active: false,
+        is_paused: false,
+        coverage_area_settings: this.getDefaultCoverageSettings(),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      const { data, error } = await this.supabase
+        .from('practitioner_match_settings')
+        .insert([defaultSettings])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      this.matchSettings = data;
+      console.log('[MatchSettingsManager] Default match settings created:', data);
+      return data;
+    } catch (error) {
+      console.error('[MatchSettingsManager] Error creating default match settings:', error);
+      // Return an in-memory default if we can't persist to DB
+      this.matchSettings = {
+        practitioner_id: this.practitionerId,
+        is_matching_active: false,
+        is_paused: false,
+        coverage_area_settings: this.getDefaultCoverageSettings()
+      };
+      return this.matchSettings;
     }
   }
 

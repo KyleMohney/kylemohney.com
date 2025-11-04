@@ -3753,7 +3753,7 @@
         const { data: practitioner, error: practitionerError } = await window.supabaseClient
           .from('practitioners')
           .select('id')
-          .eq('auth_user_id', user.id)
+          .eq('user_id', user.id)
           .single();
         
         if (practitionerError || !practitioner) {
