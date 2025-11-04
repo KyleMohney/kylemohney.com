@@ -472,10 +472,9 @@ const RootedVitality = {
                 console.log(`[Rooted Vitality] Saved active_view to localStorage: ${newView}`);
                 
                 // Navigate using relative path from current page
-                // From any page in /rooted-vitality/dashboard/pro/, go up one level then to client dashboard
                 const targetUrl = newView === 'practitioner' 
-                    ? './index.html'  // Stay in current pro directory
-                    : '../client-dashboard.html';  // Go up one level to dashboard, then to client-dashboard
+                    ? '../pro/index.html'  // Go from client-dashboard to pro/index.html
+                    : '../client-dashboard.html';  // Go from pro/* to client-dashboard
                 
                 console.log(`[Rooted Vitality] Redirecting to: ${targetUrl}`);
                 window.location.href = targetUrl;
