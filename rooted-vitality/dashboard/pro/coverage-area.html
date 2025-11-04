@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Coverage Area | Rooted Vitality</title>
+  <meta name="description" content="Configure your service coverage area and travel preferences.">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="../../styles/base.css">
+  <link rel="stylesheet" href="../../styles/layout.css">
+  <link rel="stylesheet" href="../../styles/components.css">
+  <link rel="stylesheet" href="../../styles/styles.css">
+  <link rel="stylesheet" href="../../styles/dashboard-client.css">
+
+  <!-- Leaflet Map Library -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+
+  <style>
+    /* ========================================== */
+    /* COVERAGE AREA PAGE STYLES */
+    /* ========================================== */
+
+    /* Main Container Layout */
+    .match-settings.coverage-area {
+      display: grid;
+      grid-template-columns: 240px 1fr 360px;
+      gap: 2rem;
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    @media (max-width: 1200px) {
+      .match-settings.coverage-area {
+        grid-template-columns: 200px 1fr;
+        gap: 1.5rem;
+      }
+      .settings-map {
+        display: none;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .match-settings.coverage-area {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      .settings-sidebar {
+        display: none;
+      }
+    }
+
+    /* Sidebar Navigation */
+    .settings-sidebar {
+      position: sticky;
+      top: 120px;
+      height: fit-content;
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 1rem 0;
+      border: 1px solid #e0dcd5;
+    }
+
+    .settings-sidebar nav {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .settings-sidebar a {
+      padding: 0.75rem 1rem;
+      text-decoration: none;
+      color: #6b6b6b;
+      font-size: 0.95rem;
+      border-left: 3px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .settings-sidebar a:hover {
+      background: #fafaf8;
+      color: #2e2b28;
+    }
+
+    .settings-sidebar a.active {
+      background: #ebf6e8;
+      border-left-color: #5c9a72;
+      color: #5c9a72;
+      font-weight: 600;
+    }
+
+    /* Main Content Section */
+    .settings-body {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .settings-body h1 {
+      font-size: 2rem;
+      color: #2e2b28;
+      margin: 0 0 0.5rem 0;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .intro-text {
+      color: #6b6b6b;
+      font-size: 1rem;
+      line-height: 1.6;
+      margin: 0 0 2rem 0;
+    }
+
+    /* ========================================== */
+    /* TRAVEL TYPE TILES */
+    /* ========================================== */
+
+    .travel-type-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .travel-tile {
+      position: relative;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .travel-tile input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .tile-content {
+      padding: 1.5rem;
+      background: #fafaf8;
+      border: 2px solid #e0dcd5;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .travel-tile input[type="checkbox"]:checked + .tile-content {
+      background: #ebf6e8;
+      border-color: #5c9a72;
+      box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.15);
+    }
+
+    .tile-content h3 {
+      font-size: 1.25rem;
+      color: #2e2b28;
+      margin: 0 0 0.5rem 0;
+      font-weight: 600;
+    }
+
+    .tile-content p {
+      font-size: 0.9rem;
+      color: #6b6b6b;
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    /* ========================================== */
+    /* SETTINGS CARDS */
+    /* ========================================== */
+
+    #coverage-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .settings-card {
+      background: #ffffff;
+      border: 1px solid #e0dcd5;
+      border-radius: 8px;
+      overflow: hidden;
+      display: none !important;
+      animation: slideDown 0.3s ease forwards;
+    }
+
+    .settings-card.active {
+      display: block !important;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem 1.5rem;
+      background: #fbf7ec;
+      border-bottom: 1px solid #e0dcd5;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .card-header h2 {
+      font-size: 1.1rem;
+      color: #2e2b28;
+      margin: 0;
+      font-weight: 600;
+    }
+
+    .collapse-toggle {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: #5c9a72;
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s ease;
+      padding: 0;
+    }
+
+    .collapse-toggle.collapsed {
+      transform: rotate(180deg);
+    }
+
+    .card-body {
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      max-height: 1000px;
+      overflow: hidden;
+      transition: max-height 0.3s ease, opacity 0.3s ease;
+      opacity: 1;
+    }
+
+    .card-body.collapsed {
+      max-height: 0;
+      opacity: 0;
+      padding: 0 1.5rem;
+      overflow: hidden;
+    }
+
+    /* ========================================== */
+    /* FORM ELEMENTS */
+    /* ========================================== */
+
+    .card-body label {
+      display: block;
+      font-weight: 600;
+      color: #2e2b28;
+      font-size: 0.95rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .card-body input[type="text"],
+    .card-body input[type="range"],
+    .card-body select {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      border: 1px solid #e0dcd5;
+      border-radius: 6px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      background: #fafaf8;
+      color: #2e2b28;
+      transition: all 0.2s ease;
+      box-sizing: border-box;
+    }
+
+    .card-body input[type="text"]:focus,
+    .card-body input[type="range"]:focus,
+    .card-body select:focus {
+      outline: none;
+      border-color: #5c9a72;
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.1);
+    }
+
+    .card-body input[type="text"]::placeholder {
+      color: #a8a39f;
+    }
+
+    .card-body input[type="range"] {
+      padding: 0;
+      height: 6px;
+      cursor: pointer;
+      accent-color: #5c9a72;
+    }
+
+    .card-body input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: #5c9a72;
+      margin-right: 0.5rem;
+    }
+
+    /* Radio and Checkbox Rows */
+    .option-row {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .option-row label {
+      display: flex;
+      align-items: center;
+      margin: 0;
+      font-weight: 500;
+      gap: 0.5rem;
+    }
+
+    .option-row input[type="radio"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: #5c9a72;
+    }
+
+    .option-divider {
+      height: 1px;
+      background: #e0dcd5;
+      margin: 0.5rem 0;
+    }
+
+    /* Conditional Sections */
+    .radius-field,
+    .zip-field,
+    .state-select {
+      display: none;
+    }
+
+    .radius-field.active,
+    .zip-field.active {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .state-select.active {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .radius-field input[type="range"] {
+      width: 100%;
+    }
+
+    /* Zip Code Input Row */
+    .zip-input-row {
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-end;
+    }
+
+    .zip-input-row input {
+      flex: 1;
+      margin-bottom: 0 !important;
+    }
+
+    .zip-input-row button {
+      padding: 0.875rem 1rem;
+      height: auto;
+    }
+
+    /* State Select */
+    .state-select {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .state-select input {
+      width: 100%;
+    }
+
+    /* ========================================== */
+    /* BUTTONS */
+    /* ========================================== */
+
+    button {
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      border: none;
+      border-radius: 6px;
+      padding: 0.875rem 1.5rem;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-accent {
+      background: #5c9a72;
+      color: #ffffff;
+    }
+
+    .btn-accent:hover {
+      background: #4a7d5a;
+      box-shadow: 0 2px 8px rgba(92, 154, 114, 0.25);
+    }
+
+    .btn-accent:active {
+      background: #3d6649;
+    }
+
+    .btn-neutral {
+      background: #f0ede6;
+      color: #2e2b28;
+      border: 1px solid #e0dcd5;
+    }
+
+    .btn-neutral:hover {
+      background: #e8e4db;
+    }
+
+    .btn-danger {
+      background: #d9534f;
+      color: #ffffff;
+    }
+
+    .btn-danger:hover {
+      background: #c9423f;
+    }
+
+    .save-btn {
+      margin-top: 1rem;
+    }
+
+    /* ========================================== */
+    /* COVERAGE SUMMARY */
+    /* ========================================== */
+
+    .coverage-summary {
+      background: #ebf6e8;
+      border-left: 4px solid #5c9a72;
+      padding: 1.5rem;
+      border-radius: 6px;
+      margin-bottom: 2rem;
+    }
+
+    .coverage-summary h3 {
+      font-size: 1.1rem;
+      color: #2e2b28;
+      margin: 0 0 1rem 0;
+      font-weight: 600;
+    }
+
+    #coverage-summary-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    #coverage-summary-list li {
+      color: #2e2b28;
+      font-size: 0.95rem;
+      padding-left: 1.5rem;
+      position: relative;
+    }
+
+    #coverage-summary-list li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: #5c9a72;
+      font-weight: 700;
+    }
+
+    /* ========================================== */
+    /* FORM FOOTER */
+    /* ========================================== */
+
+    .form-footer {
+      display: flex;
+      gap: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e0dcd5;
+    }
+
+    .form-footer .btn-accent {
+      flex: 1;
+      text-align: center;
+    }
+
+    /* ========================================== */
+    /* MAP SIDEBAR */
+    /* ========================================== */
+
+    .settings-map {
+      position: sticky;
+      top: 120px;
+      height: fit-content;
+      background: #ffffff;
+      border: 1px solid #e0dcd5;
+      border-radius: 8px;
+      padding: 1rem;
+      overflow: hidden;
+    }
+
+    #coverage-map {
+      width: 100%;
+      height: 500px;
+      border-radius: 6px;
+      background: #fafaf8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #a8a39f;
+      font-size: 0.9rem;
+      text-align: center;
+      padding: 1rem;
+    }
+
+    #coverage-map.loaded {
+      padding: 0;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 1024px) {
+      .match-settings.coverage-area {
+        grid-template-columns: 1fr;
+      }
+
+      .settings-sidebar {
+        display: none;
+      }
+
+      .settings-map {
+        display: none;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .travel-type-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+      }
+
+      .collapse-toggle {
+        align-self: flex-end;
+      }
+
+      .option-row {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .form-footer {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Header Injection Point -->
+  <header id="header-inject"></header>
+
+  <!-- Main Content -->
+  <main class="container-wide match-settings coverage-area">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="settings-sidebar">
+      <nav>
+        <a href="./match-settings.html">← Back to Match Settings</a>
+        <hr style="margin: 0.75rem 0; border: none; border-top: 1px solid #e0dcd5;">
+        <a href="#" class="active">Coverage Area</a>
+        <a href="#availability">Availability & Hours</a>
+        <a href="#specialties">Specialties</a>
+        <a href="#pricing">Pricing & Packages</a>
+      </nav>
+    </aside>
+
+    <!-- Main Settings Body -->
+    <section class="settings-body">
+      <h1>Coverage Area</h1>
+      <p class="intro-text">
+        Define where and how you provide your services. Enable one or more travel types below to set up detailed coverage for each service mode.
+      </p>
+
+      <!-- ========================================== -->
+      <!-- STEP 1: TRAVEL TYPE TILES -->
+      <!-- ========================================== -->
+      <div class="travel-type-grid">
+        
+        <!-- In-Office Tile -->
+        <label class="travel-tile" data-toggle="in-office">
+          <input type="checkbox" id="chk-in-office">
+          <div class="tile-content">
+            <h3>🏢 In-Office</h3>
+            <p>Clients visit your practice location.</p>
+          </div>
+        </label>
+
+        <!-- House Calls Tile -->
+        <label class="travel-tile" data-toggle="house-calls">
+          <input type="checkbox" id="chk-house-calls">
+          <div class="tile-content">
+            <h3>🚗 House Calls</h3>
+            <p>You travel to clients within a defined area.</p>
+          </div>
+        </label>
+
+        <!-- Virtual / Remote Tile -->
+        <label class="travel-tile" data-toggle="virtual-remote">
+          <input type="checkbox" id="chk-virtual-remote">
+          <div class="tile-content">
+            <h3>💻 Virtual / Remote</h3>
+            <p>Provide online sessions across states.</p>
+          </div>
+        </label>
+
+        <!-- Hybrid Tile -->
+        <label class="travel-tile" data-toggle="hybrid">
+          <input type="checkbox" id="chk-hybrid">
+          <div class="tile-content">
+            <h3>🔄 Hybrid</h3>
+            <p>Combine in-person and remote services.</p>
+          </div>
+        </label>
+
+      </div>
+
+      <!-- ========================================== -->
+      <!-- STEP 2: DYNAMIC COVERAGE CARDS -->
+      <!-- ========================================== -->
+      <div id="coverage-cards">
+
+        <!-- IN-OFFICE CARD -->
+        <div class="settings-card collapsible" id="card-in-office" data-type="in-office">
+          <div class="card-header">
+            <h2>In-Office Settings</h2>
+            <button type="button" class="collapse-toggle" data-collapse="card-in-office">−</button>
+          </div>
+          <div class="card-body">
+            
+            <div>
+              <label>Practice Address</label>
+              <input type="text" placeholder="Enter full address or city, state" data-field="address">
+            </div>
+
+            <div class="option-divider"></div>
+
+            <div>
+              <label>Client Discovery Method</label>
+              <div class="option-row">
+                <label>
+                  <input type="radio" name="inoffice-mode" value="radius" onchange="toggleInofficeMode('radius')"> 
+                  Service Radius
+                </label>
+                <label>
+                  <input type="radio" name="inoffice-mode" value="zip" onchange="toggleInofficeMode('zip')"> 
+                  ZIP Codes
+                </label>
+              </div>
+            </div>
+
+            <div class="radius-field" data-field-group="inoffice-radius">
+              <label>Service Radius (miles)</label>
+              <input type="range" min="0" max="50" step="1" value="10" data-field="radius">
+              <span style="font-size: 0.9rem; color: #6b6b6b;" id="radius-display">10 miles</span>
+            </div>
+
+            <div class="zip-field" data-field-group="inoffice-zip">
+              <label>Add ZIP Codes</label>
+              <div class="zip-input-row">
+                <input type="text" placeholder="e.g., 80205" data-field="zip-input" maxlength="5">
+                <button type="button" class="btn-neutral" onclick="addZipCode(this, 'in-office')">Add</button>
+              </div>
+              <div data-field="zip-list" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem;"></div>
+            </div>
+
+            <button type="button" class="btn-accent save-btn" onclick="saveCoverageType('in-office')">
+              Save In-Office Coverage
+            </button>
+
+          </div>
+        </div>
+
+        <!-- HOUSE CALLS CARD -->
+        <div class="settings-card collapsible" id="card-house-calls" data-type="house-calls">
+          <div class="card-header">
+            <h2>House Calls Settings</h2>
+            <button type="button" class="collapse-toggle" data-collapse="card-house-calls">−</button>
+          </div>
+          <div class="card-body">
+            
+            <div>
+              <label>Base City or Starting Location</label>
+              <input type="text" placeholder="City, State or ZIP" data-field="base-location">
+            </div>
+
+            <div>
+              <label>Travel Radius (miles)</label>
+              <input type="range" min="0" max="100" step="1" value="20" data-field="travel-radius" oninput="updateRadiusDisplay(this)">
+              <span style="font-size: 0.9rem; color: #6b6b6b;" id="house-calls-radius-display">20 miles</span>
+            </div>
+
+            <div>
+              <label>Target ZIP Codes (Optional)</label>
+              <input type="text" placeholder="e.g., 80205, 80301, 80304" data-field="target-zips">
+            </div>
+
+            <button type="button" class="btn-accent save-btn" onclick="saveCoverageType('house-calls')">
+              Save House Calls Coverage
+            </button>
+
+          </div>
+        </div>
+
+        <!-- VIRTUAL / REMOTE CARD -->
+        <div class="settings-card collapsible" id="card-virtual-remote" data-type="virtual-remote">
+          <div class="card-header">
+            <h2>Virtual / Remote Settings</h2>
+            <button type="button" class="collapse-toggle" data-collapse="card-virtual-remote">−</button>
+          </div>
+          <div class="card-body">
+            
+            <div>
+              <label>
+                <input type="checkbox" id="nationwide" onchange="toggleNationwide()"> 
+                Serve Nationwide
+              </label>
+              <p style="font-size: 0.85rem; color: #6b6b6b; margin: 0.5rem 0 0 1.75rem;">
+                Check this to be visible to clients across all US states
+              </p>
+            </div>
+
+            <div id="state-select-group" style="display: none;">
+              <label>Licensed States</label>
+              <p style="font-size: 0.85rem; color: #6b6b6b; margin: 0 0 0.75rem 0;">
+                Enter state abbreviations where you're licensed to practice
+              </p>
+              <div class="state-select">
+                <div class="zip-input-row">
+                  <input type="text" placeholder="e.g., CO, UT, AZ" data-field="states-input" maxlength="2" style="text-transform: uppercase;">
+                  <button type="button" class="btn-neutral" onclick="addState(this)">Add</button>
+                </div>
+                <div data-field="states-list" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem;"></div>
+              </div>
+            </div>
+
+            <button type="button" class="btn-accent save-btn" onclick="saveCoverageType('virtual-remote')">
+              Save Virtual Coverage
+            </button>
+
+          </div>
+        </div>
+
+        <!-- HYBRID CARD -->
+        <div class="settings-card collapsible" id="card-hybrid" data-type="hybrid">
+          <div class="card-header">
+            <h2>Hybrid Configuration</h2>
+            <button type="button" class="collapse-toggle" data-collapse="card-hybrid">−</button>
+          </div>
+          <div class="card-body">
+            
+            <p style="margin: 0 0 1rem 0; color: #6b6b6b;">
+              Hybrid mode enables both <strong>In-Office</strong> and <strong>Virtual / Remote</strong> coverage simultaneously. Configure your settings separately above, then apply hybrid mode to use both together.
+            </p>
+
+            <div style="background: #ebf6e8; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
+              <p style="margin: 0; font-size: 0.9rem; color: #2e2b28;">
+                <strong>Tip:</strong> Hybrid practitioners typically receive 30% more inquiries because they're visible to both local and remote clients.
+              </p>
+            </div>
+
+            <button type="button" class="btn-accent save-btn" onclick="saveCoverageType('hybrid')">
+              Apply Hybrid Settings
+            </button>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ========================================== -->
+      <!-- COVERAGE SUMMARY -->
+      <!-- ========================================== -->
+      <div class="coverage-summary">
+        <h3>Your Coverage Summary</h3>
+        <ul id="coverage-summary-list">
+          <li>No travel types configured yet. Select one or more above to get started.</li>
+        </ul>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- FORM FOOTER -->
+      <!-- ========================================== -->
+      <div class="form-footer">
+        <button type="button" class="btn-accent" onclick="saveAllCoverage()">
+          Save All Coverage Settings
+        </button>
+      </div>
+
+    </section>
+
+    <!-- Right Sidebar: Map Preview -->
+    <aside class="settings-map">
+      <div id="coverage-map">Map preview will display here</div>
+    </aside>
+
+  </main>
+
+  <!-- Footer Injection Point -->
+  <footer id="footer-inject"></footer>
+
+  <!-- Leaflet Map Script -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+
+  <script>
+    // ======================================================
+    // COVERAGE AREA PAGE LOGIC
+    // ======================================================
+
+    // State management
+    const coverageState = {
+      'in-office': { enabled: false, data: {} },
+      'house-calls': { enabled: false, data: {} },
+      'virtual-remote': { enabled: false, data: {} },
+      'hybrid': { enabled: false, data: {} }
+    };
+
+    // ======================================================
+    // 1. TRAVEL TYPE TILE INTERACTIONS
+    // ======================================================
+
+    document.querySelectorAll('.travel-tile').forEach(tile => {
+      const toggle = tile.getAttribute('data-toggle');
+      const checkbox = tile.querySelector('input[type="checkbox"]');
+
+      tile.addEventListener('click', (e) => {
+        if (e.target === checkbox) return;
+        checkbox.checked = !checkbox.checked;
+      });
+
+      checkbox.addEventListener('change', () => {
+        toggleCoverageCard(toggle);
+      });
+    });
+
+    function toggleCoverageCard(type) {
+      const card = document.getElementById(`card-${type}`);
+      const checkbox = document.getElementById(`chk-${type}`);
+
+      if (checkbox.checked) {
+        card.classList.add('active');
+        coverageState[type].enabled = true;
+      } else {
+        card.classList.remove('active');
+        coverageState[type].enabled = false;
+      }
+
+      updateSummary();
+    }
+
+    // ======================================================
+    // 2. COLLAPSE/EXPAND CARD BODIES
+    // ======================================================
+
+    document.querySelectorAll('.collapse-toggle').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const cardId = btn.getAttribute('data-collapse');
+        const body = document.querySelector(`#${cardId} .card-body`);
+        const toggle = btn;
+
+        body.classList.toggle('collapsed');
+        toggle.classList.toggle('collapsed');
+      });
+    });
+
+    // ======================================================
+    // 3. IN-OFFICE MODE TOGGLE (Radius vs ZIP)
+    // ======================================================
+
+    function toggleInofficeMode(mode) {
+      const radiusField = document.querySelector('[data-field-group="inoffice-radius"]');
+      const zipField = document.querySelector('[data-field-group="inoffice-zip"]');
+
+      if (mode === 'radius') {
+        radiusField.classList.add('active');
+        zipField.classList.remove('active');
+      } else if (mode === 'zip') {
+        radiusField.classList.remove('active');
+        zipField.classList.add('active');
+      }
+    }
+
+    // ======================================================
+    // 4. RADIUS DISPLAY UPDATE
+    // ======================================================
+
+    function updateRadiusDisplay(input) {
+      const card = input.closest('.card-body');
+      const display = card.querySelector('[id*="radius-display"]');
+      if (display) {
+        display.textContent = `${input.value} miles`;
+      }
+    }
+
+    // ======================================================
+    // 5. ZIP CODE MANAGEMENT
+    // ======================================================
+
+    function addZipCode(btn, type) {
+      const card = btn.closest('.card-body');
+      const input = card.querySelector('[data-field="zip-input"]');
+      const list = card.querySelector('[data-field="zip-list"]');
+      const zipCode = input.value.trim();
+
+      if (!zipCode || !/^\d{5}$/.test(zipCode)) {
+        alert('Please enter a valid 5-digit ZIP code');
+        return;
+      }
+
+      // Prevent duplicates
+      if (Array.from(list.querySelectorAll('[data-zip]')).some(el => el.getAttribute('data-zip') === zipCode)) {
+        alert('ZIP code already added');
+        return;
+      }
+
+      // Create tag
+      const tag = document.createElement('div');
+      tag.setAttribute('data-zip', zipCode);
+      tag.style.cssText = 'background: #ebf6e8; color: #5c9a72; padding: 0.5rem 0.75rem; border-radius: 4px; font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem; font-weight: 500;';
+      tag.innerHTML = `
+        ${zipCode}
+        <button type="button" onclick="removeZipTag(this)" style="background: none; border: none; color: #5c9a72; cursor: pointer; padding: 0; font-size: 1rem; line-height: 1;">×</button>
+      `;
+
+      list.appendChild(tag);
+      input.value = '';
+      input.focus();
+    }
+
+    function removeZipTag(btn) {
+      btn.closest('[data-zip]').remove();
+    }
+
+    // ======================================================
+    // 6. STATE MANAGEMENT
+    // ======================================================
+
+    function toggleNationwide() {
+      const checkbox = document.getElementById('nationwide');
+      const stateGroup = document.getElementById('state-select-group');
+      stateGroup.style.display = checkbox.checked ? 'none' : 'flex';
+      stateGroup.style.flexDirection = 'column';
+    }
+
+    function addState(btn) {
+      const card = btn.closest('.card-body');
+      const input = card.querySelector('[data-field="states-input"]');
+      const list = card.querySelector('[data-field="states-list"]');
+      const state = input.value.trim().toUpperCase();
+
+      if (!state || state.length !== 2) {
+        alert('Please enter a valid 2-letter state abbreviation');
+        return;
+      }
+
+      // Prevent duplicates
+      if (Array.from(list.querySelectorAll('[data-state]')).some(el => el.getAttribute('data-state') === state)) {
+        alert('State already added');
+        return;
+      }
+
+      // Create tag
+      const tag = document.createElement('div');
+      tag.setAttribute('data-state', state);
+      tag.style.cssText = 'background: #ebf6e8; color: #5c9a72; padding: 0.5rem 0.75rem; border-radius: 4px; font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem; font-weight: 500;';
+      tag.innerHTML = `
+        ${state}
+        <button type="button" onclick="removeStateTag(this)" style="background: none; border: none; color: #5c9a72; cursor: pointer; padding: 0; font-size: 1rem; line-height: 1;">×</button>
+      `;
+
+      list.appendChild(tag);
+      input.value = '';
+      input.focus();
+    }
+
+    function removeStateTag(btn) {
+      btn.closest('[data-state]').remove();
+    }
+
+    // ======================================================
+    // 7. SAVE FUNCTIONALITY
+    // ======================================================
+
+    function saveCoverageType(type) {
+      const card = document.getElementById(`card-${type}`);
+      const data = {};
+
+      // Collect form data
+      card.querySelectorAll('[data-field]').forEach(field => {
+        const fieldName = field.getAttribute('data-field');
+        if (field.type === 'range') {
+          data[fieldName] = field.value;
+        } else if (field.type === 'checkbox') {
+          data[fieldName] = field.checked;
+        } else if (field.type === 'radio') {
+          if (field.checked) data[fieldName] = field.value;
+        } else if (field.tagName === 'INPUT' && field.value) {
+          data[fieldName] = field.value;
+        }
+      });
+
+      // Collect ZIP codes
+      const zipList = card.querySelector('[data-field="zip-list"]');
+      if (zipList) {
+        data.zips = Array.from(zipList.querySelectorAll('[data-zip]')).map(el => el.getAttribute('data-zip'));
+      }
+
+      // Collect states
+      const stateList = card.querySelector('[data-field="states-list"]');
+      if (stateList) {
+        data.states = Array.from(stateList.querySelectorAll('[data-state]')).map(el => el.getAttribute('data-state'));
+      }
+
+      coverageState[type].data = data;
+      console.log(`Saved ${type}:`, data);
+
+      // Visual feedback
+      const btn = card.querySelector('.save-btn');
+      const originalText = btn.textContent;
+      btn.textContent = '✓ Saved';
+      setTimeout(() => {
+        btn.textContent = originalText;
+      }, 2000);
+
+      updateSummary();
+    }
+
+    function saveAllCoverage() {
+      console.log('All coverage state:', coverageState);
+      alert('All coverage settings saved! (Check console for details)');
+      updateSummary();
+    }
+
+    // ======================================================
+    // 8. UPDATE SUMMARY
+    // ======================================================
+
+    function updateSummary() {
+      const list = document.getElementById('coverage-summary-list');
+      const summary = [];
+
+      if (coverageState['in-office'].enabled) {
+        summary.push('In-Office: Clients visit your location');
+      }
+      if (coverageState['house-calls'].enabled) {
+        summary.push('House Calls: You travel up to ' + (coverageState['house-calls'].data['travel-radius'] || 20) + ' miles');
+      }
+      if (coverageState['virtual-remote'].enabled) {
+        const nationwide = coverageState['virtual-remote'].data['nationwide'];
+        if (nationwide) {
+          summary.push('Virtual: Serve nationwide');
+        } else {
+          const states = coverageState['virtual-remote'].data.states || [];
+          summary.push('Virtual: ' + (states.length ? states.join(', ') : 'No states selected'));
+        }
+      }
+      if (coverageState['hybrid'].enabled) {
+        summary.push('Hybrid: In-Office + Virtual combined');
+      }
+
+      if (summary.length === 0) {
+        list.innerHTML = '<li>No travel types configured yet. Select one or more above to get started.</li>';
+      } else {
+        list.innerHTML = summary.map(s => `<li>${s}</li>`).join('');
+      }
+    }
+
+    // ======================================================
+    // 9. PAGE INITIALIZATION
+    // ======================================================
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Initialize map placeholder (Leaflet integration can be added later)
+      const mapContainer = document.getElementById('coverage-map');
+      if (mapContainer) {
+        mapContainer.style.display = 'flex';
+        mapContainer.style.alignItems = 'center';
+        mapContainer.style.justifyContent = 'center';
+      }
+
+      // Set initial visibility for in-office radio buttons
+      const radiusRadio = document.querySelector('input[name="inoffice-mode"][value="radius"]');
+      if (radiusRadio) {
+        radiusRadio.checked = true;
+        toggleInofficeMode('radius');
+      }
+    });
+  </script>
+</body>
+
+</html>

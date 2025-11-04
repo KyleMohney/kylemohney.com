@@ -1,0 +1,3912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Match Settings | Rooted Vitality</title>
+  <meta name="description" content="Manage your service categories and matching preferences.">
+  
+  <link rel="stylesheet" href="../../styles/base.css">
+  <link rel="stylesheet" href="../../styles/layout.css">
+  <link rel="stylesheet" href="../../styles/components.css">
+  <link rel="stylesheet" href="../../styles/styles.css">
+  <link rel="stylesheet" href="../../styles/dashboard-client.css">
+  <style>
+    /* ========================================== */
+    /* MATCH SETTINGS PAGE STYLES */
+    /* ========================================== */
+    
+    .match-settings-main {
+      background: #fafaf8;
+      padding: 2rem 0;
+      min-height: calc(100vh - 200px);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .match-settings-main::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 35px,
+        rgba(92, 154, 114, 0.02) 35px,
+        rgba(92, 154, 114, 0.02) 70px
+      );
+      pointer-events: none;
+      z-index: 0;
+    }
+    
+    .match-settings-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 1rem;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .match-settings-header {
+      margin-bottom: 2rem;
+    }
+    
+    .match-settings-header h1 {
+      font-size: 2rem;
+      color: #2e2b28;
+      margin: 0 0 0.5rem 0;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    
+    .match-settings-header p {
+      font-size: 1rem;
+      color: #6b6b6b;
+      margin: 0;
+    }
+    
+    /* Main Card Container */
+    .match-settings-card {
+      background: #ffffff;
+      border: 1px solid #e0dcd5;
+      border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(45, 80, 22, 0.04);
+      overflow: hidden;
+    }
+    
+    .card-section {
+      padding: 2rem;
+      border-bottom: 1px solid #e0dcd5;
+    }
+    
+    .card-section:last-child {
+      border-bottom: none;
+    }
+    
+    .card-section-title {
+      font-size: 1.1rem;
+      color: #2e2b28;
+      margin: 0 0 1.5rem 0;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+    }
+    
+    /* Add Category Section */
+    .add-category-section {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 1rem;
+      align-items: flex-end;
+    }
+    
+    @media (max-width: 640px) {
+      .add-category-section {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .search-container {
+      position: relative;
+    }
+    
+    .search-input {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      border: 1px solid #e0dcd5;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      background: #fafaf8;
+      transition: all 0.2s ease;
+      box-sizing: border-box;
+    }
+    
+    .search-input:focus {
+      outline: none;
+      border-color: #5c9a72;
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.1);
+    }
+    
+    .search-input::placeholder {
+      color: #a8a39f;
+    }
+    
+    .autocomplete-dropdown {
+      position: absolute;
+      background: #ffffff;
+      border: 1px solid #e0dcd5;
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      max-height: 300px;
+      overflow-y: auto;
+      width: 100%;
+      margin-top: -2px;
+      z-index: 100;
+      display: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .autocomplete-dropdown.active {
+      display: block;
+    }
+    
+    .autocomplete-item {
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .autocomplete-item:last-child {
+      border-bottom: none;
+    }
+    
+    .autocomplete-item:hover {
+      background: #f5f5f5;
+    }
+    
+    .autocomplete-item-name {
+      font-weight: 600;
+      color: #2e2b28;
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+    
+    .autocomplete-item-meta {
+      font-size: 0.85rem;
+      color: #6b6b6b;
+    }
+    
+    .btn-add-category {
+      padding: 0.85rem 1.5rem;
+      background: #5c9a72;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    
+    .btn-add-category:hover {
+      background: #4a7d5a;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(92, 154, 114, 0.3);
+    }
+    
+    .btn-add-category:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Browse Categories Button */
+    .btn-browse-categories {
+      padding: 0.85rem 1.5rem;
+      background: #5c9a72;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-browse-categories:hover {
+      background: #4a7d5a;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(92, 154, 114, 0.3);
+    }
+
+    .btn-browse-categories-icon {
+      font-size: 1rem;
+    }
+    
+    /* Active Categories List */
+    #active-categories-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .category-item {
+      background: #fafaf8;
+      border: 1px solid #e0dcd5;
+      border-radius: 10px;
+      padding: 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s ease;
+    }
+    
+    .category-item:hover {
+      box-shadow: 0 2px 8px rgba(45, 80, 22, 0.06);
+      border-color: #5c9a72;
+    }
+    
+    .category-item-left {
+      flex: 1;
+    }
+    
+    .category-item-name {
+      font-weight: 600;
+      color: #2e2b28;
+      margin: 0 0 0.25rem 0;
+      font-size: 1rem;
+    }
+    
+    .category-item-meta {
+      font-size: 0.85rem;
+      color: #6b6b6b;
+      margin: 0;
+    }
+
+    /* Status Badge Styling */
+    .status-badge {
+      display: inline-block;
+      margin-left: 0.75rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      transition: all 0.2s ease;
+    }
+
+    .status-badge.active {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .status-badge.inactive {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    /* Category Item Visual State */
+    .category-item.inactive {
+      opacity: 0.7;
+      background-color: #f5f5f3;
+    }
+
+    .category-item.inactive .category-item-name {
+      color: #999;
+    }
+
+    .category-item.inactive .category-item-meta {
+      color: #bbb;
+    }
+    
+    .category-item-actions {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+    
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 28px;
+      margin-right: 0.5rem;
+    }
+    
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .toggle-slider {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.3s;
+      border-radius: 28px;
+      cursor: pointer;
+    }
+    
+    .toggle-slider:before {
+      position: absolute;
+      content: '';
+      height: 22px;
+      width: 22px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.3s;
+      border-radius: 50%;
+    }
+    
+    input:checked + .toggle-slider {
+      background-color: #5c9a72;
+    }
+    
+    input:checked + .toggle-slider:before {
+      transform: translateX(22px);
+    }
+    
+    .category-btn {
+      padding: 0.5rem 1rem;
+      border: 1px solid #e0dcd5;
+      border-radius: 6px;
+      background: #ffffff;
+      color: #2e2b28;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .category-btn:hover {
+      background: #f5f5f5;
+      border-color: #5c9a72;
+      color: #5c9a72;
+    }
+    
+    .category-btn-remove {
+      background: #fef2f2;
+      border-color: #dc3545;
+      color: #dc3545;
+    }
+    
+    .category-btn-remove:hover {
+      background: #dc3545;
+      color: #ffffff;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: #6b6b6b;
+    }
+    
+    .empty-state p {
+      margin: 0;
+      font-size: 0.95rem;
+    }
+    
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+    }
+    
+    .modal-overlay.active {
+      display: flex;
+    }
+    
+    .modal-content {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      animation: slideUp 0.3s ease;
+    }
+    
+    @keyframes slideUp {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem;
+      border-bottom: 1px solid #e0dcd5;
+    }
+    
+    .modal-header h2 {
+      margin: 0;
+      font-size: 1.3rem;
+      color: #2e2b28;
+      font-weight: 600;
+    }
+    
+    .modal-close-btn {
+      background: none;
+      border: none;
+      font-size: 2rem;
+      color: #999;
+      cursor: pointer;
+      padding: 0;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s ease;
+    }
+    
+    .modal-close-btn:hover {
+      color: #333;
+    }
+    
+    .modal-body {
+      padding: 1.5rem;
+    }
+    
+    .modal-body h3 {
+      font-size: 1rem;
+      color: #2e2b28;
+      margin: 0 0 1rem 0;
+      font-weight: 600;
+    }
+    
+    .subcategory-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    
+    .subcategory-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem;
+      border-radius: 6px;
+      transition: background 0.2s ease;
+    }
+    
+    .subcategory-item:hover {
+      background: #f5f5f5;
+    }
+    
+    .subcategory-checkbox {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: #5c9a72;
+    }
+    
+    .subcategory-label {
+      cursor: pointer;
+      flex: 1;
+      font-weight: 500;
+      color: #2e2b28;
+    }
+    
+    .modal-footer {
+      display: flex;
+      gap: 1rem;
+      padding: 1.5rem;
+      border-top: 1px solid #e0dcd5;
+      background: #fafaf8;
+    }
+    
+    .btn-modal {
+      flex: 1;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-modal-primary {
+      background: #5c9a72;
+      color: #ffffff;
+    }
+    
+    .btn-modal-primary:hover {
+      background: #4a7d5a;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(92, 154, 114, 0.3);
+    }
+    
+    .btn-modal-secondary {
+      background: #ffffff;
+      color: #2e2b28;
+      border: 1px solid #e0dcd5;
+    }
+    
+    .btn-modal-secondary:hover {
+      background: #f5f5f5;
+      border-color: #5c9a72;
+      color: #5c9a72;
+    }
+
+    /* ========================================== */
+    /* BROWSE CATEGORIES MODAL */
+    /* ========================================== */
+
+    #browse-categories-modal .modal-content {
+      max-width: 900px;
+      max-height: 85vh;
+    }
+
+    .browse-search-wrapper {
+      padding: 0 1.5rem 1rem 1.5rem;
+      border-bottom: 1px solid #e0dcd5;
+      margin: 0 -1.5rem -1.5rem -1.5rem;
+      padding: 1.5rem;
+      background: #f5faf4;
+    }
+
+    .browse-search-input {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      border: 1.5px solid #d0ccc5;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-family: 'Inter', sans-serif;
+      color: #2e2b28;
+      background: #ffffff;
+      transition: all 0.2s ease;
+      box-sizing: border-box;
+    }
+
+    .browse-search-input:focus {
+      outline: none;
+      border-color: #5c9a72;
+      box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.1);
+    }
+
+    .browse-search-input::placeholder {
+      color: #a8a39f;
+    }
+
+    .browse-category-section {
+      margin-bottom: 2.5rem;
+    }
+
+    .browse-category-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .browse-section-header {
+      margin-bottom: 1.5rem;
+    }
+
+    .browse-section-header h3 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #2e2b28;
+      letter-spacing: -0.3px;
+    }
+
+    .browse-section-subtitle {
+      margin: 0;
+      font-size: 0.85rem;
+      color: #6b6b6b;
+      line-height: 1.5;
+    }
+
+    .browse-categories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .browse-categories-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 0.75rem;
+      }
+    }
+
+    .browse-category-card {
+      padding: 1.25rem;
+      border: 1.5px solid #e0dcd5;
+      border-radius: 10px;
+      background: #ffffff;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .browse-category-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(92, 154, 114, 0.05) 0%, transparent 100%);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .browse-category-card:hover {
+      border-color: #5c9a72;
+      box-shadow: 0 4px 12px rgba(92, 154, 114, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .browse-category-card:hover::before {
+      opacity: 1;
+    }
+
+    .browse-category-card.already-added {
+      opacity: 0.6;
+      cursor: default;
+      border-color: #d0d0d0;
+      background: #f9f9f9;
+    }
+
+    .browse-category-card.already-added:hover {
+      border-color: #d0d0d0;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .browse-category-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.75rem;
+      display: block;
+    }
+
+    .browse-category-name {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #2e2b28;
+      margin-bottom: 0.5rem;
+      line-height: 1.4;
+    }
+
+    .browse-category-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .browse-category-badge {
+      display: inline-block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      letter-spacing: 0.2px;
+      background: #f0f0f0;
+      color: #555;
+      white-space: nowrap;
+      line-height: 1.4;
+    }
+
+    .browse-category-services-count {
+      font-size: 0.8rem;
+      color: #8b8b8b;
+      margin-top: 0.4rem;
+    }
+
+    .browse-category-add-btn {
+      margin-top: 0.75rem;
+      padding: 0.5rem 0.75rem;
+      background: #5c9a72;
+      color: #ffffff;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      width: 100%;
+    }
+
+    .browse-category-add-btn:hover {
+      background: #4a7d5a;
+      transform: scale(1.05);
+    }
+
+    .browse-category-add-btn:disabled,
+    .browse-category-card.already-added .browse-category-add-btn {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .browse-category-already-added {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #8b8b8b;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      padding: 0.5rem 0.75rem;
+    }
+
+    /* Modal Large Size */
+    .modal-large {
+      max-width: 900px;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      padding: 1rem 1.5rem;
+      background: #5c9a72;
+      color: #ffffff;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      box-shadow: 0 4px 12px rgba(92, 154, 114, 0.3);
+      display: none;
+      z-index: 9999;
+      animation: slideInToast 0.3s ease;
+    }
+    
+    .toast.active {
+      display: block;
+    }
+    
+    .toast.success {
+      background: #4caf50;
+    }
+    
+    .toast.error {
+      background: #dc3545;
+    }
+    
+    @keyframes slideInToast {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    /* Credential Gate Modal */
+    .credential-gate-modal .modal-body {
+      text-align: center;
+    }
+    
+    .credential-gate-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    
+    .credential-gate-message {
+      font-size: 0.95rem;
+      color: #2e2b28;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+    
+    .credential-gate-hint {
+      font-size: 0.85rem;
+      color: #6b6b6b;
+      background: #f5f5f5;
+      padding: 1rem;
+      border-radius: 6px;
+      margin-bottom: 1.5rem;
+    }
+    
+    /* ========================================== */
+    /* COVERAGE AREA STYLES */
+    /* ========================================== */
+    
+    .coverage-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .form-label {
+      font-weight: 600;
+      color: #2e2b28;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .form-label-tooltip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      background: #5c9a72;
+      color: #ffffff;
+      border-radius: 50%;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: help;
+      position: relative;
+    }
+    
+    .tooltip-content {
+      position: absolute;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #2e2b28;
+      color: #ffffff;
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      white-space: max-content;
+      z-index: 1000;
+      display: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      font-weight: 400;
+    }
+    
+    .form-label-tooltip:hover .tooltip-content {
+      display: block;
+    }
+    
+    .form-control {
+      padding: 0.85rem 1rem;
+      border: 1px solid #e0dcd5;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      background: #fafaf8;
+      transition: all 0.2s ease;
+      box-sizing: border-box;
+    }
+    
+    .form-control:focus {
+      outline: none;
+      border-color: #5c9a72;
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.1);
+    }
+    
+    .form-control::placeholder {
+      color: #a8a39f;
+    }
+    
+    .form-subtext {
+      font-size: 0.85rem;
+      color: #6b6b6b;
+      margin: 0;
+    }
+    
+    .conditional-fields {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      padding: 1.5rem;
+      background: #f5f5f5;
+      border-radius: 8px;
+      border-left: 4px solid #5c9a72;
+      display: none;
+    }
+    
+    .conditional-fields.active {
+      display: grid;
+    }
+    
+    .zip-input-wrapper {
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-end;
+    }
+    
+    .zip-input-wrapper .form-group {
+      flex: 1;
+    }
+    
+    .btn-import-csv {
+      padding: 0.85rem 1.5rem;
+      background: #ffffff;
+      border: 1px solid #e0dcd5;
+      border-radius: 8px;
+      color: #2e2b28;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-import-csv:hover {
+      border-color: #5c9a72;
+      color: #5c9a72;
+      background: #f5f5f5;
+    }
+    
+    #csv-import-input {
+      display: none;
+    }
+    
+    .zip-tags-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      padding: 0.75rem;
+      background: #ffffff;
+      border: 1px solid #e0dcd5;
+      border-radius: 8px;
+      min-height: 44px;
+      align-content: flex-start;
+    }
+    
+    .zip-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      background: #ebf6e8;
+      border: 1px solid #5c9a72;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      color: #2e2b28;
+      font-weight: 500;
+    }
+    
+    .zip-tag-remove {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      background: rgba(92, 154, 114, 0.2);
+      border: none;
+      border-radius: 50%;
+      color: #5c9a72;
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0;
+      transition: all 0.2s ease;
+    }
+    
+    .zip-tag-remove:hover {
+      background: #5c9a72;
+      color: #ffffff;
+    }
+    
+    .remote-mode-notice {
+      padding: 1rem;
+      background: #e8f4e8;
+      border-left: 4px solid #5c9a72;
+      border-radius: 6px;
+      grid-column: 1 / -1;
+      display: none;
+    }
+    
+    .remote-mode-notice.active {
+      display: block;
+    }
+    
+    .remote-mode-notice p {
+      margin: 0 0 0.75rem 0;
+      color: #2e2b28;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    
+    .remote-mode-notice .disclaimer {
+      font-size: 0.85rem;
+      color: #6b6b6b;
+      margin: 0;
+      line-height: 1.5;
+    }
+    
+    .coverage-map-placeholder {
+      grid-column: 1 / -1;
+      background: #f5f5f5;
+      border: 2px dashed #e0dcd5;
+      border-radius: 8px;
+      height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #a8a39f;
+      font-size: 0.95rem;
+      display: none;
+    }
+    
+    .coverage-map-placeholder.active {
+      display: flex;
+    }
+    
+    .coverage-actions {
+      grid-column: 1 / -1;
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+    }
+    
+    .btn-save-coverage {
+      padding: 0.85rem 2rem;
+      background: #5c9a72;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-save-coverage:hover {
+      background: #4a7d5a;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(92, 154, 114, 0.3);
+    }
+    
+    .btn-open-coverage-modal {
+      padding: 0.85rem 1.5rem;
+      background: #ffffff;
+      border: 1px solid #e0dcd5;
+      color: #2e2b28;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-open-coverage-modal:hover {
+      border-color: #5c9a72;
+      color: #5c9a72;
+      background: #f5f5f5;
+    }
+    
+    /* ========================================== */
+    /* TOOLTIP STYLING (Consistent with Profile) */
+    /* ========================================== */
+    
+    .section-tooltip {
+      font-size: 0.75rem;
+      color: #5c6b63;
+      margin-bottom: 1.25rem;
+      padding: 0.75rem 1rem;
+      background: linear-gradient(135deg, #ebf6e8 0%, #f5faf4 100%);
+      border: 1px solid rgba(92, 154, 114, 0.15);
+      border-left: 3px solid #5c9a72;
+      border-radius: 8px;
+      line-height: 1.6;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      box-shadow: 0 1px 3px rgba(92, 154, 114, 0.06);
+      cursor: help;
+      transition: all 0.2s ease;
+    }
+    
+    .section-tooltip:hover {
+      background: linear-gradient(135deg, #e5f2e0 0%, #eff6eb 100%);
+      border-color: #5c9a72;
+      box-shadow: 0 2px 8px rgba(92, 154, 114, 0.12);
+    }
+    
+    .section-tooltip::before {
+      content: 'ℹ';
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #5c9a72;
+      color: white;
+      border-radius: 50%;
+      font-size: 0.7rem;
+      font-weight: bold;
+    }
+
+    /* ========================================== */
+    /* RESTRUCTURED TOOLTIP LAYOUT */
+    /* ========================================== */
+
+    .section-description {
+      color: #2e2b28;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+      padding: 0;
+      background: none;
+      border: none;
+    }
+
+    .section-tip {
+      background: linear-gradient(135deg, #ebf6e8 0%, #f5faf4 100%);
+      border: 1px solid rgba(92, 154, 114, 0.15);
+      border-left: 3px solid #5c9a72;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      gap: 0.75rem;
+      transition: all 0.2s ease;
+    }
+
+    .section-tip:hover {
+      background: linear-gradient(135deg, #e5f2e0 0%, #eff6eb 100%);
+      border-color: #5c9a72;
+      box-shadow: 0 2px 8px rgba(92, 154, 114, 0.12);
+    }
+
+    .section-tip::before {
+      content: '✓';
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      min-width: 20px;
+      background: #5c9a72;
+      color: white;
+      border-radius: 50%;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+    .section-tip-content {
+      flex: 1;
+    }
+
+    .section-tip-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #2e2b28;
+      margin: 0 0 0.25rem 0;
+    }
+
+    .section-tip-text {
+      font-size: 0.85rem;
+      color: #5c6b63;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    /* ========================================== */
+    /* MATCHING ACTIVATION SECTION */
+    /* ========================================== */
+
+    .matching-activation-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .matching-status-display {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem;
+      background: #f9f9f7;
+      border: 1px solid #e0dcd5;
+      border-radius: 10px;
+      transition: all 0.2s ease;
+    }
+
+    .matching-status-display.active {
+      background: linear-gradient(135deg, #ebf6e8 0%, #f5faf4 100%);
+      border-color: #5c9a72;
+    }
+
+    .matching-status-content {
+      flex: 1;
+    }
+
+    .matching-status-label {
+      font-size: 0.85rem;
+      color: #6b6b6b;
+      margin: 0;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+
+    .matching-status-value {
+      font-size: 1.5rem;
+      color: #2e2b28;
+      margin: 0.25rem 0 0 0;
+      font-weight: 700;
+    }
+
+    .matching-status-display.active .matching-status-value {
+      color: #155724;
+    }
+
+    .matching-status-detail {
+      font-size: 0.8rem;
+      color: #999;
+      margin: 0.5rem 0 0 0;
+    }
+
+    /* Large Toggle Switch */
+    .toggle-switch-large {
+      position: relative;
+      display: inline-block;
+      width: 70px;
+      height: 38px;
+      margin-left: 1rem;
+    }
+
+    .toggle-switch-large input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider-large {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.3s;
+      border-radius: 38px;
+      cursor: pointer;
+    }
+
+    .toggle-slider-large:before {
+      position: absolute;
+      content: '';
+      height: 32px;
+      width: 32px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.3s;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    input:checked + .toggle-slider-large {
+      background-color: #5c9a72;
+    }
+
+    input:checked + .toggle-slider-large:before {
+      transform: translateX(32px);
+    }
+
+    .matching-controls {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-pause-matching,
+    .btn-resume-matching {
+      padding: 0.75rem 1.25rem;
+      border: 1px solid #e0dcd5;
+      border-radius: 8px;
+      background: #ffffff;
+      color: #5c9a72;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-pause-matching:hover,
+    .btn-resume-matching:hover {
+      background: #f5faf4;
+      border-color: #5c9a72;
+      box-shadow: 0 2px 8px rgba(92, 154, 114, 0.15);
+    }
+
+    .pause-info-display {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.25rem;
+      background: #fef8f0;
+      border: 1px solid #f0d9c9;
+      border-radius: 8px;
+    }
+
+    .pause-info-icon {
+      font-size: 1.5rem;
+    }
+
+    .pause-info-text {
+      flex: 1;
+    }
+
+    .pause-info-title {
+      font-size: 0.9rem;
+      color: #2e2b28;
+      margin: 0;
+      font-weight: 600;
+    }
+
+    .pause-info-time {
+      font-size: 0.85rem;
+      color: #666;
+      margin: 0.25rem 0 0 0;
+    }
+
+    /* Form Group Styling */
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+      display: block;
+      font-weight: 600;
+      color: #2e2b28;
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #e0dcd5;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      color: #2e2b28;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #5c9a72;
+      box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.1);
+    }
+
+    .pause-preview {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: #f0f7f3;
+      border-radius: 8px;
+      border-left: 4px solid #5c9a72;
+    }
+
+    .pause-preview p {
+      margin: 0;
+    }
+
+    .pause-preview p:first-child {
+      color: #2e2b28;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .pause-preview p:last-child {
+      color: #5c9a72;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+    }
+
+    /* ========================================== */
+    /* TIMEZONE SELECTOR STYLES */
+    /* ========================================== */
+
+    .timezone-selector-section {
+      background: linear-gradient(135deg, rgba(92, 154, 114, 0.08) 0%, rgba(92, 154, 114, 0.03) 100%);
+      border: 1px solid rgba(92, 154, 114, 0.2);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .timezone-selector-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    .timezone-info h3 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #2e2b28;
+    }
+
+    .timezone-info p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #6b6b6b;
+      line-height: 1.5;
+    }
+
+    .timezone-input-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .timezone-select {
+      padding: 0.875rem 1rem;
+      border: 1.5px solid #d0ccc5;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      color: #2e2b28;
+      background: white;
+      font-family: inherit;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .timezone-select:hover {
+      border-color: #5c9a72;
+      box-shadow: 0 2px 6px rgba(92, 154, 114, 0.1);
+    }
+
+    .timezone-select:focus {
+      outline: none;
+      border-color: #5c9a72;
+      box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.15);
+    }
+
+    .timezone-current-time {
+      padding: 0.75rem 1rem;
+      background: white;
+      border: 1px solid #e0dcd5;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      text-align: center;
+      color: #5c9a72;
+      font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+      .timezone-selector-content {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ========================================== */
+    /* AVAILABILITY SECTION STYLES - MODERNIZED */
+    /* ========================================== */
+
+    .availability-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .availability-header > div:first-child {
+      flex: 1;
+    }
+
+    .availability-actions {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .btn-secondary-outline {
+      padding: 0.75rem 1.25rem;
+      background: transparent;
+      border: 1px solid #5c9a72;
+      color: #5c9a72;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .btn-secondary-outline:hover {
+      background: #f5faf4;
+      border-color: #4a7e5c;
+      color: #4a7e5c;
+    }
+
+    /* Table Wrapper */
+    .availability-table-wrapper {
+      overflow-x: auto;
+      margin-bottom: 2rem;
+      border-radius: 8px;
+      border: 1px solid #e0dcd5;
+      box-shadow: 0 1px 3px rgba(45, 80, 22, 0.06);
+    }
+
+    .availability-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #ffffff;
+    }
+
+    .availability-table thead {
+      background: #f5faf4;
+      border-bottom: 2px solid #e0dcd5;
+    }
+
+    .availability-table th {
+      padding: 1rem 1.25rem;
+      text-align: left;
+      font-weight: 700;
+      color: #2e2b28;
+      font-size: 0.9rem;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+
+    .availability-table tbody tr {
+      border-bottom: 1px solid #e0dcd5;
+      transition: background 0.15s ease;
+    }
+
+    .availability-table tbody tr:hover {
+      background: #fafaf8;
+    }
+
+    .availability-table tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    .availability-table td {
+      padding: 1.25rem 1.25rem;
+      vertical-align: middle;
+      font-size: 0.95rem;
+      color: #2e2b28;
+    }
+
+    .day-name {
+      font-weight: 600;
+      color: #2e2b28;
+      min-width: 100px;
+    }
+
+    .col-toggle {
+      text-align: center;
+    }
+
+    .col-time {
+      text-align: center;
+      min-width: 110px;
+    }
+
+    .col-notes {
+      min-width: 200px;
+    }
+
+    /* Toggle Switch */
+    .toggle-switch {
+      display: inline-flex;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      cursor: pointer;
+    }
+
+    .toggle-slider {
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+      background: #d0ccc5;
+      border-radius: 24px;
+      position: relative;
+      transition: background 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .toggle-slider::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      left: 2px;
+      top: 2px;
+      background: #ffffff;
+      border-radius: 50%;
+      transition: left 0.3s ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .toggle-switch input:checked + .toggle-slider {
+      background: #5c9a72;
+    }
+
+    .toggle-switch input:checked + .toggle-slider::after {
+      left: 22px;
+    }
+
+    /* Time Input */
+    .time-input {
+      width: 100%;
+      max-width: 100px;
+      padding: 0.6rem 0.75rem;
+      border: 1px solid #e0dcd5;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      color: #2e2b28;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #fafaf8;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .time-input:focus {
+      outline: none;
+      border-color: #5c9a72;
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.1);
+    }
+
+    .time-input:disabled {
+      background: #f0f0f0;
+      color: #a8a39f;
+      cursor: not-allowed;
+      border-color: #e0dcd5;
+    }
+
+    .day-row.unavailable .time-input,
+    .day-row.unavailable .notes-input {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    /* Notes Input */
+    .notes-input {
+      width: 100%;
+      padding: 0.6rem 0.75rem;
+      border: 1px solid #e0dcd5;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      color: #2e2b28;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #fafaf8;
+      transition: all 0.2s ease;
+    }
+
+    .notes-input:focus {
+      outline: none;
+      border-color: #5c9a72;
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.1);
+    }
+
+    .notes-input:disabled {
+      background: #f0f0f0;
+      color: #a8a39f;
+      cursor: not-allowed;
+    }
+
+    .notes-input::placeholder {
+      color: #a8a39f;
+    }
+
+    /* Footer */
+    .availability-footer {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #e0dcd5;
+    }
+
+    .availability-help-text {
+      font-size: 0.85rem;
+      color: #6b6b6b;
+      margin: 0;
+      font-style: italic;
+    }
+
+    .btn-primary {
+      padding: 0.85rem 1.5rem;
+      background: #5c9a72;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      align-self: flex-start;
+    }
+
+    .btn-primary:hover {
+      background: #4a7e5c;
+      box-shadow: 0 4px 12px rgba(92, 154, 114, 0.2);
+    }
+
+    .btn-primary:active {
+      transform: translateY(1px);
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .availability-header {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .availability-actions {
+        width: 100%;
+      }
+
+      .btn-secondary-outline {
+        flex: 1;
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .availability-table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .availability-table {
+        min-width: 600px;
+      }
+
+      .availability-table th,
+      .availability-table td {
+        padding: 0.9rem 0.75rem;
+        font-size: 0.85rem;
+      }
+
+      .availability-table th {
+        font-size: 0.8rem;
+      }
+
+      .time-input {
+        max-width: 90px;
+        padding: 0.5rem;
+        font-size: 0.9rem;
+      }
+
+      .notes-input {
+        display: none;
+      }
+
+      .col-notes {
+        display: none;
+      }
+
+      .day-name {
+        min-width: 70px;
+      }
+
+      .btn-secondary-outline {
+        padding: 0.65rem 1rem;
+        font-size: 0.85rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .availability-table {
+        min-width: 500px;
+      }
+
+      .availability-table th,
+      .availability-table td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.8rem;
+      }
+
+      .time-input {
+        max-width: 75px;
+        padding: 0.4rem;
+        font-size: 0.85rem;
+      }
+
+      .toggle-slider {
+        width: 40px;
+        height: 22px;
+      }
+
+      .toggle-slider::after {
+        width: 18px;
+        height: 18px;
+      }
+
+      .toggle-switch input:checked + .toggle-slider::after {
+        left: 20px;
+      }
+    }
+  </style>
+</head>
+<body class="pro-dashboard">
+  <script>
+    localStorage.setItem('active_view', 'practitioner');
+  </script>
+  
+  <header id="header-inject"></header>
+
+  <main class="match-settings-main">
+    <div class="match-settings-container">
+      <!-- ========================================== -->
+      <!-- 1. PAGE HEADER -->
+      <!-- ========================================== -->
+      <div class="match-settings-header">
+        <h1>Match Settings</h1>
+        <p>Manage your service categories and matching preferences</p>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- 2. MAIN CARD -->
+      <!-- ========================================== -->
+      <div class="match-settings-card">
+        
+        <!-- ADD CATEGORY SECTION -->
+        <div class="card-section">
+          <h2 class="card-section-title">Add Service Category</h2>
+          <p class="section-description">Search and add service categories that describe what you offer. You can add multiple categories to reach more clients looking for your specific expertise.</p>
+          <div class="section-tip">
+            <div class="section-tip-content">
+              <p class="section-tip-title">Pro Tip: Multiple Categories = More Inquiries</p>
+              <p class="section-tip-text">Practitioners who offer multiple service categories attract 3x more client inquiries. Start with your core specialties and expand as you grow. Clients often search for combined services like "yoga + meditation" or "acupuncture + herbal medicine."</p>
+            </div>
+          </div>
+          <div class="add-category-section">
+            <div class="search-container">
+              <input 
+                type="text" 
+                id="category-search" 
+                class="search-input" 
+                placeholder="Search categories..."
+                autocomplete="off"
+              >
+              <div id="autocomplete-dropdown" class="autocomplete-dropdown"></div>
+            </div>
+            <button id="btn-add-category" class="btn-add-category" disabled>Add Category</button>
+            <            <button id="btn-browse-categories" class="btn-browse-categories">Browse</button>
+          </div>
+        </div>
+
+        <!-- ACTIVE CATEGORIES SECTION -->
+        <div class="card-section">
+          <h2 class="card-section-title">Your Active Categories</h2>
+          <p class="section-description">Toggle categories on or off to control which ones appear in client searches. Active categories (✓) will receive leads, while inactive categories (◯) won't.</p>
+          <div class="section-tip">
+            <div class="section-tip-content">
+              <p class="section-tip-title">Pro Tip: Stay Visible for Reputation</p>
+              <p class="section-tip-text">Keep categories active even if you have a full schedule—visibility matters for building your reputation and getting discovered. You can manage booking availability separately in your calendar settings.</p>
+            </div>
+          </div>
+          <div id="active-categories-list">
+            <div class="empty-state">
+              <p>No categories selected yet. Search and add one above.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- MATCHING ACTIVATION SECTION -->
+        <div class="card-section">
+          <h2 class="card-section-title">Activate Matching</h2>
+          <p class="section-description">When you activate matching, clients will begin seeing your profile and sending leads for the categories you've marked as active above. You'll receive notifications when new leads arrive. It's entirely up to you to pursue and cultivate each lead—we don't guarantee results. Your hiring decisions are always at your discretion. If you suspect a lead is suspicious, please report it to our support team right away.</p>
+          <div class="section-tip">
+            <div class="section-tip-content">
+              <p class="section-tip-title">Pro Tip: Be Responsive, Persistent & Professional</p>
+              <p class="section-tip-text">Respond to leads within the first 10 minutes or less whenever possible—speed is critical for first impressions. Follow up with prospects multiple times if needed; many become clients after 2-3 touchpoints. Always maintain professionalism in your communication; top performers have 40% higher conversion rates by staying courteous and organized.</p>
+            </div>
+          </div>
+          
+          <div class="matching-activation-container">
+            <div class="matching-status-display">
+              <div class="matching-status-content">
+                <p class="matching-status-label">Matching Status</p>
+                <p id="matching-status-text" class="matching-status-value">Inactive</p>
+                <p id="matching-status-detail" class="matching-status-detail"></p>
+              </div>
+              <label class="toggle-switch-large">
+                <input type="checkbox" id="matching-activation-toggle" onchange="toggleMatchingActivation()">
+                <span class="toggle-slider-large"></span>
+              </label>
+            </div>
+
+            <div class="matching-controls">
+              <button type="button" class="btn-pause-matching" id="btn-pause-matching" onclick="openPauseModal()" style="display: none;">
+                ⏸ Pause Until...
+              </button>
+              <button type="button" class="btn-resume-matching" id="btn-resume-matching" onclick="resumeMatching()" style="display: none;">
+                ▶ Resume Now
+              </button>
+            </div>
+
+            <div id="pause-info-display" class="pause-info-display" style="display: none;">
+              <div class="pause-info-icon">⏸</div>
+              <div class="pause-info-text">
+                <p class="pause-info-title">Matching Paused</p>
+                <p id="pause-info-time" class="pause-info-time"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- COVERAGE AREA SECTION -->
+        <div class="card-section">
+          <h2 class="card-section-title">Coverage Area</h2>
+          <p class="section-description">Define where you serve clients and how far you're willing to travel or provide remote services. This affects which clients can find and contact you.</p>
+          <div class="section-tip">
+            <div class="section-tip-content">
+              <p class="section-tip-title">Pro Tip: Expand Your Reach</p>
+              <p class="section-tip-text">Remote practitioners often see 40% more inquiries than in-person-only practitioners because they're visible to clients nationwide. If you're just starting out, consider offering remote sessions even part-time to accelerate growth.</p>
+            </div>
+          </div>
+          
+          <button type="button" class="btn-open-coverage-modal" onclick="openCoverageModal()">
+            Edit Coverage Settings
+          </button>
+        </div>
+
+        <!-- AVAILABILITY SECTION -->
+        <div class="card-section">
+          <div class="availability-header">
+            <div>
+              <h2 class="card-section-title">Availability & Hours</h2>
+              <p class="section-description">Set your working hours for each day of the week. Clients see this when browsing your profile—transparency builds trust and converts leads 25% faster.</p>
+            </div>
+            <div class="availability-actions">
+              <button type="button" class="btn-secondary-outline" onclick="applyDefaultHours()">
+                Quick Set: 9am–5pm
+              </button>
+            </div>
+          </div>
+
+          <!-- Timezone Selector -->
+          <div class="timezone-selector-section">
+            <div class="timezone-selector-content">
+              <div class="timezone-info">
+                <h3>Your Timezone</h3>
+                <p>This helps clients understand your working hours in their own time zone.</p>
+              </div>
+              <div class="timezone-input-wrapper">
+                <select id="timezone-select" class="timezone-select">
+                  <option value="">-- Select Your Timezone --</option>
+                  <optgroup label="US Eastern">
+                    <option value="America/New_York">Eastern Time (ET) - New York</option>
+                  </optgroup>
+                  <optgroup label="US Central">
+                    <option value="America/Chicago">Central Time (CT) - Chicago</option>
+                  </optgroup>
+                  <optgroup label="US Mountain">
+                    <option value="America/Denver">Mountain Time (MT) - Denver</option>
+                  </optgroup>
+                  <optgroup label="US Pacific">
+                    <option value="America/Los_Angeles">Pacific Time (PT) - Los Angeles</option>
+                  </optgroup>
+                  <optgroup label="US Alaska & Hawaii">
+                    <option value="America/Anchorage">Alaska Time (AKT)</option>
+                    <option value="Pacific/Honolulu">Hawaii-Aleutian Time (HST)</option>
+                  </optgroup>
+                  <optgroup label="Canada">
+                    <option value="America/Toronto">Eastern Time - Toronto</option>
+                    <option value="America/Vancouver">Pacific Time - Vancouver</option>
+                  </optgroup>
+                  <optgroup label="Europe">
+                    <option value="Europe/London">Greenwich Mean Time (GMT) - London</option>
+                    <option value="Europe/Paris">Central European Time (CET) - Paris</option>
+                    <option value="Europe/Berlin">Central European Time (CET) - Berlin</option>
+                  </optgroup>
+                  <optgroup label="Asia">
+                    <option value="Asia/Tokyo">Japan Standard Time (JST)</option>
+                    <option value="Asia/Hong_Kong">Hong Kong Time (HKT)</option>
+                    <option value="Asia/Singapore">Singapore Time (SGT)</option>
+                    <option value="Asia/Bangkok">Indochina Time (ICT)</option>
+                    <option value="Asia/Kolkata">Indian Standard Time (IST)</option>
+                    <option value="Asia/Dubai">Gulf Standard Time (GST)</option>
+                  </optgroup>
+                  <optgroup label="Australia">
+                    <option value="Australia/Sydney">Australian Eastern Time (AEDT/AEST)</option>
+                    <option value="Australia/Melbourne">Australian Eastern Time - Melbourne</option>
+                    <option value="Australia/Brisbane">Australian Eastern Time - Brisbane</option>
+                    <option value="Australia/Perth">Australian Western Time</option>
+                  </optgroup>
+                  <optgroup label="Other">
+                    <option value="UTC">UTC / GMT (No Offset)</option>
+                  </optgroup>
+                </select>
+                <div class="timezone-current-time">
+                  <span id="current-time-display">No timezone selected</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hours Table -->
+          <div class="availability-table-wrapper">
+            <table class="availability-table">
+              <thead>
+                <tr>
+                  <th>Day</th>
+                  <th>Available</th>
+                  <th>Opens</th>
+                  <th>Closes</th>
+                  <th class="col-notes">Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="day-row" data-day="monday">
+                  <td class="day-name">Monday</td>
+                  <td class="col-toggle">
+                    <label class="toggle-switch">
+                      <input type="checkbox" class="day-available" value="Monday" checked>
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </td>
+                  <td class="col-time">
+                    <input type="time" class="time-input time-open" value="09:00">
+                  </td>
+                  <td class="col-time">
+                    <input type="time" class="time-input time-close" value="17:00">
+                  </td>
+                  <td class="col-notes">
+                    <input type="text" class="notes-input" placeholder="e.g., Lunch 12-1pm">
+                  </td>
+                </tr>
+                <tr class="day-row" data-day="tuesday">
+                  <td class="day-name">Tuesday</td>
+                  <td class="col-toggle">
+                    <label class="toggle-switch">
+                      <input type="checkbox" class="day-available" value="Tuesday" checked>
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </td>
+                  <td class="col-time">
+                    <input type="time" class="time-input time-open" value="09:00">
+                  </td>
+                  <td class="col-time">
+                    <input type="time" class="time-input time-close" value="17:00">
+                  </td>
+                  <td class="col-notes">
+                    <input type="text" class="notes-input" placeholder="e.g., Lunch 12-1pm">
+                  </td>
+                </tr>
+                <tr class="day-row" data-day="wednesday">
+                  <td class="day-name">Wednesday</td>
+                  <td class="col-toggle">
+                    <label class="toggle-switch">
+                      <input type="checkbox" class="day-available" value="Wednesday" checked>
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </td>
+                  <td class="col-time">
+                    <input type="time" class="time-input time-open" value="09:00">
+                  </td>
+                  <td class="col-time">
+                    <input type="time" class="time-input time-close" value="17:00">
+                  </td>
+                  <td class="col-notes">
+                    <input type="text" class="notes-input" placeholder="e.g., Lunch 12-1pm">
+                  </td>
+                </tr>
+                <tr class="day-row" data-day="thursday">
+                  <td class="day-name">Thursday</td>
+                  <td class="col-toggle">
+                    <label class="toggle-switch">
+                      <input type="checkbox" class="day-available" value="Thursday" checked>
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </td>
+                  <td class="col-time">
+                    <input type="time" class="time-input time-open" value="09:00">
+                  </td>
+                  <td class="col-time">
+                    <input type="time" class="time-input time-close" value="17:00">
+                  </td>
+                  <td class="col-notes">
+                    <input type="text" class="notes-input" placeholder="e.g., Lunch 12-1pm">
+                  </td>
+                </tr>
+                <tr class="day-row" data-day="friday">
+                  <td class="day-name">Friday</td>
+                  <td class="col-toggle">
+                    <label class="toggle-switch">
+                      <input type="checkbox" class="day-available" value="Friday" checked>
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </td>
+                  <td class="col-time">
+                    <input type="time" class="time-input time-open" value="09:00">
+                  </td>
+                  <td class="col-time">
+                    <input type="time" class="time-input time-close" value="17:00">
+                  </td>
+                  <td class="col-notes">
+                    <input type="text" class="notes-input" placeholder="e.g., Lunch 12-1pm">
+                  </td>
+                </tr>
+                <tr class="day-row" data-day="saturday">
+                  <td class="day-name">Saturday</td>
+                  <td class="col-toggle">
+                    <label class="toggle-switch">
+                      <input type="checkbox" class="day-available" value="Saturday">
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </td>
+                  <td class="col-time">
+                    <input type="time" class="time-input time-open" value="09:00" disabled>
+                  </td>
+                  <td class="col-time">
+                    <input type="time" class="time-input time-close" value="17:00" disabled>
+                  </td>
+                  <td class="col-notes">
+                    <input type="text" class="notes-input" placeholder="e.g., Lunch 12-1pm" disabled>
+                  </td>
+                </tr>
+                <tr class="day-row" data-day="sunday">
+                  <td class="day-name">Sunday</td>
+                  <td class="col-toggle">
+                    <label class="toggle-switch">
+                      <input type="checkbox" class="day-available" value="Sunday">
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </td>
+                  <td class="col-time">
+                    <input type="time" class="time-input time-open" value="09:00" disabled>
+                  </td>
+                  <td class="col-time">
+                    <input type="time" class="time-input time-close" value="17:00" disabled>
+                  </td>
+                  <td class="col-notes">
+                    <input type="text" class="notes-input" placeholder="e.g., Lunch 12-1pm" disabled>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Save Button -->
+          <div class="availability-footer">
+            <button type="button" class="btn-primary" onclick="saveAvailabilitySettings()">
+              Save Availability Schedule
+            </button>
+            <p class="availability-help-text">Your schedule appears on your profile and helps clients know when they can book with you. Changes take effect immediately.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- ========================================== -->
+  <!-- MODAL: PREFERENCES EDITOR -->
+  <!-- ========================================== -->
+  <div id="preferences-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="preferences-modal-title">Preferences</h2>
+        <button class="modal-close-btn" onclick="closePreferencesModal()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <h3>Select Subcategories</h3>
+        <p class="section-description">Choose which specific services you want to offer under this category. Being specific helps attract better-matched clients.</p>
+        <div class="section-tip" style="margin-bottom: 1.5rem;">
+          <div class="section-tip-content">
+            <p class="section-tip-title">Specificity Wins</p>
+            <p class="section-tip-text">Clients who search for "trauma-informed therapy" vs. just "therapy" are more likely to book. The more specific your subcategories, the better the match—leading to fewer "not a fit" cancellations and higher satisfaction.</p>
+          </div>
+        </div>
+        <div id="subcategories-list" class="subcategory-list"></div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-modal btn-modal-secondary" onclick="closePreferencesModal()">Cancel</button>
+        <button class="btn-modal btn-modal-primary" onclick="savePreferencesModal()">Save Preferences</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: BROWSE ALL CATEGORIES -->
+  <!-- ========================================== -->
+  <div id="browse-categories-modal" class="modal-overlay">
+    <div class="modal-content modal-large">
+      <div class="modal-header">
+        <h2>Browse Service Categories</h2>
+        <button class="modal-close-btn" onclick="closeBrowseCategoriesModal()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Search Categories -->
+        <div class="browse-search-wrapper">
+          <input 
+            type="text" 
+            id="browse-categories-search" 
+            class="browse-search-input" 
+            placeholder="Search categories..."
+            autocomplete="off"
+          >
+        </div>
+
+        <!-- License Required Categories -->
+        <div class="browse-category-section">
+          <div class="browse-section-header">
+            <h3>🔐 License Required</h3>
+            <p class="browse-section-subtitle">These categories require state-regulated professional licenses. You must upload your credentials in your profile to add these categories.</p>
+          </div>
+          <div id="browse-license-required-categories" class="browse-categories-grid">
+            <!-- Populated by JavaScript -->
+          </div>
+        </div>
+
+        <!-- Certified Categories -->
+        <div class="browse-category-section">
+          <div class="browse-section-header">
+            <h3>🎓 Certification Available</h3>
+            <p class="browse-section-subtitle">These categories offer professional certifications. You can add them with or without certification, but certified practitioners show up first in search results.</p>
+          </div>
+          <div id="browse-certified-categories" class="browse-categories-grid">
+            <!-- Populated by JavaScript -->
+          </div>
+        </div>
+
+        <!-- No Requirements Categories -->
+        <div class="browse-category-section">
+          <div class="browse-section-header">
+            <h3>✓ No License or Certification Required</h3>
+            <p class="browse-section-subtitle">These categories have no legal requirements. You can add them immediately and start receiving leads right away.</p>
+          </div>
+          <div id="browse-unrestricted-categories" class="browse-categories-grid">
+            <!-- Populated by JavaScript -->
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-modal btn-modal-secondary" onclick="closeBrowseCategoriesModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: CREDENTIAL GATE -->
+  <!-- ========================================== -->
+  <div id="credential-gate-modal" class="modal-overlay credential-gate-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Verification Required</h2>
+        <button class="modal-close-btn" onclick="closeCredentialGateModal()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="credential-gate-icon">🔐</div>
+        <p class="credential-gate-message" id="credential-gate-message">
+          This category requires credential verification.
+        </p>
+        <div class="credential-gate-hint">
+          Upload your credentials in your profile to activate this category.
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-modal btn-modal-secondary" onclick="closeCredentialGateModal()">Close</button>
+        <a href="./profile.html" class="btn-modal btn-modal-primary" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">Go to Profile</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: CONFIRMATION (Remove Category) -->
+  <!-- ========================================== -->
+  <div id="confirm-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Confirm Action</h2>
+        <button class="modal-close-btn" onclick="closeConfirmModal()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <p id="confirm-message">Are you sure you want to remove this category?</p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-modal btn-modal-secondary" onclick="closeConfirmModal()">Cancel</button>
+        <button class="btn-modal btn-modal-primary" id="confirm-btn" onclick="executeConfirmAction()">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: PAUSE MATCHING -->
+  <!-- ========================================== -->
+  <div id="pause-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Pause Matching</h2>
+        <button class="modal-close-btn" onclick="closePauseModal()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <p style="color: #6b6b6b; margin-bottom: 1.5rem;">Your matching will pause for the selected period and automatically resume at the date and time you choose.</p>
+        
+        <div class="form-group">
+          <label class="form-label">Pause Until (Date)</label>
+          <input type="date" id="pause-date" class="form-input">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Resume At (Time)</label>
+          <input type="time" id="pause-time" class="form-input">
+        </div>
+
+        <div class="pause-preview" id="pause-preview-display" style="margin-top: 1.5rem; padding: 1rem; background: #f0f7f3; border-radius: 8px; border-left: 4px solid #5c9a72; display: none;">
+          <p style="margin: 0; color: #2e2b28; font-weight: 600; font-size: 0.9rem;">Resume Preview</p>
+          <p id="pause-preview-text" style="margin: 0.5rem 0 0 0; color: #5c9a72; font-size: 0.85rem;"></p>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-modal btn-modal-secondary" onclick="closePauseModal()">Cancel</button>
+        <button class="btn-modal btn-modal-primary" onclick="applyPause()">Pause Matching</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: COVERAGE AREA EDITOR -->
+  <!-- ========================================== -->
+  <div id="coverage-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Coverage Area Settings</h2>
+        <button class="modal-close-btn" onclick="closeCoverageModal()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Service Mode Selection -->
+        <p class="section-description">Choose whether you serve clients in-person at your location, offer remote sessions, or both.</p>
+        <div class="section-tip" style="margin-bottom: 1.5rem;">
+          <div class="section-tip-content">
+            <p class="section-tip-title">Remote = More Reach</p>
+            <p class="section-tip-text">Remote practitioners often see 40% more inquiries than in-person-only practitioners because they're visible to clients nationwide. If you're just starting out, consider offering remote sessions even part-time to accelerate growth.</p>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">
+            Service Mode
+            <span class="form-label-tooltip">
+              ?
+              <span class="tooltip-content">Remote practitioners may serve clients nationwide unless restricted by law. Practitioners are responsible for complying with state regulations.</span>
+            </span>
+          </label>
+          <select id="modal-service-mode" class="form-control" onchange="handleModalServiceModeChange()">
+            <option value="in-person">In-Person</option>
+            <option value="remote">Remote</option>
+            <option value="both">Both</option>
+          </select>
+        </div>
+
+        <!-- Conditional Fields: In-Person & Both -->
+        <div id="modal-conditional-location-fields" class="coverage-section active" style="margin-top: 1.5rem;">
+          <div class="form-group">
+            <label class="form-label">Base City / State</label>
+            <input 
+              type="text" 
+              id="modal-base-city-state" 
+              class="form-control" 
+              placeholder="e.g., Denver, CO"
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Service Radius (miles)</label>
+            <input 
+              type="number" 
+              id="modal-service-radius" 
+              class="form-control" 
+              placeholder="e.g., 25"
+              min="0"
+              max="500"
+            >
+          </div>
+
+          <!-- ZIP Code Entry System -->
+          <div class="form-group" style="grid-column: 1 / -1;">
+            <label class="form-label">Service Areas (ZIP Codes)</label>
+            <div class="section-tooltip" style="margin-bottom: 0.75rem;">Strategic ZIP code selection matters: Practitioners who target high-demand wellness neighborhoods see 2x more bookings. Focus on areas with high yoga studio density, holistic health centers, or affluent neighborhoods interested in wellness. You can always expand based on client feedback.</div>
+            <div class="zip-input-wrapper">
+              <div class="form-group" style="flex: 1;">
+                <input 
+                  type="text" 
+                  id="modal-zip-code-input" 
+                  class="form-control" 
+                  placeholder="Add ZIP code..."
+                  maxlength="5"
+                >
+              </div>
+              <button type="button" class="btn-import-csv" onclick="triggerModalCSVImport()">
+                Import ZIPs (CSV)
+              </button>
+              <input type="file" id="modal-csv-import-input" accept=".csv" onchange="handleModalCSVImport(event)">
+            </div>
+          </div>
+
+          <!-- ZIP Code Tags -->
+          <div class="form-group" style="grid-column: 1 / -1;">
+            <label class="form-label">Added ZIP Codes</label>
+            <div id="modal-zip-tags-container" class="zip-tags-container">
+              <span style="color: #a8a39f; font-size: 0.9rem;">No ZIP codes added yet.</span>
+            </div>
+          </div>
+
+          <!-- Coverage Map Placeholder -->
+          <div id="modal-coverage-map" class="coverage-map-placeholder active">
+            <span>Coverage map visualization will appear here</span>
+          </div>
+        </div>
+
+        <!-- Remote Mode Notice -->
+        <div id="modal-remote-mode-notice" class="remote-mode-notice" style="margin-top: 1.5rem;">
+          <p>You are currently set to provide remote services nationwide (USA).</p>
+          <p class="disclaimer">Remote practitioners may serve clients nationwide unless restricted by law. Practitioners are responsible for complying with state regulations.</p>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-modal btn-modal-secondary" onclick="closeCoverageModal()">Cancel</button>
+        <button class="btn-modal btn-modal-primary" onclick="saveModalCoverageSettings()">Save Coverage Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- TOAST NOTIFICATION -->
+  <!-- ========================================== -->
+  <div id="toast" class="toast"></div>
+
+  <footer id="footer-inject"></footer>
+
+  <!-- ========================================== -->
+  <!-- SCRIPTS -->
+  <!-- ========================================== -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../scripts/config.js"></script>
+  <script src="../../scripts/authManager.js"></script>
+  <script src="../../scripts/authModal.js"></script>
+  <script src="../../scripts/authHooks.js"></script>
+  <script src="../../injections.js"></script>
+  <script>
+    /*
+    ╔════════════════════════════════════════════════════════════════════╗
+    ║  ROOTED VITALITY, INC.                                             ║
+    ║  File: dashboard/pro/match-settings.html (inline script)           ║
+    ║  Purpose: Category & preference management for practitioners       ║
+    ║  Holistic Wellness · Modern Connection Platform                    ║
+    ║  rootedvitality.com | 2025                                         ║
+    ╚════════════════════════════════════════════════════════════════════╝
+    */
+
+    console.log('[Rooted Vitality] Match Settings page loading...');
+
+    let currentUser = null;
+    let allCategories = [];
+    let activeCategories = [];
+    let currentEditingCategory = null;
+    let taxonomyData = null;
+    let pendingConfirmAction = null;
+    let selectedCategoryForAdd = null;
+    let zipCodesList = [];
+
+    // ======================================================
+    // 1. INITIALIZATION
+    // ======================================================
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      console.log('[Rooted Vitality] Initializing match settings...');
+      
+      // Mark this as practitioner view
+      localStorage.setItem('active_view', 'practitioner');
+      
+      // Wait for header to be injected, then load logo
+      let headerWaitAttempts = 0;
+      const waitForHeader = () => {
+        headerWaitAttempts++;
+        const header = document.getElementById('rvHeader');
+        const logoImg = document.querySelector('.rv-logo-img');
+        
+        if (header && logoImg && typeof RootedVitality !== 'undefined' && typeof RootedVitality.loadPractitionerLogo === 'function') {
+          console.log('[Rooted Vitality] Header found on match-settings (attempt ' + headerWaitAttempts + '), loading practitioner logo');
+          RootedVitality.loadPractitionerLogo();
+          return true;
+        }
+        
+        // Retry up to 30 times (3 seconds total)
+        if (headerWaitAttempts < 30) {
+          setTimeout(waitForHeader, 100);
+        } else {
+          console.warn('[Rooted Vitality] Header not found after 30 attempts on match-settings');
+        }
+        return false;
+      };
+      
+      // Start waiting for header
+      waitForHeader();
+      
+      // Highlight the "Match Settings" nav link - with retry logic
+      function highlightMatchSettingsNav() {
+        const navLinks = document.querySelectorAll('.rv-nav-link');
+        let found = false;
+        
+        navLinks.forEach(link => {
+          link.classList.remove('active');
+          // Check if this link points to match-settings.html
+          const href = link.getAttribute('href') || '';
+          if (href.includes('match-settings')) {
+            link.classList.add('active');
+            found = true;
+            console.log('[Rooted Vitality] Highlighted Match Settings nav link');
+          }
+        });
+        
+        if (!found) {
+          console.log('[Rooted Vitality] Match Settings nav link not found yet, retrying...');
+          // Retry in 100ms if header hasn't loaded yet
+          setTimeout(highlightMatchSettingsNav, 100);
+        }
+      }
+      
+      // Start highlighting attempt
+      highlightMatchSettingsNav();
+      
+      // Get current user
+      try {
+        const { data: { user } } = await window.supabaseClient.auth.getUser();
+        
+        if (!user) {
+          console.log('[Rooted Vitality] No user logged in, redirecting to signup');
+          window.location.href = '/rooted-vitality/signup.html';
+          return;
+        }
+        currentUser = user;
+        console.log(`[Rooted Vitality] Loaded for user: ${user.id}`);
+        
+        // Load taxonomy data
+        await loadTaxonomy();
+        
+        // Load active categories from localStorage
+        loadActiveCategories();
+        
+        // Load coverage settings
+        loadCoverageSettings();
+        
+        // Load matching activation status
+        loadMatchingStatus();
+        
+        // Render UI
+        renderActiveCategories();
+        
+        // Setup event listeners
+        setupEventListeners();
+        setupZIPCodeInput();
+        
+        // Highlight nav link again after everything is loaded
+        setTimeout(highlightMatchSettingsNav, 200);
+        
+      } catch (error) {
+        console.error('[Rooted Vitality] Error initializing match settings:', error);
+      }
+    });
+
+    // ======================================================
+    // 2. LOAD TAXONOMY DATA (Exclude Massage Therapy)
+    // ======================================================
+
+    async function loadTaxonomy() {
+      try {
+        const response = await fetch('/data/practitioner-categories.json');
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        taxonomyData = await response.json();
+        
+        // Load all practitioner categories (already excludes Massage Therapy)
+        allCategories = taxonomyData.categories || [];
+        
+        console.log('[Rooted Vitality] Practitioner taxonomy loaded:', allCategories.length, 'categories');
+      } catch (error) {
+        console.error('[Rooted Vitality] Error loading practitioner taxonomy:', error);
+        showToast('Could not load categories. Please refresh.', 'error');
+      }
+    }
+
+    // ======================================================
+    // 3. LOAD & SAVE ACTIVE CATEGORIES
+    // ======================================================
+
+    function loadActiveCategories() {
+      const saved = localStorage.getItem('matchPreferences');
+      if (saved) {
+        try {
+          activeCategories = JSON.parse(saved);
+          console.log('[Rooted Vitality] Loaded active categories:', activeCategories);
+        } catch (error) {
+          console.error('[Rooted Vitality] Error parsing saved preferences:', error);
+          activeCategories = [];
+        }
+      }
+    }
+
+    function saveActiveCategories() {
+      localStorage.setItem('matchPreferences', JSON.stringify(activeCategories));
+      console.log('[Rooted Vitality] Saved active categories to localStorage');
+    }
+
+    // ======================================================
+    // 4. RENDER ACTIVE CATEGORIES
+    // ======================================================
+
+    function renderActiveCategories() {
+      const container = document.getElementById('active-categories-list');
+      
+      if (activeCategories.length === 0) {
+        container.innerHTML = '<div class="empty-state"><p>No categories selected yet. Search and add one above.</p></div>';
+        return;
+      }
+      
+      container.innerHTML = activeCategories.map(cat => {
+        const isActive = cat.active !== false;
+        const statusLabel = isActive ? 'Active' : 'Inactive';
+        const statusClass = isActive ? 'active' : 'inactive';
+        return `
+        <div class="category-item ${statusClass}">
+          <div class="category-item-left">
+            <p class="category-item-name">
+              ${cat.name}
+              <span class="status-badge ${statusClass}" title="Status: ${statusLabel}">
+                ${isActive ? '✓ Active' : '◯ Inactive'}
+              </span>
+            </p>
+            <p class="category-item-meta">${cat.subcategories ? cat.subcategories.length : 0} preferences selected</p>
+          </div>
+          <div class="category-item-actions">
+            <label class="toggle-switch" title="Click to ${isActive ? 'deactivate' : 'activate'} this category">
+              <input type="checkbox" ${isActive ? 'checked' : ''} onchange="toggleCategoryActive('${cat.id}')">
+              <span class="toggle-slider"></span>
+            </label>
+            <button class="category-btn" onclick="openPreferencesModal('${cat.id}')" title="Select specific services for this category">
+              Preferences
+            </button>
+            <button class="category-btn category-btn-remove" onclick="confirmRemoveCategory('${cat.id}')" title="Remove this category completely">
+              Remove
+            </button>
+          </div>
+        </div>
+      `;
+      }).join('');
+    }
+
+    // ======================================================
+    // 5. TOGGLE CATEGORY ACTIVE/INACTIVE
+    // ======================================================
+
+    function toggleCategoryActive(categoryId) {
+      const category = activeCategories.find(ac => ac.id === categoryId);
+      if (category) {
+        category.active = category.active !== false;
+        saveActiveCategories();
+        const status = category.active ? 'activated' : 'deactivated';
+        showToast(`${category.name} ${status}.`, 'success');
+        console.log('[Rooted Vitality] Category', categoryId, 'toggled to:', category.active);
+      }
+    }
+
+    // ======================================================
+    // 6. ADD CATEGORY - SEARCH & SELECT
+    // ======================================================
+
+    function setupEventListeners() {
+      const searchInput = document.getElementById('category-search');
+      const addBtn = document.getElementById('btn-add-category');
+      const browseBtn = document.getElementById('btn-browse-categories');
+      const dropdown = document.getElementById('autocomplete-dropdown');
+      
+      if (!searchInput) return;
+      
+      // Browse button listener
+      if (browseBtn) {
+        browseBtn.addEventListener('click', openBrowseCategoriesModal);
+      }
+      
+      searchInput.addEventListener('input', (e) => {
+        const value = e.target.value.trim();
+        selectedCategoryForAdd = null;
+        addBtn.disabled = true;
+        
+        if (value.length === 0) {
+          dropdown.classList.remove('active');
+          return;
+        }
+        
+        const filtered = allCategories.filter(cat =>
+          cat.name.toLowerCase().includes(value.toLowerCase()) &&
+          !activeCategories.some(ac => ac.id === cat.id)
+        );
+        
+        if (filtered.length === 0) {
+          dropdown.classList.remove('active');
+          return;
+        }
+        
+        // Show autocomplete dropdown
+        dropdown.innerHTML = filtered.slice(0, 8).map(cat => `
+          <div class="autocomplete-item" onclick="selectFromAutocomplete('${cat.id}', '${cat.name}')">
+            <span class="autocomplete-item-name">${cat.name}</span>
+            ${cat.requiresLicense || cat.requiresCertification ? `
+              <span class="autocomplete-item-meta">
+                Requires: ${cat.requiresLicense ? 'License' : 'Certification'}
+              </span>
+            ` : ''}
+          </div>
+        `).join('');
+        
+        dropdown.classList.add('active');
+      });
+      
+      // Close dropdown on blur
+      searchInput.addEventListener('blur', () => {
+        setTimeout(() => {
+          dropdown.classList.remove('active');
+        }, 200);
+      });
+      
+      // Add button handler
+      addBtn.addEventListener('click', () => {
+        if (selectedCategoryForAdd) {
+          addCategoryToActive(selectedCategoryForAdd);
+        }
+      });
+
+      // Pause modal date/time listeners
+      const pauseDateInput = document.getElementById('pause-date');
+      const pauseTimeInput = document.getElementById('pause-time');
+      
+      if (pauseDateInput && pauseTimeInput) {
+        pauseDateInput.addEventListener('change', updatePausePreview);
+        pauseTimeInput.addEventListener('change', updatePausePreview);
+      }
+    }
+
+    function selectFromAutocomplete(categoryId, categoryName) {
+      selectedCategoryForAdd = { id: categoryId, name: categoryName };
+      document.getElementById('category-search').value = categoryName;
+      document.getElementById('btn-add-category').disabled = false;
+      document.getElementById('autocomplete-dropdown').classList.remove('active');
+    }
+
+    function addCategoryToActive(categoryInfo) {
+      if (activeCategories.some(ac => ac.id === categoryInfo.id)) {
+        showToast('This category is already added.', 'error');
+        return;
+      }
+      
+      const fullCategory = allCategories.find(c => c.id === categoryInfo.id);
+      if (!fullCategory) return;
+      
+      activeCategories.push({
+        id: categoryInfo.id,
+        name: categoryInfo.name,
+        subcategories: [],
+        active: true,
+        requiresLicense: fullCategory.requiresLicense,
+        requiresCert: fullCategory.requiresCertification
+      });
+      
+      saveActiveCategories();
+      renderActiveCategories();
+      
+      // Clear search
+      document.getElementById('category-search').value = '';
+      document.getElementById('btn-add-category').disabled = true;
+      selectedCategoryForAdd = null;
+      
+      showToast(`${categoryInfo.name} added to your categories.`, 'success');
+    }
+
+    // ======================================================
+    // 7. PREFERENCES MODAL
+    // ======================================================
+
+    function openPreferencesModal(categoryId) {
+      const category = allCategories.find(c => c.id === categoryId);
+      if (!category) return;
+      
+      currentEditingCategory = categoryId;
+      
+      const modal = document.getElementById('preferences-modal');
+      const title = document.getElementById('preferences-modal-title');
+      const list = document.getElementById('subcategories-list');
+      
+      title.textContent = `${category.name} - Select Your Services`;
+      
+      // Get subcategories (these are strings in our JSON)
+      const subcategories = category.subcategories || [];
+      
+      // Get saved preferences
+      const active = activeCategories.find(ac => ac.id === categoryId);
+      const savedSubs = active?.subcategories || [];
+      
+      if (subcategories.length === 0) {
+        list.innerHTML = '<p style="color: #6b6b6b; font-size: 0.9rem;">No services available for this category.</p>';
+      } else {
+        list.innerHTML = subcategories.map((sub, idx) => {
+          // Create a safe ID from the subcategory string
+          const safeId = `sub-${categoryId}-${idx}`;
+          const isChecked = savedSubs.includes(sub);
+          return `
+          <div class="subcategory-item">
+            <input 
+              type="checkbox" 
+              id="${safeId}" 
+              class="subcategory-checkbox" 
+              data-subcategory="${sub}"
+              ${isChecked ? 'checked' : ''}
+              onchange="updateSubcategorySelection()"
+            >
+            <label for="${safeId}" class="subcategory-label">${sub}</label>
+          </div>
+        `;
+        }).join('');
+      }
+      
+      modal.classList.add('active');
+    }
+
+    function closePreferencesModal() {
+      document.getElementById('preferences-modal').classList.remove('active');
+      currentEditingCategory = null;
+    }
+
+    // ======================================================
+    // 8. BROWSE CATEGORIES MODAL
+    // ======================================================
+
+    function openBrowseCategoriesModal() {
+      const modal = document.getElementById('browse-categories-modal');
+      if (!modal) return;
+
+      renderBrowseCategoryCards();
+      modal.classList.add('active');
+      console.log('[Rooted Vitality] Browse categories modal opened');
+    }
+
+    function closeBrowseCategoriesModal() {
+      document.getElementById('browse-categories-modal').classList.remove('active');
+      document.getElementById('browse-categories-search').value = '';
+      console.log('[Rooted Vitality] Browse categories modal closed');
+    }
+
+    function renderBrowseCategoryCards() {
+      const licenseRequiredGrid = document.getElementById('browse-license-required-categories');
+      const certifiedGrid = document.getElementById('browse-certified-categories');
+      const unrestrictedGrid = document.getElementById('browse-unrestricted-categories');
+
+      if (!licenseRequiredGrid || !certifiedGrid || !unrestrictedGrid) return;
+
+      // Separate categories by credential type from taxonomy
+      const licenseRequired = allCategories.filter(cat => {
+        const cred = cat.credential || '';
+        return cred.includes('License Required') || (cat.requiresLicense && !cat.requiresCertification);
+      });
+
+      const certified = allCategories.filter(cat => {
+        const cred = cat.credential || '';
+        return cred.includes('Certified') || cred.includes('Licensed/Certified');
+      });
+
+      const unrestricted = allCategories.filter(cat => {
+        const cred = cat.credential || '';
+        return cred.includes('Certified/Open') || cred.includes('Open') || (!cat.requiresLicense && !cat.requiresCertification);
+      });
+
+      // Render each category group
+      licenseRequiredGrid.innerHTML = licenseRequired.map(cat => createBrowseCategoryCard(cat)).join('');
+      certifiedGrid.innerHTML = certified.map(cat => createBrowseCategoryCard(cat)).join('');
+      unrestrictedGrid.innerHTML = unrestricted.map(cat => createBrowseCategoryCard(cat)).join('');
+
+      // Setup search filtering
+      setupBrowseSearch();
+      
+      console.log('[Rooted Vitality] Browse category cards rendered:', licenseRequired.length, 'license-required,', certified.length, 'certified,', unrestricted.length, 'unrestricted');
+    }
+
+    function createBrowseCategoryCard(category) {
+      const isAlreadyAdded = activeCategories.some(ac => ac.id === category.id);
+      const subCount = (category.subcategories || []).length;
+      
+      // Use the credential field from taxonomy for badge
+      const credentialLabel = category.credential || '• Available';
+
+      if (isAlreadyAdded) {
+        return `
+          <div class="browse-category-card already-added" data-category-id="${category.id}">
+            <span class="browse-category-icon">${category.icon || '•'}</span>
+            <div class="browse-category-name">${category.name}</div>
+            <div class="browse-category-meta">
+              <span class="browse-category-badge">${credentialLabel}</span>
+              <div class="browse-category-services-count">${subCount} services</div>
+            </div>
+            <div class="browse-category-already-added">✓ Added</div>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="browse-category-card" data-category-id="${category.id}">
+          <span class="browse-category-icon">${category.icon || '•'}</span>
+          <div class="browse-category-name">${category.name}</div>
+          <div class="browse-category-meta">
+            <span class="browse-category-badge">${credentialLabel}</span>
+            <div class="browse-category-services-count">${subCount} services</div>
+          </div>
+          <button 
+            class="browse-category-add-btn" 
+            onclick="addCategoryFromBrowse('${category.id}', '${category.name}')"
+            title="Add ${category.name} to your categories"
+          >
+            + Add
+          </button>
+        </div>
+      `;
+    }
+
+    function setupBrowseSearch() {
+      const searchInput = document.getElementById('browse-categories-search');
+      if (!searchInput) return;
+
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        const cards = document.querySelectorAll('.browse-category-card');
+
+        cards.forEach(card => {
+          const name = card.querySelector('.browse-category-name').textContent.toLowerCase();
+          const shouldShow = name.includes(query) || query === '';
+          card.style.display = shouldShow ? '' : 'none';
+        });
+      });
+    }
+
+    function addCategoryFromBrowse(categoryId, categoryName) {
+      // Check if already added
+      if (activeCategories.some(ac => ac.id === categoryId)) {
+        showToast('This category is already added.', 'error');
+        return;
+      }
+
+      // Get full category info
+      const fullCategory = allCategories.find(c => c.id === categoryId);
+      if (!fullCategory) return;
+
+      // Check for license requirement
+      if (fullCategory.requiresLicense || fullCategory.requiresCertification) {
+        // TODO: Check if practitioner has verified credentials
+        // For now, allow but show warning
+        console.log('[Rooted Vitality] Category', categoryId, 'requires license/certification');
+      }
+
+      // Add to active categories
+      activeCategories.push({
+        id: categoryId,
+        name: categoryName,
+        subcategories: [],
+        active: true,
+        requiresLicense: fullCategory.requiresLicense,
+        requiresCert: fullCategory.requiresCertification
+      });
+
+      saveActiveCategories();
+      renderActiveCategories();
+      
+      // Update browse cards
+      renderBrowseCategoryCards();
+
+      showToast(`${categoryName} added to your categories.`, 'success');
+      console.log('[Rooted Vitality] Category added from browse:', categoryId);
+    }
+
+    function updateSubcategorySelection() {
+      console.log('[Rooted Vitality] Subcategory selection updated');
+    }
+
+    function savePreferencesModal() {
+      if (!currentEditingCategory) return;
+      
+      // Get all checked checkboxes and extract the data-subcategory attribute
+      const checkboxes = document.querySelectorAll('#subcategories-list input[type="checkbox"]:checked');
+      const selectedSubs = Array.from(checkboxes).map(cb => cb.getAttribute('data-subcategory'));
+      
+      const active = activeCategories.find(ac => ac.id === currentEditingCategory);
+      if (active) {
+        active.subcategories = selectedSubs;
+        saveActiveCategories();
+        renderActiveCategories();
+        console.log('[Rooted Vitality] Preferences saved for category:', currentEditingCategory, 'Services:', selectedSubs);
+        showToast('Services saved successfully.', 'success');
+      }
+      
+      closePreferencesModal();
+    }
+
+    // ======================================================
+    // 8. MATCHING ACTIVATION & PAUSE
+    // ======================================================
+
+    function loadMatchingStatus() {
+      const saved = localStorage.getItem('matchingActive');
+      const pauseUntil = localStorage.getItem('matchingPauseUntil');
+      
+      if (pauseUntil) {
+        const pauseTime = new Date(pauseUntil);
+        const now = new Date();
+        
+        if (now < pauseTime) {
+          // Still paused
+          updateMatchingUI(true, true, pauseTime);
+          checkPauseExpiration(pauseTime);
+          return;
+        } else {
+          // Pause time has passed, resume automatically
+          localStorage.removeItem('matchingPauseUntil');
+          localStorage.setItem('matchingActive', 'true');
+          updateMatchingUI(true, false);
+          return;
+        }
+      }
+      
+      const isActive = saved === 'true';
+      updateMatchingUI(isActive, false);
+    }
+
+    function updateMatchingUI(isActive, isPaused, pauseUntilTime = null) {
+      const toggle = document.getElementById('matching-activation-toggle');
+      const statusText = document.getElementById('matching-status-text');
+      const statusDetail = document.getElementById('matching-status-detail');
+      const statusDisplay = document.querySelector('.matching-status-display');
+      const pauseBtn = document.getElementById('btn-pause-matching');
+      const resumeBtn = document.getElementById('btn-resume-matching');
+      const pauseInfo = document.getElementById('pause-info-display');
+      
+      toggle.checked = isActive;
+      
+      if (isActive && isPaused) {
+        statusText.textContent = 'Paused';
+        statusDetail.textContent = 'Matching is temporarily paused';
+        statusDisplay.classList.add('active');
+        pauseBtn.style.display = 'none';
+        resumeBtn.style.display = 'inline-block';
+        pauseInfo.style.display = 'flex';
+        
+        if (pauseUntilTime) {
+          const formatted = pauseUntilTime.toLocaleString('en-US', {
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            meridiem: 'short'
+          });
+          document.getElementById('pause-info-time').textContent = `Resumes: ${formatted}`;
+        }
+      } else if (isActive) {
+        statusText.textContent = 'Active';
+        statusDetail.textContent = 'Clients can send leads for your active categories';
+        statusDisplay.classList.add('active');
+        pauseBtn.style.display = 'inline-block';
+        resumeBtn.style.display = 'none';
+        pauseInfo.style.display = 'none';
+      } else {
+        statusText.textContent = 'Inactive';
+        statusDetail.textContent = 'No leads will be received until you activate matching';
+        statusDisplay.classList.remove('active');
+        pauseBtn.style.display = 'none';
+        resumeBtn.style.display = 'none';
+        pauseInfo.style.display = 'none';
+      }
+      
+      console.log('[Rooted Vitality] Matching status updated:', { isActive, isPaused });
+    }
+
+    function toggleMatchingActivation() {
+      const toggle = document.getElementById('matching-activation-toggle');
+      const isNowActive = toggle.checked;
+      
+      // Check if there are any active categories
+      const hasActiveCategories = activeCategories.some(cat => cat.active !== false);
+      
+      if (isNowActive && !hasActiveCategories) {
+        toggle.checked = false;
+        showToast('You must have at least one active category to enable matching.', 'error');
+        return;
+      }
+      
+      localStorage.setItem('matchingActive', isNowActive ? 'true' : 'false');
+      localStorage.removeItem('matchingPauseUntil');
+      
+      updateMatchingUI(isNowActive, false);
+      
+      const status = isNowActive ? 'activated' : 'deactivated';
+      showToast(`Matching ${status}.`, 'success');
+      
+      console.log('[Rooted Vitality] Matching activation toggled:', isNowActive);
+    }
+
+    function openPauseModal() {
+      // Pre-fill with tomorrow's date and current time
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      
+      const dateString = tomorrow.toISOString().split('T')[0];
+      const timeString = new Date().toLocaleTimeString('en-US', { hour12: false }).slice(0, 5);
+      
+      document.getElementById('pause-date').value = dateString;
+      document.getElementById('pause-time').value = timeString;
+      
+      // Show preview
+      updatePausePreview();
+      
+      document.getElementById('pause-modal').classList.add('active');
+    }
+
+    function closePauseModal() {
+      document.getElementById('pause-modal').classList.remove('active');
+    }
+
+    function updatePausePreview() {
+      const dateInput = document.getElementById('pause-date').value;
+      const timeInput = document.getElementById('pause-time').value;
+      
+      if (!dateInput || !timeInput) return;
+      
+      const pauseDateTime = new Date(`${dateInput}T${timeInput}`);
+      const now = new Date();
+      
+      if (pauseDateTime <= now) {
+        document.getElementById('pause-preview-display').style.display = 'none';
+        return;
+      }
+      
+      const formatted = pauseDateTime.toLocaleString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        meridiem: 'short'
+      });
+      
+      document.getElementById('pause-preview-text').textContent = `Matching will resume on ${formatted}`;
+      document.getElementById('pause-preview-display').style.display = 'block';
+    }
+
+    function applyPause() {
+      const dateInput = document.getElementById('pause-date').value;
+      const timeInput = document.getElementById('pause-time').value;
+      
+      if (!dateInput || !timeInput) {
+        showToast('Please select both a date and time.', 'error');
+        return;
+      }
+      
+      const pauseDateTime = new Date(`${dateInput}T${timeInput}`);
+      const now = new Date();
+      
+      if (pauseDateTime <= now) {
+        showToast('Please select a future date and time.', 'error');
+        return;
+      }
+      
+      localStorage.setItem('matchingPauseUntil', pauseDateTime.toISOString());
+      updateMatchingUI(true, true, pauseDateTime);
+      
+      const formatted = pauseDateTime.toLocaleString('en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      
+      showToast(`Matching paused until ${formatted}.`, 'success');
+      closePauseModal();
+      
+      console.log('[Rooted Vitality] Matching paused until:', pauseDateTime);
+    }
+
+    function resumeMatching() {
+      localStorage.removeItem('matchingPauseUntil');
+      updateMatchingUI(true, false);
+      showToast('Matching resumed.', 'success');
+      console.log('[Rooted Vitality] Matching resumed immediately');
+    }
+
+    function checkPauseExpiration(pauseUntilTime) {
+      const now = new Date();
+      const timeUntilResume = pauseUntilTime - now;
+      
+      if (timeUntilResume > 0) {
+        setTimeout(() => {
+          localStorage.removeItem('matchingPauseUntil');
+          updateMatchingUI(true, false);
+          console.log('[Rooted Vitality] Pause time expired, matching resumed automatically');
+        }, timeUntilResume);
+      }
+    }
+
+    // ======================================================
+    // 9. CONFIRM MODAL
+    // ======================================================
+
+    function confirmRemoveCategory(categoryId) {
+      const category = activeCategories.find(ac => ac.id === categoryId);
+      if (!category) return;
+      
+      const message = document.getElementById('confirm-message');
+      message.textContent = `Are you sure you want to remove "${category.name}" from your categories?`;
+      
+      pendingConfirmAction = () => {
+        activeCategories = activeCategories.filter(ac => ac.id !== categoryId);
+        saveActiveCategories();
+        renderActiveCategories();
+        showToast(`${category.name} removed.`, 'success');
+        closeConfirmModal();
+      };
+      
+      document.getElementById('confirm-modal').classList.add('active');
+    }
+
+    function closeConfirmModal() {
+      document.getElementById('confirm-modal').classList.remove('active');
+      pendingConfirmAction = null;
+    }
+
+    function executeConfirmAction() {
+      if (pendingConfirmAction) {
+        pendingConfirmAction();
+      }
+    }
+
+    // ======================================================
+    // 9. TOAST NOTIFICATIONS
+    // ======================================================
+
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = `toast active ${type}`;
+      
+      setTimeout(() => {
+        toast.classList.remove('active');
+      }, 3000);
+    }
+
+    // ======================================================
+    // 10. COVERAGE AREA: SERVICE MODE
+    // ======================================================
+
+    function handleServiceModeChange() {
+      const mode = document.getElementById('service-mode').value;
+      const conditionalFields = document.getElementById('conditional-location-fields');
+      const remoteModeNotice = document.getElementById('remote-mode-notice');
+
+      if (mode === 'remote') {
+        conditionalFields.classList.remove('active');
+        remoteModeNotice.classList.add('active');
+        console.log('[Rooted Vitality] Service mode set to: Remote');
+      } else {
+        conditionalFields.classList.add('active');
+        remoteModeNotice.classList.remove('active');
+        console.log('[Rooted Vitality] Service mode set to:', mode);
+      }
+    }
+
+    function handleModalServiceModeChange() {
+      const mode = document.getElementById('modal-service-mode').value;
+      const conditionalFields = document.getElementById('modal-conditional-location-fields');
+      const remoteModeNotice = document.getElementById('modal-remote-mode-notice');
+
+      if (mode === 'remote') {
+        conditionalFields.classList.remove('active');
+        remoteModeNotice.classList.add('active');
+        console.log('[Rooted Vitality] Modal service mode set to: Remote');
+      } else {
+        conditionalFields.classList.add('active');
+        remoteModeNotice.classList.remove('active');
+        console.log('[Rooted Vitality] Modal service mode set to:', mode);
+      }
+    }
+
+    // ======================================================
+    // 11. COVERAGE AREA: ZIP CODE MANAGEMENT
+    // ======================================================
+
+    function setupZIPCodeInput() {
+      const input = document.getElementById('zip-code-input');
+      if (!input) return;
+
+      input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          addZIPCode(input.value.trim());
+          input.value = '';
+        }
+      });
+
+      // Setup modal ZIP input
+      const modalInput = document.getElementById('modal-zip-code-input');
+      if (modalInput) {
+        modalInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            addModalZIPCode(modalInput.value.trim());
+            modalInput.value = '';
+          }
+        });
+      }
+    }
+
+    function addZIPCode(zipCode) {
+      // Validate ZIP code (5 digits)
+      if (!/^\d{5}$/.test(zipCode)) {
+        showToast('Invalid ZIP code. Enter a 5-digit code.', 'error');
+        return;
+      }
+
+      // Check for duplicates
+      if (zipCodesList.includes(zipCode)) {
+        showToast('This ZIP code is already added.', 'error');
+        return;
+      }
+
+      zipCodesList.push(zipCode);
+      renderZIPCodeTags();
+      console.log('[Rooted Vitality] ZIP code added:', zipCode);
+    }
+
+    function removeZIPCode(zipCode) {
+      zipCodesList = zipCodesList.filter(z => z !== zipCode);
+      renderZIPCodeTags();
+      console.log('[Rooted Vitality] ZIP code removed:', zipCode);
+    }
+
+    function renderZIPCodeTags() {
+      const container = document.getElementById('zip-tags-container');
+
+      if (zipCodesList.length === 0) {
+        container.innerHTML = '<span style="color: #a8a39f; font-size: 0.9rem;">No ZIP codes added yet.</span>';
+        return;
+      }
+
+      container.innerHTML = zipCodesList.map(zip => `
+        <span class="zip-tag">
+          ${zip}
+          <button type="button" class="zip-tag-remove" onclick="removeZIPCode('${zip}')" aria-label="Remove ZIP code">
+            ×
+          </button>
+        </span>
+      `).join('');
+    }
+
+    // ======================================================
+    // 12. COVERAGE AREA: CSV IMPORT
+    // ======================================================
+
+    function triggerCSVImport() {
+      document.getElementById('csv-import-input').click();
+    }
+
+    function handleCSVImport(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const csv = e.target.result;
+          const lines = csv.split('\n');
+          let imported = 0;
+          let skipped = 0;
+
+          lines.forEach(line => {
+            // Extract all 5-digit sequences from the line
+            const zips = line.match(/\d{5}/g) || [];
+            zips.forEach(zip => {
+              if (!zipCodesList.includes(zip)) {
+                zipCodesList.push(zip);
+                imported++;
+              } else {
+                skipped++;
+              }
+            });
+          });
+
+          renderZIPCodeTags();
+          showToast(`Imported ${imported} ZIP codes${skipped > 0 ? ` (${skipped} duplicates skipped)` : ''}.`, 'success');
+          console.log('[Rooted Vitality] CSV import complete:', imported, 'imported,', skipped, 'skipped');
+        } catch (error) {
+          console.error('[Rooted Vitality] CSV import error:', error);
+          showToast('Error importing CSV. Please check the format.', 'error');
+        }
+      };
+
+      reader.readAsText(file);
+      // Reset input for re-upload
+      event.target.value = '';
+    }
+
+    // ======================================================
+    // 13. COVERAGE AREA: LOAD & SAVE
+    // ======================================================
+
+    function loadCoverageSettings() {
+      const saved = localStorage.getItem('coverageArea');
+      if (saved) {
+        try {
+          const settings = JSON.parse(saved);
+          document.getElementById('service-mode').value = settings.mode || 'in-person';
+          document.getElementById('base-city-state').value = settings.cityState || '';
+          document.getElementById('service-radius').value = settings.radius || '';
+          zipCodesList = settings.zipCodes || [];
+          
+          handleServiceModeChange();
+          renderZIPCodeTags();
+          
+          console.log('[Rooted Vitality] Loaded coverage settings:', settings);
+        } catch (error) {
+          console.error('[Rooted Vitality] Error loading coverage settings:', error);
+        }
+      }
+    }
+
+    function saveCoverageSettings() {
+      const mode = document.getElementById('service-mode').value;
+      const cityState = document.getElementById('base-city-state').value;
+      const radius = document.getElementById('service-radius').value;
+
+      // Validation
+      if (mode !== 'remote' && !cityState.trim()) {
+        showToast('Please enter a base city/state for in-person or both modes.', 'error');
+        return;
+      }
+
+      if (mode !== 'remote' && !radius) {
+        showToast('Please enter a service radius for in-person or both modes.', 'error');
+        return;
+      }
+
+      const coverageArea = {
+        mode,
+        cityState: mode === 'remote' ? '' : cityState.trim(),
+        radius: mode === 'remote' ? null : parseInt(radius),
+        zipCodes: zipCodesList
+      };
+
+      localStorage.setItem('coverageArea', JSON.stringify(coverageArea));
+      console.log('[Rooted Vitality] Coverage settings saved:', coverageArea);
+      showToast('Coverage area saved.', 'success');
+    }
+
+    // ======================================================
+    // 14. COVERAGE AREA: MODAL FUNCTIONS
+    // ======================================================
+
+    function openCoverageModal() {
+      const modal = document.getElementById('coverage-modal');
+      
+      // Sync modal with current data
+      document.getElementById('modal-service-mode').value = document.getElementById('service-mode')?.value || 'in-person';
+      document.getElementById('modal-base-city-state').value = document.getElementById('base-city-state')?.value || '';
+      document.getElementById('modal-service-radius').value = document.getElementById('service-radius')?.value || '';
+      
+      renderModalZIPCodeTags();
+      handleModalServiceModeChange();
+      
+      modal.classList.add('active');
+      console.log('[Rooted Vitality] Coverage modal opened');
+    }
+
+    function closeCoverageModal() {
+      document.getElementById('coverage-modal').classList.remove('active');
+      console.log('[Rooted Vitality] Coverage modal closed');
+    }
+
+    function saveModalCoverageSettings() {
+      const mode = document.getElementById('modal-service-mode').value;
+      const cityState = document.getElementById('modal-base-city-state').value;
+      const radius = document.getElementById('modal-service-radius').value;
+
+      // Validation
+      if (mode !== 'remote' && !cityState.trim()) {
+        showToast('Please enter a base city/state for in-person or both modes.', 'error');
+        return;
+      }
+
+      if (mode !== 'remote' && !radius) {
+        showToast('Please enter a service radius for in-person or both modes.', 'error');
+        return;
+      }
+
+      // Sync to page inputs
+      document.getElementById('service-mode').value = mode;
+      document.getElementById('base-city-state').value = mode === 'remote' ? '' : cityState.trim();
+      document.getElementById('service-radius').value = mode === 'remote' ? '' : radius;
+
+      const coverageArea = {
+        mode,
+        cityState: mode === 'remote' ? '' : cityState.trim(),
+        radius: mode === 'remote' ? null : parseInt(radius),
+        zipCodes: zipCodesList
+      };
+
+      localStorage.setItem('coverageArea', JSON.stringify(coverageArea));
+      console.log('[Rooted Vitality] Coverage settings saved from modal:', coverageArea);
+      showToast('Coverage area saved.', 'success');
+      closeCoverageModal();
+    }
+
+    // ======================================================
+    // 15. COVERAGE AREA: MODAL ZIP CODE FUNCTIONS
+    // ======================================================
+
+    function addModalZIPCode(zipCode) {
+      // Validate ZIP code (5 digits)
+      if (!/^\d{5}$/.test(zipCode)) {
+        showToast('Invalid ZIP code. Enter a 5-digit code.', 'error');
+        return;
+      }
+
+      // Check for duplicates
+      if (zipCodesList.includes(zipCode)) {
+        showToast('This ZIP code is already added.', 'error');
+        return;
+      }
+
+      zipCodesList.push(zipCode);
+      renderModalZIPCodeTags();
+      console.log('[Rooted Vitality] ZIP code added from modal:', zipCode);
+    }
+
+    function removeModalZIPCode(zipCode) {
+      zipCodesList = zipCodesList.filter(z => z !== zipCode);
+      renderModalZIPCodeTags();
+      console.log('[Rooted Vitality] ZIP code removed from modal:', zipCode);
+    }
+
+    function renderModalZIPCodeTags() {
+      const container = document.getElementById('modal-zip-tags-container');
+
+      if (zipCodesList.length === 0) {
+        container.innerHTML = '<span style="color: #a8a39f; font-size: 0.9rem;">No ZIP codes added yet.</span>';
+        return;
+      }
+
+      container.innerHTML = zipCodesList.map(zip => `
+        <span class="zip-tag">
+          ${zip}
+          <button type="button" class="zip-tag-remove" onclick="removeModalZIPCode('${zip}')" aria-label="Remove ZIP code">
+            ×
+          </button>
+        </span>
+      `).join('');
+    }
+
+    function triggerModalCSVImport() {
+      document.getElementById('modal-csv-import-input').click();
+    }
+
+    function handleModalCSVImport(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const csv = e.target.result;
+          const lines = csv.split('\n');
+          let imported = 0;
+          let skipped = 0;
+
+          lines.forEach(line => {
+            // Extract all 5-digit sequences from the line
+            const zips = line.match(/\d{5}/g) || [];
+            zips.forEach(zip => {
+              if (!zipCodesList.includes(zip)) {
+                zipCodesList.push(zip);
+                imported++;
+              } else {
+                skipped++;
+              }
+            });
+          });
+
+          renderModalZIPCodeTags();
+          showToast(`Imported ${imported} ZIP codes${skipped > 0 ? ` (${skipped} duplicates skipped)` : ''}.`, 'success');
+          console.log('[Rooted Vitality] Modal CSV import complete:', imported, 'imported,', skipped, 'skipped');
+        } catch (error) {
+          console.error('[Rooted Vitality] Modal CSV import error:', error);
+          showToast('Error importing CSV. Please check the format.', 'error');
+        }
+      };
+
+      reader.readAsText(file);
+      // Reset input for re-upload
+      event.target.value = '';
+    }
+
+    // ======================================================
+    // 16. AVAILABILITY SETTINGS
+    // ======================================================
+
+    function applyDefaultHours() {
+      // Set all days to 9am-5pm and enable them
+      document.querySelectorAll('.day-row').forEach(row => {
+        const checkbox = row.querySelector('.day-available');
+        const openInput = row.querySelector('.time-open');
+        const closeInput = row.querySelector('.time-close');
+
+        checkbox.checked = true;
+        openInput.value = '09:00';
+        closeInput.value = '17:00';
+
+        // Enable inputs if they were disabled
+        openInput.disabled = false;
+        closeInput.disabled = false;
+        row.querySelector('.notes-input').disabled = false;
+
+        row.classList.remove('unavailable');
+      });
+
+      showToast('Default hours applied: 9am–5pm for all days.', 'success');
+    }
+
+    function saveAvailabilitySettings() {
+      const scheduleData = {};
+      let hasAtLeastOneDay = false;
+
+      // Collect data from each day row
+      document.querySelectorAll('.day-row').forEach(row => {
+        const day = row.dataset.day;
+        const checkbox = row.querySelector('.day-available');
+        const openInput = row.querySelector('.time-open');
+        const closeInput = row.querySelector('.time-close');
+        const notesInput = row.querySelector('.notes-input');
+
+        if (checkbox.checked) {
+          hasAtLeastOneDay = true;
+
+          const openTime = openInput.value;
+          const closeTime = closeInput.value;
+
+          // Validation
+          if (!openTime || !closeTime) {
+            showToast(`Missing times for ${day}. Please fill in both open and close times.`, 'error');
+            return;
+          }
+
+          if (closeTime <= openTime) {
+            showToast(`Closing time must be after opening time on ${day}.`, 'error');
+            return;
+          }
+
+          scheduleData[day] = {
+            available: true,
+            open: openTime,
+            close: closeTime,
+            notes: notesInput.value.trim() || null
+          };
+        } else {
+          // Day is closed
+          scheduleData[day] = {
+            available: false,
+            open: null,
+            close: null,
+            notes: null
+          };
+        }
+      });
+
+      // Must have at least one available day
+      if (!hasAtLeastOneDay) {
+        showToast('Please select at least one day you are available.', 'error');
+        return;
+      }
+
+      // Get selected timezone
+      const timezoneSelect = document.getElementById('timezone-select');
+      const selectedTimezone = timezoneSelect?.value || null;
+
+      const availabilityData = {
+        schedule: scheduleData,
+        timezone: selectedTimezone,
+        lastUpdated: new Date().toISOString()
+      };
+
+      // Save to localStorage for now
+      localStorage.setItem('availabilitySettings', JSON.stringify(availabilityData));
+      console.log('[Rooted Vitality] Availability settings saved:', availabilityData);
+      showToast('Availability schedule and timezone saved successfully.', 'success');
+    }
+
+    // ======================================================
+    // 17. TIMEZONE SELECTOR
+    // ======================================================
+
+    const timezoneMap = {
+      'US_Eastern': { label: 'Eastern Time (ET)', offset: -5, dst: -4 },
+      'US_Central': { label: 'Central Time (CT)', offset: -6, dst: -5 },
+      'US_Mountain': { label: 'Mountain Time (MT)', offset: -7, dst: -6 },
+      'US_Pacific': { label: 'Pacific Time (PT)', offset: -8, dst: -7 },
+      'US_Alaska': { label: 'Alaska Time (AKT)', offset: -9, dst: -8 },
+      'US_Hawaii': { label: 'Hawaii-Aleutian Time (HST)', offset: -10, dst: -10 },
+      'Canada_Toronto': { label: 'Eastern Time - Toronto (ET)', offset: -5, dst: -4 },
+      'Canada_Vancouver': { label: 'Pacific Time - Vancouver (PT)', offset: -8, dst: -7 },
+      'Europe_London': { label: 'Greenwich Mean Time (GMT)', offset: 0, dst: 1 },
+      'Europe_Paris': { label: 'Central European Time (CET)', offset: 1, dst: 2 },
+      'Europe_Berlin': { label: 'Central European Time - Berlin (CET)', offset: 1, dst: 2 },
+      'Asia_Tokyo': { label: 'Japan Standard Time (JST)', offset: 9, dst: 9 },
+      'Asia_Hong_Kong': { label: 'Hong Kong Time (HKT)', offset: 8, dst: 8 },
+      'Asia_Singapore': { label: 'Singapore Standard Time (SGT)', offset: 8, dst: 8 },
+      'Asia_Bangkok': { label: 'Indochina Time (ICT)', offset: 7, dst: 7 },
+      'Asia_India': { label: 'Indian Standard Time (IST)', offset: 5.5, dst: 5.5 },
+      'Asia_Dubai': { label: 'Gulf Standard Time (GST)', offset: 4, dst: 4 },
+      'Australia_Sydney': { label: 'Australian Eastern Time (AEST)', offset: 10, dst: 11 },
+      'Australia_Melbourne': { label: 'Australian Eastern Time (AEST)', offset: 10, dst: 11 },
+      'Australia_Brisbane': { label: 'Australian Eastern Standard Time (AEST)', offset: 10, dst: 10 },
+      'Australia_Perth': { label: 'Australian Western Standard Time (AWST)', offset: 8, dst: 8 },
+      'UTC': { label: 'Coordinated Universal Time (UTC)', offset: 0, dst: 0 }
+    };
+
+    function formatTimeInTimezone(timezone) {
+      const now = new Date();
+      const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+      
+      let offset = timezoneMap[timezone]?.offset || 0;
+      
+      // Simple DST check (March-November in Northern Hemisphere)
+      const month = now.getMonth();
+      if (timezoneMap[timezone]?.dst !== timezoneMap[timezone]?.offset) {
+        if (month >= 2 && month <= 10) {
+          offset = timezoneMap[timezone]?.dst || offset;
+        }
+      }
+      
+      const tzTime = new Date(utcTime + (offset * 3600000));
+      
+      return tzTime.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+        timeZone: 'UTC' // We're manually calculating, so use UTC
+      });
+    }
+
+    function updateCurrentTimeDisplay() {
+      const select = document.getElementById('timezone-select');
+      const display = document.getElementById('current-time-display');
+      
+      if (!select || !display) return;
+      
+      const timezone = select.value;
+      if (!timezone) {
+        display.textContent = 'No timezone selected';
+        return;
+      }
+      
+      const tzLabel = timezoneMap[timezone]?.label || timezone;
+      const currentTime = formatTimeInTimezone(timezone);
+      display.textContent = `${tzLabel} • ${currentTime}`;
+    }
+
+    function setupTimezoneListener() {
+      const select = document.getElementById('timezone-select');
+      if (!select) return;
+      
+      select.addEventListener('change', (e) => {
+        const selectedTimezone = e.target.value;
+        if (selectedTimezone) {
+          localStorage.setItem('practitioner_timezone', selectedTimezone);
+          console.log('[Rooted Vitality] Timezone saved:', selectedTimezone);
+        }
+        updateCurrentTimeDisplay();
+      });
+      
+      // Update time display every minute
+      setInterval(updateCurrentTimeDisplay, 60000);
+    }
+
+    function initializeTimezoneSelector() {
+      const select = document.getElementById('timezone-select');
+      if (!select) return;
+      
+      // Load saved timezone if exists
+      const savedTimezone = localStorage.getItem('practitioner_timezone');
+      if (savedTimezone && timezoneMap[savedTimezone]) {
+        select.value = savedTimezone;
+      }
+      
+      updateCurrentTimeDisplay();
+      setupTimezoneListener();
+    }
+
+    // Initialize availability table interactions
+    document.addEventListener('DOMContentLoaded', () => {
+      // Setup timezone selector
+      initializeTimezoneSelector();
+      
+      document.querySelectorAll('.day-available').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+          const row = this.closest('.day-row');
+          const openInput = row.querySelector('.time-open');
+          const closeInput = row.querySelector('.time-close');
+          const notesInput = row.querySelector('.notes-input');
+
+          if (this.checked) {
+            // Day is available - enable inputs
+            openInput.disabled = false;
+            closeInput.disabled = false;
+            notesInput.disabled = false;
+            row.classList.remove('unavailable');
+          } else {
+            // Day is unavailable - disable inputs
+            openInput.disabled = true;
+            closeInput.disabled = true;
+            notesInput.disabled = true;
+            row.classList.add('unavailable');
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
+
+

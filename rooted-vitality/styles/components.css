@@ -524,6 +524,7 @@ label {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 1rem;
 }
 
 .rv-logo-container {
@@ -535,6 +536,17 @@ label {
     transition: all 0.3s ease;
 }
 
+.rv-logo,
+.rv-logo-public,
+.rv-logo-client,
+.rv-logo-practitioner {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
 .rv-logo-image {
     height: 62px;
     width: auto;
@@ -542,6 +554,7 @@ label {
     transition: transform 0.4s ease;
 }
 
+.rv-logo:hover .rv-logo-image,
 .rv-logo-container:hover .rv-logo-image {
     transform: scale(1.08);
 }
@@ -562,14 +575,17 @@ label {
     transition: color 0.3s ease;
 }
 
+.rv-logo:hover .rv-brand-name,
 .rv-logo-container:hover .rv-brand-name {
     color: #5c9a72;
 }
 
+/* Desktop navigation - nav + icons in a row */
 .rv-nav {
     display: flex;
     gap: 1.8rem;
     align-items: center;
+    flex: 1;
 }
 
 .rv-nav a {
@@ -629,8 +645,30 @@ label {
 
 .rv-nav .cta:focus {
     outline: 2px solid #5c9a72;
-    outline-offset: 2px;
+    outline-offset: 4px;
 }
+
+/* Desktop: notifications and avatar menu visible on right - flex container */
+.rv-notifications-menu {
+    display: flex !important;
+    align-items: center;
+    margin-right: 0.5rem;
+}
+
+.rv-avatar-menu {
+    display: flex !important;
+    align-items: center;
+    margin-left: 0.5rem;
+}
+
+/* Desktop: hamburger hidden */
+.rv-menu-toggle {
+    display: none;
+}
+
+/* ======================================================
+   HEADER: DESKTOP ICON STYLING
+   ====================================================== */
 
 .rv-nav-btn {
     padding: 0.6rem 1.2rem;
@@ -666,13 +704,13 @@ label {
     display: none;
     background: none;
     border: none;
-    font-size: 2rem;
+    font-size: 2.4rem;
     color: #6b6359;
     cursor: pointer;
     padding: 0.625rem;
-    height: 40px;
-    width: 40px;
-    display: flex;
+    height: 48px;
+    width: 48px;
+    margin-left: 1rem;
     align-items: center;
     justify-content: center;
     transition: transform 0.3s ease, color 0.3s ease;
@@ -904,8 +942,8 @@ label {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 24px;
+    height: 24px;
     stroke: #6b6359;
     color: #6b6359;
 }
@@ -1044,6 +1082,7 @@ label {
     position: relative;
     display: flex;
     align-items: center;
+    margin-right: 1rem;
 }
 
 .rv-notifications-dropdown {
@@ -1569,7 +1608,7 @@ label {
     }
     
     .rv-menu-toggle {
-        font-size: 1.4rem;
+        font-size: 1.7rem;
     }
     
     .rv-nav {

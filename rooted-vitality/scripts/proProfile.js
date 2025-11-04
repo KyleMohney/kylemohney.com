@@ -13,12 +13,26 @@ console.log('[Rooted Vitality] proProfile.js loading...');
 let currentUser = null;
 let autoSaveTimeout = null;
 const AUTO_SAVE_DELAY = 1500; // 1.5 seconds
+let hasUnsavedChanges = false; // Track if page has unsaved changes
 
 // Initialize credential arrays (use window object for access from functions)
 window.educationCredentials = [];
 window.licenseCredentials = [];
 window.certificationCredentials = [];
 window.continuingEducationCredentials = [];
+
+/**
+ * Warn user if they try to leave page with unsaved changes
+ */
+window.addEventListener('beforeunload', (event) => {
+    if (hasUnsavedChanges) {
+        console.warn('[SAVE] ⚠️ User attempting to leave page with unsaved changes');
+        // Standard beforeunload message (browsers show their own warning)
+        event.preventDefault();
+        event.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+        return event.returnValue;
+    }
+});
 
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('[Rooted Vitality] Initializing practitioner profile...');
@@ -111,6 +125,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('[Rooted Vitality] Error initializing profile:', error);
     }
     
+    // Setup change tracking for unsaved changes warning
+    setupUnsavedChangesTracking();
+    
     // Setup event listeners for all input fields
     setupInputListeners();
     setupLanguageListeners();
@@ -125,6 +142,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupBackgroundCheckButton();
     setupAlbumButton();
     setupHeaderSaveButton();
+    setupReportConcernListeners();
     
     console.log('[Rooted Vitality] Practitioner profile initialized');
 });
@@ -309,32 +327,61 @@ async function populateProfileFields(data) {
         console.log('[Rooted Vitality] ✓ Set ethos_statement');
     }
     
-    // Credentials - now as JSON arrays
-    if (data.education_credentials && Array.isArray(data.education_credentials)) {
-        console.log('[Rooted Vitality] ✓ Loading education credentials:', data.education_credentials);
-        window.educationCredentials = data.education_credentials;
-    } else {
+    // Credentials - now stored in practitioners.credentials JSONB array
+    if (data.credentials && Array.isArray(data.credentials)) {
+        console.log('[Rooted Vitality] ✓ Loading credentials from JSONB:', data.credentials);
+        
+        // Clear all credential arrays first
         window.educationCredentials = [];
-    }
-    
-    if (data.license_credentials && Array.isArray(data.license_credentials)) {
-        // Filter out empty/invalid credentials
-        const validLicenses = data.license_credentials.filter(cred => cred && (cred.license_type || cred.license_number));
-        console.log('[Rooted Vitality] ✓ Loading license credentials:', validLicenses, '(filtered from', data.license_credentials.length, ')');
-        window.licenseCredentials = validLicenses;
-    } else {
         window.licenseCredentials = [];
-    }
-    
-    if (data.certification_credentials && Array.isArray(data.certification_credentials)) {
-        // Filter out empty/invalid credentials
-        const validCerts = data.certification_credentials.filter(cred => cred && (cred.certification_type || cred.issuing_organization));
-        console.log('[Rooted Vitality] ✓ Loading certification credentials:', validCerts, '(filtered from', data.certification_credentials.length, ')');
-        window.certificationCredentials = validCerts;
-    } else {
         window.certificationCredentials = [];
+        window.continuingEducationCredentials = [];
+        
+        // Separate credentials by type
+        data.credentials.forEach(cred => {
+            if (cred.credential_type === 'degree') {
+                window.educationCredentials.push(cred);
+            } else if (cred.credential_type === 'license') {
+                window.licenseCredentials.push(cred);
+            } else if (cred.credential_type === 'certification') {
+                window.certificationCredentials.push(cred);
+            } else if (cred.credential_type === 'continuing_education') {
+                window.continuingEducationCredentials.push(cred);
+            }
+        });
+        
+        console.log('[Rooted Vitality] ✓ Credentials separated by type:', {
+            degrees: window.educationCredentials.length,
+            licenses: window.licenseCredentials.length,
+            certifications: window.certificationCredentials.length,
+            continuingEducation: window.continuingEducationCredentials.length
+        });
+    } else {
+        // Fallback to legacy field names for backward compatibility
+        if (data.education_credentials && Array.isArray(data.education_credentials)) {
+            window.educationCredentials = data.education_credentials;
+        } else {
+            window.educationCredentials = [];
+        }
+        
+        if (data.license_credentials && Array.isArray(data.license_credentials)) {
+            window.licenseCredentials = data.license_credentials;
+        } else {
+            window.licenseCredentials = [];
+        }
+        
+        if (data.certification_credentials && Array.isArray(data.certification_credentials)) {
+            window.certificationCredentials = data.certification_credentials;
+        } else {
+            window.certificationCredentials = [];
+        }
+        
+        if (data.continuing_education && Array.isArray(data.continuing_education)) {
+            window.continuingEducationCredentials = data.continuing_education;
+        } else {
+            window.continuingEducationCredentials = [];
+        }
     }
-    
     
     // Social media fields
     if (data.social_media) {
@@ -496,6 +543,9 @@ function setupInputListeners() {
     
     // Setup section save buttons
     setupSectionSaveButtons();
+    
+    // Setup payment and insurance checkboxes
+    setupPaymentInsuranceSection();
 }
 
 /**
@@ -538,10 +588,14 @@ function updateProfileCompleteness() {
                 return faqList && faqList.querySelectorAll('.faq-item').length > 0;
             },
             'payment': () => {
-                // Complete if either insurance selected OR payment methods filled
-                const hasInsurance = window.selectedInsurance && window.selectedInsurance.length > 0;
-                const paymentMethods = document.getElementById('payment-methods')?.value?.trim();
-                return hasInsurance || !!paymentMethods;
+                // Complete if either insurance is accepted OR any payment methods selected
+                const acceptsInsurance = document.getElementById('accepts-insurance')?.checked || false;
+                const insuranceSelected = document.querySelectorAll('input[name="insurance-provider"]:checked').length > 0;
+                const paymentMethodsSelected = document.querySelectorAll('input[name="payment-method"]:checked').length > 0;
+                const customInsurance = document.getElementById('custom-insurance-providers')?.value?.trim() || '';
+                const customPayment = document.getElementById('custom-payment-methods')?.value?.trim() || '';
+                
+                return acceptsInsurance || insuranceSelected || paymentMethodsSelected || !!customInsurance || !!customPayment;
             },
             'pricing': () => {
                 // Complete if any pricing info provided
@@ -788,6 +842,45 @@ function setupCredentialButtons() {
     if (addCertBtn) addCertBtn.addEventListener('click', () => addCredential('certification'));
 }
 
+/**
+ * Setup tracking for unsaved changes
+ * Monitors all form inputs and marks page as having unsaved changes
+ * Clears the flag when a successful save completes
+ */
+function setupUnsavedChangesTracking() {
+    console.log('[UNSAVED] Setting up unsaved changes tracking...');
+    
+    // Helper function to mark changes
+    window.markAsChanged = function() {
+        if (!hasUnsavedChanges) {
+            hasUnsavedChanges = true;
+            console.log('[UNSAVED] ✏️ Page has unsaved changes');
+        }
+    };
+    
+    // Helper function to clear changes flag after successful save
+    window.clearUnsavedChanges = function() {
+        hasUnsavedChanges = false;
+        console.log('[UNSAVED] ✓ Unsaved changes cleared (save successful)');
+    };
+    
+    // Monitor text inputs and textareas
+    document.addEventListener('input', (e) => {
+        if (e.target.matches('input[type="text"], input[type="email"], input[type="url"], textarea')) {
+            window.markAsChanged();
+        }
+    }, { capture: true });
+    
+    // Monitor checkboxes and radio buttons
+    document.addEventListener('change', (e) => {
+        if (e.target.matches('input[type="checkbox"], input[type="radio"], select')) {
+            window.markAsChanged();
+        }
+    }, { capture: true });
+    
+    console.log('[UNSAVED] ✓ Unsaved changes tracking initialized');
+}
+
 function addCredential(type) {
     const credentialArray = getCredentialArray(type);
     const newCredential = {
@@ -825,24 +918,24 @@ function getEmptyCredentialTemplate(type) {
     switch(type) {
         case 'degree':
             return {
-                education_type: '',
-                institution: '',
-                degree_qualification: '',
-                graduation_year: ''
+                title: '',
+                issuer: '',
+                issue_date: null,
+                expiration_date: null
             };
         case 'license':
             return {
-                license_type: '',
-                license_number: '',
-                issuing_authority: '',
-                expiration_date: ''
+                title: '',
+                issuer: '',
+                issue_date: null,
+                expiration_date: null
             };
         case 'certification':
             return {
-                certification_type: '',
-                issuing_organization: '',
-                credential_id: '',
-                expiration_date: ''
+                title: '',
+                issuer: '',
+                issue_date: null,
+                expiration_date: null
             };
         default: return {};
     }
@@ -874,78 +967,25 @@ function createCredentialFormItem(type, credential) {
     div.className = 'credential-item';
     div.setAttribute('data-id', credential.id);
     
-    let titleField = '';
-    let fieldsHTML = '';
-    
-    if (type === 'degree') {
-        titleField = credential.degree_qualification || 'New Degree';
-        fieldsHTML = `
-            <div class="credential-field">
-                <label>Education Type</label>
-                <select class="credential-input" data-field="education_type">
-                    <option value="">Select...</option>
-                    <option value="High School" ${credential.education_type === 'High School' ? 'selected' : ''}>High School</option>
-                    <option value="Associate's Degree" ${credential.education_type === "Associate's Degree" ? 'selected' : ''}>Associate's Degree</option>
-                    <option value="Bachelor's Degree" ${credential.education_type === "Bachelor's Degree" ? 'selected' : ''}>Bachelor's Degree</option>
-                    <option value="Master's Degree" ${credential.education_type === "Master's Degree" ? 'selected' : ''}>Master's Degree</option>
-                    <option value="Doctorate" ${credential.education_type === 'Doctorate' ? 'selected' : ''}>Doctorate</option>
-                    <option value="Certificate" ${credential.education_type === 'Certificate' ? 'selected' : ''}>Certificate</option>
-                </select>
-            </div>
-            <div class="credential-field">
-                <label>Institution</label>
-                <input type="text" class="credential-input" data-field="institution" placeholder="School or University" value="${credential.institution || ''}">
-            </div>
-            <div class="credential-field">
-                <label>Degree / Qualification</label>
-                <input type="text" class="credential-input" data-field="degree_qualification" placeholder="e.g., Bachelor of Science in Nutrition" value="${credential.degree_qualification || ''}">
-            </div>
-            <div class="credential-field">
-                <label>Graduation Year</label>
-                <input type="number" class="credential-input" data-field="graduation_year" placeholder="YYYY" value="${credential.graduation_year || ''}" min="1970" max="2100">
-            </div>
-        `;
-    } else if (type === 'license') {
-        titleField = credential.license_type || 'New License';
-        fieldsHTML = `
-            <div class="credential-field">
-                <label>License Type</label>
-                <input type="text" class="credential-input" data-field="license_type" placeholder="e.g., Massage Therapy License" value="${credential.license_type || ''}">
-            </div>
-            <div class="credential-field">
-                <label>License Number</label>
-                <input type="text" class="credential-input" data-field="license_number" placeholder="License number" value="${credential.license_number || ''}">
-            </div>
-            <div class="credential-field">
-                <label>Issuing Authority</label>
-                <input type="text" class="credential-input" data-field="issuing_authority" placeholder="State or organization" value="${credential.issuing_authority || ''}">
-            </div>
-            <div class="credential-field">
-                <label>Expiration Date</label>
-                <input type="date" class="credential-input" data-field="expiration_date" value="${credential.expiration_date || ''}">
-            </div>
-        `;
-    } else if (type === 'certification') {
-        titleField = credential.certification_type || 'New Certification';
-        fieldsHTML = `
-            <div class="credential-field">
-                <label>Certification Type</label>
-                <input type="text" class="credential-input" data-field="certification_type" placeholder="e.g., Certified Wellness Coach" value="${credential.certification_type || ''}">
-            </div>
-            <div class="credential-field">
-                <label>Issuing Organization</label>
-                <input type="text" class="credential-input" data-field="issuing_organization" placeholder="Organization name" value="${credential.issuing_organization || ''}">
-            </div>
-            <div class="credential-field">
-                <label>Credential ID</label>
-                <input type="text" class="credential-input" data-field="credential_id" placeholder="Certificate or ID number" value="${credential.credential_id || ''}">
-            </div>
-            <div class="credential-field">
-                <label>Expiration Date</label>
-                <input type="date" class="credential-input" data-field="expiration_date" value="${credential.expiration_date || ''}">
-            </div>
-        `;
-    }
+    let titleField = credential.title || 'New Credential';
+    let fieldsHTML = `
+        <div class="credential-field">
+            <label>Title</label>
+            <input type="text" class="credential-input" data-field="title" placeholder="e.g., Bachelor of Science in Nutrition" value="${credential.title || ''}">
+        </div>
+        <div class="credential-field">
+            <label>Issuer / Institution</label>
+            <input type="text" class="credential-input" data-field="issuer" placeholder="School, organization, or authority" value="${credential.issuer || ''}">
+        </div>
+        <div class="credential-field">
+            <label>Issue Date</label>
+            <input type="date" class="credential-input" data-field="issue_date" value="${credential.issue_date || ''}">
+        </div>
+        <div class="credential-field">
+            <label>Expiration Date</label>
+            <input type="date" class="credential-input" data-field="expiration_date" value="${credential.expiration_date || ''}">
+        </div>
+    `;
     
     div.innerHTML = `
         <div class="credential-item-header">
@@ -994,31 +1034,12 @@ function createCredentialDisplayItem(type, credential) {
     const div = document.createElement('div');
     div.className = 'credential-display-item';
     
-    let title = '';
-    let details = '';
-    
-    if (type === 'degree') {
-        title = credential.degree_qualification || credential.education_type || 'Degree';
-        details = [
-            credential.education_type && `<strong>Type:</strong> ${credential.education_type}`,
-            credential.institution && `<strong>Institution:</strong> ${credential.institution}`,
-            credential.graduation_year && `<strong>Graduated:</strong> ${credential.graduation_year}`
-        ].filter(Boolean).join(' • ');
-    } else if (type === 'license') {
-        title = credential.license_type || 'License';
-        details = [
-            credential.license_number && `<strong>License #:</strong> ${credential.license_number}`,
-            credential.issuing_authority && `<strong>Authority:</strong> ${credential.issuing_authority}`,
-            credential.expiration_date && `<strong>Expires:</strong> ${credential.expiration_date}`
-        ].filter(Boolean).join(' • ');
-    } else if (type === 'certification') {
-        title = credential.certification_type || 'Certification';
-        details = [
-            credential.issuing_organization && `<strong>Organization:</strong> ${credential.issuing_organization}`,
-            credential.credential_id && `<strong>ID:</strong> ${credential.credential_id}`,
-            credential.expiration_date && `<strong>Expires:</strong> ${credential.expiration_date}`
-        ].filter(Boolean).join(' • ');
-    }
+    let title = credential.title || 'Credential';
+    let details = [
+        credential.issuer && `<strong>Issuer:</strong> ${credential.issuer}`,
+        credential.issue_date && `<strong>Issued:</strong> ${credential.issue_date}`,
+        credential.expiration_date && `<strong>Expires:</strong> ${credential.expiration_date}`
+    ].filter(Boolean).join(' • ');
     
     div.innerHTML = `
         <div class="credential-display-item-title">${title}</div>
@@ -1088,6 +1109,7 @@ async function saveHeaderFields() {
         
         // Update completeness meter
         updateProfileCompleteness();
+        window.clearUnsavedChanges();
         
     } catch (error) {
         console.error('[Rooted Vitality] Error in saveHeaderFields:', error);
@@ -1096,31 +1118,219 @@ async function saveHeaderFields() {
 }
 
 async function saveSectionData(sectionId) {
-    if (!currentUser) return;
+    console.log('═══════════════════════════════════════════════════');
+    console.log(`[SAVE] STARTING SAVE FOR SECTION: ${sectionId.toUpperCase()}`);
+    console.log('═══════════════════════════════════════════════════');
+    
+    if (!currentUser) {
+        console.error('[SAVE] ❌ NO CURRENT USER - CANNOT SAVE');
+        showAutoSaveIndicator('error');
+        return;
+    }
+    
+    console.log(`[SAVE] Current User ID: ${currentUser.id}`);
     
     try {
         showAutoSaveIndicator('saving');
         
-        // For credential sections, save to credentials table instead
-        if (['degrees', 'licenses', 'certifications'].includes(sectionId)) {
-            await saveCredentialsSection(sectionId);
+        // Handle master sections that contain multiple subsections
+        if (sectionId === 'about') {
+            // About & Specializations section saves: About You + Your Approach & Philosophy + Conditions & Specializations
+            await saveAboutSection();
+            return;
+        } else if (sectionId === 'credentials') {
+            // Credentials section saves: Degrees + Licenses + Certifications + Background Check + Continuing Education
+            await saveCredentialsSection('all');
+            return;
+        } else if (sectionId === 'photos') {
+            // Photos & Video section saves: Professional Photos + Professional Video Introduction
+            await savePhotosAndVideoSection();
+            return;
+        } else if (sectionId === 'more-details') {
+            // More Details section saves: Languages + FAQ + Social Media + Practice Type + Payment & Insurance
+            await saveMoreDetailsSection();
             return;
         }
         
-        // For other sections, prepare practitioners table updates
+        // Fallback for individual sections (shouldn't normally reach here)
+        console.warn(`[SAVE] ⚠️ Unknown section: ${sectionId}`);
+        showAutoSaveIndicator('error');
+        
+    } catch (error) {
+        console.error(`[SAVE] ❌ Error in saveSectionData for ${sectionId}:`, error);
+        showAutoSaveIndicator('error');
+    }
+}
+
+/**
+ * Save About & Specializations section (About You + Approach + Conditions)
+ */
+async function saveAboutSection() {
+    try {
         const practitionerData = {
             user_id: currentUser.id,
+            email: currentUser.email || '',
+            bio: document.getElementById('about-content')?.value || '',
+            ethos_statement: document.getElementById('approach-content')?.value || '',
+            conditions_treated: saveConditionsData(),
             updated_at: new Date().toISOString()
         };
         
-        // Add fields based on section
-        if (sectionId === 'about') {
-            practitionerData.bio = document.getElementById('about-content')?.value || '';
-        } else if (sectionId === 'approach') {
-            practitionerData.ethos_statement = document.getElementById('approach-content')?.value || '';
-        } else if (sectionId === 'social') {
-            // Create plain object for social media and let Supabase handle JSON serialization
-            const socialData = {
+        console.log('[SAVE] About section data:', practitionerData);
+        
+        const { error } = await window.supabaseClient
+            .from('practitioners')
+            .upsert(practitionerData, { onConflict: 'user_id' });
+        
+        if (error) {
+            console.error('[SAVE] ❌ Error saving about section:', error);
+            showAutoSaveIndicator('error');
+            return;
+        }
+        
+        console.log('[SAVE] ✓ About section saved successfully');
+        showAutoSaveIndicator('success');
+        lockSectionEdit('about');
+        updateProfileCompleteness();
+        window.clearUnsavedChanges();
+        
+    } catch (error) {
+        console.error('[SAVE] ❌ Error in saveAboutSection:', error);
+        showAutoSaveIndicator('error');
+    }
+}
+
+/**
+ * Save Credentials section (Degrees + Licenses + Certifications + Background Check + Continuing Education)
+ */
+async function saveCredentialsSection(type = 'all') {
+    try {
+        // Combine all credentials into one array
+        const allCredentials = [];
+        
+        // Add degrees
+        if (window.educationCredentials && window.educationCredentials.length > 0) {
+            window.educationCredentials.forEach(cred => {
+                allCredentials.push({
+                    ...cred,
+                    credential_type: 'degree'
+                });
+            });
+        }
+        
+        // Add licenses
+        if (window.licenseCredentials && window.licenseCredentials.length > 0) {
+            window.licenseCredentials.forEach(cred => {
+                allCredentials.push({
+                    ...cred,
+                    credential_type: 'license'
+                });
+            });
+        }
+        
+        // Add certifications
+        if (window.certificationCredentials && window.certificationCredentials.length > 0) {
+            window.certificationCredentials.forEach(cred => {
+                allCredentials.push({
+                    ...cred,
+                    credential_type: 'certification'
+                });
+            });
+        }
+        
+        // Add continuing education
+        if (window.continuingEducationCredentials && window.continuingEducationCredentials.length > 0) {
+            window.continuingEducationCredentials.forEach(cred => {
+                allCredentials.push({
+                    ...cred,
+                    credential_type: 'continuing_education'
+                });
+            });
+        }
+        
+        console.log('[SAVE] All credentials to save:', allCredentials);
+        
+        // Save to practitioners.credentials JSONB column
+        const practitionerData = {
+            user_id: currentUser.id,
+            email: currentUser.email || '',
+            credentials: allCredentials,
+            updated_at: new Date().toISOString()
+        };
+        
+        const { error } = await window.supabaseClient
+            .from('practitioners')
+            .upsert(practitionerData, { onConflict: 'user_id' });
+        
+        if (error) {
+            console.error('[SAVE] ❌ Error saving credentials:', error);
+            showAutoSaveIndicator('error');
+            return;
+        }
+        
+        console.log('[SAVE] ✓ Credentials saved successfully');
+        showAutoSaveIndicator('success');
+        lockSectionEdit('credentials');
+        updateProfileCompleteness();
+        window.clearUnsavedChanges();
+        
+    } catch (error) {
+        console.error('[SAVE] ❌ Error in saveCredentialsSection:', error);
+        showAutoSaveIndicator('error');
+    }
+}
+
+/**
+ * Save Photos & Video section (Professional Photos + Professional Video Introduction)
+ */
+async function savePhotosAndVideoSection() {
+    try {
+        const practitionerData = {
+            user_id: currentUser.id,
+            email: currentUser.email || '',
+            gallery_photos: getPhotosForSave(),
+            intro_video_url: window.videoData?.url || null,
+            updated_at: new Date().toISOString()
+        };
+        
+        console.log('[SAVE] Photos & Video section data:', practitionerData);
+        
+        const { error } = await window.supabaseClient
+            .from('practitioners')
+            .upsert(practitionerData, { onConflict: 'user_id' });
+        
+        if (error) {
+            console.error('[SAVE] ❌ Error saving photos & video section:', error);
+            showAutoSaveIndicator('error');
+            return;
+        }
+        
+        console.log('[SAVE] ✓ Photos & Video section saved successfully');
+        showAutoSaveIndicator('success');
+        lockSectionEdit('photos');
+        updateProfileCompleteness();
+        window.clearUnsavedChanges();
+        
+    } catch (error) {
+        console.error('[SAVE] ❌ Error in savePhotosAndVideoSection:', error);
+        showAutoSaveIndicator('error');
+    }
+}
+
+/**
+ * Save More Details section (Languages + FAQ + Social Media + Practice Type + Payment & Insurance)
+ */
+async function saveMoreDetailsSection() {
+    try {
+        const paymentCheckboxData = getPaymentCheckboxValues();
+        const practiceData = savePracticeData();
+        
+        const practitionerData = {
+            user_id: currentUser.id,
+            email: currentUser.email || '',
+            languages: getSelectedLanguages(),
+            faq: window.faqItems || [],
+            social_media: {
                 facebook: document.getElementById('social-facebook')?.value || '',
                 instagram: document.getElementById('social-instagram')?.value || '',
                 twitter: document.getElementById('social-x')?.value || '',
@@ -1129,169 +1339,36 @@ async function saveSectionData(sectionId) {
                 tiktok: document.getElementById('social-tiktok')?.value || '',
                 pinterest: document.getElementById('social-pinterest')?.value || '',
                 website: document.getElementById('social-website')?.value || ''
-            };
-            // Store as plain object - Supabase will handle JSONB serialization
-            practitionerData.social_media = socialData;
-        } else if (sectionId === 'languages') {
-            practitionerData.languages = getSelectedLanguages();
-            console.log('[Rooted Vitality] Saving languages:', practitionerData.languages);
-        } else if (sectionId === 'photos') {
-            // Save only metadata for photos (caption/id), not base64 data
-            practitionerData.gallery_photos = getPhotosForSave();
-            console.log('[Rooted Vitality] Saving photos metadata:', practitionerData.gallery_photos);
-        } else if (sectionId === 'faq') {
-            practitionerData.faq = window.faqItems;
-            console.log('[Rooted Vitality] Saving FAQ:', practitionerData.faq);
-        } else if (sectionId === 'payment') {
-            practitionerData.insurance_accepted = window.selectedInsurance || [];
-            practitionerData.payment_methods = document.getElementById('payment-methods')?.value || '';
-            console.log('[Rooted Vitality] Saving payment information:', practitionerData);
-        } else if (sectionId === 'pricing') {
-            const pricingData = savePricingData();
-            practitionerData.pricing = JSON.stringify(pricingData);
-            console.log('[Rooted Vitality] Saving pricing:', practitionerData.pricing);
-        } else if (sectionId === 'practice') {
-            const practiceData = savePracticeData();
-            practitionerData.practice_type = JSON.stringify(practiceData);
-            console.log('[Rooted Vitality] Saving practice type:', practitionerData.practice_type);
-        } else if (sectionId === 'conditions') {
-            const conditionsData = saveConditionsData();
-            practitionerData.conditions_treated = conditionsData;
-            console.log('[Rooted Vitality] Saving conditions treated:', practitionerData.conditions_treated);
-        } else if (sectionId === 'video') {
-            if (window.videoData && window.videoData.url) {
-                practitionerData.intro_video_url = window.videoData.url;
-                console.log('[Rooted Vitality] Saving video URL:', practitionerData.intro_video_url);
-            }
-        } else if (sectionId === 'continuing-education') {
-            practitionerData.continuing_education = window.continuingEducationCredentials || [];
-            console.log('[Rooted Vitality] Saving continuing education:', practitionerData.continuing_education);
-        }
-        
-        console.log(`[Rooted Vitality] Saving section ${sectionId}:`, practitionerData);
-        
-        // Prepare UPSERT data with required fields
-        const upsertData = {
-            user_id: currentUser.id,
-            email: currentUser.email || '',
-            ...practitionerData,
+            },
+            practice_type: JSON.stringify(practiceData),
+            accepts_insurance: paymentCheckboxData.accepts_insurance,
+            insurance_providers: paymentCheckboxData.insurance_providers,
+            custom_insurance_providers: paymentCheckboxData.custom_insurance_providers,
+            payment_methods: paymentCheckboxData.payment_methods,
+            custom_payment_methods: paymentCheckboxData.custom_payment_methods,
             updated_at: new Date().toISOString()
         };
         
-        // Use UPSERT pattern to avoid RLS silent failures
+        console.log('[SAVE] More Details section data:', practitionerData);
+        
         const { error } = await window.supabaseClient
             .from('practitioners')
-            .upsert(upsertData, { onConflict: 'user_id' });
+            .upsert(practitionerData, { onConflict: 'user_id' });
         
         if (error) {
-            console.error(`[Rooted Vitality] Error saving section ${sectionId}:`, error);
+            console.error('[SAVE] ❌ Error saving more details section:', error);
             showAutoSaveIndicator('error');
             return;
         }
         
-        console.log(`[Rooted Vitality] Section ${sectionId} saved successfully`);
+        console.log('[SAVE] ✓ More Details section saved successfully');
         showAutoSaveIndicator('success');
-        
-        // Lock the section to read-only mode after successful save
-        lockSectionEdit(sectionId);
-        
-        // Update profile completeness meter
+        lockSectionEdit('more-details');
         updateProfileCompleteness();
+        window.clearUnsavedChanges();
         
     } catch (error) {
-        console.error(`[Rooted Vitality] Error in saveSectionData for ${sectionId}:`, error);
-        showAutoSaveIndicator('error');
-    }
-}
-
-/**
- * Save credentials (education, licenses, certifications) to credentials table
- */
-async function saveCredentialsSection(sectionId) {
-    if (!currentUser) return;
-    
-    try {
-        // Get practitioner_id for this user
-        const { data: practitioner, error: practError } = await window.supabaseClient
-            .from('practitioners')
-            .select('id')
-            .eq('user_id', currentUser.id)
-            .single();
-        
-        if (practError || !practitioner) {
-            console.error('[Rooted Vitality] Could not find practitioner record:', practError);
-            showAutoSaveIndicator('error');
-            return;
-        }
-        
-        const practitionerId = practitioner.id;
-        
-        // Get credentials array
-        let credentials = [];
-        let credentialType = '';
-        
-        if (sectionId === 'degrees') {
-            credentials = window.educationCredentials || [];
-            credentialType = 'education';
-        } else if (sectionId === 'licenses') {
-            credentials = window.licenseCredentials || [];
-            credentialType = 'license';
-        } else if (sectionId === 'certifications') {
-            credentials = window.certificationCredentials || [];
-            credentialType = 'certification';
-        }
-        
-        console.log(`[Rooted Vitality] Saving ${sectionId}:`, credentials);
-        
-        // Delete existing credentials of this type for this practitioner
-        const { error: deleteError } = await window.supabaseClient
-            .from('credentials')
-            .delete()
-            .eq('practitioner_id', practitionerId)
-            .eq('credential_type', credentialType);
-        
-        if (deleteError) {
-            console.error(`[Rooted Vitality] Error deleting old ${sectionId}:`, deleteError);
-            showAutoSaveIndicator('error');
-            return;
-        }
-        
-        // If no credentials to save, we're done
-        if (credentials.length === 0) {
-            console.log(`[Rooted Vitality] No ${sectionId} to save`);
-            showAutoSaveIndicator('success');
-            return;
-        }
-        
-        // Insert new credentials
-        const credentialRecords = credentials.map(cred => ({
-            practitioner_id: practitionerId,
-            credential_type: credentialType,
-            title: cred.title || '',
-            issuer: cred.issuer || '',
-            issue_date: cred.issueDate || null,
-            expiration_date: cred.expirationDate || null,
-            credential_number: cred.number || cred.credential_number || '',
-            credential_url: cred.url || cred.credential_url || '',
-            description: cred.description || ''
-        }));
-        
-        const { error: insertError } = await window.supabaseClient
-            .from('credentials')
-            .insert(credentialRecords);
-        
-        if (insertError) {
-            console.error(`[Rooted Vitality] Error saving ${sectionId}:`, insertError);
-            showAutoSaveIndicator('error');
-            return;
-        }
-        
-        console.log(`[Rooted Vitality] ${sectionId} saved successfully (${credentials.length} records)`);
-        showAutoSaveIndicator('success');
-        updateProfileCompleteness();
-        
-    } catch (error) {
-        console.error(`[Rooted Vitality] Error in saveCredentialsSection for ${sectionId}:`, error);
+        console.error('[SAVE] ❌ Error in saveMoreDetailsSection:', error);
         showAutoSaveIndicator('error');
     }
 }
@@ -2693,9 +2770,20 @@ window.videoData = {
 };
 
 function setupVideoListeners() {
+    const uploadBtn = document.getElementById('upload-video-btn');
     const videoInput = document.getElementById('video-input');
+    const removeBtn = document.getElementById('remove-video-btn');
+    
+    if (uploadBtn) {
+        uploadBtn.addEventListener('click', () => videoInput.click());
+    }
+    
     if (videoInput) {
         videoInput.addEventListener('change', handleVideoUpload);
+    }
+    
+    if (removeBtn) {
+        removeBtn.addEventListener('click', removeVideo);
     }
 }
 
@@ -2740,9 +2828,9 @@ function handleVideoUpload(event) {
         };
         
         // Update UI
-        document.getElementById('video-filename').textContent = `Selected: ${file.name}`;
-        document.getElementById('video-duration-info').textContent = `Duration: ${Math.round(duration)}s`;
-        document.getElementById('video-preview-section').style.display = 'block';
+        document.getElementById('video-filename-display').textContent = `Selected: ${file.name}`;
+        document.getElementById('video-file-info').style.display = 'flex';
+        document.getElementById('video-preview-container').style.display = 'flex';
         
         console.log('[Rooted Vitality] Video loaded:', { fileName: file.name, duration: duration });
     }, { once: true });
@@ -2751,23 +2839,24 @@ function handleVideoUpload(event) {
 function removeVideo() {
     window.videoData = { url: null, duration: null, fileName: null };
     document.getElementById('video-input').value = '';
-    document.getElementById('video-filename').textContent = '';
+    document.getElementById('video-filename-display').textContent = '';
     document.getElementById('video-preview').src = '';
-    document.getElementById('video-duration-info').textContent = '';
-    document.getElementById('video-preview-section').style.display = 'none';
+    document.getElementById('video-file-info').style.display = 'none';
+    document.getElementById('video-preview-container').style.display = 'none';
     console.log('[Rooted Vitality] Video removed');
 }
 
 function loadVideo(videoUrl) {
     try {
         window.videoData.url = videoUrl;
-        const displayPlayer = document.getElementById('video-display-player');
-        const placeholder = document.getElementById('video-display-placeholder');
+        const displayDiv = document.getElementById('video-display');
         
-        if (videoUrl && displayPlayer) {
-            displayPlayer.src = videoUrl;
-            displayPlayer.style.display = 'block';
-            if (placeholder) placeholder.style.display = 'none';
+        if (videoUrl && displayDiv) {
+            const html = `<video controls class="video-preview-player">
+                <source src="${videoUrl}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>`;
+            displayDiv.innerHTML = html;
             console.log('[Rooted Vitality] ✓ Video loaded for display');
         }
     } catch (error) {
@@ -3039,6 +3128,270 @@ function renderContinuingEducationDisplay() {
     
     displayDiv.innerHTML = html;
     console.log('[Rooted Vitality] ✓ CE display rendered - Total hours: ' + totalHours);
+}
+
+/**
+ * Payment & Insurance Checkbox Handling
+ */
+function setupPaymentInsuranceSection() {
+    const acceptsInsuranceCheckbox = document.getElementById('accepts-insurance');
+    const insuranceProvidersList = document.getElementById('insurance-providers-list');
+    
+    if (acceptsInsuranceCheckbox) {
+        // Show/hide insurance providers list based on checkbox
+        acceptsInsuranceCheckbox.addEventListener('change', (e) => {
+            if (insuranceProvidersList) {
+                insuranceProvidersList.style.display = e.target.checked ? 'flex' : 'none';
+            }
+            console.log('[Rooted Vitality] Insurance acceptance:', e.target.checked);
+        });
+        
+        // Initialize display state
+        if (insuranceProvidersList) {
+            insuranceProvidersList.style.display = acceptsInsuranceCheckbox.checked ? 'flex' : 'none';
+        }
+    }
+    
+    // Setup payment section display mode rendering
+    const paymentSection = document.querySelector('[data-section="payment"]');
+    if (paymentSection) {
+        // Monitor for edit/display mode changes
+        const observer = new MutationObserver(() => {
+            if (!paymentSection.classList.contains('section-edit')) {
+                renderPaymentDisplay();
+            }
+        });
+        
+        observer.observe(paymentSection, { attributes: true, attributeFilter: ['class'] });
+    }
+}
+
+function getPaymentCheckboxValues() {
+    const paymentData = {
+        accepts_insurance: document.getElementById('accepts-insurance')?.checked || false,
+        insurance_providers: [],
+        custom_insurance_providers: document.getElementById('custom-insurance-providers')?.value || '',
+        payment_methods: [],
+        custom_payment_methods: document.getElementById('custom-payment-methods')?.value || ''
+    };
+    
+    // Collect selected insurance providers
+    const insuranceCheckboxes = document.querySelectorAll('input[name="insurance-provider"]:checked');
+    insuranceCheckboxes.forEach(cb => {
+        paymentData.insurance_providers.push(cb.value);
+    });
+    
+    // Collect selected payment methods
+    const paymentCheckboxes = document.querySelectorAll('input[name="payment-method"]:checked');
+    paymentCheckboxes.forEach(cb => {
+        paymentData.payment_methods.push(cb.value);
+    });
+    
+    console.log('[Rooted Vitality] Payment data collected:', paymentData);
+    return paymentData;
+}
+
+function renderPaymentDisplay() {
+    const displayDiv = document.getElementById('payment-display');
+    if (!displayDiv) return;
+    
+    const acceptsInsuranceCheckbox = document.getElementById('accepts-insurance');
+    const insuranceProviders = document.querySelectorAll('input[name="insurance-provider"]:checked');
+    const paymentMethods = document.querySelectorAll('input[name="payment-method"]:checked');
+    const customInsurance = document.getElementById('custom-insurance-providers')?.value || '';
+    const customPayment = document.getElementById('custom-payment-methods')?.value || '';
+    
+    let html = '';
+    
+    // Insurance section
+    if (acceptsInsuranceCheckbox?.checked) {
+        html += '<div class="payment-display-subsection">';
+        html += '<h4>Insurance Accepted</h4>';
+        html += '<div class="payment-display-badges">';
+        
+        insuranceProviders.forEach(provider => {
+            const label = provider.parentElement.textContent.trim();
+            html += `<span class="payment-display-badge">✓ ${label}</span>`;
+        });
+        
+        if (customInsurance) {
+            const customProviders = customInsurance.split(',').map(p => p.trim()).filter(p => p);
+            customProviders.forEach(provider => {
+                html += `<span class="payment-display-badge">✓ ${provider}</span>`;
+            });
+        }
+        
+        html += '</div></div>';
+    } else {
+        html += '<div class="payment-display-subsection"><p class="placeholder-text">No insurance currently accepted</p></div>';
+    }
+    
+    // Payment methods section
+    if (paymentMethods.length > 0 || customPayment) {
+        html += '<div class="payment-display-subsection">';
+        html += '<h4>Payment Methods Accepted</h4>';
+        html += '<div class="payment-display-badges">';
+        
+        paymentMethods.forEach(method => {
+            const label = method.parentElement.textContent.trim();
+            html += `<span class="payment-display-badge">✓ ${label}</span>`;
+        });
+        
+        if (customPayment) {
+            const customMethods = customPayment.split(',').map(m => m.trim()).filter(m => m);
+            customMethods.forEach(method => {
+                html += `<span class="payment-display-badge">✓ ${method}</span>`;
+            });
+        }
+        
+        html += '</div></div>';
+    } else {
+        html += '<div class="payment-display-subsection"><p class="placeholder-text">No payment methods specified yet</p></div>';
+    }
+    
+    displayDiv.innerHTML = html;
+    console.log('[Rooted Vitality] ✓ Payment display rendered');
+}
+
+/**
+ * Report a Concern / Error Reporting System
+ */
+
+// Initialize ticket number from localStorage
+function initializeTicketNumber() {
+    if (!localStorage.getItem('error_ticket_counter')) {
+        localStorage.setItem('error_ticket_counter', '1');
+    }
+}
+
+function getNextTicketNumber() {
+    let counter = parseInt(localStorage.getItem('error_ticket_counter') || '1');
+    localStorage.setItem('error_ticket_counter', (counter + 1).toString());
+    return counter;
+}
+
+function setupReportConcernListeners() {
+    const reportBtn = document.getElementById('report-concern-btn');
+    if (reportBtn) {
+        reportBtn.addEventListener('click', openReportModal);
+    }
+    
+    // Initialize ticket number on page load
+    initializeTicketNumber();
+}
+
+function openReportModal() {
+    const modal = document.getElementById('report-concern-modal');
+    if (modal) {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeReportModal() {
+    const modal = document.getElementById('report-concern-modal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        // Clear form
+        document.getElementById('report-concern-form').reset();
+    }
+}
+
+async function submitReportConcern() {
+    const form = document.getElementById('report-concern-form');
+    
+    // Validate form
+    if (!form.checkValidity()) {
+        alert('Please fill in all required fields');
+        return;
+    }
+    
+    const title = document.getElementById('report-title').value;
+    const description = document.getElementById('report-description').value;
+    const email = document.getElementById('report-email').value;
+    const section = document.getElementById('report-section').value;
+    const priority = document.getElementById('report-priority').value;
+    
+    // Get ticket number
+    const ticketNumber = getNextTicketNumber();
+    const ticketId = `TICKET-${String(ticketNumber).padStart(6, '0')}`;
+    
+    try {
+        // Show loading state
+        const submitBtn = event.target;
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Sending...';
+        submitBtn.disabled = true;
+        
+        // Prepare email data
+        const emailContent = `
+=== ROOTED VITALITY USER ERROR REPORT ===
+
+Ticket ID: ${ticketId}
+Timestamp: ${new Date().toLocaleString()}
+Priority: ${priority.toUpperCase()}
+
+--- USER INFORMATION ---
+Email: ${email}
+
+--- ISSUE DETAILS ---
+Title: ${title}
+Section: ${section}
+
+Description:
+${description}
+
+--- SYSTEM INFO ---
+User ID: ${currentUser?.id || 'Unknown'}
+URL: ${window.location.href}
+User Agent: ${navigator.userAgent}
+
+=== END REPORT ===
+        `;
+        
+        // Call Supabase edge function or send via email service
+        // For now, we'll use a simple fetch to a Supabase function
+        const response = await fetch('/api/send-error-report', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                ticketId: ticketId,
+                title: title,
+                description: description,
+                email: email,
+                section: section,
+                priority: priority,
+                userEmail: email,
+                timestamp: new Date().toISOString(),
+                userId: currentUser?.id || 'unknown',
+                url: window.location.href
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to send report');
+        }
+        
+        // Show success message
+        alert(`✓ Report submitted successfully!\n\nTicket ID: ${ticketId}\n\nWe'll investigate this issue right away.`);
+        
+        // Close modal and reset form
+        closeReportModal();
+        
+        console.log(`[Rooted Vitality] Error report submitted: ${ticketId}`);
+        
+    } catch (error) {
+        console.error('[Rooted Vitality] Error submitting report:', error);
+        alert('Failed to submit report. Please try again or contact support directly.');
+        
+        // Reset button
+        const submitBtn = event.target;
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    }
 }
 
 console.log('[Rooted Vitality] proProfile.js loaded');
