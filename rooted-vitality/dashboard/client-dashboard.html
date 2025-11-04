@@ -90,14 +90,13 @@
                             <option value="">Select...</option>
                             <option value="male">Male</option>
                             <option value="female">Female</option>
-                            <option value="other">Other</option>
                             <option value="prefer-not-to-say">Prefer not to say</option>
                         </select>
                     </div>
 
                     <div class="form-group full-width">
-                        <label for="gender">Gender</label>
-                        <input type="text" id="gender" name="gender" placeholder="Optional">
+                        <label for="address">Address</label>
+                        <input type="text" id="address" name="address" placeholder="Optional">
                     </div>
 
                     <div class="form-actions full-width">
@@ -108,42 +107,7 @@
             </section>
 
             <!-- ============================================
-                 2. MEMBERSHIP MANAGEMENT SECTION
-                 ============================================ -->
-            <section class="dashboard-section">
-                <div class="section-header">
-                    <h2>Membership</h2>
-                    <span class="section-note">(Placeholder for future feature)</span>
-                </div>
-
-                <div class="membership-container">
-                    <div class="membership-display">
-                        <div class="membership-badge" id="membershipBadge">
-                            <span class="badge-label">Current Tier</span>
-                            <span class="badge-value" id="currentTier">Free</span>
-                        </div>
-                        <p class="membership-description">
-                            You have access to free wellness resources and practitioner directory browsing.
-                        </p>
-                    </div>
-
-                    <div class="membership-actions">
-                        <button type="button" class="btn btn-secondary" id="upgradeBasicBtn">
-                            Upgrade to Basic
-                        </button>
-                        <button type="button" class="btn btn-secondary" id="upgradePremiumBtn">
-                            Upgrade to Premium
-                        </button>
-                    </div>
-
-                    <p class="future-feature-note">
-                        <span class="feature-badge">Future</span> Tiered membership system with benefits, pricing, and billing management.
-                    </p>
-                </div>
-            </section>
-
-            <!-- ============================================
-                 3. CONNECTION PREFERENCES SECTION
+                 2. CONNECTION PREFERENCES SECTION
                  ============================================ -->
             <section class="dashboard-section">
                 <div class="section-header">
@@ -166,66 +130,6 @@
 
                 <p class="future-feature-note">
                     <span class="feature-badge">Future</span> Practitioner outreach system, communication filters, and notification preferences.
-                </p>
-            </section>
-
-            <!-- ============================================
-                 4. WELLNESS PROFILE SECTION
-                 ============================================ -->
-            <section class="dashboard-section">
-                <div class="section-header">
-                    <h2>Wellness Profile</h2>
-                    <span class="section-note">(Placeholder for future feature)</span>
-                </div>
-
-                <form id="wellnessForm" class="form-grid">
-                    <div class="form-group full-width">
-                        <label for="wellnessGoals">Wellness Goals</label>
-                        <textarea id="wellnessGoals" name="wellnessGoals" rows="3" placeholder="Describe your wellness aspirations..."></textarea>
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label for="healthFocus">Current Health Focus</label>
-                        <textarea id="healthFocus" name="healthFocus" rows="3" placeholder="What are you currently working on?"></textarea>
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label for="healingModalities">Preferred Healing Modalities</label>
-                        <select id="healingModalities" name="healingModalities" multiple>
-                            <option value="acupuncture">Acupuncture</option>
-                            <option value="aromatherapy">Aromatherapy</option>
-                            <option value="ayurveda">Ayurveda</option>
-                            <option value="chakra-healing">Chakra Healing</option>
-                            <option value="coaching">Coaching</option>
-                            <option value="energy-work">Energy Work</option>
-                            <option value="herbal-medicine">Herbal Medicine</option>
-                            <option value="massage">Massage Therapy</option>
-                            <option value="meditation">Meditation</option>
-                            <option value="nutrition">Nutrition</option>
-                            <option value="reiki">Reiki</option>
-                            <option value="yoga">Yoga</option>
-                            <option value="other">Other</option>
-                        </select>
-                        <p class="field-hint">Select one or more modalities (hold Ctrl/Cmd to select multiple)</p>
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label for="locationPreference">Location Preference</label>
-                        <select id="locationPreference" name="locationPreference">
-                            <option value="">Select...</option>
-                            <option value="in-person">In-person</option>
-                            <option value="virtual">Virtual</option>
-                            <option value="either">Either</option>
-                        </select>
-                    </div>
-
-                    <div class="form-actions full-width">
-                        <button type="submit" class="btn btn-primary">Save Wellness Profile</button>
-                    </div>
-                </form>
-
-                <p class="future-feature-note">
-                    <span class="feature-badge">Future</span> Profile visibility settings, sharing with practitioners, and wellness tracking analytics.
                 </p>
             </section>
 
