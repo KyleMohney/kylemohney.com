@@ -321,11 +321,64 @@ function openThreadView(conversation) {
         conversation.status === 'away' ? '◐ Away' : 
         'Offline';
     
+    // Update lead details hero
+    populateLeadDetailsHero(conversation);
+    
     // Render messages
     renderMessages(conversation.messages);
     
     // Show thread view
     threadView.style.display = 'flex';
+}
+
+/**
+ * Populate the lead details hero section with client information
+ */
+function populateLeadDetailsHero(conversation) {
+    // Update lead avatar
+    document.getElementById('lead-avatar-large').src = conversation.clientAvatar;
+    
+    // Update lead name
+    document.getElementById('lead-name').textContent = conversation.clientName;
+    
+    // Update lead status (interested, hired, etc.)
+    const leadStatus = document.getElementById('lead-status');
+    if (conversation.status === 'hired') {
+        leadStatus.textContent = '✓ Hired';
+        leadStatus.style.color = 'var(--primary)';
+    } else if (conversation.archived) {
+        leadStatus.textContent = 'Archived';
+        leadStatus.style.color = 'var(--text-tertiary)';
+    } else {
+        leadStatus.textContent = 'Interested in services';
+        leadStatus.style.color = 'var(--text-secondary)';
+    }
+    
+    // Update services
+    const servicesContainer = document.getElementById('lead-services-list');
+    if (conversation.services && conversation.services.length > 0) {
+        servicesContainer.innerHTML = conversation.services
+            .slice(0, 3)
+            .map(service => `<span class="lead-service-tag">${service}</span>`)
+            .join('');
+    } else {
+        servicesContainer.innerHTML = '<span style="color: var(--text-tertiary);">No services listed</span>';
+    }
+    
+    // Setup action buttons
+    const hireBtn = document.getElementById('lead-action-hire');
+    const detailsBtn = document.getElementById('lead-action-details');
+    
+    // Disable hire button if already hired
+    if (conversation.status === 'hired') {
+        hireBtn.textContent = '✓ Hired';
+        hireBtn.disabled = true;
+        hireBtn.style.opacity = '0.6';
+    } else {
+        hireBtn.textContent = 'Hire Client';
+        hireBtn.disabled = false;
+        hireBtn.style.opacity = '1';
+    }
 }
 
 /**
