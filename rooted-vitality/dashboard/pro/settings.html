@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Settings | Rooted Vitality Client</title>
-  <link rel="stylesheet" href="../styles/styles.css">
-  <link rel="stylesheet" href="./styles/client-settings.css">
+  <title>Settings | Rooted Vitality Practitioner Dashboard</title>
+  <link rel="stylesheet" href="../../styles/styles.css">
+  <link rel="stylesheet" href="./styles/settings.css">
 </head>
-<body class="rooted-body client-view">
+<body class="rooted-body practitioner-view">
   
   <!-- ========================================== -->
   <!-- HEADER (Injected via injections.js) -->
@@ -28,7 +28,7 @@
         <li><a href="#account" class="settings-nav-link active" data-section="account">Account</a></li>
         <li><a href="#notifications" class="settings-nav-link" data-section="notifications">Notifications</a></li>
         <li><a href="#memberships" class="settings-nav-link" data-section="memberships">Memberships</a></li>
-        <li><a href="#security" class="settings-nav-link" data-section="security">Security</a></li>
+        <li><a href="#privacy" class="settings-nav-link" data-section="privacy">Security</a></li>
       </ul>
     </nav>
 
@@ -70,15 +70,15 @@
           </div>
         </div>
 
-        <!-- Zip Code -->
+        <!-- Physical Address -->
         <div class="settings-card">
           <div class="card-header">
-            <h3>Zip Code</h3>
-            <button class="btn-edit-setting" data-setting="zipcode">Edit</button>
+            <h3>Physical Address</h3>
+            <button class="btn-edit-setting" data-setting="address">Edit</button>
           </div>
           <div class="card-content">
             <div class="info-group">
-              <p class="info-value" id="display-zipcode">Loading...</p>
+              <p class="info-value" id="display-address">Loading...</p>
             </div>
           </div>
         </div>
@@ -118,37 +118,37 @@
           </div>
         </div>
 
-        <!-- Practitioner Messages Notifications -->
+        <!-- Lead Notifications -->
         <div class="settings-card">
           <div class="card-header">
-            <h3>Practitioner Messages</h3>
+            <h3>Lead Notifications</h3>
           </div>
           <div class="card-content">
-            <p class="setting-description">When a practitioner messages you or accepts your match request</p>
+            <p class="setting-description">When new potential clients show interest in your services</p>
             <div class="notification-channels">
               <label class="notification-channel-toggle">
-                <input type="checkbox" name="pro-messages-bell" checked class="notification-input">
+                <input type="checkbox" name="leads-bell" checked class="notification-input">
                 <span class="toggle-label">In-App Notification</span>
               </label>
               <label class="notification-channel-toggle">
-                <input type="checkbox" name="pro-messages-email" checked class="notification-input">
+                <input type="checkbox" name="leads-email" checked class="notification-input">
                 <span class="toggle-label">Email</span>
               </label>
               <label class="notification-channel-toggle">
-                <input type="checkbox" name="pro-messages-sms" class="notification-input">
+                <input type="checkbox" name="leads-sms" class="notification-input">
                 <span class="toggle-label">SMS</span>
               </label>
             </div>
           </div>
         </div>
 
-        <!-- Opportunity Replies Notifications -->
+        <!-- Opportunity Notifications -->
         <div class="settings-card">
           <div class="card-header">
-            <h3>Opportunity Lead Replies</h3>
+            <h3>Opportunity Notifications</h3>
           </div>
           <div class="card-content">
-            <p class="setting-description">When practitioners reply to your wellness inquiries</p>
+            <p class="setting-description">Booking requests, appointments, and client interactions</p>
             <div class="notification-channels">
               <label class="notification-channel-toggle">
                 <input type="checkbox" name="opportunities-bell" checked class="notification-input">
@@ -172,7 +172,7 @@
             <h3>Promotions & News</h3>
           </div>
           <div class="card-content">
-            <p class="setting-description">Updates about features, special offers, and wellness news</p>
+            <p class="setting-description">Updates about features, special offers, and industry news</p>
             <div class="notification-channels">
               <label class="notification-channel-toggle">
                 <input type="checkbox" name="promotions-bell" class="notification-input">
@@ -196,7 +196,7 @@
             <h3>System Notifications</h3>
           </div>
           <div class="card-content">
-            <p class="setting-description">Account updates, subscription alerts, and important security notifications</p>
+            <p class="setting-description">Membership updates, new reviews, and important account alerts</p>
             <div class="notification-channels">
               <label class="notification-channel-toggle">
                 <input type="checkbox" name="system-bell" checked class="notification-input">
@@ -221,26 +221,22 @@
       </section>
 
       <!-- ========================================== -->
-      <!-- 3. MEMBERSHIPS & BILLING -->
+      <!-- 3. MEMBERSHIPS -->
       <!-- ========================================== -->
       <section class="settings-section" data-section="memberships" id="memberships">
         <div class="settings-section-header">
           <h1>Memberships & Billing</h1>
-          <p class="section-description">Manage your active memberships and subscription</p>
+          <p class="section-description">Manage your active memberships and billing information</p>
         </div>
 
-        <!-- Active Subscription -->
+        <!-- Active Memberships -->
         <div class="settings-card">
           <div class="card-header">
-            <h3>Active Subscription</h3>
+            <h3>Active Memberships</h3>
           </div>
           <div class="card-content">
-            <div class="subscription-info">
-              <div class="subscription-status">
-                <p class="subscription-plan" id="current-plan">Free Plan</p>
-                <p class="subscription-detail" id="plan-detail">Get started with wellness guidance</p>
-              </div>
-              <button class="btn-setting-action" id="upgrade-plan-btn">View Plans</button>
+            <div id="active-memberships-list" class="memberships-list">
+              <p class="setting-description">Loading your memberships...</p>
             </div>
           </div>
         </div>
@@ -267,14 +263,14 @@
           </div>
         </div>
 
-        <!-- Subscription History -->
+        <!-- Subscription Plans -->
         <div class="settings-card">
           <div class="card-header">
-            <h3>Subscription History</h3>
+            <h3>Available Plans</h3>
           </div>
           <div class="card-content">
-            <p class="setting-description">View your past and current subscriptions</p>
-            <button class="btn-secondary" id="view-history-btn">View History</button>
+            <p class="setting-description">Upgrade or downgrade your membership plan</p>
+            <button class="btn-secondary" id="view-plans-btn">View Plans</button>
           </div>
         </div>
       </section>
@@ -282,7 +278,7 @@
       <!-- ========================================== -->
       <!-- 4. SECURITY -->
       <!-- ========================================== -->
-      <section class="settings-section" data-section="security" id="security">
+      <section class="settings-section" data-section="privacy" id="privacy">
         <div class="settings-section-header">
           <h1>Security</h1>
           <p class="section-description">Manage your account security and data settings</p>
@@ -299,13 +295,24 @@
           </div>
         </div>
 
-        <!-- Delete My Account -->
+        <!-- Delete Practitioner Profile -->
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>Delete Practitioner Profile</h3>
+          </div>
+          <div class="card-content">
+            <p class="setting-description">Remove your practitioner profile from Rooted Vitality. You can still log in and use the service as a client. Your account will remain active and your data will be preserved.</p>
+            <button class="btn-secondary" id="delete-profile-btn">Delete My Profile</button>
+          </div>
+        </div>
+
+        <!-- Delete Account -->
         <div class="settings-card">
           <div class="card-header">
             <h3>Delete My Account</h3>
           </div>
           <div class="card-content">
-            <p class="setting-description">Permanently delete your entire account. <strong>This cannot be undone.</strong> If you have an attached practitioner profile, it will also be deleted.</p>
+            <p class="setting-description">Permanently delete your entire account including both your client and practitioner profiles. <strong>This cannot be undone.</strong></p>
             <button class="btn-secondary" id="delete-account-btn">Delete My Account</button>
           </div>
         </div>
@@ -322,6 +329,94 @@
         </div>
       </section>
 
+      <!-- ========================================== -->
+      <!-- END OF SETTINGS SECTIONS -->
+      <!-- ========================================== -->
+
+      <!-- ========================================== -->
+      <!-- EDIT MODALS -->
+      <!-- ========================================== -->
+
+      <!-- Email Edit Modal -->
+      <div id="edit-email-modal" class="settings-modal" style="display: none;">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>Update Email Address</h2>
+            <button class="modal-close-btn" aria-label="Close">&times;</button>
+          </div>
+          <form id="edit-email-form" class="modal-form">
+            <div class="form-group">
+              <label for="email-input">New Email Address</label>
+              <input type="email" id="email-input" class="form-input" placeholder="your@email.com" required>
+              <p class="form-help">You'll need to verify this email address before it becomes active.</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn-secondary modal-cancel-btn">Cancel</button>
+              <button type="submit" class="btn-accent">Update Email</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Phone Edit Modal -->
+      <div id="edit-phone-modal" class="settings-modal" style="display: none;">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>Update Phone Number</h2>
+            <button class="modal-close-btn" aria-label="Close">&times;</button>
+          </div>
+          <form id="edit-phone-form" class="modal-form">
+            <div class="form-group">
+              <label for="phone-input">Phone Number</label>
+              <input type="tel" id="phone-input" class="form-input" placeholder="(555) 123-4567" required>
+              <p class="form-help">Include area code and any extensions if applicable.</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn-secondary modal-cancel-btn">Cancel</button>
+              <button type="submit" class="btn-accent">Update Phone</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Address Edit Modal -->
+      <div id="edit-address-modal" class="settings-modal" style="display: none;">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>Update Physical Address</h2>
+            <button class="modal-close-btn" aria-label="Close">&times;</button>
+          </div>
+          <form id="edit-address-form" class="modal-form">
+            <div class="form-group">
+              <label for="address-street-input">Street Address</label>
+              <input type="text" id="address-street-input" class="form-input" placeholder="123 Main Street, Suite 100" required>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="address-city-input">City</label>
+                <input type="text" id="address-city-input" class="form-input" placeholder="Denver" required>
+              </div>
+              <div class="form-group">
+                <label for="address-state-input">State</label>
+                <input type="text" id="address-state-input" class="form-input" placeholder="CO" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="address-zip-input">ZIP Code</label>
+              <input type="text" id="address-zip-input" class="form-input" placeholder="80202" required>
+            </div>
+            <p class="form-help">Your City and State will appear in your profile.</p>
+            <div class="modal-footer">
+              <button type="button" class="btn-secondary modal-cancel-btn">Cancel</button>
+              <button type="submit" class="btn-accent">Update Address</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
     </div>
   </main>
 
@@ -330,16 +425,19 @@
   <!-- ========================================== -->
   <footer id="rooted-footer"></footer>
 
-  <!-- Supabase JS Client -->
+  <!-- ========================================== -->
+  <!-- SCRIPTS -->
+  <!-- ========================================== -->
+  <!-- Supabase JS Client Library -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
-  <!-- Rooted Vitality Scripts -->
-  <script src="../scripts/config.js"></script>
-  <script src="../scripts/authManager.js"></script>
-  <script src="../scripts/authModal.js"></script>
-  <script src="../scripts/authHooks.js"></script>
-  <script src="../scripts/clientHeaderAvatar.js"></script>
-  <script src="../injections.js"></script>
-  <script src="./scripts/clientSettings.js"></script>
+  <script src="../../scripts/config.js"></script>
+  <script src="../../scripts/authManager.js"></script>
+  <script src="../../scripts/authModal.js"></script>
+  <script src="../../scripts/authHooks.js"></script>
+  <script src="../../injections.js"></script>
+  <script src="../../scripts/proDashboard.js"></script>
+  <script src="./scripts/proSettings.js"></script>
+
 </body>
 </html>

@@ -140,9 +140,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupContinuingEducationListeners();
     setupAvatarUpload();
     setupBackgroundCheckButton();
+    setupBusinessVerification();
     setupAlbumButton();
+    setupVideoButton();
     setupHeaderSaveButton();
     setupReportConcernListeners();
+    
+    // Setup review event listeners
+    attachReviewEventListeners();
     
     console.log('[Rooted Vitality] Practitioner profile initialized');
 });
@@ -153,6 +158,7 @@ async function loadProfile(userId) {
         
         
         // Fetch from practitioners table (main profile data)
+        // Query by user_id, not id
         const { data: practitioner, error: practError } = await window.supabaseClient
             .from('practitioners')
             .select('*')
@@ -171,33 +177,14 @@ async function loadProfile(userId) {
             console.error('[Rooted Vitality] Error loading practitioner data:', practError);
         }
         
-        // Fetch from profiles table (user metadata)
-        const { data: profile, error: profileError } = await window.supabaseClient
-            .from('profiles')
-            .select('*')
-            .eq('id', userId)
-            .single();
-        
-        console.log('[Rooted Vitality] Profiles query result:', { 
-            profile,
-            profileError,
-            hasData: !!profile,
-            errorCode: profileError?.code,
-            errorMessage: profileError?.message
-        });
-        
-        if (profileError && profileError.code !== 'PGRST116') {
-            console.error('[Rooted Vitality] Error loading profile data:', profileError);
-        }
-        
+        // All practitioner data is now in practitioners table, profiles table is deprecated
         if (practitioner) {
             console.log('[Rooted Vitality] Practitioner data loaded from database:', practitioner);
+            // Store practitioner data globally for badge system and form logic
+            window.practitionerData = practitioner;
+            console.log('[Rooted Vitality] ✓ Practitioner data stored in window.practitionerData');
             // KEEP currentUser as the auth user, don't overwrite with practitioner record
             await populateProfileFields(practitioner);
-        } else if (profile) {
-            console.log('[Rooted Vitality] Profile loaded from database (limited data):', profile);
-            // KEEP currentUser as the auth user, don't overwrite with profile record
-            await populateProfileFields(profile);
         } else {
             // Try to get name from auth user metadata
             const { data: { user } } = await window.supabaseClient.auth.getUser();
@@ -206,6 +193,8 @@ async function loadProfile(userId) {
                 document.getElementById('profile-name').value = user.user_metadata.full_name;
             }
             console.log('[Rooted Vitality] New profile - showing blank form');
+            // Initialize empty practitionerData for new profiles
+            window.practitionerData = {};
             initializeCredentialSections();
         }
         
@@ -241,7 +230,9 @@ async function populateProfileFields(data) {
     });
     
     if (fullName) {
-        document.getElementById('profile-name').value = fullName;
+        const nameField = document.getElementById('profile-name');
+        nameField.value = fullName;
+        nameField.title = fullName; // Show full name on hover
         console.log('[Rooted Vitality] ✓ Set profile-name to:', fullName);
     } else {
         console.warn('[Rooted Vitality] ⚠ No name field found in data');
@@ -261,39 +252,55 @@ async function populateProfileFields(data) {
         console.log('[Rooted Vitality] ✓ Set team_size to:', teamSize);
     }
     
-    // Location fields
-    console.log('[Rooted Vitality] Location value from data:', { location: data.location, type: typeof data.location });
-    if (data.location) {
-        document.getElementById('profile-location').value = data.location;
-        console.log('[Rooted Vitality] ✓ Set location to:', data.location);
-    } else {
-        console.log('[Rooted Vitality] ⚠ Location is falsy:', data.location);
+    // Location fields - pull from address_city and address_state if available
+    console.log('[Rooted Vitality] Location and address fields:', { 
+        location: data.location,
+        address_city: data.address_city,
+        address_state: data.address_state,
+        type: typeof data.location
+    });
+    
+    // Years in Service - calculate from year_established
+    let yearsValue = data.years_in_practice || data.years_in_service || null;
+    
+    // If no stored years value, calculate from year_established
+    if (!yearsValue && data.year_established) {
+        const established = parseInt(data.year_established);
+        const currentYear = new Date().getFullYear();
+        yearsValue = Math.max(1, currentYear - established); // At least 1 year
+        console.log(`[Rooted Vitality] Calculated years: ${currentYear} - ${established} = ${yearsValue} years`);
     }
     
-    // Years in Service - try years_in_practice first, then years_in_service
-    const yearsValue = data.years_in_practice || data.years_in_service || data.year_established || '';
     if (yearsValue) {
         document.getElementById('profile-years').value = yearsValue;
-        console.log('[Rooted Vitality] ✓ Set years to:', yearsValue, '(source: years_in_practice or years_in_service)');
+        console.log('[Rooted Vitality] ✓ Set years to:', yearsValue);
     }
     
     // Avatar - from practitioners table (display only in profile form)
+    // Use practice_logo_url for practitioner logo
     let avatarUrl = null;
-    if (data.profile_photo_url) {
-        avatarUrl = data.profile_photo_url;
-        document.getElementById('profile-avatar').src = avatarUrl;
+    const avatarDiv = document.getElementById('profile-avatar');
+    
+    if (data.practice_logo_url) {
+        avatarUrl = data.practice_logo_url;
+        // Show image
+        avatarDiv.innerHTML = `<img src="${avatarUrl}" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;">`;
         console.log('[Rooted Vitality] ✓ Set profile avatar preview to:', avatarUrl);
-    } else if (data.avatar_url) {
-        avatarUrl = data.avatar_url;
-        document.getElementById('profile-avatar').src = avatarUrl;
-        console.log('[Rooted Vitality] ✓ Set profile avatar preview to (from avatar_url):', avatarUrl);
     } else {
         // Check local storage as fallback
-        const localStorageAvatar = localStorage.getItem(`profile_photo_url_${data.id || data.user_id}`);
+        const localStorageAvatar = localStorage.getItem(`practice_logo_url_${data.id || data.user_id}`);
         if (localStorageAvatar) {
             avatarUrl = localStorageAvatar;
-            document.getElementById('profile-avatar').src = avatarUrl;
+            avatarDiv.innerHTML = `<img src="${localStorageAvatar}" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;">`;
             console.log('[Rooted Vitality] ✓ Set profile avatar preview (from local storage):', avatarUrl);
+        } else {
+            // Show initial from business name
+            const initial = fullName ? fullName.charAt(0).toUpperCase() : 'P';
+            avatarDiv.innerHTML = initial;
+            avatarDiv.style.display = 'flex';
+            avatarDiv.style.alignItems = 'center';
+            avatarDiv.style.justifyContent = 'center';
+            console.log('[Rooted Vitality] ✓ Set profile avatar to initial:', initial);
         }
     }
     
@@ -358,6 +365,7 @@ async function populateProfileFields(data) {
         });
     } else {
         // Fallback to legacy field names for backward compatibility
+        console.log('[Rooted Vitality] ✓ Loading credentials from legacy fields (not JSONB)');
         if (data.education_credentials && Array.isArray(data.education_credentials)) {
             window.educationCredentials = data.education_credentials;
         } else {
@@ -366,12 +374,14 @@ async function populateProfileFields(data) {
         
         if (data.license_credentials && Array.isArray(data.license_credentials)) {
             window.licenseCredentials = data.license_credentials;
+            console.log('[Rooted Vitality] ✓ Loaded license_credentials:', window.licenseCredentials.length, window.licenseCredentials);
         } else {
             window.licenseCredentials = [];
         }
         
         if (data.certification_credentials && Array.isArray(data.certification_credentials)) {
             window.certificationCredentials = data.certification_credentials;
+            console.log('[Rooted Vitality] ✓ Loaded certification_credentials:', window.certificationCredentials.length, window.certificationCredentials);
         } else {
             window.certificationCredentials = [];
         }
@@ -415,8 +425,11 @@ async function populateProfileFields(data) {
     
     // Payment information - from practitioners table
     if (data.payment_methods) {
-        document.getElementById('payment-methods').value = data.payment_methods;
-        console.log('[Rooted Vitality] ✓ Set payment methods');
+        const paymentEl = document.getElementById('payment-methods');
+        if (paymentEl) {
+            paymentEl.value = data.payment_methods;
+            console.log('[Rooted Vitality] ✓ Set payment methods');
+        }
     }
     
     // Load insurance accepted list (new array-based system)
@@ -446,9 +459,12 @@ async function populateProfileFields(data) {
     }
     
     // Load video introduction
+    console.log('[Rooted Vitality] Video URL from database:', data.intro_video_url);
     if (data.intro_video_url) {
         loadVideo(data.intro_video_url);
-        console.log('[Rooted Vitality] ✓ Loaded intro video');
+        console.log('[Rooted Vitality] ✓ Loaded intro video:', data.intro_video_url);
+    } else {
+        console.log('[Rooted Vitality] No video URL found in database');
     }
     
     // Load continuing education credentials
@@ -520,7 +536,7 @@ let completenessTimeout = null;
 
 function setupInputListeners() {
     const inputFields = [
-        'profile-name', 'profile-location', 'profile-years', 'profile-teamsize',
+        'profile-name', 'profile-years', 'profile-teamsize', 'profile-dba-name',
         'about-content', 'approach-content', 'degrees-content', 'licenses-content',
         'certifications-content', 'social-facebook', 'social-instagram', 'social-x',
         'social-linkedin', 'social-youtube', 'social-tiktok', 'social-pinterest', 'social-website'
@@ -550,35 +566,44 @@ function setupInputListeners() {
 
 /**
  * Calculate and update profile completeness meter
- * Counts: name, location, years, about, approach, degrees, licenses, certifications, modalities, social (as 1), albums, languages, faq, payment
- * Total possible: 14 sections
+ * Covers all profile sections: About, Credentials, Photos/Video, Reviews, Additional Details
+ * Total: 18 sections for comprehensive profile tracking
  */
 function updateProfileCompleteness() {
     try {
         // Define what needs to be filled for each section
-        // 17 total sections tracked
+        // 17 total sections tracked across all profile panels (location removed)
         const sections = {
+            // About & Specializations Panel (5 sections)
             'name': () => !!document.getElementById('profile-name')?.value?.trim(),
-            'location': () => !!document.getElementById('profile-location')?.value?.trim(),
             'years': () => {
                 const val = document.getElementById('profile-years')?.value;
                 return val !== null && val !== undefined && val !== '';
             },
             'about': () => !!document.getElementById('about-content')?.value?.trim(),
             'approach': () => !!document.getElementById('approach-content')?.value?.trim(),
-            'degrees': () => educationCredentials && educationCredentials.length > 0,
-            'credentials': () => {
-                // Licenses OR Certifications count as 1 section
-                const hasLicenses = licenseCredentials && licenseCredentials.length > 0;
-                const hasCerts = certificationCredentials && certificationCredentials.length > 0;
-                return hasLicenses || hasCerts;
+            'conditions': () => {
+                // Complete if at least 1 condition checkbox is checked
+                const checkedConditions = document.querySelectorAll('input[name="condition"]:checked');
+                return checkedConditions && checkedConditions.length > 0;
             },
-            'social': () => {
-                // ALL social links count as 1 section - complete if ANY link is filled
-                const socialFields = ['social-facebook', 'social-instagram', 'social-x', 'social-linkedin', 
-                                    'social-youtube', 'social-tiktok', 'social-pinterest', 'social-website'];
-                return socialFields.some(fieldId => !!document.getElementById(fieldId)?.value?.trim());
+            
+            // Credentials Panel (3 sections)
+            'education': () => window.educationCredentials && window.educationCredentials.length > 0,
+            'licenses': () => window.licenseCredentials && window.licenseCredentials.length > 0,
+            'certifications': () => window.certificationCredentials && window.certificationCredentials.length > 0,
+            
+            // Photos & Video Panel (2 sections)
+            'photos': () => window.currentPhotos && window.currentPhotos.length > 0,
+            'video': () => window.videoData && window.videoData.url,
+            
+            // Reviews Panel (1 section)
+            'reviews': () => {
+                // Complete if they have any reviews (mock data counts for now)
+                return allReviews && allReviews.length > 0;
             },
+            
+            // Additional Details Panel (6 sections)
             'languages': () => {
                 const langsList = document.getElementById('languages-list');
                 return langsList && langsList.querySelectorAll('.language-tag').length > 0;
@@ -587,15 +612,10 @@ function updateProfileCompleteness() {
                 const faqList = document.getElementById('faq-list');
                 return faqList && faqList.querySelectorAll('.faq-item').length > 0;
             },
-            'payment': () => {
-                // Complete if either insurance is accepted OR any payment methods selected
-                const acceptsInsurance = document.getElementById('accepts-insurance')?.checked || false;
-                const insuranceSelected = document.querySelectorAll('input[name="insurance-provider"]:checked').length > 0;
-                const paymentMethodsSelected = document.querySelectorAll('input[name="payment-method"]:checked').length > 0;
-                const customInsurance = document.getElementById('custom-insurance-providers')?.value?.trim() || '';
-                const customPayment = document.getElementById('custom-payment-methods')?.value?.trim() || '';
-                
-                return acceptsInsurance || insuranceSelected || paymentMethodsSelected || !!customInsurance || !!customPayment;
+            'practice': () => {
+                // Complete if structure or setting selected
+                const hasStructure = window.practiceData && window.practiceData.structure;
+                return !!hasStructure;
             },
             'pricing': () => {
                 // Complete if any pricing info provided
@@ -606,14 +626,25 @@ function updateProfileCompleteness() {
                 );
                 return !!hasPrice;
             },
-            'practice': () => {
-                // Complete if structure or setting selected
-                const hasStructure = window.practiceData && window.practiceData.structure;
-                return !!hasStructure;
+            'payment': () => {
+                // Complete if at least 1 payment method checkbox is checked OR custom text provided
+                const paymentMethodsSelected = document.querySelectorAll('input[name="payment-method"]:checked').length > 0;
+                const customPayment = document.getElementById('custom-payment-methods')?.value?.trim() || '';
+                return paymentMethodsSelected || !!customPayment;
             },
-            'conditions': () => window.conditionsData && window.conditionsData.length > 0,
-            'video': () => window.videoData && window.videoData.url,
-            'photos': () => window.currentPhotos && window.currentPhotos.length > 0,
+            'insurance': () => {
+                // Complete if insurance checkbox selected OR at least 1 provider checkbox checked OR custom text
+                const acceptsInsurance = document.getElementById('accepts-insurance')?.checked || false;
+                const insuranceSelected = document.querySelectorAll('input[name="insurance-provider"]:checked').length > 0;
+                const customInsurance = document.getElementById('custom-insurance-providers')?.value?.trim() || '';
+                return acceptsInsurance || insuranceSelected || !!customInsurance;
+            },
+            'social': () => {
+                // Complete if at least 1 social media field is filled
+                const socialFields = ['social-facebook', 'social-instagram', 'social-x', 'social-linkedin', 
+                                    'social-youtube', 'social-tiktok', 'social-pinterest', 'social-website'];
+                return socialFields.some(fieldId => !!document.getElementById(fieldId)?.value?.trim());
+            },
             'continuing-education': () => window.continuingEducationCredentials && window.continuingEducationCredentials.length > 0
         };
         
@@ -662,81 +693,102 @@ function updateProfileCompleteness() {
 }
 
 /**
- * Update credentials badge based on available licenses and certifications
+ * Update credentials badge based on background check status, license credentials, certification credentials, and verification status
  */
 function updateCredentialsBadge() {
     try {
-        const badgeLicensed = document.getElementById('badge-licensed');
-        const badgeVerified = document.getElementById('badge-verified');
+        const badgeBackgroundCheck = document.getElementById('badge-background-check');
+        const badgeLicense = document.getElementById('badge-license');
         const badgeCertified = document.getElementById('badge-certified');
+        const badgeVerified = document.getElementById('badge-verified');
         
-        if (!badgeLicensed || !badgeVerified || !badgeCertified) {
-            console.warn('[Rooted Vitality] Badge elements not found!');
-            return;
+        if (!badgeBackgroundCheck) {
+            console.warn('[Rooted Vitality] Background check badge element not found!');
         }
         
-        // Check credentials exist and are arrays
-        if (!Array.isArray(window.licenseCredentials)) window.licenseCredentials = [];
-        if (!Array.isArray(window.certificationCredentials)) window.certificationCredentials = [];
-        if (!Array.isArray(window.educationCredentials)) window.educationCredentials = [];
+        if (!badgeLicense) {
+            console.warn('[Rooted Vitality] License badge element not found!');
+        }
         
-        const hasLicenses = window.licenseCredentials.length > 0;
-        const hasCerts = window.certificationCredentials.length > 0;
-        const hasDegrees = window.educationCredentials.length > 0;
+        if (!badgeCertified) {
+            console.warn('[Rooted Vitality] Certified badge element not found!');
+        }
         
-        console.log('[Rooted Vitality] updateCredentialsBadge - BEFORE:', {
-            licensedClasses: badgeLicensed.className,
-            hasLicenses,
-            licenseCredentialsLength: window.licenseCredentials.length
+        if (!badgeVerified) {
+            console.warn('[Rooted Vitality] Verified badge element not found!');
+        }
+        
+        const hasBackgroundCheck = window.practitionerData && window.practitionerData.background_check_status;
+        const hasLicense = window.licenseCredentials && window.licenseCredentials.length > 0;
+        const hasCertified = window.certificationCredentials && window.certificationCredentials.length > 0;
+        const isVerified = window.practitionerData && window.practitionerData.verification_status === 'approved';
+        
+        console.log('[Rooted Vitality] updateCredentialsBadge - Status:', {
+            hasBackgroundCheck,
+            hasLicense,
+            hasCertified,
+            isVerified,
+            licenseCount: window.licenseCredentials?.length || 0,
+            certificationCount: window.certificationCredentials?.length || 0,
+            backgroundStatus: window.practitionerData?.background_check_status,
+            verificationStatus: window.practitionerData?.verification_status
         });
         
-        // ALWAYS reset to locked state first
-        badgeLicensed.classList.add('badge-locked');
-        badgeVerified.classList.add('badge-locked');
-        badgeCertified.classList.add('badge-locked');
-        
-        // ALWAYS remove active classes
-        badgeLicensed.classList.remove('licensed', 'verified', 'certified');
-        badgeVerified.classList.remove('licensed', 'verified', 'certified');
-        badgeCertified.classList.remove('licensed', 'verified', 'certified');
-        
-        console.log('[Rooted Vitality] Badges initialized with badge-locked class:', {
-            licensedClasses: badgeLicensed.className
-        });
-        
-        // Licensed Badge - Unlock ONLY if user has licenses
-        if (hasLicenses) {
-            badgeLicensed.classList.remove('badge-locked');
-            badgeLicensed.classList.add('licensed');
-            console.log('[Rooted Vitality] ⭐ Badge activated: Licensed');
-        } else {
-            console.log('[Rooted Vitality] ✓ Licensed badge stays locked (no licenses)', { hasLicenses });
+        // Background Check Badge - ALWAYS reset to locked state first
+        if (badgeBackgroundCheck) {
+            badgeBackgroundCheck.classList.add('badge-locked');
+            badgeBackgroundCheck.classList.remove('background-check');
+            
+            if (hasBackgroundCheck) {
+                badgeBackgroundCheck.classList.remove('badge-locked');
+                badgeBackgroundCheck.classList.add('background-check');
+                console.log('[Rooted Vitality] ⭐ Badge activated: Background Check');
+            } else {
+                console.log('[Rooted Vitality] ✓ Background Check badge stays locked', { hasBackgroundCheck });
+            }
         }
         
-        // Verified Badge - Unlock ONLY if user has BOTH licenses AND certifications
-        if (hasLicenses && hasCerts) {
-            badgeVerified.classList.remove('badge-locked');
-            badgeVerified.classList.add('verified');
-            console.log('[Rooted Vitality] ⭐ Badge activated: Verified');
-        } else {
-            console.log('[Rooted Vitality] ✓ Verified badge stays locked', { hasLicenses, hasCerts });
+        // License Badge - ALWAYS reset to locked state first
+        if (badgeLicense) {
+            badgeLicense.classList.add('badge-locked');
+            badgeLicense.classList.remove('license');
+            
+            if (hasLicense) {
+                badgeLicense.classList.remove('badge-locked');
+                badgeLicense.classList.add('license');
+                console.log('[Rooted Vitality] ⭐ Badge activated: License');
+            } else {
+                console.log('[Rooted Vitality] ✓ License badge stays locked', { hasLicense });
+            }
         }
         
-        // Certified Badge - Unlock ONLY if user has certifications
-        if (hasCerts) {
-            badgeCertified.classList.remove('badge-locked');
-            badgeCertified.classList.add('certified');
-            console.log('[Rooted Vitality] ⭐ Badge activated: Certified');
-        } else {
-            console.log('[Rooted Vitality] ✓ Certified badge stays locked (no certs)', { hasCerts });
+        // Certified Badge - ALWAYS reset to locked state first
+        if (badgeCertified) {
+            badgeCertified.classList.add('badge-locked');
+            badgeCertified.classList.remove('certified');
+            
+            if (hasCertified) {
+                badgeCertified.classList.remove('badge-locked');
+                badgeCertified.classList.add('certified');
+                console.log('[Rooted Vitality] ⭐ Badge activated: Certified');
+            } else {
+                console.log('[Rooted Vitality] ✓ Certified badge stays locked', { hasCertified });
+            }
         }
         
-        console.log('[Rooted Vitality] Credentials badge showcase updated - FINAL:', {
-            licensedClasses: badgeLicensed.className,
-            hasLicenses,
-            hasCerts,
-            hasDegrees
-        });
+        // Verified Badge - ALWAYS reset to locked state first
+        if (badgeVerified) {
+            badgeVerified.classList.add('badge-locked');
+            badgeVerified.classList.remove('verified');
+            
+            if (isVerified) {
+                badgeVerified.classList.remove('badge-locked');
+                badgeVerified.classList.add('verified');
+                console.log('[Rooted Vitality] ⭐ Badge activated: Verified');
+            } else {
+                console.log('[Rooted Vitality] ✓ Verified badge stays locked', { isVerified });
+            }
+        }
     } catch (error) {
         console.error('[Rooted Vitality] Error updating credentials badge:', error);
     }
@@ -777,8 +829,6 @@ async function saveHeaderInfo() {
             email: currentUser.email || '',
             legal_name: document.getElementById('profile-name')?.value || '',
             dba_name: document.getElementById('profile-dba-name')?.value || '',
-            location: document.getElementById('profile-location')?.value || '',
-            years_in_practice: document.getElementById('profile-years')?.value ? parseInt(document.getElementById('profile-years').value) : null,
             business_size: document.getElementById('profile-teamsize')?.value || '',
             updated_at: new Date().toISOString()
         };
@@ -1001,7 +1051,8 @@ function createCredentialFormItem(type, credential) {
     div.querySelectorAll('.credential-input').forEach(input => {
         input.addEventListener('change', () => {
             updateCredentialField(type, credential.id, input.getAttribute('data-field'), input.value);
-            renderCredentials(type);
+            // Don't re-render here - just update the data
+            // renderCredentials(type) causes jumpiness
         });
     });
     
@@ -1056,7 +1107,7 @@ function debounceAutoSave() {
         // Check if this is a header field edit and save immediately
         if (event && event.target) {
             const fieldId = event.target.id;
-            if (['profile-name', 'profile-location', 'profile-years', 'profile-teamsize', 'profile-dba-name'].includes(fieldId)) {
+            if (['profile-name', 'profile-years', 'profile-teamsize', 'profile-dba-name'].includes(fieldId)) {
                 saveHeaderFields();
                 return;
             }
@@ -1085,8 +1136,6 @@ async function saveHeaderFields() {
             email: currentUser.email || '',
             legal_name: document.getElementById('profile-name')?.value || '',
             dba_name: document.getElementById('profile-dba-name')?.value || '',
-            location: document.getElementById('profile-location')?.value || '',
-            years_in_practice: document.getElementById('profile-years')?.value ? parseInt(document.getElementById('profile-years').value) : null,
             business_size: document.getElementById('profile-teamsize')?.value || '',
             updated_at: new Date().toISOString()
         };
@@ -1272,6 +1321,7 @@ async function saveCredentialsSection(type = 'all') {
         showAutoSaveIndicator('success');
         lockSectionEdit('credentials');
         updateProfileCompleteness();
+        updateCredentialsBadge();
         window.clearUnsavedChanges();
         
     } catch (error) {
@@ -1285,22 +1335,26 @@ async function saveCredentialsSection(type = 'all') {
  */
 async function savePhotosAndVideoSection() {
     try {
+        const photosData = getPhotosForSave();
         const practitionerData = {
             user_id: currentUser.id,
             email: currentUser.email || '',
-            gallery_photos: getPhotosForSave(),
+            gallery_photos: photosData,
             intro_video_url: window.videoData?.url || null,
             updated_at: new Date().toISOString()
         };
         
         console.log('[SAVE] Photos & Video section data:', practitionerData);
+        console.log('[SAVE] Photos data size:', JSON.stringify(photosData).length, 'characters');
         
-        const { error } = await window.supabaseClient
+        const { data, error } = await window.supabaseClient
             .from('practitioners')
             .upsert(practitionerData, { onConflict: 'user_id' });
         
         if (error) {
             console.error('[SAVE] ❌ Error saving photos & video section:', error);
+            console.error('[SAVE] ❌ Full error details:', JSON.stringify(error, null, 2));
+            console.error('[SAVE] ❌ Data being sent:', JSON.stringify(practitionerData, null, 2));
             showAutoSaveIndicator('error');
             return;
         }
@@ -1644,15 +1698,14 @@ function lockSectionEdit(sectionId) {
             renderContinuingEducationDisplay();
         }
     } else if (sectionId === 'photos') {
-        // Handle photo gallery section
+        // Handle photo gallery section - keep in edit mode for profile page
         const editDiv = document.getElementById('photos-edit');
         const displayDiv = document.getElementById('photos-display');
         
-        if (editDiv) editDiv.style.display = 'none';
-        if (displayDiv) {
-            displayDiv.style.display = 'block';
-            renderPhotosDisplay();
-        }
+        if (editDiv) editDiv.style.display = 'block';
+        if (displayDiv) displayDiv.style.display = 'none';
+        // Stay in edit mode, just refresh the photos list
+        renderPhotosList();
     } else {
         // Hide the textarea and show display text for regular text sections
         const textarea = section.querySelector('.section-edit-field');
@@ -1721,30 +1774,6 @@ async function saveProfile() {
             console.error('[Rooted Vitality] Error saving to practitioners table:', practError);
             showSaveStatus('Save failed', 'error');
             return;
-        }
-        
-        // Also update profiles table with additional metadata
-        const profileData = {
-            id: currentUser.id,
-            updated_at: new Date().toISOString()
-        };
-        
-        // Add custom fields if the profiles table has them
-        const locationValue = document.getElementById('profile-location').value;
-        const yearsValue = document.getElementById('profile-years').value;
-        const teamValue = document.getElementById('profile-teamsize').value;
-        
-        if (locationValue) profileData.location = locationValue;
-        if (yearsValue) profileData.years_in_service = parseInt(yearsValue) || null;
-        if (teamValue) profileData.team_size = teamValue;
-        
-        const { error: profileError } = await window.supabaseClient
-            .from('profiles')
-            .upsert(profileData, { onConflict: 'id' });
-        
-        if (profileError) {
-            console.warn('[Rooted Vitality] Warning saving to profiles table:', profileError);
-            // Don't fail if profiles table doesn't have all columns
         }
         
         console.log('[Rooted Vitality] Profile saved successfully');
@@ -1818,12 +1847,12 @@ async function uploadAvatar(file) {
         const avatarUrl = data.publicUrl;
         console.log('[Rooted Vitality] Avatar uploaded to storage:', avatarUrl);
         
-        // Update practitioners table with new avatar URL using the correct user_id
+        // Update practitioners table with new practice logo URL
         try {
             const { data: updateData, error: practitionerError } = await window.supabaseClient
                 .from('practitioners')
                 .update({ 
-                    profile_photo_url: avatarUrl, 
+                    practice_logo_url: avatarUrl, 
                     updated_at: new Date().toISOString() 
                 })
                 .eq('user_id', authUserId);
@@ -1841,11 +1870,13 @@ async function uploadAvatar(file) {
         
         // Update local currentUser object so it persists
         if (currentUser) {
-            currentUser.profile_photo_url = avatarUrl;
+            currentUser.practice_logo_url = avatarUrl;
         }
         
-        // Update preview
-        document.getElementById('profile-avatar').src = avatarUrl;
+        // Update preview in avatar div
+        const avatarDiv = document.getElementById('profile-avatar');
+        avatarDiv.innerHTML = `<img src="${avatarUrl}" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;">`;
+        console.log('[Rooted Vitality] Updated profile avatar image after upload');
         
     // Update header with avatar using the universal avatar system
     const activeView = localStorage.getItem('active_view') || 'client';
@@ -1890,6 +1921,143 @@ function setupBackgroundCheckButton() {
     }
 }
 
+function setupBusinessVerification() {
+    const formContainer = document.getElementById('verification-form-container');
+    const statusDisplay = document.getElementById('verification-status-display');
+    const form = document.getElementById('business-verification-form');
+    const cancelBtn = document.getElementById('cancel-verification-btn');
+    
+    if (!form || !formContainer) {
+        console.warn('[Rooted Vitality] Business verification form elements not found');
+        return;
+    }
+
+    // Check if verification already submitted
+    const checkVerificationStatus = () => {
+        if (window.practitionerData && window.practitionerData.verification_submitted) {
+            formContainer.style.display = 'none';
+            statusDisplay.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 0.5rem; justify-content: center;">
+                    <span style="font-size: 1.5rem;">✓</span>
+                    <span>Your verification documents have been submitted and are pending admin review.</span>
+                </div>
+            `;
+            statusDisplay.classList.add('submitted');
+        } else {
+            statusDisplay.innerHTML = `
+                <button class="btn-accent" style="cursor: pointer;" onclick="document.getElementById('verification-form-container').style.display = document.getElementById('verification-form-container').style.display === 'none' ? 'block' : 'none'">
+                    + Submit Verification Documents
+                </button>
+            `;
+            statusDisplay.classList.remove('submitted');
+        }
+    };
+
+    // Initial status check
+    checkVerificationStatus();
+
+    // Handle form submission
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        console.log('[Rooted Vitality] Submitting business verification form');
+
+        try {
+            const einSsn = document.getElementById('verification-ein-ssn').value.trim();
+            const idFront = document.getElementById('verification-id-front').files[0];
+            const idBack = document.getElementById('verification-id-back').files[0];
+
+            if (!einSsn || !idFront || !idBack) {
+                showSaveStatus('Please fill in all required fields', 'error');
+                return;
+            }
+
+            // Validate EIN/SSN format
+            const einSsnRegex = /^(\d{2}-\d{7}|\d{3}-\d{2}-\d{4})$/;
+            if (!einSsnRegex.test(einSsn)) {
+                showSaveStatus('Please enter a valid EIN (12-3456789) or SSN (123-45-6789)', 'error');
+                return;
+            }
+
+            showSaveStatus('Uploading verification documents...', 'saving');
+
+            // Upload front ID to Supabase Storage
+            const frontFileName = `verification-id-front-${currentUser.id}-${Date.now()}`;
+            const { data: frontData, error: frontError } = await window.supabaseClient.storage
+                .from('verification-documents')
+                .upload(`${currentUser.id}/${frontFileName}`, idFront);
+
+            if (frontError) {
+                console.error('[Rooted Vitality] Error uploading front ID:', frontError);
+                showSaveStatus('Error uploading front ID. Please try again.', 'error');
+                return;
+            }
+
+            // Upload back ID to Supabase Storage
+            const backFileName = `verification-id-back-${currentUser.id}-${Date.now()}`;
+            const { data: backData, error: backError } = await window.supabaseClient.storage
+                .from('verification-documents')
+                .upload(`${currentUser.id}/${backFileName}`, idBack);
+
+            if (backError) {
+                console.error('[Rooted Vitality] Error uploading back ID:', backError);
+                showSaveStatus('Error uploading back ID. Please try again.', 'error');
+                return;
+            }
+
+            // Get public URLs for the uploaded files
+            const frontUrl = window.supabaseClient.storage
+                .from('verification-documents')
+                .getPublicUrl(`${currentUser.id}/${frontFileName}`).data.publicUrl;
+
+            const backUrl = window.supabaseClient.storage
+                .from('verification-documents')
+                .getPublicUrl(`${currentUser.id}/${backFileName}`).data.publicUrl;
+
+            // Update practitioner record with verification data
+            const { error: updateError } = await window.supabaseClient
+                .from('practitioners')
+                .update({
+                    verification_submitted: true,
+                    verification_ein_ssn: einSsn,
+                    verification_id_front_url: frontUrl,
+                    verification_id_back_url: backUrl,
+                    verification_submitted_at: new Date().toISOString()
+                })
+                .eq('user_id', currentUser.id);
+
+            if (updateError) {
+                console.error('[Rooted Vitality] Error saving verification data:', updateError);
+                showSaveStatus('Error saving verification data. Please try again.', 'error');
+                return;
+            }
+
+            // Update local data
+            window.practitionerData.verification_submitted = true;
+            window.practitionerData.verification_ein_ssn = einSsn;
+            window.practitionerData.verification_id_front_url = frontUrl;
+            window.practitionerData.verification_id_back_url = backUrl;
+
+            console.log('[Rooted Vitality] ✓ Verification documents submitted successfully');
+            showSaveStatus('✓ Verification documents submitted! Admin review pending.', 'success');
+
+            // Reset form and update display
+            form.reset();
+            checkVerificationStatus();
+        } catch (error) {
+            console.error('[Rooted Vitality] Error submitting verification:', error);
+            showSaveStatus('An unexpected error occurred. Please try again.', 'error');
+        }
+    });
+
+    // Handle cancel button
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+            form.reset();
+            formContainer.style.display = 'none';
+        });
+    }
+}
+
 /* ========================================== */
 /* PROFESSIONAL PHOTO GALLERY FUNCTIONS */
 /* ========================================== */
@@ -1901,7 +2069,8 @@ function loadPhotos(photos) {
     console.log('[Rooted Vitality] Loading photos:', photos);
     window.currentPhotos = Array.isArray(photos) ? photos : [];
     renderPhotosList();
-    renderPhotosDisplay();
+    // Only render display mode when not in edit mode
+    // renderPhotosDisplay();
 }
 
 function addPhotoToGallery() {
@@ -1923,19 +2092,41 @@ function addPhotoToGallery() {
             return;
         }
         
-        // Read file as data URL
-        const reader = new FileReader();
-        reader.onload = (event) => {
+        try {
+            showSaveStatus('Uploading photo...', 'saving');
+            
+            // Upload to Supabase Storage
+            const { data: { user } } = await window.supabaseClient.auth.getUser();
+            if (!user) throw new Error('Not authenticated');
+            
+            const fileExt = file.name.split('.').pop();
+            const fileName = `photos/${user.id}-${Date.now()}.${fileExt}`;
+            
+            const { error: uploadError } = await window.supabaseClient.storage
+                .from('practitioner-files')
+                .upload(fileName, file, { upsert: true });
+            
+            if (uploadError) throw uploadError;
+            
+            const { data } = window.supabaseClient.storage
+                .from('practitioner-files')
+                .getPublicUrl(fileName);
+            
             const photoData = {
                 id: Date.now(),
-                data: event.target.result,
+                url: data.publicUrl,
                 caption: 'Photo'
             };
+            
             window.currentPhotos.push(photoData);
             renderPhotosList();
+            showSaveStatus('Photo uploaded successfully', 'success');
             debounceAutoSave();
-        };
-        reader.readAsDataURL(file);
+            
+        } catch (error) {
+            console.error('Error uploading photo:', error);
+            showSaveStatus('Photo upload failed', 'error');
+        }
     });
     
     fileInput.click();
@@ -1966,7 +2157,7 @@ function renderPhotosList() {
     
     list.innerHTML = window.currentPhotos.map(photo => `
         <div class="photo-card" data-photo-id="${photo.id}">
-            <img src="${photo.data}" alt="Gallery photo" class="photo-card-image">
+            <img src="${photo.url || photo.data}" alt="Gallery photo" class="photo-card-image">
             <div class="photo-card-actions">
                 <button class="photo-card-btn" onclick="removePhoto(${photo.id})" title="Remove photo">×</button>
             </div>
@@ -1994,17 +2185,18 @@ function renderPhotosDisplay() {
     
     display.innerHTML = window.currentPhotos.map(photo => `
         <div class="photo-display-card">
-            <img src="${photo.data}" alt="Gallery photo" class="photo-display-image">
+            <img src="${photo.url || photo.data}" alt="Gallery photo" class="photo-display-image">
             <div class="photo-display-caption">${photo.caption || 'Photo'}</div>
         </div>
     `).join('');
 }
 
 function getPhotosForSave() {
-    // Return simplified photo data for database storage (without base64 data for now)
+    // Return photo URLs for database storage (much smaller than base64)
     return window.currentPhotos.map(p => ({
         id: p.id,
-        caption: p.caption
+        caption: p.caption,
+        url: p.url || p.data // Use URL if available, fallback to data for old photos
     }));
 }
 
@@ -2015,6 +2207,121 @@ function setupAlbumButton() {
             e.preventDefault();
             addPhotoToGallery();
         });
+    }
+}
+
+/* ========================================== */
+/* PROFESSIONAL VIDEO FUNCTIONS */
+/* ========================================== */
+
+window.videoData = null;
+
+function setupVideoButton() {
+    const btn = document.getElementById('add-video-btn');
+    if (btn) {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            addVideoToProfile();
+        });
+    }
+}
+
+async function addVideoToProfile() {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'video/mp4,video/webm,video/mov,video/quicktime';
+    
+    fileInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        if (file.size > 50 * 1024 * 1024) { // 50MB limit
+            alert('Video file must be smaller than 50MB');
+            return;
+        }
+        
+        try {
+            showSaveStatus('Uploading video...', 'saving');
+            
+            // Upload to Supabase Storage
+            const { data: { user } } = await window.supabaseClient.auth.getUser();
+            if (!user) throw new Error('Not authenticated');
+            
+            const fileExt = file.name.split('.').pop();
+            const fileName = `videos/${user.id}-${Date.now()}.${fileExt}`;
+            
+            const { error: uploadError } = await window.supabaseClient.storage
+                .from('practitioner-files')
+                .upload(fileName, file, { upsert: true });
+            
+            if (uploadError) throw uploadError;
+            
+            const { data } = window.supabaseClient.storage
+                .from('practitioner-files')
+                .getPublicUrl(fileName);
+            
+            window.videoData = {
+                url: data.publicUrl,
+                name: file.name,
+                size: file.size
+            };
+            
+            renderVideoPreview();
+            showSaveStatus('Video uploaded successfully', 'success');
+            debounceAutoSave();
+            
+        } catch (error) {
+            console.error('Error uploading video:', error);
+            showSaveStatus('Video upload failed', 'error');
+        }
+    });
+    
+    fileInput.click();
+}
+
+function renderVideoPreview() {
+    const videoList = document.getElementById('video-list');
+    if (!videoList) return;
+    
+    if (!window.videoData) {
+        videoList.innerHTML = '';
+        return;
+    }
+    
+    videoList.innerHTML = `
+        <div class="video-preview-card">
+            <video class="video-preview" controls>
+                <source src="${window.videoData.url}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="video-info">
+                <p class="video-name">${window.videoData.name}</p>
+                <p class="video-size">${(window.videoData.size / (1024 * 1024)).toFixed(1)} MB</p>
+            </div>
+            <button class="video-remove-btn" onclick="removeVideo()" title="Remove video">×</button>
+        </div>
+    `;
+}
+
+function removeVideo() {
+    window.videoData = null;
+    renderVideoPreview();
+    debounceAutoSave();
+}
+
+function loadVideo(videoUrl) {
+    console.log('[Rooted Vitality] loadVideo called with:', videoUrl);
+    if (videoUrl) {
+        window.videoData = {
+            url: videoUrl,
+            name: 'Intro Video',
+            size: 0
+        };
+        console.log('[Rooted Vitality] Setting window.videoData:', window.videoData);
+        renderVideoPreview();
+        console.log('[Rooted Vitality] renderVideoPreview called');
+    } else {
+        console.log('[Rooted Vitality] loadVideo: No video URL provided');
     }
 }
 
@@ -2846,24 +3153,6 @@ function removeVideo() {
     console.log('[Rooted Vitality] Video removed');
 }
 
-function loadVideo(videoUrl) {
-    try {
-        window.videoData.url = videoUrl;
-        const displayDiv = document.getElementById('video-display');
-        
-        if (videoUrl && displayDiv) {
-            const html = `<video controls class="video-preview-player">
-                <source src="${videoUrl}" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>`;
-            displayDiv.innerHTML = html;
-            console.log('[Rooted Vitality] ✓ Video loaded for display');
-        }
-    } catch (error) {
-        console.error('[Rooted Vitality] Error loading video:', error);
-    }
-}
-
 /**
  * Conditions Treated Functions
  */
@@ -2928,50 +3217,8 @@ function loadConditions(conditionsArray) {
 }
 
 function renderConditionsDisplay() {
-    try {
-        const displayDiv = document.getElementById('conditions-display-content');
-        if (!displayDiv) return;
-        
-        if (!window.conditionsData || window.conditionsData.length === 0) {
-            displayDiv.innerHTML = '<div class="conditions-placeholder">No conditions selected yet.</div>';
-            return;
-        }
-        
-        // Map of condition values to display labels
-        const conditionLabels = {
-            'anxiety': 'Anxiety Disorders',
-            'depression': 'Depression',
-            'trauma': 'Trauma & PTSD',
-            'bipolar': 'Bipolar Disorder',
-            'ocd': 'OCD',
-            'adhd': 'ADHD',
-            'autism': 'Autism Spectrum',
-            'sleep': 'Sleep Disorders',
-            'chronic-pain': 'Chronic Pain Management',
-            'stress': 'Stress Management',
-            'addiction': 'Addiction & Substance Use',
-            'eating': 'Eating Disorders',
-            'relationships': 'Relationship Issues',
-            'grief': 'Grief & Loss',
-            'career': 'Career Counseling',
-            'life-transitions': 'Life Transitions',
-            'family': 'Family Therapy',
-            'parenting': 'Parenting Support',
-            'self-esteem': 'Self-Esteem & Confidence',
-            'anger-management': 'Anger Management'
-        };
-        
-        let html = '';
-        window.conditionsData.forEach(condition => {
-            const label = conditionLabels[condition] || condition;
-            html += `<span class="condition-badge">${label}</span>`;
-        });
-        
-        displayDiv.innerHTML = html;
-        console.log('[Rooted Vitality] ✓ Conditions display rendered');
-    } catch (error) {
-        console.error('[Rooted Vitality] Error rendering conditions display:', error);
-    }
+    // Pills display removed - conditions are shown only as checkboxes
+    return;
 }
 
 /**
@@ -3391,6 +3638,306 @@ User Agent: ${navigator.userAgent}
         const submitBtn = event.target;
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
+    }
+}
+
+// ======================================================
+// REVIEWS & TESTIMONIALS FUNCTIONALITY
+// ======================================================
+
+let allReviews = [];
+let filteredReviews = [];
+
+/**
+ * Initialize reviews when switching to reviews panel
+ */
+async function initializeReviews() {
+    try {
+        console.log('[Reviews] Initializing reviews panel...');
+        
+        // Load reviews data
+        await loadReviews();
+        
+        // Render initial reviews
+        renderReviews(allReviews);
+        updateReviewsStats();
+        
+        // Attach review event listeners
+        attachReviewEventListeners();
+        
+        console.log('[Reviews] Reviews panel initialized successfully');
+        
+    } catch (error) {
+        console.error('[Reviews] Error initializing reviews:', error);
+        showToast('Error loading reviews', 'error');
+    }
+}
+
+/**
+ * Load reviews from database (mock data for now)
+ */
+async function loadReviews() {
+    try {
+        console.log('[Reviews] Loading reviews from database...');
+        
+        // Mock reviews data - in production, fetch from Supabase
+        allReviews = [
+            {
+                id: 1,
+                clientName: 'Sarah Johnson',
+                rating: 5,
+                text: 'Amazing experience! The practitioner was very professional and knowledgeable. Highly recommend!',
+                date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+                source: 'platform',
+                verified: true
+            },
+            {
+                id: 2,
+                clientName: 'Michael Chen',
+                rating: 5,
+                text: 'Great service and very attentive to my needs. Will definitely book again.',
+                date: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000),
+                source: 'platform',
+                verified: true
+            },
+            {
+                id: 3,
+                clientName: 'Emily Rodriguez',
+                rating: 4,
+                text: 'Very good overall. The only suggestion would be to offer more flexible scheduling.',
+                date: new Date(Date.now() - 21 * 24 * 60 * 60 * 1000),
+                source: 'platform',
+                verified: true
+            }
+        ];
+        
+        console.log(`[Reviews] Loaded ${allReviews.length} reviews`);
+        filteredReviews = [...allReviews];
+        
+    } catch (error) {
+        console.error('[Reviews] Error loading reviews:', error);
+        throw error;
+    }
+}
+
+/**
+ * Render reviews to the page
+ */
+function renderReviews(reviews) {
+    console.log(`[Reviews] Rendering ${reviews.length} reviews...`);
+    
+    const container = document.getElementById('reviews-container');
+    const noReviewsState = document.getElementById('no-reviews-state');
+    
+    if (!container || !noReviewsState) {
+        console.warn('[Reviews] Review containers not found - not on reviews panel');
+        return;
+    }
+    
+    if (reviews.length === 0) {
+        container.style.display = 'none';
+        noReviewsState.style.display = 'block';
+        return;
+    }
+    
+    container.style.display = 'grid';
+    noReviewsState.style.display = 'none';
+    
+    container.innerHTML = reviews.map(review => createReviewCard(review)).join('');
+}
+
+/**
+ * Create a review card HTML element
+ */
+function createReviewCard(review) {
+    const stars = Array(5)
+        .fill(0)
+        .map((_, i) => `<span class="star ${i < review.rating ? 'filled' : 'empty'}">★</span>`)
+        .join('');
+    
+    const formattedDate = formatReviewDate(review.date);
+    const source = review.source === 'platform' ? 'Platform' : 'External';
+    
+    return `
+        <div class="review-card" data-review-id="${review.id}" data-source="${review.source}" data-rating="${review.rating}">
+            <div class="review-header">
+                <div class="review-client-info">
+                    <h3 class="review-client-name">${escapeHtml(review.clientName)}</h3>
+                    <span class="review-source-badge ${review.source}">${source}</span>
+                </div>
+                <div class="review-stars">${stars}</div>
+            </div>
+            <p class="review-text">${escapeHtml(review.text)}</p>
+            <div class="review-footer">
+                <span class="review-date">${formattedDate}</span>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Update statistics cards
+ */
+function updateReviewsStats() {
+    const totalReviews = allReviews.length;
+    const platformReviews = allReviews.filter(r => r.source === 'platform').length;
+    const externalReviews = allReviews.filter(r => r.source === 'external').length;
+    
+    const avgRating = totalReviews > 0 
+        ? (allReviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews).toFixed(1)
+        : 5.0;
+    
+    // Update DOM elements if they exist
+    const avgRatingEl = document.getElementById('avg-rating');
+    const totalReviewsEl = document.getElementById('total-reviews');
+    const platformReviewsEl = document.getElementById('platform-reviews');
+    const externalReviewsEl = document.getElementById('external-reviews');
+    const avgStarsEl = document.getElementById('avg-stars');
+    
+    if (avgRatingEl) avgRatingEl.textContent = avgRating;
+    if (totalReviewsEl) totalReviewsEl.textContent = totalReviews;
+    if (platformReviewsEl) platformReviewsEl.textContent = platformReviews;
+    if (externalReviewsEl) externalReviewsEl.textContent = externalReviews;
+    
+    // Update stars
+    if (avgStarsEl) {
+        const avgStars = Math.round(avgRating);
+        const starsHtml = Array(5)
+            .fill(0)
+            .map((_, i) => `<span class="star ${i < avgStars ? 'filled' : 'empty'}">★</span>`)
+            .join('');
+        avgStarsEl.innerHTML = starsHtml;
+    }
+    
+    console.log(`[Reviews] Stats updated - Avg: ${avgRating}, Total: ${totalReviews}`);
+}
+
+/**
+ * Apply filters to reviews
+ */
+function applyReviewFilters() {
+    const ratingFilter = document.getElementById('filter-rating')?.value;
+    const sourceFilter = document.getElementById('filter-source')?.value;
+    
+    filteredReviews = allReviews.filter(review => {
+        const matchRating = !ratingFilter || review.rating.toString() === ratingFilter;
+        const matchSource = !sourceFilter || review.source === sourceFilter;
+        return matchRating && matchSource;
+    });
+    
+    renderReviews(filteredReviews);
+    console.log(`[Reviews] Filters applied - ${filteredReviews.length} reviews shown`);
+}
+
+/**
+ * Show review link modal
+ */
+function showReviewLinkModal() {
+    console.log('[Reviews] showReviewLinkModal() called');
+    
+    const modal = document.getElementById('review-link-modal');
+    if (!modal) {
+        console.error('[Reviews] Modal element not found!');
+        return;
+    }
+    
+    const reviewLink = `${window.location.origin}/rooted-vitality/review?practitioner=${currentUser.id}`;
+    console.log('[Reviews] Generated review link:', reviewLink);
+    
+    const linkInput = document.getElementById('review-link-input');
+    if (linkInput) {
+        linkInput.value = reviewLink;
+    } else {
+        console.warn('[Reviews] Link input not found');
+    }
+    
+    modal.style.display = 'block';
+    console.log('[Reviews] Review link modal opened');
+}
+
+/**
+ * Close review link modal
+ */
+function closeReviewLinkModal() {
+    const modal = document.getElementById('review-link-modal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+/**
+ * Copy review link to clipboard
+ */
+function copyReviewLink() {
+    const input = document.getElementById('review-link-input');
+    if (!input) return;
+    
+    input.select();
+    document.execCommand('copy');
+    showToast('Review link copied to clipboard!', 'success');
+    console.log('[Reviews] Review link copied to clipboard');
+}
+
+/**
+ * Format date for reviews
+ */
+function formatReviewDate(date) {
+    const now = new Date();
+    const reviewDate = new Date(date);
+    const diffDays = Math.floor((now - reviewDate) / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+    if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
+    
+    return reviewDate.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+}
+
+/**
+ * Attach event listeners for reviews functionality
+ */
+function attachReviewEventListeners() {
+    console.log('[Reviews] Attaching review event listeners...');
+    
+    // Review link button
+    const getReviewLinkBtn = document.getElementById('get-review-link-btn');
+    if (getReviewLinkBtn) {
+        getReviewLinkBtn.addEventListener('click', showReviewLinkModal);
+        console.log('[Reviews] Attached listener to get-review-link-btn');
+    } else {
+        console.warn('[Reviews] get-review-link-btn not found');
+    }
+    
+    // Empty state review link button
+    const emptyStateBtn = document.getElementById('empty-state-review-link-btn');
+    if (emptyStateBtn) {
+        emptyStateBtn.addEventListener('click', showReviewLinkModal);
+        console.log('[Reviews] Attached listener to empty-state-review-link-btn');
+    } else {
+        console.warn('[Reviews] empty-state-review-link-btn not found');
+    }
+    
+    // Copy review link button
+    const copyBtn = document.getElementById('copy-review-link-btn');
+    if (copyBtn) {
+        copyBtn.addEventListener('click', copyReviewLink);
+    }
+    
+    // Filter dropdowns
+    const ratingFilter = document.getElementById('filter-rating');
+    if (ratingFilter) {
+        ratingFilter.addEventListener('change', applyReviewFilters);
+    }
+    
+    const sourceFilter = document.getElementById('filter-source');
+    if (sourceFilter) {
+        sourceFilter.addEventListener('change', applyReviewFilters);
     }
 }
 

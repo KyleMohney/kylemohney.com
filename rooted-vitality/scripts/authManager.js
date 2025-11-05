@@ -147,9 +147,15 @@ window.authManager = {
                 localStorage.removeItem('rvRememberMe');
             }
             
-            // Set default view for all users (client)
-            localStorage.setItem('active_view', 'client');
-            console.log('[Rooted Vitality] Default view set to: client');
+            // Set default view based on role
+            // Practitioners default to practitioner view, clients default to client view
+            if (userRole === 'practitioner') {
+                localStorage.setItem('active_view', 'practitioner');
+                console.log('[Rooted Vitality] Default view set to: practitioner');
+            } else {
+                localStorage.setItem('active_view', 'client');
+                console.log('[Rooted Vitality] Default view set to: client');
+            }
             
             // Update header UI
             this._updateHeader(userRole || role);
@@ -329,20 +335,9 @@ window.authManager = {
      */
     async _setRole(role, user) {
         try {
-            const { error } = await window.supabaseClient
-                .from('profiles')
-                .upsert({
-                    id: user.id,
-                    email: user.email,
-                    role: role
-                });
-            
-            if (error) {
-                console.error('[Rooted Vitality] Error setting role:', error);
-                return false;
-            }
-            
-            console.log('[Rooted Vitality] Role assigned:', role);
+            // Role is now implicit based on which table the user is in (clients vs practitioners)
+            // This method is deprecated but keeping for compatibility
+            console.log('[Rooted Vitality] Role assignment:', role, '(stored in clients/practitioners tables)');
             return true;
         } catch (error) {
             console.error('[Rooted Vitality] Unexpected role assignment error:', error);
@@ -351,23 +346,35 @@ window.authManager = {
     },
     
     /**
-     * Retrieve user role from profiles table
+     * Retrieve user role from database
      * @private
      */
     async _getUserRole(userId) {
         try {
-            const { data, error } = await window.supabaseClient
-                .from('profiles')
-                .select('role, first_name, last_name')
-                .eq('id', userId)
+            // Check if user is in practitioners table (queries by user_id)
+            const { data: practitioner, error: practError } = await window.supabaseClient
+                .from('practitioners')
+                .select('id')
+                .eq('user_id', userId)
                 .single();
             
-            if (error) {
-                console.error('[Rooted Vitality] Error retrieving role:', error);
-                return null;
+            if (practitioner && !practError) {
+                return 'practitioner';
             }
             
-            return data?.role || null;
+            // Check if user is in clients table
+            const { data: client, error: clientError } = await window.supabaseClient
+                .from('clients')
+                .select('id')
+                .eq('user_id', userId)
+                .single();
+            
+            if (client && !clientError) {
+                return 'client';
+            }
+            
+            console.error('[Rooted Vitality] Could not determine user role');
+            return null;
         } catch (error) {
             console.error('[Rooted Vitality] Unexpected role retrieval error:', error);
             return null;
@@ -382,23 +389,45 @@ window.authManager = {
         try {
             console.log('[Rooted Vitality] Fetching profile for user:', userId);
             
-            const { data, error } = await window.supabaseClient
-                .from('profiles')
-                .select('role, first_name, last_name')
-                .eq('id', userId)
+            // Try practitioners table first (practitioners have legal_name, dba_name, NOT first_name/last_name)
+            const { data: practitioner, error: practError } = await window.supabaseClient
+                .from('practitioners')
+                .select('legal_name, dba_name, email')
+                .eq('user_id', userId)
                 .single();
             
-            if (error) {
-                console.error('[Rooted Vitality] Error retrieving profile - Full error:', error);
-                console.error('[Rooted Vitality] Error code:', error.code);
-                console.error('[Rooted Vitality] Error message:', error.message);
-                console.error('[Rooted Vitality] Error details:', error.details);
-                console.error('[Rooted Vitality] Error hint:', error.hint);
-                return null;
+            if (practitioner && !practError) {
+                // Map legal_name to first_name for consistency in the app
+                return { 
+                    role: 'practitioner', 
+                    first_name: practitioner.legal_name || practitioner.dba_name,
+                    email: practitioner.email,
+                    ...practitioner 
+                };
             }
             
-            console.log('[Rooted Vitality] Profile data retrieved:', data);
-            return data;
+            // If practitioners query failed due to RLS (406) or not found (PGRST116), that's ok - just not a practitioner
+            // Only log errors that aren't "not found" or permission issues
+            if (practError && practError.code !== 'PGRST116' && !practError.message?.includes('406')) {
+                console.warn('[Rooted Vitality] Practitioners query issue (not critical):', practError.code);
+            }
+            
+            // Fall back to clients table (clients have first_name, last_name)
+            const { data: client, error: clientError } = await window.supabaseClient
+                .from('clients')
+                .select('first_name, last_name, email')
+                .eq('user_id', userId)
+                .single();
+            
+            if (client && !clientError) {
+                return { role: 'client', ...client };
+            }
+            
+            if (clientError) {
+                console.error('[Rooted Vitality] Error retrieving client profile - Full error:', clientError);
+            }
+            
+            return null;
         } catch (error) {
             console.error('[Rooted Vitality] Unexpected profile retrieval error:', error);
             return null;

@@ -57,18 +57,18 @@ async function initializeDashboard() {
         // Fetch complete profile data from Supabase (to get all signup fields)
         if (userData?.id) {
             try {
-                const { data: profileData, error: profileError } = await window.supabaseClient
-                    .from('profiles')
+                const { data: clients, error: clientError } = await window.supabaseClient
+                    .from('clients')
                     .select('*')
-                    .eq('id', userData.id)
+                    .eq('user_id', userData.id)
                     .single();
 
-                if (profileData && !profileError) {
-                    console.log('[Dashboard] Full profile data from Supabase:', profileData);
-                    userData = { ...userData, ...profileData };
+                if (clients && !clientError) {
+                    console.log('[Dashboard] Full client data from Supabase:', clients);
+                    userData = { ...userData, ...clients };
                 }
             } catch (err) {
-                console.warn('[Dashboard] Could not fetch fresh profile data, using localStorage:', err);
+                console.warn('[Dashboard] Could not fetch fresh client data, using localStorage:', err);
             }
         }
         
@@ -113,17 +113,19 @@ function populateDashboardForms(userData) {
     try {
         document.getElementById('firstName').value = userData.first_name || '';
         document.getElementById('lastName').value = userData.last_name || '';
-        document.getElementById('email').value = userData.email || '';
-        document.getElementById('phone').value = userData.phone || '';
         document.getElementById('age').value = userData.age || '';
         document.getElementById('sex').value = userData.sex || '';
         
         // Load avatar if available
-        if (userData.avatar_url) {
-            const avatarImg = document.getElementById('clientProfileAvatar');
-            if (avatarImg) {
-                avatarImg.src = userData.avatar_url;
-                console.log('[Dashboard] Avatar loaded:', userData.avatar_url);
+        const avatarContainer = document.getElementById('clientProfileAvatarContainer');
+        if (avatarContainer) {
+            if (userData.profile_picture_url) {
+                avatarContainer.innerHTML = `<img id="clientProfileAvatar" src="${userData.profile_picture_url}" alt="Your profile picture" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;">`;
+                console.log('[Dashboard] Avatar loaded:', userData.profile_picture_url);
+            } else if (userData.first_name) {
+                // Show first initial if no profile picture
+                avatarContainer.textContent = userData.first_name.charAt(0).toUpperCase();
+                console.log('[Dashboard] Avatar initial:', userData.first_name.charAt(0));
             }
         }
     } catch (error) {
@@ -232,21 +234,24 @@ async function handleClientAvatarUpload(file) {
         const avatarUrl = data.publicUrl;
         console.log('[Dashboard] Avatar uploaded to storage:', avatarUrl);
         
-        // Update profiles table
+        // Update clients table
         const { data: updateData, error: profileError } = await window.supabaseClient
-            .from('profiles')
+            .from('clients')
             .update({ 
-                avatar_url: avatarUrl,
+                profile_picture_url: avatarUrl,
                 updated_at: new Date().toISOString()
             })
-            .eq('id', userId);
+            .eq('user_id', userId);
         
         if (profileError) throw profileError;
         
         console.log('[Dashboard] Profile updated with avatar:', updateData);
         
-        // Update preview
-        document.getElementById('clientProfileAvatar').src = avatarUrl;
+        // Update preview - put the image into the container
+        const avatarContainer = document.getElementById('clientProfileAvatarContainer');
+        if (avatarContainer) {
+            avatarContainer.innerHTML = `<img id="clientProfileAvatar" src="${avatarUrl}" alt="Your profile picture" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;">`;
+        }
         
         // Update header avatar
         if (typeof RootedVitality !== 'undefined') {

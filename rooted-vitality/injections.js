@@ -343,14 +343,17 @@ const RootedVitality = {
                             this.updateAvatarInitial('U');
                         }
                         
-                        // Load practitioner's business logo universally
+                        // Load appropriate avatar based on role and view
                         if (role === 'practitioner' && view === 'practitioner') {
+                            // Practitioner in practitioner view - show business logo
                             console.log('[Rooted Vitality] Scheduling loadPractitionerLogo with 300ms delay');
                             this.loadPractitionerLogo();
-                        }
-                        
-                        // Load client's avatar
-                        if (role === 'client') {
+                        } else if (role === 'practitioner' && view === 'client') {
+                            // Practitioner in client view - show client avatar (not business logo)
+                            console.log('[Rooted Vitality] Practitioner in client view - loading client avatar');
+                            this.loadClientAvatar();
+                        } else if (role === 'client') {
+                            // Client - load client avatar
                             console.log('[Rooted Vitality] Scheduling loadClientAvatar');
                             this.loadClientAvatar();
                         }
@@ -856,15 +859,13 @@ const RootedVitality = {
                 keys: Object.keys(practitioner),
                 hasLegalBusinessName: !!practitioner.legal_business_name,
                 legalBusinessName: practitioner.legal_business_name,
-                profilePhotoUrl: practitioner.profile_photo_url,
-                avatarUrl: practitioner.avatar_url
+                practiceLogoUrl: practitioner.practice_logo_url
             });
             
-            // Use profile_photo_url or avatar_url (check what columns exist)
-            const logoUrl = practitioner?.profile_photo_url || practitioner?.avatar_url;
+            // Use practice_logo_url (dedicated practitioner logo, separate from client profile_photo)
+            const logoUrl = practitioner?.practice_logo_url;
             console.log('[Rooted Vitality] Logo URL determination:', {
-                profile_photo_url: practitioner?.profile_photo_url,
-                avatar_url: practitioner?.avatar_url,
+                practice_logo_url: practitioner?.practice_logo_url,
                 finalLogoUrl: logoUrl
             });
             
@@ -928,16 +929,16 @@ const RootedVitality = {
                 return;
             }
             
-            const { data: profile, error } = await window.supabaseClient
-                .from('profiles')
-                .select('avatar_url, full_name')
-                .eq('id', user.id)
+            const { data: client, error } = await window.supabaseClient
+                .from('clients')
+                .select('profile_picture_url, first_name')
+                .eq('user_id', user.id)
                 .single();
             
-            if (error || !profile) return;
+            if (error || !client) return;
             
-            if (profile.avatar_url) {
-                this.updateHeaderAvatar(profile.avatar_url);
+            if (client.profile_picture_url) {
+                this.updateHeaderAvatar(client.profile_picture_url);
                 console.log('[Rooted Vitality] Client avatar loaded');
             }
             

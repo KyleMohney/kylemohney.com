@@ -15,16 +15,37 @@ window.addEventListener('DOMContentLoaded', async () => {
     const firstName = form.querySelector('#firstName').value.trim();
     const lastName  = form.querySelector('#lastName').value.trim();
     const email     = form.querySelector('#email').value.trim();
+    const confirmEmail = form.querySelector('#confirmEmail').value.trim();
     const phone     = form.querySelector('#phone').value.trim();
+    const zipcode   = form.querySelector('#zipcode').value.trim();
+    const dob       = form.querySelector('#dob').value;
+    const sex       = form.querySelector('#sex').value || null;
     const password  = form.querySelector('#password').value.trim();
     const confirmPassword = form.querySelector('#confirmPassword').value.trim();
-    const age       = form.querySelector('#age').value || null;
-    const sex       = form.querySelector('#sex').value || null;
     const termsAccepted = form.querySelector('#terms').checked;
 
     // ============ 2. Validate Required Fields ============
-    if (!firstName || !lastName || !email || !phone || !password) {
+    if (!firstName || !lastName || !email || !confirmEmail || !phone || !password || !dob) {
       alert('Please complete all required fields (marked with *).');
+      return;
+    }
+
+    if (email !== confirmEmail) {
+      alert('Email addresses do not match. Please check your entries.');
+      return;
+    }
+
+    // Calculate age from DOB and verify 18+
+    const dobDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - dobDate.getFullYear();
+    const monthDiff = today.getMonth() - dobDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dobDate.getDate())) {
+      age--;
+    }
+
+    if (age < 18) {
+      alert('You must be at least 18 years old to use Rooted Vitality.');
       return;
     }
 
@@ -93,38 +114,64 @@ window.addEventListener('DOMContentLoaded', async () => {
         throw new Error('Failed to create user account.');
       }
 
-      // ============ 5. Update Profile Data ============
-      // Profile is auto-created by database trigger, now update with additional fields
-      const profileData = {
+      // ============ 5. Create Client Record ============
+      // Create a new client record with signup data
+      
+      // Generate serial number for client
+      let serialNumber = '';
+      try {
+        console.log('[Signup] Attempting to generate serial number...');
+        console.log('[Signup] serialNumberManager available:', !!window.serialNumberManager);
+        console.log('[Signup] supabaseClient available:', !!window.supabaseClient);
+        
+        serialNumber = await window.serialNumberManager.generateSerialNumber('client');
+        console.log('✅ [Signup] Generated client serial number:', serialNumber);
+      } catch (serialError) {
+        console.error('⚠️ [Signup] Error generating serial number:', serialError.message);
+        console.error('⚠️ [Signup] Full error:', serialError);
+        // Continue signup even if serial number generation fails - it's not critical
+      }
+      
+      const clientData = {
+        user_id: authData.user.id,
+        email: email,
         first_name: firstName,
         last_name: lastName,
         phone,
-        age: age ? parseInt(age) : null,
-        sex: sex || null,
+        zipcode,
+        age,
+        sex,
+        account_status: 'active',
+        account_standing: 'good',
+        serial_number: serialNumber || null,
+        created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
       
-      console.log('📝 [Signup] Updating profile data:', profileData);
+      console.log('📝 [Signup] Creating client record:', clientData);
       
-      const { error: profileError } = await window.supabaseClient
-        .from('profiles')
-        .update(profileData)
-        .eq('id', authData.user.id);
+      const { error: clientError } = await window.supabaseClient
+        .from('clients')
+        .insert([clientData]);
 
-      if (profileError) {
-        console.error('❌ [Signup] Profile error details:', profileError);
-        console.error('❌ [Signup] Error code:', profileError.code);
-        console.error('❌ [Signup] Error message:', profileError.message);
-        console.error('❌ [Signup] Error hint:', profileError.hint);
-        throw new Error(`Profile creation failed: ${profileError.message}`);
+      if (clientError) {
+        console.error('❌ [Signup] Client record error details:', clientError);
+        console.error('❌ [Signup] Error code:', clientError.code);
+        console.error('❌ [Signup] Error message:', clientError.message);
+        console.error('❌ [Signup] Error hint:', clientError.hint);
+        throw new Error(`Client record creation failed: ${clientError.message}`);
       }
 
-      console.log('✅ [Signup] Profile created successfully!');
+      console.log('✅ [Signup] Client record created successfully!');
 
       // ============ 6. Success: Show Message & Redirect ============
-      // No email verification required - redirect straight to index
+      // Wait briefly for Supabase to persist session, then redirect
       alert('Account created! Welcome to Rooted Vitality.');
-      window.location.href = '/rooted-vitality/index.html';
+      
+      // Give Supabase time to persist the session to localStorage
+      setTimeout(() => {
+        window.location.href = '/rooted-vitality/index.html';
+      }, 500);
 
     } catch (error) {
       console.error('Signup error:', error);

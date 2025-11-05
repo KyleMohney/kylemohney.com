@@ -413,7 +413,7 @@
     font-weight: 600;
     font-size: 0.9rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     text-decoration: none;
     display: inline-block;
     margin-top: 0.5rem;
@@ -477,6 +477,60 @@
     background: rgba(92, 154, 114, 0.05);
     border-color: #4a7d5a;
     color: #4a7d5a;
+}
+
+/* ========================================== */
+/* 8. MEMBERSHIPS & BILLING */
+/* ========================================== */
+
+.subscription-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.subscription-status {
+    flex: 1;
+}
+
+.subscription-plan {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2d2d2d;
+    margin: 0 0 0.5rem 0;
+}
+
+.subscription-detail {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 0;
+}
+
+#upgrade-plan-btn,
+#view-billing-btn,
+#manage-payment-btn,
+#view-history-btn {
+    background: #5c9a72;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-block;
+    white-space: nowrap;
+}
+
+#upgrade-plan-btn:hover,
+#view-billing-btn:hover,
+#manage-payment-btn:hover,
+#view-history-btn:hover {
+    background: #4a7d5a;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(92, 154, 114, 0.25);
 }
 
 /* ========================================== */
@@ -590,4 +644,61 @@
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* ========================================== */
+/* 11. INLINE EDIT STYLES */
+/* ========================================== */
+
+.edit-inline-input {
+    width: 100%;
+    padding: 0.8rem;
+    border: 2px solid var(--rooted-primary);
+    border-radius: 6px;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    font-family: inherit;
+    transition: border-color 0.2s ease;
+}
+
+.edit-inline-input:focus {
+    outline: none;
+    border-color: #4a7d5a;
+    box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.1);
+}
+
+.edit-inline-actions {
+    display: flex;
+    gap: 0.8rem;
+}
+
+.btn-inline-save,
+.btn-inline-cancel {
+    flex: 1;
+    padding: 0.6rem 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-inline-save {
+    background-color: var(--rooted-primary);
+    color: white;
+}
+
+.btn-inline-save:hover {
+    background-color: #4a7d5a;
+    transform: translateY(-1px);
+}
+
+.btn-inline-cancel {
+    background-color: #f0f0f0;
+    color: var(--rooted-dark);
+}
+
+.btn-inline-cancel:hover {
+    background-color: #e0e0e0;
 }

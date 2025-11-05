@@ -40,20 +40,20 @@
           <input type="email" id="email" required>
         </div>
         <div>
+          <label for="confirmEmail">Confirm Email *</label>
+          <input type="email" id="confirmEmail" required>
+        </div>
+        <div>
           <label for="phone">Phone Number *</label>
           <input type="tel" id="phone" required>
         </div>
         <div>
-          <label for="password">Password *</label>
-          <input type="password" id="password" required minlength="6">
+          <label for="zipcode">Zip Code</label>
+          <input type="text" id="zipcode" placeholder="12345">
         </div>
         <div>
-          <label for="confirmPassword">Confirm Password *</label>
-          <input type="password" id="confirmPassword" required minlength="6">
-        </div>
-        <div>
-          <label for="age">Age</label>
-          <input type="number" id="age" min="0">
+          <label for="dob">Date of Birth * (Must be 18+)</label>
+          <input type="date" id="dob" required>
         </div>
         <div>
           <label for="sex">Sex</label>
@@ -64,26 +64,31 @@
             <option value="Prefer not to say">Prefer not to say</option>
           </select>
         </div>
+        <div>
+          <label for="password">Password *</label>
+          <input type="password" id="password" required minlength="6">
+        </div>
+        <div>
+          <label for="confirmPassword">Confirm Password *</label>
+          <input type="password" id="confirmPassword" required minlength="6">
+        </div>
       </div>
 
       <div class="signup-consent">
         <label>
           <input type="checkbox" id="terms" required>
-          I agree to the <a href="./policies/terms-of-service.html" target="_blank">Terms of Service</a> and <a href="./policies/privacy-policy.html" target="_blank">Privacy Policy</a>.
+          I agree to the <a href="./policies/terms-of-service.html" target="_blank">Terms of Service</a> and <a href="./policies/privacy-policy.html" target="_blank">Privacy Policy.</a>
         </label>
       </div>
 
       <button type="submit" class="signup-submit">Create My Account</button>
-
-      <p class="signup-alt">Practitioner signup <strong>coming soon</strong>.</p>
     </form>
   </main>
 
   <!-- Footer injected by injections.js -->
   <footer id="footer-inject"></footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="./scripts/config.js"></script>
+  <script src="./scripts/serialNumberManager.js"></script>
   <script src="./scripts/authManager.js"></script>
   <script src="./scripts/authModal.js"></script>
   <script src="./scripts/authHooks.js"></script>

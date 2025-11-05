@@ -26,6 +26,8 @@ const state = {
         year_established: '',
         business_size: '',
         phone: '',
+        physical_address: '',
+        zipcode: '',
         email: '',
     },
 };
@@ -166,21 +168,52 @@ function validateStep(stepNum) {
 // ═══════════════════════════════════════════════════════════════════════════
 
 function updateProgress() {
-    const percent = (state.currentStep / state.totalSteps) * 100;
+    // Step 1: Business info fields (legal name, dba, year, size, phone, address, zipcode)
+    const step1Fields = document.querySelectorAll('[name="legal_business_name"], [name="dba_name"], [name="year_established"], [name="business_size"], [name="phone"], [name="physical_address"], [name="zipcode"]');
+    let step1Filled = 0;
+    step1Fields.forEach(field => {
+        if (field.value && field.value.trim()) step1Filled++;
+    });
+    const step1Complete = step1Filled === step1Fields.length;
+    
+    // Step 2: Legal agreement checkboxes (required for submission)
+    const agreeTerms = document.getElementById('agreeTerms');
+    const confirmAccuracy = document.getElementById('confirmAccuracy');
+    const step2CheckboxesFilled = (agreeTerms && agreeTerms.checked ? 1 : 0) + (confirmAccuracy && confirmAccuracy.checked ? 1 : 0);
+    const step2CheckboxesTotal = 2;
+    const step2Complete = agreeTerms && agreeTerms.checked && confirmAccuracy && confirmAccuracy.checked;
+    
+    // Calculate overall progress percentage
+    // Total: 7 (step 1 fields) + 2 (step 2 checkboxes) = 9
+    const totalRequiredFields = step1Fields.length + step2CheckboxesTotal;
+    const totalFilledFields = step1Filled + step2CheckboxesFilled;
+    const percent = totalRequiredFields > 0 ? (totalFilledFields / totalRequiredFields) * 100 : 0;
+    
     const bar = document.getElementById('progressBar');
-    if (bar) bar.style.width = percent + '%';
+    if (bar) {
+        bar.style.width = percent + '%';
+    }
     
     const pct = document.getElementById('progressPercentage');
     if (pct) pct.textContent = Math.round(percent) + '%';
     
+    // Update step indicator styles
     document.querySelectorAll('.step').forEach(step => {
         const stepNum = parseInt(step.getAttribute('data-step'));
         step.classList.remove('active', 'completed');
         
-        if (stepNum === state.currentStep) {
-            step.classList.add('active');
-        } else if (stepNum < state.currentStep) {
-            step.classList.add('completed');
+        if (stepNum === 1) {
+            if (step1Complete) {
+                step.classList.add('completed');
+            } else {
+                step.classList.add('active');
+            }
+        } else if (stepNum === 2) {
+            if (step2Complete) {
+                step.classList.add('completed');
+            } else if (step1Complete) {
+                step.classList.add('active');
+            }
         }
     });
 }
@@ -256,6 +289,16 @@ async function registerPractitioner(event) {
         submitBtn.disabled = true;
         submitBtn.textContent = 'Registering...';
         
+        // Generate serial number for practitioner
+        let serialNumber = '';
+        try {
+            serialNumber = await window.serialNumberManager.generateSerialNumber('practitioner');
+            console.log('[Signup] Generated practitioner serial number:', serialNumber);
+        } catch (serialError) {
+            console.error('[Signup] Warning: Could not generate serial number:', serialError);
+            // Continue signup even if serial number generation fails - it's not critical
+        }
+        
         const payload = {
             user_id: state.session.id,
             email: state.session.email,
@@ -264,7 +307,10 @@ async function registerPractitioner(event) {
             year_established: parseInt(state.formData.year_established),
             business_size: state.formData.business_size,
             phone: state.formData.phone,
+            physical_address: state.formData.physical_address,
+            zipcode: state.formData.zipcode,
             status: 'registered',
+            serial_number: serialNumber || null,
             submitted_at: new Date().toISOString(),
         };
         
@@ -280,25 +326,36 @@ async function registerPractitioner(event) {
         
         console.log('[Signup] Registered successfully');
         
-        // Update profile to set role as practitioner
-        const { error: profileError } = await window.supabaseClient
-            .from('profiles')
+        // Update practitioners table to mark as practitioner
+        const { error: practError } = await window.supabaseClient
+            .from('practitioners')
             .update({ 
-                role: 'practitioner',
-                is_practitioner: true 
+                updated_at: new Date().toISOString()
             })
-            .eq('id', state.session.id);
+            .eq('user_id', state.session.id);
         
-        if (profileError) {
-            console.error('[Signup] Warning: Could not update profile role:', profileError);
+        if (practError) {
+            console.error('[Signup] Warning: Could not update practitioner record:', practError);
         } else {
-            console.log('[Signup] Profile updated with practitioner role');
+            console.log('[Signup] Practitioner record updated');
         }
         
         // Hide form and show success modal
         document.getElementById('practitionerForm').style.display = 'none';
         const modal = document.getElementById('successModal');
         modal.classList.remove('hidden');
+        
+        // Update user role in localStorage to reflect practitioner status
+        const currentUser = window.authManager.getCurrentUser();
+        if (currentUser) {
+            currentUser.role = 'practitioner';
+            localStorage.setItem('rvUser', JSON.stringify(currentUser));
+            console.log('[Signup] Updated user role to practitioner in localStorage');
+        }
+        
+        // Set active_view to practitioner for practitioners
+        localStorage.setItem('active_view', 'practitioner');
+        console.log('[Signup] Set active_view to practitioner');
         
         // Clear draft
         clearDraft();
@@ -337,10 +394,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     form.addEventListener('submit', registerPractitioner);
     form.addEventListener('input', updateFormData);
     
+    // Add event listeners to update progress on any field change
+    const allInputs = document.querySelectorAll('input[required], select[required], textarea[required], input[type="checkbox"]');
+    allInputs.forEach(input => {
+        input.addEventListener('input', updateProgress);
+        input.addEventListener('change', updateProgress);
+    });
+    
     document.getElementById('step1Next').addEventListener('click', nextStep);
     document.getElementById('step2Prev').addEventListener('click', prevStep);
     
     showStep(1);
+    updateProgress(); // Initialize progress on page load
     console.log('[Signup] Ready');
 });
 
