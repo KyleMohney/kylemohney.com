@@ -147,15 +147,9 @@ window.authManager = {
                 localStorage.removeItem('rvRememberMe');
             }
             
-            // Set default view based on role
-            // Practitioners default to practitioner view, clients default to client view
-            if (userRole === 'practitioner') {
-                localStorage.setItem('active_view', 'practitioner');
-                console.log('[Rooted Vitality] Default view set to: practitioner');
-            } else {
-                localStorage.setItem('active_view', 'client');
-                console.log('[Rooted Vitality] Default view set to: client');
-            }
+            // Set default view for all users (client)
+            localStorage.setItem('active_view', 'client');
+            console.log('[Rooted Vitality] Default view set to: client');
             
             // Update header UI
             this._updateHeader(userRole || role);
@@ -389,30 +383,18 @@ window.authManager = {
         try {
             console.log('[Rooted Vitality] Fetching profile for user:', userId);
             
-            // Try practitioners table first (practitioners have legal_name, dba_name, NOT first_name/last_name)
+            // Try practitioners table first
             const { data: practitioner, error: practError } = await window.supabaseClient
                 .from('practitioners')
-                .select('legal_name, dba_name, email')
+                .select('first_name, last_name, email')
                 .eq('user_id', userId)
                 .single();
             
             if (practitioner && !practError) {
-                // Map legal_name to first_name for consistency in the app
-                return { 
-                    role: 'practitioner', 
-                    first_name: practitioner.legal_name || practitioner.dba_name,
-                    email: practitioner.email,
-                    ...practitioner 
-                };
+                return { role: 'practitioner', ...practitioner };
             }
             
-            // If practitioners query failed due to RLS (406) or not found (PGRST116), that's ok - just not a practitioner
-            // Only log errors that aren't "not found" or permission issues
-            if (practError && practError.code !== 'PGRST116' && !practError.message?.includes('406')) {
-                console.warn('[Rooted Vitality] Practitioners query issue (not critical):', practError.code);
-            }
-            
-            // Fall back to clients table (clients have first_name, last_name)
+            // Fall back to clients table
             const { data: client, error: clientError } = await window.supabaseClient
                 .from('clients')
                 .select('first_name, last_name, email')
@@ -423,8 +405,11 @@ window.authManager = {
                 return { role: 'client', ...client };
             }
             
+            if (practError) {
+                console.error('[Rooted Vitality] Error retrieving profile - Full error:', practError);
+            }
             if (clientError) {
-                console.error('[Rooted Vitality] Error retrieving client profile - Full error:', clientError);
+                console.error('[Rooted Vitality] Error retrieving profile - Full error:', clientError);
             }
             
             return null;

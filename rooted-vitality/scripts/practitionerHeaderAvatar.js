@@ -89,7 +89,7 @@ window.PractitionerHeaderAvatar = {
             // Fetch practitioner data
             const { data: practitioner, error } = await window.supabaseClient
                 .from('practitioners')
-                .select('legal_business_name, practice_logo_url')
+                .select('legal_business_name, profile_photo_url, avatar_url')
                 .eq('user_id', userId)
                 .single();
             
@@ -112,11 +112,12 @@ window.PractitionerHeaderAvatar = {
             
             console.log('[Rooted Vitality Avatar] Practitioner data retrieved:', {
                 name: practitioner.legal_business_name,
-                hasPracticeLogoUrl: !!practitioner.practice_logo_url
+                hasProfilePhotoUrl: !!practitioner.profile_photo_url,
+                hasAvatarUrl: !!practitioner.avatar_url
             });
             
             // Determine what to show
-            const logoUrl = practitioner.practice_logo_url;
+            const logoUrl = practitioner.profile_photo_url || practitioner.avatar_url;
             const firstName = practitioner.legal_business_name;
             
             if (logoUrl) {

@@ -116,22 +116,6 @@ window.addEventListener('DOMContentLoaded', async () => {
 
       // ============ 5. Create Client Record ============
       // Create a new client record with signup data
-      
-      // Generate serial number for client
-      let serialNumber = '';
-      try {
-        console.log('[Signup] Attempting to generate serial number...');
-        console.log('[Signup] serialNumberManager available:', !!window.serialNumberManager);
-        console.log('[Signup] supabaseClient available:', !!window.supabaseClient);
-        
-        serialNumber = await window.serialNumberManager.generateSerialNumber('client');
-        console.log('✅ [Signup] Generated client serial number:', serialNumber);
-      } catch (serialError) {
-        console.error('⚠️ [Signup] Error generating serial number:', serialError.message);
-        console.error('⚠️ [Signup] Full error:', serialError);
-        // Continue signup even if serial number generation fails - it's not critical
-      }
-      
       const clientData = {
         user_id: authData.user.id,
         email: email,
@@ -143,7 +127,6 @@ window.addEventListener('DOMContentLoaded', async () => {
         sex,
         account_status: 'active',
         account_standing: 'good',
-        serial_number: serialNumber || null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };

@@ -289,16 +289,6 @@ async function registerPractitioner(event) {
         submitBtn.disabled = true;
         submitBtn.textContent = 'Registering...';
         
-        // Generate serial number for practitioner
-        let serialNumber = '';
-        try {
-            serialNumber = await window.serialNumberManager.generateSerialNumber('practitioner');
-            console.log('[Signup] Generated practitioner serial number:', serialNumber);
-        } catch (serialError) {
-            console.error('[Signup] Warning: Could not generate serial number:', serialError);
-            // Continue signup even if serial number generation fails - it's not critical
-        }
-        
         const payload = {
             user_id: state.session.id,
             email: state.session.email,
@@ -310,7 +300,6 @@ async function registerPractitioner(event) {
             physical_address: state.formData.physical_address,
             zipcode: state.formData.zipcode,
             status: 'registered',
-            serial_number: serialNumber || null,
             submitted_at: new Date().toISOString(),
         };
         
@@ -352,10 +341,6 @@ async function registerPractitioner(event) {
             localStorage.setItem('rvUser', JSON.stringify(currentUser));
             console.log('[Signup] Updated user role to practitioner in localStorage');
         }
-        
-        // Set active_view to practitioner for practitioners
-        localStorage.setItem('active_view', 'practitioner');
-        console.log('[Signup] Set active_view to practitioner');
         
         // Clear draft
         clearDraft();

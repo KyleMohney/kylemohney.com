@@ -426,23 +426,24 @@ function handleCCPARequest() {
 async function loadNotificationPreferences() {
     try {
         const { data, error } = await window.supabaseClient
-            .from('clients')
-            .select('notification_settings')
+            .from('notification_settings')
+            .select('*')
             .eq('user_id', currentUser.id)
+            .eq('user_type', 'client')
             .single();
         
-        if (error) {
+        if (error && error.code !== 'PGRST116') {
             console.error('[Rooted Vitality] Error loading notification settings:', error);
             return;
         }
         
-        if (data && data.notification_settings) {
+        if (data) {
             console.log('[Rooted Vitality] Notification preferences loaded');
             // Apply saved preferences to checkboxes
-            Object.keys(data.notification_settings).forEach(key => {
+            Object.keys(data).forEach(key => {
                 const checkbox = document.querySelector(`[name="${key}"]`);
-                if (checkbox && typeof data.notification_settings[key] === 'boolean') {
-                    checkbox.checked = data.notification_settings[key];
+                if (checkbox && typeof data[key] === 'boolean') {
+                    checkbox.checked = data[key];
                 }
             });
         }
@@ -462,14 +463,14 @@ async function saveNotificationPreferences(e) {
         
         console.log('[Rooted Vitality] Saving notification preferences:', preferences);
         
-        // notification_settings is a JSONB column in the clients table, not a separate table
         const { error } = await window.supabaseClient
-            .from('clients')
-            .update({
-                notification_settings: preferences,
+            .from('notification_settings')
+            .upsert({
+                user_id: currentUser.id,
+                user_type: 'client',
+                ...preferences,
                 updated_at: new Date().toISOString()
-            })
-            .eq('user_id', currentUser.id);
+            });
         
         if (error) {
             console.error('[Rooted Vitality] Error saving preferences:', error);
