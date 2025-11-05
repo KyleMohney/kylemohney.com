@@ -386,7 +386,7 @@ window.authManager = {
             // Try practitioners table first
             const { data: practitioner, error: practError } = await window.supabaseClient
                 .from('practitioners')
-                .select('first_name, last_name, email')
+                .select('*')
                 .eq('user_id', userId)
                 .single();
             
@@ -397,7 +397,7 @@ window.authManager = {
             // Fall back to clients table
             const { data: client, error: clientError } = await window.supabaseClient
                 .from('clients')
-                .select('first_name, last_name, email')
+                .select('*')
                 .eq('user_id', userId)
                 .single();
             
