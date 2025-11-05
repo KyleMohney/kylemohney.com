@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings | Rooted Vitality Client</title>
+  <link rel="stylesheet" href="../styles/styles.css">
+  <link rel="stylesheet" href="./styles/client-settings.css">
+</head>
+<body class="rooted-body client-view">
+  
+  <!-- ========================================== -->
+  <!-- HEADER (Injected via injections.js) -->
+  <!-- ========================================== -->
+  <header id="rooted-header"></header>
+
+  <!-- ========================================== -->
+  <!-- MAIN CONTENT -->
+  <!-- ========================================== -->
+  <main class="settings-main">
+    
+    <!-- Settings Sidebar Navigation -->
+    <nav class="settings-sidebar">
+      <div class="settings-sidebar-header">
+        <h2>Settings</h2>
+      </div>
+      <ul class="settings-nav-list">
+        <li><a href="#account" class="settings-nav-link active" data-section="account">Account</a></li>
+        <li><a href="#notifications" class="settings-nav-link" data-section="notifications">Notifications</a></li>
+      </ul>
+    </nav>
+
+    <!-- Settings Content Area -->
+    <div class="settings-content">
+      
+      <!-- ========================================== -->
+      <!-- 1. ACCOUNT SETTINGS -->
+      <!-- ========================================== -->
+      <section class="settings-section active" data-section="account" id="account">
+        <div class="settings-section-header">
+          <h1>Account Settings</h1>
+          <p class="section-description">Manage your account information</p>
+        </div>
+
+        <!-- Email Address -->
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>Email Address</h3>
+            <button class="btn-edit-setting" data-setting="email">Edit</button>
+          </div>
+          <div class="card-content">
+            <div class="info-group">
+              <p class="info-value" id="display-email">Loading...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Phone Number -->
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>Phone Number</h3>
+            <button class="btn-edit-setting" data-setting="phone">Edit</button>
+          </div>
+          <div class="card-content">
+            <div class="info-group">
+              <p class="info-value" id="display-phone">Loading...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Zip Code -->
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>Zip Code</h3>
+            <button class="btn-edit-setting" data-setting="zipcode">Edit</button>
+          </div>
+          <div class="card-content">
+            <div class="info-group">
+              <p class="info-value" id="display-zipcode">Loading...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Password Reset -->
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>Password Reset</h3>
+          </div>
+          <div class="card-content">
+            <p class="setting-description">Update your password to keep your account secure</p>
+            <button class="btn-setting-action" id="change-password-btn">Change Password</button>
+          </div>
+        </div>
+
+        <!-- Account Standing -->
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>Account Standing</h3>
+          </div>
+          <div class="card-content">
+            <div class="status-badge" id="account-standing-badge">Active</div>
+            <p class="setting-description" id="account-standing-desc">Your account is in good standing</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- 2. NOTIFICATION SETTINGS -->
+      <!-- ========================================== -->
+      <section class="settings-section" data-section="notifications" id="notifications">
+        <div class="settings-section-header">
+          <h1>Notification Preferences</h1>
+          <p class="section-description">Customize how you receive notifications across all channels</p>
+          <div class="notification-info-banner">
+            <p class="notification-info-text">Email and SMS notifications will be sent to the contact information in your <a href="#account" class="link-to-account">Account Settings</a></p>
+          </div>
+        </div>
+
+        <!-- Practitioner Messages Notifications -->
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>Practitioner Messages</h3>
+          </div>
+          <div class="card-content">
+            <p class="setting-description">When a practitioner messages you or accepts your match request</p>
+            <div class="notification-channels">
+              <label class="notification-channel-toggle">
+                <input type="checkbox" name="pro-messages-bell" checked class="notification-input">
+                <span class="toggle-label">In-App Notification</span>
+              </label>
+              <label class="notification-channel-toggle">
+                <input type="checkbox" name="pro-messages-email" checked class="notification-input">
+                <span class="toggle-label">Email</span>
+              </label>
+              <label class="notification-channel-toggle">
+                <input type="checkbox" name="pro-messages-sms" class="notification-input">
+                <span class="toggle-label">SMS</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Opportunity Replies Notifications -->
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>Opportunity Lead Replies</h3>
+          </div>
+          <div class="card-content">
+            <p class="setting-description">When practitioners reply to your wellness inquiries</p>
+            <div class="notification-channels">
+              <label class="notification-channel-toggle">
+                <input type="checkbox" name="opportunities-bell" checked class="notification-input">
+                <span class="toggle-label">In-App Notification</span>
+              </label>
+              <label class="notification-channel-toggle">
+                <input type="checkbox" name="opportunities-email" checked class="notification-input">
+                <span class="toggle-label">Email</span>
+              </label>
+              <label class="notification-channel-toggle">
+                <input type="checkbox" name="opportunities-sms" class="notification-input">
+                <span class="toggle-label">SMS</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Promotions & News -->
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>Promotions & News</h3>
+          </div>
+          <div class="card-content">
+            <p class="setting-description">Updates about features, special offers, and wellness news</p>
+            <div class="notification-channels">
+              <label class="notification-channel-toggle">
+                <input type="checkbox" name="promotions-bell" class="notification-input">
+                <span class="toggle-label">In-App Notification</span>
+              </label>
+              <label class="notification-channel-toggle">
+                <input type="checkbox" name="promotions-email" checked class="notification-input">
+                <span class="toggle-label">Email</span>
+              </label>
+              <label class="notification-channel-toggle">
+                <input type="checkbox" name="promotions-sms" class="notification-input">
+                <span class="toggle-label">SMS</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- System Notifications -->
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>System Notifications</h3>
+          </div>
+          <div class="card-content">
+            <p class="setting-description">Account updates, subscription alerts, and important security notifications</p>
+            <div class="notification-channels">
+              <label class="notification-channel-toggle">
+                <input type="checkbox" name="system-bell" checked class="notification-input">
+                <span class="toggle-label">In-App Notification</span>
+              </label>
+              <label class="notification-channel-toggle">
+                <input type="checkbox" name="system-email" checked class="notification-input">
+                <span class="toggle-label">Email</span>
+              </label>
+              <label class="notification-channel-toggle">
+                <input type="checkbox" name="system-sms" class="notification-input">
+                <span class="toggle-label">SMS</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section Footer with Save Button -->
+        <div class="section-footer">
+          <button id="save-notifications-btn" class="btn-accent">Save Notification Preferences</button>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ========================================== -->
+  <!-- FOOTER (Injected via injections.js) -->
+  <!-- ========================================== -->
+  <footer id="rooted-footer"></footer>
+
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Rooted Vitality Scripts -->
+  <script src="../scripts/config.js"></script>
+  <script src="../scripts/authManager.js"></script>
+  <script src="../scripts/authModal.js"></script>
+  <script src="../scripts/authHooks.js"></script>
+  <script src="../injections.js"></script>
+  <script src="./scripts/clientSettings.js"></script>
+</body>
+</html>
