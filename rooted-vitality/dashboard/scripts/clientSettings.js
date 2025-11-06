@@ -48,7 +48,10 @@ async function initializeSettings() {
         // Load user settings from database
         const loaded = await loadUserSettings();
         if (!loaded) {
-            console.warn('[Rooted Vitality] Failed to load user settings, but continuing with available data');
+            console.error('[Rooted Vitality] No client profile found - user needs to create profile first');
+            // Redirect to profile setup if no client record exists
+            window.location.href = '/rooted-vitality/join-network.html?role=client&step=profile';
+            return;
         }
         
         // Populate UI with user data

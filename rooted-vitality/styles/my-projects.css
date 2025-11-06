@@ -314,22 +314,48 @@ TABLE OF CONTENTS
 .project-card__header {
   padding: 1.5rem;
   border-bottom: 1px solid rgba(92, 154, 114, 0.1);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s ease;
+}
+
+.project-card__header:hover {
+  background: rgba(92, 154, 114, 0.02);
 }
 
 .project-card__title-row {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   gap: 1rem;
+}
+
+.project-card__toggle {
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: var(--rooted-primary);
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+
+.project-card--collapsed .project-card__toggle {
+  transform: rotate(-90deg);
 }
 
 .project-card__title {
   font-size: 1.375rem;
   font-weight: 600;
   color: var(--rooted-primary);
-  margin: 0 0 0.25rem 0;
+  margin: 0;
   font-family: var(--font-sans);
   line-height: 1.3;
+  flex: 1;
 }
 
 .project-card__id {
@@ -386,6 +412,17 @@ TABLE OF CONTENTS
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+  max-height: 500px;
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+  opacity: 1;
+}
+
+.project-card--collapsed .project-card__body {
+  max-height: 0;
+  padding: 0 1.5rem;
+  overflow: hidden;
+  opacity: 0;
 }
 
 .project-card__description {
@@ -541,6 +578,15 @@ TABLE OF CONTENTS
   display: flex;
   gap: 0.75rem;
   justify-content: flex-end;
+  max-height: 100px;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+}
+
+.project-card--collapsed .project-card__footer {
+  max-height: 0;
+  padding: 0 1.5rem;
+  border-top: none;
 }
 
 .btn-project-action {

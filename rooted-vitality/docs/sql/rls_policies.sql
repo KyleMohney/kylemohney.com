@@ -12,6 +12,66 @@
 -- PROJECTS TABLE POLICIES
 -- ============================================================================
 
+-- ============================================================================
+-- CLIENTS TABLE POLICIES
+-- ============================================================================
+
+ALTER TABLE clients ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "clients_select_policy" ON clients;
+DROP POLICY IF EXISTS "clients_update_policy" ON clients;
+DROP POLICY IF EXISTS "clients_service_role_policy" ON clients;
+
+-- SELECT: Users can see their own client record
+CREATE POLICY "clients_select_policy" ON clients
+FOR SELECT
+USING (user_id = auth.uid());
+
+-- UPDATE: Users can update their own client record
+CREATE POLICY "clients_update_policy" ON clients
+FOR UPDATE
+USING (user_id = auth.uid())
+WITH CHECK (user_id = auth.uid());
+
+-- SERVICE ROLE BYPASS: Allow service role (triggers, functions) full access
+CREATE POLICY "clients_service_role_policy" ON clients
+FOR ALL
+USING (auth.role() = 'authenticated' OR auth.role() = 'service_role')
+WITH CHECK (auth.role() = 'authenticated' OR auth.role() = 'service_role');
+
+
+-- ============================================================================
+-- PRACTITIONERS TABLE POLICIES
+-- ============================================================================
+
+ALTER TABLE practitioners ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "practitioners_select_policy" ON practitioners;
+DROP POLICY IF EXISTS "practitioners_update_policy" ON practitioners;
+DROP POLICY IF EXISTS "practitioners_service_role_policy" ON practitioners;
+
+-- SELECT: Users can see their own practitioner record
+CREATE POLICY "practitioners_select_policy" ON practitioners
+FOR SELECT
+USING (user_id = auth.uid());
+
+-- UPDATE: Users can update their own practitioner record
+CREATE POLICY "practitioners_update_policy" ON practitioners
+FOR UPDATE
+USING (user_id = auth.uid())
+WITH CHECK (user_id = auth.uid());
+
+-- SERVICE ROLE BYPASS: Allow service role (triggers, functions) full access
+CREATE POLICY "practitioners_service_role_policy" ON practitioners
+FOR ALL
+USING (auth.role() = 'authenticated' OR auth.role() = 'service_role')
+WITH CHECK (auth.role() = 'authenticated' OR auth.role() = 'service_role');
+
+
+-- ============================================================================
+-- PROJECTS TABLE POLICIES
+-- ============================================================================
+
 ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "projects_select_policy" ON projects;

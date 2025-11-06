@@ -527,6 +527,15 @@ async function loadProjects() {
     visibleProjects.forEach(project => {
       const card = createProjectCard(project);
       container.appendChild(card);
+      
+      // Add collapse toggle handler
+      const toggleBtn = card.querySelector('.project-card__toggle');
+      if (toggleBtn) {
+        toggleBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          card.classList.toggle('project-card--collapsed');
+        });
+      }
     });
 
     // Update stats
@@ -575,8 +584,11 @@ function createProjectCard(project) {
   const card = document.createElement('div');
   card.className = 'project-card';
   card.innerHTML = `
-    <div class="project-card__header">
+    <div class="project-card__header" data-project-id="${project.id}">
       <div class="project-card__title-row">
+        <button class="project-card__toggle" aria-label="Toggle project details">
+          <span class="toggle-icon">▼</span>
+        </button>
         <h3 class="project-card__title">${categoryName}</h3>
         <span class="project-card__status" style="background-color: ${statusColor}20; color: ${statusColor}; border: 1px solid ${statusColor}">
           ${statusLabel}
@@ -645,6 +657,15 @@ function updateStats(projects) {
   document.getElementById('total-practitioners').textContent = uniquePractitioners;
 }
 
+function browseMatches(projectId) {
+  window.location.href = `/rooted-vitality/dashboard/client-directory.html?project_id=${projectId}`;
+}
+
+function viewMatches(projectId) {
+  // View matches takes to My Matches page showing all connections for this client
+  window.location.href = `/rooted-vitality/dashboard/client-my-matches.html`;
+}
+
 function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
@@ -654,10 +675,6 @@ function escapeHtml(text) {
 function showNotification(message, type = 'info') {
   console.log(`[${type.toUpperCase()}] ${message}`);
   // TODO: Implement toast notification UI
-}
-
-function browseMatches(projectId) {
-  window.location.href = `/rooted-vitality/dashboard/client-directory.html?project_id=${projectId}`;
 }
 
 // ========================================== 

@@ -21,11 +21,10 @@ CREATE OR REPLACE FUNCTION generate_client_serial()
 RETURNS TRIGGER AS $$
 BEGIN
   IF NEW.serial_number IS NULL THEN
-    NEW.serial_number := 'C' || (
-      SELECT COALESCE(MAX(CAST(SUBSTRING(serial_number FROM 2) AS INTEGER)), 0) + 1
-      FROM clients
-      WHERE serial_number ~ '^C[0-9]+$'
-    )::TEXT;
+    NEW.serial_number := 'C' || COALESCE(
+      (SELECT MAX(CAST(SUBSTRING(serial_number, 2) AS INTEGER)) FROM clients WHERE serial_number ~ '^C[0-9]+$'),
+      0
+    ) + 1;
   END IF;
   RETURN NEW;
 END;
@@ -45,11 +44,10 @@ CREATE OR REPLACE FUNCTION generate_practitioner_serial()
 RETURNS TRIGGER AS $$
 BEGIN
   IF NEW.serial_number IS NULL THEN
-    NEW.serial_number := 'P' || (
-      SELECT COALESCE(MAX(CAST(SUBSTRING(serial_number FROM 2) AS INTEGER)), 0) + 1
-      FROM practitioners
-      WHERE serial_number ~ '^P[0-9]+$'
-    )::TEXT;
+    NEW.serial_number := 'P' || COALESCE(
+      (SELECT MAX(CAST(SUBSTRING(serial_number, 2) AS INTEGER)) FROM practitioners WHERE serial_number ~ '^P[0-9]+$'),
+      0
+    ) + 1;
   END IF;
   RETURN NEW;
 END;
