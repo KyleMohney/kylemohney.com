@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practitioner Profile - Rooted Vitality</title>
+    <link rel="stylesheet" href="../universal-header.html">
+    <link rel="stylesheet" href="../styles/find-practitioners.css">
+    <link rel="stylesheet" href="../styles/practitioner-profile.css">
+</head>
+<body>
+    <!-- Header will be injected here -->
+    <div id="rvHeader"></div>
+
+    <main class="profile-container">
+        <!-- Loading State -->
+        <div id="profile-loading" class="profile-loading">
+            <div class="spinner"></div>
+            <p>Loading practitioner profile...</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="profile-error" class="profile-error" style="display: none;">
+            <p id="error-message">Unable to load practitioner profile</p>
+        </div>
+
+        <!-- Profile Content (Hidden until loaded) -->
+        <div id="profile-content" style="display: none;">
+            <!-- Hero Section -->
+            <section class="profile-hero">
+                <div class="hero-background"></div>
+                <div class="hero-content">
+                    <div class="hero-photo-container">
+                        <img id="profile-photo" src="" alt="Practitioner" class="hero-photo">
+                    </div>
+                    <div class="hero-info">
+                        <div class="hero-header">
+                            <div class="hero-title-group">
+                                <h1 id="profile-business-name" class="hero-title"></h1>
+                                <p id="profile-tagline" class="hero-tagline"></p>
+                            </div>
+                            <div class="hero-badges">
+                                <span id="badge-credentials" class="badge badge-credentials" style="display: none;">
+                                    <i class="icon-check"></i> Credentials Verified
+                                </span>
+                                <span id="badge-featured" class="badge badge-featured" style="display: none;">
+                                    <i class="icon-star"></i> Featured
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="hero-stats">
+                            <div class="stat">
+                                <span id="stat-rating" class="stat-value">5.0</span>
+                                <span class="stat-label">Rating</span>
+                                <div id="stat-stars" class="stat-stars"></div>
+                            </div>
+                            <div class="stat">
+                                <span id="stat-reviews" class="stat-value">0</span>
+                                <span class="stat-label">Reviews</span>
+                            </div>
+                            <div class="stat">
+                                <span id="stat-years" class="stat-value">—</span>
+                                <span class="stat-label">In Practice</span>
+                            </div>
+                            <div class="stat">
+                                <span id="stat-business-type" class="stat-value">—</span>
+                                <span class="stat-label">Practice Type</span>
+                            </div>
+                        </div>
+
+                        <div class="hero-actions">
+                            <button id="btn-hire" class="btn btn-primary btn-lg">Hire Practitioner</button>
+                            <button id="btn-contact" class="btn btn-secondary btn-lg">Contact</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Introduction Video Section -->
+            <section id="video-section" class="profile-section profile-video" style="display: none;">
+                <div class="section-container">
+                    <h2 class="section-title">Introduction</h2>
+                    <div class="video-container">
+                        <video id="intro-video" controls width="100%">
+                            <source id="video-source" src="" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                </div>
+            </section>
+
+            <!-- About & Approach Section -->
+            <section class="profile-section profile-about">
+                <div class="section-container">
+                    <div class="about-grid">
+                        <div class="about-column">
+                            <h2 class="section-title">About</h2>
+                            <p id="profile-bio" class="section-text"></p>
+                        </div>
+                        <div id="approach-column" class="about-column" style="display: none;">
+                            <h2 class="section-title">My Approach</h2>
+                            <p id="profile-approach" class="section-text"></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Specializations Section -->
+            <section id="conditions-section" class="profile-section profile-specializations" style="display: none;">
+                <div class="section-container">
+                    <h2 class="section-title">Specializations</h2>
+                    <div id="conditions-grid" class="conditions-grid"></div>
+                </div>
+            </section>
+
+            <!-- Credentials Section -->
+            <section id="credentials-section" class="profile-section profile-credentials" style="display: none;">
+                <div class="section-container">
+                    <h2 class="section-title">Credentials</h2>
+                    <div id="credentials-grid" class="credentials-grid"></div>
+                </div>
+            </section>
+
+            <!-- Reviews Section -->
+            <section id="reviews-section" class="profile-section profile-reviews" style="display: none;">
+                <div class="section-container">
+                    <h2 class="section-title">Client Reviews</h2>
+                    <div id="reviews-container" class="reviews-grid"></div>
+                    <div id="no-reviews-state" class="no-reviews-state" style="display: none;">
+                        <p>No reviews yet. Schedule a session to be the first to leave a review!</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Gallery Section -->
+            <section id="gallery-section" class="profile-section profile-gallery" style="display: none;">
+                <div class="section-container">
+                    <h2 class="section-title">Gallery</h2>
+                    <div id="gallery-grid" class="gallery-grid"></div>
+                </div>
+            </section>
+
+            <!-- Additional Details Section -->
+            <section id="additional-section" class="profile-section profile-additional" style="display: none;">
+                <div class="section-container">
+                    <h2 class="section-title">Additional Details</h2>
+                    <div class="additional-details">
+                        <div id="modalities-detail" class="detail-item" style="display: none;">
+                            <h3>Modalities</h3>
+                            <div id="modalities-list" class="detail-list"></div>
+                        </div>
+                        <div id="languages-detail" class="detail-item" style="display: none;">
+                            <h3>Languages</h3>
+                            <div id="languages-list" class="detail-list"></div>
+                        </div>
+                        <div id="insurance-detail" class="detail-item" style="display: none;">
+                            <h3>Insurance</h3>
+                            <div id="insurance-info"></div>
+                        </div>
+                        <div id="pricing-detail" class="detail-item" style="display: none;">
+                            <h3>Pricing</h3>
+                            <p id="pricing-info"></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Image Modal for Gallery -->
+    <div id="image-modal" class="image-modal" style="display: none;">
+        <div class="image-modal-content">
+            <span class="image-modal-close">&times;</span>
+            <img id="image-modal-img" src="" alt="Full size image">
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../scripts/config.js"></script>
+    <script src="../components/header_public.html"></script>
+    <script src="../scripts/practitioner-profile.js"></script>
+</body>
+</html>

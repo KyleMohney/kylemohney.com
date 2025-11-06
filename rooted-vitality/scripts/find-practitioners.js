@@ -387,7 +387,7 @@ function createPractitionerCard(practitioner) {
       <p class="card-bio">${(practitioner.bio || '').substring(0, 150)}${(practitioner.bio || '').length > 150 ? '...' : ''}</p>
 
       <div class="card-actions">
-        <button class="card-btn card-btn--view" onclick="openPractitionerModal('${practitioner.id}')">View Profile</button>
+        <button class="card-btn card-btn--view" onclick="navigateToPractitionerProfile('${practitioner.id}')">View Profile</button>
         <button class="card-btn card-btn--connect" onclick="openConnectionRequest('${practitioner.id}')">Connect</button>
       </div>
     </div>
@@ -591,6 +591,14 @@ function setupEventListeners() {
 
 function capitalizeFirst(str) {
   return str.charAt(0).toUpperCase() + str.slice(1).replace('-', ' ');
+}
+
+/**
+ * Navigate to practitioner profile page
+ */
+function navigateToPractitionerProfile(practitionerId) {
+  console.log('[Find Practitioners] Navigating to profile for practitioner:', practitionerId);
+  window.location.href = `practitioner-profile.html?practitioner_id=${practitionerId}`;
 }
 
 // ============================================================================

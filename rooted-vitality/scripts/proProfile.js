@@ -117,6 +117,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         currentUser = user;
         console.log(`[Rooted Vitality] Loaded profile for user: ${user.id}`);
         
+        // Initialize conditions manager with Supabase client
+        console.log('[Rooted Vitality] Initializing conditions manager...');
+        await window.conditionsManager.init(window.supabaseClient);
         
         // Load profile data from Supabase
         await loadProfile(user.id);
@@ -197,6 +200,10 @@ async function loadProfile(userId) {
             window.practitionerData = {};
             initializeCredentialSections();
         }
+        
+        // Render dynamic conditions checkboxes from taxonomy
+        console.log('[Rooted Vitality] Rendering conditions checkboxes...');
+        window.conditionsManager.render();
         
         // Update completeness meter after loading profile
         updateProfileCompleteness();
@@ -2414,12 +2421,13 @@ function setupPublicProfileLink() {
     console.log('[Rooted Vitality] Setting up public profile link');
     
     const previewLink = document.getElementById('view-public-profile');
-    if (previewLink && currentUser) {
+    if (previewLink && currentUser && window.practitionerData && window.practitionerData.id) {
         previewLink.addEventListener('click', (e) => {
             e.preventDefault();
-            // Generate public profile URL (adjust path as needed)
-            const publicProfileUrl = `/profiles/${currentUser.id}`;
+            // Navigate to public profile page with practitioner ID (from dashboard/pro/profile.html, go up to dashboard/)
+            const publicProfileUrl = `../practitioner-profile.html?practitioner_id=${window.practitionerData.id}`;
             window.open(publicProfileUrl, '_blank');
+            console.log('[Rooted Vitality] Opening public profile:', publicProfileUrl);
         });
     }
 }
@@ -3213,8 +3221,8 @@ function setupConditionsListeners() {
 
 function updateConditionsData() {
     try {
-        const checkboxes = document.querySelectorAll('input[name="condition"]:checked');
-        window.conditionsData = Array.from(checkboxes).map(checkbox => checkbox.value);
+        // Get selected conditions from the conditions manager
+        window.conditionsData = window.conditionsManager.getSelected();
         console.log('[Rooted Vitality] Updated conditions data:', window.conditionsData);
     } catch (error) {
         console.error('[Rooted Vitality] Error updating conditions data:', error);
@@ -3239,13 +3247,12 @@ function loadConditions(conditionsArray) {
             return;
         }
         
-        window.conditionsData = conditionsArray;
+        console.log('[Rooted Vitality] Loading conditions into UI:', conditionsArray);
         
-        // Check the corresponding checkboxes
-        const checkboxes = document.querySelectorAll('input[name="condition"]');
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = conditionsArray.includes(checkbox.value);
-        });
+        // Use conditions manager to set selected conditions
+        // This handles the dynamic taxonomy checkboxes
+        window.conditionsData = conditionsArray;
+        window.conditionsManager.setSelected(conditionsArray);
         
         // Render display
         renderConditionsDisplay();
