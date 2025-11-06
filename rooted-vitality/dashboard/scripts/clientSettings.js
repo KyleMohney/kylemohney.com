@@ -152,6 +152,17 @@ function switchSection(sectionId) {
 /* ========================================== */
 
 function populateSettingsUI() {
+    // Populate Open to Contact toggle
+    const openToContactToggle = document.getElementById('open-to-contact-toggle');
+    if (openToContactToggle) {
+        openToContactToggle.checked = userSettings.open_to_contact !== false; // Default to true
+        
+        // Add change listener
+        openToContactToggle.addEventListener('change', async (e) => {
+            await handleOpenToContactToggle(e.target.checked);
+        });
+    }
+    
     // Populate email
     document.getElementById('display-email').textContent = userSettings.email || currentUser.email || 'Not provided';
     
@@ -173,6 +184,43 @@ function populateSettingsUI() {
         standingBadge.textContent = 'Active';
         standingBadge.classList.remove('inactive');
         standingDesc.textContent = 'Your account is in good standing';
+    }
+}
+
+async function handleOpenToContactToggle(isEnabled) {
+    try {
+        console.log('[Rooted Vitality] Updating open_to_contact to:', isEnabled);
+        
+        const { error } = await window.supabaseClient
+            .from('clients')
+            .update({ 
+                open_to_contact: isEnabled,
+                updated_at: new Date().toISOString()
+            })
+            .eq('user_id', currentUser.id);
+        
+        if (error) {
+            console.error('[Rooted Vitality] Error updating open_to_contact:', error);
+            showNotification('Failed to update setting', 'error');
+            // Revert toggle
+            document.getElementById('open-to-contact-toggle').checked = !isEnabled;
+            return;
+        }
+        
+        // Update local state
+        userSettings.open_to_contact = isEnabled;
+        
+        const message = isEnabled 
+            ? 'You are now open to practitioner matches' 
+            : 'You will not receive new match requests';
+        showNotification(message, 'success');
+        
+        console.log('[Rooted Vitality] open_to_contact updated successfully');
+    } catch (error) {
+        console.error('[Rooted Vitality] Exception updating open_to_contact:', error);
+        showNotification('Error updating setting', 'error');
+        // Revert toggle
+        document.getElementById('open-to-contact-toggle').checked = !isEnabled;
     }
 }
 
@@ -417,6 +465,34 @@ function handleDeleteAccount() {
 function handleCCPARequest() {
     console.log('[Rooted Vitality] CCPA request clicked');
     alert('CCPA data request form functionality to be implemented');
+}
+
+function showNotification(message, type = 'success') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification notification--${type}`;
+    notification.textContent = message;
+    notification.style.cssText = `
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        padding: 1rem 1.5rem;
+        background: ${type === 'success' ? '#5c9a72' : '#d4534f'};
+        color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10000;
+        font-weight: 500;
+        animation: slideIn 0.3s ease;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
 }
 
 /* ========================================== */

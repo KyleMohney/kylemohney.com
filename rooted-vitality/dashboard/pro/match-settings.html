@@ -3088,107 +3088,8 @@
                 </div>
               </div>
 
-              <!-- BASE LOCATION / RADIUS (Legacy - Hidden until checkbox) -->
-              <div id="conditional-location-fields" class="coverage-section-group" style="display: none;">
-                <div class="coverage-section-header">
-                  <label class="coverage-section-label">Base Location</label>
-                  <span class="tooltip-icon-inline" title="Your primary location for in-person or house call services.">?</span>
-                </div>
-                <input 
-                  type="text"
-                  id="base-city-state" 
-                  class="form-control base-location-input" 
-                  placeholder="City, State (e.g., Denver, CO)"
-                />
-              </div>
-
-              <!-- Service Radius Slider (Legacy - Hidden until checkbox) -->
-              <div id="radius-section" class="coverage-section-group" style="display: none;">
-                <div class="coverage-section-header">
-                  <label class="coverage-section-label">Service Radius</label>
-                  <span class="tooltip-icon-inline" title="Drag to set how far you're willing to travel. See the map update in real-time.">?</span>
-                </div>
-                <div class="radius-control-compact">
-                  <div class="radius-display-header">
-                    <span id="radius-value-display" class="radius-value-badge">25 mi</span>
-                  </div>
-                  <input 
-                    type="range"
-                    id="service-radius" 
-                    class="radius-slider"
-                    min="0"
-                    max="500"
-                    value="25"
-                    step="1"
-                    oninput="updateRadiusDisplay()"
-                  >
-                  <div class="radius-scale">
-                    <span>0 mi</span>
-                    <span>250 mi</span>
-                    <span>500 mi</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Target ZIP Codes (Hidden until checkbox) -->
-              <div class="coverage-section-group" style="display: none;">
-                <div class="coverage-section-header">
-                  <label class="coverage-section-label">Target ZIP Codes</label>
-                  <span class="tooltip-icon-inline" title="Optional: Focus on 2-3 high-demand areas for better results.">?</span>
-                </div>
-                
-                <div class="zip-section">
-                  <div class="zip-input-row">
-                    <input 
-                      type="text" 
-                      id="zip-code-input" 
-                      class="form-control zip-input" 
-                      placeholder="Enter ZIP code..."
-                      maxlength="5"
-                    >
-                    <button type="button" class="btn-import-csv" onclick="triggerCSVImport()">
-                      Import CSV
-                    </button>
-                    <input type="file" id="csv-import-input" accept=".csv" onchange="handleCSVImport(event)" style="display: none;">
-                  </div>
-
-                  <!-- ZIP Code Tags -->
-                  <div id="zip-tags-container" class="zip-tags-container">
-                    <span style="color: #a8a39f; font-size: 0.9rem;">No ZIP codes added yet.</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Licensed States (Hidden until checkbox) -->
-              <div class="coverage-section-group" style="display: none;">
-                <div class="coverage-section-header">
-                  <label class="coverage-section-label">Licensed States</label>
-                  <span class="tooltip-icon-inline" title="Enter the state abbreviations where you're licensed to practice. Essential for remote practitioners.">?</span>
-                </div>
-                
-                <div class="states-section">
-                  <div class="states-input-row">
-                    <input 
-                      type="text" 
-                      id="state-input" 
-                      class="form-control state-input" 
-                      placeholder="State abbr. (e.g., CO, NY, CA)"
-                      maxlength="2"
-                      style="text-transform: uppercase;"
-                    >
-                    <button type="button" class="btn-add-state" onclick="addState()" title="Add state">
-                      Add
-                    </button>
-                  </div>
-
-                  <!-- State Tags -->
-                  <div id="state-tags-container" class="state-tags-container">
-                    <span style="color: #a8a39f; font-size: 0.9rem;">No states added yet.</span>
-                  </div>
-                </div>
-              </div>
-
             </div>
+            <!-- END coverage-controls-column -->
 
             <!-- Right Column: Map -->
             <div class="coverage-map-column">
@@ -3648,6 +3549,11 @@
     let selectedCategoryForAdd = null;
     let zipCodesList = [];
     let statesList = [];
+    
+    // Coverage area arrays
+    let inofficeZipsList = [];
+    let housecallsZipsList = [];
+    let virtualStatesList = [];
 
     // ======================================================
     // 0. PANEL NAVIGATION
@@ -3775,6 +3681,9 @@
         
         // Load coverage settings
         loadCoverageSettings();
+        
+        // Load availability settings
+        loadAvailabilitySettings();
         
         // Initialize coverage map after a short delay to ensure DOM is ready
         setTimeout(() => {
@@ -4952,18 +4861,10 @@
         clearVirtualRemoteSelection();
       }
 
-      // Show/hide conditional fields based on whether any in-person options are selected
-      const conditionalFields = document.getElementById('conditional-location-fields');
-      const radiusSection = document.getElementById('radius-section');
-      const mapContainer = document.getElementById('coverage-map');
+      // Initialize map if any service type is selected
+      const hasAnyService = inPerson || houseCalls || virtual;
 
-      const hasInPersonServices = inPerson || houseCalls;
-
-      if (hasInPersonServices) {
-        // Show the radius/location controls
-        conditionalFields.classList.add('visible');
-        radiusSection.classList.add('visible');
-
+      if (hasAnyService) {
         // Initialize map if not already done
         setTimeout(() => {
           if (coverageMap) {
@@ -4973,10 +4874,6 @@
             initializeCoverageMap();
           }
         }, 100);
-      } else {
-        // Hide radius/location controls but keep map visible
-        conditionalFields.classList.remove('visible');
-        radiusSection.classList.remove('visible');
       }
 
       console.log('[Rooted Vitality] Travel type updated:', {
@@ -5753,6 +5650,61 @@
     }
 
     // ======================================================
+    // 11B. COVERAGE AREA: RENDER FUNCTIONS FOR LOADING
+    // ======================================================
+
+    function renderInofficeZipTags() {
+      const container = document.getElementById('inoffice-zip-tags');
+      if (!container) return;
+      
+      container.innerHTML = '';
+      inofficeZipsList.forEach(zipCode => {
+        const tag = document.createElement('div');
+        tag.setAttribute('data-zip', zipCode);
+        tag.style.cssText = 'background: #ebf6e8; color: #5c9a72; padding: 0.5rem 0.75rem; border-radius: 4px; font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem; font-weight: 500;';
+        tag.innerHTML = `
+          ${zipCode}
+          <button type="button" onclick="removeInofficeZip(this)" style="background: none; border: none; color: #5c9a72; cursor: pointer; padding: 0; font-size: 1rem; line-height: 1;">×</button>
+        `;
+        container.appendChild(tag);
+      });
+    }
+
+    function renderHouseCallsZipTags() {
+      const container = document.getElementById('housecalls-zip-tags');
+      if (!container) return;
+      
+      container.innerHTML = '';
+      housecallsZipsList.forEach(zipCode => {
+        const tag = document.createElement('div');
+        tag.setAttribute('data-zip', zipCode);
+        tag.style.cssText = 'background: #ebf6e8; color: #5c9a72; padding: 0.5rem 0.75rem; border-radius: 4px; font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem; font-weight: 500;';
+        tag.innerHTML = `
+          ${zipCode}
+          <button type="button" onclick="removeHouseCallsZip(this)" style="background: none; border: none; color: #5c9a72; cursor: pointer; padding: 0; font-size: 1rem; line-height: 1;">×</button>
+        `;
+        container.appendChild(tag);
+      });
+    }
+
+    function renderVirtualRemoteStateTags() {
+      const container = document.getElementById('virtualremote-state-tags');
+      if (!container) return;
+      
+      container.innerHTML = '';
+      virtualStatesList.forEach(stateCode => {
+        const tag = document.createElement('div');
+        tag.setAttribute('data-state', stateCode);
+        tag.style.cssText = 'background: #ebf6e8; color: #5c9a72; padding: 0.5rem 0.75rem; border-radius: 4px; font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem; font-weight: 500;';
+        tag.innerHTML = `
+          ${stateCode}
+          <button type="button" onclick="removeVirtualRemoteState(this)" style="background: none; border: none; color: #5c9a72; cursor: pointer; padding: 0; font-size: 1rem; line-height: 1;">×</button>
+        `;
+        container.appendChild(tag);
+      });
+    }
+
+    // ======================================================
     // 12. COVERAGE AREA: RADIUS SLIDER
     // ======================================================
 
@@ -6000,52 +5952,191 @@
     // 13. COVERAGE AREA: LOAD & SAVE
     // ======================================================
 
-    function loadCoverageSettings() {
-      const saved = localStorage.getItem('coverageArea');
-      if (saved) {
-        try {
-          const settings = JSON.parse(saved);
-          document.getElementById('service-mode').value = settings.mode || 'in-person';
-          document.getElementById('base-city-state').value = settings.cityState || '';
-          document.getElementById('service-radius').value = settings.radius || '';
-          zipCodesList = settings.zipCodes || [];
-          
-          handleServiceModeChange();
-          renderZIPCodeTags();
-          
-          console.log('[Rooted Vitality] Loaded coverage settings:', settings);
-        } catch (error) {
-          console.error('[Rooted Vitality] Error loading coverage settings:', error);
+    async function loadCoverageSettings() {
+      try {
+        // Get current user
+        const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+        if (userError || !user) {
+          console.log('[Coverage Settings] No user logged in');
+          return;
         }
+
+        // Load from database
+        const { data: practitioner, error } = await supabaseClient
+          .from('practitioners')
+          .select('in_person_enabled, in_person_option, in_person_base_zipcode, in_person_radius_miles, in_person_zipcodes, housecalls_enabled, housecalls_option, housecalls_base_zipcode, housecalls_radius_miles, housecalls_zipcodes, virtual_enabled, virtual_option, virtual_states')
+          .eq('user_id', user.id)
+          .single();
+
+        if (error || !practitioner) {
+          console.log('[Coverage Settings] No practitioner data found');
+          return;
+        }
+
+        console.log('[Coverage Settings] Loaded from database:', practitioner);
+
+        // Restore IN-PERSON settings
+        if (practitioner.in_person_enabled) {
+          document.getElementById('travel-in-person').checked = true;
+          document.getElementById('inoffice-settings').style.display = 'block';
+          
+          if (practitioner.in_person_option === 'radius') {
+            document.getElementById('inoffice-mode-radius').checked = true;
+            document.getElementById('inoffice-radius-content').style.display = 'block';
+            document.getElementById('inoffice-base-zip').value = practitioner.in_person_base_zipcode || '';
+            document.getElementById('inoffice-radius-slider').value = practitioner.in_person_radius_miles || 10;
+            updateInofficeRadiusDisplay();
+          } else if (practitioner.in_person_option === 'zipcodes' && practitioner.in_person_zipcodes) {
+            document.getElementById('inoffice-mode-zips').checked = true;
+            document.getElementById('inoffice-zips-content').style.display = 'block';
+            // Populate ZIP tags
+            inofficeZipsList = practitioner.in_person_zipcodes;
+            renderInofficeZipTags();
+          }
+        }
+
+        // Restore HOUSE-CALLS settings
+        if (practitioner.housecalls_enabled) {
+          document.getElementById('travel-house-calls').checked = true;
+          document.getElementById('housecalls-settings').style.display = 'block';
+          
+          if (practitioner.housecalls_option === 'radius') {
+            document.getElementById('housecalls-mode-radius').checked = true;
+            document.getElementById('housecalls-radius-content').style.display = 'block';
+            document.getElementById('housecalls-base-zip').value = practitioner.housecalls_base_zipcode || '';
+            document.getElementById('housecalls-radius-slider').value = practitioner.housecalls_radius_miles || 10;
+            updateHouseCallsRadiusDisplay();
+          } else if (practitioner.housecalls_option === 'zipcodes' && practitioner.housecalls_zipcodes) {
+            document.getElementById('housecalls-mode-zips').checked = true;
+            document.getElementById('housecalls-zips-content').style.display = 'block';
+            // Populate ZIP tags
+            housecallsZipsList = practitioner.housecalls_zipcodes;
+            renderHouseCallsZipTags();
+          }
+        }
+
+        // Restore VIRTUAL settings
+        if (practitioner.virtual_enabled) {
+          document.getElementById('travel-virtual').checked = true;
+          document.getElementById('virtualremote-settings').style.display = 'block';
+          
+          if (practitioner.virtual_option === 'nationwide') {
+            document.getElementById('virtualremote-mode-nationwide').checked = true;
+          } else if (practitioner.virtual_option === 'states' && practitioner.virtual_states) {
+            document.getElementById('virtualremote-mode-states').checked = true;
+            document.getElementById('virtualremote-states-content').style.display = 'block';
+            // Populate state tags
+            virtualStatesList = practitioner.virtual_states;
+            renderVirtualRemoteStateTags();
+          }
+        }
+
+      } catch (error) {
+        console.error('[Coverage Settings] Error loading:', error);
       }
     }
 
-    function saveCoverageSettings() {
-      const mode = document.getElementById('service-mode').value;
-      const cityState = document.getElementById('base-city-state').value;
-      const radius = document.getElementById('service-radius').value;
+    async function saveCoverageSettings() {
+      try {
+        // Get current user
+        const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+        if (userError || !user) {
+          showToast('Please log in to save coverage settings.', 'error');
+          return;
+        }
 
-      // Validation
-      if (mode !== 'remote' && !cityState.trim()) {
-        showToast('Please enter a base city/state for in-person or both modes.', 'error');
-        return;
+        // Build coverage data object from all 6 options
+        const coverageData = {
+          // IN-PERSON COVERAGE
+          in_person_enabled: document.getElementById('travel-in-person')?.checked || false,
+          in_person_option: null,
+          in_person_base_zipcode: null,
+          in_person_radius_miles: null,
+          in_person_zipcodes: [],
+
+          // HOUSE-CALLS COVERAGE
+          housecalls_enabled: document.getElementById('travel-house-calls')?.checked || false,
+          housecalls_option: null,
+          housecalls_base_zipcode: null,
+          housecalls_radius_miles: null,
+          housecalls_zipcodes: [],
+
+          // VIRTUAL COVERAGE
+          virtual_enabled: document.getElementById('travel-virtual')?.checked || false,
+          virtual_option: null,
+          virtual_states: []
+        };
+
+        // In-Person: Determine which option is selected
+        if (coverageData.in_person_enabled) {
+          const radiusChecked = document.getElementById('inoffice-mode-radius')?.checked;
+          const zipsChecked = document.getElementById('inoffice-mode-zips')?.checked;
+
+          if (radiusChecked) {
+            coverageData.in_person_option = 'radius';
+            coverageData.in_person_base_zipcode = document.getElementById('inoffice-base-zip')?.value || null;
+            coverageData.in_person_radius_miles = parseInt(document.getElementById('inoffice-radius-slider')?.value) || null;
+          } else if (zipsChecked) {
+            coverageData.in_person_option = 'zipcodes';
+            // Get zipcodes from tags
+            const zipTags = document.querySelectorAll('#inoffice-zip-tags .zip-tag');
+            coverageData.in_person_zipcodes = Array.from(zipTags).map(tag => tag.textContent.replace('×', '').trim());
+          }
+        }
+
+        // House-Calls: Determine which option is selected
+        if (coverageData.housecalls_enabled) {
+          const radiusChecked = document.getElementById('housecalls-mode-radius')?.checked;
+          const zipsChecked = document.getElementById('housecalls-mode-zips')?.checked;
+
+          if (radiusChecked) {
+            coverageData.housecalls_option = 'radius';
+            coverageData.housecalls_base_zipcode = document.getElementById('housecalls-base-zip')?.value || null;
+            coverageData.housecalls_radius_miles = parseInt(document.getElementById('housecalls-radius-slider')?.value) || null;
+          } else if (zipsChecked) {
+            coverageData.housecalls_option = 'zipcodes';
+            // Get zipcodes from tags
+            const zipTags = document.querySelectorAll('#housecalls-zip-tags .zip-tag');
+            coverageData.housecalls_zipcodes = Array.from(zipTags).map(tag => tag.textContent.replace('×', '').trim());
+          }
+        }
+
+        // Virtual: Determine which option is selected
+        if (coverageData.virtual_enabled) {
+          const nationwideChecked = document.getElementById('virtualremote-mode-nationwide')?.checked;
+          const statesChecked = document.getElementById('virtualremote-mode-states')?.checked;
+
+          if (nationwideChecked) {
+            coverageData.virtual_option = 'nationwide';
+          } else if (statesChecked) {
+            coverageData.virtual_option = 'states';
+            // Get states from tags
+            const stateTags = document.querySelectorAll('#virtualremote-state-tags .state-tag');
+            coverageData.virtual_states = Array.from(stateTags).map(tag => tag.textContent.replace('×', '').trim());
+          }
+        }
+
+        console.log('[Coverage Settings] Saving coverage data:', coverageData);
+
+        // Update practitioners table
+        const { data, error } = await supabaseClient
+          .from('practitioners')
+          .update(coverageData)
+          .eq('user_id', user.id);
+
+        if (error) {
+          console.error('[Coverage Settings] Save error:', error);
+          showToast('Failed to save coverage settings: ' + error.message, 'error');
+          return;
+        }
+
+        console.log('[Coverage Settings] Coverage settings saved successfully');
+        showToast('Coverage area saved successfully!', 'success');
+
+      } catch (error) {
+        console.error('[Coverage Settings] Unexpected error:', error);
+        showToast('An unexpected error occurred. Please try again.', 'error');
       }
-
-      if (mode !== 'remote' && !radius) {
-        showToast('Please enter a service radius for in-person or both modes.', 'error');
-        return;
-      }
-
-      const coverageArea = {
-        mode,
-        cityState: mode === 'remote' ? '' : cityState.trim(),
-        radius: mode === 'remote' ? null : parseInt(radius),
-        zipCodes: zipCodesList
-      };
-
-      localStorage.setItem('coverageArea', JSON.stringify(coverageArea));
-      console.log('[Rooted Vitality] Coverage settings saved:', coverageArea);
-      showToast('Coverage area saved.', 'success');
     }
 
     // ======================================================
@@ -6231,72 +6322,168 @@
       showToast('Default hours applied: 9am–5pm for all days.', 'success');
     }
 
-    function saveAvailabilitySettings() {
-      const scheduleData = {};
-      let hasAtLeastOneDay = false;
+    async function saveAvailabilitySettings() {
+      try {
+        const scheduleData = {};
+        let hasAtLeastOneDay = false;
 
-      // Collect data from each day row
-      document.querySelectorAll('.day-row').forEach(row => {
-        const day = row.dataset.day;
-        const checkbox = row.querySelector('.day-available');
-        const openInput = row.querySelector('.time-open');
-        const closeInput = row.querySelector('.time-close');
-        const notesInput = row.querySelector('.notes-input');
+        // Collect data from each day row
+        document.querySelectorAll('.day-row').forEach(row => {
+          const day = row.dataset.day;
+          const checkbox = row.querySelector('.day-available');
+          const openInput = row.querySelector('.time-open');
+          const closeInput = row.querySelector('.time-close');
+          const notesInput = row.querySelector('.notes-input');
 
-        if (checkbox.checked) {
-          hasAtLeastOneDay = true;
+          if (checkbox.checked) {
+            hasAtLeastOneDay = true;
 
-          const openTime = openInput.value;
-          const closeTime = closeInput.value;
+            const openTime = openInput.value;
+            const closeTime = closeInput.value;
 
-          // Validation
-          if (!openTime || !closeTime) {
-            showToast(`Missing times for ${day}. Please fill in both open and close times.`, 'error');
-            return;
+            // Validation
+            if (!openTime || !closeTime) {
+              showToast(`Missing times for ${day}. Please fill in both open and close times.`, 'error');
+              return;
+            }
+
+            if (closeTime <= openTime) {
+              showToast(`Closing time must be after opening time on ${day}.`, 'error');
+              return;
+            }
+
+            scheduleData[day] = {
+              available: true,
+              open: openTime,
+              close: closeTime,
+              notes: notesInput.value.trim() || null
+            };
+          } else {
+            // Day is closed
+            scheduleData[day] = {
+              available: false,
+              open: null,
+              close: null,
+              notes: null
+            };
           }
+        });
 
-          if (closeTime <= openTime) {
-            showToast(`Closing time must be after opening time on ${day}.`, 'error');
-            return;
-          }
-
-          scheduleData[day] = {
-            available: true,
-            open: openTime,
-            close: closeTime,
-            notes: notesInput.value.trim() || null
-          };
-        } else {
-          // Day is closed
-          scheduleData[day] = {
-            available: false,
-            open: null,
-            close: null,
-            notes: null
-          };
+        // Must have at least one available day
+        if (!hasAtLeastOneDay) {
+          showToast('Please select at least one day you are available.', 'error');
+          return;
         }
-      });
 
-      // Must have at least one available day
-      if (!hasAtLeastOneDay) {
-        showToast('Please select at least one day you are available.', 'error');
-        return;
+        // Get selected timezone
+        const timezoneSelect = document.getElementById('timezone-select');
+        const selectedTimezone = timezoneSelect?.value || null;
+
+        if (!selectedTimezone) {
+          showToast('Please select your timezone.', 'error');
+          return;
+        }
+
+        // Get current user
+        const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+        if (userError || !user) {
+          showToast('Please log in to save availability settings.', 'error');
+          return;
+        }
+
+        // Save to database
+        const { data, error } = await supabaseClient
+          .from('practitioners')
+          .update({
+            availability_schedule: scheduleData,
+            timezone: selectedTimezone,
+            availability_last_updated: new Date().toISOString()
+          })
+          .eq('user_id', user.id);
+
+        if (error) {
+          console.error('[Availability] Save error:', error);
+          showToast('Failed to save availability: ' + error.message, 'error');
+          return;
+        }
+
+        console.log('[Availability] Settings saved to database:', { scheduleData, selectedTimezone });
+        showToast('Availability schedule and timezone saved successfully.', 'success');
+
+      } catch (error) {
+        console.error('[Availability] Unexpected error:', error);
+        showToast('An unexpected error occurred. Please try again.', 'error');
       }
+    }
 
-      // Get selected timezone
-      const timezoneSelect = document.getElementById('timezone-select');
-      const selectedTimezone = timezoneSelect?.value || null;
+    async function loadAvailabilitySettings() {
+      try {
+        // Get current user
+        const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+        if (userError || !user) {
+          console.log('[Availability] No user logged in');
+          return;
+        }
 
-      const availabilityData = {
-        schedule: scheduleData,
-        timezone: selectedTimezone,
-        lastUpdated: new Date().toISOString()
-      };
+        // Load from database
+        const { data: practitioner, error } = await supabaseClient
+          .from('practitioners')
+          .select('availability_schedule, timezone')
+          .eq('user_id', user.id)
+          .single();
 
-      // Save to localStorage for now
-      localStorage.setItem('availabilitySettings', JSON.stringify(availabilityData));
-      console.log('[Rooted Vitality] Availability settings saved:', availabilityData);
-      showToast('Availability schedule and timezone saved successfully.', 'success');
+        if (error) {
+          console.error('[Availability] Database error:', error);
+          // Don't show error to user, just fail silently for now
+          return;
+        }
+
+        if (!practitioner) {
+          console.log('[Availability] No practitioner data found');
+          return;
+        }
+
+        console.log('[Availability] Loaded from database:', practitioner);
+
+        // Restore timezone
+        if (practitioner.timezone) {
+          const timezoneSelect = document.getElementById('timezone-select');
+          if (timezoneSelect) {
+            timezoneSelect.value = practitioner.timezone;
+          }
+        }
+
+        // Restore schedule
+        if (practitioner.availability_schedule) {
+          const schedule = practitioner.availability_schedule;
+          
+          document.querySelectorAll('.day-row').forEach(row => {
+            const day = row.dataset.day;
+            const dayData = schedule[day];
+            
+            if (dayData) {
+              const checkbox = row.querySelector('.day-available');
+              const openInput = row.querySelector('.time-open');
+              const closeInput = row.querySelector('.time-close');
+              const notesInput = row.querySelector('.notes-input');
+
+              checkbox.checked = dayData.available || false;
+              
+              if (dayData.available) {
+                openInput.value = dayData.open || '';
+                closeInput.value = dayData.close || '';
+                notesInput.value = dayData.notes || '';
+                openInput.disabled = false;
+                closeInput.disabled = false;
+                notesInput.disabled = false;
+              }
+            }
+          });
+        }
+
+      } catch (error) {
+        console.error('[Availability] Error loading:', error);
+      }
     }
 
     // ======================================================
