@@ -643,6 +643,225 @@
 }
 
 /* ============================================
+   SERVICE CATEGORIES SECTION
+   ============================================ */
+
+.services-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.service-category {
+    padding: var(--spacing-lg);
+    background: white;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.service-category:hover {
+    border-color: var(--color-secondary);
+    box-shadow: 0 4px 12px rgba(212, 196, 124, 0.1);
+}
+
+.service-category h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin: 0 0 var(--spacing-md) 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.95rem;
+}
+
+.service-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.service-tag {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: rgba(92, 154, 114, 0.1);
+    color: var(--color-primary);
+    border-radius: 20px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+/* ============================================
+   BUSINESS HOURS SECTION
+   ============================================ */
+
+.hours-container {
+    padding: var(--spacing-lg);
+    background: white;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+}
+
+.hours-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.hours-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.hours-row:last-child {
+    border-bottom: none;
+}
+
+.hours-row .day {
+    font-weight: 600;
+    color: var(--color-dark);
+    min-width: 100px;
+}
+
+.hours-row .time {
+    color: var(--color-text);
+    font-size: 0.95rem;
+}
+
+.hours-row .status {
+    color: var(--color-muted);
+    font-style: italic;
+}
+
+/* ============================================
+   SERVICE COVERAGE SECTION
+   ============================================ */
+
+.coverage-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.coverage-item {
+    padding: var(--spacing-lg);
+    background: linear-gradient(135deg, #fafaf8 0%, #f5f3f0 100%);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+}
+
+.coverage-item h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin: 0 0 var(--spacing-md) 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.95rem;
+}
+
+.coverage-details {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--color-text);
+}
+
+.coverage-details p {
+    margin: 0;
+}
+
+/* ============================================
+   PAYMENT & INSURANCE SECTION
+   ============================================ */
+
+.payment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.payment-item {
+    padding: var(--spacing-lg);
+    background: white;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+}
+
+.payment-item h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin: 0 0 var(--spacing-md) 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.methods-list,
+.insurance-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.method-badge,
+.insurance-badge {
+    display: inline-block;
+    padding: 0.75rem 1.25rem;
+    background: rgba(92, 154, 114, 0.08);
+    color: var(--color-primary);
+    border: 1px solid rgba(92, 154, 114, 0.2);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: center;
+}
+
+.insurance-badge {
+    background: rgba(212, 196, 124, 0.1);
+    color: var(--color-accent);
+    border-color: rgba(212, 196, 124, 0.2);
+}
+
+/* ============================================
+   SOCIAL MEDIA SECTION
+   ============================================ */
+
+.social-links {
+    display: flex;
+    gap: var(--spacing-lg);
+    justify-content: center;
+    padding: var(--spacing-lg);
+    background: white;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    flex-wrap: wrap;
+}
+
+.social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--color-primary), #4a8661);
+    color: white;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(92, 154, 114, 0.2);
+}
+
+.social-link:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(92, 154, 114, 0.3);
+    background: linear-gradient(135deg, #4a8661, var(--color-primary));
+}
+
+/* ============================================
    RESPONSIVE
    ============================================ */
 

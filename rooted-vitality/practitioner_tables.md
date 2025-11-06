@@ -1,37 +1,3 @@
-==========
-Client Tables
-==========
-| column_name           | data_type                   | is_nullable | column_default                                      |
-| --------------------- | --------------------------- | ----------- | --------------------------------------------------- |
-| id                    | uuid                        | NO          | gen_random_uuid()                                   |
-| user_id               | uuid                        | NO          | null                                                |
-| first_name            | character varying           | YES         | null                                                |
-| last_name             | character varying           | YES         | null                                                |
-| email                 | character varying           | NO          | null                                                |
-| phone                 | character varying           | YES         | null                                                |
-| zipcode               | character varying           | YES         | null                                                |
-| account_status        | character varying           | YES         | 'active'::character varying                         |
-| account_standing      | character varying           | YES         | 'good'::character varying                           |
-| two_factor_enabled    | boolean                     | YES         | false                                               |
-| two_factor_method     | character varying           | YES         | null                                                |
-| created_at            | timestamp with time zone    | YES         | CURRENT_TIMESTAMP                                   |
-| updated_at            | timestamp with time zone    | YES         | CURRENT_TIMESTAMP                                   |
-| last_login            | timestamp with time zone    | YES         | null                                                |
-| settings_updated_at   | timestamp with time zone    | YES         | CURRENT_TIMESTAMP                                   |
-| profile_picture_url   | character varying           | YES         | null                                                |
-| age                   | integer                     | YES         | null                                                |
-| sex                   | text                        | YES         | null                                                |
-| notification_settings | jsonb                       | YES         | '{"sms": true, "push": true, "email": true}'::jsonb |
-| membership_level      | text                        | YES         | 'free'::text                                        |
-| membership_started_at | timestamp without time zone | YES         | null                                                |
-| membership_expires_at | timestamp without time zone | YES         | null                                                |
-| serial_number         | text                        | YES         | null                                                |
-| open_to_contact       | boolean                     | YES         | true                                                |
-
-
-==========
-Practitioner Tables
-==========
 | column_name                | data_type                   | is_nullable | column_default                                                                                                                                                                                                                                   |
 | -------------------------- | --------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | id                         | uuid                        | NO          | uuid_generate_v4()                                                                                                                                                                                                                               |
@@ -42,6 +8,8 @@ Practitioner Tables
 | bio                        | text                        | YES         | null                                                                                                                                                                                                                                             |
 | tagline                    | text                        | YES         | null                                                                                                                                                                                                                                             |
 | modalities                 | ARRAY                       | YES         | null                                                                                                                                                                                                                                             |
+| availability               | ARRAY                       | YES         | null                                                                                                                                                                                                                                             |
+| workspace_type             | text                        | YES         | null                                                                                                                                                                                                                                             |
 | created_at                 | timestamp without time zone | YES         | now()                                                                                                                                                                                                                                            |
 | updated_at                 | timestamp without time zone | YES         | now()                                                                                                                                                                                                                                            |
 | status                     | text                        | YES         | 'pending_review'::text                                                                                                                                                                                                                           |
@@ -77,6 +45,11 @@ Practitioner Tables
 | in_person_base_zipcode     | text                        | YES         | null                                                                                                                                                                                                                                             |
 | in_person_radius_miles     | integer                     | YES         | null                                                                                                                                                                                                                                             |
 | in_person_zipcodes         | ARRAY                       | YES         | null                                                                                                                                                                                                                                             |
+| house_calls_enabled        | boolean                     | YES         | false                                                                                                                                                                                                                                            |
+| house_calls_option         | text                        | YES         | null                                                                                                                                                                                                                                             |
+| house_calls_base_zipcode   | text                        | YES         | null                                                                                                                                                                                                                                             |
+| house_calls_radius_miles   | integer                     | YES         | null                                                                                                                                                                                                                                             |
+| house_calls_zipcodes       | ARRAY                       | YES         | null                                                                                                                                                                                                                                             |
 | virtual_enabled            | boolean                     | YES         | false                                                                                                                                                                                                                                            |
 | virtual_option             | text                        | YES         | null                                                                                                                                                                                                                                             |
 | virtual_states             | ARRAY                       | YES         | null                                                                                                                                                                                                                                             |
@@ -98,33 +71,3 @@ Practitioner Tables
 | badge_certified            | boolean                     | YES         | false                                                                                                                                                                                                                                            |
 | badge_licensed             | boolean                     | YES         | false                                                                                                                                                                                                                                            |
 | badge_verified             | boolean                     | YES         | false                                                                                                                                                                                                                                            |
-| service_category_ids       | ARRAY                       | YES         | '{}'::uuid[]                                                                                                                                                                                                                                     |
-| service_category_names     | ARRAY                       | YES         | '{}'::text[]                                                                                                                                                                                                                                     |
-| service_subcategory_ids    | ARRAY                       | YES         | '{}'::uuid[]                                                                                                                                                                                                                                     |
-| service_subcategory_names  | ARRAY                       | YES         | '{}'::text[]                                                                                                                                                                                                                                     |
-
-
-==========
-Projects
-==========
-| column_name            | data_type                | is_nullable | column_default                               |
-| ---------------------- | ------------------------ | ----------- | -------------------------------------------- |
-| id                     | uuid                     | NO          | gen_random_uuid()                            |
-| client_serial          | text                     | NO          | null                                         |
-| category_id            | text                     | NO          | null                                         |
-| description            | text                     | NO          | null                                         |
-| street                 | text                     | YES         | null                                         |
-| zipcode                | text                     | NO          | null                                         |
-| state                  | text                     | NO          | null                                         |
-| start_date             | date                     | NO          | null                                         |
-| urgency                | text                     | YES         | 'browsing'::text                             |
-| project_status         | text                     | YES         | 'open'::text                                 |
-| client_open_to_contact | boolean                  | YES         | true                                         |
-| created_at             | timestamp with time zone | YES         | now()                                        |
-| updated_at             | timestamp with time zone | YES         | now()                                        |
-| review_left            | boolean                  | YES         | false                                        |
-| project_id             | integer                  | NO          | nextval('projects_project_id_seq'::regclass) |
-| travel_preference      | text                     | YES         | null                                         |
-| subcategory_text       | text                     | YES         | null                                         |
-
-

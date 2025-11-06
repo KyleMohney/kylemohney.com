@@ -1270,8 +1270,19 @@ const RootedVitality = {
         let headerView = null;
         
         try {
-            // Check for authenticated user
-            if (typeof window.authManager !== 'undefined') {
+            // Check if this is practitioner profile page with pre-detected role
+            if (window.PRACTITIONER_PROFILE_PAGE && window.DETECTED_USER_ROLE) {
+                headerRole = window.DETECTED_USER_ROLE;
+                console.log('[Rooted Vitality] Using pre-detected role from practitioner profile:', headerRole);
+                
+                // For practitioners, load view from localStorage
+                if (headerRole === 'practitioner') {
+                    headerView = localStorage.getItem('active_view') || 'client';
+                    console.log('[Rooted Vitality] Practitioner view:', headerView);
+                }
+            } 
+            // Check for authenticated user via authManager
+            else if (typeof window.authManager !== 'undefined') {
                 const userData = window.authManager.getCurrentUser();
                 if (userData && userData.role) {
                     headerRole = userData.role;

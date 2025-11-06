@@ -253,5 +253,77 @@ CREATE INDEX IF NOT EXISTS idx_matches_status ON project_practitioner_matches(st
 
 
 -- ============================================================================
+-- MIGRATION 011: Normalize House Calls Naming
+-- ============================================================================
+-- Description: Remove duplicate house_calls_* columns and standardize to housecalls_*
+-- This fixes naming inconsistency in the schema (some columns use underscore, some don't)
+
+ALTER TABLE practitioners
+DROP COLUMN IF EXISTS house_calls_enabled,
+DROP COLUMN IF EXISTS house_calls_option,
+DROP COLUMN IF EXISTS house_calls_base_zipcode,
+DROP COLUMN IF EXISTS house_calls_radius_miles,
+DROP COLUMN IF EXISTS house_calls_zipcodes;
+
+-- Update comments on the correct columns
+COMMENT ON COLUMN practitioners.housecalls_enabled IS 'Whether practitioner travels to client locations for sessions';
+COMMENT ON COLUMN practitioners.housecalls_option IS 'Coverage type: radius (base zipcode + mileage) or zipcodes (specific list)';
+COMMENT ON COLUMN practitioners.housecalls_base_zipcode IS 'Base ZIP code for house calls radius calculation';
+COMMENT ON COLUMN practitioners.housecalls_radius_miles IS 'Travel radius in miles from base ZIP code';
+COMMENT ON COLUMN practitioners.housecalls_zipcodes IS 'Array of specific ZIP codes for house calls coverage';
+
+
+-- ============================================================================
+-- MIGRATION 012: Add Per-Service Pricing
+-- ============================================================================
+-- Description: Add ability to set different prices for different services per practitioner
+-- This enables practitioners to charge varying rates based on service complexity/type
+
+ALTER TABLE practitioner_selected_services
+ADD COLUMN IF NOT EXISTS price_per_service NUMERIC(10, 2) DEFAULT NULL;
+
+COMMENT ON COLUMN practitioner_selected_services.price_per_service IS 'Price for this specific service (e.g., 150.00). If NULL, practitioner uses their default pricing from practitioners.pricing field.';
+
+-- Create index for performance when filtering/sorting by price
+CREATE INDEX IF NOT EXISTS idx_practitioner_selected_services_price 
+ON practitioner_selected_services(practitioner_id, price_per_service) 
+WHERE price_per_service IS NOT NULL;
+
+
+-- ============================================================================
+-- MIGRATION 013: Remove Duplicate House Calls Columns
+-- ============================================================================
+-- Description: Remove duplicate house_calls_* columns (with underscore)
+-- Keep housecalls_* versions (without underscore) for consistency
+-- These columns contained identical data and were creating schema confusion
+
+ALTER TABLE practitioners
+DROP COLUMN IF EXISTS house_calls_enabled,
+DROP COLUMN IF EXISTS house_calls_option,
+DROP COLUMN IF EXISTS house_calls_base_zipcode,
+DROP COLUMN IF EXISTS house_calls_radius_miles,
+DROP COLUMN IF EXISTS house_calls_zipcodes;
+
+-- Clarify the correct columns
+COMMENT ON COLUMN practitioners.housecalls_enabled IS 'Whether practitioner travels to client locations for sessions';
+COMMENT ON COLUMN practitioners.housecalls_option IS 'Coverage type: radius (base zipcode + mileage) or zipcodes (specific list)';
+COMMENT ON COLUMN practitioners.housecalls_base_zipcode IS 'Base ZIP code for house calls radius calculation';
+COMMENT ON COLUMN practitioners.housecalls_radius_miles IS 'Travel radius in miles from base ZIP code';
+COMMENT ON COLUMN practitioners.housecalls_zipcodes IS 'Array of specific ZIP codes for house calls coverage';
+
+
+-- ============================================================================
+-- MIGRATION 014: Remove Unused Columns (Optional Cleanup)
+-- ============================================================================
+-- Description: Remove unused legacy columns that have no code references
+-- These columns consume space and add schema confusion
+
+ALTER TABLE practitioners
+DROP COLUMN IF EXISTS workspace_type,
+DROP COLUMN IF EXISTS availability;
+
+COMMENT ON TABLE practitioners IS 'Main practitioner profile data. Coverage area, services, and pricing managed through relationships to dedicated tables.';
+
+-- ============================================================================
 -- END OF MIGRATIONS
 -- ============================================================================

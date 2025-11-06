@@ -322,6 +322,28 @@ function displayPractitioners() {
     grid.appendChild(createPractitionerCard(practitioner));
   });
 
+  // Attach event listeners to View Profile buttons
+  document.querySelectorAll('.card-btn--view').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const practitionerId = this.dataset.practitionerId;
+      if (practitionerId) {
+        navigateToPractitionerProfile(practitionerId);
+      }
+    });
+  });
+
+  // Attach event listeners to Connect buttons
+  document.querySelectorAll('.card-btn--connect').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const practitionerId = this.dataset.practitionerId;
+      if (practitionerId) {
+        openConnectionRequest(practitionerId);
+      }
+    });
+  });
+
   // Update count
   document.getElementById('showing-count').textContent = pageData.length;
   document.getElementById('total-count').textContent = filteredPractitioners.length;
@@ -351,6 +373,18 @@ function createPractitionerCard(practitioner) {
   const badges = [];
   if (practitioner.credentials_verified) {
     badges.push('<span class="badge badge--verified" title="Credentials Verified">✓ Verified</span>');
+  }
+  if (practitioner.badge_background_check) {
+    badges.push('<span class="badge badge--background-check" title="Background Check Passed">✓ Background Check</span>');
+  }
+  if (practitioner.badge_certified) {
+    badges.push('<span class="badge badge--certified" title="Certified">✓ Certified</span>');
+  }
+  if (practitioner.badge_licensed) {
+    badges.push('<span class="badge badge--licensed" title="Licensed">✓ Licensed</span>');
+  }
+  if (practitioner.badge_verified) {
+    badges.push('<span class="badge badge--verified-business" title="Business Verified">✓ Verified Business</span>');
   }
   const profileCompletion = practitioner.profile_completion_percent || 0;
   if (profileCompletion >= 80) {
@@ -387,8 +421,8 @@ function createPractitionerCard(practitioner) {
       <p class="card-bio">${(practitioner.bio || '').substring(0, 150)}${(practitioner.bio || '').length > 150 ? '...' : ''}</p>
 
       <div class="card-actions">
-        <button class="card-btn card-btn--view" onclick="navigateToPractitionerProfile('${practitioner.id}')">View Profile</button>
-        <button class="card-btn card-btn--connect" onclick="openConnectionRequest('${practitioner.id}')">Connect</button>
+        <button class="card-btn card-btn--view" data-practitioner-id="${practitioner.id}">View Profile</button>
+        <button class="card-btn card-btn--connect" data-practitioner-id="${practitioner.id}">Connect</button>
       </div>
     </div>
   `;
@@ -406,9 +440,19 @@ function createStars(rating) {
 }
 
 function showEmptyState(title, message) {
-  document.getElementById('empty-state').style.display = 'block';
-  document.getElementById('empty-state__title').textContent = title;
-  document.getElementById('empty-state__text').textContent = message;
+  const emptyState = document.getElementById('empty-state');
+  const emptyStateTitle = document.getElementById('empty-state__title');
+  const emptyStateText = document.getElementById('empty-state__text');
+  
+  if (emptyState) {
+    emptyState.style.display = 'block';
+  }
+  if (emptyStateTitle) {
+    emptyStateTitle.textContent = title;
+  }
+  if (emptyStateText) {
+    emptyStateText.textContent = message;
+  }
 }
 
 // ============================================================================
@@ -598,7 +642,13 @@ function capitalizeFirst(str) {
  */
 function navigateToPractitionerProfile(practitionerId) {
   console.log('[Find Practitioners] Navigating to profile for practitioner:', practitionerId);
-  window.location.href = `practitioner-profile.html?practitioner_id=${practitionerId}`;
+  if (!practitionerId) {
+    console.error('[Find Practitioners] No practitioner ID provided');
+    return;
+  }
+  const profileUrl = `practitioner-profile.html?practitioner_id=${practitionerId}`;
+  console.log('[Find Practitioners] Navigating to:', profileUrl);
+  window.location.href = profileUrl;
 }
 
 // ============================================================================

@@ -115,7 +115,7 @@
       ]
     },
     {
-      "id": "wellness-coaching",
+      "id": "wellness_coaching",
       "name": "Health & Wellness Coaching",
       "icon": "🎯",
       "credential": "🟡/🟢 Certified/Open",
@@ -140,7 +140,7 @@
       ]
     },
     {
-      "id": "personal-training",
+      "id": "personal_training",
       "name": "Personal Training & Fitness",
       "icon": "💪",
       "credential": "🟡/🟢 Certified/Open",
@@ -230,7 +230,7 @@
       ]
     },
     {
-      "id": "mental-health",
+      "id": "mental_health",
       "name": "Mental Health Counseling & Therapy",
       "icon": "🧠",
       "credential": "🔴 License Required",
@@ -261,7 +261,7 @@
       ]
     },
     {
-      "id": "energy-healing",
+      "id": "energy_healing",
       "name": "Energy Healing & Bodywork",
       "icon": "✨",
       "credential": "🟢 Open Practice",
@@ -363,7 +363,7 @@
       ]
     },
     {
-      "id": "functional-medicine",
+      "id": "functional_medicine",
       "name": "Functional Medicine",
       "icon": "🔬",
       "credential": "🔴/🟡 Licensed + Certified",
@@ -391,7 +391,7 @@
       ]
     },
     {
-      "id": "physical-therapy",
+      "id": "physical_therapy",
       "name": "Physical Therapy",
       "icon": "🏥",
       "credential": "🔴 License Required",
@@ -447,7 +447,7 @@
       ]
     },
     {
-      "id": "life-coaching",
+      "id": "life_coaching",
       "name": "Life Coaching",
       "icon": "🌟",
       "credential": "🟢 Open Practice",
@@ -500,25 +500,26 @@
       ]
     },
     {
-      "id": "midwifery-doula",
+      "id": "midwifery",
       "name": "Midwifery & Doula Services",
       "icon": "👶",
-      "credential": "🔴/🟡 Varies by State",
+      "credential": "🔴 License Required",
       "subcategories": [
-        "Prenatal Care",
-        "Labor & Delivery Support",
         "Birth Doula Services",
         "Postpartum Doula Services",
-        "Home Birth Midwifery",
-        "Birth Center Services",
+        "Lactation Support",
+        "Prenatal Care",
+        "Labor & Delivery Support",
+        "Postpartum Recovery",
+        "Emotional Support",
+        "Advocacy Services",
+        "Childbirth Education",
+        "Partner Support Training",
+        "Home Birth Assistance",
         "Hospital Birth Support",
-        "Water Birth Assistance",
-        "Breastfeeding Support",
+        "Placenta Care",
         "Newborn Care Education",
-        "Childbirth Education Classes",
-        "Prenatal Yoga Instruction",
-        "Postpartum Care",
-        "Lactation Consulting"
+        "Grief Support (Miscarriage/Loss)"
       ]
     },
     {

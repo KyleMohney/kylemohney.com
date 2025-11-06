@@ -360,10 +360,10 @@ async function handleEditField(fieldType, fieldName) {
         const phoneInput = document.getElementById('phone-input');
         phoneInput.value = userSettings.phone || '';
     } else if (fieldType === 'address') {
-        document.getElementById('address-street-input').value = userSettings.address_street || '';
-        document.getElementById('address-city-input').value = userSettings.address_city || '';
-        document.getElementById('address-state-input').value = userSettings.address_state || '';
-        document.getElementById('address-zip-input').value = userSettings.address_zip || '';
+        document.getElementById('address-street-input').value = userSettings.physical_address || '';
+        document.getElementById('address-city-input').value = userSettings.practice_city || '';
+        document.getElementById('address-state-input').value = userSettings.practice_state || '';
+        document.getElementById('address-zip-input').value = userSettings.zipcode || '';
     }
 
     // Show modal
@@ -407,10 +407,10 @@ async function handleEditField(fieldType, fieldName) {
                     return;
                 }
 
-                updateData.address_street = street;
-                updateData.address_city = city;
-                updateData.address_state = state;
-                updateData.address_zip = zip;
+                updateData.physical_address = street;
+                updateData.practice_city = city;
+                updateData.practice_state = state;
+                updateData.zipcode = zip;
                 newValue = `${street}, ${city}, ${state} ${zip}`;
             }
 

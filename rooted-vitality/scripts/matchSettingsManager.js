@@ -226,7 +226,19 @@ class MatchSettingsManager {
     try {
       const { data, error } = await this.supabase
         .from('practitioner_selected_services')
-        .select('id, taxonomy_id, subcategory_id, is_active, created_at, updated_at')
+        .select(`
+          id,
+          taxonomy_id,
+          subcategory_id,
+          is_active,
+          price_per_service,
+          created_at,
+          updated_at,
+          taxonomy_subcategories (
+            id,
+            name
+          )
+        `)
         .eq('practitioner_id', this.practitionerId);
 
       if (error) throw error;
@@ -262,23 +274,105 @@ class MatchSettingsManager {
 
   /**
    * Add a new service category
+   * Accepts either:
+   * - categoryId (string like "acupuncture") + subcategoryName (string like "Fertility Support")
+   * - OR taxonomyId (UUID) + subcategoryId (UUID)
    */
-  async addServiceCategory(taxonomyId, subcategoryId) {
+  async addServiceCategory(categoryIdOrTaxonomyId, subcategoryNameOrId, pricePerService = null) {
     try {
-      const { data, error } = await this.supabase
+      let taxonomyId, subcategoryId;
+
+      // Check if inputs are UUIDs or string IDs
+      const isUUID = (str) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+      
+      if (isUUID(categoryIdOrTaxonomyId) && isUUID(subcategoryNameOrId)) {
+        // Already UUIDs, use directly
+        taxonomyId = categoryIdOrTaxonomyId;
+        subcategoryId = subcategoryNameOrId;
+      } else {
+        // String IDs - look up the UUIDs
+        const categoryId = categoryIdOrTaxonomyId;
+        const subcategoryName = subcategoryNameOrId;
+
+        // Look up taxonomy ID from category_id
+        const { data: taxonomyData, error: taxonomyError } = await this.supabase
+          .from('holistic_health_taxonomy')
+          .select('id')
+          .eq('category_id', categoryId)
+          .single();
+
+        if (taxonomyError || !taxonomyData) {
+          throw new Error(`Category "${categoryId}" not found in taxonomy`);
+        }
+        taxonomyId = taxonomyData.id;
+
+        // Look up subcategory ID from name
+        const { data: subcatData, error: subcatError } = await this.supabase
+          .from('taxonomy_subcategories')
+          .select('id')
+          .eq('taxonomy_id', taxonomyId)
+          .eq('name', subcategoryName)
+          .single();
+
+        if (subcatError || !subcatData) {
+          throw new Error(`Subcategory "${subcategoryName}" not found under category "${categoryId}"`);
+        }
+        subcategoryId = subcatData.id;
+      }
+
+      // Insert or update the service (upsert)
+      // First try to find if it already exists
+      const { data: existing } = await this.supabase
         .from('practitioner_selected_services')
-        .insert({
-          practitioner_id: this.practitionerId,
-          taxonomy_id: taxonomyId,
-          subcategory_id: subcategoryId,
-          is_active: false  // Default to inactive
-        })
-        .select()
+        .select('id')
+        .eq('practitioner_id', this.practitionerId)
+        .eq('taxonomy_id', taxonomyId)
+        .eq('subcategory_id', subcategoryId)
         .single();
 
+      let data, error;
+      
+      if (existing) {
+        // Update existing service with new price
+        const result = await this.supabase
+          .from('practitioner_selected_services')
+          .update({
+            price_per_service: pricePerService,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', existing.id)
+          .select()
+          .single();
+        data = result.data;
+        error = result.error;
+      } else {
+        // Insert new service
+        const result = await this.supabase
+          .from('practitioner_selected_services')
+          .insert({
+            practitioner_id: this.practitionerId,
+            taxonomy_id: taxonomyId,
+            subcategory_id: subcategoryId,
+            is_active: false,  // Default to inactive
+            price_per_service: pricePerService  // Optional price per service
+          })
+          .select()
+          .single();
+        data = result.data;
+        error = result.error;
+      }
+
       if (error) throw error;
-      this.selectedServices.push(data);
-      console.log('[MatchSettingsManager] Service category added:', subcategoryId);
+      
+      // Update cache
+      const cacheIndex = this.selectedServices.findIndex(s => s.id === data.id);
+      if (cacheIndex !== -1) {
+        this.selectedServices[cacheIndex] = data;
+      } else {
+        this.selectedServices.push(data);
+      }
+      
+      console.log('[MatchSettingsManager] Service category added/updated:', subcategoryNameOrId, 'Price:', pricePerService);
       return data;
     } catch (error) {
       console.error('[MatchSettingsManager] Error adding service category:', error);
@@ -310,6 +404,39 @@ class MatchSettingsManager {
       return data;
     } catch (error) {
       console.error('[MatchSettingsManager] Error toggling service category:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update pricing for a specific service
+   */
+  async updateServicePrice(serviceId, priceAmount) {
+    try {
+      const updateData = {
+        price_per_service: priceAmount,
+        updated_at: new Date().toISOString()
+      };
+
+      const { data, error } = await this.supabase
+        .from('practitioner_selected_services')
+        .update(updateData)
+        .eq('id', serviceId)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Update local cache
+      const index = this.selectedServices.findIndex(s => s.id === serviceId);
+      if (index !== -1) {
+        this.selectedServices[index] = data;
+      }
+
+      console.log('[MatchSettingsManager] Service price updated:', serviceId, 'to $' + (priceAmount ? priceAmount.toFixed(2) : 'default'));
+      return data;
+    } catch (error) {
+      console.error('[MatchSettingsManager] Error updating service price:', error);
       throw error;
     }
   }
