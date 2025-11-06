@@ -1186,24 +1186,43 @@ async function saveSectionData(sectionId) {
         if (sectionId === 'about') {
             // About & Specializations section saves: About You + Your Approach & Philosophy + Conditions & Specializations
             await saveAboutSection();
-            return;
         } else if (sectionId === 'credentials') {
             // Credentials section saves: Degrees + Licenses + Certifications + Background Check + Continuing Education
             await saveCredentialsSection('all');
-            return;
         } else if (sectionId === 'photos') {
             // Photos & Video section saves: Professional Photos + Professional Video Introduction
             await savePhotosAndVideoSection();
-            return;
         } else if (sectionId === 'more-details') {
             // More Details section saves: Languages + FAQ + Social Media + Practice Type + Payment & Insurance
             await saveMoreDetailsSection();
+        } else {
+            // Fallback for individual sections (shouldn't normally reach here)
+            console.warn(`[SAVE] ⚠️ Unknown section: ${sectionId}`);
+            showAutoSaveIndicator('error');
             return;
         }
         
-        // Fallback for individual sections (shouldn't normally reach here)
-        console.warn(`[SAVE] ⚠️ Unknown section: ${sectionId}`);
-        showAutoSaveIndicator('error');
+        // After section is saved, update profile_completion_percent in database
+        const percentageEl = document.getElementById('completeness-percentage');
+        const profileCompletionPercent = percentageEl ? parseInt(percentageEl.textContent) : 0;
+        
+        console.log(`[SAVE] Saving profile_completion_percent: ${profileCompletionPercent}%`);
+        
+        const { error: updateError } = await window.supabaseClient
+            .from('practitioners')
+            .update({ 
+                profile_completion_percent: profileCompletionPercent,
+                updated_at: new Date().toISOString()
+            })
+            .eq('user_id', currentUser.id);
+        
+        if (updateError) {
+            console.error('[SAVE] ❌ Error updating profile_completion_percent:', updateError);
+        } else {
+            console.log(`[SAVE] ✓ profile_completion_percent updated to ${profileCompletionPercent}%`);
+        }
+        
+        showAutoSaveIndicator('success');
         
     } catch (error) {
         console.error(`[SAVE] ❌ Error in saveSectionData for ${sectionId}:`, error);
@@ -1735,51 +1754,67 @@ async function saveProfile() {
     try {
         showSaveStatus('Saving...', 'saving');
         
+        // Get the profile completion percentage that's already being calculated
+        const percentageEl = document.getElementById('completeness-percentage');
+        const profileCompletionPercent = percentageEl ? parseInt(percentageEl.textContent) : 0;
+        
+        console.log('[Rooted Vitality] Attempting to save profile with completion:', profileCompletionPercent + '%');
+        console.log('[Rooted Vitality] Completeness element found:', !!percentageEl);
+        console.log('[Rooted Vitality] Completeness text content:', percentageEl?.textContent);
+        
         // Prepare data for practitioners table (primary practitioner profile)
         // Support both field name conventions - schema uses legal_name, signup uses legal_business_name
         const practitionerData = {
             user_id: currentUser.id,
-            legal_name: document.getElementById('profile-name').value,
-            legal_business_name: document.getElementById('profile-name').value,
-            business_size: document.getElementById('profile-teamsize').value,
-            bio: document.getElementById('about-content').value,
-            ethos_statement: document.getElementById('approach-content').value,
-            education: document.getElementById('degrees-content').value,
-            license_issuer: document.getElementById('licenses-content').value,
-            certifications: document.getElementById('certifications-content').value,
+            legal_name: document.getElementById('profile-name')?.value || '',
+            legal_business_name: document.getElementById('profile-name')?.value || '',
+            business_size: document.getElementById('profile-teamsize')?.value || '',
+            bio: document.getElementById('about-content')?.value || '',
+            ethos_statement: document.getElementById('approach-content')?.value || '',
+            profile_completion_percent: profileCompletionPercent,
             updated_at: new Date().toISOString()
         };
         
         // Social media as JSON
         const socialData = {
-            facebook: document.getElementById('social-facebook').value,
-            instagram: document.getElementById('social-instagram').value,
-            twitter: document.getElementById('social-x').value,
-            linkedin: document.getElementById('social-linkedin').value,
-            youtube: document.getElementById('social-youtube').value,
-            tiktok: document.getElementById('social-tiktok').value,
-            pinterest: document.getElementById('social-pinterest').value,
-            website: document.getElementById('social-website').value
+            facebook: document.getElementById('social-facebook')?.value || '',
+            instagram: document.getElementById('social-instagram')?.value || '',
+            twitter: document.getElementById('social-x')?.value || '',
+            linkedin: document.getElementById('social-linkedin')?.value || '',
+            youtube: document.getElementById('social-youtube')?.value || '',
+            tiktok: document.getElementById('social-tiktok')?.value || '',
+            pinterest: document.getElementById('social-pinterest')?.value || '',
+            website: document.getElementById('social-website')?.value || ''
         };
         practitionerData.social_media = socialData;
         
-        console.log('[Rooted Vitality] Saving practitioner data:', practitionerData);
+        console.log('[Rooted Vitality] Full practitioner data being saved:', practitionerData);
         
         // Save to practitioners table
-        const { error: practError } = await window.supabaseClient
+        const { data: upsertData, error: practError } = await window.supabaseClient
             .from('practitioners')
             .upsert(practitionerData, { onConflict: 'user_id' });
         
+        console.log('[Rooted Vitality] Upsert response - Data:', upsertData, 'Error:', practError);
+        
         if (practError) {
             console.error('[Rooted Vitality] Error saving to practitioners table:', practError);
+            console.error('[Rooted Vitality] Error details:', {
+                code: practError?.code,
+                message: practError?.message,
+                details: practError?.details,
+                hint: practError?.hint
+            });
             showSaveStatus('Save failed', 'error');
             return;
         }
         
         console.log('[Rooted Vitality] Profile saved successfully');
+        console.log('[Rooted Vitality] Saved profile_completion_percent:', profileCompletionPercent + '%');
         showSaveStatus('Saved', 'success');
     } catch (error) {
         console.error('[Rooted Vitality] Error in saveProfile:', error);
+        console.error('[Rooted Vitality] Error stack:', error.stack);
         showSaveStatus('Save failed', 'error');
     }
 }
@@ -3014,9 +3049,13 @@ function savePracticeData() {
         const setting = document.querySelector('input[name="practice-setting"]:checked')?.value || null;
         const delivery = [];
         
-        if (document.getElementById('practice-in-person').checked) delivery.push('in-person');
-        if (document.getElementById('practice-virtual').checked) delivery.push('virtual');
-        if (document.getElementById('practice-hybrid').checked) delivery.push('hybrid');
+        const housecallsEl = document.getElementById('practice-housecalls');
+        const inofficeEl = document.getElementById('practice-inoffice');
+        const virtualEl = document.getElementById('practice-virtual');
+        
+        if (housecallsEl?.checked) delivery.push('house-calls');
+        if (inofficeEl?.checked) delivery.push('in-office');
+        if (virtualEl?.checked) delivery.push('virtual');
         
         window.practiceData = {
             structure: structure,

@@ -309,9 +309,25 @@ function validatePage(page) {
     case 2:
       const zipcode = document.getElementById('project-zipcode').value.trim();
       const state = document.getElementById('project-state').value.trim();
+      const street = document.getElementById('project-street').value.trim();
       const startDate = document.getElementById('project-start-date').value;
+      const urgency = document.querySelector('input[name="urgency"]:checked');
+      const travelPref = document.querySelector('input[name="travel-preference"]:checked');
+      
+      if (!street) {
+        alert('Please enter your street address');
+        return false;
+      }
       if (!zipcode || !state || !startDate) {
         alert('Please fill in zip code, state, and start date');
+        return false;
+      }
+      if (!urgency) {
+        alert('Please select how urgent your need is');
+        return false;
+      }
+      if (!travelPref) {
+        alert('Please select your session type preference');
         return false;
       }
       return true;
@@ -389,7 +405,8 @@ async function createProject(matchNow = false) {
       description: document.getElementById('project-description').value,
       project_status: 'pending',  // New projects start as 'pending'
       review_left: false,  // No review yet
-      client_open_to_contact: clientProfile.open_to_contact !== false  // Sync from client settings
+      client_open_to_contact: clientProfile.open_to_contact !== false,  // Sync from client settings
+      subcategory_text: selectedConcerns.length > 0 ? selectedConcerns.map(c => c.name).join(', ') : null  // Store selected subcategories as comma-separated text
     };
 
     console.log('[createProject] Form data:', formData);
@@ -439,8 +456,8 @@ async function createProject(matchNow = false) {
     await loadProjects();
 
     if (matchNow) {
-      console.log('[createProject] Redirecting to directory...');
-      window.location.href = `/rooted-vitality/dashboard/client-directory.html?project_id=${projectId}`;
+      console.log('[createProject] Redirecting to Find Practitioners page...');
+      window.location.href = `client-find-practitioners.html?project_id=${projectId}`;
     } else {
       console.log('[createProject] Showing success notification');
       showNotification(`Project created successfully!`, 'success');
@@ -658,7 +675,7 @@ function updateStats(projects) {
 }
 
 function browseMatches(projectId) {
-  window.location.href = `/rooted-vitality/dashboard/client-directory.html?project_id=${projectId}`;
+  window.location.href = `client-find-practitioners.html?project_id=${projectId}`;
 }
 
 function viewMatches(projectId) {

@@ -345,7 +345,9 @@ window.authManager = {
      */
     async _getUserRole(userId) {
         try {
-            // Check if user is in practitioners table (queries by user_id)
+            // IMPORTANT: Check practitioners FIRST
+            // Users who are practitioners should always be identified as practitioners
+            // even if they also have a client record
             const { data: practitioner, error: practError } = await window.supabaseClient
                 .from('practitioners')
                 .select('id')
@@ -356,7 +358,7 @@ window.authManager = {
                 return 'practitioner';
             }
             
-            // Check if user is in clients table
+            // Fall back to clients table if not a practitioner
             const { data: client, error: clientError } = await window.supabaseClient
                 .from('clients')
                 .select('id')
@@ -383,7 +385,9 @@ window.authManager = {
         try {
             console.log('[Rooted Vitality] Fetching profile for user:', userId);
             
-            // Try practitioners table first
+            // IMPORTANT: Check practitioners FIRST
+            // Users who are practitioners should always be identified as practitioners
+            // even if they also have a client record
             const { data: practitioner, error: practError } = await window.supabaseClient
                 .from('practitioners')
                 .select('*')
@@ -391,10 +395,11 @@ window.authManager = {
                 .single();
             
             if (practitioner && !practError) {
+                console.log('[Rooted Vitality] User found in practitioners table');
                 return { role: 'practitioner', ...practitioner };
             }
             
-            // Fall back to clients table
+            // Fall back to clients table if not a practitioner
             const { data: client, error: clientError } = await window.supabaseClient
                 .from('clients')
                 .select('*')
@@ -402,14 +407,15 @@ window.authManager = {
                 .single();
             
             if (client && !clientError) {
+                console.log('[Rooted Vitality] User found in clients table');
                 return { role: 'client', ...client };
             }
             
             if (practError) {
-                console.error('[Rooted Vitality] Error retrieving profile - Full error:', practError);
+                console.error('[Rooted Vitality] Error retrieving from practitioners table:', practError);
             }
             if (clientError) {
-                console.error('[Rooted Vitality] Error retrieving profile - Full error:', clientError);
+                console.error('[Rooted Vitality] Error retrieving from clients table:', clientError);
             }
             
             return null;

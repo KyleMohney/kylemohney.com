@@ -155,8 +155,9 @@
               id="project-street"
               name="street"
               placeholder="123 Main St"
+              required
             >
-            <span class="form-hint">Optional - where practitioners will meet you</span>
+            <span class="form-hint">Where practitioners will meet you</span>
           </div>
 
           <div class="form-group">
@@ -199,21 +200,21 @@
             <label>How Urgent?</label>
             <div class="radio-group">
               <label class="radio-label">
-                <input type="radio" name="urgency" value="browsing" checked>
+                <input type="radio" name="urgency" value="browsing" required>
                 <span class="radio-text">
                   <strong>Just Browsing</strong>
                   <small>Exploring options</small>
                 </span>
               </label>
               <label class="radio-label">
-                <input type="radio" name="urgency" value="interested">
+                <input type="radio" name="urgency" value="interested" required>
                 <span class="radio-text">
                   <strong>Interested</strong>
                   <small>Moderate priority</small>
                 </span>
               </label>
               <label class="radio-label">
-                <input type="radio" name="urgency" value="urgent">
+                <input type="radio" name="urgency" value="urgent" required>
                 <span class="radio-text">
                   <strong>Urgent</strong>
                   <small>Need help soon</small>
@@ -227,28 +228,28 @@
             <label>Session Type Preference</label>
             <div class="radio-group">
               <label class="radio-label">
-                <input type="radio" name="travel-preference" value="in-person" checked>
+                <input type="radio" name="travel-preference" value="in-person" required>
                 <span class="radio-text">
                   <strong>In-Person</strong>
                   <small>Visit practitioner's office</small>
                 </span>
               </label>
               <label class="radio-label">
-                <input type="radio" name="travel-preference" value="house-calls">
+                <input type="radio" name="travel-preference" value="house-calls" required>
                 <span class="radio-text">
                   <strong>House Calls</strong>
                   <small>Practitioner comes to me</small>
                 </span>
               </label>
               <label class="radio-label">
-                <input type="radio" name="travel-preference" value="virtual">
+                <input type="radio" name="travel-preference" value="virtual" required>
                 <span class="radio-text">
                   <strong>Virtual</strong>
                   <small>Online session</small>
                 </span>
               </label>
               <label class="radio-label">
-                <input type="radio" name="travel-preference" value="flexible">
+                <input type="radio" name="travel-preference" value="flexible" required>
                 <span class="radio-text">
                   <strong>Flexible</strong>
                   <small>Open to any option</small>

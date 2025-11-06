@@ -43,9 +43,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     currentUser = userData;
     console.log('[My Projects] User authenticated:', currentUser.email);
 
-    // Load projects and practitioners
+    // Load projects
     await loadProjects();
-    await loadPractitioners();
     renderProjectsGrid();
     attachEventListeners();
 

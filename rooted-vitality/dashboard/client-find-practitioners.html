@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Find Practitioners · Rooted Vitality</title>
+  <link rel="stylesheet" href="../styles/styles.css">
+  <link rel="stylesheet" href="../styles/find-practitioners.css">
+</head>
+<body>
+  <header id="header-inject"></header>
+  
+  <main class="find-practitioners-container">
+    <!-- Hero Section -->
+    <section class="directory-hero">
+      <div class="directory-hero__content">
+        <h1 class="directory-hero__title">Find Practitioners</h1>
+        <p class="directory-hero__subtitle" id="directory-subtitle">Matching practitioners for your project</p>
+      </div>
+    </section>
+
+    <!-- Main Content Grid -->
+    <div class="directory-grid">
+      <!-- Left Sidebar: Filters -->
+      <aside class="directory-sidebar">
+        <!-- Back Button -->
+        <button id="back-to-projects" class="btn btn--secondary" style="width: 100%; margin-bottom: 0.5rem; cursor: pointer;" onclick="window.location.href='client-my-projects.html';">← Back to Projects</button>
+        <button id="refresh-search" class="btn btn--secondary" style="width: 100%; margin-bottom: 1rem; cursor: pointer;" onclick="refreshSearch();">Refresh Search</button>
+
+        <!-- Sorting -->
+        <div class="directory-sidebar__card">
+          <h3 class="directory-sidebar__title">Sort By</h3>
+          <select id="sort-selector" class="directory-sidebar__select">
+            <option value="recent">Most Recent</option>
+            <option value="rating">Highest Rated</option>
+            <option value="name">Name (A-Z)</option>
+            <option value="match-score">Best Match</option>
+          </select>
+        </div>
+
+        <!-- Filter Info -->
+        <div class="directory-sidebar__card">
+          <p class="directory-sidebar__text">
+            Filters are based on your project's preferences and practitioner availability. Only practitioners matching your session type preference are shown.
+          </p>
+        </div>
+      </aside>
+
+      <!-- Right Content: Practitioner List -->
+      <section class="directory-content">
+        <!-- Controls Bar -->
+        <div class="directory-controls">
+          <div class="controls-left">
+            <span class="results-count">Showing <span id="showing-count">0</span> of <span id="total-count">0</span> practitioners</span>
+          </div>
+          <div class="controls-right">
+            <button id="clear-filters" class="btn btn--secondary" style="display:none;">Clear Filters</button>
+          </div>
+        </div>
+
+        <!-- Practitioners Grid -->
+        <div id="practitioners-grid" class="practitioners-grid">
+          <!-- Practitioner cards will be injected here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="empty-state" style="display:none;">
+          <div class="empty-state__content">
+            <h3 class="empty-state__title">No Matches Found</h3>
+            <p class="empty-state__text">
+              We couldn't find practitioners matching your criteria right now. 
+              Try adjusting your filters or create another project.
+            </p>
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <div id="pagination" class="pagination" style="display:none;">
+          <button id="prev-page" class="btn btn--secondary" disabled>← Previous</button>
+          <span class="pagination__info">Page <span id="current-page">1</span> of <span id="total-pages">1</span></span>
+          <button id="next-page" class="btn btn--secondary" disabled>Next →</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Practitioner Detail Modal -->
+  <div id="practitioner-modal" class="modal">
+    <div class="modal__overlay"></div>
+    <div class="modal__content modal__content--large">
+      <div class="modal__header">
+        <h2 id="modal-title">Practitioner Profile</h2>
+        <button class="modal__close" aria-label="Close modal">&times;</button>
+      </div>
+
+      <div class="modal__body">
+        <!-- Profile Section -->
+        <div class="practitioner-profile">
+          <div class="profile-header">
+            <img id="modal-avatar" class="profile-avatar" src="" alt="">
+            <div class="profile-info">
+              <h3 id="modal-name" class="profile-name">Practitioner Name</h3>
+              <p id="modal-specialty" class="profile-specialty">Specialty</p>
+              <div class="profile-rating">
+                <span id="modal-rating" class="rating-stars">★★★★★</span>
+                <span id="modal-rating-count" class="rating-count">(0 reviews)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Services Section -->
+          <div class="profile-section">
+            <h4 class="profile-section__title">Services Offered</h4>
+            <div id="modal-services" class="services-badges">
+              <!-- Service badges injected here -->
+            </div>
+          </div>
+
+          <!-- Bio Section -->
+          <div class="profile-section">
+            <h4 class="profile-section__title">About</h4>
+            <p id="modal-bio" class="profile-bio">Practitioner bio</p>
+          </div>
+
+          <!-- Coverage Section -->
+          <div class="profile-section">
+            <h4 class="profile-section__title">Coverage Area</h4>
+            <p id="modal-coverage" class="profile-coverage">Coverage information</p>
+          </div>
+
+          <!-- Contact Info Section -->
+          <div class="profile-section">
+            <h4 class="profile-section__title">Contact Information</h4>
+            <div class="contact-info">
+              <p id="modal-email" class="contact-item">
+                <span class="contact-label">Email:</span>
+                <a href="" id="modal-email-link"></a>
+              </p>
+              <p id="modal-phone" class="contact-item">
+                <span class="contact-label">Phone:</span>
+                <a href="" id="modal-phone-link"></a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal__footer">
+        <button id="modal-send-request" class="btn btn--primary">Send Connection Request</button>
+        <button id="modal-close" class="btn btn--secondary">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Connection Request Modal -->
+  <div id="connection-request-modal" class="modal">
+    <div class="modal__overlay"></div>
+    <div class="modal__content">
+      <div class="modal__header">
+        <h2>Connection Request</h2>
+        <button class="modal__close" aria-label="Close modal">&times;</button>
+      </div>
+
+      <div class="modal__body">
+        <p id="request-confirmation-text">
+          Your connection request has been sent to <strong id="request-practitioner-name">Practitioner Name</strong>.
+        </p>
+        <p class="form-hint">
+          They'll be notified and can accept or decline your request. You can track all your connections in "My Matches".
+        </p>
+      </div>
+
+      <div class="modal__footer">
+        <button id="request-modal-close" class="btn btn--primary">Got It</button>
+      </div>
+    </div>
+  </div>
+
+  <footer id="footer-inject"></footer>
+
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Rooted Vitality Scripts (in order) -->
+  <script src="../scripts/config.js"></script>
+  <script src="../scripts/authManager.js"></script>
+  <script src="../scripts/authHooks.js"></script>
+  <script src="../injections.js"></script>
+  <script src="../scripts/find-practitioners.js"></script>
+</body>
+</html>

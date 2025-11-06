@@ -113,9 +113,16 @@ if (!window.supabase) {
     throw new Error('Supabase JS library required');
 }
 
-window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    storage: localStorage,
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
+  }
+});
 
-console.log('✅ [Rooted Vitality] Supabase client initialized');
+console.log('✅ [Rooted Vitality] Supabase client initialized with localStorage persistence');
 console.log('📍 [Rooted Vitality] Supabase URL:', SUPABASE_URL);
 
 // ======================================================

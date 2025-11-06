@@ -183,7 +183,50 @@ COMMENT ON COLUMN project_practitioner_matches.client_serial IS 'Client serial n
 
 
 -- ============================================================================
--- MIGRATION 007: Indexes for Performance
+-- MIGRATION 007: Soft Delete System
+-- ============================================================================
+-- Description: Add soft delete timestamps for audit trail and testing
+
+ALTER TABLE clients
+ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP;
+
+ALTER TABLE practitioners
+ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP;
+
+COMMENT ON COLUMN clients.deleted_at IS 'Soft delete timestamp - NULL if active, timestamp if deleted';
+COMMENT ON COLUMN practitioners.deleted_at IS 'Soft delete timestamp - NULL if active, timestamp if deleted';
+
+
+-- ============================================================================
+-- MIGRATION 008: Matching System
+-- ============================================================================
+-- Description: Add matching toggle and credentials verification fields
+
+ALTER TABLE practitioners
+ADD COLUMN IF NOT EXISTS matching_enabled BOOLEAN DEFAULT true,
+ADD COLUMN IF NOT EXISTS matching_paused BOOLEAN DEFAULT false,
+ADD COLUMN IF NOT EXISTS credentials_verified BOOLEAN DEFAULT false,
+ADD COLUMN IF NOT EXISTS profile_completion_percent INTEGER DEFAULT 0;
+
+COMMENT ON COLUMN practitioners.matching_enabled IS 'Whether practitioner wants to receive new match opportunities';
+COMMENT ON COLUMN practitioners.matching_paused IS 'Whether practitioner has temporarily paused matching';
+COMMENT ON COLUMN practitioners.credentials_verified IS 'Whether practitioner credentials have been verified by admin';
+COMMENT ON COLUMN practitioners.profile_completion_percent IS 'Percentage of profile fields filled (0-100)';
+
+
+-- ============================================================================
+-- MIGRATION 009: Add Subcategory Text Field to Projects
+-- ============================================================================
+-- Description: Store subcategory text/label directly in projects table for easier matching
+
+ALTER TABLE projects
+ADD COLUMN IF NOT EXISTS subcategory_text TEXT;
+
+COMMENT ON COLUMN projects.subcategory_text IS 'User-selected subcategory text (e.g., "Pregnancy Support", "Labor Support") - stored for easier filtering in matching queries';
+
+
+-- ============================================================================
+-- MIGRATION 010: Add Indexes for Performance
 -- ============================================================================
 -- Description: Add indexes for common query patterns
 
