@@ -26,13 +26,51 @@ console.log('[Rooted Vitality] practitionerHelpers.js loading...');
  * @param {string} email - User email
  * @returns {object} Created profile data
  */
+/**
+ * Generate next practitioner serial number (P-number)
+ * Format: P + 8 digits (e.g., P00020001)
+ */
+async function generatePractitionerSerialNumber() {
+    try {
+        // Query the last practitioner serial number
+        const { data, error } = await window.supabaseClient
+            .from('practitioners')
+            .select('serial_number')
+            .not('serial_number', 'is', null)
+            .order('created_at', { ascending: false })
+            .limit(1);
+
+        if (error) throw error;
+
+        let nextNumber = 1;
+        if (data && data.length > 0 && data[0].serial_number) {
+            // Extract the numeric part from the last serial (e.g., "P00020050" -> 50)
+            const lastSerial = data[0].serial_number;
+            const numericPart = parseInt(lastSerial.substring(1)); // Remove 'P' and parse
+            nextNumber = numericPart + 1;
+        }
+
+        // Format as P + 8 digits with leading zeros
+        const serialNumber = 'P' + String(nextNumber).padStart(8, '0');
+        console.log('[Practitioner Helpers] Generated serial number:', serialNumber);
+        return serialNumber;
+    } catch (error) {
+        console.error('[Practitioner Helpers] Error generating serial number:', error);
+        throw error;
+    }
+}
+
 async function createPractitionerProfile(userId, email) {
     try {
+        // Generate serial number for this practitioner
+        const serialNumber = await generatePractitionerSerialNumber();
+        
         const { data, error } = await window.supabaseClient
             .from('practitioners')
             .insert([{
                 user_id: userId,
                 email: email,
+                serial_number: serialNumber,
                 status: 'draft',
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString()
@@ -41,7 +79,7 @@ async function createPractitionerProfile(userId, email) {
             .single();
 
         if (error) throw error;
-        console.log('[Practitioner Helpers] Profile created:', data.id);
+        console.log('[Practitioner Helpers] Profile created:', data.id, 'with serial:', serialNumber);
         return data;
     } catch (error) {
         console.error('[Practitioner Helpers] Error creating profile:', error);
