@@ -132,6 +132,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Render profile
         renderProfile();
         
+        // Setup Contact button
+        setupContactButton();
+        
         // Hide loading, show content
         document.getElementById('profile-loading').style.display = 'none';
         document.getElementById('profile-content').style.display = 'block';
@@ -155,9 +158,8 @@ async function loadReviews() {
         const { data, error } = await window.supabaseClient
             .from('reviews')
             .select('*')
-            .eq('practitioner_id', practitioner.id)
+            .eq('practitioner_id', practitioner.user_id)
             .eq('is_visible', true)
-            .eq('is_approved', true)
             .order('created_at', { ascending: false })
             .limit(10);
         
@@ -220,6 +222,334 @@ async function loadServiceCategories() {
         console.error('[Practitioner Profile] Error loading service categories:', error);
         practitioner.service_categories = [];
     }
+}
+
+/**
+ * Setup Contact button - check user role and disable if practitioner
+ */
+function setupContactButton() {
+    console.log('[Practitioner Profile] setupContactButton() called');
+    const contactBtn = document.getElementById('btn-contact');
+    console.log('[Practitioner Profile] Contact button found:', !!contactBtn);
+    if (!contactBtn) return;
+    
+    try {
+        console.log('[Practitioner Profile] authManager available:', !!window.authManager);
+        const currentUser = window.authManager ? window.authManager.getCurrentUser() : null;
+        console.log('[Practitioner Profile] Current user:', currentUser?.id || 'none');
+        
+        if (!currentUser) {
+            // Public user - button is active, redirects to signup/login on click
+            console.log('[Practitioner Profile] Setting up button for public user');
+            contactBtn.addEventListener('click', () => {
+                console.log('[Practitioner Profile] Public user clicked Contact');
+                window.location.href = '/rooted-vitality/dashboard/signup.html';
+            });
+            return;
+        }
+        
+        // Check if current user is a practitioner
+        const rvUserStr = localStorage.getItem('rvUser');
+        console.log('[Practitioner Profile] rvUser in localStorage:', !!rvUserStr);
+        if (!rvUserStr) {
+            // Client - button is active
+            console.log('[Practitioner Profile] Setting up button for client (no rvUser)');
+            contactBtn.addEventListener('click', () => {
+                console.log('[Practitioner Profile] Client clicked Contact');
+                openConnectionRequest(practitioner.id);
+            });
+            return;
+        }
+        
+        const rvUser = JSON.parse(rvUserStr);
+        const userRole = rvUser.role;
+        console.log('[Practitioner Profile] User role:', userRole);
+        
+        if (userRole === 'practitioner') {
+            // Practitioner viewing another profile - disable button
+            console.log('[Practitioner Profile] Disabling button for practitioner');
+            contactBtn.disabled = true;
+            contactBtn.textContent = "Can't contact yourself";
+            contactBtn.style.opacity = '0.6';
+            contactBtn.style.cursor = 'not-allowed';
+            contactBtn.title = 'Practitioners cannot contact other practitioners';
+        } else if (userRole === 'client') {
+            // Client - button is active
+            console.log('[Practitioner Profile] Setting up button for client');
+            contactBtn.addEventListener('click', () => {
+                console.log('[Practitioner Profile] Client clicked Contact');
+                openConnectionRequest(practitioner.id);
+            });
+        }
+    } catch (error) {
+        console.error('[Practitioner Profile] Error setting up Contact button:', error);
+    }
+}
+
+/**
+ * Open connection request modal (client action)
+ */
+async function openConnectionRequest(practitionerId) {
+    console.log('[Practitioner Profile] openConnectionRequest called with ID:', practitionerId);
+    if (!practitionerId) {
+        console.warn('[Practitioner Profile] No practitioner ID provided');
+        return;
+    }
+    
+    const currentUser = window.authManager.getCurrentUser();
+    console.log('[Practitioner Profile] Current user:', currentUser?.id);
+    if (!currentUser) {
+        console.log('[Practitioner Profile] No user, redirecting to signup');
+        window.location.href = '/rooted-vitality/dashboard/signup.html';
+        return;
+    }
+    
+    try {
+        // First, check if we have a project_id from sessionStorage (from find-practitioners flow)
+        const storedProjectId = sessionStorage.getItem('selectedProjectId');
+        console.log('[Practitioner Profile] Stored project ID from sessionStorage:', storedProjectId);
+        
+        if (storedProjectId) {
+            // We already know the project - use it directly
+            console.log('[Practitioner Profile] Using known project from sessionStorage');
+            await createMatchWithProjectId(storedProjectId, practitionerId);
+            return;
+        }
+        
+        // Otherwise, fetch all projects and let user choose
+        console.log('[Practitioner Profile] No project in sessionStorage, fetching all projects');
+        
+        // Get client's projects
+        const { data: clientData, error: clientError } = await window.supabaseClient
+            .from('clients')
+            .select('serial_number, id')
+            .eq('user_id', currentUser.id)
+            .single();
+        
+        if (clientError || !clientData) {
+            console.error('[Practitioner Profile] Client fetch error:', clientError);
+            alert('Error: Could not find your client profile');
+            return;
+        }
+        console.log('[Practitioner Profile] Client data:', clientData);
+        
+        // Get practitioner's serial number
+        console.log('[Practitioner Profile] Fetching practitioner serial...');
+        const { data: proData, error: proError } = await window.supabaseClient
+            .from('practitioners')
+            .select('serial_number')
+            .eq('id', practitionerId)
+            .single();
+        
+        if (proError || !proData) {
+            console.error('[Practitioner Profile] Practitioner fetch error:', proError);
+            alert('Error: Could not find practitioner details');
+            return;
+        }
+        console.log('[Practitioner Profile] Practitioner serial:', proData.serial_number);
+        
+        // Get client's projects (with category info)
+        console.log('[Practitioner Profile] Fetching client projects...');
+        console.log('[Practitioner Profile] Query params - client_serial:', clientData.serial_number);
+        
+        const { data: projects, error: projectError } = await window.supabaseClient
+            .from('projects')
+            .select('id, description, client_serial, category_id, category_name, project_status, created_at')
+            .eq('client_serial', clientData.serial_number)
+            .order('created_at', { ascending: false });
+        
+        if (projectError) {
+            console.error('[Practitioner Profile] Project fetch error details:', {
+                message: projectError.message,
+                code: projectError.code,
+                details: projectError.details,
+                hint: projectError.hint
+            });
+            alert('Error: Could not load your projects. ' + (projectError.message || 'Unknown error'));
+            return;
+        }
+        console.log('[Practitioner Profile] Projects found:', projects?.length || 0);
+        
+        if (!projects || projects.length === 0) {
+            alert('Please create a project first before connecting with practitioners');
+            window.location.href = '/rooted-vitality/dashboard/client/pages/my-projects.html';
+            return;
+        }
+        
+        if (projects.length === 1) {
+            // Only one project - create match directly
+            console.log('[Practitioner Profile] One project found, creating match directly');
+            await createMatchAndRedirect(projects[0], practitionerId, proData.serial_number);
+        } else {
+            // Multiple projects - show selector modal
+            console.log('[Practitioner Profile] Multiple projects found, showing selector');
+            showProjectSelector(projects, practitionerId, proData.serial_number);
+        }
+        
+    } catch (error) {
+        console.error('[Practitioner Profile] Error in openConnectionRequest:', error);
+        alert('Error processing your connection request');
+    }
+}
+
+/**
+ * Create match with a known project ID
+ */
+async function createMatchWithProjectId(projectId, practitionerId) {
+    try {
+        console.log('[Practitioner Profile] createMatchWithProjectId called with projectId:', projectId, 'practitionerId:', practitionerId);
+        
+        if (!projectId) {
+            console.error('[Practitioner Profile] No project ID provided to createMatchWithProjectId');
+            alert('Error: No project selected');
+            return;
+        }
+        
+        // Fetch the project to get client_serial and practitioner serial
+        console.log('[Practitioner Profile] Fetching project details...');
+        const { data: project, error: projectError } = await window.supabaseClient
+            .from('projects')
+            .select('client_serial')
+            .eq('id', projectId)
+            .single();
+        
+        if (projectError || !project) {
+            console.error('[Practitioner Profile] Project fetch error:', projectError);
+            alert('Error: Could not find your project');
+            return;
+        }
+        console.log('[Practitioner Profile] Project fetched successfully:', project);
+        
+        // Get practitioner's serial number
+        console.log('[Practitioner Profile] Fetching practitioner details...');
+        const { data: proData, error: proError } = await window.supabaseClient
+            .from('practitioners')
+            .select('serial_number')
+            .eq('id', practitionerId)
+            .single();
+        
+        if (proError || !proData) {
+            console.error('[Practitioner Profile] Practitioner fetch error:', proError);
+            alert('Error: Could not find practitioner details');
+            return;
+        }
+        console.log('[Practitioner Profile] Practitioner fetched successfully:', proData);
+        
+        console.log('[Practitioner Profile] Calling createMatchAndRedirect with:', { id: projectId, client_serial: project.client_serial }, practitionerId, proData.serial_number);
+        await createMatchAndRedirect({ id: projectId, client_serial: project.client_serial }, practitionerId, proData.serial_number);
+        
+    } catch (error) {
+        console.error('[Practitioner Profile] Exception in createMatchWithProjectId:', error);
+        alert('Error creating connection');
+    }
+}
+
+/**
+ * Create match and redirect to My Matches with messaging open
+ */
+async function createMatchAndRedirect(project, practitionerId, practitionerSerial) {
+    try {
+        console.log('[Practitioner Profile] Creating match for project:', project.id);
+        
+        const insertData = {
+            project_id: project.id,
+            practitioner_id: practitionerId,
+            client_serial: project.client_serial,
+            practitioner_serial: practitionerSerial,
+            status: 'active'
+        };
+        console.log('[Practitioner Profile] Insert data:', insertData);
+        
+        const { data, error } = await window.supabaseClient
+            .from('project_practitioner_matches')
+            .insert(insertData)
+            .select();
+        
+        if (error) {
+            // 23505 = duplicate key (match already exists - this is fine, proceed to my-matches)
+            if (error.code === '23505') {
+                console.log('[Practitioner Profile] Match already exists, proceeding to my-matches');
+            } else {
+                console.error('[Practitioner Profile] Error creating match:', error);
+                alert('Error creating connection');
+                return;
+            }
+        } else {
+            console.log('[Practitioner Profile] Match created successfully:', data);
+        }
+        
+        // Redirect to My Matches with project and practitioner in query params
+        const redirectUrl = `/rooted-vitality/dashboard/client/pages/my-matches.html?project_id=${project.id}&practitioner_id=${practitionerId}`;
+        console.log('[Practitioner Profile] Redirecting to:', redirectUrl);
+        window.location.href = redirectUrl;
+        
+    } catch (error) {
+        console.error('[Practitioner Profile] Exception creating match:', error);
+        alert('Error creating connection');
+    }
+}
+
+/**
+ * Show project selector modal for multi-project clients
+ */
+function showProjectSelector(projects, practitionerId, practitionerSerial) {
+    // Create a simple modal to select project
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    `;
+    
+    let projectsHtml = projects.map(p => `
+        <option value="${p.id}">${p.category_name || p.category_id || 'Project'}</option>
+    `).join('');
+    
+    modal.innerHTML = `
+        <div style="background: white; padding: 2rem; border-radius: 8px; max-width: 400px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <h3 style="margin-top: 0; font-family: var(--font-sans);">Select Project for Connection</h3>
+            <p style="color: #666; font-size: 0.95rem;">Which project would you like to connect this practitioner to?</p>
+            
+            <select id="project-selector" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 0.95rem; margin: 1rem 0;">
+                <option value="">Choose a project...</option>
+                ${projectsHtml}
+            </select>
+            
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                <button id="cancel-selector" style="flex: 1; padding: 0.75rem; background: #ddd; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">Cancel</button>
+                <button id="confirm-selector" style="flex: 1; padding: 0.75rem; background: #5c9a72; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">Connect</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    const selector = document.getElementById('project-selector');
+    const confirmBtn = document.getElementById('confirm-selector');
+    const cancelBtn = document.getElementById('cancel-selector');
+    
+    confirmBtn.addEventListener('click', async () => {
+        const selectedProjectId = selector.value;
+        if (!selectedProjectId) {
+            alert('Please select a project');
+            return;
+        }
+        
+        const selectedProject = projects.find(p => p.id === selectedProjectId);
+        document.body.removeChild(modal);
+        await createMatchAndRedirect(selectedProject, practitionerId, practitionerSerial);
+    });
+    
+    cancelBtn.addEventListener('click', () => {
+        document.body.removeChild(modal);
+    });
 }
 
 // ======================================================

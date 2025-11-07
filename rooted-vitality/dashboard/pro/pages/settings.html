@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings | Rooted Vitality Practitioner Dashboard</title>
+  <link rel="stylesheet" href="../../../styles/styles.css">
+  <link rel="stylesheet" href="../styles/settings.css">
+</head>
+<body class="rooted-body practitioner-view">
+  
+  <!-- ========================================== -->
+  <!-- HEADER (Injected via injections.js) -->
+  <!-- ========================================== -->
+  <header id="rooted-header"></header>
+
+  <!-- ========================================== -->
+  <!-- MAIN CONTENT -->
+  <!-- ========================================== -->
+  <main class="settings-main">
+    
+    <!-- Settings Sidebar Navigation -->
+    <nav class="settings-sidebar">
+      <div class="settings-sidebar-header">
+        <h2>Settings</h2>
+      </div>
+      <ul class="settings-nav-list">
+        <li><a href="#account" class="settings-nav-link active" data-section="account">Account</a></li>
+        <li><a href="#notifications" class="settings-nav-link" data-section="notifications">Notifications</a></li>
+        <li><a href="#memberships" class="settings-nav-link" data-section="memberships">Memberships</a></li>
+        <li><a href="#privacy" class="settings-nav-link" data-section="privacy">Security</a></li>
+      </ul>
+    </nav>
+
+    <!-- Settings Content Area -->
+    <div class="settings-content">
+      
+      <!-- ========================================== -->
+      <!-- 1. ACCOUNT SETTINGS -->
+      <!-- ========================================== -->
+      <section class="settings-section active" data-section="account" id="account">
+        <div class="settings-section-header">
+          <h1>Account Settings</h1>
+          <p class="section-description">Manage your account information</p>
+        </div>
+
+        <!-- Email Address -->
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>Email Address</h3>
+            <button class="btn-edit-setting" data-setting="email">Edit</button>
+          </div>
+          <div class="card-content">
+            <div class="info-group">
+              <p class="info-value" id="display-email">Loading...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Phone Number -->
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>Phone Number</h3>
+            <button class="btn-edit-setting" data-setting="phone">Edit</button>
+          </div>
+          <div class="card-content">
+            <div class="info-group">
+              <p class="info-value" id="display-phone">Loading...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Physical Address -->
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>Physical Address</h3>
+            <button class="btn-edit-setting" data-setting="address">Edit</button>
+          </div>
+          <div class="card-content">
+            <div class="info-group">
+              <p class="info-value" id="display-address">Loading...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Password Reset -->
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>Password Reset</h3>
+          </div>
+          <div class="card-content">
+            <p class="setting-description">Update your password to keep your account secure</p>
+            <button class="btn-setting-action" id="change-password-btn">Change Password</button>
+          </div>
+        </div>
+
+        <!-- Account Standing -->
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>Account Standing</h3>
+          </div>
+          <div class="card-content">
+            <div class="status-badge" id="account-standing-badge">Active</div>
+            <p class="setting-description" id="account-standing-desc">Your account is in good standing</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- 2. NOTIFICATION SETTINGS -->
+      <!-- ========================================== -->
+      <section class="settings-section" data-section="notifications" id="notifications">
+        <div class="settings-section-header">
+          <h1>Notification Preferences</h1>
+          <p class="section-description">Customize how you receive notifications across all channels</p>
+          <div class="notification-info-banner">
+            <p class="notification-info-text">Email and SMS notifications will be sent to the contact information in your <a href="#account" class="link-to-account">Account Settings</a></p>
+          </div>
+        </div>
+
+        <!-- Lead Notifications -->
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>Lead Notifications</h3>
+          </div>
+          <div class="card-content">
+            <p class="setting-description">When new potential clients show interest in your services</p>
+            <div class="notification-channels">
+              <label class="notification-channel-toggle">
+                <input type="checkbox" name="leads-bell" checked class="notification-input">
+                <span class="toggle-label">In-App Notification</span>
+              </label>
+              <label class="notification-channel-toggle">
+                <input type="checkbox" name="leads-email" checked class="notification-input">
+                <span class="toggle-label">Email</span>
+              </label>
+              <label class="notification-channel-toggle">
+                <input type="checkbox" name="leads-sms" class="notification-input">
+                <span class="toggle-label">SMS</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Opportunity Notifications -->
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>Opportunity Notifications</h3>
+          </div>
+          <div class="card-content">
+            <p class="setting-description">Booking requests, appointments, and client interactions</p>
+            <div class="notification-channels">
+              <label class="notification-channel-toggle">
+                <input type="checkbox" name="opportunities-bell" checked class="notification-input">
+                <span class="toggle-label">In-App Notification</span>
+              </label>
+              <label class="notification-channel-toggle">
+                <input type="checkbox" name="opportunities-email" checked class="notification-input">
+                <span class="toggle-label">Email</span>
+              </label>
+              <label class="notification-channel-toggle">
+                <input type="checkbox" name="opportunities-sms" class="notification-input">
+                <span class="toggle-label">SMS</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Promotions & News -->
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>Promotions & News</h3>
+          </div>
+          <div class="card-content">
+            <p class="setting-description">Updates about features, special offers, and industry news</p>
+            <div class="notification-channels">
+              <label class="notification-channel-toggle">
+                <input type="checkbox" name="promotions-bell" class="notification-input">
+                <span class="toggle-label">In-App Notification</span>
+              </label>
+              <label class="notification-channel-toggle">
+                <input type="checkbox" name="promotions-email" checked class="notification-input">
+                <span class="toggle-label">Email</span>
+              </label>
+              <label class="notification-channel-toggle">
+                <input type="checkbox" name="promotions-sms" class="notification-input">
+                <span class="toggle-label">SMS</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- System Notifications -->
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>System Notifications</h3>
+          </div>
+          <div class="card-content">
+            <p class="setting-description">Membership updates, new reviews, and important account alerts</p>
+            <div class="notification-channels">
+              <label class="notification-channel-toggle">
+                <input type="checkbox" name="system-bell" checked class="notification-input">
+                <span class="toggle-label">In-App Notification</span>
+              </label>
+              <label class="notification-channel-toggle">
+                <input type="checkbox" name="system-email" checked class="notification-input">
+                <span class="toggle-label">Email</span>
+              </label>
+              <label class="notification-channel-toggle">
+                <input type="checkbox" name="system-sms" class="notification-input">
+                <span class="toggle-label">SMS</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section Footer with Save Button -->
+        <div class="section-footer">
+          <button id="save-notifications-btn" class="btn-accent">Save Notification Preferences</button>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- 3. MEMBERSHIPS -->
+      <!-- ========================================== -->
+      <section class="settings-section" data-section="memberships" id="memberships">
+        <div class="settings-section-header">
+          <h1>Memberships & Billing</h1>
+          <p class="section-description">Manage your active memberships and billing information</p>
+        </div>
+
+        <!-- Active Memberships -->
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>Active Memberships</h3>
+          </div>
+          <div class="card-content">
+            <div id="active-memberships-list" class="memberships-list">
+              <p class="setting-description">Loading your memberships...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Billing Information -->
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>Billing Information</h3>
+          </div>
+          <div class="card-content">
+            <p class="setting-description">View and manage your billing details</p>
+            <button class="btn-secondary" id="view-billing-btn">View Billing History</button>
+          </div>
+        </div>
+
+        <!-- Payment Methods -->
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>Payment Methods</h3>
+          </div>
+          <div class="card-content">
+            <p class="setting-description">Manage your payment methods on file</p>
+            <button class="btn-secondary" id="manage-payment-btn">Manage Payment Methods</button>
+          </div>
+        </div>
+
+        <!-- Subscription Plans -->
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>Available Plans</h3>
+          </div>
+          <div class="card-content">
+            <p class="setting-description">Upgrade or downgrade your membership plan</p>
+            <button class="btn-secondary" id="view-plans-btn">View Plans</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- 4. SECURITY -->
+      <!-- ========================================== -->
+      <section class="settings-section" data-section="privacy" id="privacy">
+        <div class="settings-section-header">
+          <h1>Security</h1>
+          <p class="section-description">Manage your account security and data settings</p>
+        </div>
+
+        <!-- Two-Factor Authentication -->
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>Two-Factor Authentication</h3>
+          </div>
+          <div class="card-content">
+            <p class="setting-description">Add an extra layer of security to your account</p>
+            <button class="btn-setting-action" id="enable-2fa-btn">Enable Two-Factor Authentication</button>
+          </div>
+        </div>
+
+        <!-- Delete Practitioner Profile -->
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>Delete Practitioner Profile</h3>
+          </div>
+          <div class="card-content">
+            <p class="setting-description">Remove your practitioner profile from Rooted Vitality. You can still log in and use the service as a client. Your account will remain active and your data will be preserved.</p>
+            <button class="btn-secondary" id="delete-profile-btn">Delete My Profile</button>
+          </div>
+        </div>
+
+        <!-- Delete Account -->
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>Delete My Account</h3>
+          </div>
+          <div class="card-content">
+            <p class="setting-description">Permanently delete your entire account including both your client and practitioner profiles. <strong>This cannot be undone.</strong></p>
+            <button class="btn-secondary" id="delete-account-btn">Delete My Account</button>
+          </div>
+        </div>
+
+        <!-- CCPA Request -->
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>CCPA Data Request</h3>
+          </div>
+          <div class="card-content">
+            <p class="setting-description">California residents can submit a request to have their data removed from our system under the California Consumer Privacy Act (CCPA).</p>
+            <button class="btn-secondary" id="ccpa-request-btn">Submit CCPA Request</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- END OF SETTINGS SECTIONS -->
+      <!-- ========================================== -->
+
+      <!-- ========================================== -->
+      <!-- EDIT MODALS -->
+      <!-- ========================================== -->
+
+      <!-- Email Edit Modal -->
+      <div id="edit-email-modal" class="settings-modal" style="display: none;">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>Update Email Address</h2>
+            <button class="modal-close-btn" aria-label="Close">&times;</button>
+          </div>
+          <form id="edit-email-form" class="modal-form">
+            <div class="form-group">
+              <label for="email-input">New Email Address</label>
+              <input type="email" id="email-input" class="form-input" placeholder="your@email.com" required>
+              <p class="form-help">You'll need to verify this email address before it becomes active.</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn-secondary modal-cancel-btn">Cancel</button>
+              <button type="submit" class="btn-accent">Update Email</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Phone Edit Modal -->
+      <div id="edit-phone-modal" class="settings-modal" style="display: none;">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>Update Phone Number</h2>
+            <button class="modal-close-btn" aria-label="Close">&times;</button>
+          </div>
+          <form id="edit-phone-form" class="modal-form">
+            <div class="form-group">
+              <label for="phone-input">Phone Number</label>
+              <input type="tel" id="phone-input" class="form-input" placeholder="(555) 123-4567" required>
+              <p class="form-help">Include area code and any extensions if applicable.</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn-secondary modal-cancel-btn">Cancel</button>
+              <button type="submit" class="btn-accent">Update Phone</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Address Edit Modal -->
+      <div id="edit-address-modal" class="settings-modal" style="display: none;">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>Update Physical Address</h2>
+            <button class="modal-close-btn" aria-label="Close">&times;</button>
+          </div>
+          <form id="edit-address-form" class="modal-form">
+            <div class="form-group">
+              <label for="address-street-input">Street Address</label>
+              <input type="text" id="address-street-input" class="form-input" placeholder="123 Main Street, Suite 100" required>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="address-city-input">City</label>
+                <input type="text" id="address-city-input" class="form-input" placeholder="Denver" required>
+              </div>
+              <div class="form-group">
+                <label for="address-state-input">State</label>
+                <input type="text" id="address-state-input" class="form-input" placeholder="CO" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="address-zip-input">ZIP Code</label>
+              <input type="text" id="address-zip-input" class="form-input" placeholder="80202" required>
+            </div>
+            <p class="form-help">Your City and State will appear in your profile.</p>
+            <div class="modal-footer">
+              <button type="button" class="btn-secondary modal-cancel-btn">Cancel</button>
+              <button type="submit" class="btn-accent">Update Address</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ========================================== -->
+  <!-- FOOTER (Injected via injections.js) -->
+  <!-- ========================================== -->
+  <footer id="rooted-footer"></footer>
+
+  <!-- ========================================== -->
+  <!-- SCRIPTS -->
+  <!-- ========================================== -->
+  <!-- Supabase JS Client Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <script src="../../../scripts/config.js"></script>
+  <script src="../../../scripts/authManager.js"></script>
+  <script src="../../../scripts/authModal.js"></script>
+  <script src="../../../scripts/authHooks.js"></script>
+  <script src="../../../injections.js"></script>
+  <script src="../../../scripts/proDashboard.js"></script>
+  <script src="../scripts/proSettings.js"></script>
+
+</body>
+</html>

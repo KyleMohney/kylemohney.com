@@ -21,6 +21,7 @@ const state = {
     totalSteps: 2,
     session: null,
     formData: {
+        legal_name: '',
         legal_business_name: '',
         dba_name: '',
         year_established: '',
@@ -170,8 +171,8 @@ function validateStep(stepNum) {
 // ═══════════════════════════════════════════════════════════════════════════
 
 function updateProgress() {
-    // Step 1: Business info fields (legal name, dba, year, size, phone, address, zipcode)
-    const step1Fields = document.querySelectorAll('[name="legal_business_name"], [name="dba_name"], [name="year_established"], [name="business_size"], [name="phone"], [name="physical_address"], [name="zipcode"]');
+    // Step 1: Business info fields (legal name, legal business name, dba, year, size, phone, address, zipcode)
+    const step1Fields = document.querySelectorAll('[name="legal_name"], [name="legal_business_name"], [name="dba_name"], [name="year_established"], [name="business_size"], [name="phone"], [name="physical_address"], [name="zipcode"]');
     let step1Filled = 0;
     step1Fields.forEach(field => {
         if (field.value && field.value.trim()) step1Filled++;
@@ -272,9 +273,10 @@ async function registerPractitioner(event) {
     updateFormData();
     
     // Check required fields
-    if (!state.formData.legal_business_name || !state.formData.dba_name || 
+    if (!state.formData.legal_name || !state.formData.legal_business_name || !state.formData.dba_name || 
         !state.formData.year_established || !state.formData.business_size || 
-        !state.formData.phone) {
+        !state.formData.phone || !state.formData.physical_address || !state.formData.practice_city || 
+        !state.formData.practice_state || !state.formData.zipcode) {
         alert('Please complete all required fields.');
         return;
     }
@@ -294,6 +296,7 @@ async function registerPractitioner(event) {
         const payload = {
             user_id: state.session.id,
             email: state.session.email,
+            legal_name: state.formData.legal_name,
             legal_business_name: state.formData.legal_business_name,
             dba_name: state.formData.dba_name,
             year_established: parseInt(state.formData.year_established),

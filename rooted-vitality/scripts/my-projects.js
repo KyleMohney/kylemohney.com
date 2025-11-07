@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', async () => {
  */
 async function loadProjects() {
   try {
-    const { data, error } = await window.supabase
+    const { data, error } = await window.supabaseClient
       .from('projects')
       .select('*, project_practitioners(practitioner_id)')
       .eq('client_id', currentUser.id)
@@ -111,6 +111,9 @@ function renderProjectsGrid() {
   }
 
   container.innerHTML = projects.map(project => createProjectCard(project)).join('');
+  
+  // Attach event listeners to newly rendered titles
+  attachProjectTitleEditing();
 }
 
 /**
@@ -125,20 +128,40 @@ function createProjectCard(project) {
     day: 'numeric'
   });
 
+  console.log('[DEBUG] Project data:', {
+    custom_name: project.custom_name,
+    category_name: project.category_name,
+    subcategory_text: project.subcategory_text,
+    state: project.state,
+    street: project.street,
+    zipcode: project.zipcode,
+    all_keys: Object.keys(project)
+  });
+
   const matchedPractitioners = project.project_practitioners || [];
   const practitionersList = matchedPractitioners
     .map(pp => practitioners.find(p => p.id === pp.practitioner_id))
     .filter(Boolean);
 
-  const statusClass = `project-card__status--${project.status || 'active'}`;
-  const statusLabel = (project.status || 'active').charAt(0).toUpperCase() + (project.status || 'active').slice(1);
+  // Determine status: if has matches and not explicitly closed, show "Active", otherwise show project status
+  let displayStatus = project.status || 'Pending';
+  if (matchedPractitioners.length > 0 && project.status !== 'closed') {
+    displayStatus = 'Active';
+  } else if (project.status === 'closed') {
+    displayStatus = 'Closed';
+  } else {
+    displayStatus = 'Pending';
+  }
+
+  const statusClass = `project-card__status--${displayStatus.toLowerCase()}`;
+  const statusLabel = displayStatus;
 
   return `
     <article class="project-card">
       <!-- Card Header -->
       <div class="project-card__header">
         <div class="project-card__title-group">
-          <h3 class="project-card__title">${escapeHtml(project.name)}</h3>
+          <h3 class="project-card__title" contenteditable="true" data-project-id="${project.id}" spellcheck="false">${escapeHtml(project.custom_name || project.category_name || 'Untitled Project')}</h3>
           <span class="project-card__status ${statusClass}">${statusLabel}</span>
         </div>
         <div class="project-card__meta">
@@ -152,6 +175,22 @@ function createProjectCard(project) {
         
         <div class="project-card__category">
           <span class="category-badge">${formatCategory(project.category)}</span>
+        </div>
+
+        <!-- Focus Areas (Subcategories) -->
+        ${project.subcategory_text ? `
+          <div class="project-card__subcategories">
+            <h4 class="project-card__section-title">Focus Areas</h4>
+            <div class="subcategories-list">
+              ${project.subcategory_text.split(',').map(sub => sub.trim()).filter(Boolean).map(name => `<span class="subcategory-badge">${escapeHtml(name)}</span>`).join('')}
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- Location -->
+        <div class="project-card__location">
+          <span class="location-label">Location:</span>
+          <span class="location-value">${escapeHtml(project.state || 'N/A')}</span>
         </div>
 
         <!-- Practitioners Section -->
@@ -196,12 +235,12 @@ function createProjectCard(project) {
  */
 async function createProject(formData) {
   try {
-    const { data, error } = await window.supabase
+    const { data, error } = await window.supabaseClient
       .from('projects')
       .insert([
         {
           client_id: currentUser.id,
-          name: formData.name,
+          custom_name: formData.name,
           description: formData.description,
           category: formData.category,
           status: 'active',
@@ -339,6 +378,9 @@ function filterProjectsByStatus(status) {
   }
   
   container.innerHTML = filtered.map(p => createProjectCard(p)).join('');
+  
+  // Attach event listeners to newly rendered titles
+  attachProjectTitleEditing();
 }
 
 /**
@@ -363,6 +405,70 @@ function updateStats() {
  */
 function browseForProject(projectId) {
   window.location.href = `./project-practitioners.html?project_id=${projectId}`;
+}
+
+/**
+ * Attach editing functionality to project title elements
+ */
+function attachProjectTitleEditing() {
+  const editableTitles = document.querySelectorAll('.project-card__title');
+  
+  editableTitles.forEach(titleEl => {
+    // Prevent multiple listeners on same element
+    if (titleEl.dataset.listenerAttached) return;
+    titleEl.dataset.listenerAttached = 'true';
+    
+    // On blur, save the new title
+    titleEl.addEventListener('blur', async (e) => {
+      const projectId = titleEl.getAttribute('data-project-id');
+      const newTitle = titleEl.textContent.trim();
+      
+      if (!projectId || !newTitle) return;
+      
+      try {
+        const { error } = await window.supabaseClient
+          .from('projects')
+          .update({ custom_name: newTitle })
+          .eq('id', projectId);
+        
+        if (error) {
+          console.error('[My Projects] Error updating project title:', error);
+          showNotification('Failed to save project title', 'error');
+          // Revert to original
+          const project = projects.find(p => p.id === projectId);
+          if (project) {
+            titleEl.textContent = project.custom_name || project.category_name || 'Untitled Project';
+          }
+        } else {
+          // Update local project
+          const project = projects.find(p => p.id === projectId);
+          if (project) {
+            project.custom_name = newTitle;
+          }
+          console.log('[My Projects] Project title updated successfully:', newTitle);
+          showNotification('Project title saved', 'success');
+        }
+      } catch (err) {
+        console.error('[My Projects] Exception updating project title:', err);
+        showNotification('Error saving project title', 'error');
+      }
+    });
+    
+    // On keydown Enter, blur to save
+    titleEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        titleEl.blur();
+      }
+    });
+    
+    // Prevent multiple line breaks
+    titleEl.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+      }
+    });
+  });
 }
 
 /**

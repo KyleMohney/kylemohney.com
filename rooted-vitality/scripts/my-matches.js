@@ -91,26 +91,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ========================================== 
+// ========================================== 
 // LOAD TAXONOMY
 // ========================================== 
 
 async function loadTaxonomy() {
   try {
-    const { data, error } = await window.supabaseClient
-      .from('taxonomy')
-      .select('category_id, name, icon');
-
-    if (error) throw error;
-
-    // Build taxonomy object
-    (data || []).forEach(category => {
-      taxonomyData[category.category_id] = {
-        name: category.name,
-        icon: category.icon
-      };
-    });
-
-    console.log('[My Matches] Taxonomy loaded:', taxonomyData);
+    // Taxonomy data is loaded from projects table during loadMatches
+    // No separate taxonomy table query needed
+    console.log('[My Matches] Taxonomy data available from projects');
   } catch (error) {
     console.error('[My Matches] Error loading taxonomy:', error);
   }
@@ -125,7 +114,7 @@ async function loadMatches(clientSerial) {
     // Fetch matches
     const { data: matchesData, error: matchesError } = await window.supabaseClient
       .from('project_practitioner_matches')
-      .select('id, project_id, practitioner_id, practitioner_serial, status, created_at')
+      .select('id, project_id, practitioner_id, practitioner_serial, client_serial, status, created_at')
       .eq('client_serial', clientSerial)
       .order('created_at', { ascending: false });
 
@@ -157,7 +146,7 @@ async function loadMatches(clientSerial) {
     if (projectIds.length > 0) {
       const { data: projectsData, error: projectsError } = await window.supabaseClient
         .from('projects')
-        .select('id, category_id, category_name')
+        .select('id, project_id, category_id, category_name')
         .in('id', projectIds);
       
       if (projectsError) {
@@ -273,9 +262,9 @@ function createMatchCard(match) {
     : `<div class="match-card__avatar-initials">${initials}</div>`;
 
   const statusLabel = {
-    pending: 'In-Progress',
-    accepted: 'Hired',
-    not_hired: 'Not Hired',
+    'in-progress': 'In-Progress',
+    hired: 'Hired',
+    'not-hired': 'Not Hired',
     declined: 'Declined'
   }[match.status] || match.status;
 
@@ -291,7 +280,7 @@ function createMatchCard(match) {
   const projectDisplay = getCategoryName(project);
 
   const card = document.createElement('div');
-  const closedClass = (match.status === 'not_hired' || match.status === 'declined') ? ' match-card--closed' : '';
+  const closedClass = (match.status === 'not-hired' || match.status === 'declined') ? ' match-card--closed' : '';
   card.className = `match-card${closedClass}`;
   card.setAttribute('data-match-id', match.id);
   card.innerHTML = `
@@ -318,13 +307,13 @@ function createMatchCard(match) {
           <button class="match-card__action-btn match-card__action-btn--primary" onclick="openPractitionerModal('${match.id}')">
             View Profile
           </button>
-          ${match.status === 'accepted' ? `
-            <button class="match-card__action-btn match-card__action-btn--secondary" onclick="sendMessage('${match.id}')">
-              Message
+          ${(match.status === 'hired' || match.status === 'not-hired') ? `
+            <button class="match-card__action-btn match-card__action-btn--review" onclick="openReviewModal('${match.id}', '${match.practitioner_id}', '${escapeHtml(match.practitioners?.dba_name || match.practitioners?.legal_name || 'Practitioner')}')">
+              Leave Review
             </button>
           ` : ''}
         </div>
-        <span class="match-card__status-pill match-card__status-pill--${match.status}">${statusLabel}</span>
+        <span class="match-card__status-pill match-card__status-pill--${match.status.replace('-', '_')}">${statusLabel}</span>
       </div>
     </div>
   `;
@@ -360,7 +349,7 @@ function initMessageThreadHandlers() {
 }
 
 /**
- * Update match status (Hired / Not Hired / etc)
+ * Update match status (In-Progress / Hired / Not Hired)
  */
 async function updateMatchStatus(matchId, newStatus) {
   try {
@@ -376,8 +365,34 @@ async function updateMatchStatus(matchId, newStatus) {
       alert('Error updating status: ' + error.message);
       return;
     }
-    
+
     console.log('[My Matches] Match status updated successfully');
+    
+    // Update project status based on match status
+    if (selectedMatch && selectedMatch.project_id) {
+      let newProjectStatus = null;
+      
+      if (newStatus === 'in-progress') {
+        newProjectStatus = 'in-progress';
+      } else if (newStatus === 'hired') {
+        newProjectStatus = 'hired';
+      } else if (newStatus === 'not-hired') {
+        newProjectStatus = 'not-hired';
+      }
+
+      if (newProjectStatus) {
+        const { error: projectError } = await window.supabaseClient
+          .from('projects')
+          .update({ project_status: newProjectStatus })
+          .eq('id', selectedMatch.project_id);
+
+        if (projectError) {
+          console.error('[My Matches] Error updating project status:', projectError);
+        } else {
+          console.log('[My Matches] Project status updated to:', newProjectStatus);
+        }
+      }
+    }
     
     // Update local match
     if (selectedMatch && selectedMatch.id === matchId) {
@@ -407,8 +422,15 @@ async function updateMatchStatus(matchId, newStatus) {
     // Refresh display to show updated status
     displayMatches(currentPage);
     
-    // Show feedback
-    alert(`Status updated to "${newStatus}"`);
+    // Show feedback with correct status label
+    const statusLabels = {
+      'in-progress': 'In-Progress',
+      'hired': 'Hired',
+      'not-hired': 'Not Hired',
+      'declined': 'Declined'
+    };
+    const label = statusLabels[newStatus] || newStatus;
+    alert(`Status changed to "${label}"`);
     
   } catch (error) {
     console.error('[My Matches] Exception updating match status:', error);

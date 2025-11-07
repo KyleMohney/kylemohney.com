@@ -401,28 +401,28 @@ TABLE OF CONTENTS:
   font-family: var(--font-serif);
 }
 
-.match-card__status-pill--pending {
-  background-color: #fef3c7;
-  border-color: #f59e0b;
-  color: #92400e;
+.match-card__status-pill--in_progress {
+  background-color: #dbeafe;
+  border-color: #3b82f6;
+  color: #1e40af;
 }
 
-.match-card__status-pill--accepted {
+.match-card__status-pill--hired {
   background-color: #d1fae5;
   border-color: #10b981;
   color: #065f46;
 }
 
 .match-card__status-pill--not_hired {
-  background-color: #f3f4f6;
-  border-color: #d1d5db;
-  color: #6b7280;
-}
-
-.match-card__status-pill--declined {
   background-color: #fee2e2;
   border-color: #ef4444;
   color: #7f1d1d;
+}
+
+.match-card__status-pill--declined {
+  background-color: #f3f4f6;
+  border-color: #d1d5db;
+  color: #6b7280;
 }
 
 .match-card__rating {
@@ -514,10 +514,28 @@ TABLE OF CONTENTS:
   background: rgba(92, 154, 114, 0.05);
 }
 
+.match-card__action-btn--review {
+  background: var(--rooted-accent);
+  color: var(--rooted-dark);
+  border: 2px solid var(--rooted-accent);
+  font-weight: 700;
+}
+
+.match-card__action-btn--review:hover {
+  background: #c9bb6f;
+  border-color: #c9bb6f;
+}
+
+/* Ensure review button remains interactive on closed cards */
+.match-card--closed .match-card__action-btn--review {
+  opacity: 1;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(212, 196, 124, 0.3);
+}
+
 .match-card__footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 1rem;
   margin-top: 1rem;
 }
@@ -1140,5 +1158,201 @@ TABLE OF CONTENTS:
   .thread-header__title {
     font-size: 1.1rem;
   }
+}
+
+/* ========================================== */
+/* REVIEW MODAL */
+/* ========================================== */
+
+.modal__content--review {
+  max-width: 600px;
+}
+
+.review-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0 1.5rem;
+}
+
+.review-form__section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.review-form__section:first-of-type {
+  margin-top: 0.75rem;
+}
+
+.review-form__label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--rooted-primary);
+  font-family: var(--font-sans);
+}
+
+.required {
+  color: #ef4444;
+}
+
+/* Star Rating */
+.star-rating {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 2rem;
+}
+
+.star-btn {
+  background: none;
+  border: none;
+  color: #d1d5db;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 2rem;
+  padding: 0;
+  line-height: 1;
+}
+
+.star-btn:hover {
+  color: var(--rooted-accent);
+  transform: scale(1.15);
+}
+
+.star-btn--active {
+  color: var(--rooted-accent);
+}
+
+/* Text Area */
+.review-form__textarea {
+  padding: 0.75rem;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  resize: vertical;
+  transition: border-color 0.2s ease;
+}
+
+.review-form__textarea:focus {
+  outline: none;
+  border-color: var(--rooted-primary);
+  box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.1);
+}
+
+.review-form__hint {
+  font-size: 0.8rem;
+  color: #999;
+  text-align: right;
+}
+
+/* Photo Upload */
+.photo-upload {
+  position: relative;
+}
+
+.photo-upload__input {
+  display: none;
+}
+
+.photo-upload__label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem 1rem;
+  border: 2px dashed #e5e5e5;
+  border-radius: 8px;
+  background: #f9fafb;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.photo-upload__label:hover {
+  border-color: var(--rooted-primary);
+  background: rgba(92, 154, 114, 0.02);
+}
+
+.photo-upload--dragging .photo-upload__label {
+  border-color: var(--rooted-accent);
+  background: rgba(212, 196, 124, 0.1);
+}
+
+.photo-upload__icon {
+  font-size: 2rem;
+  filter: grayscale(100%) brightness(0.85);
+  opacity: 0.6;
+}
+
+.photo-upload__text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--rooted-primary);
+  font-family: var(--font-sans);
+}
+
+.photo-upload__hint {
+  font-size: 0.8rem;
+  color: #999;
+}
+
+/* Photo Preview */
+.photo-preview {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.photo-preview__item {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f0f0f0;
+}
+
+.photo-preview__item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-preview__remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 28px;
+  height: 28px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.25rem;
+  line-height: 1;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.photo-preview__remove:hover {
+  background: rgba(0, 0, 0, 0.9);
+}
+
+/* Form Actions (already defined, ensure flex layout) */
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0;
+}
+
+.form-actions .btn {
+  flex: 1;
 }
 

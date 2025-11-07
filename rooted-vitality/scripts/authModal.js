@@ -62,7 +62,7 @@ window.initAuthModal = () => {
                 <button type="submit" class="rv-auth-submit">Sign In</button>
             </form>
             <div class="rv-auth-footer">
-                <p id="rvToggleLogin">Don't have an account? <a href="${pathPrefix}signup.html" id="rvRegisterLink">Sign up</a></p>
+                <p id="rvToggleLogin">Don't have an account? <a href="${pathPrefix}dashboard/signup.html" id="rvRegisterLink">Sign up</a></p>
             </div>
         </div>
     </div>
@@ -127,7 +127,7 @@ window.initAuthModal = () => {
     // Redirect to signup page
     registerLink.addEventListener('click', (e) => {
         e.preventDefault();
-        const signupPath = isSubdirectory ? '../signup.html' : './signup.html';
+        const signupPath = isSubdirectory ? '../dashboard/signup.html' : './dashboard/signup.html';
         window.location.href = signupPath;
     });
 

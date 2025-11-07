@@ -201,11 +201,21 @@ const RootedVitality = {
             let isSubdirectory = false;
             let pathPrefix = './';
             
-            // Check if we're in /dashboard/pro/ (two levels deep)
-            if (currentPath.includes('/dashboard/pro/')) {
+            // Check if we're in /dashboard/pro/pages/ (three levels deep)
+            if (currentPath.includes('/dashboard/pro/pages/')) {
+                isSubdirectory = true;
+                pathPrefix = '../../../';
+            }
+            // Check if we're in /dashboard/client/pages/ (three levels deep)
+            else if (currentPath.includes('/dashboard/client/pages/')) {
+                isSubdirectory = true;
+                pathPrefix = '../../../';
+            }
+            // Check if we're in /dashboard/pro/ or /dashboard/client/ (two levels deep - legacy)
+            else if (currentPath.includes('/dashboard/pro/') || currentPath.includes('/dashboard/client/')) {
                 isSubdirectory = true;
                 pathPrefix = '../../';
-            } 
+            }
             // Check for other first-level subdirectories
             else if (currentPath.includes('/articles/') || 
                      currentPath.includes('/policies/') || 
@@ -487,7 +497,7 @@ const RootedVitality = {
                     targetUrl = '/rooted-vitality/dashboard/pro/index.html';
                     console.log('[Rooted Vitality] Practitioner view selected, targetUrl set to:', targetUrl);
                 } else {
-                    targetUrl = '/rooted-vitality/dashboard/client-dashboard.html';
+                    targetUrl = '/rooted-vitality/dashboard/client/pages/dashboard.html';
                     console.log('[Rooted Vitality] Client view selected, targetUrl set to:', targetUrl);
                 }
                 
@@ -519,7 +529,7 @@ const RootedVitality = {
               <span class="rv-brand-text">Rooted Vitality</span>
             </a>
             <nav class="rv-nav" aria-label="Primary Navigation">
-              <a href="${pathPrefix}signup.html" class="rv-nav-link rv-btn-accent">Sign Up</a>
+              <a href="${pathPrefix}dashboard/signup.html" class="rv-nav-link rv-btn-accent">Sign Up</a>
               <a href="${pathPrefix}login.html" class="rv-nav-link rv-nav-login">Log In</a>
             </nav>
           </div>
@@ -956,6 +966,68 @@ const RootedVitality = {
     },
 
     /**
+     * Load and display notifications for practitioner
+     */
+    loadNotifications: async function() {
+        if (!window.supabaseClient) {
+            console.log('[Rooted Vitality] Supabase not available');
+            return;
+        }
+
+        try {
+            const { data: { user } } = await window.supabaseClient.auth.getUser();
+            console.log('[Rooted Vitality] Current user:', user?.id);
+
+            if (!user) {
+                console.log('[Rooted Vitality] No user logged in');
+                return;
+            }
+
+            // Test query - get all notifications without RLS
+            const { data: testData, error: testError } = await window.supabaseClient
+                .from('notifications')
+                .select('*');
+            
+            console.log('[Rooted Vitality] Test query (all notifications):', testData?.length || 0, 'error:', testError);
+
+            // Real query with filter
+            const { data, error } = await window.supabaseClient
+                .from('notifications')
+                .select('*')
+                .eq('practitioner_id', user.id)
+                .order('created_at', { ascending: false });
+
+            console.log('[Rooted Vitality] Filtered notifications for', user.id, ':', data?.length || 0, 'error:', error);
+
+            if (error) {
+                console.warn('[Rooted Vitality] Query error:', error);
+                return;
+            }
+
+            const notificationsList = document.querySelector('.rv-notifications-list');
+            if (!notificationsList) return;
+
+            if (!data || data.length === 0) {
+                notificationsList.innerHTML = '<p class="rv-notifications-empty">No notifications yet</p>';
+                return;
+            }
+
+            notificationsList.innerHTML = data.map(notif => `
+                <a href="${notif.link || '#'}" class="rv-notification-item ${notif.is_read ? 'read' : 'unread'}">
+                    <div class="rv-notification-content">
+                        <p class="rv-notification-title">${notif.title}</p>
+                        <p class="rv-notification-message">${notif.message}</p>
+                        <span class="rv-notification-time">${new Date(notif.created_at).toLocaleDateString()}</span>
+                    </div>
+                </a>
+            `).join('');
+
+        } catch (error) {
+            console.error('[Rooted Vitality] Error:', error);
+        }
+    },
+
+    /**
      * Initialize notifications menu interactions
      * Handles click toggle, outside click close
      */
@@ -970,11 +1042,17 @@ const RootedVitality = {
             return;
         }
         
-        // Toggle dropdown on button click
+        // Toggle dropdown on button click AND load notifications
         notificationsBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             const isOpen = notificationsDropdown.classList.toggle('show');
             notificationsBtn.setAttribute('aria-expanded', isOpen);
+            
+            // Load notifications when opening
+            if (isOpen) {
+                console.log('[Rooted Vitality] Bell clicked, loading notifications...');
+                this.loadNotifications();
+            }
         });
         
         // Close dropdown when clicking outside

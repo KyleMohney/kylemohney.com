@@ -169,7 +169,7 @@ window.authManager = {
                 window.location.href = baseUrl + 'dashboard/pro/index.html';
             } else if (finalRole === 'client') {
                 console.log('[Rooted Vitality] Redirecting to client dashboard');
-                window.location.href = baseUrl + 'dashboard/client-dashboard.html';
+                window.location.href = baseUrl + 'dashboard/client/pages/dashboard.html';
             }
             
             return true;
@@ -486,7 +486,7 @@ window.authManager = {
                     const currentPath = window.location.pathname;
                     const isInSubdir = currentPath.includes('/articles/') || currentPath.includes('/policies/') || currentPath.includes('/dashboard/');
                     const baseDir = isInSubdir ? '../' : '';
-                    const dashboardFile = role === 'practitioner' ? 'dashboard/dashboard-practitioner.html' : 'dashboard/client-dashboard.html';
+                    const dashboardFile = role === 'practitioner' ? 'dashboard/pro/index.html' : 'dashboard/client/pages/dashboard.html';
                     window.location.href = baseDir + dashboardFile;
                     console.log('[Dashboard] Navigating to:', baseDir + dashboardFile);
                 });

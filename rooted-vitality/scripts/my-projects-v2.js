@@ -71,6 +71,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initialize open to contact toggle
     initOpenToContactToggle();
 
+    // Refresh projects when page gains focus (in case changes were made on My Matches page)
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        console.log('[My Projects] Page became visible, refreshing projects...');
+        loadProjects();
+      }
+    });
+
   } catch (error) {
     console.error('Error initializing projects page:', error);
   }
@@ -631,17 +639,19 @@ function createProjectCard(project) {
 
   const statusLabel = {
     pending: 'Pending',
-    matched: 'Matched',
+    'in-progress': 'In-Progress',
     hired: 'Hired',
-    canceled: 'Canceled'
+    'not-hired': 'Not Hired',
+    declined: 'Declined'
   }[project.project_status] || project.project_status;
 
   // Status color based on project status
   const statusColor = {
     pending: '#f59e0b',  // Orange
-    matched: '#3b82f6',  // Blue
+    'in-progress': '#3b82f6',  // Blue
     hired: '#5c9a72',    // Green
-    canceled: '#999'     // Gray
+    'not-hired': '#ef4444',  // Red
+    declined: '#999'     // Gray
   }[project.project_status] || '#999';
 
   // Format location as "City, State"

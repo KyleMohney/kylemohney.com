@@ -40,7 +40,7 @@ async function initializeReviewsPage() {
             if (!user) {
                 console.log('[Reviews] No user logged in, redirecting to signup');
                 const baseUrl = (typeof RootedVitality !== 'undefined' && RootedVitality.config.siteUrl) ? RootedVitality.config.siteUrl : '/rooted-vitality/';
-                window.location.href = baseUrl + 'signup.html';
+                window.location.href = baseUrl + 'dashboard/signup.html';
                 return;
             }
             currentUser = user;

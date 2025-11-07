@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>My Profile | Rooted Vitality</title>
+  <meta name="description" content="Your professional practitioner profile on Rooted Vitality.">
+  
+  <link rel="stylesheet" href="../../../styles/base.css">
+  <link rel="stylesheet" href="../../../styles/layout.css">
+  <link rel="stylesheet" href="../../../styles/components.css">
+  <link rel="stylesheet" href="../../../styles/styles.css">
+  <link rel="stylesheet" href="../../../styles/profile.css">
+</head>
+<body class="pro-dashboard">
+  <script>
+    localStorage.setItem('active_view', 'practitioner');
+    
+    // Profile Panel Navigation Switcher - Define early for inline onclick handlers
+    function switchProfilePanel(panelName, buttonElement) {
+      console.log('Switching to panel:', panelName);
+      
+      // Hide all panels
+      document.querySelectorAll('.profile-panel').forEach(panel => {
+        panel.classList.remove('active');
+      });
+      
+      // Remove active from nav items
+      document.querySelectorAll('.profile-nav-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      
+      // Show selected panel
+      const panel = document.querySelector(`[data-panel="${panelName}"]`);
+      if (panel) {
+        panel.classList.add('active');
+        console.log('Panel activated:', panelName);
+        
+        // Initialize reviews if switching to reviews panel
+        if (panelName === 'reviews' && typeof initializeReviews === 'function') {
+          initializeReviews();
+        }
+      } else {
+        console.warn('Panel not found:', panelName);
+      }
+      
+      // Activate the clicked button
+      if (buttonElement) {
+        buttonElement.classList.add('active');
+      }
+    }
+
+    // Subsection Collapse/Expand Toggle
+    function toggleSubsection(button) {
+      const subsection = button.closest('.bio-subsection, .credentials-subsection, .photos-subsection, .more-details-subsection');
+      if (subsection) {
+        subsection.classList.toggle('collapsed');
+        button.setAttribute('aria-expanded', subsection.classList.contains('collapsed') ? 'false' : 'true');
+      }
+    }
+  </script>
+  
+  <header id="header-inject"></header>
+
+  <main id="profile-container" class="profile-main">
+    <article class="profile-page">
+      
+      <!-- Profile Header Card -->
+      <div class="profile-header-card">
+        <div class="profile-avatar-container">
+          <div id="profile-avatar" class="profile-avatar" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #5c9a72 0%, #4a7d5a 100%); font-size: 48px; color: white; font-weight: bold;">U</div>
+          <label class="avatar-upload-btn" title="Change profile photo">
+            <input type="file" id="avatar-input" accept="image/*" style="display: none;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+              <circle cx="12" cy="13" r="4"></circle>
+            </svg>
+          </label>
+        </div>
+        
+        <div class="profile-header-info">
+          <div class="profile-name-section">
+            <div class="profile-name-with-badge">
+              <div class="name-inputs-group">
+                <div class="name-field">
+                  <label>Legal Business Name</label>
+                  <input type="text" id="profile-name" class="profile-name-input" placeholder="Auto-populated from registration" value="" readonly>
+                </div>
+                <div class="name-field">
+                  <label>DBA Name (Display Name)</label>
+                  <input type="text" id="profile-dba-name" class="profile-name-input" placeholder="What customers will see (optional)" value="">
+                </div>
+              </div>
+              <div class="credentials-badges-showcase">
+                <div id="badge-background-check" class="credentials-badge badge-locked" title="Earned when background check is complete">
+                  <span class="badge-icon">✓</span>
+                  <span class="badge-text">Background</span>
+                </div>
+                <div id="badge-verified" class="credentials-badge badge-locked" title="Earned when business verification is approved">
+                  <span class="badge-icon">✓</span>
+                  <span class="badge-text">Verified</span>
+                </div>
+                <div id="badge-license" class="credentials-badge badge-locked" title="Earned when license credentials are added">
+                  <span class="badge-icon">✓</span>
+                  <span class="badge-text">Licensed</span>
+                </div>
+                <div id="badge-certified" class="credentials-badge badge-locked" title="Earned when certification credentials are added">
+                  <span class="badge-icon">✓</span>
+                  <span class="badge-text">Certified</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="profile-header-footer">
+            <div class="profile-meta-inputs">
+              <div class="meta-field">
+                <label>Team Size</label>
+                <input type="text" id="profile-teamsize" placeholder="e.g., 1–10" value="">
+              </div>
+              <div class="meta-field">
+                <label>Years in Service</label>
+                <input type="number" id="profile-years" placeholder="e.g., 8" min="0" value="">
+              </div>
+            </div>
+
+            <div class="header-action-group">
+              <button id="save-header-info" class="btn-header-save">Save</button>
+              <a href="#" id="view-public-profile" class="profile-preview-link">View Public Profile →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile Completeness Section -->
+      <div class="profile-completeness-section">
+        <!-- Profile Completeness Meter -->
+        <div class="profile-completeness-card">
+          <div class="completeness-content">
+            <div class="completeness-text">
+              <div class="completeness-header">
+                <h3>Profile Completeness</h3>
+              </div>
+              <p id="completeness-percentage">0%</p>
+            </div>
+            <div class="completeness-bar-container">
+              <div class="completeness-bar">
+                <div id="completeness-progress" class="completeness-progress" style="width: 0%;"></div>
+              </div>
+              <p class="completeness-label" id="completeness-label">Fill in sections to complete your profile</p>
+            </div>
+          </div>
+
+          <!-- Profile Completeness Info Card -->
+          <div class="completeness-tooltip-content">
+            <p><strong>Complete profiles are:</strong></p>
+            <div class="completeness-checklist">
+              <div class="checklist-item">✓ 3x more likely to be selected by clients</div>
+              <div class="checklist-item">✓ Featured higher in search results</div>
+              <div class="checklist-item">✓ More trusted with verified credentials</div>
+              <div class="checklist-item">✓ Receive more qualified leads</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile Sections Container with Side Navigation -->
+      <div class="profile-sections-wrapper">
+        
+        <!-- Side Navigation -->
+        <nav class="profile-nav">
+          <button class="profile-nav-item active" onclick="switchProfilePanel('bio', this)">About & Specializations</button>
+          <button class="profile-nav-item" onclick="switchProfilePanel('credentials', this)">Credentials</button>
+          <button class="profile-nav-item" onclick="switchProfilePanel('photos-video', this)">Photos & Video</button>
+          <button class="profile-nav-item" onclick="switchProfilePanel('reviews', this)">Reviews</button>
+          <button class="profile-nav-item" onclick="switchProfilePanel('more-details', this)">Additional Details</button>
+        </nav>
+
+        <!-- Content Panels Container -->
+        <div class="profile-panels-container">
+
+        <!-- About Section -->
+        <section class="profile-panel active" data-panel="bio">
+          <div class="section-header">
+            <h2>About & Specializations</h2>
+            <button class="section-edit-btn" data-section="about" style="display: none;">Edit</button>
+          </div>
+          
+          <!-- About Subsection -->
+          <div class="bio-subsection">
+            <button class="subsection-toggle" onclick="toggleSubsection(this)" aria-expanded="true">
+              <h3>About You</h3>
+              <span class="toggle-icon">▼</span>
+            </button>
+            <div class="subsection-content">
+              <div class="section-instruction">Tell clients about your background, experience, and what makes you different.</div>
+              <div class="section-tooltip">Share your story in 2-3 sentences. Include your credentials, years of experience, and what inspires your practice. Clients connect with practitioners who feel authentic and approachable.</div>
+              <textarea id="about-content" class="profile-textarea section-edit-field" data-section="about" placeholder="Tell us about yourself, your background, and your wellness philosophy..."></textarea>
+            </div>
+          </div>
+
+          <!-- Approach Subsection -->
+          <div class="bio-subsection">
+            <button class="subsection-toggle" onclick="toggleSubsection(this)" aria-expanded="true">
+              <h3>Your Approach & Philosophy</h3>
+              <span class="toggle-icon">▼</span>
+            </button>
+            <div class="subsection-content">
+              <div class="section-instruction">Explain your treatment philosophy and what principles guide your practice.</div>
+              <div class="section-tooltip">Describe your methodology in simple terms. What makes your approach effective? How do you help clients feel heard and valued? This builds trust and sets expectations.</div>
+              <textarea id="approach-content" class="profile-textarea section-edit-field" data-section="approach" placeholder="Describe your treatment approach and core wellness philosophy..."></textarea>
+            </div>
+          </div>
+
+          <!-- Conditions & Specializations Subsection -->
+          <div class="bio-subsection">
+            <button class="subsection-toggle" onclick="toggleSubsection(this)" aria-expanded="true">
+              <h3>Conditions & Specializations</h3>
+              <span class="toggle-icon">▼</span>
+            </button>
+            <div class="subsection-content">
+              <div class="section-instruction">Select the conditions and specializations you focus on.</div>
+              <div class="section-tooltip">Help clients find you by specifying conditions you treat and your specializations. This improves discoverability and sets expectations. These are loaded from your service offerings in Match Settings.</div>
+              <div class="conditions-checkbox-container">
+                <div class="condition-checkbox-grid" id="conditions-checkboxes-container">
+                  <!-- Dynamically loaded from database taxonomy by conditions-manager.js -->
+                  <p style="color: #666; font-style: italic;">Loading conditions from database...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Section Save Button -->
+          <div class="section-footer">
+            <button class="section-save-btn" data-section="about">Save About & Specializations</button>
+          </div>
+        </section>
+
+        <!-- Credentials Section (Degrees, Licenses, Certifications combined) -->
+        <section class="profile-panel" data-panel="credentials">
+          <div class="section-header">
+            <h2>Professional Credentials</h2>
+          </div>
+          
+          <!-- Degrees Subsection -->
+          <div class="credentials-subsection">
+            <button class="subsection-toggle" onclick="toggleSubsection(this)" aria-expanded="true">
+              <h3>Degrees & Education</h3>
+              <span class="toggle-icon">▼</span>
+            </button>
+            <div class="subsection-content">
+              <div class="section-instruction">Add your formal education and academic credentials that qualify you as a practitioner.</div>
+              <div class="section-tooltip">List your degrees, the institution, and graduation year. Include any relevant academic honors or distinctions that build credibility.</div>
+              <div class="credentials-section-edit" id="degrees-edit" style="display: none;">
+                <div id="degrees-list" class="credentials-list"></div>
+                <button class="btn-add-credential" id="add-degree-btn" data-credential-type="degree">+ Add Degree</button>
+              </div>
+              <div class="credentials-section-display" id="degrees-display"></div>
+            </div>
+          </div>
+
+          <!-- Licenses Subsection -->
+          <div class="credentials-subsection">
+            <button class="subsection-toggle" onclick="toggleSubsection(this)" aria-expanded="true">
+              <h3>Licenses</h3>
+              <span class="toggle-icon">▼</span>
+            </button>
+            <div class="subsection-content">
+              <div class="section-instruction">Add your professional licenses, regulatory credentials, and state certifications.</div>
+              <div class="section-tooltip">Include license type, issuing state/authority, license number, and expiration date. This is critical for building client trust and regulatory compliance.</div>
+              <div class="credentials-section-edit" id="licenses-edit" style="display: none;">
+                <div id="licenses-list" class="credentials-list"></div>
+                <button class="btn-add-credential" id="add-license-btn" data-credential-type="license">+ Add License</button>
+              </div>
+              <div class="credentials-section-display" id="licenses-display"></div>
+            </div>
+          </div>
+
+          <!-- Certifications Subsection -->
+          <div class="credentials-subsection">
+            <button class="subsection-toggle" onclick="toggleSubsection(this)" aria-expanded="true">
+              <h3>Certifications</h3>
+              <span class="toggle-icon">▼</span>
+            </button>
+            <div class="subsection-content">
+              <div class="section-instruction">List professional certifications and specialized training programs you've completed.</div>
+              <div class="section-tooltip">Include certification name, issuing organization, credential number, and expiration date. Specialized certifications demonstrate expertise and commitment to professional development.</div>
+              <div class="credentials-section-edit" id="certifications-edit" style="display: none;">
+                <div id="certifications-list" class="credentials-list"></div>
+                <button class="btn-add-credential" id="add-certification-btn" data-credential-type="certification">+ Add Certification</button>
+              </div>
+              <div class="credentials-section-display" id="certifications-display"></div>
+            </div>
+          </div>
+
+          <!-- Background Check Subsection -->
+          <div class="credentials-subsection">
+            <button class="subsection-toggle" onclick="toggleSubsection(this)" aria-expanded="true">
+              <h3>Background Check & Verification</h3>
+              <span class="toggle-icon">▼</span>
+            </button>
+            <div class="subsection-content">
+              <div class="section-instruction">Complete your background check to build trust with potential clients.</div>
+              <div class="section-tooltip">A background check is required to verify your credentials and build trust with potential clients. This is a secure, one-time verification process.</div>
+              <div id="background-check-status" class="background-check-status-placeholder"></div>
+              <button class="btn-accent" id="start-background-check">Start Background Check</button>
+            </div>
+          </div>
+
+          <!-- Business Verification Subsection -->
+          <div class="credentials-subsection">
+            <button class="subsection-toggle" onclick="toggleSubsection(this)" aria-expanded="true">
+              <h3>Business Verification</h3>
+              <span class="toggle-icon">▼</span>
+            </button>
+            <div class="subsection-content">
+              <div class="section-instruction">Submit your business verification documents to unlock the Verified badge.</div>
+              <div class="section-tooltip">Admins will review your business documents (EIN/SSN and ID photos) to verify your identity and business legitimacy. This helps build trust in our community.</div>
+              
+              <div id="verification-form-container" style="display: none;">
+                <form id="business-verification-form" class="business-verification-form">
+                  <div class="verification-form-group">
+                    <label for="verification-ein-ssn">Business EIN or Social Security Number</label>
+                    <input 
+                      type="text" 
+                      id="verification-ein-ssn" 
+                      name="ein_ssn" 
+                      placeholder="e.g., 12-3456789 or 123-45-6789"
+                      maxlength="20"
+                      required
+                    >
+                    <div class="input-hint">We'll use this to verify your business. Your SSN/EIN is encrypted and only seen by admins.</div>
+                  </div>
+
+                  <div class="verification-form-row">
+                    <div class="verification-form-group">
+                      <label for="verification-id-front">Front of ID Photo</label>
+                      <input 
+                        type="file" 
+                        id="verification-id-front" 
+                        name="id_front" 
+                        accept="image/*"
+                        required
+                      >
+                      <div class="input-hint">Driver's license, passport, or government ID</div>
+                    </div>
+
+                    <div class="verification-form-group">
+                      <label for="verification-id-back">Back of ID Photo</label>
+                      <input 
+                        type="file" 
+                        id="verification-id-back" 
+                        name="id_back" 
+                        accept="image/*"
+                        required
+                      >
+                      <div class="input-hint">Back of ID (if applicable)</div>
+                    </div>
+                  </div>
+
+                  <div id="verification-submit-status" class="verification-status" style="display: none;"></div>
+
+                  <div class="verification-form-actions">
+                    <button type="submit" class="btn-accent" id="submit-verification-btn">Submit for Verification</button>
+                    <button type="button" class="btn-secondary" id="cancel-verification-btn">Cancel</button>
+                  </div>
+                </form>
+              </div>
+
+              <div id="verification-status-display" class="verification-status-display"></div>
+            </div>
+          </div>
+
+          <!-- Continuing Education Subsection -->
+          <div class="credentials-subsection">
+            <button class="subsection-toggle" onclick="toggleSubsection(this)" aria-expanded="true">
+              <h3>Continuing Education</h3>
+              <span class="toggle-icon">▼</span>
+            </button>
+            <div class="subsection-content">
+              <div class="section-instruction">Show clients your commitment to staying current in your field.</div>
+              <div class="section-tooltip">Add professional development courses, workshops, and training programs completed in the last 2 years. This demonstrates your dedication to continuous learning and best practices.</div>
+              
+              <!-- Edit Mode (start open) -->
+              <div id="continuing-education-edit" class="continuing-education-edit" style="display: flex;">
+                <div id="continuing-education-list" class="continuing-education-list"></div>
+                <button class="btn-add-credential" id="add-ce-btn" data-ce-type="course">+ Add Course</button>
+              </div>
+              
+              <!-- Display Mode -->
+              <div id="continuing-education-display" class="continuing-education-display"></div>
+            </div>
+          </div>
+          
+          <!-- Section Save Button -->
+          <div class="section-footer">
+            <button class="section-save-btn" data-section="credentials">Save Professional Credentials</button>
+          </div>
+        </section>
+
+        <!-- Continuing Education Section -->
+        <!-- Presence & Photos Section -->
+        <!-- Photos & Video Section -->
+        <section class="profile-panel" data-panel="photos-video">
+          <div class="section-header">
+            <h2>Professional Photos & Video</h2>
+          </div>
+          
+          <!-- Professional Photos Subsection -->
+          <div class="photos-subsection">
+            <button class="subsection-toggle" onclick="toggleSubsection(this)" aria-expanded="true">
+              <h3>Professional Photos</h3>
+              <span class="toggle-icon">▼</span>
+            </button>
+            <div class="subsection-content">
+              <div class="section-instruction">Upload professional photos that showcase your practice and build client confidence.</div>
+              <div class="section-tooltip">Add 4–6 professional photos including workspace, headshot, treatment areas, or team photos. High-quality images help clients feel comfortable and establish trust before booking.</div>
+              <div id="photos-edit" class="photos-edit" style="display: block;">
+                <div class="photos-upload-area">
+                  <button class="btn-accent" id="add-photo-btn">+ Add Photo</button>
+                  <p class="photos-upload-hint">Upload up to 6 photos • JPG, PNG, or WebP • 5MB max per file</p>
+                </div>
+                <div id="photos-list" class="photos-list"></div>
+              </div>
+              <div id="photos-display" class="photos-display" style="display: none;"></div>
+            </div>
+          </div>
+
+          <!-- Professional Video Subsection -->
+          <div class="photos-subsection">
+            <button class="subsection-toggle" onclick="toggleSubsection(this)" aria-expanded="true">
+              <h3>Professional Video Introduction</h3>
+              <span class="toggle-icon">▼</span>
+            </button>
+            <div class="subsection-content">
+              <div class="section-instruction">Record a brief professional introduction to help clients get to know you.</div>
+              <div class="section-tooltip">A 30–60 second video introduction helps build personal connection and trust. Show your personality, speak about your practice philosophy, and create a welcoming first impression.</div>
+              <div id="video-edit" class="video-edit" style="display: block;">
+                <div class="video-upload-area">
+                  <button class="btn-accent" id="add-video-btn">+ Add Video</button>
+                  <p class="video-upload-hint">Upload a video file • MP4, WebM, or MOV • 50MB max</p>
+                </div>
+                <div id="video-list" class="video-list"></div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Section Save Button -->
+          <div class="section-footer">
+            <button class="section-save-btn" data-section="photos">Save Photos & Video</button>
+          </div>
+        </section>
+
+        <!-- Languages Section -->
+        <!-- Additional Details Section (Languages, FAQ, Practice, Payment combined) -->
+        <section class="profile-panel" data-panel="more-details">
+          <div class="section-header">
+            <h2>Additional Details</h2>
+          </div>
+
+          <!-- Languages Subsection -->
+          <div class="more-details-subsection">
+            <button class="subsection-toggle" onclick="toggleSubsection(this)" aria-expanded="true">
+              <h3>Languages</h3>
+              <span class="toggle-icon">▼</span>
+            </button>
+            <div class="subsection-content">
+              <div class="section-instruction">List all languages you speak professionally with clients.</div>
+              <div class="section-tooltip">Multilingual practitioners can reach a broader client base. Add each language you're comfortable conducting sessions in professionally.</div>
+              <div class="languages-input-container">
+                <input 
+                  type="text" 
+                  id="language-input" 
+                  class="language-text-input" 
+                  placeholder="Type a language (e.g., English, Spanish, Mandarin) and press Enter"
+                  data-section="languages"
+                >
+                <div id="languages-list" class="languages-list"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- FAQ Subsection -->
+          <div class="more-details-subsection">
+            <button class="subsection-toggle" onclick="toggleSubsection(this)" aria-expanded="true">
+              <h3>Frequently Asked Questions</h3>
+              <span class="toggle-icon">▼</span>
+            </button>
+            <div class="subsection-content">
+              <div class="section-instruction">Answer common questions clients ask about your services.</div>
+              <div class="section-tooltip">Pre-answering FAQs reduces booking friction and helps clients understand what to expect. Address common concerns like scheduling, payment, cancellation policies, and session format.</div>
+              <div id="faq-list" class="faq-list"></div>
+              <button class="btn-add-credential" id="add-faq-btn">+ Add Question</button>
+            </div>
+          </div>
+
+          <!-- Social Media & Connect Subsection -->
+          <div class="more-details-subsection">
+            <button class="subsection-toggle" onclick="toggleSubsection(this)" aria-expanded="true">
+              <h3>Social Media & Connect</h3>
+              <span class="toggle-icon">▼</span>
+            </button>
+            <div class="subsection-content">
+              <div class="section-instruction">Share your social profiles and website to build your online presence.</div>
+              <div class="section-tooltip">Add links to your professional social profiles and website. This allows clients to follow you, learn more about your work, and reach out through multiple channels.</div>
+              <div class="social-inputs-grid">
+              <div class="social-input-field">
+                <label for="social-facebook">Facebook</label>
+                <input type="url" id="social-facebook" class="section-edit-field" data-section="social" placeholder="https://facebook.com/yourprofile" value="">
+              </div>
+              <div class="social-input-field">
+                <label for="social-instagram">Instagram</label>
+                <input type="url" id="social-instagram" class="section-edit-field" data-section="social" placeholder="https://instagram.com/yourprofile" value="">
+              </div>
+              <div class="social-input-field">
+                <label for="social-x">X (Twitter)</label>
+                <input type="url" id="social-x" class="section-edit-field" data-section="social" placeholder="https://x.com/yourprofile" value="">
+              </div>
+              <div class="social-input-field">
+                <label for="social-linkedin">LinkedIn</label>
+                <input type="url" id="social-linkedin" class="section-edit-field" data-section="social" placeholder="https://linkedin.com/in/yourprofile" value="">
+              </div>
+              <div class="social-input-field">
+                <label for="social-youtube">YouTube</label>
+                <input type="url" id="social-youtube" class="section-edit-field" data-section="social" placeholder="https://youtube.com/@yourprofile" value="">
+              </div>
+              <div class="social-input-field">
+                <label for="social-tiktok">TikTok</label>
+                <input type="url" id="social-tiktok" class="section-edit-field" data-section="social" placeholder="https://tiktok.com/@yourprofile" value="">
+              </div>
+              <div class="social-input-field">
+                <label for="social-pinterest">Pinterest</label>
+                <input type="url" id="social-pinterest" class="section-edit-field" data-section="social" placeholder="https://pinterest.com/yourprofile" value="">
+              </div>
+              <div class="social-input-field">
+                <label for="social-website">Your Website</label>
+                <input type="url" id="social-website" class="section-edit-field" data-section="social" placeholder="https://yourwebsite.com" value="">
+              </div>
+            </div>
+            </div>
+          </div>
+
+          <!-- Practice Type & Setting Subsection -->
+          <div class="more-details-subsection">
+            <button class="subsection-toggle" onclick="toggleSubsection(this)" aria-expanded="true">
+              <h3>Practice Type & Setting</h3>
+              <span class="toggle-icon">▼</span>
+            </button>
+            <div class="subsection-content">
+              <div class="section-instruction">Describe your practice structure, location setting, and service delivery methods.</div>
+              <div class="section-tooltip">Let clients know if you work solo or in a group, whether sessions are in-person, virtual, or hybrid. Specify your location or availability for remote services.</div>
+            <div id="practice-edit" class="practice-edit">
+              <!-- Practice Type Table -->
+              <div class="practice-table-wrapper">
+                <h4>Practice Type</h4>
+                <table class="practice-table">
+                  <tbody>
+                    <tr>
+                      <td>
+                        <label class="checkbox-label">
+                          <input type="radio" name="practice-type" value="solo"> Solo Practice
+                        </label>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <label class="checkbox-label">
+                          <input type="radio" name="practice-type" value="group"> Group Practice
+                        </label>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Setting Table -->
+              <div class="practice-table-wrapper">
+                <h4>Practice Setting</h4>
+                <table class="practice-table">
+                  <tbody>
+                    <tr>
+                      <td>
+                        <label class="checkbox-label">
+                          <input type="radio" name="practice-setting" value="private"> Private Practice
+                        </label>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <label class="checkbox-label">
+                          <input type="radio" name="practice-setting" value="clinic"> Clinic/Center
+                        </label>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <label class="checkbox-label">
+                          <input type="radio" name="practice-setting" value="hospital"> Hospital/Medical Facility
+                        </label>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div id="practice-display" class="practice-display" style="display: none;">
+              <div id="practice-display-content"></div>
+            </div>
+            </div>
+          </div>
+
+          <!-- Payment & Insurance Subsection -->
+          <div class="more-details-subsection">
+            <button class="subsection-toggle" onclick="toggleSubsection(this)" aria-expanded="true">
+              <h3>Payment & Insurance</h3>
+              <span class="toggle-icon">▼</span>
+            </button>
+            <div class="subsection-content">
+              <div class="section-instruction">Tell clients what payment methods and insurance plans you accept.</div>
+              <div class="section-tooltip">Transparency about payment options builds client confidence and reduces booking friction. Select all methods and insurance options you accept.</div>
+              <div id="payment-edit" class="payment-edit">
+              <!-- Insurance Providers Table -->
+              <div class="payment-table-wrapper">
+                <h4>Insurance Providers</h4>
+                <table class="payment-table">
+                  <tbody>
+                    <tr>
+                      <td>
+                        <label class="checkbox-label">
+                          <input type="checkbox" name="insurance-provider" value="aetna">
+                          Aetna
+                        </label>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <label class="checkbox-label">
+                          <input type="checkbox" name="insurance-provider" value="anthem">
+                          Anthem / BlueCross
+                        </label>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <label class="checkbox-label">
+                          <input type="checkbox" name="insurance-provider" value="cigna">
+                          Cigna
+                        </label>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <label class="checkbox-label">
+                          <input type="checkbox" name="insurance-provider" value="humana">
+                          Humana
+                        </label>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <label class="checkbox-label">
+                          <input type="checkbox" name="insurance-provider" value="united">
+                          United Healthcare
+                        </label>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <label class="checkbox-label">
+                          <input type="checkbox" name="insurance-provider" value="medicaid">
+                          Medicaid
+                        </label>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <label class="checkbox-label">
+                          <input type="checkbox" name="insurance-provider" value="medicare">
+                          Medicare
+                        </label>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <label class="checkbox-label">
+                          <input type="checkbox" name="insurance-provider" value="private-pay">
+                          Private Pay
+                        </label>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Other Insurance Text Box -->
+              <div class="payment-table-wrapper">
+                <label for="custom-insurance-providers">Other Insurance Providers</label>
+                <textarea 
+                  id="custom-insurance-providers" 
+                  class="text-input" 
+                  placeholder="List any other insurance providers you accept (comma-separated)"
+                  rows="3"
+                ></textarea>
+              </div>
+
+              <!-- Payment Methods Table -->
+              <div class="payment-table-wrapper">
+                <h4>Payment Methods Accepted</h4>
+                <table class="payment-table">
+                  <tbody>
+                    <tr>
+                      <td>
+                        <label class="checkbox-label">
+                          <input type="checkbox" name="payment-method" value="stripe">
+                          Stripe
+                        </label>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <label class="checkbox-label">
+                          <input type="checkbox" name="payment-method" value="square">
+                          Square
+                        </label>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <label class="checkbox-label">
+                          <input type="checkbox" name="payment-method" value="paypal">
+                          PayPal
+                        </label>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <label class="checkbox-label">
+                          <input type="checkbox" name="payment-method" value="cash">
+                          Cash
+                        </label>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <label class="checkbox-label">
+                          <input type="checkbox" name="payment-method" value="check">
+                          Check
+                        </label>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <label class="checkbox-label">
+                          <input type="checkbox" name="payment-method" value="venmo">
+                          Venmo
+                        </label>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <label class="checkbox-label">
+                          <input type="checkbox" name="payment-method" value="bank-transfer">
+                          Bank Transfer
+                        </label>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <label class="checkbox-label">
+                          <input type="checkbox" name="payment-method" value="credit-card">
+                          Credit Card
+                        </label>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div id="payment-display" class="payment-display" style="display: none;">
+              <div id="payment-display-content"></div>
+            </div>
+            </div>
+          </div>
+          
+          <!-- Section Save Button -->
+          <div class="section-footer">
+            <button class="section-save-btn" data-section="more-details">Save Additional Details</button>
+          </div>
+        </section>
+
+        <!-- Reviews Section -->
+        <section class="profile-panel" data-panel="reviews">
+          <div class="section-header">
+            <h2>Reviews</h2>
+            <button id="get-review-link-btn" class="section-save-btn">Get Review Link</button>
+          </div>
+
+          <!-- Reviews Stats Overview -->
+          <div class="reviews-stats">
+            <div class="stat-card">
+              <div class="stat-value" id="avg-rating">5.0</div>
+              <div class="stat-label">Average Rating</div>
+              <div class="stat-stars" id="avg-stars">
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+                <span class="star filled">★</span>
+              </div>
+            </div>
+            
+            <div class="stat-card">
+              <div class="stat-value" id="total-reviews">0</div>
+              <div class="stat-label">Total Reviews</div>
+            </div>
+            
+            <div class="stat-card">
+              <div class="stat-value" id="platform-reviews">0</div>
+              <div class="stat-label">Platform Reviews</div>
+            </div>
+            
+            <div class="stat-card">
+              <div class="stat-value" id="external-reviews">0</div>
+              <div class="stat-label">External Reviews</div>
+              <p class="stat-hint">(Max 3)</p>
+            </div>
+          </div>
+
+          <!-- Filter Section -->
+          <div class="reviews-filter-section">
+            <div class="filter-group">
+              <label for="filter-rating" class="filter-label">Filter by Rating:</label>
+              <select id="filter-rating" class="filter-select">
+                <option value="">All Ratings</option>
+                <option value="5">5 Stars</option>
+                <option value="4">4 Stars</option>
+                <option value="3">3 Stars</option>
+                <option value="2">2 Stars</option>
+                <option value="1">1 Star</option>
+              </select>
+            </div>
+            
+            <div class="filter-group">
+              <label for="filter-source" class="filter-label">Filter by Source:</label>
+              <select id="filter-source" class="filter-select">
+                <option value="">All Sources</option>
+                <option value="platform">Platform</option>
+                <option value="external">External</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Reviews List -->
+          <div id="reviews-container" class="reviews-container">
+            <!-- Reviews will be populated here by JavaScript -->
+          </div>
+
+          <!-- Empty State -->
+          <div id="no-reviews-state" class="empty-state" style="display: none;">
+            <div class="empty-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </div>
+            <h3>No Reviews Yet</h3>
+            <p>Start collecting reviews from clients to build your reputation and increase visibility.</p>
+            <button id="empty-state-review-link-btn" class="btn btn-primary">Get Review Link</button>
+          </div>
+        </section>
+
+        </div> <!-- Close profile-panels-container -->
+      </div>
+
+      <!-- Report a Concern Footer Link -->
+      <div class="report-concern-footer">
+        <button id="report-concern-btn" class="report-concern-link">Report a Concern</button>
+      </div>
+
+  <!-- Report a Concern Modal -->
+  <div id="report-concern-modal" class="modal" style="display: none;">
+    <div class="modal-overlay" onclick="closeReportModal()"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Report a Concern</h2>
+        <button class="modal-close-btn" onclick="closeReportModal()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <form id="report-concern-form">
+          <div class="form-group">
+            <label for="concern-type">Type of Concern</label>
+            <select id="concern-type" name="concern-type" required>
+              <option value="">Select a concern type...</option>
+              <option value="professionalism">Professionalism Issue</option>
+              <option value="safety">Safety Concern</option>
+              <option value="credentials">Credentials Question</option>
+              <option value="ethics">Ethics Concern</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="concern-description">Description</label>
+            <textarea id="concern-description" name="concern-description" rows="4" placeholder="Please describe the concern..." required></textarea>
+          </div>
+
+          <div class="form-group">
+            <button type="submit" class="btn-primary">Submit Report</button>
+            <button type="button" class="btn-secondary" onclick="closeReportModal()">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Picture Upload Modal -->
+  <div id="profile-picture-modal" class="modal" style="display: none;">
+    <div class="modal-overlay" onclick="closeProfilePictureModal()"></div>
+    <div class="modal-content profile-picture-modal">
+      <div class="modal-header">
+        <h2>Upload Profile Picture</h2>
+        <button class="modal-close-btn" onclick="closeProfilePictureModal()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Drop Zone -->
+        <div id="upload-dropzone" class="upload-dropzone">
+          <div class="dropzone-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+          </div>
+          <h3>Drag and drop your photo here</h3>
+          <p>or</p>
+          <button class="browse-btn" onclick="document.getElementById('profile-picture-input').click()">Browse Files</button>
+          <input type="file" id="profile-picture-input" accept="image/jpeg,image/png,image/webp" style="display: none;">
+          <p class="dropzone-note">JPG, PNG or WebP • Max 5MB</p>
+        </div>
+
+        <!-- Preview Section -->
+        <div id="preview-section" class="preview-section" style="display: none;">
+          <div class="preview-image-container">
+            <img id="preview-image" src="" alt="Preview" class="preview-image">
+          </div>
+          <div class="preview-info">
+            <p id="preview-filename"></p>
+            <p id="preview-size"></p>
+          </div>
+        </div>
+
+        <!-- Upload Progress -->
+        <div id="upload-progress-section" class="upload-progress-section" style="display: none;">
+          <p>Uploading...</p>
+          <div class="progress-bar">
+            <div id="progress-fill" class="progress-fill"></div>
+          </div>
+          <p id="progress-percentage">0%</p>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeProfilePictureModal()">Cancel</button>
+        <button id="confirm-upload-btn" class="btn-primary" onclick="confirmProfilePictureUpload()" style="display: none;">Upload Photo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Review Link Modal -->
+  <div id="review-link-modal" class="modal" style="display: none;">
+    <div class="modal-overlay" onclick="closeReviewLinkModal()"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Share Review Link</h2>
+        <button class="modal-close" onclick="closeReviewLinkModal()">×</button>
+      </div>
+      
+      <div class="modal-body">
+        <p style="color: #6b6359; line-height: 1.6; margin-bottom: 1.5rem;">Share this link with clients to collect reviews on our platform. You can also add up to 3 external reviews (e.g., from Google, Yelp) manually.</p>
+        
+        <div class="review-link-container">
+          <label for="review-link-input" style="font-size: 0.95rem;">Your Review Link:</label>
+          <div class="copy-input-group">
+            <input type="text" id="review-link-input" class="review-link-input" value="" readonly>
+            <button id="copy-review-link-btn" class="btn btn-primary" onclick="copyReviewLink()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+              </svg>
+              Copy
+            </button>
+          </div>
+        </div>
+        
+        <div class="external-reviews-info">
+          <h4 style="color: #2e2b28; margin: 0 0 0.5rem 0; font-size: 1.05rem;">External Reviews</h4>
+          <p style="font-size: 0.9rem; color: #6b6359; line-height: 1.5; margin: 0;">For now, you can manually add external reviews (up to 3) by contacting support.</p>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeReviewLinkModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <footer id="footer-inject"></footer>
+
+  <!-- Supabase JS Client Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Rooted Vitality Scripts -->
+  <script src="../../../scripts/config.js"></script>
+  <script src="../../../scripts/authManager.js"></script>
+  <script src="../../../scripts/authModal.js"></script>
+  <script src="../../../scripts/authHooks.js"></script>
+  <script src="../../../injections.js"></script>
+  <script src="../../../scripts/conditions-manager.js"></script>
+  <script src="../../../scripts/proDashboard.js"></script>
+  <script src="../../../scripts/proProfile.js"></script>
+
+</body>
+</html>

@@ -31,6 +31,7 @@ let filteredPractitioners = [];
 let selectedProject = null;
 let currentPage = 1;
 const practitionersPerPage = 10;
+let matchedPractitioners = []; // Track which practitioners have been matched
 
 // ============================================================================
 // INITIALIZATION
@@ -119,9 +120,54 @@ async function loadProject() {
 
     // Load practitioners for this project
     selectedProject = project;
+    sessionStorage.setItem('selectedProjectId', project.id);
+    
+    // Load existing matches first
+    await loadExistingMatches();
+    
+    // Then load practitioners for this project
     await loadPractitioners(project);
   } catch (error) {
     console.error('[loadProject] Exception:', error);
+  }
+}
+
+// ============================================================================
+// LOAD EXISTING MATCHES
+// ============================================================================
+
+async function loadExistingMatches() {
+  try {
+    console.log('[loadExistingMatches] Loading existing matches...');
+    
+    // Get client's serial number
+    const { data: clientProfile, error: clientError } = await supabaseClient
+      .from('clients')
+      .select('serial_number')
+      .eq('user_id', currentUser.id)
+      .single();
+    
+    if (clientError || !clientProfile) {
+      console.warn('[loadExistingMatches] Could not load client profile');
+      return;
+    }
+    
+    // Get all matches for this client
+    const { data: matches, error: matchesError } = await supabaseClient
+      .from('project_practitioner_matches')
+      .select('practitioner_id, practitioner_serial')
+      .eq('client_serial', clientProfile.serial_number);
+    
+    if (matchesError) {
+      console.warn('[loadExistingMatches] Error loading matches:', matchesError);
+      return;
+    }
+    
+    // Store matched practitioner IDs
+    matchedPractitioners = (matches || []).map(m => m.practitioner_id);
+    console.log('[loadExistingMatches] Found', matchedPractitioners.length, 'matched practitioners');
+  } catch (error) {
+    console.error('[loadExistingMatches] Exception:', error);
   }
 }
 
@@ -170,6 +216,39 @@ async function loadPractitioners(project) {
       practitioners = rpcData || [];
       console.log('[loadPractitioners] Found', practitioners.length, 'matching practitioners');
       console.log('[loadPractitioners] Practitioners data:', practitioners);
+      
+      // Fetch full practitioner details including badge fields
+      if (practitioners.length > 0) {
+        const practitionerIds = practitioners.map(p => p.id);
+        const { data: fullPractitioners, error: detailsError } = await supabaseClient
+          .from('practitioners')
+          .select('id, badge_licensed, badge_certified, badge_background_check, credentials_verified')
+          .in('id', practitionerIds);
+        
+        if (!detailsError && fullPractitioners) {
+          console.log('[loadPractitioners] Full practitioner details:', fullPractitioners);
+          
+          // Merge badge fields into practitioners data
+          const badgeMap = {};
+          fullPractitioners.forEach(p => {
+            badgeMap[p.id] = {
+              badge_licensed: p.badge_licensed,
+              badge_certified: p.badge_certified,
+              badge_background_check: p.badge_background_check,
+              credentials_verified: p.credentials_verified
+            };
+          });
+          
+          // Update practitioners with badge fields
+          practitioners = practitioners.map(p => ({
+            ...p,
+            ...badgeMap[p.id]
+          }));
+          
+          console.log('[loadPractitioners] Merged practitioners with badges:', practitioners);
+        }
+      }
+      
       allPractitioners = practitioners;
 
       // Update project info display
@@ -210,6 +289,7 @@ function updateProjectInfo(project) {
   }
 
   selectedProject = project;
+  sessionStorage.setItem('selectedProjectId', project.id);
 }
 
 /**
@@ -364,7 +444,11 @@ function displayPractitioners() {
 
 function createPractitionerCard(practitioner) {
   const card = document.createElement('div');
-  card.className = 'practitioner-card';
+  
+  // Check if this practitioner has already been matched
+  const isMatched = matchedPractitioners.includes(practitioner.practitioner_id);
+  const matchedClass = isMatched ? ' practitioner-card--matched' : '';
+  card.className = `practitioner-card${matchedClass}`;
 
   // Use business name fields only: legal_business_name or dba_name (not legal_name which is owner name)
   const displayName = practitioner.legal_business_name || practitioner.dba_name || 'Practitioner';
@@ -374,29 +458,36 @@ function createPractitionerCard(practitioner) {
   if (practitioner.housecalls_enabled) services.push('House Calls');
   if (practitioner.virtual_enabled) services.push('Virtual');
 
-  // Build badges for credentials and profile status
+  // Build badges list - only show the main credentials
   const badges = [];
+  
+  // Debug: log all practitioner fields related to badges
+  console.log('[createPractitionerCard] Practitioner badge fields:', {
+    name: displayName,
+    credentials_verified: practitioner.credentials_verified,
+    badge_licensed: practitioner.badge_licensed,
+    badge_certified: practitioner.badge_certified,
+    badge_background_check: practitioner.badge_background_check,
+    allFields: Object.keys(practitioner).filter(k => k.includes('badge') || k.includes('verified'))
+  });
+  
   if (practitioner.credentials_verified) {
-    badges.push('<span class="badge badge--verified" title="Credentials Verified">✓ Verified</span>');
-  }
-  if (practitioner.badge_background_check) {
-    badges.push('<span class="badge badge--background-check" title="Background Check Passed">✓ Background Check</span>');
-  }
-  if (practitioner.badge_certified) {
-    badges.push('<span class="badge badge--certified" title="Certified">✓ Certified</span>');
+    badges.push('<li class="badge-item"><span class="badge-check">✓</span> Verified</li>');
   }
   if (practitioner.badge_licensed) {
-    badges.push('<span class="badge badge--licensed" title="Licensed">✓ Licensed</span>');
+    badges.push('<li class="badge-item"><span class="badge-check">✓</span> Licensed</li>');
   }
-  if (practitioner.badge_verified) {
-    badges.push('<span class="badge badge--verified-business" title="Business Verified">✓ Verified Business</span>');
+  if (practitioner.badge_certified) {
+    badges.push('<li class="badge-item"><span class="badge-check">✓</span> Certified</li>');
   }
-  const profileCompletion = practitioner.profile_completion_percent || 0;
-  if (profileCompletion >= 80) {
-    badges.push('<span class="badge badge--complete" title="Profile Complete">Complete</span>');
+  if (practitioner.badge_background_check) {
+    badges.push('<li class="badge-item"><span class="badge-check">✓</span> Background Check</li>');
   }
+  
+  const badgesHtml = badges.length > 0 ? `<ul class="card-header-badges">${badges.join('')}</ul>` : '';
 
   card.innerHTML = `
+    ${isMatched ? '<div class="matched-overlay"><div class="matched-label">Matched</div></div>' : ''}
     <div class="card-header">
       <div class="card-avatar-section">
         <img src="${practitioner.profile_photo_url || 'https://via.placeholder.com/140?text=No+Photo'}" 
@@ -404,9 +495,7 @@ function createPractitionerCard(practitioner) {
              class="card-avatar"
              onerror="this.src='https://via.placeholder.com/140?text=No+Photo'">
       </div>
-      <div class="card-header-badges">
-        ${badges.join('')}
-      </div>
+      ${badgesHtml}
     </div>
 
     <div class="card-body">
@@ -541,7 +630,7 @@ async function sendConnectionRequest(practitionerId, practitionerSerial) {
         practitioner_id: practitionerId,
         client_serial: selectedProject.client_serial,
         practitioner_serial: practitionerSerial,
-        status: 'pending'
+        status: 'active'
       });
 
     if (error) {
@@ -551,7 +640,7 @@ async function sendConnectionRequest(practitionerId, practitionerSerial) {
     }
 
     console.log('[sendConnectionRequest] Connection request sent successfully');
-    alert('Connection request sent! You can track responses in "My Matches".');
+    alert('Connection established! Message them in "My Matches".');
 
   } catch (error) {
     console.error('[sendConnectionRequest] Exception:', error);
@@ -610,8 +699,8 @@ function setupEventListeners() {
   if (backButton) {
     console.log('[setupEventListeners] Back button found, attaching click handler');
     backButton.addEventListener('click', () => {
-      console.log('[Back Button] Navigating to client-my-projects.html');
-      window.location.href = 'client-my-projects.html';
+      console.log('[Back Button] Navigating to my-projects.html');
+      window.location.href = 'my-projects.html';
     });
   } else {
     console.error('[setupEventListeners] Back button with id "back-to-projects" not found');
@@ -651,7 +740,7 @@ function navigateToPractitionerProfile(practitionerId) {
     console.error('[Find Practitioners] No practitioner ID provided');
     return;
   }
-  const profileUrl = `practitioner-profile.html?practitioner_id=${practitionerId}`;
+  const profileUrl = `/rooted-vitality/dashboard/pro/pages/practitioner-profile.html?practitioner_id=${practitionerId}`;
   console.log('[Find Practitioners] Navigating to:', profileUrl);
   window.location.href = profileUrl;
 }

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>My Projects · Rooted Vitality</title>
+  <link rel="stylesheet" href="../../../styles/styles.css">
+  <link rel="stylesheet" href="../styles/my-projects.css">
+</head>
+<body>
+  <header id="header-inject"></header>
+  
+  <main class="my-projects-container">
+    <!-- Hero Section -->
+    <section class="projects-hero">
+      <div class="projects-hero__content">
+        <h1 class="projects-hero__title">My Projects</h1>
+        <p class="projects-hero__subtitle">Track your wellness initiatives and connect with expert practitioners</p>
+      </div>
+    </section>
+
+    <!-- Main Content Grid -->
+    <div class="projects-grid">
+      <!-- Left Sidebar: Educational Info -->
+      <aside class="projects-sidebar">
+        <!-- Open to Contact Toggle -->
+        <div class="projects-sidebar__card projects-sidebar__card--featured">
+          <div class="card-header-row">
+            <h3 class="projects-sidebar__title">Open to Matches</h3>
+            <label class="toggle-switch">
+              <input type="checkbox" id="open-to-contact-toggle" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <p class="projects-sidebar__text">
+            When enabled, practitioners who match with your <strong>open projects</strong> can proactively reach out to you. You'll have the option to <strong>accept or reject</strong> these matches.
+          </p>
+          <p class="projects-sidebar__note">
+            Only applies to projects with "Pending" status.
+          </p>
+        </div>
+
+        <div class="projects-sidebar__card">
+          <h3 class="projects-sidebar__title">What is a Project?</h3>
+          <p class="projects-sidebar__text">
+            A project is your personal wellness initiative. Whether you're managing a health goal, undergoing treatment, or exploring a wellness path, projects help you organize your journey and connect with the right practitioners.
+          </p>
+        </div>
+
+        <div class="projects-sidebar__card">
+          <h3 class="projects-sidebar__title">Finding Practitioners</h3>
+          <p class="projects-sidebar__text">
+            Once you create a project, you can browse practitioners matched to your specific wellness needs. Review their credentials, ratings, and approach before connecting.
+          </p>
+        </div>
+
+        <button class="btn btn-primary projects-sidebar__cta" id="create-project-btn">
+          + Create New Project
+        </button>
+      </aside>
+
+      <!-- Right Side: Projects List -->
+      <section class="projects-main">
+        <!-- Filters & Stats -->
+        <div class="projects-header">
+          <div class="projects-stats">
+            <div class="stat-item">
+              <span class="stat-item__label">Total Projects</span>
+              <span class="stat-item__value" id="total-projects">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-item__label">Active Practitioners</span>
+              <span class="stat-item__value" id="total-practitioners">0</span>
+            </div>
+          </div>
+          <div class="projects-filters">
+            <select id="filter-status" class="filter-select">
+              <option value="">All Projects</option>
+              <option value="active">Active</option>
+              <option value="paused">Paused</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Projects Cards Container -->
+        <div class="projects-cards" id="projects-container">
+          <!-- Project cards will be injected here -->
+          <div class="projects-empty">
+            <p>No projects yet. Create your first project to get started!</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Create Project Modal -->
+  <div id="create-project-modal" class="modal modal--hidden">
+    <div class="modal__overlay"></div>
+    <div class="modal__content modal__content--large">
+      <div class="modal__header">
+        <h2 id="modal-title">Create New Project</h2>
+        <button class="modal__close" aria-label="Close modal">&times;</button>
+      </div>
+      
+      <form id="create-project-form" class="modal__body">
+        <!-- PAGE 1: Category & Concerns -->
+        <div class="form-page form-page--active" data-page="1">
+          <div class="form-page__header">
+            <h3>Step 1: What's Your Focus?</h3>
+            <p class="form-page__subtitle">Select your category and which specific areas apply to you</p>
+          </div>
+
+          <div class="form-group">
+            <label for="project-category">Category</label>
+            <select id="project-category" name="category" required>
+              <option value="">-- Choose a category --</option>
+            </select>
+          </div>
+
+          <div id="concerns-section" style="display:none;">
+            <h4>Your Specific Concerns</h4>
+            <p class="form-hint">Select all that apply to you:</p>
+            <div id="subcategories-container" class="checkboxes-grid">
+              <!-- Checkboxes will be injected here -->
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="project-description">Tell Us More About Your Situation</label>
+            <textarea
+              id="project-description"
+              name="description"
+              placeholder="Describe your health concerns, goals, or what you're hoping to achieve..."
+              rows="5"
+              maxlength="1000"
+              required
+            ></textarea>
+            <span class="form-hint" id="char-count">0 / 1000 characters</span>
+          </div>
+        </div>
+
+        <!-- PAGE 2: Contact Info, Timeline, Urgency -->
+        <div class="form-page" data-page="2">
+          <div class="form-page__header">
+            <h3>Step 2: Your Details</h3>
+            <p class="form-page__subtitle">Help us match you with the right practitioners</p>
+          </div>
+
+          <div class="form-group">
+            <label for="project-street">Street Address</label>
+            <input
+              type="text"
+              id="project-street"
+              name="street"
+              placeholder="123 Main St"
+              required
+            >
+            <span class="form-hint">Where practitioners will meet you</span>
+          </div>
+
+          <div class="form-group">
+            <label for="project-city">City</label>
+            <input
+              type="text"
+              id="project-city"
+              name="city"
+              placeholder="San Francisco"
+              required
+            >
+            <span class="form-hint">Your city</span>
+          </div>
+
+          <div class="form-group">
+            <label for="project-zipcode">Zip Code</label>
+            <input
+              type="text"
+              id="project-zipcode"
+              name="zipcode"
+              placeholder="12345"
+              maxlength="5"
+              required
+            >
+            <span class="form-hint">Used to match you with local practitioners</span>
+          </div>
+
+          <div class="form-group">
+            <label for="project-state">State</label>
+            <input
+              type="text"
+              id="project-state"
+              name="state"
+              placeholder="CA"
+              maxlength="2"
+              required
+            >
+            <span class="form-hint">2-letter state code</span>
+          </div>
+
+          <div class="form-group">
+            <label for="project-start-date">When Do You Want to Begin?</label>
+            <input
+              type="date"
+              id="project-start-date"
+              name="start_date"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label>How Urgent?</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="urgency" value="browsing" required>
+                <span class="radio-text">
+                  <strong>Just Browsing</strong>
+                  <small>Exploring options</small>
+                </span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="urgency" value="interested" required>
+                <span class="radio-text">
+                  <strong>Interested</strong>
+                  <small>Moderate priority</small>
+                </span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="urgency" value="urgent" required>
+                <span class="radio-text">
+                  <strong>Urgent</strong>
+                  <small>Need help soon</small>
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Travel Preference -->
+          <div class="form-group">
+            <label>Session Type Preference</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="travel-preference" value="in-person" required>
+                <span class="radio-text">
+                  <strong>In-Person</strong>
+                  <small>Visit practitioner's office</small>
+                </span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="travel-preference" value="house-calls" required>
+                <span class="radio-text">
+                  <strong>House Calls</strong>
+                  <small>Practitioner comes to me</small>
+                </span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="travel-preference" value="virtual" required>
+                <span class="radio-text">
+                  <strong>Virtual</strong>
+                  <small>Online session</small>
+                </span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="travel-preference" value="flexible" required>
+                <span class="radio-text">
+                  <strong>Flexible</strong>
+                  <small>Open to any option</small>
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- PAGE 3: Action Buttons -->
+        <div class="form-page" data-page="3">
+          <div class="form-page__header">
+            <h3>You're All Set!</h3>
+            <p class="form-page__subtitle">What would you like to do next?</p>
+          </div>
+
+          <div class="action-cards">
+            <button type="button" id="btn-create-project" class="action-card">
+              <h4>Create Project</h4>
+              <p>Save your project and browse our practitioner directory at your own pace. You can flag yourself as open to contact so practitioners can find you.</p>
+            </button>
+
+            <button type="button" id="btn-match-now" class="action-card action-card--primary">
+              <h4>Match Now</h4>
+              <p>Jump straight to our directory to find practitioners who match your needs</p>
+            </button>
+          </div>
+        </div>
+
+        <!-- Form Navigation -->
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" id="btn-prev-page" style="display:none;">Back</button>
+          <button type="button" class="btn btn-secondary modal-cancel" id="btn-cancel-form">Cancel</button>
+          <button type="button" class="btn btn-primary" id="btn-next-page">Next</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Close Project Modal -->
+  <div id="close-project-modal" class="modal modal--hidden">
+    <div class="modal__overlay"></div>
+    <div class="modal__content modal__content--small">
+      <button class="modal__close" aria-label="Close modal">&times;</button>
+      
+      <div class="modal__header">
+        <h2 class="modal__title">Close Project</h2>
+        <p class="modal__subtitle">Please tell us the outcome of this project</p>
+      </div>
+
+      <form id="close-project-form">
+        <div class="form-group">
+          <label>What happened with this project?</label>
+          
+          <div class="radio-options">
+            <label class="radio-label">
+              <input type="radio" name="closure-reason" value="hired" required>
+              <span class="radio-text">
+                <strong>Hired a Practitioner</strong>
+                <small>I found and hired someone for this project</small>
+              </span>
+            </label>
+
+            <label class="radio-label">
+              <input type="radio" name="closure-reason" value="canceled" required>
+              <span class="radio-text">
+                <strong>Canceled Project</strong>
+                <small>I no longer need help with this</small>
+              </span>
+            </label>
+
+            <label class="radio-label">
+              <input type="radio" name="closure-reason" value="other" required>
+              <span class="radio-text">
+                <strong>Other</strong>
+                <small>Something else happened</small>
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group" id="other-reason-group" style="display: none;">
+          <label for="other-reason">Please explain (optional)</label>
+          <textarea 
+            id="other-reason" 
+            name="other-reason" 
+            rows="4" 
+            placeholder="Tell us what happened with this project..."
+            class="form-control"
+          ></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary modal-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary">Close Project</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer id="footer-inject"></footer>
+
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Rooted Vitality Scripts (in order) -->
+  <script src="../../../scripts/config.js"></script>
+  <script src="../../../scripts/authManager.js"></script>
+  <script src="../../../scripts/authHooks.js"></script>
+  <script src="../../../injections.js"></script>
+  <script src="../../../scripts/my-projects-v2.js"></script>
+</body>
+</html>

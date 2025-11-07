@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>My Matches · Rooted Vitality</title>
+  <link rel="stylesheet" href="../../../styles/styles.css">
+  <link rel="stylesheet" href="../styles/my-matches.css">
+</head>
+<body>
+  <header id="header-inject"></header>
+  
+  <main class="my-matches-container">
+    <!-- Hero Section -->
+    <section class="matches-hero">
+      <div class="matches-hero__content">
+        <h1 class="matches-hero__title">My Matches</h1>
+        <p class="matches-hero__subtitle">Practitioners you've connected with</p>
+      </div>
+    </section>
+
+    <!-- Main Content: 3-Column Layout -->
+    <div class="matches-grid-3col">
+      <!-- LEFT COLUMN: Filters & Summary -->
+      <aside class="matches-sidebar">
+        <!-- Summary Card -->
+        <div class="matches-sidebar__card matches-sidebar__card--featured">
+          <h3 class="matches-sidebar__title">Your Connections</h3>
+          <p class="matches-sidebar__text">
+            View all practitioners you've connected with across your projects.
+          </p>
+          <div class="summary-stats" style="margin-top: 1rem;">
+            <div class="summary-stat">
+              <span class="summary-stat__label">Total Connections</span>
+              <span class="summary-stat__value" id="total-connections">0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter Card -->
+        <div class="matches-sidebar__card">
+          <h3 class="matches-sidebar__title">Filter Connections</h3>
+          
+          <div class="filter-group">
+            <label class="filter-label">Connection Status</label>
+            <select id="filter-status" class="filter-select">
+              <option value="">All Statuses</option>
+              <option value="pending">Pending Review</option>
+              <option value="accepted">Accepted</option>
+              <option value="declined">Declined</option>
+              <option value="not_hired">Not Hired</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-label">Service Type</label>
+            <select id="filter-service-type" class="filter-select">
+              <option value="">All Types</option>
+              <option value="in-person">In-Person</option>
+              <option value="house-calls">House Calls</option>
+              <option value="virtual">Virtual</option>
+            </select>
+          </div>
+
+          <button class="btn btn-secondary" id="btn-reset-filters" style="width: 100%; margin-top: 1rem;">
+            Reset Filters
+          </button>
+        </div>
+
+        <!-- Info Card -->
+        <div class="matches-sidebar__card">
+          <h3 class="matches-sidebar__title">Status Reference</h3>
+          <ul class="status-list" style="margin: 0; padding-left: 1.25rem; font-size: 0.9rem; color: #666; line-height: 1.8;">
+            <li><strong>Pending:</strong> Awaiting practitioner response</li>
+            <li><strong>Accepted:</strong> Ready to connect</li>
+            <li><strong>Declined:</strong> Not interested</li>
+            <li><strong>Not Hired:</strong> Reviewed but not selected</li>
+          </ul>
+        </div>
+      </aside>
+
+      <!-- MIDDLE COLUMN: Practitioners List -->
+      <section class="matches-main">
+        <!-- Header with sort -->
+        <div class="matches-header">
+          <div class="matches-stats">
+            <div class="stat-item">
+              <span class="stat-item__label">Showing</span>
+              <span class="stat-item__value" id="showing-count">0</span>
+            </div>
+          </div>
+          <div class="matches-sort">
+            <select id="sort-connections" class="filter-select">
+              <option value="recent">Most Recent</option>
+              <option value="name">Name (A-Z)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Practitioners Container -->
+        <div class="matches-list" id="matches-container">
+          <!-- Connection cards will be injected here -->
+          <div class="matches-empty">
+            <p>You haven't connected with any practitioners yet.</p>
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="matches-pagination" id="pagination-container" style="display: none;">
+          <!-- Pagination will be injected here -->
+        </div>
+      </section>
+
+      <!-- RIGHT COLUMN: Message Thread (Always visible) -->
+      <section class="message-thread-column">
+        <div class="message-thread-panel" id="message-thread-panel">
+          <!-- Header with Status Dropdown -->
+          <div class="thread-header">
+            <div class="thread-header__content">
+              <h3 id="thread-practitioner-name" class="thread-header__title">Select a practitioner</h3>
+              <div class="thread-header__meta" id="thread-practitioner-meta"></div>
+            </div>
+            
+            <!-- Status Dropdown -->
+            <div class="thread-header__actions">
+              <select id="status-dropdown" class="status-dropdown" style="display: none;">
+                <option value="">Mark As...</option>
+                <option value="in-progress">In-Progress</option>
+                <option value="hired">Hired</option>
+                <option value="not-hired">Not Hired</option>
+              </select>
+            </div>
+          </div>
+          
+          <!-- Messages Area -->
+          <div id="message-thread" class="message-thread">
+            <div class="empty-state">
+              <p>Select a practitioner to view message history</p>
+            </div>
+          </div>
+
+          <!-- Message Input -->
+          <div class="message-input-area">
+            <textarea 
+              id="message-input" 
+              class="message-input" 
+              placeholder="Type your message..." 
+              rows="3"
+              disabled
+            ></textarea>
+            <button id="send-message-btn" class="btn btn-primary" disabled>Send Message</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Practitioner Details Modal -->
+  <div id="practitioner-modal" class="modal modal--hidden">
+    <div class="modal__overlay"></div>
+    <div class="modal__content">
+      <button class="modal__close" aria-label="Close modal">&times;</button>
+      
+      <div class="modal__header">
+        <div class="practitioner-header">
+          <div class="practitioner-avatar" id="modal-avatar"></div>
+          <div class="practitioner-info">
+            <h2 class="modal__title" id="modal-name">Practitioner Name</h2>
+            <p class="modal__subtitle" id="modal-specialty">Specialty</p>
+            <div class="rating-badge" id="modal-rating"></div>
+            <div class="connection-status-badge" id="modal-status"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal__body">
+        <div class="practitioner-details">
+          <!-- Bio -->
+          <section class="modal-section">
+            <h3 class="modal-section__title">About</h3>
+            <p id="modal-bio">—</p>
+          </section>
+
+          <!-- Services -->
+          <section class="modal-section">
+            <h3 class="modal-section__title">Services Offered</h3>
+            <div id="modal-services">—</div>
+          </section>
+
+          <!-- Availability -->
+          <section class="modal-section">
+            <h3 class="modal-section__title">Availability & Location</h3>
+            <div id="modal-availability">—</div>
+          </section>
+
+          <!-- Contact -->
+          <section class="modal-section">
+            <h3 class="modal-section__title">Contact Information</h3>
+            <div id="modal-contact">—</div>
+          </section>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary modal-cancel">Close</button>
+        <button type="button" class="btn btn-primary" id="btn-message">Send Message</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Review Modal -->
+  <div id="review-modal" class="modal modal--hidden">
+    <div class="modal__overlay"></div>
+    <div class="modal__content modal__content--review">
+      <button class="modal__close" aria-label="Close modal">&times;</button>
+      
+      <div class="modal__header">
+        <h2 class="modal__title">Leave a Review</h2>
+        <p class="modal__subtitle" id="review-practitioner-name">Practitioner Name</p>
+      </div>
+
+      <form id="review-form" class="review-form">
+        <!-- Star Rating -->
+        <div class="review-form__section">
+          <label class="review-form__label">Rating <span class="required">*</span></label>
+          <div class="star-rating" id="star-rating">
+            <button type="button" class="star-btn" data-rating="1" title="Poor">★</button>
+            <button type="button" class="star-btn" data-rating="2" title="Fair">★</button>
+            <button type="button" class="star-btn" data-rating="3" title="Good">★</button>
+            <button type="button" class="star-btn" data-rating="4" title="Very Good">★</button>
+            <button type="button" class="star-btn" data-rating="5" title="Excellent">★</button>
+          </div>
+          <input type="hidden" id="review-rating" name="rating" required>
+        </div>
+
+        <!-- Review Text -->
+        <div class="review-form__section">
+          <label class="review-form__label">Comments <span class="required">*</span></label>
+          <textarea 
+            id="review-text" 
+            name="review_text" 
+            class="review-form__textarea" 
+            placeholder="Share your experience with this practitioner..." 
+            rows="6"
+            required
+            minlength="10"
+            maxlength="1000"
+          ></textarea>
+          <div class="review-form__hint" id="char-count">0 / 1000</div>
+        </div>
+
+        <!-- Photo Upload -->
+        <div class="review-form__section">
+          <label class="review-form__label">Photos (Optional)</label>
+          <div class="photo-upload">
+            <input 
+              type="file" 
+              id="review-photos" 
+              name="photos" 
+              class="photo-upload__input" 
+              accept="image/*" 
+              multiple
+            >
+            <label for="review-photos" class="photo-upload__label">
+              <span class="photo-upload__icon">📸</span>
+              <span class="photo-upload__text">Click to add photos or drag and drop</span>
+              <span class="photo-upload__hint">Max 3 photos, 5MB each</span>
+            </label>
+            <div class="photo-preview" id="photo-preview"></div>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary modal-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit-review">Submit Review</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer id="footer-inject"></footer>
+
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Rooted Vitality Scripts (in order) -->
+  <script src="../../../scripts/config.js"></script>
+  <script src="../../../scripts/authManager.js"></script>
+  <script src="../../../scripts/authHooks.js"></script>
+  <script src="../../../injections.js"></script>
+  <script src="../../../scripts/matchMessagingManager.js"></script>
+  <script src="../../../scripts/reviewsManager.js"></script>
+  <script src="../../../scripts/my-matches.js"></script>
+  
+  <!-- Initialize Reviews Manager -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.supabaseClient && window.authManager) {
+        reviewsManager.init(window.supabaseClient, window.authManager);
+      }
+    });
+  </script>
+</body>
+</html>

@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!user) {
             console.log('[Rooted Vitality] No user logged in, redirecting to signup');
             const baseUrl = (typeof RootedVitality !== 'undefined' && RootedVitality.config.siteUrl) ? RootedVitality.config.siteUrl : '/rooted-vitality/';
-            window.location.href = baseUrl + 'signup.html';
+            window.location.href = baseUrl + 'dashboard/signup.html';
             return;
         }
         
