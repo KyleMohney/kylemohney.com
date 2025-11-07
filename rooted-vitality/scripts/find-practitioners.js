@@ -426,8 +426,8 @@ function createPractitionerCard(practitioner) {
       <p class="card-bio">${(practitioner.bio || '').substring(0, 150)}${(practitioner.bio || '').length > 150 ? '...' : ''}</p>
 
       <div class="card-actions">
-        <button class="card-btn card-btn--view" data-practitioner-id="${practitioner.id}">View Profile</button>
-        <button class="card-btn card-btn--connect" data-practitioner-id="${practitioner.id}">Connect</button>
+        <button class="card-btn card-btn--view" data-practitioner-id="${practitioner.practitioner_id}">View Profile</button>
+        <button class="card-btn card-btn--connect" data-practitioner-id="${practitioner.practitioner_id}">Connect</button>
       </div>
     </div>
   `;
