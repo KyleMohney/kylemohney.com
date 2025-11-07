@@ -311,6 +311,13 @@ TABLE OF CONTENTS
   border-color: var(--rooted-primary);
 }
 
+.project-card--closed {
+  opacity: 0.6;
+  background-color: #f9fafb;
+  border-color: #e5e7eb;
+  pointer-events: none;
+}
+
 .project-card__header {
   padding: 1.5rem;
   border-bottom: 1px solid rgba(92, 154, 114, 0.1);

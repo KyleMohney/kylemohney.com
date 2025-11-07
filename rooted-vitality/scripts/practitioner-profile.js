@@ -139,6 +139,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('profile-loading').style.display = 'none';
         document.getElementById('profile-content').style.display = 'block';
         
+        // Check for section parameter (e.g., ?section=reviews) and scroll to it
+        const targetSection = urlParams.get('section');
+        if (targetSection) {
+            const sectionEl = document.getElementById(`${targetSection}-section`);
+            if (sectionEl) {
+                setTimeout(() => {
+                    sectionEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 200);
+            }
+        }
+        
     } catch (error) {
         console.error('[Practitioner Profile] Error loading profile:', error);
         document.getElementById('profile-loading').style.display = 'none';
@@ -476,6 +487,35 @@ async function createMatchAndRedirect(project, practitionerId, practitionerSeria
             }
         } else {
             console.log('[Practitioner Profile] Match created successfully:', data);
+        }
+
+        // Create auto-message
+        try {
+            const currentUser = window.authManager.getCurrentUser();
+            const { data: clientData, error: clientError } = await window.supabaseClient
+                .from('clients')
+                .select('id, first_name')
+                .eq('user_id', currentUser.id)
+                .single();
+
+            if (!clientError && clientData) {
+                const clientName = clientData.first_name || 'Client';
+                const messageText = `${clientName} wants connect about their wellness project!`;
+
+                await window.supabaseClient
+                    .from('project_messages')
+                    .insert({
+                        project_id: project.id,
+                        practitioner_id: practitionerId,
+                        client_id: clientData.id,
+                        sender_id: clientData.id,
+                        sender_type: 'client',
+                        message: messageText,
+                        is_read: false
+                    });
+            }
+        } catch (msgError) {
+            console.warn('[Practitioner Profile] Error creating auto-message:', msgError);
         }
         
         // Redirect to My Matches with project and practitioner in query params
@@ -1059,11 +1099,39 @@ function renderReviewsCard() {
                 .map(() => `<span class="star" style="color: #e0d8cc;">★</span>`)
                 .join('');
             
+            // Build intelligent client name from stored database values
+            let displayName = 'Client';
+            const first = review.client_first_name?.trim();
+            const last = review.client_last_name?.trim();
+            
+            if (first && last) {
+                displayName = `${first[0]}. ${last}`;
+            } else if (last) {
+                displayName = last;
+            } else if (first) {
+                displayName = first;
+            } else if (review.client_name) {
+                displayName = review.client_name;
+            }
+            
+            // Build photos section if photos exist
+            let photosHtml = '';
+            if (review.photos && Array.isArray(review.photos) && review.photos.length > 0) {
+                const photoThumbnails = review.photos
+                    .map((photo, idx) => {
+                        const photoUrl = typeof photo === 'string' ? photo : photo.url;
+                        return `<img src="${photoUrl}" alt="Review photo ${idx + 1}" class="review-photo-thumbnail" loading="lazy">`;
+                    })
+                    .join('');
+                photosHtml = `<div class="review-photos-gallery">${photoThumbnails}</div>`;
+            }
+            
             return `
                 <div class="review-item">
                     <div class="review-stars">${stars}${emptyStars}</div>
                     <p class="review-text">"${escapeHtml(review.review_text || '')}"</p>
-                    <div class="review-author">— ${escapeHtml(review.client_name || 'Client')}</div>
+                    ${photosHtml}
+                    <div class="review-author">— ${escapeHtml(displayName)}</div>
                 </div>
             `;
         })

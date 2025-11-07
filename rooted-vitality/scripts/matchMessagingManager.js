@@ -159,16 +159,57 @@ async function sendMessage() {
   }
 
   try {
-    // Get client ID
-    const { data: clientData, error: clientError } = await supabaseClient
-      .from('clients')
-      .select('id')
-      .eq('user_id', currentUser.id)
-      .single();
+    let senderId, senderType, clientId;
+    const rvUserStr = localStorage.getItem('rvUser');
+    const ispractitioner = rvUserStr ? JSON.parse(rvUserStr).role === 'practitioner' : false;
 
-    if (clientError || !clientData) {
-      console.error('[Messaging] Could not find client record');
-      return;
+    if (ispractitioner) {
+      // Sender is practitioner
+      senderId = selectedPractitionerId;
+      senderType = 'practitioner';
+      
+      // Get client ID from the project_practitioner_matches
+      const { data: matchData, error: matchError } = await supabaseClient
+        .from('project_practitioner_matches')
+        .select('id')
+        .eq('project_id', selectedProjectId)
+        .eq('practitioner_id', selectedPractitionerId)
+        .single();
+
+      if (matchError || !matchData) {
+        console.error('[Messaging] Could not find match record');
+        return;
+      }
+
+      // Get client ID from the project
+      const { data: projectData, error: projectError } = await supabaseClient
+        .from('projects')
+        .select('client_id')
+        .eq('id', selectedProjectId)
+        .single();
+
+      if (projectError || !projectData) {
+        console.error('[Messaging] Could not find project');
+        return;
+      }
+
+      clientId = projectData.client_id;
+    } else {
+      // Sender is client
+      const { data: clientData, error: clientError } = await supabaseClient
+        .from('clients')
+        .select('id')
+        .eq('user_id', currentUser.id)
+        .single();
+
+      if (clientError || !clientData) {
+        console.error('[Messaging] Could not find client record');
+        return;
+      }
+
+      senderId = clientData.id;
+      senderType = 'client';
+      clientId = clientData.id;
     }
 
     // Insert message
@@ -177,9 +218,9 @@ async function sendMessage() {
       .insert({
         project_id: selectedProjectId,
         practitioner_id: selectedPractitionerId,
-        client_id: clientData.id,
-        sender_id: clientData.id,
-        sender_type: 'client',
+        client_id: clientId,
+        sender_id: senderId,
+        sender_type: senderType,
         message: message,
         is_read: false
       });

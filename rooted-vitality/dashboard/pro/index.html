@@ -3,218 +3,581 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Practitioner Dashboard | Rooted Vitality</title>
+  <title>Clients | Rooted Vitality</title>
   <link rel="stylesheet" href="../../styles/base.css">
   <link rel="stylesheet" href="../../styles/layout.css">
   <link rel="stylesheet" href="../../styles/components.css">
   <link rel="stylesheet" href="../../styles/styles.css">
+  
+  <style>
+    /* ========================================== */
+    /* CLIENTS PAGE STYLES */
+    /* ========================================== */
+    
+    .clients-main {
+      background: #fafaf8;
+      padding: 2rem 0;
+      min-height: calc(100vh - 200px);
+    }
+    
+    .clients-container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 0 1rem;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 2rem;
+    }
+
+    @media (max-width: 1024px) {
+      .clients-container {
+        grid-template-columns: 240px 1fr;
+        gap: 1.5rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .clients-container {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .clients-header {
+      grid-column: 1 / -1;
+      margin-bottom: 1rem;
+    }
+    
+    .clients-header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #2d2d2d;
+      margin: 0;
+    }
+    
+    /* Sidebar */
+    .clients-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    
+    .sidebar-tab {
+      background: white;
+      border: 2px solid transparent;
+      border-radius: 12px;
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: left;
+    }
+    
+    .sidebar-tab:hover {
+      border-color: #5c9a72;
+      box-shadow: 0 4px 12px rgba(92, 154, 114, 0.1);
+    }
+    
+    .sidebar-tab.active {
+      border-color: #5c9a72;
+      background: #f0f9f6;
+    }
+    
+    .sidebar-tab__title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin: 0 0 0.5rem 0;
+    }
+    
+    .sidebar-tab.active .sidebar-tab__title {
+      color: #5c9a72;
+    }
+    
+    .sidebar-tab__description {
+      font-size: 0.85rem;
+      color: #666;
+      margin: 0;
+      line-height: 1.4;
+    }
+    
+    /* Main Content */
+    .clients-main-content {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+    
+    .clients-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    .client-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .client-card:hover {
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+      transform: translateY(-4px);
+    }
+    
+    .card-header {
+      display: flex;
+      gap: 1rem;
+      padding: 1.5rem;
+      border-bottom: 1px solid #e5e5e5;
+    }
+    
+    .client-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #5c9a72 0%, #4a7d5a 100%);
+      font-size: 24px;
+      color: white;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+    
+    .client-info {
+      flex: 1;
+    }
+    
+    .client-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin: 0 0 0.3rem 0;
+    }
+    
+    .client-service {
+      font-size: 0.9rem;
+      color: #666;
+      margin: 0.2rem 0;
+    }
+    
+    .client-meta {
+      font-size: 0.85rem;
+      color: #999;
+      margin: 0.3rem 0 0 0;
+    }
+    
+    .message-preview-box {
+      padding: 1.5rem;
+      background: #f9f9f9;
+      flex: 1;
+    }
+    
+    .message-text {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: #555;
+      margin: 0;
+    }
+    
+    .card-actions {
+      display: flex;
+      gap: 0.5rem;
+      padding: 1rem 1.5rem;
+      flex-wrap: wrap;
+    }
+    
+    .card-actions button {
+      flex: 1;
+      min-width: 80px;
+      padding: 0.6rem 1rem;
+      font-size: 0.85rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-accent {
+      background: #5c9a72;
+      color: white;
+    }
+    
+    .btn-accent:hover {
+      background: #4a7d5a;
+    }
+    
+    .btn-neutral {
+      background: #e8e8e8;
+      color: #333;
+    }
+    
+    .btn-neutral:hover {
+      background: #d5d5d5;
+    }
+    
+    .btn-danger {
+      background: #fee;
+      color: #c33;
+    }
+    
+    .btn-danger:hover {
+      background: #fdd;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 3rem 2rem;
+      background: white;
+      border-radius: 12px;
+    }
+    
+    .empty-state h3 {
+      font-size: 1.3rem;
+      color: #2d2d2d;
+      margin: 0 0 0.5rem 0;
+    }
+    
+    .empty-state p {
+      color: #999;
+      margin: 0;
+    }
+  </style>
 </head>
 <body class="pro-dashboard">
   <script>
-    // Set practitioner view immediately before any scripts load
     localStorage.setItem('active_view', 'practitioner');
     console.log('[Rooted Vitality] Practitioner dashboard - active_view set to: practitioner');
   </script>
   <header id="header-inject"></header>
 
-  <!-- Main Content Container -->
-  <main id="pro-content" class="container-wide">
-    <!-- Clients -->
-    <section id="tab-clients" class="tab-panel active">
-      <h1>Clients</h1>
+  <main class="clients-main">
+    <div class="clients-container">
+      <div class="clients-header">
+        <h1>Clients</h1>
+      </div>
       
-      <!-- Client Sub-tabs -->
-      <div class="clients-subtabs">
-        <button class="clients-tab active" data-clients-tab="new-clients">New Clients</button>
-        <button class="clients-tab" data-clients-tab="opportunities">Opportunities</button>
-      </div>
-
-      <!-- New Clients List -->
-      <div id="new-clients" class="clients-list active">
-        <!-- Client Card 1 -->
-        <div class="client-card">
-          <div class="card-header">
-            <div class="client-avatar" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #5c9a72 0%, #4a7d5a 100%); font-size: 24px; color: white; font-weight: bold;">S</div>
-            <div class="client-info">
-              <h3 class="client-name">Sarah Mitchell</h3>
-              <p class="client-service">Acupuncture & Herbal Medicine</p>
-              <p class="client-location">📍 Denver, CO</p>
-            </div>
-          </div>
-          
-          <div class="card-divider"></div>
-          
-          <div class="message-preview-box">
-            <div class="message-text" id="msg-1">
-              <p>Hi! I've been dealing with chronic back pain and fatigue for months. Looking for someone who can help me explore natural remedies and lifestyle changes. Would love to discuss acupuncture options!</p>
-            </div>
-            <a href="#" class="read-more-toggle" data-msg="msg-1">Read more</a>
-          </div>
-          
-          <div class="card-divider"></div>
-          
-          <div class="card-actions">
-            <button class="btn-accent" data-action="accept">Accept</button>
-            <button class="btn-neutral" data-action="decline">Decline</button>
-            <button class="btn-neutral" data-action="decline-message">Decline w/ Message</button>
-            <button class="btn-danger" data-action="block">Block User</button>
-          </div>
+      <!-- Sidebar -->
+      <aside class="clients-sidebar">
+        <div class="sidebar-tab active" data-tab="new-clients">
+          <h3 class="sidebar-tab__title">New Clients</h3>
+          <p class="sidebar-tab__description">Clients who have matched directly with you and requested contact</p>
         </div>
-
-        <!-- Client Card 2 -->
-        <div class="client-card">
-          <div class="card-header">
-            <div class="client-avatar" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #5c9a72 0%, #4a7d5a 100%); font-size: 24px; color: white; font-weight: bold;">M</div>
-            <div class="client-info">
-              <h3 class="client-name">Marcus Johnson</h3>
-              <p class="client-service">Nutritional Counseling</p>
-              <p class="client-location">📍 Remote</p>
-            </div>
-          </div>
-          
-          <div class="card-divider"></div>
-          
-          <div class="message-preview-box">
-            <div class="message-text" id="msg-2">
-              <p>I'm looking for help with my diet. Need someone experienced in holistic nutrition.</p>
-            </div>
-            <a href="#" class="read-more-toggle" data-msg="msg-2">Read more</a>
-          </div>
-          
-          <div class="card-divider"></div>
-          
-          <div class="card-actions">
-            <button class="btn-accent" data-action="accept">Accept</button>
-            <button class="btn-neutral" data-action="decline">Decline</button>
-            <button class="btn-neutral" data-action="decline-message">Decline w/ Message</button>
-            <button class="btn-danger" data-action="block">Block User</button>
-          </div>
+        
+        <div class="sidebar-tab" data-tab="opportunities">
+          <h3 class="sidebar-tab__title">Opportunities</h3>
+          <p class="sidebar-tab__description">Clients open to contact who haven't matched yet</p>
         </div>
-
-        <!-- Client Card 3 -->
-        <div class="client-card">
-          <div class="card-header">
-            <div class="client-avatar" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #5c9a72 0%, #4a7d5a 100%); font-size: 24px; color: white; font-weight: bold;">E</div>
-            <div class="client-info">
-              <h3 class="client-name">Emily Chen</h3>
-              <p class="client-service">Yoga & Mindfulness</p>
-              <p class="client-location">📍 Portland, OR</p>
-            </div>
-          </div>
-          
-          <div class="card-divider"></div>
-          
-          <div class="message-preview-box">
-            <div class="message-text" id="msg-3">
-              <p>Interested in beginning a yoga and meditation practice to help with stress management. I'm a complete beginner but very motivated!</p>
-            </div>
-            <a href="#" class="read-more-toggle" data-msg="msg-3">Read more</a>
-          </div>
-          
-          <div class="card-divider"></div>
-          
-          <div class="card-actions">
-            <button class="btn-accent" data-action="accept">Accept</button>
-            <button class="btn-neutral" data-action="decline">Decline</button>
-            <button class="btn-neutral" data-action="decline-message">Decline w/ Message</button>
-            <button class="btn-danger" data-action="block">Block User</button>
-          </div>
+      </aside>
+      
+      <!-- Main Content -->
+      <div class="clients-main-content">
+        <!-- New Clients Tab -->
+        <div id="new-clients" class="clients-list" style="display: grid;">
+          <!-- Client cards will be populated here by JavaScript -->
+        </div>
+        
+        <!-- Opportunities Tab -->
+        <div id="opportunities" class="clients-list" style="display: none;">
+          <!-- Opportunity cards will be populated here by JavaScript -->
         </div>
       </div>
-
-      <!-- Opportunities List -->
-      <div id="opportunities" class="clients-list">
-        <!-- Opportunity Card 1 -->
-        <div class="client-card">
-          <div class="card-header">
-            <div class="client-avatar" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #5c9a72 0%, #4a7d5a 100%); font-size: 24px; color: white; font-weight: bold;">D</div>
-            <div class="client-info">
-              <h3 class="client-name">David Thompson</h3>
-              <p class="client-service">Massage Therapy & Bodywork</p>
-              <p class="client-location">📍 Boulder, CO</p>
-            </div>
-          </div>
-          
-          <div class="card-divider"></div>
-          
-          <div class="message-preview-box">
-            <div class="message-text" id="msg-opp-1">
-              <p>Previously worked with a practitioner who moved away. Looking for deep tissue massage and sports recovery work.</p>
-            </div>
-            <a href="#" class="read-more-toggle" data-msg="msg-opp-1">Read more</a>
-          </div>
-          
-          <div class="card-divider"></div>
-          
-          <div class="card-actions">
-            <button class="btn-accent" data-action="message">Message</button>
-            <button class="btn-neutral" data-action="skip">Skip</button>
-            <button class="btn-danger" data-action="block">Block User</button>
-          </div>
-        </div>
-
-        <!-- Opportunity Card 2 -->
-        <div class="client-card">
-          <div class="card-header">
-            <div class="client-avatar" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #5c9a72 0%, #4a7d5a 100%); font-size: 24px; color: white; font-weight: bold;">J</div>
-            <div class="client-info">
-              <h3 class="client-name">Jessica Rodriguez</h3>
-              <p class="client-service">Energy Healing & Reiki</p>
-              <p class="client-location">📍 Austin, TX</p>
-            </div>
-          </div>
-          
-          <div class="card-divider"></div>
-          
-          <div class="message-preview-box">
-            <div class="message-text" id="msg-opp-2">
-              <p>Seeking Reiki and energy work sessions monthly. Interested in practitioners with 5+ years of experience.</p>
-            </div>
-            <a href="#" class="read-more-toggle" data-msg="msg-opp-2">Read more</a>
-          </div>
-          
-          <div class="card-divider"></div>
-          
-          <div class="card-actions">
-            <button class="btn-accent" data-action="message">Message</button>
-            <button class="btn-neutral" data-action="skip">Skip</button>
-            <button class="btn-danger" data-action="block">Block User</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Messages -->
-    <section id="tab-messages" class="tab-panel">
-      <h1>Inbox</h1>
-      <p>All accepted clients appear here for ongoing communication. Placeholder chat area.</p>
-    </section>
-
-    <!-- Match Settings -->
-    <section id="tab-match-settings" class="tab-panel">
-      <h1>Match Settings</h1>
-      <p>Placeholder targeting and coverage options.</p>
-    </section>
-
-    <!-- Profile -->
-    <section id="tab-profile" class="tab-panel">
-      <h1>Profile</h1>
-      <p>Placeholder practitioner profile editor.</p>
-    </section>
+    </div>
   </main>
 
+  <!-- Decline with Message Modal -->
+  <div id="decline-message-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 12px; padding: 2rem; max-width: 500px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+      <h2 style="margin: 0 0 1rem 0; font-size: 1.3rem; color: #2d2d2d;">Send Decline Message</h2>
+      <p style="color: #666; margin: 0 0 1rem 0;">Let the client know why you're declining:</p>
+      <textarea id="decline-message-text" style="width: 100%; height: 120px; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; font-size: 0.95rem; resize: vertical;" placeholder="Type your message..."></textarea>
+      <div style="display: flex; gap: 0.5rem; margin-top: 1.5rem;">
+        <button id="decline-message-cancel" style="flex: 1; padding: 0.75rem; border: none; border-radius: 6px; background: #e8e8e8; color: #333; font-weight: 600; cursor: pointer;">Cancel</button>
+        <button id="decline-message-send" style="flex: 1; padding: 0.75rem; border: none; border-radius: 6px; background: #c33; color: white; font-weight: 600; cursor: pointer;">Send & Decline</button>
+      </div>
+    </div>
+  </div>
+
   <footer id="footer-inject"></footer>
-  
-  <!-- Supabase JS Client Library -->
+
+  <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  
-  <!-- Rooted Vitality Scripts (in order) -->
+
+  <!-- Rooted Vitality Scripts -->
   <script src="../../scripts/config.js"></script>
   <script src="../../scripts/authManager.js"></script>
-  <script src="../../scripts/authModal.js"></script>
   <script src="../../scripts/authHooks.js"></script>
   <script src="../../injections.js"></script>
-  <script src="../../scripts/renderManager.js"></script>
-  <script src="../../scripts/proDashboard.js"></script>
+  
+  <script>
+    // Tab switching logic
+    document.querySelectorAll('.sidebar-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tabName = tab.dataset.tab;
+        
+        // Update active state
+        document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        // Show/hide content
+        document.querySelectorAll('.clients-list').forEach(list => list.style.display = 'none');
+        document.getElementById(tabName).style.display = 'grid';
+      });
+    });
+
+    // Load client data
+    async function loadClientsData() {
+      try {
+        if (!window.supabaseClient || !window.authManager) {
+          console.error('[Pro Clients] Supabase or auth not ready');
+          return;
+        }
+
+        const currentUser = window.authManager.getCurrentUser();
+        if (!currentUser) {
+          console.log('[Pro Clients] User not authenticated');
+          return;
+        }
+
+        // Get practitioner ID
+        const rvUserStr = localStorage.getItem('rvUser');
+        if (!rvUserStr) {
+          console.error('[Pro Clients] No rvUser in localStorage');
+          return;
+        }
+
+        const rvUser = JSON.parse(rvUserStr);
+        const practitionerId = rvUser.id;
+        console.log('[Pro Clients] Loading data for practitioner:', practitionerId);
+
+        // Get new clients (active matches)
+        const { data: matches, error: matchError } = await window.supabaseClient
+          .from('project_practitioner_matches')
+          .select(`
+            id,
+            project_id,
+            client_serial,
+            status,
+            created_at,
+            projects (
+              id,
+              description,
+              category_name,
+              created_at,
+              clients (
+                id,
+                first_name,
+                last_name,
+                user_id
+              )
+            )
+          `)
+          .eq('practitioner_id', practitionerId)
+          .eq('status', 'active');
+
+        if (matchError) {
+          console.error('[Pro Clients] Error loading matches:', matchError);
+          return;
+        }
+
+        console.log('[Pro Clients] Loaded matches:', matches?.length);
+
+        // Get first message from each match
+        const newClientsContainer = document.getElementById('new-clients');
+        if (!matches || matches.length === 0) {
+          newClientsContainer.innerHTML = '<div class="empty-state"><h3>No New Clients Yet</h3><p>Clients who contact you will appear here</p></div>';
+        } else {
+          newClientsContainer.innerHTML = '';
+        }
+
+        const opportunitiesContainer = document.getElementById('opportunities');
+        opportunitiesContainer.innerHTML = '<div class="empty-state"><h3>No Opportunities Yet</h3><p>Clients looking for practitioners will appear here soon</p></div>';
+
+        for (const match of matches) {
+          if (!match.projects?.clients) continue;
+
+          const project = match.projects;
+          const client = project.clients;
+          const clientName = `${client.first_name || 'Client'} ${client.last_name ? client.last_name[0] + '.' : ''}`;
+          const initials = (client.first_name?.[0] || 'C') + (client.last_name?.[0] || 'L');
+
+          // Get first message
+          const { data: messages } = await window.supabaseClient
+            .from('project_messages')
+            .select('message')
+            .eq('project_id', match.project_id)
+            .eq('practitioner_id', practitionerId)
+            .order('created_at', { ascending: true })
+            .limit(1);
+
+          const firstMessage = messages?.[0]?.message || 'No messages yet';
+
+          const card = document.createElement('div');
+          card.className = 'client-card';
+          card.innerHTML = `
+            <div class="card-header">
+              <div class="client-avatar">${initials}</div>
+              <div class="client-info">
+                <h3 class="client-name">${clientName}</h3>
+                <p class="client-service">${project.category_name || 'Wellness'}</p>
+                <p class="client-meta">Started ${new Date(project.created_at).toLocaleDateString()}</p>
+              </div>
+            </div>
+            <div class="message-preview-box">
+              <p class="message-text">${firstMessage}</p>
+            </div>
+            <div class="card-actions">
+              <button class="btn-accent" data-action="accept" data-match-id="${match.id}">Accept</button>
+              <button class="btn-neutral" data-action="message" data-match-id="${match.id}">Message</button>
+              <button class="btn-neutral" data-action="decline-msg" data-match-id="${match.id}">Decline w/ Msg</button>
+              <button class="btn-danger" data-action="decline" data-match-id="${match.id}">Decline</button>
+              <button class="btn-danger" data-action="block" data-match-id="${match.id}">Block</button>
+            </div>
+          `;
+
+          // Attach handlers
+          let currentMatchForDeclineMsg = null;
+
+          card.querySelector('[data-action="accept"]').addEventListener('click', async () => {
+            const { error } = await window.supabaseClient
+              .from('project_practitioner_matches')
+              .update({ status: 'accepted' })
+              .eq('id', match.id);
+
+            if (!error) {
+              alert('Client accepted! View in your Inbox to message them.');
+              card.remove();
+            } else {
+              alert('Error accepting client');
+            }
+          });
+
+          card.querySelector('[data-action="message"]').addEventListener('click', () => {
+            window.location.href = `/rooted-vitality/dashboard/pro/pages/my-matches.html?match_id=${match.id}`;
+          });
+
+          card.querySelector('[data-action="decline-msg"]').addEventListener('click', () => {
+            currentMatchForDeclineMsg = match;
+            document.getElementById('decline-message-text').value = '';
+            const modal = document.getElementById('decline-message-modal');
+            modal.style.display = 'flex';
+          });
+
+          card.querySelector('[data-action="decline"]').addEventListener('click', async () => {
+            if (confirm('Are you sure you want to decline this client? They will be notified.')) {
+              const { error } = await window.supabaseClient
+                .from('project_practitioner_matches')
+                .update({ status: 'declined' })
+                .eq('id', match.id);
+
+              if (!error) {
+                card.remove();
+              }
+            }
+          });
+
+          card.querySelector('[data-action="block"]').addEventListener('click', async () => {
+            if (confirm('Block this customer? They won\'t be able to match with you again.')) {
+              // Decline the match
+              const { error: declineError } = await window.supabaseClient
+                .from('project_practitioner_matches')
+                .update({ status: 'declined' })
+                .eq('id', match.id);
+
+              if (declineError) {
+                alert('Error blocking customer');
+                return;
+              }
+
+              // Add to blocklist
+              const { error: blockError } = await window.supabaseClient
+                .from('practitioner_blocks')
+                .insert({
+                  practitioner_id: practitionerId,
+                  client_serial: match.client_serial
+                });
+
+              if (!blockError) {
+                card.remove();
+              }
+            }
+          });
+
+          newClientsContainer.appendChild(card);
+        }
+
+      } catch (error) {
+        console.error('[Pro Clients] Error:', error);
+      }
+    }
+
+    // Modal handlers for decline with message
+    let currentMatchForDeclineMsg = null;
+
+    document.getElementById('decline-message-cancel').addEventListener('click', () => {
+      document.getElementById('decline-message-modal').style.display = 'none';
+      currentMatchForDeclineMsg = null;
+    });
+
+    document.getElementById('decline-message-send').addEventListener('click', async () => {
+      if (!currentMatchForDeclineMsg) return;
+
+      const messageText = document.getElementById('decline-message-text').value.trim();
+      if (!messageText) {
+        alert('Please type a message');
+        return;
+      }
+
+      try {
+        // Decline the match
+        const { error: declineError } = await window.supabaseClient
+          .from('project_practitioner_matches')
+          .update({ status: 'declined' })
+          .eq('id', currentMatchForDeclineMsg.id);
+
+        if (declineError) {
+          alert('Error declining');
+          return;
+        }
+
+        // Send message to client
+        const { error: messageError } = await window.supabaseClient
+          .from('project_messages')
+          .insert({
+            project_id: currentMatchForDeclineMsg.project_id,
+            practitioner_id: currentMatchForDeclineMsg.projects?.clients?.user_id ? null : window.supabaseClient.auth.user()?.id,
+            client_id: currentMatchForDeclineMsg.projects?.clients?.id,
+            sender_id: window.authManager?.getCurrentUser()?.id,
+            sender_type: 'practitioner',
+            message: messageText,
+            is_read: false
+          });
+
+        if (!messageError) {
+          document.getElementById('decline-message-modal').style.display = 'none';
+          // Remove card from UI
+          const cards = document.querySelectorAll('[data-match-id="' + currentMatchForDeclineMsg.id + '"]');
+          cards.forEach(c => c.closest('.client-card')?.remove());
+          currentMatchForDeclineMsg = null;
+          alert('Declined with message sent to client');
+        }
+      } catch (error) {
+        console.error('[Pro Clients] Error sending decline message:', error);
+        alert('Error sending message');
+      }
+    });
+
+    // Load when page is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadClientsData);
+    } else {
+      setTimeout(loadClientsData, 500);
+    }
+  </script>
 </body>
 </html>

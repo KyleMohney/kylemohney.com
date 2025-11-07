@@ -623,6 +623,26 @@ async function sendConnectionRequest(practitionerId, practitionerSerial) {
   try {
     console.log('[sendConnectionRequest] Creating match...');
 
+    // Get client ID and name
+    const currentUser = window.authManager?.getCurrentUser();
+    if (!currentUser) {
+      alert('Error: Not authenticated');
+      return;
+    }
+
+    const { data: clientData, error: clientError } = await supabaseClient
+      .from('clients')
+      .select('id, first_name, last_name')
+      .eq('user_id', currentUser.id)
+      .single();
+
+    if (clientError || !clientData) {
+      console.error('[sendConnectionRequest] Could not find client:', clientError);
+      alert('Error retrieving client information');
+      return;
+    }
+
+    // Create match
     const { data, error } = await supabaseClient
       .from('project_practitioner_matches')
       .insert({
@@ -637,6 +657,26 @@ async function sendConnectionRequest(practitionerId, practitionerSerial) {
       console.error('[sendConnectionRequest] Error:', error);
       alert('Error sending connection request');
       return;
+    }
+
+    // Create auto-message
+    const clientName = clientData.first_name || 'Client';
+    const messageText = `${clientName} wants connect about their wellness project!`;
+
+    const { error: messageError } = await supabaseClient
+      .from('project_messages')
+      .insert({
+        project_id: selectedProject.id,
+        practitioner_id: practitionerId,
+        client_id: clientData.id,
+        sender_id: clientData.id,
+        sender_type: 'client',
+        message: messageText,
+        is_read: false
+      });
+
+    if (messageError) {
+      console.error('[sendConnectionRequest] Error creating auto-message:', messageError);
     }
 
     console.log('[sendConnectionRequest] Connection request sent successfully');

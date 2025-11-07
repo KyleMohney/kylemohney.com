@@ -280,7 +280,7 @@ function createMatchCard(match) {
   const projectDisplay = getCategoryName(project);
 
   const card = document.createElement('div');
-  const closedClass = (match.status === 'not-hired' || match.status === 'declined') ? ' match-card--closed' : '';
+  const closedClass = (match.status === 'hired' || match.status === 'not-hired' || match.status === 'declined') ? ' match-card--closed' : '';
   card.className = `match-card${closedClass}`;
   card.setAttribute('data-match-id', match.id);
   card.innerHTML = `
@@ -308,7 +308,7 @@ function createMatchCard(match) {
             View Profile
           </button>
           ${(match.status === 'hired' || match.status === 'not-hired') ? `
-            <button class="match-card__action-btn match-card__action-btn--review" onclick="openReviewModal('${match.id}', '${match.practitioner_id}', '${escapeHtml(match.practitioners?.dba_name || match.practitioners?.legal_name || 'Practitioner')}')">
+            <button class="match-card__action-btn match-card__action-btn--review" onclick="openReviewModal('${match.id}', '${match.practitioner_id}', '${escapeHtml(match.practitioners?.dba_name || match.practitioners?.legal_name || 'Practitioner')}', '${match.project_id || ''}', '${escapeHtml(match.client_first_name || '')}', '${escapeHtml(match.client_last_name || '')}', '${match.client_id || ''}')">
               Leave Review
             </button>
           ` : ''}

@@ -966,6 +966,28 @@ const RootedVitality = {
     },
 
     /**
+     * Mark a notification as read in database
+     */
+    markNotificationAsRead: async function(notifId) {
+        try {
+            const { error } = await window.supabaseClient
+                .from('notifications')
+                .update({ is_read: true })
+                .eq('id', notifId);
+            
+            if (error) {
+                console.error('[Rooted Vitality] Error marking notification as read:', error);
+                return;
+            }
+            
+            console.log('[Rooted Vitality] Notification marked as read:', notifId);
+            this.loadNotifications(); // Refresh to update bell state
+        } catch (error) {
+            console.error('[Rooted Vitality] Exception marking notification as read:', error);
+        }
+    },
+
+    /**
      * Load and display notifications for practitioner
      */
     loadNotifications: async function() {
@@ -1019,12 +1041,24 @@ const RootedVitality = {
             }
 
             notificationsList.innerHTML = data.map(notif => `
-                <a href="${notif.link || '#'}" class="rv-notifications-item ${notif.is_read ? 'read' : 'unread'}">
+                <a href="${notif.link || '#'}" class="rv-notifications-item ${notif.is_read ? 'read' : 'unread'}" data-notif-id="${notif.id}">
                     <p class="rv-notifications-title">${notif.title}</p>
                     <p class="rv-notifications-message">${notif.message}</p>
                     <span class="rv-notifications-time">${new Date(notif.created_at).toLocaleDateString()}</span>
                 </a>
             `).join('');
+
+            // Add click handler to mark notifications as read
+            document.querySelectorAll('.rv-notifications-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    const notifId = item.dataset.notifId;
+                    if (notifId && !item.classList.contains('read')) {
+                        this.markNotificationAsRead(notifId);
+                        item.classList.remove('unread');
+                        item.classList.add('read');
+                    }
+                });
+            });
 
         } catch (error) {
             console.error('[Rooted Vitality] Error loading notifications:', error);

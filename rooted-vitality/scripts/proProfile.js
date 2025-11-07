@@ -3720,42 +3720,77 @@ async function initializeReviews() {
 }
 
 /**
- * Load reviews from database (mock data for now)
+ * Load reviews from database
  */
 async function loadReviews() {
     try {
         console.log('[Reviews] Loading reviews from database...');
         
-        // Mock reviews data - in production, fetch from Supabase
-        allReviews = [
-            {
-                id: 1,
-                clientName: 'Sarah Johnson',
-                rating: 5,
-                text: 'Amazing experience! The practitioner was very professional and knowledgeable. Highly recommend!',
-                date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-                source: 'platform',
-                verified: true
-            },
-            {
-                id: 2,
-                clientName: 'Michael Chen',
-                rating: 5,
-                text: 'Great service and very attentive to my needs. Will definitely book again.',
-                date: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000),
-                source: 'platform',
-                verified: true
-            },
-            {
-                id: 3,
-                clientName: 'Emily Rodriguez',
-                rating: 4,
-                text: 'Very good overall. The only suggestion would be to offer more flexible scheduling.',
-                date: new Date(Date.now() - 21 * 24 * 60 * 60 * 1000),
-                source: 'platform',
-                verified: true
-            }
-        ];
+        // Get current practitioner
+        const { data: { user } } = await window.supabaseClient.auth.getUser();
+        if (!user) {
+            allReviews = [];
+            filteredReviews = [];
+            return;
+        }
+        
+        // Get practitioner ID
+        const { data: practitionerData, error: practitionerError } = await window.supabaseClient
+            .from('practitioners')
+            .select('id, user_id')
+            .eq('user_id', user.id)
+            .single();
+        
+        if (practitionerError || !practitionerData) {
+            console.error('[Reviews] Error loading practitioner:', practitionerError);
+            allReviews = [];
+            filteredReviews = [];
+            return;
+        }
+        
+        // Fetch real reviews from database
+        const { data: dbReviews, error: reviewsError } = await window.supabaseClient
+            .from('reviews')
+            .select('*')
+            .eq('practitioner_id', practitionerData.user_id)
+            .eq('is_visible', true)
+            .order('created_at', { ascending: false });
+        
+        if (reviewsError) {
+            console.error('[Reviews] Error loading reviews:', reviewsError);
+            allReviews = [];
+        } else {
+            // Transform database reviews to match our format
+            console.log('[Reviews] Raw database reviews:', dbReviews);
+            allReviews = (dbReviews || []).map(review => {
+                // Use stored client names from database
+                let displayName = 'Client';
+                const first = review.client_first_name?.trim();
+                const last = review.client_last_name?.trim();
+                
+                if (first && last) {
+                    displayName = `${first[0]}. ${last}`;
+                } else if (last) {
+                    displayName = last;
+                } else if (first) {
+                    displayName = first;
+                } else if (review.client_name) {
+                    displayName = review.client_name;
+                }
+                
+                return {
+                    id: review.id,
+                    clientName: displayName,
+                    rating: review.rating || 5,
+                    text: review.review_text || '',
+                    date: new Date(review.created_at),
+                    source: 'platform',
+                    verified: true,
+                    photos: review.photos || []
+                };
+            });
+            console.log('[Reviews] Transformed reviews:', allReviews);
+        }
         
         console.log(`[Reviews] Loaded ${allReviews.length} reviews`);
         filteredReviews = [...allReviews];
@@ -3804,6 +3839,18 @@ function createReviewCard(review) {
     const formattedDate = formatReviewDate(review.date);
     const source = review.source === 'platform' ? 'Platform' : 'External';
     
+    // Build photos section if photos exist
+    let photosHtml = '';
+    if (review.photos && Array.isArray(review.photos) && review.photos.length > 0) {
+        const photoThumbnails = review.photos
+            .map((photo, idx) => {
+                const photoUrl = typeof photo === 'string' ? photo : photo.url;
+                return `<img src="${photoUrl}" alt="Review photo ${idx + 1}" class="review-photo-thumbnail" loading="lazy">`;
+            })
+            .join('');
+        photosHtml = `<div class="review-photos-gallery">${photoThumbnails}</div>`;
+    }
+    
     return `
         <div class="review-card" data-review-id="${review.id}" data-source="${review.source}" data-rating="${review.rating}">
             <div class="review-header">
@@ -3814,6 +3861,7 @@ function createReviewCard(review) {
                 <div class="review-stars">${stars}</div>
             </div>
             <p class="review-text">${escapeHtml(review.text)}</p>
+            ${photosHtml}
             <div class="review-footer">
                 <span class="review-date">${formattedDate}</span>
             </div>

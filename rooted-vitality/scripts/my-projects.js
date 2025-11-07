@@ -71,6 +71,8 @@ async function loadProjects() {
     if (error) throw error;
     projects = data || [];
     console.log('[My Projects] Loaded', projects.length, 'projects');
+    console.log('[My Projects] Project statuses:', projects.map(p => ({ id: p.id, status: p.status, name: p.custom_name })));
+    console.log('[My Projects] FULL PROJECT DATA:', JSON.stringify(projects, null, 2));
     updateStats();
   } catch (error) {
     console.error('[My Projects] Error loading projects:', error);
@@ -110,7 +112,15 @@ function renderProjectsGrid() {
     return;
   }
 
-  container.innerHTML = projects.map(project => createProjectCard(project)).join('');
+  console.log('[renderProjectsGrid] Rendering', projects.length, 'projects');
+  container.innerHTML = '';
+  projects.forEach(project => {
+    console.log('[renderProjectsGrid] Creating card for project:', project.id, 'status:', project.status);
+    const card = createProjectCard(project);
+    console.log('[renderProjectsGrid] Card created, className:', card.className);
+    container.appendChild(card);
+  });
+  console.log('[renderProjectsGrid] Done. Container now has', container.children.length, 'children');
   
   // Attach event listeners to newly rendered titles
   attachProjectTitleEditing();
@@ -119,23 +129,15 @@ function renderProjectsGrid() {
 /**
  * Create HTML for a single project card
  * @param {Object} project - Project data from Supabase
- * @returns {string} - HTML for the project card
+ * @returns {HTMLElement} - DOM element for the project card
  */
 function createProjectCard(project) {
+  const TERMINAL_STATUSES = ['closed', 'hired', 'not_hired', 'declined'];
+  
   const createdDate = new Date(project.created_at).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
     day: 'numeric'
-  });
-
-  console.log('[DEBUG] Project data:', {
-    custom_name: project.custom_name,
-    category_name: project.category_name,
-    subcategory_text: project.subcategory_text,
-    state: project.state,
-    street: project.street,
-    zipcode: project.zipcode,
-    all_keys: Object.keys(project)
   });
 
   const matchedPractitioners = project.project_practitioners || [];
@@ -143,10 +145,16 @@ function createProjectCard(project) {
     .map(pp => practitioners.find(p => p.id === pp.practitioner_id))
     .filter(Boolean);
 
-  // Determine status: if has matches and not explicitly closed, show "Active", otherwise show project status
+  // Determine status
   let displayStatus = project.status || 'Pending';
-  if (matchedPractitioners.length > 0 && project.status !== 'closed') {
+  if (matchedPractitioners.length > 0 && !TERMINAL_STATUSES.includes(project.status)) {
     displayStatus = 'Active';
+  } else if (project.status === 'hired') {
+    displayStatus = 'Hired';
+  } else if (project.status === 'not_hired') {
+    displayStatus = 'Not Hired';
+  } else if (project.status === 'declined') {
+    displayStatus = 'Declined';
   } else if (project.status === 'closed') {
     displayStatus = 'Closed';
   } else {
@@ -154,75 +162,79 @@ function createProjectCard(project) {
   }
 
   const statusClass = `project-card__status--${displayStatus.toLowerCase()}`;
-  const statusLabel = displayStatus;
+  const closedClass = TERMINAL_STATUSES.includes(project.status) ? ' project-card--closed' : '';
 
-  return `
-    <article class="project-card">
-      <!-- Card Header -->
-      <div class="project-card__header">
-        <div class="project-card__title-group">
-          <h3 class="project-card__title" contenteditable="true" data-project-id="${project.id}" spellcheck="false">${escapeHtml(project.custom_name || project.category_name || 'Untitled Project')}</h3>
-          <span class="project-card__status ${statusClass}">${statusLabel}</span>
-        </div>
-        <div class="project-card__meta">
-          <span class="project-card__date">Created ${createdDate}</span>
-        </div>
+  // Create the card element
+  const card = document.createElement('article');
+  card.className = `project-card${closedClass}`;
+  
+  card.innerHTML = `
+    <!-- Card Header -->
+    <div class="project-card__header">
+      <div class="project-card__title-group">
+        <h3 class="project-card__title" contenteditable="true" data-project-id="${project.id}" spellcheck="false">${escapeHtml(project.custom_name || project.category_name || 'Untitled Project')}</h3>
+        <span class="project-card__status ${statusClass}">${displayStatus}</span>
+      </div>
+      <div class="project-card__meta">
+        <span class="project-card__date">Created ${createdDate}</span>
+      </div>
+    </div>
+
+    <!-- Card Body -->
+    <div class="project-card__body">
+      ${project.description ? `<p class="project-card__description">${escapeHtml(project.description)}</p>` : ''}
+      
+      <div class="project-card__category">
+        <span class="category-badge">${formatCategory(project.category)}</span>
       </div>
 
-      <!-- Card Body -->
-      <div class="project-card__body">
-        ${project.description ? `<p class="project-card__description">${escapeHtml(project.description)}</p>` : ''}
-        
-        <div class="project-card__category">
-          <span class="category-badge">${formatCategory(project.category)}</span>
-        </div>
-
-        <!-- Focus Areas (Subcategories) -->
-        ${project.subcategory_text ? `
-          <div class="project-card__subcategories">
-            <h4 class="project-card__section-title">Focus Areas</h4>
-            <div class="subcategories-list">
-              ${project.subcategory_text.split(',').map(sub => sub.trim()).filter(Boolean).map(name => `<span class="subcategory-badge">${escapeHtml(name)}</span>`).join('')}
-            </div>
+      <!-- Focus Areas (Subcategories) -->
+      ${project.subcategory_text ? `
+        <div class="project-card__subcategories">
+          <h4 class="project-card__section-title">Focus Areas</h4>
+          <div class="subcategories-list">
+            ${project.subcategory_text.split(',').map(sub => sub.trim()).filter(Boolean).map(name => `<span class="subcategory-badge">${escapeHtml(name)}</span>`).join('')}
           </div>
-        ` : ''}
-
-        <!-- Location -->
-        <div class="project-card__location">
-          <span class="location-label">Location:</span>
-          <span class="location-value">${escapeHtml(project.state || 'N/A')}</span>
         </div>
+      ` : ''}
 
-        <!-- Practitioners Section -->
-        <div class="project-card__practitioners">
-          <h4 class="project-card__section-title">Matched Practitioners</h4>
-          ${
-            practitionersList.length > 0
-              ? `
-                <div class="practitioners-list">
-                  ${practitionersList.map(prac => `
-                    <div class="practitioner-badge">
-                      ${prac.avatar_url ? `<img src="${prac.avatar_url}" alt="${prac.first_name}" class="practitioner-badge__avatar">` : '<div class="practitioner-badge__avatar--placeholder"></div>'}
-                      <div class="practitioner-badge__info">
-                        <div class="practitioner-badge__name">${escapeHtml(prac.first_name)} ${escapeHtml(prac.last_name)}</div>
-                        <div class="practitioner-badge__specialty">${escapeHtml(prac.specialty)}</div>
-                      </div>
+      <!-- Location -->
+      <div class="project-card__location">
+        <span class="location-label">Location:</span>
+        <span class="location-value">${escapeHtml(project.state || 'N/A')}</span>
+      </div>
+
+      <!-- Practitioners Section -->
+      <div class="project-card__practitioners">
+        <h4 class="project-card__section-title">Matched Practitioners</h4>
+        ${
+          practitionersList.length > 0
+            ? `
+              <div class="practitioners-list">
+                ${practitionersList.map(prac => `
+                  <div class="practitioner-badge">
+                    ${prac.avatar_url ? `<img src="${prac.avatar_url}" alt="${prac.first_name}" class="practitioner-badge__avatar">` : '<div class="practitioner-badge__avatar--placeholder"></div>'}
+                    <div class="practitioner-badge__info">
+                      <div class="practitioner-badge__name">${escapeHtml(prac.first_name)} ${escapeHtml(prac.last_name)}</div>
+                      <div class="practitioner-badge__specialty">${escapeHtml(prac.specialty)}</div>
                     </div>
-                  `).join('')}
-                </div>
-              `
-              : '<p class="practitioners-empty">No practitioners matched yet. Browse and connect with practitioners.</p>'
-          }
-        </div>
+                  </div>
+                `).join('')}
+              </div>
+            `
+            : '<p class="practitioners-empty">No practitioners matched yet. Browse and connect with practitioners.</p>'
+        }
       </div>
+    </div>
 
-      <!-- Card Footer / Actions -->
-      <div class="project-card__footer">
-        <a href="./project-detail.html?id=${project.id}" class="btn btn-secondary btn-small">View Details</a>
-        <button class="btn btn-primary btn-small" onclick="browseForProject('${project.id}')">Find Practitioners</button>
-      </div>
-    </article>
+    <!-- Card Footer / Actions -->
+    <div class="project-card__footer">
+      <a href="./project-detail.html?id=${project.id}" class="btn btn-secondary btn-small">View Details</a>
+      <button class="btn btn-primary btn-small" onclick="browseForProject('${project.id}')">Find Practitioners</button>
+    </div>
   `;
+
+  return card;
 }
 
 // ======================================================

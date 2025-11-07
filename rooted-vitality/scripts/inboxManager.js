@@ -163,63 +163,87 @@ function setupBackButtonListener() {
  */
 async function loadConversations() {
     try {
-        // TODO: Replace with actual Supabase query when messaging table is ready
-        // For now, using mock data for UI development
-        
-        const clientNames = ['Sarah Johnson', 'Michael Chen', 'Emily Rodriguez'];
-        
-        conversations = [
-            {
-                id: 1,
-                practitionerId: currentUser.id,
-                clientName: 'Sarah Johnson',
-                clientAvatar: generateInitialsAvatar('Sarah Johnson'),
-                lastMessage: 'Thank you for the great session yesterday!',
-                lastMessageTime: new Date(Date.now() - 2 * 60 * 60 * 1000),
-                isUnread: true,
+        // Get practitioner ID
+        const rvUserStr = localStorage.getItem('rvUser');
+        if (!rvUserStr) {
+            console.error('[Inbox] No rvUser in localStorage');
+            return;
+        }
+
+        const rvUser = JSON.parse(rvUserStr);
+        const practitionerId = rvUser.id;
+        console.log('[Inbox] Loading conversations for practitioner:', practitionerId);
+
+        // Get all accepted matches for this practitioner
+        const { data: matches, error: matchError } = await window.supabaseClient
+            .from('project_practitioner_matches')
+            .select(`
+                id,
+                project_id,
+                status,
+                created_at,
+                projects (
+                    id,
+                    description,
+                    category_name,
+                    clients (
+                        id,
+                        first_name,
+                        last_name
+                    )
+                )
+            `)
+            .eq('practitioner_id', practitionerId)
+            .eq('status', 'accepted');
+
+        if (matchError) {
+            console.error('[Inbox] Error loading matches:', matchError);
+            return;
+        }
+
+        conversations = [];
+
+        // Load messages for each match
+        for (const match of matches || []) {
+            if (!match.projects?.clients) continue;
+
+            const project = match.projects;
+            const client = project.clients;
+            const clientName = `${client.first_name || 'Client'} ${client.last_name || ''}`;
+
+            // Get latest messages
+            const { data: messages } = await window.supabaseClient
+                .from('project_messages')
+                .select('id, message, sender_type, created_at')
+                .eq('project_id', match.project_id)
+                .eq('practitioner_id', practitionerId)
+                .order('created_at', { ascending: false })
+                .limit(50);
+
+            const lastMessage = messages?.[0];
+            const unreadCount = messages?.filter(m => !m.is_read && m.sender_type === 'client').length || 0;
+
+            conversations.push({
+                id: match.id,
+                matchId: match.id,
+                projectId: match.project_id,
+                clientId: client.id,
+                practitionerId: practitionerId,
+                clientName: clientName,
+                clientAvatar: generateInitialsAvatar(clientName),
+                lastMessage: lastMessage?.message || 'No messages yet',
+                lastMessageTime: lastMessage?.created_at ? new Date(lastMessage.created_at) : new Date(match.created_at),
+                isUnread: unreadCount > 0,
+                unreadCount: unreadCount,
                 status: 'online',
                 category: 'all',
-                messages: [
-                    { id: 1, sender: 'client', text: 'Hi, I wanted to book a session', timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000) },
-                    { id: 2, sender: 'practitioner', text: 'Hello Sarah! I have availability on Wednesday at 2 PM.', timestamp: new Date(Date.now() - 23 * 60 * 60 * 1000) },
-                    { id: 3, sender: 'client', text: 'That works perfectly for me!', timestamp: new Date(Date.now() - 22 * 60 * 60 * 1000) },
-                    { id: 4, sender: 'client', text: 'Thank you for the great session yesterday!', timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000) }
-                ]
-            },
-            {
-                id: 2,
-                practitionerId: currentUser.id,
-                clientName: 'Michael Chen',
-                clientAvatar: generateInitialsAvatar('Michael Chen'),
-                lastMessage: 'Looking forward to our session next week',
-                lastMessageTime: new Date(Date.now() - 5 * 60 * 60 * 1000),
-                isUnread: false,
-                status: 'away',
-                category: 'all',
-                messages: [
-                    { id: 1, sender: 'client', text: 'Hi, can I reschedule for next week?', timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000) },
-                    { id: 2, sender: 'practitioner', text: 'Of course! Let me check my calendar.', timestamp: new Date(Date.now() - 4.5 * 60 * 60 * 1000) }
-                ]
-            },
-            {
-                id: 3,
-                practitionerId: currentUser.id,
-                clientName: 'Emily Rodriguez',
-                clientAvatar: generateInitialsAvatar('Emily Rodriguez'),
-                lastMessage: 'Session completed',
-                lastMessageTime: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-                isUnread: false,
-                status: 'offline',
-                category: 'hired',
-                messages: [
-                    { id: 1, sender: 'client', text: 'Thank you so much!', timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) }
-                ]
-            }
-        ];
-        
-        console.log(`[Rooted Vitality] Loaded ${conversations.length} conversations with initials avatars`);
+                messages: messages || []
+            });
+        }
+
+        console.log(`[Inbox] Loaded ${conversations.length} conversations`);
     } catch (error) {
-        console.error('[Rooted Vitality] Error loading conversations:', error);
+        console.error('[Inbox] Error loading conversations:', error);
     }
 }
 
@@ -326,6 +350,64 @@ function openThreadView(conversation) {
     
     // Render messages
     renderMessages(conversation.messages);
+    
+    // Enable message input and set up send handler
+    const messageInput = document.getElementById('message-input');
+    const sendBtn = document.getElementById('send-message-btn');
+    
+    if (messageInput) {
+        messageInput.disabled = false;
+        messageInput.placeholder = `Message ${conversation.clientName}...`;
+    }
+    
+    if (sendBtn) {
+        sendBtn.disabled = false;
+        
+        // Remove old listeners by cloning
+        const newSendBtn = sendBtn.cloneNode(true);
+        sendBtn.parentNode.replaceChild(newSendBtn, sendBtn);
+        
+        // Add new listener
+        newSendBtn.addEventListener('click', async () => {
+            const message = messageInput.value.trim();
+            if (!message) return;
+            
+            try {
+                const { error } = await window.supabaseClient
+                    .from('project_messages')
+                    .insert({
+                        project_id: conversation.projectId,
+                        practitioner_id: conversation.practitionerId,
+                        client_id: conversation.clientId,
+                        sender_id: currentUser.id,
+                        sender_type: 'practitioner',
+                        message: message,
+                        is_read: false
+                    });
+                
+                if (!error) {
+                    messageInput.value = '';
+                    messageInput.focus();
+                    // Reload conversation
+                    await loadConversations();
+                    renderThreadsList();
+                } else {
+                    alert('Error sending message');
+                }
+            } catch (error) {
+                console.error('[Inbox] Error sending message:', error);
+                alert('Error sending message');
+            }
+        });
+        
+        // Also send on Enter key
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                newSendBtn.click();
+            }
+        });
+    }
     
     // Show thread view
     threadView.style.display = 'flex';

@@ -888,6 +888,24 @@ label {
     outline-offset: 4px;
 }
 
+.rv-header-client .rv-practitioner-btn {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    color: #2d2d2d;
+    transition: color 0.3s ease;
+}
+
+.rv-header-client .rv-practitioner-btn:hover {
+    color: #5c9a72;
+}
+
+.rv-header-client .rv-practitioner-btn:focus {
+    outline: 2px solid #5c9a72;
+    outline-offset: 4px;
+}
+
 /* Sign Out Button - Remove default button border */
 .rv-header-client .rv-sign-out-btn {
     background: none;
@@ -1133,11 +1151,14 @@ label {
 }
 
 .rv-notifications-item {
+    display: block;
     padding: 0.7rem 1rem;
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     border-left: 3px solid transparent;
     transition: all 0.2s ease;
     cursor: pointer;
+    text-decoration: none;
+    color: inherit;
 }
 
 .rv-notifications-item:hover {

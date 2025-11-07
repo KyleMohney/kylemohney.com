@@ -1022,20 +1022,27 @@ body { font-family: var(--font-sans); color: var(--color-text); background: #faf
 .reviews-compact {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-md);
+    gap: 1rem;
 }
 
 .review-item {
-    padding: var(--spacing-md);
-    background: #fafaf8;
-    border-radius: 6px;
+    padding: 1.25rem;
+    background: linear-gradient(135deg, rgba(235, 246, 232, 0.4) 0%, rgba(250, 226, 202, 0.15) 100%);
+    border: 1px solid rgba(92, 154, 114, 0.1);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.review-item:hover {
+    border-color: rgba(92, 154, 114, 0.25);
+    box-shadow: 0 2px 8px rgba(92, 154, 114, 0.08);
 }
 
 .review-stars {
     display: flex;
-    gap: 0.2rem;
+    gap: 0.3rem;
     margin-bottom: 0.75rem;
-    font-size: 1rem;
+    font-size: 1.1rem;
 }
 
 .star {
@@ -1043,20 +1050,21 @@ body { font-family: var(--font-sans); color: var(--color-text); background: #faf
 }
 
 .review-text {
-    margin: 0 0 0.75rem 0;
+    margin: 0 0 1rem 0;
     font-size: 0.95rem;
-    font-style: italic;
-    color: var(--color-text);
     line-height: 1.6;
+    color: var(--color-text);
+    font-style: italic;
 }
 
 .review-author {
-    font-size: 0.9rem;
-    color: var(--color-muted);
+    font-size: 0.85rem;
+    color: #999;
+    font-weight: 500;
 }
 
 .no-reviews-state {
-    padding: var(--spacing-lg);
+    padding: 2rem;
     text-align: center;
     color: var(--color-muted);
 }

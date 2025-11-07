@@ -660,7 +660,9 @@ function createProjectCard(project) {
     .join(', ') || 'N/A';
 
   const card = document.createElement('div');
-  card.className = 'project-card';
+  const TERMINAL_STATUSES = ['hired', 'not-hired', 'declined'];
+  const closedClass = TERMINAL_STATUSES.includes(project.project_status) ? ' project-card--closed' : '';
+  card.className = `project-card${closedClass}`;
   card.innerHTML = `
     <div class="project-card__header" data-project-id="${project.id}">
       <div class="project-card__title-row">

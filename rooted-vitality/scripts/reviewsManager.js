@@ -89,12 +89,16 @@ let reviewsManager = {
   // MODAL MANAGEMENT
   // ======================================================
 
-  openReviewModal(matchId, practitionerId, practitionerName) {
+  openReviewModal(matchId, practitionerId, practitionerName, projectId, clientFirstName, clientLastName, clientId) {
     console.log('[Reviews] Opening modal for:', practitionerName, 'UUID:', practitionerId);
 
     this.currentReview = {
       matchId,
       practitionerId,
+      projectId: projectId || null,
+      clientId: clientId || null,
+      clientFirstName: clientFirstName || '',
+      clientLastName: clientLastName || '',
       practitionerName: practitionerName || 'Practitioner',
       rating: 0,
       photos: []
@@ -218,7 +222,8 @@ let reviewsManager = {
       reader.onload = (e) => {
         this.currentReview.photos.push({
           file: file,
-          preview: e.target.result
+          preview: e.target.result,
+          name: file.name
         });
         this.updatePhotoPreview();
       };
@@ -284,13 +289,87 @@ let reviewsManager = {
       const practitionerUserId = practitionerData.user_id;
       console.log('[Reviews] Practitioner user_id found:', practitionerUserId);
 
+      // Get client name from current user
+      const { data: { user } } = await this.supabaseClient.auth.getUser();
+      let clientName = 'Client';
+      let clientFirstName = this.currentReview.clientFirstName || '';
+      let clientLastName = this.currentReview.clientLastName || '';
+      
+      // Format client name intelligently
+      if (clientFirstName && clientLastName) {
+        clientName = `${clientFirstName[0]}. ${clientLastName}`;
+      } else if (clientLastName) {
+        clientName = clientLastName;
+      } else if (clientFirstName) {
+        clientName = clientFirstName;
+      } else if (user?.email) {
+        clientName = user.email.split('@')[0];
+      }
+
+      // Step 2: Upload photos to Supabase Storage if any
+      let photoUrls = [];
+      if (this.currentReview.photos && this.currentReview.photos.length > 0) {
+        console.log('[Reviews] Uploading photos...');
+        for (const photo of this.currentReview.photos) {
+          try {
+            // Convert data URL to blob if needed
+            let fileToUpload = photo.file;
+            if (!fileToUpload && photo.preview) {
+              // If we only have preview (data URL), convert it to blob
+              const response = await fetch(photo.preview);
+              fileToUpload = await response.blob();
+            }
+            
+            if (!fileToUpload) {
+              console.warn('[Reviews] Could not upload photo - no file data');
+              continue;
+            }
+
+            // Generate unique filename
+            const timestamp = Date.now();
+            const random = Math.random().toString(36).substring(7);
+            const fileName = `review-photos/${practitionerUserId}/${timestamp}-${random}-${fileToUpload.name || 'photo.jpg'}`;
+
+            console.log('[Reviews] Uploading photo to:', fileName);
+
+            // Upload to Supabase Storage
+            const { data: uploadData, error: uploadError } = await this.supabaseClient.storage
+              .from('review-files')
+              .upload(fileName, fileToUpload, { upsert: false });
+
+            if (uploadError) {
+              console.error('[Reviews] Photo upload failed:', uploadError);
+              continue;
+            }
+
+            // Get public URL
+            const { data: publicUrlData } = this.supabaseClient.storage
+              .from('review-files')
+              .getPublicUrl(fileName);
+
+            if (publicUrlData && publicUrlData.publicUrl) {
+              photoUrls.push(publicUrlData.publicUrl);
+              console.log('[Reviews] Photo uploaded successfully:', publicUrlData.publicUrl);
+            }
+          } catch (photoError) {
+            console.error('[Reviews] Error processing photo:', photoError);
+          }
+        }
+        console.log('[Reviews] Photos uploaded:', photoUrls.length);
+      }
+
       // Build review record - practitioner_id FK points to practitioners.user_id
       const reviewData = {
         practitioner_id: practitionerUserId,
+        project_id: this.currentReview.projectId || null,
+        client_id: this.currentReview.clientId || null,
         rating: this.currentReview.rating,
         review_text: reviewText,
-        client_name: 'Client',  // Placeholder - can be populated from context if available
+        client_name: clientName,
+        client_first_name: clientFirstName,
+        client_last_name: clientLastName,
         practitioner_name: this.currentReview.practitionerName,
+        photos: photoUrls && photoUrls.length > 0 ? photoUrls : [],
         is_visible: true,
         is_approved: false
       };
@@ -316,8 +395,8 @@ let reviewsManager = {
           practitioner_id: practitionerUserId,
           type: 'review_posted',
           title: 'New Review',
-          message: `You received a new 5-star review: "${reviewText.substring(0, 50)}${reviewText.length > 50 ? '...' : ''}"`,
-          link: '/rooted-vitality/dashboard/pro/pages/reviews.html',
+          message: `You received a new ${this.currentReview.rating}-star review: "${reviewText.substring(0, 50)}${reviewText.length > 50 ? '...' : ''}"`,
+          link: '/rooted-vitality/dashboard/pro/pages/practitioner-profile.html?section=reviews',
           is_read: false
         };
 
