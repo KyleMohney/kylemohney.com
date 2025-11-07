@@ -326,9 +326,14 @@ function displayPractitioners() {
   document.querySelectorAll('.card-btn--view').forEach(btn => {
     btn.addEventListener('click', function(e) {
       e.preventDefault();
+      console.log('[displayPractitioners] View Profile button clicked');
+      console.log('[displayPractitioners] Button dataset:', this.dataset);
       const practitionerId = this.dataset.practitionerId;
+      console.log('[displayPractitioners] Practitioner ID from data attribute:', practitionerId);
       if (practitionerId) {
         navigateToPractitionerProfile(practitionerId);
+      } else {
+        console.error('[displayPractitioners] No practitioner ID found in button data');
       }
     });
   });
