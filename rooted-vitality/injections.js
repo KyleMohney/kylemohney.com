@@ -970,40 +970,46 @@ const RootedVitality = {
      */
     loadNotifications: async function() {
         if (!window.supabaseClient) {
-            console.log('[Rooted Vitality] Supabase not available');
             return;
         }
 
         try {
             const { data: { user } } = await window.supabaseClient.auth.getUser();
-            console.log('[Rooted Vitality] Current user:', user?.id);
-
             if (!user) {
-                console.log('[Rooted Vitality] No user logged in');
                 return;
             }
 
-            // Test query - get all notifications without RLS
-            const { data: testData, error: testError } = await window.supabaseClient
-                .from('notifications')
-                .select('*');
-            
-            console.log('[Rooted Vitality] Test query (all notifications):', testData?.length || 0, 'error:', testError);
-
-            // Real query with filter
             const { data, error } = await window.supabaseClient
                 .from('notifications')
                 .select('*')
-                .eq('practitioner_id', user.id)
                 .order('created_at', { ascending: false });
 
-            console.log('[Rooted Vitality] Filtered notifications for', user.id, ':', data?.length || 0, 'error:', error);
-
             if (error) {
-                console.warn('[Rooted Vitality] Query error:', error);
+                console.warn('[Rooted Vitality] Notification query error:', error);
                 return;
             }
 
+            // Update bell color based on unread count
+            const unreadCount = data?.filter(n => !n.is_read).length || 0;
+            const bellIcon = document.querySelector('.rv-bell-icon');
+            const badge = document.querySelector('.rv-notification-badge');
+            
+            if (bellIcon) {
+                if (unreadCount > 0) {
+                    bellIcon.style.color = '#d4c47c'; // Gold for unread
+                    if (badge) {
+                        badge.textContent = unreadCount;
+                        badge.style.display = 'block';
+                    }
+                } else {
+                    bellIcon.style.color = 'currentColor'; // White/normal
+                    if (badge) {
+                        badge.style.display = 'none';
+                    }
+                }
+            }
+
+            // Render notifications list
             const notificationsList = document.querySelector('.rv-notifications-list');
             if (!notificationsList) return;
 
@@ -1013,17 +1019,15 @@ const RootedVitality = {
             }
 
             notificationsList.innerHTML = data.map(notif => `
-                <a href="${notif.link || '#'}" class="rv-notification-item ${notif.is_read ? 'read' : 'unread'}">
-                    <div class="rv-notification-content">
-                        <p class="rv-notification-title">${notif.title}</p>
-                        <p class="rv-notification-message">${notif.message}</p>
-                        <span class="rv-notification-time">${new Date(notif.created_at).toLocaleDateString()}</span>
-                    </div>
+                <a href="${notif.link || '#'}" class="rv-notifications-item ${notif.is_read ? 'read' : 'unread'}">
+                    <p class="rv-notifications-title">${notif.title}</p>
+                    <p class="rv-notifications-message">${notif.message}</p>
+                    <span class="rv-notifications-time">${new Date(notif.created_at).toLocaleDateString()}</span>
                 </a>
             `).join('');
 
         } catch (error) {
-            console.error('[Rooted Vitality] Error:', error);
+            console.error('[Rooted Vitality] Error loading notifications:', error);
         }
     },
 
