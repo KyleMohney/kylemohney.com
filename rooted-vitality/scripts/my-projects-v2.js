@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     currentUser = authManager.getCurrentUser();
 
     if (!currentUser) {
-      window.location.href = '/rooted-vitality/signup.html';
+      window.location.href = '/rooted-vitality/dashboard/signup.html';
       return;
     }
 
@@ -309,6 +309,7 @@ function validatePage(page) {
     case 2:
       const zipcode = document.getElementById('project-zipcode').value.trim();
       const state = document.getElementById('project-state').value.trim();
+      const city = document.getElementById('project-city').value.trim();
       const street = document.getElementById('project-street').value.trim();
       const startDate = document.getElementById('project-start-date').value;
       const urgency = document.querySelector('input[name="urgency"]:checked');
@@ -316,6 +317,11 @@ function validatePage(page) {
       
       if (!street) {
         alert('Please enter your street address');
+        return false;
+      }
+      
+      if (!city) {
+        alert('Please enter your city');
         return false;
       }
       if (!zipcode || !state || !startDate) {
@@ -393,10 +399,22 @@ async function createProject(matchNow = false) {
     console.log('[createProject] Using client serial:', clientProfile.serial_number);
     console.log('[createProject] Client open_to_contact:', clientProfile.open_to_contact);
     
+    // Get category name from taxonomyData based on category_id
+    const selectedCategoryId = document.getElementById('project-category').value;
+    const categoryName = taxonomyData[selectedCategoryId]?.name || selectedCategoryId;
+    console.log('[createProject] Category:', selectedCategoryId, '→', categoryName);
+    
+    // Build subcategory names from selected concerns
+    const subcategoryNames = selectedConcerns.length > 0 
+      ? selectedConcerns.map(c => c.name).join(', ') 
+      : null;
+    
     const formData = {
       client_serial: clientProfile.serial_number,  // Use serial number, not UUID
-      category_id: document.getElementById('project-category').value,
+      category_id: selectedCategoryId,
+      category_name: categoryName,  // Store human-readable category name from taxonomy
       street: document.getElementById('project-street').value || null,
+      city: document.getElementById('project-city').value || null,
       zipcode: document.getElementById('project-zipcode').value,
       state: document.getElementById('project-state').value,
       start_date: document.getElementById('project-start-date').value,
@@ -406,7 +424,7 @@ async function createProject(matchNow = false) {
       project_status: 'pending',  // New projects start as 'pending'
       review_left: false,  // No review yet
       client_open_to_contact: clientProfile.open_to_contact !== false,  // Sync from client settings
-      subcategory_text: selectedConcerns.length > 0 ? selectedConcerns.map(c => c.name).join(', ') : null  // Store selected subcategories as comma-separated text
+      subcategory_name: subcategoryNames  // Store selected subcategories with their taxonomy names
     };
 
     console.log('[createProject] Form data:', formData);
@@ -457,7 +475,7 @@ async function createProject(matchNow = false) {
 
     if (matchNow) {
       console.log('[createProject] Redirecting to Find Practitioners page...');
-      window.location.href = `client-find-practitioners.html?project_id=${projectId}`;
+      window.location.href = `find-practitioners.html?project_id=${projectId}`;
     } else {
       console.log('[createProject] Showing success notification');
       showNotification(`Project created successfully!`, 'success');
@@ -493,8 +511,10 @@ async function loadProjects() {
         id,
         project_id,
         category_id,
+        custom_name,
         description,
         street,
+        city,
         zipcode,
         state,
         start_date,
@@ -503,14 +523,17 @@ async function loadProjects() {
         review_left,
         client_open_to_contact,
         created_at,
+        subcategory_name,
         project_client_concerns(
           id,
-          taxonomy_subcategories(name)
+          subcategory_id,
+          taxonomy_subcategories(id, name)
         ),
         project_practitioner_matches(
           practitioner_serial,
           status
-        )
+        ),
+        holistic_health_taxonomy!inner(name)
       `)
       .eq('client_serial', clientProfile.serial_number)  // Use serial number
       .order('created_at', { ascending: false });
@@ -553,6 +576,32 @@ async function loadProjects() {
           card.classList.toggle('project-card--collapsed');
         });
       }
+
+      // Add title editor handler for custom_name
+      const titleEditor = card.querySelector('[data-project-title-editor]');
+      if (titleEditor) {
+        titleEditor.addEventListener('blur', async (e) => {
+          const newTitle = e.target.textContent.trim();
+          const projectId = e.target.dataset.projectId;
+          const currentDisplayName = project.custom_name || project.holistic_health_taxonomy?.name;
+          
+          if (newTitle && newTitle !== currentDisplayName) {
+            try {
+              const { error } = await supabaseClient
+                .from('projects')
+                .update({ custom_name: newTitle })
+                .eq('id', projectId);
+              
+              if (error) throw error;
+              console.log('[Project Title] Updated project', projectId, 'to:', newTitle);
+            } catch (error) {
+              console.error('[Project Title] Error updating project:', error);
+              // Revert the title on error
+              e.target.textContent = currentDisplayName;
+            }
+          }
+        });
+      }
     });
 
     // Update stats
@@ -564,12 +613,15 @@ async function loadProjects() {
 }
 
 function createProjectCard(project) {
-  const categoryName = taxonomyData[project.category_id]?.name || project.category_id;
+  // Determine display title: use custom_name if set, otherwise use category name from taxonomy join
+  let displayTitle = project.custom_name && project.custom_name.trim() 
+    ? project.custom_name 
+    : (project.holistic_health_taxonomy?.name || project.category_id);
   
-  const concerns = project.project_client_concerns
-    ?.map(c => c.taxonomy_subcategories?.name)
-    .filter(Boolean)
-    .join(', ') || 'No concerns selected';
+  // Build focus areas from subcategory_name field (directly from projects table)
+  const concerns = project.subcategory_name && project.subcategory_name.trim()
+    ? project.subcategory_name
+    : 'No focus areas selected';
 
   const urgencyColor = {
     browsing: '#999',
@@ -592,11 +644,10 @@ function createProjectCard(project) {
     canceled: '#999'     // Gray
   }[project.project_status] || '#999';
 
-  const fullAddress = [
-    project.street,
-    project.zipcode,
-    project.state
-  ].filter(Boolean).join(', ');
+  // Format location as "City, State"
+  const location = [project.city, project.state]
+    .filter(Boolean)
+    .join(', ') || 'N/A';
 
   const card = document.createElement('div');
   card.className = 'project-card';
@@ -606,7 +657,7 @@ function createProjectCard(project) {
         <button class="project-card__toggle" aria-label="Toggle project details">
           <span class="toggle-icon">▼</span>
         </button>
-        <h3 class="project-card__title">${categoryName}</h3>
+        <h3 class="project-card__title" contenteditable="true" spellcheck="false" data-project-id="${project.id}" data-project-title-editor>${escapeHtml(displayTitle)}</h3>
         <span class="project-card__status" style="background-color: ${statusColor}20; color: ${statusColor}; border: 1px solid ${statusColor}">
           ${statusLabel}
         </span>
@@ -624,7 +675,7 @@ function createProjectCard(project) {
         
         <div class="detail-row">
           <span class="detail-label">Location</span>
-          <span class="detail-value">${escapeHtml(fullAddress)}</span>
+          <span class="detail-value">${escapeHtml(location)}</span>
         </div>
         
         <div class="detail-grid">
@@ -675,12 +726,12 @@ function updateStats(projects) {
 }
 
 function browseMatches(projectId) {
-  window.location.href = `client-find-practitioners.html?project_id=${projectId}`;
+  window.location.href = `find-practitioners.html?project_id=${projectId}`;
 }
 
 function viewMatches(projectId) {
   // View matches takes to My Matches page showing all connections for this client
-  window.location.href = `/rooted-vitality/dashboard/client-my-matches.html`;
+  window.location.href = `/rooted-vitality/dashboard/client/pages/my-matches.html`;
 }
 
 function escapeHtml(text) {
