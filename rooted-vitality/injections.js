@@ -1335,7 +1335,10 @@ const RootedVitality = {
             return;
         }
         
-        // Detect if we're in a subdirectory and adjust paths accordingly
+        // Use absolute path from root for maximum compatibility
+        const logoPath = '/rooted-vitality/assets/logo_trimmed.png';
+        
+        // Detect if we're in a subdirectory and adjust paths for links
         const currentPath = window.location.pathname;
         let pathPrefix = './';
         
@@ -1357,7 +1360,7 @@ const RootedVitality = {
                 <!-- Left Section: Branding & Contact -->
                 <div class="rv-footer-section rv-footer-brand">
                     <div class="rv-footer-logo">
-                        <img src="${pathPrefix}assets/logo_trimmed.png" alt="Rooted Vitality logo" class="rv-footer-logo-img">
+                        <img src="${logoPath}" alt="Rooted Vitality logo" class="rv-footer-logo-img">
                     </div>
                     <div class="rv-footer-branding">
                         <h3 class="rv-footer-title">Rooted<br>Vitality</h3>
