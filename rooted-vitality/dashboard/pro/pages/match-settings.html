@@ -4007,26 +4007,33 @@
         console.log('[Rooted Vitality] Loading services from DB:', services.length, 'services');
         console.log('[Rooted Vitality] Available categories:', allCategories.length);
         
+        if (!services || services.length === 0) {
+          console.log('[Rooted Vitality] No services selected yet');
+          return;
+        }
+        
         services.forEach(s => {
-          const subcategoryName = s.taxonomy_subcategories?.name || 'Unknown';
+          // Use the flattened category and subcategory names
+          const subcategoryName = s.subcategory_name || 'Unknown';
+          const categoryName = s.category_name || 'Unknown';
           
-          // Find which category contains this subcategory
+          // Find which category in allCategories matches
           const categoryWithService = allCategories.find(cat => 
-            cat.subcategories && cat.subcategories.includes(subcategoryName)
+            cat.name === categoryName || 
+            (cat.subcategories && cat.subcategories.includes(subcategoryName))
           );
           
           if (!categoryWithService) {
-            console.warn('[Rooted Vitality] Could not find category for subcategory:', subcategoryName);
+            console.warn('[Rooted Vitality] Could not find category for:', {subcategoryName, categoryName});
             return;
           }
           
           const categoryId = categoryWithService.id;
-          const categoryName = categoryWithService.name;
           
           if (!categoryMap.has(categoryId)) {
             categoryMap.set(categoryId, {
               id: categoryId,
-              name: categoryName,
+              name: categoryWithService.name,
               subcategories: [],
               active: false,  // Will be true if any subcategory is active
               price_per_service: null,

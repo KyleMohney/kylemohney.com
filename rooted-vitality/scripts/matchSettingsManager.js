@@ -224,6 +224,7 @@ class MatchSettingsManager {
    */
   async loadSelectedServices() {
     try {
+      // Query with explicit category and subcategory joins
       const { data, error } = await this.supabase
         .from('practitioner_selected_services')
         .select(`
@@ -234,19 +235,36 @@ class MatchSettingsManager {
           price_per_service,
           created_at,
           updated_at,
-          taxonomy_subcategories (
+          taxonomy!inner(
             id,
-            name
+            name as category_name
+          ),
+          taxonomy_subcategories(
+            id,
+            name as subcategory_name
           )
         `)
         .eq('practitioner_id', this.practitionerId);
 
-      if (error) throw error;
-      this.selectedServices = data || [];
-      console.log('[MatchSettingsManager] Selected services loaded:', data?.length || 0);
-      return data;
+      if (error) {
+        console.error('[MatchSettingsManager] Query error details:', error);
+        throw error;
+      }
+
+      // Transform data to flatten the relationships
+      this.selectedServices = (data || []).map(service => ({
+        ...service,
+        category_name: service.taxonomy?.name || 'Unknown',
+        category_id: service.taxonomy?.id || service.taxonomy_id,
+        subcategory_name: service.taxonomy_subcategories?.name || 'Unknown',
+        subcategory_id: service.subcategory_id
+      }));
+
+      console.log('[MatchSettingsManager] Selected services loaded:', this.selectedServices.length);
+      return this.selectedServices;
     } catch (error) {
       console.error('[MatchSettingsManager] Error loading selected services:', error);
+      this.selectedServices = [];
       return [];
     }
   }
