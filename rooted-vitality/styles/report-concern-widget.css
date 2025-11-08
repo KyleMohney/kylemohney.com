@@ -16,34 +16,37 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 30px 20px;
-    background: linear-gradient(135deg, rgba(92, 154, 114, 0.05) 0%, rgba(74, 139, 98, 0.05) 100%);
-    border-top: 1px solid rgba(92, 154, 114, 0.2);
+    padding: 40px 20px;
+    background: transparent;
+    border-top: none;
     margin-top: 60px;
 }
 
 .report-concern-link {
     background: none;
-    border: 1px solid #5c9a72;
+    border: none;
     color: #5c9a72;
-    padding: 10px 20px;
-    border-radius: 6px;
+    padding: 0;
+    border-radius: 0;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 400;
     cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    transition: all 0.2s ease;
+    text-transform: none;
+    letter-spacing: normal;
+    text-decoration: underline;
 }
 
 .report-concern-link:hover {
-    background: #5c9a72;
-    color: white;
-    box-shadow: 0 4px 12px rgba(92, 154, 114, 0.25);
+    background: none;
+    color: #4a8b62;
+    box-shadow: none;
+    text-decoration: underline;
 }
 
 .report-concern-link:active {
-    transform: scale(0.98);
+    transform: none;
+    opacity: 0.7;
 }
 
 /* ============================================================
