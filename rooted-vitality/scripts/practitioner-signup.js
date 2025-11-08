@@ -403,12 +403,15 @@ async function registerPractitioner(event) {
             created_at: new Date().toISOString()
         };
 
-        await window.supabaseClient
+        const { error: notifError } = await window.supabaseClient
             .from('practitioner_notifications')
-            .insert([welcomeNotification])
-            .catch(err => console.warn('[Signup] Welcome notification insertion note:', err));
-
-        console.log('[Signup] Welcome notification created');
+            .insert([welcomeNotification]);
+        
+        if (notifError) {
+            console.warn('[Signup] Welcome notification insertion warning:', notifError);
+        } else {
+            console.log('[Signup] Welcome notification created');
+        }
         
         // Hide form and show success modal
         document.getElementById('practitionerForm').style.display = 'none';

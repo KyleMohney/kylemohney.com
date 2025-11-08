@@ -54,10 +54,15 @@ ALTER TABLE practitioners ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Practitioners see own profile" ON practitioners;
 DROP POLICY IF EXISTS "Public can view approved practitioners" ON practitioners;
 
--- SELECT: Practitioners see their own profile
+-- SELECT: Practitioners see their own profile (or public sees non-deleted profiles)
 CREATE POLICY "Practitioners see own profile" ON practitioners
 FOR SELECT
-USING (id = auth.uid() OR deleted_at IS NULL);
+USING (id = auth.uid());
+
+-- SELECT: Public can see non-deleted approved profiles
+CREATE POLICY "Public view practitioners" ON practitioners
+FOR SELECT
+USING (deleted_at IS NULL AND status = 'registered');
 
 -- UPDATE: Practitioners can update their own profile
 CREATE POLICY "Practitioners update own profile" ON practitioners
