@@ -4363,11 +4363,11 @@
           return;
         }
 
-        // Find the category in activeCategories to get the databaseId
+        // Find the category in activeCategories
         const category = activeCategories.find(ac => ac.id === categoryId);
-        if (!category || !category.databaseId) {
-          console.error('[Rooted Vitality] Service not found for category:', categoryId);
-          showToast('Service not found', 'error');
+        if (!category) {
+          console.error('[Rooted Vitality] Category not found:', categoryId);
+          showToast('Category not found', 'error');
           return;
         }
 
@@ -4379,15 +4379,26 @@
           return;
         }
 
-        // Save to database (updates practitioner_selected_services)
-        await matchSettingsManager.updateServicePrice(category.databaseId, price);
+        // Update price for ALL services in this category
+        if (category.serviceIds && category.serviceIds.length > 0) {
+          console.log('[Rooted Vitality] Updating price for', category.serviceIds.length, 'service(s) in category:', categoryId);
+          for (const serviceId of category.serviceIds) {
+            await matchSettingsManager.updateServicePrice(serviceId, price);
+          }
+        } else {
+          console.warn('[Rooted Vitality] Category', categoryId, 'has no services to update');
+          showToast('No services selected for this category', 'info');
+          return;
+        }
 
         // Get current user for sync
         const { data: { user } } = await window.supabaseClient.auth.getUser();
 
-        // Sync all pricing to practitioners table as JSON array
+        // Sync ALL pricing to practitioners table as JSON array
+        // This ensures the practitioners.pricing column has complete pricing data for all categories
         if (user) {
           await matchSettingsManager.syncServicePricingToPractitioner(user.id);
+          console.log('[Rooted Vitality] ✓ All service pricing synced to practitioners table');
         }
 
         // Update local state
@@ -4396,8 +4407,8 @@
         }
 
         const priceDisplay = price ? `$${price.toFixed(2)}` : 'default pricing';
-        showToast(`Price updated to ${priceDisplay}`, 'success');
-        console.log('[Rooted Vitality] Category', categoryId, 'price updated to:', price);
+        showToast(`Price updated to ${priceDisplay} for all services in ${category.name}`, 'success');
+        console.log('[Rooted Vitality] Category', categoryId, 'price updated to:', price, 'for', category.serviceIds.length, 'service(s)');
       } catch (error) {
         console.error('[Rooted Vitality] Error saving category price:', error);
         showToast('Failed to save pricing', 'error');
