@@ -308,6 +308,64 @@ async function registerPractitioner(event) {
             zipcode: state.formData.zipcode,
             status: 'registered',
             submitted_at: new Date().toISOString(),
+            // Capture all practitioner table fields with proper types
+            bio: null,
+            tagline: null,
+            ethos_statement: null,
+            modalities: [], // TEXT[] array
+            conditions_treated: [], // TEXT[] array
+            languages: ['English'], // TEXT[] array
+            credentials: JSON.stringify([]), // JSONB
+            credentials_verified: false,
+            badge_verified: false,
+            badge_certified: false,
+            badge_licensed: false,
+            badge_background_check: false,
+            accepts_insurance: false,
+            insurance_accepted: [], // TEXT[] array
+            insurance_providers: [], // TEXT[] array
+            custom_insurance_providers: [], // TEXT[] array
+            payment_methods: [], // TEXT[] array
+            custom_payment_methods: [], // TEXT[] array
+            pricing: null,
+            practice_type: null,
+            practice_logo_url: null,
+            intro_video_url: null,
+            gallery_photos: JSON.stringify([]), // JSONB
+            service_category_ids: [], // TEXT[] array
+            service_category_names: [], // TEXT[] array
+            service_subcategory_ids: [], // TEXT[] array
+            service_subcategory_names: [], // TEXT[] array
+            social_media: JSON.stringify({}), // JSONB
+            notification_preferences: JSON.stringify({
+                email_matches: true,
+                email_messages: true,
+                email_reviews: true
+            }), // JSONB
+            // Availability defaults
+            in_person_enabled: false,
+            in_person_option: null,
+            in_person_base_zipcode: null,
+            in_person_radius_miles: null,
+            in_person_zipcodes: [], // TEXT[] array
+            housecalls_enabled: false,
+            housecalls_option: null,
+            housecalls_base_zipcode: null,
+            housecalls_radius_miles: null,
+            housecalls_zipcodes: [], // TEXT[] array
+            virtual_enabled: false,
+            virtual_option: null,
+            virtual_states: [], // TEXT[] array
+            timezone: 'America/Denver',
+            availability_schedule: JSON.stringify({}), // JSONB
+            availability_last_updated: null,
+            // Matching settings
+            matching_enabled: true,
+            matching_paused: false,
+            profile_completion_percent: 10,
+            faq: null,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
         };
         
         const { error } = await window.supabaseClient

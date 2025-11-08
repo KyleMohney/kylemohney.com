@@ -399,8 +399,8 @@
 /* Locked/Greyed Out Badge (Default State - Waiting to be Earned) */
 .credentials-badge.badge-locked {
     background: transparent !important;
-    border-color: rgba(200, 200, 200, 0.3) !important;
-    color: rgba(180, 180, 180, 0.6) !important;
+    border-color: white !important;
+    color: white !important;
     cursor: default !important;
     box-shadow: none !important;
     opacity: 0.65;
@@ -408,98 +408,118 @@
 
 .credentials-badge.badge-locked:hover {
     background: transparent !important;
-    border-color: rgba(200, 200, 200, 0.4) !important;
-    color: rgba(180, 180, 180, 0.65) !important;
+    border-color: white !important;
+    color: white !important;
 }
 
 .credentials-badge.badge-locked .badge-icon {
-    opacity: 0.6 !important;
-    color: rgba(180, 180, 180, 0.6) !important;
+    opacity: 0.65 !important;
+    color: white !important;
 }
 
 .credentials-badge.badge-locked .badge-text {
-    color: rgba(180, 180, 180, 0.6) !important;
-    opacity: 1 !important;
+    color: white !important;
+    opacity: 0.65 !important;
 }
 
 /* Background Check Badge (Blue) - Active State */
 .credentials-badge.background-check {
-    background: rgba(74, 144, 226, 0.15) !important;
-    border-color: rgba(74, 144, 226, 0.85) !important;
-    color: var(--white) !important;
+    background: transparent !important;
+    border-color: white !important;
+    color: white !important;
     opacity: 1 !important;
-    box-shadow: 0 0 18px rgba(74, 144, 226, 0.35) !important;
+    box-shadow: none !important;
 }
 
 .credentials-badge.background-check:hover {
-    background: rgba(74, 144, 226, 0.25) !important;
-    border-color: rgba(74, 144, 226, 0.95) !important;
-    box-shadow: 0 0 22px rgba(74, 144, 226, 0.5) !important;
+    background: transparent !important;
+    border-color: white !important;
+    color: white !important;
+    box-shadow: none !important;
 }
 
 .credentials-badge.background-check .badge-icon {
-    color: rgba(74, 144, 226, 1) !important;
+    color: white !important;
     opacity: 1 !important;
+}
+
+.credentials-badge.background-check .badge-text {
+    color: white !important;
 }
 
 /* License Badge (Gold) - Active State */
 .credentials-badge.license {
-    background: rgba(212, 165, 116, 0.15) !important;
-    border-color: rgba(212, 165, 116, 0.85) !important;
-    color: var(--white) !important;
+    background: transparent !important;
+    border-color: white !important;
+    color: white !important;
     opacity: 1 !important;
-    box-shadow: 0 0 18px rgba(212, 165, 116, 0.35) !important;
+    box-shadow: none !important;
 }
 
 .credentials-badge.license:hover {
-    background: rgba(212, 165, 116, 0.25) !important;
-    border-color: rgba(212, 165, 116, 0.95) !important;
-    box-shadow: 0 0 22px rgba(212, 165, 116, 0.5) !important;
+    background: transparent !important;
+    border-color: white !important;
+    color: white !important;
+    box-shadow: none !important;
 }
 
 .credentials-badge.license .badge-icon {
-    color: rgba(212, 165, 116, 1) !important;
+    color: white !important;
     opacity: 1 !important;
+}
+
+.credentials-badge.license .badge-text {
+    color: white !important;
 }
 
 /* Certified Badge (Teal) - Active State */
 .credentials-badge.certified {
-    background: rgba(76, 175, 175, 0.15) !important;
-    border-color: rgba(76, 175, 175, 0.85) !important;
-    color: var(--white) !important;
+    background: transparent !important;
+    border-color: white !important;
+    color: white !important;
     opacity: 1 !important;
-    box-shadow: 0 0 18px rgba(76, 175, 175, 0.35) !important;
+    box-shadow: none !important;
 }
 
 .credentials-badge.certified:hover {
-    background: rgba(76, 175, 175, 0.25) !important;
-    border-color: rgba(76, 175, 175, 0.95) !important;
-    box-shadow: 0 0 22px rgba(76, 175, 175, 0.5) !important;
+    background: transparent !important;
+    border-color: white !important;
+    color: white !important;
+    box-shadow: none !important;
 }
 
 .credentials-badge.certified .badge-icon {
-    color: rgba(76, 175, 175, 1) !important;
+    color: white !important;
     opacity: 1 !important;
+}
+
+.credentials-badge.certified .badge-text {
+    color: white !important;
 }
 
 /* Verified Badge (Purple) - Active State */
 .credentials-badge.verified {
-    background: rgba(155, 89, 182, 0.15) !important;
-    border-color: rgba(155, 89, 182, 0.85) !important;
-    color: var(--white) !important;
+    background: transparent !important;
+    border-color: white !important;
+    color: white !important;
     opacity: 1 !important;
-    box-shadow: 0 0 18px rgba(155, 89, 182, 0.35) !important;
+    box-shadow: none !important;
 }
 
 .credentials-badge.verified:hover {
-    background: rgba(155, 89, 182, 0.25) !important;
-    border-color: rgba(155, 89, 182, 0.95) !important;
-    box-shadow: 0 0 22px rgba(155, 89, 182, 0.5) !important;
+    background: transparent !important;
+    border-color: white !important;
+    color: white !important;
+    box-shadow: none !important;
 }
 
 .credentials-badge.verified .badge-icon {
-    color: rgba(155, 89, 182, 1) !important;
+    color: white !important;
     opacity: 1 !important;
+}
+
+.credentials-badge.verified .badge-text {
+    color: white !important;
 }
 
 .badge-icon {
@@ -3766,6 +3786,33 @@
     cursor: pointer;
     accent-color: var(--primary);
     flex-shrink: 0;
+}
+
+/* Custom input fields for insurance and payment "Other" options */
+.insurance-custom-input,
+.payment-custom-input {
+    flex: 1;
+    min-width: 100px;
+    padding: 0.5rem 0.75rem;
+    border: none;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.95rem;
+    background: transparent;
+    color: var(--dark-text);
+    transition: all 0.2s ease;
+    font-family: inherit;
+    outline: none;
+}
+
+.insurance-custom-input::placeholder,
+.payment-custom-input::placeholder {
+    color: #999;
+}
+
+.insurance-custom-input:focus,
+.payment-custom-input:focus {
+    border-bottom-color: var(--primary);
+    box-shadow: 0 1px 0 var(--primary);
 }
 
 .practice-group {

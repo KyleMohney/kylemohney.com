@@ -156,8 +156,10 @@ DECLARE
   v_category_id TEXT;
   v_subcategory_name TEXT;
   v_start_date DATE;
+  v_payment_methods TEXT[];
+  v_insurance_providers TEXT[];
 BEGIN
-  -- Get project details
+  -- Get project details INCLUDING payment methods and insurance requirements
   SELECT 
     proj.id,
     proj.travel_preference,
@@ -165,7 +167,9 @@ BEGIN
     proj.state,
     proj.category_id,
     proj.subcategory_name,
-    proj.start_date
+    proj.start_date,
+    COALESCE(proj.accepted_payment_methods, ARRAY[]::TEXT[]),
+    COALESCE(proj.accepted_insurance_providers, ARRAY[]::TEXT[])
   INTO 
     v_project_id,
     v_travel_preference,
@@ -173,7 +177,9 @@ BEGIN
     v_client_state,
     v_category_id,
     v_subcategory_name,
-    v_start_date
+    v_start_date,
+    v_payment_methods,
+    v_insurance_providers
   FROM projects proj
   WHERE proj.id = p_project_id;
 
@@ -199,21 +205,32 @@ BEGIN
     p.credentials_verified,
     p.profile_completion_percent,
     CASE 
-      WHEN p.in_person_base_zipcode IS NOT NULL THEN
-        (SELECT ROUND(calculate_distance_miles(
-          uz1.latitude, uz1.longitude,
-          uz2.latitude, uz2.longitude
+      WHEN p.in_person_base_zipcode IS NOT NULL AND v_client_zipcode IS NOT NULL THEN
+        ROUND(calculate_distance_miles(
+          (SELECT latitude FROM us_zipcodes WHERE zipcode = p.in_person_base_zipcode LIMIT 1),
+          (SELECT longitude FROM us_zipcodes WHERE zipcode = p.in_person_base_zipcode LIMIT 1),
+          (SELECT latitude FROM us_zipcodes WHERE zipcode = v_client_zipcode LIMIT 1),
+          (SELECT longitude FROM us_zipcodes WHERE zipcode = v_client_zipcode LIMIT 1)
         ))::INTEGER
-        FROM us_zipcodes uz1
-        WHERE uz1.zipcode = p.in_person_base_zipcode
-        CROSS JOIN us_zipcodes uz2
-        WHERE uz2.zipcode = v_client_zipcode
-        LIMIT 1)
       ELSE NULL
-    END::INTEGER AS distance_miles,
+    END AS distance_miles,
     ROUND(
-      (CASE WHEN p.credentials_verified THEN 30.0 ELSE 0.0 END) +
-      (COALESCE(p.profile_completion_percent, 0)::NUMERIC / 100.0 * 70.0),
+      (CASE WHEN p.credentials_verified THEN 20.0 ELSE 0.0 END) +
+      (COALESCE(p.profile_completion_percent, 0)::NUMERIC / 100.0 * 20.0) +
+      (CASE WHEN COALESCE(array_length(p.accepted_payment_methods, 1), 0) > 0 AND 
+              (v_payment_methods IS NULL OR array_length(v_payment_methods, 1) = 0 OR 
+               p.accepted_payment_methods && v_payment_methods) THEN 15.0 ELSE 0.0 END) +
+      (CASE WHEN COALESCE(array_length(p.accepted_insurance_providers, 1), 0) > 0 AND 
+              (v_insurance_providers IS NULL OR array_length(v_insurance_providers, 1) = 0 OR 
+               p.accepted_insurance_providers && v_insurance_providers) THEN 15.0 ELSE 0.0 END) +
+      (CASE WHEN COALESCE(p.avg_rating, 0) >= 4.5 THEN 15.0 
+            WHEN COALESCE(p.avg_rating, 0) >= 4.0 THEN 12.0 
+            WHEN COALESCE(p.avg_rating, 0) >= 3.5 THEN 8.0 
+            ELSE 0.0 END) +
+      (CASE WHEN COALESCE(p.review_count, 0) >= 20 THEN 15.0 
+            WHEN COALESCE(p.review_count, 0) >= 10 THEN 10.0 
+            WHEN COALESCE(p.review_count, 0) >= 5 THEN 5.0 
+            ELSE 0.0 END),
       2
     )::NUMERIC AS match_score
   FROM practitioners p
@@ -222,14 +239,28 @@ BEGIN
     AND COALESCE(p.matching_enabled, true) = true
     AND COALESCE(p.matching_paused, false) = false
     
-    -- Category must match
-    AND p.service_category_ids && ARRAY[v_category_id]
+    -- Category must match - compare TEXT arrays
+    AND v_category_id::TEXT = ANY(p.service_category_names)
     
     -- Subcategory must match service_subcategory_names
     AND (
       v_subcategory_name IS NULL OR 
       v_subcategory_name = '' OR
-      p.service_subcategory_names && STRING_TO_ARRAY(v_subcategory_name, ', ')
+      v_subcategory_name::TEXT = ANY(p.service_subcategory_names)
+    )
+    
+    -- Payment methods must match (if project requires specific payment methods)
+    AND (
+      v_payment_methods IS NULL OR 
+      array_length(v_payment_methods, 1) IS NULL OR
+      p.accepted_payment_methods && v_payment_methods
+    )
+    
+    -- Insurance providers must match (if project requires specific insurance)
+    AND (
+      v_insurance_providers IS NULL OR 
+      array_length(v_insurance_providers, 1) IS NULL OR
+      p.accepted_insurance_providers && v_insurance_providers
     )
     
     -- Travel preference must be supported AND location must match
@@ -251,7 +282,7 @@ BEGIN
         -- Virtual nationwide or for the client's state
         (COALESCE(p.virtual_enabled, false) = true AND (
           p.virtual_option = 'nationwide' OR
-          p.virtual_states && ARRAY[v_client_state]
+          v_client_state::TEXT = ANY(p.virtual_states)
         ))
       )) OR
       
@@ -272,7 +303,7 @@ BEGIN
       -- VIRTUAL: Must have virtual enabled and either nationwide or client state in list
       (v_travel_preference = 'virtual' AND COALESCE(p.virtual_enabled, false) = true AND (
         p.virtual_option = 'nationwide' OR
-        p.virtual_states && ARRAY[v_client_state]
+        v_client_state::TEXT = ANY(p.virtual_states)
       ))
     )
   ORDER BY 
@@ -289,14 +320,19 @@ COMMENT ON FUNCTION match_practitioners(UUID) IS
 -- ============================================================================
 -- Use this to test the matching system
 
--- Example: Test matching for a specific project
--- SELECT * FROM match_practitioners('YOUR-PROJECT-ID-HERE'::UUID);
+-- First, get a real project with complete address data
+WITH test_project AS (
+  SELECT id FROM projects 
+  WHERE street IS NOT NULL AND zipcode IS NOT NULL AND state IS NOT NULL
+  LIMIT 1
+)
+SELECT * FROM match_practitioners((SELECT id FROM test_project)::UUID);
 
--- Example: Test distance calculation
+-- Example: Test distance calculation between two NYC zip codes
 -- SELECT calculate_distance_miles(40.7128, -74.0060, 40.7580, -73.9855) as distance_blocks_manhattan;
 
--- Example: Test radius matching for a specific zipcode pair
--- SELECT is_zipcode_within_radius('10001', 5, '10019') as within_5_miles;
+-- Example: Test radius matching - is OH 44446 (Niles) within 50 miles of UT 84501 (Pricefield)?
+-- SELECT is_zipcode_within_radius('44446', 50, '84501') as within_50_miles;
 
 -- ============================================================================
 -- NOTES

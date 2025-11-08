@@ -642,7 +642,7 @@ async function sendConnectionRequest(practitionerId, practitionerSerial) {
       return;
     }
 
-    // Create match
+    // Create match with all fields
     const { data, error } = await supabaseClient
       .from('project_practitioner_matches')
       .insert({
@@ -650,13 +650,37 @@ async function sendConnectionRequest(practitionerId, practitionerSerial) {
         practitioner_id: practitionerId,
         client_serial: selectedProject.client_serial,
         practitioner_serial: practitionerSerial,
-        status: 'active'
+        status: 'active',
+        is_read: false,                              // NEW - unread when first created
+        client_initiated: true,                      // NEW - client sent request
+        created_at: new Date().toISOString(),        // NEW
+        updated_at: new Date().toISOString(),        // NEW
+        matched_at: new Date().toISOString(),        // NEW
+        contacted_at: null,                          // NEW - will be set when practitioner responds
+        match_score: 0,                              // NEW - can be calculated if needed
+        matched_concerns: selectedProject.description ? [selectedProject.description] : []  // NEW - array format
       });
 
     if (error) {
       console.error('[sendConnectionRequest] Error:', error);
       alert('Error sending connection request');
       return;
+    }
+
+    // Update projects table to track matched practitioners
+    const currentMatched = selectedProject.matched_practitioners || [];
+    if (!currentMatched.includes(practitionerId)) {
+      const { error: projectUpdateError } = await supabaseClient
+        .from('projects')
+        .update({
+          matched_practitioners: [...currentMatched, practitionerId],
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', selectedProject.id);
+
+      if (projectUpdateError) {
+        console.error('[sendConnectionRequest] Error updating matched practitioners:', projectUpdateError);
+      }
     }
 
     // Create auto-message

@@ -36,8 +36,9 @@ DECLARE
   v_project_id UUID;
   v_travel_preference TEXT;
   v_client_zipcode TEXT;
+  v_client_state TEXT;
   v_category_id TEXT;
-  v_subcategory_text TEXT;
+  v_subcategory_name TEXT;
   v_start_date DATE;
 BEGIN
   -- Get project details
@@ -45,15 +46,17 @@ BEGIN
     proj.id,
     proj.travel_preference,
     proj.zipcode,
+    proj.state,
     proj.category_id,
-    proj.subcategory_text,
+    proj.subcategory_name,
     proj.start_date
   INTO 
     v_project_id,
     v_travel_preference,
     v_client_zipcode,
+    v_client_state,
     v_category_id,
-    v_subcategory_text,
+    v_subcategory_name,
     v_start_date
   FROM projects proj
   WHERE proj.id = p_project_id;
@@ -91,23 +94,26 @@ BEGIN
     AND COALESCE(p.matching_enabled, true) = true
     AND COALESCE(p.matching_paused, false) = false
     
-    -- STRICT MATCHING: Must have at least one service enabled for travel preference
+    -- Category must match
+    AND p.service_category_ids && ARRAY[v_category_id]
+    
+    -- Travel preference must be supported
     AND (
       (v_travel_preference = 'flexible' AND (COALESCE(p.in_person_enabled, false) OR COALESCE(p.housecalls_enabled, false) OR COALESCE(p.virtual_enabled, false))) OR
       (v_travel_preference = 'in-person' AND COALESCE(p.in_person_enabled, false) = true) OR
-      (v_travel_preference = 'house-calls' AND COALESCE(p.housecalls_enabled, false) = true) OR
+      (v_travel_preference = 'housecalls' AND COALESCE(p.housecalls_enabled, false) = true) OR
       (v_travel_preference = 'virtual' AND COALESCE(p.virtual_enabled, false) = true)
     )
     
-    -- STRICT MATCHING: At least one subcategory must match conditions_treated
+    -- Subcategory must match service_subcategory_names
     AND (
-      v_subcategory_text IS NULL OR 
-      v_subcategory_text = '' OR
-      EXISTS (
-        SELECT 1 FROM UNNEST(STRING_TO_ARRAY(v_subcategory_text, ', ')) AS sub_item
-        WHERE COALESCE(p.conditions_treated, ARRAY[]::TEXT[]) @> ARRAY[sub_item]
-      )
+      v_subcategory_name IS NULL OR 
+      v_subcategory_name = '' OR
+      p.service_subcategory_names && STRING_TO_ARRAY(v_subcategory_name, ', ')
     )
+    
+    -- Location match: same zipcode or state
+    AND (p.zipcode = v_client_zipcode OR p.practice_state = v_client_state)
   ORDER BY 
     p.credentials_verified DESC,
     p.profile_completion_percent DESC;

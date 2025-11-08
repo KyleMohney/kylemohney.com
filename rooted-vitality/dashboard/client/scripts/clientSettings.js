@@ -227,6 +227,48 @@ async function handleOpenToContactToggle(isEnabled) {
     }
 }
 
+/**
+ * Save a single field to database with validation
+ * Updates client profile field and sets settings_updated_at timestamp
+ * @param {string} fieldName - Field name to update (email, phone, zipcode, age, sex, etc.)
+ * @param {*} newValue - New value for the field
+ */
+async function saveFieldToDatabase(fieldName, newValue) {
+    try {
+        console.log('[Rooted Vitality] Saving field to database:', fieldName, '=', newValue);
+        
+        // Build update object
+        const updateData = {};
+        updateData[fieldName] = newValue;
+        updateData['settings_updated_at'] = new Date().toISOString();
+        updateData['updated_at'] = new Date().toISOString();
+        
+        const { error } = await window.supabaseClient
+            .from('clients')
+            .update(updateData)
+            .eq('user_id', currentUser.id);
+        
+        if (error) {
+            console.error('[Rooted Vitality] Error saving field:', error);
+            showNotification(`Failed to update ${fieldName}`, 'error');
+            return false;
+        }
+        
+        // Update local state
+        userSettings[fieldName] = newValue;
+        userSettings['settings_updated_at'] = updateData['settings_updated_at'];
+        userSettings['updated_at'] = updateData['updated_at'];
+        
+        showNotification(`${fieldName} updated successfully`, 'success');
+        console.log('[Rooted Vitality] Field saved successfully:', fieldName);
+        return true;
+    } catch (error) {
+        console.error('[Rooted Vitality] Exception saving field:', error);
+        showNotification('Error saving changes', 'error');
+        return false;
+    }
+}
+
 function setupButtonActions() {
     // Edit Email
     const editEmailBtn = document.querySelector('[data-setting="email"]');
@@ -429,7 +471,44 @@ function setupEditListeners() {
 
 function handleChangePassword() {
     console.log('[Rooted Vitality] Change password clicked');
+    // TODO: Implement password change via Supabase auth.updateUser()
     alert('Change password functionality to be implemented');
+}
+
+/**
+ * Handle 2FA enable/disable
+ */
+async function handleEnable2FA() {
+    console.log('[Rooted Vitality] Enable 2FA clicked');
+    try {
+        // For now, show alert - requires detailed 2FA setup implementation
+        // In production: integrate with Supabase MFA or third-party service
+        const confirmed = confirm('Enable two-factor authentication? (Implementation pending)');
+        if (confirmed) {
+            // Update two_factor_enabled and two_factor_method in database
+            const { error } = await window.supabaseClient
+                .from('clients')
+                .update({
+                    two_factor_enabled: true,
+                    two_factor_method: 'email', // or 'sms', 'authenticator'
+                    settings_updated_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                })
+                .eq('user_id', currentUser.id);
+            
+            if (error) {
+                console.error('[Rooted Vitality] Error enabling 2FA:', error);
+                showNotification('Error enabling two-factor authentication', 'error');
+            } else {
+                userSettings.two_factor_enabled = true;
+                userSettings.two_factor_method = 'email';
+                showNotification('Two-factor authentication enabled', 'success');
+            }
+        }
+    } catch (error) {
+        console.error('[Rooted Vitality] Exception enabling 2FA:', error);
+        showNotification('Error with two-factor setup', 'error');
+    }
 }
 
 function handleViewPlans() {
@@ -542,7 +621,8 @@ async function saveNotificationPreferences(e) {
         
         console.log('[Rooted Vitality] Saving notification preferences:', preferences);
         
-        const { error } = await window.supabaseClient
+        // Save to notification_settings table
+        const { error: notifError } = await window.supabaseClient
             .from('notification_settings')
             .upsert({
                 user_id: currentUser.id,
@@ -551,15 +631,36 @@ async function saveNotificationPreferences(e) {
                 updated_at: new Date().toISOString()
             });
         
-        if (error) {
-            console.error('[Rooted Vitality] Error saving preferences:', error);
-            alert('Error saving preferences');
-        } else {
-            console.log('[Rooted Vitality] Preferences saved successfully');
-            alert('Notification preferences updated successfully');
+        if (notifError) {
+            console.error('[Rooted Vitality] Error saving preferences:', notifError);
+            showNotification('Error saving preferences', 'error');
+            return;
         }
+        
+        // Also update notification_settings JSON in clients table and settings_updated_at
+        const prefsJson = JSON.stringify(preferences);
+        const { error: clientError } = await window.supabaseClient
+            .from('clients')
+            .update({
+                notification_settings: prefsJson,
+                settings_updated_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            })
+            .eq('user_id', currentUser.id);
+        
+        if (clientError) {
+            console.error('[Rooted Vitality] Error updating client notification_settings:', clientError);
+        }
+        
+        // Update local state
+        userSettings.notification_settings = prefsJson;
+        userSettings.settings_updated_at = new Date().toISOString();
+        
+        console.log('[Rooted Vitality] Preferences saved successfully');
+        showNotification('Notification preferences updated successfully', 'success');
     } catch (error) {
         console.error('[Rooted Vitality] Exception saving preferences:', error);
+        showNotification('Error saving preferences', 'error');
     }
 }
 

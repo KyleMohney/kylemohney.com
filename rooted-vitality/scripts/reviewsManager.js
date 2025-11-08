@@ -371,7 +371,18 @@ let reviewsManager = {
         practitioner_name: this.currentReview.practitionerName,
         photos: photoUrls && photoUrls.length > 0 ? photoUrls : [],
         is_visible: true,
-        is_approved: false
+        is_approved: false,
+        // NEW FIELDS
+        is_verified: false,                         // Will be verified by admin/system
+        is_featured: false,                         // Will be set by admin for featured reviews
+        review_date: new Date().toISOString(),      // When review was written
+        created_at: new Date().toISOString(),       // When record created
+        updated_at: new Date().toISOString(),       // When record updated
+        source: 'rooted_vitality',                  // Internal platform source
+        external_platform: null,                    // For external reviews (google, yelp, etc)
+        external_url: null,                         // URL to external review if imported
+        external_review_id: null,                   // ID of review on external platform
+        moderation_notes: ''                        // Admin notes during moderation
       };
 
       console.log('[Reviews] Review data:', reviewData);

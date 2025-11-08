@@ -134,6 +134,9 @@ window.authManager = {
                 finalRole: userRole
             });
             
+            // Update last_login timestamp in database
+            await this._updateLastLogin(data.user.id, userRole);
+            
             // Store session locally with firstName
             this._persistUser(data.user, userRole, firstName);
 
@@ -422,6 +425,30 @@ window.authManager = {
         } catch (error) {
             console.error('[Rooted Vitality] Unexpected profile retrieval error:', error);
             return null;
+        }
+    },
+    
+    /**
+     * Update last_login timestamp in database
+     * @private
+     */
+    async _updateLastLogin(userId, userRole) {
+        try {
+            const tableName = userRole === 'practitioner' ? 'practitioners' : 'clients';
+            const now = new Date().toISOString();
+            
+            const { error } = await window.supabaseClient
+                .from(tableName)
+                .update({ last_login: now })
+                .eq('user_id', userId);
+            
+            if (error) {
+                console.error('[Rooted Vitality] Error updating last_login:', error);
+            } else {
+                console.log(`[Rooted Vitality] last_login updated for ${tableName}`);
+            }
+        } catch (error) {
+            console.error('[Rooted Vitality] Exception updating last_login:', error);
         }
     },
     

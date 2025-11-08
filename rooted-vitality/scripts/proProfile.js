@@ -508,20 +508,58 @@ async function populateProfileFields(data) {
     
     // Load insurance providers list - check both insurance_providers and insurance_accepted for backwards compatibility
     let insuranceData = [];
-    if (data.insurance_providers && Array.isArray(data.insurance_providers)) {
-        insuranceData = data.insurance_providers;
-        console.log('[Rooted Vitality] ✓ Loaded insurance_providers:', insuranceData);
-    } else if (data.insurance_accepted && Array.isArray(data.insurance_accepted)) {
-        insuranceData = data.insurance_accepted;
+    if (data.insurance_providers) {
+        // Handle both array and JSON string formats (stored as TEXT in DB)
+        if (typeof data.insurance_providers === 'string') {
+            try {
+                insuranceData = JSON.parse(data.insurance_providers);
+                console.log('[Rooted Vitality] ✓ Parsed insurance_providers from JSON:', insuranceData);
+            } catch (e) {
+                console.log('[Rooted Vitality] Could not parse insurance_providers:', e);
+                insuranceData = [];
+            }
+        } else if (Array.isArray(data.insurance_providers)) {
+            insuranceData = data.insurance_providers;
+            console.log('[Rooted Vitality] ✓ Loaded insurance_providers (already array):', insuranceData);
+        }
+    } else if (data.insurance_accepted) {
+        // Backwards compatibility
+        if (typeof data.insurance_accepted === 'string') {
+            try {
+                insuranceData = JSON.parse(data.insurance_accepted);
+                console.log('[Rooted Vitality] ✓ Parsed insurance_accepted from JSON:', insuranceData);
+            } catch (e) {
+                insuranceData = [];
+            }
+        } else if (Array.isArray(data.insurance_accepted)) {
+            insuranceData = data.insurance_accepted;
+        }
         console.log('[Rooted Vitality] ✓ Loaded insurance_accepted (legacy):', insuranceData);
     }
     window.selectedInsurance = insuranceData;
     loadInsurance(insuranceData);
     
     // Load payment methods
-    if (data.payment_methods && Array.isArray(data.payment_methods)) {
-        loadPaymentMethods(data.payment_methods);
-        console.log('[Rooted Vitality] ✓ Loaded payment_methods:', data.payment_methods);
+    if (data.payment_methods) {
+        // Handle both array and JSON string formats (stored as TEXT in DB)
+        let paymentData = [];
+        if (typeof data.payment_methods === 'string') {
+            try {
+                paymentData = JSON.parse(data.payment_methods);
+                console.log('[Rooted Vitality] ✓ Parsed payment_methods from JSON:', paymentData);
+            } catch (e) {
+                console.log('[Rooted Vitality] Could not parse payment_methods:', e);
+                paymentData = [];
+            }
+        } else if (Array.isArray(data.payment_methods)) {
+            paymentData = data.payment_methods;
+            console.log('[Rooted Vitality] ✓ Loaded payment_methods (already array):', paymentData);
+        }
+        if (paymentData.length > 0) {
+            loadPaymentMethods(paymentData);
+        } else {
+            window.selectedPaymentMethods = [];
+        }
     } else {
         window.selectedPaymentMethods = [];
     }
@@ -1537,6 +1575,10 @@ async function saveMoreDetailsSection() {
         const faqToSave = Array.isArray(window.faqItems) ? window.faqItems : [];
         console.log('[SAVE] faqToSave (after formatting):', faqToSave);
         
+        // Format insurance and payment data for saving
+        const insuranceToSave = Array.isArray(paymentCheckboxData.insurance_providers) ? paymentCheckboxData.insurance_providers : [];
+        const paymentToSave = Array.isArray(paymentCheckboxData.payment_methods) ? paymentCheckboxData.payment_methods : [];
+        
         const updateData = {
             languages: languagesToSave,
             faq: faqToSave,
@@ -1551,9 +1593,9 @@ async function saveMoreDetailsSection() {
                 website: document.getElementById('social-website')?.value || ''
             },
             accepts_insurance: paymentCheckboxData.accepts_insurance === true,
-            insurance_providers: Array.isArray(paymentCheckboxData.insurance_providers) ? paymentCheckboxData.insurance_providers : [],
+            insurance_providers: JSON.stringify(insuranceToSave),
             custom_insurance_providers: paymentCheckboxData.custom_insurance_providers || '',
-            payment_methods: Array.isArray(paymentCheckboxData.payment_methods) ? paymentCheckboxData.payment_methods : [],
+            payment_methods: JSON.stringify(paymentToSave),
             custom_payment_methods: paymentCheckboxData.custom_payment_methods || '',
             updated_at: new Date().toISOString()
         };
@@ -2896,8 +2938,13 @@ const INSURANCE_PROVIDERS = {
 function loadInsurance(insuranceArray) {
     console.log('[Rooted Vitality] Loading insurance:', insuranceArray);
     window.selectedInsurance = Array.isArray(insuranceArray) ? insuranceArray : [];
-    renderInsuranceCheckboxes();
-    renderInsuranceDisplay();
+    
+    // Give DOM time to render checkboxes before trying to check them
+    setTimeout(() => {
+        console.log('[Rooted Vitality] Calling renderInsuranceCheckboxes after timeout');
+        renderInsuranceCheckboxes();
+        renderInsuranceDisplay();
+    }, 100);
 }
 
 function renderInsuranceCheckboxes() {
@@ -3007,8 +3054,13 @@ const PAYMENT_METHODS = {
 function loadPaymentMethods(paymentMethodsArray) {
     console.log('[Rooted Vitality] Loading payment methods:', paymentMethodsArray);
     window.selectedPaymentMethods = Array.isArray(paymentMethodsArray) ? paymentMethodsArray : [];
-    renderPaymentCheckboxes();
-    renderPaymentDisplay();
+    
+    // Give DOM time to render checkboxes before trying to check them
+    setTimeout(() => {
+        console.log('[Rooted Vitality] Calling renderPaymentCheckboxes after timeout');
+        renderPaymentCheckboxes();
+        renderPaymentDisplay();
+    }, 100);
 }
 
 function renderPaymentCheckboxes() {

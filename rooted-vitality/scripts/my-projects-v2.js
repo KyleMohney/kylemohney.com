@@ -396,7 +396,7 @@ async function createProject(matchNow = false) {
     // Get client serial number and open_to_contact setting
     const { data: clientProfile, error: clientError } = await supabaseClient
       .from('clients')
-      .select('serial_number, open_to_contact')
+      .select('serial_number, open_to_contact, first_name, last_name')
       .eq('user_id', currentUser.id)
       .single();
 
@@ -419,6 +419,8 @@ async function createProject(matchNow = false) {
     
     const formData = {
       client_serial: clientProfile.serial_number,  // Use serial number, not UUID
+      client_first_name: clientProfile.first_name,  // Capture client's first name
+      client_last_name: clientProfile.last_name,    // Capture client's last name
       category_id: selectedCategoryId,
       category_name: categoryName,  // Store human-readable category name from taxonomy
       street: document.getElementById('project-street').value || null,
@@ -432,7 +434,12 @@ async function createProject(matchNow = false) {
       project_status: 'pending',  // New projects start as 'pending'
       review_left: false,  // No review yet
       client_open_to_contact: clientProfile.open_to_contact !== false,  // Sync from client settings
-      subcategory_name: subcategoryNames  // Store selected subcategories with their taxonomy names
+      subcategory_name: subcategoryNames,  // Store selected subcategories with their taxonomy names
+      matched_practitioners: [],  // Initialize as empty - will be updated when practitioners match
+      hired_practitioner: null,    // Initialize as null - set when client hires
+      custom_name: null,           // Optional custom project name
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
     };
 
     console.log('[createProject] Form data:', formData);
@@ -865,11 +872,13 @@ async function handleCloseProject() {
       newStatus = 'canceled';
     }
 
-    // Update the project status
+    // Update the project status with closed_date and other tracking fields
     const { error: updateError } = await supabaseClient
       .from('projects')
       .update({ 
         project_status: newStatus,
+        closed_date: new Date().toISOString(),  // Capture when project was closed
+        updated_at: new Date().toISOString()    // Track the update time
         // Optionally store closure notes if you have that column
         // closure_notes: closureReason === 'other' ? otherReasonText : null
       })

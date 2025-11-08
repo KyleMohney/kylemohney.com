@@ -231,6 +231,20 @@ async function sendMessage() {
       return;
     }
 
+    // Update match's contacted_at timestamp on first message
+    const { error: matchUpdateError } = await supabaseClient
+      .from('project_practitioner_matches')
+      .update({
+        contacted_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .eq('project_id', selectedProjectId)
+      .eq('practitioner_id', selectedPractitionerId);
+
+    if (matchUpdateError) {
+      console.error('[Messaging] Error updating match contacted_at:', matchUpdateError);
+    }
+
     // Clear input
     messageInput.value = '';
     messageInput.focus();

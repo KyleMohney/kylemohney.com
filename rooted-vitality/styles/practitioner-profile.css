@@ -168,8 +168,9 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
-    background: rgba(92, 154, 114, 0.1);
-    color: var(--color-primary);
+    background: transparent !important;
+    color: white !important;
+    border: 2px solid white !important;
     border-radius: 20px;
     font-size: 0.9rem;
     font-weight: 600;
@@ -177,13 +178,15 @@
 }
 
 .badge-credentials {
-    background: rgba(92, 154, 114, 0.1);
-    color: var(--color-primary);
+    background: transparent !important;
+    color: white !important;
+    border: 2px solid white !important;
 }
 
 .badge-featured {
-    background: rgba(212, 196, 124, 0.15);
-    color: var(--color-accent);
+    background: transparent !important;
+    color: white !important;
+    border: 2px solid white !important;
 }
 
 .hero-stats {

@@ -278,28 +278,47 @@ async function handleAccountFormSubmit(e) {
     try {
         const accountForm = document.getElementById('accountForm');
         const formData = collectFormData(accountForm);
+        
+        // Get current user
+        const { data: { user } } = await window.supabaseClient.auth.getUser();
+        if (!user) {
+            showToast('Not authenticated', 'error');
+            return;
+        }
 
-        // TODO: Future integration - send to Supabase
-        // const { error } = await window.supabaseClient
-        //     .from('profiles')
-        //     .update(formData)
-        //     .eq('id', user.id);
+        // Prepare update data with all fields including timestamps
+        const updateData = {
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            phone: formData.phone || null,
+            age: parseInt(formData.age) || null,
+            sex: formData.sex || null,
+            settings_updated_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        };
+        
+        // Save to Supabase clients table
+        const { error } = await window.supabaseClient
+            .from('clients')
+            .update(updateData)
+            .eq('user_id', user.id);
 
-        // For now, save to localStorage
+        if (error) {
+            console.error('[Dashboard] Error saving to Supabase:', error);
+            showToast('Error saving account information', 'error');
+            return;
+        }
+
+        // Update localStorage
         const userData = window.authManager.getCurrentUser();
         const updatedData = {
             ...userData,
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-            phone: formData.phone,
-            age: parseInt(formData.age) || null,
-            sex: formData.sex,
-            updated_at: new Date().toISOString()
+            ...updateData
         };
 
         localStorage.setItem('rvUser', JSON.stringify(updatedData));
         
-        console.log('[Dashboard] Account information saved');
+        console.log('[Dashboard] Account information saved to Supabase and localStorage');
         showToast('Account information updated successfully', 'success');
 
     } catch (error) {
@@ -320,16 +339,8 @@ async function handleWellnessFormSubmit(e) {
         const formData = collectFormData(wellnessForm);
         const modalities = collectMultiSelectData('healingModalities');
 
-        // TODO: Future integration - send to Supabase
-        // const { error } = await window.supabaseClient
-        //     .from('wellness_profiles')
-        //     .upsert({
-        //         user_id: user.id,
-        //         goals: formData.wellnessGoals,
-        //         ...
-        //     });
-
-        // For now, save to localStorage
+        // For now, wellness data stored in localStorage as it's not in clients table
+        // TODO: Consider creating separate wellness_profiles table if needed
         const wellnessData = {
             goals: formData.wellnessGoals,
             healthFocus: formData.healthFocus,
@@ -339,6 +350,22 @@ async function handleWellnessFormSubmit(e) {
         };
 
         localStorage.setItem('rvWellnessProfile', JSON.stringify(wellnessData));
+        
+        // Also update clients table settings_updated_at to track that user modified settings
+        const { data: { user } } = await window.supabaseClient.auth.getUser();
+        if (user) {
+            const { error } = await window.supabaseClient
+                .from('clients')
+                .update({
+                    settings_updated_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                })
+                .eq('user_id', user.id);
+            
+            if (error) {
+                console.warn('[Dashboard] Error updating settings_updated_at:', error);
+            }
+        }
         
         console.log('[Dashboard] Wellness profile saved');
         showToast('Wellness profile updated successfully', 'success');

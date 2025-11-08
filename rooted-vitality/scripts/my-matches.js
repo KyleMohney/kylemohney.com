@@ -355,9 +355,21 @@ async function updateMatchStatus(matchId, newStatus) {
   try {
     console.log('[My Matches] Updating match status:', { matchId, newStatus });
     
+    // Build update object with all relevant fields
+    const updateData = {
+      status: newStatus,
+      updated_at: new Date().toISOString(),
+      is_read: true  // Mark as read when practitioner views/updates
+    };
+
+    // Track when practitioner first responds
+    if (newStatus === 'active' || newStatus === 'in-progress') {
+      updateData.contacted_at = new Date().toISOString();
+    }
+    
     const { error } = await window.supabaseClient
       .from('project_practitioner_matches')
-      .update({ status: newStatus })
+      .update(updateData)
       .eq('id', matchId);
     
     if (error) {
@@ -371,25 +383,31 @@ async function updateMatchStatus(matchId, newStatus) {
     // Update project status based on match status
     if (selectedMatch && selectedMatch.project_id) {
       let newProjectStatus = null;
+      let projectUpdateData = {};
       
       if (newStatus === 'in-progress') {
         newProjectStatus = 'in-progress';
       } else if (newStatus === 'hired') {
         newProjectStatus = 'hired';
+        // Capture which practitioner was hired
+        projectUpdateData.hired_practitioner = selectedMatch.practitioner_id;
       } else if (newStatus === 'not-hired') {
         newProjectStatus = 'not-hired';
       }
 
       if (newProjectStatus) {
+        projectUpdateData.project_status = newProjectStatus;
+        projectUpdateData.updated_at = new Date().toISOString();
+        
         const { error: projectError } = await window.supabaseClient
           .from('projects')
-          .update({ project_status: newProjectStatus })
+          .update(projectUpdateData)
           .eq('id', selectedMatch.project_id);
 
         if (projectError) {
           console.error('[My Matches] Error updating project status:', projectError);
         } else {
-          console.log('[My Matches] Project status updated to:', newProjectStatus);
+          console.log('[My Matches] Project status updated to:', newProjectStatus, 'with data:', projectUpdateData);
         }
       }
     }

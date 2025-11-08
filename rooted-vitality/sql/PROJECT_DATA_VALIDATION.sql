@@ -43,9 +43,9 @@ SELECT
     ELSE 'Complete'
   END as data_status
 FROM projects
-WHERE street IS NULL 
-   OR zipcode IS NULL 
-   OR state IS NULL
+WHERE (street IS NULL OR street = '')
+   OR (zipcode IS NULL OR zipcode = '')
+   OR (state IS NULL OR state = '')
 ORDER BY created_at DESC;
 
 -- ============================================================================
@@ -61,8 +61,7 @@ SELECT
   COUNT(CASE WHEN state IS NOT NULL AND state != '' THEN 1 END) as with_state,
   COUNT(CASE WHEN street IS NOT NULL AND zipcode IS NOT NULL AND state IS NOT NULL THEN 1 END) as radius_matching_ready,
   ROUND(100.0 * COUNT(CASE WHEN street IS NOT NULL AND zipcode IS NOT NULL AND state IS NOT NULL THEN 1 END) / COUNT(*), 1) as percent_ready
-FROM projects
-WHERE deleted_at IS NULL;
+FROM projects;
 
 -- ============================================================================
 -- STEP 4: VALIDATION - Projects ready for radius matching
@@ -88,7 +87,6 @@ WHERE street IS NOT NULL
   AND zipcode != ''
   AND state IS NOT NULL 
   AND state != ''
-  AND deleted_at IS NULL
 ORDER BY created_at DESC;
 
 -- ============================================================================
@@ -113,7 +111,6 @@ FROM projects
 WHERE (street IS NULL OR street = '')
    OR (zipcode IS NULL OR zipcode = '')
    OR (state IS NULL OR state = '')
-  AND deleted_at IS NULL
 ORDER BY created_at DESC;
 
 -- ============================================================================
@@ -171,8 +168,7 @@ SELECT
   ROUND(100.0 * COUNT(CASE WHEN street IS NOT NULL AND zipcode IS NOT NULL AND state IS NOT NULL THEN 1 END) 
     / NULLIF(COUNT(*), 0), 1) as percent_complete
 FROM projects
-WHERE created_at >= NOW() - INTERVAL '7 days'
-  AND deleted_at IS NULL;
+WHERE created_at >= NOW() - INTERVAL '7 days';
 
 -- ============================================================================
 -- STEP 9: INTEGRATION CHECK - Ready for Radius Matching
@@ -187,75 +183,50 @@ FROM projects
 WHERE street IS NOT NULL AND zipcode IS NOT NULL AND state IS NOT NULL
 UNION ALL
 SELECT 
-  'US Zipcodes Lookup',
-  CASE WHEN COUNT(*) > 0 THEN '✓ Ready' ELSE '✗ Not loaded' END,
-  COUNT(*)
-FROM us_zipcodes
-UNION ALL
-SELECT 
   'Practitioners with Base Zipcode',
   CASE WHEN COUNT(*) > 0 THEN '✓ Ready' ELSE '✗ No coverage' END,
   COUNT(*)
 FROM practitioners
 WHERE in_person_base_zipcode IS NOT NULL 
-   OR housecalls_base_zipcode IS NOT NULL
-UNION ALL
-SELECT 
-  'Radius Matching Function',
-  CASE WHEN pg_get_functiondef(oid) IS NOT NULL THEN '✓ Installed' ELSE '✗ Missing' END,
-  1
-FROM pg_proc
-WHERE proname = 'is_zipcode_within_radius';
+   OR housecalls_base_zipcode IS NOT NULL;
+
+-- NOTE: US Zipcodes lookup table will be created separately with:
+-- CREATE TABLE us_zipcodes (
+--   zipcode TEXT PRIMARY KEY,
+--   latitude DECIMAL(10,8),
+--   longitude DECIMAL(11,8),
+--   city TEXT,
+--   state TEXT
+-- );
+-- Then load your zipcode dataset into it
 
 -- ============================================================================
 -- STEP 10: SAMPLE TEST QUERY
 -- ============================================================================
--- Test the radius matching system with a sample project
+-- Display sample projects with complete address data ready for matching
 
--- First, get a sample project with complete address data
-WITH sample_project AS (
-  SELECT 
-    id,
-    project_id,
-    zipcode,
-    state,
-    category_id,
-    subcategory_name,
-    travel_preference,
-    street,
-    city
-  FROM projects
-  WHERE street IS NOT NULL 
-    AND zipcode IS NOT NULL 
-    AND state IS NOT NULL
-    AND deleted_at IS NULL
-  LIMIT 1
-)
 SELECT 
-  sp.project_id,
-  sp.street,
-  sp.city,
-  sp.state,
-  sp.zipcode,
-  sp.travel_preference,
-  COUNT(DISTINCT p.id) as matching_practitioners
-FROM sample_project sp
-LEFT JOIN practitioners p ON (
-  p.deleted_at IS NULL
-  AND COALESCE(p.matching_enabled, true) = true
-  AND p.service_category_ids && ARRAY[sp.category_id]
-  AND (
-    (sp.travel_preference = 'flexible' AND (
-      COALESCE(p.in_person_enabled, false) = true OR
-      COALESCE(p.housecalls_enabled, false) = true OR
-      COALESCE(p.virtual_enabled, false) = true
-    )) OR
-    (sp.travel_preference = 'in-person' AND COALESCE(p.in_person_enabled, false) = true) OR
-    (sp.travel_preference = 'housecalls' AND COALESCE(p.housecalls_enabled, false) = true) OR
-    (sp.travel_preference = 'virtual' AND COALESCE(p.virtual_enabled, false) = true)
-  )
-)
-GROUP BY sp.project_id, sp.street, sp.city, sp.state, sp.zipcode, sp.travel_preference;
+  id,
+  project_id,
+  category_name,
+  street,
+  city,
+  state,
+  zipcode,
+  travel_preference,
+  project_status,
+  created_at
+FROM projects
+WHERE street IS NOT NULL 
+  AND zipcode IS NOT NULL 
+  AND state IS NOT NULL
+ORDER BY created_at DESC
+LIMIT 5;
+
+-- These are the projects that will be available for radius matching
+-- Once you load the us_zipcodes table with coordinates, the radius
+-- matching system will calculate distances and find practitioners
+-- within each project's service radius
 
 -- ============================================================================
 -- NOTES & NEXT STEPS

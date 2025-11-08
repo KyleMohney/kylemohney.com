@@ -701,16 +701,16 @@
                         </label>
                       </td>
                     </tr>
+                    <tr>
+                      <td>
+                        <label class="checkbox-label">
+                          <input type="checkbox" class="insurance-checkbox" id="custom-insurance-checkbox" onchange="updateInsuranceSelection()">
+                          <input type="text" class="insurance-custom-input" id="custom-insurance-input" placeholder="Other insurance provider..." onchange="updateInsuranceSelection()" onkeypress="if(event.key==='Enter') updateInsuranceSelection();">
+                        </label>
+                      </td>
+                    </tr>
                   </tbody>
                 </table>
-              </div>
-
-              <!-- Other Insurance Providers (Checkbox + Custom Input) -->
-              <div class="payment-table-wrapper">
-                <label class="insurance-checkbox-item custom-insurance-checkbox">
-                  <input type="checkbox" class="insurance-checkbox" id="custom-insurance-checkbox" onchange="updateInsuranceSelection()">
-                  <input type="text" class="insurance-custom-input" id="custom-insurance-input" placeholder="Other insurance provider..." onchange="updateInsuranceSelection()" onkeypress="if(event.key==='Enter') updateInsuranceSelection();">
-                </label>
               </div>
 
               <!-- Payment Methods Table -->
@@ -721,7 +721,7 @@
                     <tr>
                       <td>
                         <label class="checkbox-label">
-                          <input type="checkbox" name="payment-method" value="stripe" class="payment-checkbox" onchange="debounceAutoSave('more-details')">
+                          <input type="checkbox" name="payment-method" value="stripe" class="payment-checkbox" onchange="updatePaymentMethodSelection()">
                           Stripe
                         </label>
                       </td>
@@ -729,7 +729,7 @@
                     <tr>
                       <td>
                         <label class="checkbox-label">
-                          <input type="checkbox" name="payment-method" value="square" class="payment-checkbox" onchange="debounceAutoSave('more-details')">
+                          <input type="checkbox" name="payment-method" value="square" class="payment-checkbox" onchange="updatePaymentMethodSelection()">
                           Square
                         </label>
                       </td>
@@ -737,7 +737,7 @@
                     <tr>
                       <td>
                         <label class="checkbox-label">
-                          <input type="checkbox" name="payment-method" value="paypal" class="payment-checkbox" onchange="debounceAutoSave('more-details')">
+                          <input type="checkbox" name="payment-method" value="paypal" class="payment-checkbox" onchange="updatePaymentMethodSelection()">
                           PayPal
                         </label>
                       </td>
@@ -745,7 +745,7 @@
                     <tr>
                       <td>
                         <label class="checkbox-label">
-                          <input type="checkbox" name="payment-method" value="cash" class="payment-checkbox" onchange="debounceAutoSave('more-details')">
+                          <input type="checkbox" name="payment-method" value="cash" class="payment-checkbox" onchange="updatePaymentMethodSelection()">
                           Cash
                         </label>
                       </td>
@@ -753,7 +753,7 @@
                     <tr>
                       <td>
                         <label class="checkbox-label">
-                          <input type="checkbox" name="payment-method" value="check" class="payment-checkbox" onchange="debounceAutoSave('more-details')">
+                          <input type="checkbox" name="payment-method" value="check" class="payment-checkbox" onchange="updatePaymentMethodSelection()">
                           Check
                         </label>
                       </td>
@@ -761,7 +761,7 @@
                     <tr>
                       <td>
                         <label class="checkbox-label">
-                          <input type="checkbox" name="payment-method" value="venmo" class="payment-checkbox" onchange="debounceAutoSave('more-details')">
+                          <input type="checkbox" name="payment-method" value="venmo" class="payment-checkbox" onchange="updatePaymentMethodSelection()">
                           Venmo
                         </label>
                       </td>
@@ -769,7 +769,7 @@
                     <tr>
                       <td>
                         <label class="checkbox-label">
-                          <input type="checkbox" name="payment-method" value="bank-transfer" class="payment-checkbox" onchange="debounceAutoSave('more-details')">
+                          <input type="checkbox" name="payment-method" value="bank-transfer" class="payment-checkbox" onchange="updatePaymentMethodSelection()">
                           Bank Transfer
                         </label>
                       </td>
@@ -777,21 +777,21 @@
                     <tr>
                       <td>
                         <label class="checkbox-label">
-                          <input type="checkbox" name="payment-method" value="credit-card" class="payment-checkbox" onchange="debounceAutoSave('more-details')">
+                          <input type="checkbox" name="payment-method" value="credit-card" class="payment-checkbox" onchange="updatePaymentMethodSelection()">
                           Credit Card
+                        </label>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <label class="checkbox-label">
+                          <input type="checkbox" class="payment-checkbox" id="custom-payment-checkbox" onchange="updatePaymentMethodSelection()">
+                          <input type="text" class="payment-custom-input" id="custom-payment-input" placeholder="Other payment method..." onchange="updatePaymentMethodSelection()" onkeypress="if(event.key==='Enter') updatePaymentMethodSelection();">
                         </label>
                       </td>
                     </tr>
                   </tbody>
                 </table>
-              </div>
-
-              <!-- Other Payment Methods (Checkbox + Custom Input) -->
-              <div class="payment-table-wrapper">
-                <label class="payment-checkbox-item custom-payment-checkbox">
-                  <input type="checkbox" class="payment-checkbox" id="custom-payment-checkbox" onchange="updatePaymentMethodSelection()">
-                  <input type="text" class="payment-custom-input" id="custom-payment-input" placeholder="Other payment method..." onchange="updatePaymentMethodSelection()" onkeypress="if(event.key==='Enter') updatePaymentMethodSelection();">
-                </label>
               </div>
             </div>
             <div id="payment-display" class="payment-display" style="display: none;">

@@ -197,19 +197,20 @@ body { font-family: var(--font-sans); color: var(--color-text); background: #faf
     align-items: center;
     gap: 0.5rem;
     padding: 0.6rem 1.2rem;
-    background: rgba(92, 154, 114, 0.1);
-    color: var(--color-primary);
+    background: transparent !important;
+    color: white !important;
+    border: 2px solid white !important;
     border-radius: 20px;
     font-size: 0.9rem;
     font-weight: 500;
 }
 
-.badge-credentials { background: rgba(92, 154, 114, 0.15); }
-.badge-featured { background: rgba(212, 196, 124, 0.15); color: var(--color-secondary); }
-.badge-background-check { background: none; color: white; }
-.badge-certified { background: none; color: white; }
-.badge-licensed { background: none; color: white; }
-.badge-verified { background: none; color: white; }
+.badge-credentials { background: transparent !important; border: 2px solid white !important; color: white !important; }
+.badge-featured { background: transparent !important; border: 2px solid white !important; color: white !important; }
+.badge-background-check { background: transparent !important; border: 2px solid white !important; color: white !important; }
+.badge-certified { background: transparent !important; border: 2px solid white !important; color: white !important; }
+.badge-licensed { background: transparent !important; border: 2px solid white !important; color: white !important; }
+.badge-verified { background: transparent !important; border: 2px solid white !important; color: white !important; }
 
 .hero-stats {
     display: grid;
