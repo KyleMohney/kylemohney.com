@@ -4630,6 +4630,12 @@
     function closePreferencesModal() {
       document.getElementById('preferences-modal').classList.remove('active');
       currentEditingCategory = null;
+      
+      // Auto-save any changes by re-saving all active categories to database
+      // This ensures categories are persisted even if user closes without confirming
+      setTimeout(() => {
+        saveAllCategoriesToDatabase();
+      }, 100);
     }
 
     // ======================================================
@@ -4648,7 +4654,13 @@
 
     function closeBrowseCategoriesModal() {
       document.getElementById('browse-categories-modal').classList.remove('active');
-      console.log('[Rooted Vitality] Browse categories modal closed');
+      
+      // Auto-save any categories that were added but not yet saved
+      setTimeout(() => {
+        saveAllCategoriesToDatabase();
+      }, 100);
+      
+      console.log('[Rooted Vitality] Browse categories modal closed, auto-saving');
     }
 
     function renderBrowseCategoryCards() {
