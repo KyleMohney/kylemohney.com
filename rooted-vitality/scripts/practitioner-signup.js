@@ -294,7 +294,7 @@ async function registerPractitioner(event) {
         submitBtn.textContent = 'Registering...';
         
         const payload = {
-            user_id: state.session.id,
+            id: state.session.id,  // Use 'id' not 'user_id' - id is the auth.users link
             email: state.session.email,
             legal_name: state.formData.legal_name,
             legal_business_name: state.formData.legal_business_name,
@@ -386,7 +386,7 @@ async function registerPractitioner(event) {
             .update({ 
                 updated_at: new Date().toISOString()
             })
-            .eq('user_id', state.session.id);
+            .eq('id', state.session.id);  // Use 'id' not 'user_id'
         
         if (practError) {
             console.error('[Signup] Warning: Could not update practitioner record:', practError);

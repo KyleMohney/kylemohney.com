@@ -118,7 +118,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       // Create a new client record with signup data
       // Capture ALL client table fields with appropriate defaults
       const clientData = {
-        user_id: authData.user.id,
+        id: authData.user.id,  // Use 'id' not 'user_id' - id is the auth.users link
         email: email,
         first_name: firstName,
         last_name: lastName,

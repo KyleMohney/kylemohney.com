@@ -169,7 +169,7 @@ async function loadReviews() {
         const { data, error } = await window.supabaseClient
             .from('reviews')
             .select('*')
-            .eq('practitioner_id', practitioner.user_id)
+            .eq('practitioner_id', practitioner.id)  // Use 'id' not 'user_id'
             .eq('is_visible', true)
             .order('created_at', { ascending: false })
             .limit(10);
