@@ -32,7 +32,7 @@ async function safePractitionerUpdate(updateData) {
     
     try {
         console.log('[DB] ====== safePractitionerUpdate CALLED ======');
-        console.log('[DB] Updating user_id:', currentUser.id);
+        console.log('[DB] Updating id:', currentUser.id);
         console.log('[DB] Update data keys:', Object.keys(updateData));
         console.log('[DB] languages in updateData:', updateData.languages);
         console.log('[DB] faq in updateData:', updateData.faq);
@@ -42,7 +42,7 @@ async function safePractitionerUpdate(updateData) {
         const { data: updated, error: updateError } = await window.supabaseClient
             .from('practitioners')
             .update(updateData)
-            .eq('user_id', currentUser.id)
+            .eq('id', currentUser.id)
             .select()
             .single();
         
@@ -51,7 +51,7 @@ async function safePractitionerUpdate(updateData) {
         if (updateError && updateError.code === 'PGRST116') {
             // Record doesn't exist, INSERT it
             const insertData = {
-                user_id: currentUser.id,
+                id: currentUser.id,
                 email: currentUser.email || '',
                 status: 'draft',
                 created_at: new Date().toISOString(),
@@ -224,7 +224,7 @@ async function loadProfile(userId) {
         const { data: practitioner, error: practError } = await window.supabaseClient
             .from('practitioners')
             .select('*')
-            .eq('user_id', userId)
+            .eq('id', userId)
             .single();
         
         console.log('[Rooted Vitality] Practitioners query result:', { 
@@ -1314,7 +1314,7 @@ async function saveHeaderFields() {
         showAutoSaveIndicator('saving');
         
         const headerData = {
-            user_id: currentUser.id,
+            id: currentUser.id,
             email: currentUser.email || '',
             legal_name: document.getElementById('profile-name')?.value || '',
             dba_name: document.getElementById('profile-dba-name')?.value || '',
@@ -1396,7 +1396,7 @@ async function saveSectionData(sectionId) {
                 profile_completion_percent: profileCompletionPercent,
                 updated_at: new Date().toISOString()
             })
-            .eq('user_id', currentUser.id);
+            .eq('id', currentUser.id);
         
         if (updateError) {
             console.error('[SAVE] ❌ Error updating profile_completion_percent:', updateError);
@@ -1948,7 +1948,7 @@ async function saveProfile() {
         // Prepare data for practitioners table (primary practitioner profile)
         // Support both field name conventions - schema uses legal_name, signup uses legal_business_name
         const practitionerData = {
-            user_id: currentUser.id,
+            id: currentUser.id,
             legal_name: document.getElementById('profile-name')?.value || '',
             legal_business_name: document.getElementById('profile-name')?.value || '',
             business_size: document.getElementById('profile-teamsize')?.value || '',
@@ -2073,7 +2073,7 @@ async function uploadAvatar(file) {
                     practice_logo_url: avatarUrl, 
                     updated_at: new Date().toISOString() 
                 })
-                .eq('user_id', authUserId);
+                .eq('id', authUserId);
             
             if (practitionerError) {
                 console.error('[Rooted Vitality] Database update error:', practitionerError);
@@ -2241,7 +2241,7 @@ function setupBusinessVerification() {
                     verification_id_back_url: backUrl,
                     verification_submitted_at: new Date().toISOString()
                 })
-                .eq('user_id', currentUser.id);
+                .eq('id', currentUser.id);
 
             if (updateError) {
                 console.error('[Rooted Vitality] Error saving verification data:', updateError);
@@ -4158,8 +4158,8 @@ async function loadReviews() {
         // Get practitioner ID
         const { data: practitionerData, error: practitionerError } = await window.supabaseClient
             .from('practitioners')
-            .select('id, user_id')
-            .eq('user_id', user.id)
+            .select('id')
+            .eq('id', user.id)
             .single();
         
         if (practitionerError || !practitionerData) {
@@ -4464,4 +4464,5 @@ function attachReviewEventListeners() {
 }
 
 console.log('[Rooted Vitality] proProfile.js loaded');
+
 

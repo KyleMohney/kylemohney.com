@@ -60,7 +60,7 @@ async function initializeDashboard() {
                 const { data: clients, error: clientError } = await window.supabaseClient
                     .from('clients')
                     .select('*')
-                    .eq('user_id', userData.id)
+                    .eq('id', userData.id)
                     .single();
 
                 if (clients && !clientError) {
@@ -241,7 +241,7 @@ async function handleClientAvatarUpload(file) {
                 profile_picture_url: avatarUrl,
                 updated_at: new Date().toISOString()
             })
-            .eq('user_id', userId);
+            .eq('id', userId);
         
         if (profileError) throw profileError;
         
@@ -301,7 +301,7 @@ async function handleAccountFormSubmit(e) {
         const { error } = await window.supabaseClient
             .from('clients')
             .update(updateData)
-            .eq('user_id', user.id);
+            .eq('id', user.id);
 
         if (error) {
             console.error('[Dashboard] Error saving to Supabase:', error);
@@ -360,7 +360,7 @@ async function handleWellnessFormSubmit(e) {
                     settings_updated_at: new Date().toISOString(),
                     updated_at: new Date().toISOString()
                 })
-                .eq('user_id', user.id);
+                .eq('id', user.id);
             
             if (error) {
                 console.warn('[Dashboard] Error updating settings_updated_at:', error);
@@ -819,3 +819,4 @@ window.addEventListener('DOMContentLoaded', async () => {
 });
 
 console.log('[Rooted Vitality] dashboard-client.js ready');
+

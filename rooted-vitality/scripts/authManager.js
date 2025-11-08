@@ -354,7 +354,7 @@ window.authManager = {
             const { data: practitioner, error: practError } = await window.supabaseClient
                 .from('practitioners')
                 .select('id')
-                .eq('user_id', userId)
+                .eq('id', userId)
                 .single();
             
             if (practitioner && !practError) {
@@ -365,7 +365,7 @@ window.authManager = {
             const { data: client, error: clientError } = await window.supabaseClient
                 .from('clients')
                 .select('id')
-                .eq('user_id', userId)
+                .eq('id', userId)
                 .single();
             
             if (client && !clientError) {
@@ -394,7 +394,7 @@ window.authManager = {
             const { data: practitioner, error: practError } = await window.supabaseClient
                 .from('practitioners')
                 .select('*')
-                .eq('user_id', userId)
+                .eq('id', userId)
                 .single();
             
             if (practitioner && !practError) {
@@ -406,7 +406,7 @@ window.authManager = {
             const { data: client, error: clientError } = await window.supabaseClient
                 .from('clients')
                 .select('*')
-                .eq('user_id', userId)
+                .eq('id', userId)
                 .single();
             
             if (client && !clientError) {
@@ -440,7 +440,7 @@ window.authManager = {
             const { error } = await window.supabaseClient
                 .from(tableName)
                 .update({ last_login: now })
-                .eq('user_id', userId);
+                .eq('id', userId);
             
             if (error) {
                 console.error('[Rooted Vitality] Error updating last_login:', error);
@@ -626,3 +626,4 @@ window.addEventListener('DOMContentLoaded', async () => {
 console.log('[Rooted Vitality] authManager ready (Supabase integration)');
 
 // End of authManager.js — Rooted Vitality Supabase Authentication Module
+

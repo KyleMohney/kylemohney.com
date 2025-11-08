@@ -1,11 +1,11 @@
-﻿/*
-╔════════════════════════════════════════════════════════════════════╗
-║  ROOTED VITALITY, INC.                                             ║
-║  File: scripts/reviewsManager.js                                   ║
-║  Purpose: Review submission modal & database integration           ║
-║  Holistic Wellness · Modern Connection Platform                    ║
-║  rootedvitality.com | 2025                                         ║
-╚════════════════════════════════════════════════════════════════════╝
+/*
++--------------------------------------------------------------------+
+�  ROOTED VITALITY, INC.                                             �
+�  File: scripts/reviewsManager.js                                   �
+�  Purpose: Review submission modal & database integration           �
+�  Holistic Wellness � Modern Connection Platform                    �
+�  rootedvitality.com | 2025                                         �
++--------------------------------------------------------------------+
 
 ARCHITECTURE:
 - reviews table has: id (UUID), rating, review_text, created_at, updated_at, 
@@ -242,7 +242,7 @@ let reviewsManager = {
       div.className = 'photo-preview__item';
       div.innerHTML = `
         <img src="${photo.preview}" alt="Photo ${index + 1}">
-        <button type="button" class="photo-preview__remove" onclick="reviewsManager.removePhoto(${index})" title="Remove">×</button>
+        <button type="button" class="photo-preview__remove" onclick="reviewsManager.removePhoto(${index})" title="Remove">�</button>
       `;
       preview.appendChild(div);
     });
@@ -305,7 +305,7 @@ let reviewsManager = {
           const { data: clientData } = await this.supabaseClient
             .from('clients')
             .select('serial_number')
-            .eq('user_id', user.id)
+            .eq('id', user.id)
             .single();
           clientSerial = clientData?.serial_number || null;
         }
@@ -387,7 +387,7 @@ let reviewsManager = {
         const { data: clientDataForId } = await this.supabaseClient
           .from('clients')
           .select('id')
-          .eq('user_id', currentUser.id)
+          .eq('id', currentUser.id)
           .single();
         clientIdToStore = clientDataForId?.id || null;
       }

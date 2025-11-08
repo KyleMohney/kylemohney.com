@@ -101,7 +101,7 @@ window.ClientHeaderAvatar = {
             const { data: clients, error } = await window.supabaseClient
                 .from('clients')
                 .select('first_name, profile_picture_url')
-                .eq('user_id', userId)
+                .eq('id', userId)
                 .single();
             
             console.log('[Rooted Vitality Avatar] Clients table query result:', { 
@@ -407,3 +407,4 @@ document.addEventListener('visibilitychange', () => {
         }
     }
 }, false);
+

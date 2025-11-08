@@ -82,8 +82,8 @@ async function loadReviews() {
         // Get practitioner ID
         const { data: practitionerData, error: practitionerError } = await window.supabaseClient
             .from('practitioners')
-            .select('id, user_id')
-            .eq('user_id', currentUser.id)
+            .select('id')
+            .eq('id', currentUser.id)
             .single();
         
         if (practitionerError || !practitionerData) {
@@ -455,3 +455,4 @@ if (document.readyState === 'loading') {
 }
 
 console.log('[Reviews] proReviews.js loaded');
+

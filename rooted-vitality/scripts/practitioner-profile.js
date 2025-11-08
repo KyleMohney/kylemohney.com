@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const { data, error } = await window.supabaseClient
                     .from('practitioners')
                     .select('*')
-                    .eq('user_id', user.id)
+                    .eq('id', user.id)
                     .single();
                 
                 if (data) {
@@ -334,7 +334,7 @@ async function openConnectionRequest(practitionerId) {
         const { data: clientData, error: clientError } = await window.supabaseClient
             .from('clients')
             .select('serial_number, id')
-            .eq('user_id', currentUser.id)
+            .eq('id', currentUser.id)
             .single();
         
         if (clientError || !clientData) {
@@ -495,7 +495,7 @@ async function createMatchAndRedirect(project, practitionerId, practitionerSeria
             const { data: clientData, error: clientError } = await window.supabaseClient
                 .from('clients')
                 .select('id, first_name')
-                .eq('user_id', currentUser.id)
+                .eq('id', currentUser.id)
                 .single();
 
             if (!clientError && clientData) {
@@ -1353,3 +1353,4 @@ function openImageModal(imageUrl) {
 }
 
 console.log('[Practitioner Profile] Script loaded');
+

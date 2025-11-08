@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const { data: clientProfile, error: clientError } = await supabaseClient
       .from('clients')
       .select('serial_number, open_to_contact')
-      .eq('user_id', currentUser.id)
+      .eq('id', currentUser.id)
       .single();
 
     if (clientError || !clientProfile) {
@@ -96,7 +96,7 @@ async function initOpenToContactToggle() {
   const { data: clientProfile } = await supabaseClient
     .from('clients')
     .select('open_to_contact')
-    .eq('user_id', currentUser.id)
+    .eq('id', currentUser.id)
     .single();
 
   if (clientProfile) {
@@ -114,7 +114,7 @@ async function initOpenToContactToggle() {
           open_to_contact: isEnabled,
           updated_at: new Date().toISOString()
         })
-        .eq('user_id', currentUser.id);
+        .eq('id', currentUser.id);
 
       if (error) {
         console.error('[Open to Contact] Error updating:', error);
@@ -397,7 +397,7 @@ async function createProject(matchNow = false) {
     const { data: clientProfile, error: clientError } = await supabaseClient
       .from('clients')
       .select('serial_number, open_to_contact, first_name, last_name')
-      .eq('user_id', currentUser.id)
+      .eq('id', currentUser.id)
       .single();
 
     if (clientError || !clientProfile) {
@@ -512,7 +512,7 @@ async function loadProjects() {
     const { data: clientProfile, error: clientError } = await supabaseClient
       .from('clients')
       .select('serial_number')
-      .eq('user_id', currentUser.id)
+      .eq('id', currentUser.id)
       .single();
 
     if (clientError || !clientProfile) {
@@ -902,3 +902,4 @@ async function handleCloseProject() {
     showNotification('Failed to close project. Please try again.', 'error');
   }
 }
+

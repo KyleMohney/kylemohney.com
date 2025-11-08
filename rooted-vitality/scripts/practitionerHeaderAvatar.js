@@ -90,7 +90,7 @@ window.PractitionerHeaderAvatar = {
             const { data: practitioner, error } = await window.supabaseClient
                 .from('practitioners')
                 .select('legal_business_name, profile_photo_url, avatar_url')
-                .eq('user_id', userId)
+                .eq('id', userId)
                 .single();
             
             console.log('[Rooted Vitality Avatar] Database query result:', { 
@@ -346,3 +346,4 @@ const initPractitionerAvatar = () => {
 initPractitionerAvatar();
 
 console.log('[Rooted Vitality] practitionerHeaderAvatar.js loaded');
+

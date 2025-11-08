@@ -144,7 +144,7 @@ async function loadExistingMatches() {
     const { data: clientProfile, error: clientError } = await supabaseClient
       .from('clients')
       .select('serial_number')
-      .eq('user_id', currentUser.id)
+      .eq('id', currentUser.id)
       .single();
     
     if (clientError || !clientProfile) {
@@ -635,7 +635,7 @@ async function sendConnectionRequest(practitionerId, practitionerSerial) {
     const { data: clientData, error: clientError } = await supabaseClient
       .from('clients')
       .select('id, first_name, last_name')
-      .eq('user_id', currentUser.id)
+      .eq('id', currentUser.id)
       .single();
 
     if (clientError || !clientData) {
@@ -854,3 +854,4 @@ if (document.readyState === 'loading') {
 } else {
   initializePage();
 }
+

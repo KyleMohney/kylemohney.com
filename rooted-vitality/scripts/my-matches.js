@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const { data: clientProfile, error: clientError } = await window.supabaseClient
       .from('clients')
       .select('serial_number')
-      .eq('user_id', currentUser.id)
+      .eq('id', currentUser.id)
       .single();
 
     if (clientError || !clientProfile) {
@@ -725,3 +725,4 @@ function showNotification(message, type = 'info') {
   console.log(`[${type.toUpperCase()}] ${message}`);
   // TODO: Implement toast notification UI
 }
+

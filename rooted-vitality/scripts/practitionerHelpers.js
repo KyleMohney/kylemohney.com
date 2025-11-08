@@ -72,7 +72,7 @@ async function createPractitionerProfile(userId, email) {
         const { data, error } = await window.supabaseClient
             .from('practitioners')
             .insert([{
-                user_id: userId,
+                id: userId,
                 email: email,
                 status: 'draft',
                 created_at: new Date().toISOString(),
@@ -107,7 +107,7 @@ async function updatePractitionerProfile(userId, formData) {
         const { data, error } = await window.supabaseClient
             .from('practitioners')
             .update(updatePayload)
-            .eq('user_id', userId)
+            .eq('id', userId)
             .select()
             .single();
 
@@ -130,7 +130,7 @@ async function getPractitionerProfile(userId) {
         const { data, error } = await window.supabaseClient
             .from('practitioners')
             .select('*')
-            .eq('user_id', userId)
+            .eq('id', userId)
             .single();
 
         if (error) throw error;
@@ -156,7 +156,7 @@ async function updatePractitionerStatus(userId, status) {
                 updated_at: new Date().toISOString(),
                 submitted_at: status === 'pending_review' ? new Date().toISOString() : undefined
             })
-            .eq('user_id', userId)
+            .eq('id', userId)
             .select()
             .single();
 
@@ -363,7 +363,7 @@ async function rejectPractitioner(userId, reason) {
                 rejection_reason: reason,
                 updated_at: new Date().toISOString()
             })
-            .eq('user_id', userId)
+            .eq('id', userId)
             .select()
             .single();
 
@@ -395,3 +395,4 @@ export {
     rejectPractitioner
 };
 */
+

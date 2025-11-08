@@ -507,7 +507,7 @@ class MatchSettingsManager {
           pricing: servicePricingArray,
           updated_at: new Date().toISOString()
         })
-        .eq('user_id', practitionerId);
+        .eq('id', practitionerId);
 
       if (error) throw error;
 
@@ -824,3 +824,4 @@ class MatchSettingsManager {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = MatchSettingsManager;
 }
+

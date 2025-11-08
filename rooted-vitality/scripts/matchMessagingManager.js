@@ -199,7 +199,7 @@ async function sendMessage() {
       const { data: clientData, error: clientError } = await supabaseClient
         .from('clients')
         .select('id')
-        .eq('user_id', currentUser.id)
+        .eq('id', currentUser.id)
         .single();
 
       if (clientError || !clientData) {
@@ -320,3 +320,4 @@ function closeMessageThread() {
     threadPanel.style.display = 'none';
   }
 }
+
