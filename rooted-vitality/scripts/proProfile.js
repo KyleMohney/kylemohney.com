@@ -1611,6 +1611,7 @@ async function saveMoreDetailsSection() {
         console.log('[SAVE] FAQ being saved:', updateData.faq, 'Type:', typeof updateData.faq);
         console.log('[SAVE] Payment Methods being saved:', updateData.payment_methods, 'Type:', typeof updateData.payment_methods);
         console.log('[SAVE] Insurance Providers being saved:', updateData.insurance_providers, 'Type:', typeof updateData.insurance_providers);
+        console.log('[SAVE] Practice Type being saved:', updateData.practice_type, 'Type:', typeof updateData.practice_type);
         
         const result = await safePractitionerUpdate(updateData);
         

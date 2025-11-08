@@ -1335,10 +1335,7 @@ const RootedVitality = {
             return;
         }
         
-        // Use absolute path from root for maximum compatibility
-        const logoPath = '/rooted-vitality/assets/logo_trimmed.png';
-        
-        // Detect if we're in a subdirectory and adjust paths for links
+        // Detect if we're in a subdirectory and adjust paths for links and images
         const currentPath = window.location.pathname;
         let pathPrefix = './';
         
@@ -1353,6 +1350,8 @@ const RootedVitality = {
                  currentPath.includes('/help-center/')) {
             pathPrefix = '../';
         }
+        
+        const logoPath = `${pathPrefix}assets/logo_trimmed.png`;
         
         const footerHTML = `
         <footer id="rvFooter" class="rv-footer">
@@ -1441,6 +1440,15 @@ const RootedVitality = {
      */
     injectReportConcern: function() {
         console.log('[Rooted Vitality] injectReportConcern() called');
+        
+        // Skip injection on certain pages where it causes duplicates
+        const currentPath = window.location.pathname;
+        if (currentPath.includes('/dashboard/pro/pages/') || 
+            currentPath.includes('/dashboard/client/') ||
+            currentPath.includes('/dashboard/')) {
+            console.log('[Rooted Vitality] Skipping report concern injection on dashboard pages');
+            return;
+        }
         
         // Prevent double injection
         if (document.getElementById('report-concern-footer')) {
