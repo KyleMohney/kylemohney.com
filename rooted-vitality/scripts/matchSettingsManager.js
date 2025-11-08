@@ -442,7 +442,7 @@ class MatchSettingsManager {
   }
 
   /**
-   * Sync all service pricing to practitioners table as JSON array
+   * Sync all service pricing to practitioners table as JSONB array
    * Called after any price change to keep database in sync
    */
   async syncServicePricingToPractitioner(practitionerId) {
@@ -456,18 +456,18 @@ class MatchSettingsManager {
         price_per_service: service.price_per_service || null
       }));
 
-      // Save to practitioners table as JSON in service_pricing column
+      // Save to practitioners table as JSONB in pricing column
       const { error } = await this.supabase
         .from('practitioners')
         .update({
-          service_pricing: JSON.stringify(servicePricingArray),
+          pricing: servicePricingArray,
           updated_at: new Date().toISOString()
         })
         .eq('user_id', practitionerId);
 
       if (error) throw error;
 
-      console.log('[MatchSettingsManager] ✓ Service pricing synced to practitioners table');
+      console.log('[MatchSettingsManager] ✓ Service pricing synced to practitioners.pricing:', servicePricingArray);
       return true;
     } catch (error) {
       console.error('[MatchSettingsManager] Error syncing service pricing:', error);
