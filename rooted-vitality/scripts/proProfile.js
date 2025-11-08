@@ -31,6 +31,13 @@ async function safePractitionerUpdate(updateData) {
     }
     
     try {
+        console.log('[DB] ====== safePractitionerUpdate CALLED ======');
+        console.log('[DB] Updating user_id:', currentUser.id);
+        console.log('[DB] Update data keys:', Object.keys(updateData));
+        console.log('[DB] languages in updateData:', updateData.languages);
+        console.log('[DB] faq in updateData:', updateData.faq);
+        console.log('[DB] Full update data:', JSON.stringify(updateData, null, 2));
+        
         // Try UPDATE first
         const { data: updated, error: updateError } = await window.supabaseClient
             .from('practitioners')
@@ -38,6 +45,8 @@ async function safePractitionerUpdate(updateData) {
             .eq('user_id', currentUser.id)
             .select()
             .single();
+        
+        console.log('[DB] Update response - data:', updated, 'error:', updateError);
         
         if (updateError && updateError.code === 'PGRST116') {
             // Record doesn't exist, INSERT it
@@ -236,7 +245,15 @@ async function loadProfile(userId) {
             // Store practitioner data globally for badge system and form logic
             window.practitionerData = practitioner;
             console.log('[Rooted Vitality] ✓ Practitioner data stored in window.practitionerData');
-            // KEEP currentUser as the auth user, don't overwrite with practitioner record
+        }
+        
+        // Render dynamic conditions checkboxes from taxonomy FIRST (before loading conditions data)
+        console.log('[Rooted Vitality] Rendering conditions checkboxes before loading profile...');
+        window.conditionsManager.render();
+        
+        // Then populate profile fields (which will set selected conditions)
+        if (practitioner) {
+            console.log('[Rooted Vitality] Practitioner profile found, populating fields...');
             await populateProfileFields(practitioner);
         } else {
             // Try to get name from auth user metadata
@@ -250,10 +267,6 @@ async function loadProfile(userId) {
             window.practitionerData = {};
             initializeCredentialSections();
         }
-        
-        // Render dynamic conditions checkboxes from taxonomy
-        console.log('[Rooted Vitality] Rendering conditions checkboxes...');
-        window.conditionsManager.render();
         
         // Update completeness meter after loading profile
         updateProfileCompleteness();
@@ -271,6 +284,10 @@ async function loadProfile(userId) {
 async function populateProfileFields(data) {
     console.log('[Rooted Vitality] populateProfileFields called with data:', data);
     console.log('[Rooted Vitality] Full data object keys:', Object.keys(data));
+    console.log('[Rooted Vitality] conditions_treated field present:', 'conditions_treated' in data);
+    console.log('[Rooted Vitality] conditions_treated value:', data.conditions_treated);
+    console.log('[Rooted Vitality] conditions_treated type:', typeof data.conditions_treated);
+    console.log('[Rooted Vitality] conditions_treated is array:', Array.isArray(data.conditions_treated));
     
     // Try to populate from practitioners table fields first, then fallback to profiles table fields
     
@@ -489,12 +506,46 @@ async function populateProfileFields(data) {
         }
     }
     
-    // Load insurance accepted list (new array-based system)
-    if (data.insurance_accepted && Array.isArray(data.insurance_accepted)) {
-        loadInsurance(data.insurance_accepted);
-        console.log('[Rooted Vitality] ✓ Loaded insurance accepted:', data.insurance_accepted);
+    // Load insurance providers list - check both insurance_providers and insurance_accepted for backwards compatibility
+    let insuranceData = [];
+    if (data.insurance_providers && Array.isArray(data.insurance_providers)) {
+        insuranceData = data.insurance_providers;
+        console.log('[Rooted Vitality] ✓ Loaded insurance_providers:', insuranceData);
+    } else if (data.insurance_accepted && Array.isArray(data.insurance_accepted)) {
+        insuranceData = data.insurance_accepted;
+        console.log('[Rooted Vitality] ✓ Loaded insurance_accepted (legacy):', insuranceData);
+    }
+    window.selectedInsurance = insuranceData;
+    loadInsurance(insuranceData);
+    
+    // Load payment methods
+    if (data.payment_methods && Array.isArray(data.payment_methods)) {
+        window.selectedPaymentMethods = data.payment_methods;
+        console.log('[Rooted Vitality] ✓ Loaded payment_methods:', window.selectedPaymentMethods);
+        // Check the appropriate checkboxes
+        document.querySelectorAll('input[name="payment-method"]').forEach(cb => {
+            cb.checked = window.selectedPaymentMethods.includes(cb.value);
+        });
     } else {
-        loadInsurance([]);
+        window.selectedPaymentMethods = [];
+    }
+    
+    // Load custom insurance providers text
+    if (data.custom_insurance_providers) {
+        const customInsuranceEl = document.getElementById('custom-insurance-providers');
+        if (customInsuranceEl) {
+            customInsuranceEl.value = data.custom_insurance_providers;
+            console.log('[Rooted Vitality] ✓ Loaded custom_insurance_providers:', data.custom_insurance_providers);
+        }
+    }
+    
+    // Load custom payment methods text
+    if (data.custom_payment_methods) {
+        const customPaymentEl = document.getElementById('custom-payment-methods');
+        if (customPaymentEl) {
+            customPaymentEl.value = data.custom_payment_methods;
+            console.log('[Rooted Vitality] ✓ Loaded custom_payment_methods:', data.custom_payment_methods);
+        }
     }
     
     // Load pricing information
@@ -524,13 +575,47 @@ async function populateProfileFields(data) {
         console.log('[Rooted Vitality] No video URL found in database');
     }
     
-    // Load continuing education credentials
-    if (data.continuing_education && Array.isArray(data.continuing_education)) {
-        window.continuingEducationCredentials = data.continuing_education;
-        renderContinuingEducationDisplay();
-        console.log('[Rooted Vitality] ✓ Loaded continuing education:', data.continuing_education);
+    // Continuing education credentials are loaded above from data.credentials array
+    // (filtered by credential_type === 'continuing_education')
+    // No need to load from a separate field
+    console.log('[Rooted Vitality] ✓ Continuing education already loaded from credentials array:', window.continuingEducationCredentials.length, 'items');
+    
+    // Load languages from database
+    // Languages are stored as text[] array in database
+    if (data.languages) {
+        console.log('[Rooted Vitality] Raw languages from DB:', data.languages, 'type:', typeof data.languages, 'isArray:', Array.isArray(data.languages));
+        
+        // Handle different formats that might come from database
+        let languagesArray = [];
+        if (Array.isArray(data.languages)) {
+            languagesArray = data.languages;
+        } else if (typeof data.languages === 'string') {
+            // If it comes back as a string, try to parse it
+            try {
+                languagesArray = JSON.parse(data.languages);
+            } catch (e) {
+                // If parsing fails, treat as single language
+                languagesArray = [data.languages];
+            }
+        }
+        
+        window.currentLanguages = languagesArray;
+        console.log('[Rooted Vitality] ✓ Loaded languages from database:', window.currentLanguages);
     } else {
-        window.continuingEducationCredentials = [];
+        window.currentLanguages = [];
+        console.log('[Rooted Vitality] No languages found in database');
+    }
+    
+    // Load FAQ from database
+    if (data.faq && Array.isArray(data.faq)) {
+        window.faqItems = data.faq;
+        // Set nextId to max id + 1
+        window.faqNextId = Math.max(...window.faqItems.map(item => item.id || 0), 0) + 1;
+        console.log('[Rooted Vitality] ✓ Loaded FAQ from database:', window.faqItems.length, 'items');
+    } else {
+        window.faqItems = [];
+        window.faqNextId = 0;
+        console.log('[Rooted Vitality] No FAQ found in database');
     }
     
     // Legacy support: accepts_insurance boolean (will be migrated)
@@ -585,6 +670,26 @@ function initializeCredentialSections() {
         console.log(`[Rooted Vitality] 🔧 Credential array length: ${credentialArray.length}`);
     });
     
+    // Initialize continuing education section
+    console.log(`[Rooted Vitality] 🔧 Processing section: continuing-education`);
+    const ceEditDiv = document.getElementById('continuing-education-edit');
+    const ceDisplayDiv = document.getElementById('continuing-education-display');
+    
+    if (ceEditDiv) {
+        ceEditDiv.style.display = 'flex';
+        console.log(`[Rooted Vitality] 🔧 Set continuing-education-edit display = flex`);
+    }
+    
+    if (ceDisplayDiv) {
+        ceDisplayDiv.style.display = 'none';
+        console.log(`[Rooted Vitality] 🔧 Set continuing-education-display display = none`);
+    }
+    
+    // Render any existing continuing education credentials
+    console.log(`[Rooted Vitality] 🔧 Rendering continuing education list`);
+    renderContinuingEducationList();
+    
+    console.log(`[Rooted Vitality] 🔧 Credential array length: ${(window.continuingEducationCredentials || []).length}`);
     console.log('[Rooted Vitality] 🔧 initializeCredentialSections completed');
 }
 
@@ -775,20 +880,20 @@ function updateCredentialsBadge() {
             console.warn('[Rooted Vitality] Verified badge element not found!');
         }
         
-        const hasBackgroundCheck = window.practitionerData && window.practitionerData.background_check_status;
-        const hasLicense = window.licenseCredentials && window.licenseCredentials.length > 0;
-        const hasCertified = window.certificationCredentials && window.certificationCredentials.length > 0;
-        const isVerified = window.practitionerData && window.practitionerData.verification_status === 'approved';
+        const hasBackgroundCheck = window.practitionerData && window.practitionerData.badge_background_check;
+        const hasLicense = window.practitionerData && window.practitionerData.badge_licensed;
+        const hasCertified = window.practitionerData && window.practitionerData.badge_certified;
+        const isVerified = window.practitionerData && window.practitionerData.badge_verified;
         
         console.log('[Rooted Vitality] updateCredentialsBadge - Status:', {
             hasBackgroundCheck,
             hasLicense,
             hasCertified,
             isVerified,
-            licenseCount: window.licenseCredentials?.length || 0,
-            certificationCount: window.certificationCredentials?.length || 0,
-            backgroundStatus: window.practitionerData?.background_check_status,
-            verificationStatus: window.practitionerData?.verification_status
+            badgeBackgroundCheck: window.practitionerData?.badge_background_check,
+            badgeLicensed: window.practitionerData?.badge_licensed,
+            badgeCertified: window.practitionerData?.badge_certified,
+            badgeVerified: window.practitionerData?.badge_verified
         });
         
         // Background Check Badge - ALWAYS reset to locked state first
@@ -1146,9 +1251,15 @@ function createCredentialDisplayItem(type, credential) {
 }
 
 /* Debounce auto-save for Phase 1 sections (Languages, FAQ) */
-function debounceAutoSave() {
+function debounceAutoSave(sectionOverride = null) {
     clearTimeout(autoSaveTimeout);
     autoSaveTimeout = setTimeout(() => {
+        // If section is explicitly provided, use it
+        if (sectionOverride) {
+            saveSectionData(sectionOverride);
+            return;
+        }
+        
         // Check if this is a header field edit and save immediately
         if (event && event.target) {
             const fieldId = event.target.id;
@@ -1280,18 +1391,22 @@ async function saveSectionData(sectionId) {
  */
 async function saveAboutSection() {
     try {
+        const conditionsData = saveConditionsData();
+        
         const updateData = {
             bio: document.getElementById('about-content')?.value || '',
             ethos_statement: document.getElementById('approach-content')?.value || '',
-            conditions_treated: saveConditionsData(),
+            conditions_treated: Array.isArray(conditionsData) ? conditionsData : [],
             updated_at: new Date().toISOString()
         };
         
         console.log('[SAVE] About section data:', updateData);
+        console.log('[SAVE] Conditions type:', typeof updateData.conditions_treated, 'value:', updateData.conditions_treated);
         
         const result = await safePractitionerUpdate(updateData);
         
         console.log('[SAVE] ✓ About section saved successfully');
+        console.log('[SAVE] Result conditions:', result?.conditions_treated);
         window.practitionerData = result;
         showAutoSaveIndicator('success');
         lockSectionEdit('about');
@@ -1412,12 +1527,31 @@ async function savePhotosAndVideoSection() {
  */
 async function saveMoreDetailsSection() {
     try {
+        console.log('[SAVE] ========== saveMoreDetailsSection STARTED ==========');
+        console.log('[SAVE] window.currentLanguages:', window.currentLanguages);
+        console.log('[SAVE] window.faqItems:', window.faqItems);
+        
         const paymentCheckboxData = getPaymentCheckboxValues();
-        const practiceData = savePracticeData();
+        
+        console.log('[SAVE] paymentCheckboxData:', paymentCheckboxData);
+        console.log('[SAVE] Insurance providers from checkboxes:', paymentCheckboxData.insurance_providers);
+        console.log('[SAVE] Payment methods from checkboxes:', paymentCheckboxData.payment_methods);
+        
+        const selectedLanguages = getSelectedLanguages();
+        console.log('[SAVE] selectedLanguages from getSelectedLanguages():', selectedLanguages);
+        console.log('[SAVE] selectedLanguages type:', typeof selectedLanguages, 'isArray:', Array.isArray(selectedLanguages));
+        
+        // Ensure languages is properly formatted as an array
+        const languagesToSave = Array.isArray(selectedLanguages) ? selectedLanguages : [];
+        console.log('[SAVE] languagesToSave (after formatting):', languagesToSave);
+        
+        // Ensure FAQ is properly formatted as an array
+        const faqToSave = Array.isArray(window.faqItems) ? window.faqItems : [];
+        console.log('[SAVE] faqToSave (after formatting):', faqToSave);
         
         const updateData = {
-            languages: getSelectedLanguages(),
-            faq: window.faqItems || [],
+            languages: languagesToSave,
+            faq: faqToSave,
             social_media: {
                 facebook: document.getElementById('social-facebook')?.value || '',
                 instagram: document.getElementById('social-instagram')?.value || '',
@@ -1428,20 +1562,29 @@ async function saveMoreDetailsSection() {
                 pinterest: document.getElementById('social-pinterest')?.value || '',
                 website: document.getElementById('social-website')?.value || ''
             },
-            practice_type: JSON.stringify(practiceData),
-            accepts_insurance: paymentCheckboxData.accepts_insurance,
-            insurance_providers: paymentCheckboxData.insurance_providers,
-            custom_insurance_providers: paymentCheckboxData.custom_insurance_providers,
-            payment_methods: paymentCheckboxData.payment_methods,
-            custom_payment_methods: paymentCheckboxData.custom_payment_methods,
+            accepts_insurance: paymentCheckboxData.accepts_insurance === true,
+            insurance_providers: Array.isArray(paymentCheckboxData.insurance_providers) ? paymentCheckboxData.insurance_providers : [],
+            custom_insurance_providers: paymentCheckboxData.custom_insurance_providers || '',
+            payment_methods: Array.isArray(paymentCheckboxData.payment_methods) ? paymentCheckboxData.payment_methods : [],
+            custom_payment_methods: paymentCheckboxData.custom_payment_methods || '',
             updated_at: new Date().toISOString()
         };
         
+        // Remove practice_type from here (redundant - already captured in signup/hero)
+        
         console.log('[SAVE] More Details section data:', updateData);
+        console.log('[SAVE] Languages being saved:', updateData.languages, 'Type:', typeof updateData.languages);
+        console.log('[SAVE] FAQ being saved:', updateData.faq, 'Type:', typeof updateData.faq);
+        console.log('[SAVE] Payment Methods being saved:', updateData.payment_methods, 'Type:', typeof updateData.payment_methods);
+        console.log('[SAVE] Insurance Providers being saved:', updateData.insurance_providers, 'Type:', typeof updateData.insurance_providers);
         
         const result = await safePractitionerUpdate(updateData);
         
         console.log('[SAVE] ✓ More Details section saved successfully');
+        console.log('[SAVE] Result from database:', result);
+        console.log('[SAVE] Languages in result:', result?.languages, 'Type:', typeof result?.languages);
+        console.log('[SAVE] Payment Methods in result:', result?.payment_methods, 'Type:', typeof result?.payment_methods);
+        console.log('[SAVE] Insurance Providers in result:', result?.insurance_providers, 'Type:', typeof result?.insurance_providers);
         window.practitionerData = result;
         showAutoSaveIndicator('success');
         lockSectionEdit('more-details');
@@ -2383,17 +2526,6 @@ function updateBackgroundCheckStatus(status) {
             </div>
         `;
         if (button) button.style.display = 'none';
-    } else if (status === 'pending') {
-        statusContainer.innerHTML = `
-            <div class="background-check-status pending">
-                <span class="status-icon">⏳</span>
-                <div>
-                    <p>Background Check In Progress</p>
-                    <p class="status-date">We're verifying your credentials</p>
-                </div>
-            </div>
-        `;
-        if (button) button.style.display = 'none';
     }
 }
 
@@ -2444,59 +2576,127 @@ function populateQuickStats() {
 /* ========================================== */
 
 function loadLanguages() {
-    console.log('[Rooted Vitality] Loading languages from profile');
+    console.log('[Rooted Vitality] Loading languages from window.currentLanguages');
+    console.log('[Rooted Vitality] window.currentLanguages value:', window.currentLanguages);
     
-    if (!currentUser || !currentUser.languages) {
-        console.log('[Rooted Vitality] No languages data found');
+    if (!window.currentLanguages || window.currentLanguages.length === 0) {
+        console.log('[Rooted Vitality] No languages data found, clearing all checkboxes');
+        // Uncheck all checkboxes
+        document.querySelectorAll('.language-checkbox').forEach(cb => cb.checked = false);
+        document.getElementById('custom-language-input').value = '';
         renderLanguagesList([]);
         return;
     }
     
-    // Parse languages if stored as JSON string
-    let languages = [];
-    if (typeof currentUser.languages === 'string') {
-        try {
-            languages = JSON.parse(currentUser.languages);
-        } catch (e) {
-            console.error('[Rooted Vitality] Error parsing languages:', e);
-            languages = [];
+    console.log('[Rooted Vitality] Rendering languages:', window.currentLanguages);
+    
+    // Uncheck all first
+    document.querySelectorAll('.language-checkbox').forEach(cb => cb.checked = false);
+    document.getElementById('custom-language-input').value = '';
+    
+    // Check the boxes that match
+    const predefinedLanguages = ['English', 'Spanish', 'French', 'German', 'Mandarin', 'Japanese', 'Portuguese', 'Italian', 'Korean', 'Vietnamese'];
+    let customLanguages = [];
+    
+    window.currentLanguages.forEach(lang => {
+        if (predefinedLanguages.includes(lang)) {
+            const checkbox = document.querySelector(`.language-checkbox[value="${lang}"]`);
+            if (checkbox) checkbox.checked = true;
+        } else {
+            customLanguages.push(lang);
         }
-    } else if (Array.isArray(currentUser.languages)) {
-        languages = currentUser.languages;
+    });
+    
+    // Handle custom languages
+    if (customLanguages.length > 0) {
+        const customCheckbox = document.getElementById('custom-language-checkbox');
+        const customInput = document.getElementById('custom-language-input');
+        customCheckbox.checked = true;
+        // Set the custom input to the first custom language (user can edit)
+        customInput.value = customLanguages[0];
     }
     
-    renderLanguagesList(languages);
-    console.log('[Rooted Vitality] Loaded languages:', languages);
+    renderLanguagesList(window.currentLanguages);
+    console.log('[Rooted Vitality] ✓ Loaded languages:', window.currentLanguages);
 }
 
 function setupLanguageListeners() {
     console.log('[Rooted Vitality] Setting up language listeners');
     
-    const languageInput = document.getElementById('language-input');
-    if (!languageInput) return;
-    
-    languageInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            const language = languageInput.value.trim();
-            if (language) {
-                addLanguage(language);
-                languageInput.value = '';
-            }
-        }
+    // Setup checkbox listeners for predefined languages
+    const checkboxes = document.querySelectorAll('.language-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateLanguagesFromCheckboxes);
     });
+    
+    // Setup custom language input
+    const customInput = document.getElementById('custom-language-input');
+    if (customInput) {
+        customInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const language = customInput.value.trim();
+                if (language) {
+                    addLanguage(language);
+                    customInput.value = '';
+                }
+            }
+        });
+    }
 }
 
 window.currentLanguages = [];
 
 function addLanguage(language) {
     console.log('[Rooted Vitality] Adding language:', language);
+    console.log('[Rooted Vitality] window.currentLanguages BEFORE add:', window.currentLanguages);
     
     if (!window.currentLanguages.includes(language)) {
         window.currentLanguages.push(language);
+        console.log('[Rooted Vitality] window.currentLanguages AFTER add:', window.currentLanguages);
         renderLanguagesList(window.currentLanguages);
-        debounceAutoSave();
+        console.log('[Rooted Vitality] renderLanguagesList called');
+        debounceAutoSave('more-details');
+        console.log('[Rooted Vitality] debounceAutoSave called');
+    } else {
+        console.log('[Rooted Vitality] Language already exists, not adding');
     }
+}
+
+function addLanguageFromButton() {
+    const languageInput = document.getElementById('language-input');
+    if (languageInput && languageInput.value.trim()) {
+        addLanguage(languageInput.value.trim());
+        languageInput.value = '';
+        languageInput.focus();
+    }
+}
+
+function updateLanguagesFromCheckboxes() {
+    console.log('[Rooted Vitality] Updating languages from checkboxes');
+    
+    const languages = [];
+    
+    // Collect checked checkboxes (excluding the custom language checkbox)
+    const checkboxes = document.querySelectorAll('.language-checkbox:not(#custom-language-checkbox):checked');
+    checkboxes.forEach(checkbox => {
+        languages.push(checkbox.value);
+    });
+    
+    // Collect custom language if checkbox is checked AND text is entered
+    const customCheckbox = document.getElementById('custom-language-checkbox');
+    const customInput = document.getElementById('custom-language-input');
+    if (customCheckbox && customCheckbox.checked && customInput && customInput.value.trim()) {
+        const customLang = customInput.value.trim();
+        if (!languages.includes(customLang)) {
+            languages.push(customLang);
+        }
+    }
+    
+    window.currentLanguages = languages;
+    console.log('[Rooted Vitality] Languages updated:', window.currentLanguages);
+    renderLanguagesList(window.currentLanguages);
+    debounceAutoSave('more-details');
 }
 
 function removeLanguage(language) {
@@ -2504,7 +2704,7 @@ function removeLanguage(language) {
     
     window.currentLanguages = window.currentLanguages.filter(lang => lang !== language);
     renderLanguagesList(window.currentLanguages);
-    debounceAutoSave();
+    debounceAutoSave('more-details');
 }
 
 function renderLanguagesList(languages) {
@@ -2537,31 +2737,15 @@ window.faqItems = [];
 window.faqNextId = 0;
 
 function loadFAQ() {
-    console.log('[Rooted Vitality] Loading FAQ from profile');
+    console.log('[Rooted Vitality] Loading FAQ from window.faqItems');
     
-    if (!currentUser || !currentUser.faq) {
+    if (!window.faqItems || window.faqItems.length === 0) {
         console.log('[Rooted Vitality] No FAQ data found');
         window.faqItems = [];
+        window.faqNextId = 0;
         renderFAQItems();
         return;
     }
-    
-    // Parse FAQ if stored as JSON string
-    let faqs = [];
-    if (typeof currentUser.faq === 'string') {
-        try {
-            faqs = JSON.parse(currentUser.faq);
-        } catch (e) {
-            console.error('[Rooted Vitality] Error parsing FAQ:', e);
-            faqs = [];
-        }
-    } else if (Array.isArray(currentUser.faq)) {
-        faqs = currentUser.faq;
-    }
-    
-    window.faqItems = faqs;
-    // Set nextId to max id + 1
-    window.faqNextId = Math.max(...window.faqItems.map(item => item.id || 0), 0) + 1;
     
     renderFAQItems();
     console.log('[Rooted Vitality] Loaded FAQ items:', window.faqItems);
@@ -2575,8 +2759,11 @@ function renderFAQItems() {
     // Render form fields for each FAQ item
     faqList.innerHTML = window.faqItems.map((item, index) => `
         <div class="faq-form-item" data-faq-id="${item.id}">
+            <div class="faq-item-header">
+                <div class="faq-item-number">Q${index + 1}</div>
+                <button class="faq-delete-btn" onclick="deleteFAQItem(${item.id})" title="Remove this Q&A">Remove</button>
+            </div>
             <div class="faq-form-group">
-                <label>Question ${index + 1}</label>
                 <input 
                     type="text" 
                     class="faq-question-input" 
@@ -2586,7 +2773,6 @@ function renderFAQItems() {
                 >
             </div>
             <div class="faq-form-group">
-                <label>Answer</label>
                 <textarea 
                     class="faq-answer-input" 
                     data-faq-id="${item.id}"
@@ -2594,7 +2780,6 @@ function renderFAQItems() {
                     rows="3"
                 >${item.answer || ''}</textarea>
             </div>
-            <button class="faq-delete-btn" onclick="deleteFAQItem(${item.id})" title="Remove this Q&A">× Remove</button>
         </div>
     `).join('');
     
@@ -2618,7 +2803,7 @@ function renderFAQItems() {
                 } else {
                     item.answer = e.target.value;
                 }
-                debounceAutoSave();
+                debounceAutoSave('more-details');
             }
         });
     });
@@ -2640,6 +2825,7 @@ function addFAQItem() {
     });
     
     renderFAQItems();
+    debounceAutoSave('more-details');
     
     // Focus on the new question field
     setTimeout(() => {
@@ -2655,7 +2841,7 @@ function deleteFAQItem(id) {
     
     window.faqItems = window.faqItems.filter(faq => faq.id !== id);
     renderFAQItems();
-    debounceAutoSave();
+    debounceAutoSave('more-details');
 }
 
 function setupFAQListeners() {
@@ -2727,9 +2913,15 @@ function loadInsurance(insuranceArray) {
 }
 
 function renderInsuranceCheckboxes() {
+    console.log('[DEBUG] renderInsuranceCheckboxes called');
     const checkboxes = document.querySelectorAll('.insurance-checkbox');
+    console.log('[DEBUG] Found insurance checkboxes with .insurance-checkbox class:', checkboxes.length);
+    console.log('[DEBUG] window.selectedInsurance:', window.selectedInsurance);
+    
     checkboxes.forEach(checkbox => {
-        checkbox.checked = window.selectedInsurance.includes(checkbox.value);
+        const shouldCheck = window.selectedInsurance.includes(checkbox.value);
+        console.log('[DEBUG] Checkbox', checkbox.value, '- should be checked:', shouldCheck);
+        checkbox.checked = shouldCheck;
         checkbox.addEventListener('change', updateInsuranceSelection);
     });
 }
@@ -2738,7 +2930,7 @@ function updateInsuranceSelection() {
     const checkboxes = document.querySelectorAll('.insurance-checkbox:checked');
     window.selectedInsurance = Array.from(checkboxes).map(cb => cb.value);
     renderInsuranceDisplay();
-    debounceAutoSave();
+    debounceAutoSave('more-details');
 }
 
 function renderInsuranceDisplay() {
@@ -3233,8 +3425,12 @@ function updateConditionsData() {
 function saveConditionsData() {
     try {
         updateConditionsData();
-        console.log('[Rooted Vitality] Saved conditions data:', window.conditionsData);
-        return window.conditionsData;
+        const conditions = window.conditionsData || [];
+        console.log('[Rooted Vitality] Saved conditions data type:', typeof conditions);
+        console.log('[Rooted Vitality] Saved conditions data is array:', Array.isArray(conditions));
+        console.log('[Rooted Vitality] Saved conditions data:', conditions);
+        console.log('[Rooted Vitality] Saved conditions length:', conditions.length);
+        return conditions;
     } catch (error) {
         console.error('[Rooted Vitality] Error saving conditions data:', error);
         return [];
@@ -3244,16 +3440,32 @@ function saveConditionsData() {
 function loadConditions(conditionsArray) {
     try {
         if (!Array.isArray(conditionsArray)) {
-            console.warn('[Rooted Vitality] Conditions not an array:', conditionsArray);
-            return;
+            console.warn('[Rooted Vitality] Conditions not an array:', conditionsArray, typeof conditionsArray);
+            // Try to parse if it's a stringified array
+            if (typeof conditionsArray === 'string') {
+                try {
+                    conditionsArray = JSON.parse(conditionsArray);
+                    console.log('[Rooted Vitality] Parsed conditions from string:', conditionsArray);
+                } catch (e) {
+                    console.error('[Rooted Vitality] Failed to parse conditions string:', e);
+                    return;
+                }
+            } else {
+                return;
+            }
         }
         
-        console.log('[Rooted Vitality] Loading conditions into UI:', conditionsArray);
+        console.log('[Rooted Vitality] Loading conditions into UI:', conditionsArray, 'length:', conditionsArray.length);
         
         // Use conditions manager to set selected conditions
         // This handles the dynamic taxonomy checkboxes
         window.conditionsData = conditionsArray;
-        window.conditionsManager.setSelected(conditionsArray);
+        if (window.conditionsManager && window.conditionsManager.setSelected) {
+            window.conditionsManager.setSelected(conditionsArray);
+            console.log('[Rooted Vitality] ✓ Called conditionsManager.setSelected()');
+        } else {
+            console.warn('[Rooted Vitality] ⚠ conditionsManager not ready or setSelected not available');
+        }
         
         // Render display
         renderConditionsDisplay();
@@ -3471,13 +3683,17 @@ function getPaymentCheckboxValues() {
     
     // Collect selected insurance providers
     const insuranceCheckboxes = document.querySelectorAll('input[name="insurance-provider"]:checked');
+    console.log('[DEBUG] Found insurance checkboxes (checked):', insuranceCheckboxes.length);
     insuranceCheckboxes.forEach(cb => {
+        console.log('[DEBUG] Adding insurance provider:', cb.value);
         paymentData.insurance_providers.push(cb.value);
     });
     
     // Collect selected payment methods
     const paymentCheckboxes = document.querySelectorAll('input[name="payment-method"]:checked');
+    console.log('[DEBUG] Found payment checkboxes (checked):', paymentCheckboxes.length);
     paymentCheckboxes.forEach(cb => {
+        console.log('[DEBUG] Adding payment method:', cb.value);
         paymentData.payment_methods.push(cb.value);
     });
     
