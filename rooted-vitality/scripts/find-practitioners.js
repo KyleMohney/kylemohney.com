@@ -642,6 +642,25 @@ async function sendConnectionRequest(practitionerId, practitionerSerial) {
       return;
     }
 
+    // Get match score and distance from the matching algorithm
+    let matchScore = 75;
+    let distanceMiles = null;
+    
+    const { data: matchData, error: matchQueryError } = await supabaseClient.rpc(
+      'match_practitioners',
+      { v_project_id: selectedProject.id }
+    );
+
+    if (!matchQueryError && matchData && matchData.length > 0) {
+      const practitionerMatch = matchData.find(m => m.practitioner_id === practitionerId);
+      if (practitionerMatch) {
+        matchScore = practitionerMatch.match_score || 75;
+        distanceMiles = practitionerMatch.distance_miles || null;
+      }
+    }
+
+    console.log('[sendConnectionRequest] Match score:', matchScore, 'Distance:', distanceMiles);
+
     // Create match with all fields
     const { data, error } = await supabaseClient
       .from('project_practitioner_matches')
@@ -651,14 +670,15 @@ async function sendConnectionRequest(practitionerId, practitionerSerial) {
         client_serial: selectedProject.client_serial,
         practitioner_serial: practitionerSerial,
         status: 'active',
-        is_read: false,                              // NEW - unread when first created
-        client_initiated: true,                      // NEW - client sent request
-        created_at: new Date().toISOString(),        // NEW
-        updated_at: new Date().toISOString(),        // NEW
-        matched_at: new Date().toISOString(),        // NEW
-        contacted_at: null,                          // NEW - will be set when practitioner responds
-        match_score: 0,                              // NEW - can be calculated if needed
-        matched_concerns: selectedProject.description ? [selectedProject.description] : []  // NEW - array format
+        is_read: false,                              // Unread when first created
+        client_initiated: true,                      // Client sent request
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        matched_at: new Date().toISOString(),
+        contacted_at: null,                          // Will be set when practitioner responds
+        match_score: matchScore,                     // Quality score from matching algorithm
+        distance_miles: distanceMiles,               // Distance to practitioner
+        matched_concerns: selectedProject.description ? [selectedProject.description] : []
       });
 
     if (error) {

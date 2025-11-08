@@ -247,6 +247,196 @@
       color: #999;
       margin: 0;
     }
+
+    /* Toast Notification Styles */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 400px;
+    }
+
+    .toast {
+      background: white;
+      border-left: 4px solid #5c9a72;
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+      animation: slideIn 0.3s ease-out;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .toast.success {
+      border-left-color: #5c9a72;
+    }
+
+    .toast.info {
+      border-left-color: #2196F3;
+    }
+
+    .toast.error {
+      border-left-color: #f44336;
+    }
+
+    .toast-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .toast-content {
+      flex: 1;
+    }
+
+    .toast-title {
+      font-weight: 600;
+      color: #2d2d2d;
+      margin: 0 0 4px 0;
+      font-size: 0.95rem;
+    }
+
+    .toast-message {
+      color: #666;
+      font-size: 0.85rem;
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    .toast-close {
+      background: none;
+      border: none;
+      font-size: 18px;
+      color: #999;
+      cursor: pointer;
+      padding: 0;
+      flex-shrink: 0;
+    }
+
+    .toast-close:hover {
+      color: #666;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideOut {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+    }
+
+    /* Match Quality Badge */
+    .match-quality-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      background: #f0f9f6;
+      border: 1px solid #5c9a72;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #5c9a72;
+      margin-top: 0.5rem;
+    }
+
+    .match-quality-badge.high {
+      background: #e8f5e9;
+      border-color: #4caf50;
+      color: #2e7d32;
+    }
+
+    .match-quality-badge.medium {
+      background: #f1f8e9;
+      border-color: #ff9800;
+      color: #e65100;
+    }
+
+    .match-quality-badge.low {
+      background: #fce4ec;
+      border-color: #f44336;
+      color: #c2185b;
+    }
+
+    /* Distance Badge */
+    .distance-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      background: #e3f2fd;
+      border-radius: 16px;
+      font-size: 0.8rem;
+      color: #1976d2;
+      margin-left: 0.5rem;
+    }
+
+    /* Enhanced Card Styling */
+    .match-details {
+      padding: 0.75rem 1.5rem;
+      background: #f5f5f5;
+      border-bottom: 1px solid #e5e5e5;
+      font-size: 0.85rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .match-detail-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: #666;
+    }
+
+    .match-detail-label {
+      font-weight: 600;
+      color: #333;
+    }
+
+    /* Notification Badge on Sidebar */
+    .sidebar-tab__badge {
+      display: inline-block;
+      background: #f44336;
+      color: white;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: bold;
+      margin-top: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .toast-container {
+        max-width: calc(100vw - 20px);
+        left: 10px;
+        right: 10px;
+      }
+    }
   </style>
 </head>
 <body class="pro-dashboard">
@@ -257,6 +447,9 @@
   <header id="header-inject"></header>
 
   <main class="clients-main">
+    <!-- Toast Container for Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
     <div class="clients-container">
       <div class="clients-header">
         <h1>Clients</h1>
@@ -315,7 +508,52 @@
   <script src="../../injections.js"></script>
   
   <script>
-    // Tab switching logic
+    // ============================================================================
+    // TOAST NOTIFICATION SYSTEM
+    // ============================================================================
+    function showToast(title, message, type = 'info', duration = 5000) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      
+      const icons = {
+        success: '✓',
+        info: 'ℹ',
+        error: '✕'
+      };
+
+      toast.innerHTML = `
+        <div class="toast-icon">${icons[type] || '•'}</div>
+        <div class="toast-content">
+          <p class="toast-title">${title}</p>
+          <p class="toast-message">${message}</p>
+        </div>
+        <button class="toast-close">×</button>
+      `;
+
+      container.appendChild(toast);
+
+      const closeBtn = toast.querySelector('.toast-close');
+      closeBtn.addEventListener('click', () => {
+        toast.style.animation = 'slideOut 0.3s ease-out forwards';
+        setTimeout(() => toast.remove(), 300);
+      });
+
+      if (duration > 0) {
+        setTimeout(() => {
+          if (toast.parentElement) {
+            toast.style.animation = 'slideOut 0.3s ease-out forwards';
+            setTimeout(() => toast.remove(), 300);
+          }
+        }, duration);
+      }
+
+      return toast;
+    }
+
+    // ============================================================================
+    // TAB SWITCHING LOGIC
+    // ============================================================================
     document.querySelectorAll('.sidebar-tab').forEach(tab => {
       tab.addEventListener('click', () => {
         const tabName = tab.dataset.tab;
@@ -330,7 +568,9 @@
       });
     });
 
-    // Load client data
+    // ============================================================================
+    // LOAD CLIENT DATA & REAL-TIME SUBSCRIPTIONS
+    // ============================================================================
     async function loadClientsData() {
       try {
         if (!window.supabaseClient || !window.authManager) {
@@ -417,6 +657,14 @@
 
           const firstMessage = messages?.[0]?.message || 'No messages yet';
 
+          // Get match quality details from the match record
+          const matchScore = match.match_score || 0;
+          const matchQuality = matchScore >= 80 ? 'high' : matchScore >= 60 ? 'medium' : 'low';
+          const qualityLabel = matchScore >= 80 ? 'Excellent Match' : matchScore >= 60 ? 'Good Match' : 'Potential Match';
+          const distanceMiles = match.distance_miles ? match.distance_miles.toFixed(1) : 'Unknown';
+          const daysAgo = Math.floor((new Date() - new Date(match.created_at)) / (1000 * 60 * 60 * 24));
+          const daysText = daysAgo === 0 ? 'Today' : daysAgo === 1 ? 'Yesterday' : `${daysAgo} days ago`;
+
           const card = document.createElement('div');
           card.className = 'client-card';
           card.innerHTML = `
@@ -425,7 +673,11 @@
               <div class="client-info">
                 <h3 class="client-name">${clientName}</h3>
                 <p class="client-service">${project.category_name || 'Wellness'}</p>
-                <p class="client-meta">Started ${new Date(project.created_at).toLocaleDateString()}</p>
+                <p class="client-meta">Matched ${daysText}</p>
+                <span class="match-quality-badge ${matchQuality}">
+                  ${qualityLabel} (${matchScore}/100)
+                </span>
+                ${distanceMiles !== 'Unknown' ? `<span class="distance-badge">📍 ${distanceMiles} mi</span>` : ''}
               </div>
             </div>
             <div class="message-preview-box">
@@ -450,10 +702,10 @@
               .eq('id', match.id);
 
             if (!error) {
-              alert('Client accepted! View in your Inbox to message them.');
+              showToast('Client Accepted', `You accepted ${clientName}. Check your inbox to message them!`, 'success');
               card.remove();
             } else {
-              alert('Error accepting client');
+              showToast('Error', 'Failed to accept client', 'error');
             }
           });
 
@@ -476,6 +728,7 @@
                 .eq('id', match.id);
 
               if (!error) {
+                showToast('Declined', `You declined ${clientName}`, 'info');
                 card.remove();
               }
             }
@@ -490,7 +743,7 @@
                 .eq('id', match.id);
 
               if (declineError) {
-                alert('Error blocking customer');
+                showToast('Error', 'Failed to block customer', 'error');
                 return;
               }
 
@@ -503,6 +756,7 @@
                 });
 
               if (!blockError) {
+                showToast('Blocked', `You blocked ${clientName}`, 'info');
                 card.remove();
               }
             }
@@ -510,6 +764,7 @@
 
           newClientsContainer.appendChild(card);
         }
+
 
       } catch (error) {
         console.error('[Pro Clients] Error:', error);
@@ -564,19 +819,148 @@
           const cards = document.querySelectorAll('[data-match-id="' + currentMatchForDeclineMsg.id + '"]');
           cards.forEach(c => c.closest('.client-card')?.remove());
           currentMatchForDeclineMsg = null;
-          alert('Declined with message sent to client');
+          showToast('Declined', 'Your message has been sent to the client', 'success');
         }
       } catch (error) {
         console.error('[Pro Clients] Error sending decline message:', error);
-        alert('Error sending message');
+        showToast('Error', 'Failed to send decline message', 'error');
       }
     });
 
+    // ============================================================================
+    // REAL-TIME SUBSCRIPTIONS FOR NEW MATCHES
+    // ============================================================================
+    let realtimeSubscription = null;
+    let newClientsCount = 0;
+
+    function setupRealtimeSubscription(practitionerId) {
+      if (realtimeSubscription) {
+        realtimeSubscription.unsubscribe();
+      }
+
+      // Subscribe to new matches for this practitioner
+      realtimeSubscription = window.supabaseClient
+        .channel(`practitioner_matches:${practitionerId}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'project_practitioner_matches',
+            filter: `practitioner_id=eq.${practitionerId}`
+          },
+          async (payload) => {
+            console.log('[Real-time] New match received:', payload);
+            
+            // Fetch full match details
+            const { data: match, error } = await window.supabaseClient
+              .from('project_practitioner_matches')
+              .select(`
+                id,
+                project_id,
+                client_serial,
+                status,
+                created_at,
+                match_score,
+                distance_miles,
+                projects (
+                  id,
+                  description,
+                  category_name,
+                  created_at,
+                  clients (
+                    id,
+                    first_name,
+                    last_name,
+                    user_id
+                  )
+                )
+              `)
+              .eq('id', payload.new.id)
+              .single();
+
+            if (match && match.status === 'active') {
+              const project = match.projects;
+              const client = project.clients;
+              const clientName = `${client.first_name || 'Client'} ${client.last_name ? client.last_name[0] + '.' : ''}`;
+              
+              // Show toast notification
+              const matchScore = match.match_score || 0;
+              const qualityLabel = matchScore >= 80 ? 'Excellent Match' : matchScore >= 60 ? 'Good Match' : 'Potential Match';
+              const distanceMiles = match.distance_miles ? match.distance_miles.toFixed(1) : 'Unknown';
+              
+              showToast(
+                '🎉 New Client Match!',
+                `${clientName} from ${project.category_name || 'Wellness'} just matched with you! ${distanceMiles !== 'Unknown' ? `(${distanceMiles} mi) ` : ''}${qualityLabel}`,
+                'success',
+                0  // Keep toast until user closes it
+              );
+
+              // Reload the clients list to show the new match
+              if (document.querySelector('.sidebar-tab.active').dataset.tab === 'new-clients') {
+                // Reload to show new match
+                setTimeout(() => {
+                  loadClientsData();
+                }, 500);
+              }
+
+              // Increment and show badge
+              newClientsCount++;
+              const badge = document.querySelector('.sidebar-tab[data-tab="new-clients"] .sidebar-tab__badge');
+              if (badge) {
+                badge.textContent = newClientsCount;
+              }
+            }
+          }
+        )
+        .subscribe();
+    }
+
+    // ============================================================================
+    // PAGE INITIALIZATION
+    // ============================================================================
+    let practitionerIdGlobal = null;
+
+    async function initializeClientsPage() {
+      try {
+        if (!window.supabaseClient || !window.authManager) {
+          console.error('[Pro Clients] Supabase or auth not ready');
+          return;
+        }
+
+        const currentUser = window.authManager.getCurrentUser();
+        if (!currentUser) {
+          console.log('[Pro Clients] User not authenticated');
+          return;
+        }
+
+        // Get practitioner ID
+        const rvUserStr = localStorage.getItem('rvUser');
+        if (!rvUserStr) {
+          console.error('[Pro Clients] No rvUser in localStorage');
+          return;
+        }
+
+        const rvUser = JSON.parse(rvUserStr);
+        practitionerIdGlobal = rvUser.id;
+
+        // Load initial data
+        await loadClientsData();
+
+        // Setup real-time subscriptions
+        setupRealtimeSubscription(practitionerIdGlobal);
+
+        console.log('[Pro Clients] Page initialized with real-time subscriptions');
+      } catch (error) {
+        console.error('[Pro Clients] Initialization error:', error);
+      }
+    }
+
     // Load when page is ready
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', loadClientsData);
+      document.addEventListener('DOMContentLoaded', initializeClientsPage);
     } else {
-      setTimeout(loadClientsData, 500);
+      setTimeout(initializeClientsPage, 500);
     }
   </script>
 </body>
