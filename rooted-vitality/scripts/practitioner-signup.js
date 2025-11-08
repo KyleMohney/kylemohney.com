@@ -319,7 +319,7 @@ async function registerPractitioner(event) {
             badge_verified: false,
             badge_certified: false,
             badge_licensed: false,
-            badge_background_check: false,
+            badge_background_check: null,  // TEXT: null | 'pending' | 'passed' | 'failed'
             accepts_insurance: false,
             insurance_accepted: [], // TEXT[] array
             insurance_providers: [], // TEXT[] array

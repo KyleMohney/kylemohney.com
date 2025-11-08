@@ -636,13 +636,13 @@ function renderHero() {
     
     // ===== HERO BADGES =====
     console.log('[Practitioner Profile] Processing badges...');
-    console.log('[Practitioner Profile] Badge Background Check:', practitioner.badge_background_check);
+    console.log('[Practitioner Profile] Background Check Status:', practitioner.background_check_status);
     console.log('[Practitioner Profile] Badge Certified:', practitioner.badge_certified);
     console.log('[Practitioner Profile] Badge Licensed:', practitioner.badge_licensed);
     console.log('[Practitioner Profile] Badge Verified:', practitioner.badge_verified);
     
-    // Show badges based on boolean flags
-    if (practitioner.badge_background_check) {
+    // Show badges based on status values (background_check only when 'passed')
+    if (practitioner.background_check_status === 'passed') {
         console.log('[Practitioner Profile] ✓ Showing Background Check badge');
         document.getElementById('badge-background-check').style.display = 'inline-flex';
     } else {

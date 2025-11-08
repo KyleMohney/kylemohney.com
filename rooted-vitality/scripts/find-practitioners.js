@@ -482,7 +482,7 @@ function createPractitionerCard(practitioner) {
   if (practitioner.badge_certified) {
     badges.push('<li class="badge-item"><span class="badge-check">✓</span> Certified</li>');
   }
-  if (practitioner.badge_background_check) {
+  if (practitioner.background_check_status === 'passed') {
     badges.push('<li class="badge-item"><span class="badge-check">✓</span> Background Check</li>');
   }
   

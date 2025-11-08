@@ -1428,14 +1428,44 @@
     font-size: 0.95rem;
 }
 
-.background-check-status.completed {
+/* Passed status - green */
+.background-check-status.passed {
     background: #f0f8f4;
     border-left-color: var(--success);
 }
 
+.background-check-status.passed .status-icon {
+    color: var(--success);
+}
+
+/* Pending status - orange/yellow */
 .background-check-status.pending {
     background: #fff9e6;
     border-left-color: var(--warning);
+}
+
+.background-check-status.pending .status-icon {
+    color: var(--warning);
+}
+
+/* Failed status - red */
+.background-check-status.failed {
+    background: #ffe6e6;
+    border-left-color: #e74c3c;
+}
+
+.background-check-status.failed .status-icon {
+    color: #e74c3c;
+}
+
+/* Not started status - gray */
+.background-check-status.not-started {
+    background: #f5f5f5;
+    border-left-color: #999;
+}
+
+.background-check-status.not-started .status-icon {
+    color: #999;
 }
 
 .status-icon {
@@ -1444,14 +1474,6 @@
     display: flex;
     align-items: center;
     min-width: 24px;
-}
-
-.background-check-status.completed .status-icon {
-    color: var(--success);
-}
-
-.background-check-status.pending .status-icon {
-    color: var(--warning);
 }
 
 .background-check-status p {
@@ -4985,21 +5007,53 @@
     gap: 1rem;
     padding: 1rem;
     border-radius: 8px;
+    border-left: 4px solid;
 }
 
-.background-check-status.in-progress {
-    background: #f0f8ff;
-    border-left: 4px solid #4a90e2;
-}
-
-.background-check-status.completed {
+/* Passed state - green */
+.background-check-status.passed {
     background: #f0fdf4;
-    border-left: 4px solid #22c55e;
+    border-left-color: #22c55e;
+}
+
+.background-check-status.passed .status-icon {
+    color: #22c55e;
+}
+
+/* Pending state - blue/orange */
+.background-check-status.pending {
+    background: #f0f8ff;
+    border-left-color: #4a90e2;
+}
+
+.background-check-status.pending .status-icon {
+    color: #f59e0b;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* Failed state - red */
+.background-check-status.failed {
+    background: #fef2f2;
+    border-left-color: #ef4444;
+}
+
+.background-check-status.failed .status-icon {
+    color: #ef4444;
+}
+
+/* Not started state - gray */
+.background-check-status.not-started {
+    background: #f9fafb;
+    border-left-color: #999;
+}
+
+.background-check-status.not-started .status-icon {
+    color: #999;
 }
 
 .background-check-status .status-icon {
     font-size: 1.5rem;
-    color: #22c55e;
+    min-width: 24px;
 }
 
 .background-check-status .status-spinner {
@@ -5016,6 +5070,11 @@
     to { transform: rotate(360deg); }
 }
 
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
 .background-check-status p {
     margin: 0;
 }
@@ -5025,3 +5084,4 @@
     font-size: 0.85rem;
     margin-top: 0.25rem !important;
 }
+

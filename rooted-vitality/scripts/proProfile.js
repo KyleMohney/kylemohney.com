@@ -807,8 +807,8 @@ function updateProfileCompleteness() {
             points += 1;
         }
         
-        // 9 POINTS: Background Check Badge
-        if (window.currentPractitioner && window.currentPractitioner.badge_background_check === true) {
+        // 9 POINTS: Background Check Badge (only 'passed' status counts)
+        if (window.currentPractitioner && window.currentPractitioner.background_check_status === 'passed') {
             points += 1;
         }
         
@@ -934,7 +934,7 @@ function updateCredentialsBadge() {
             console.warn('[Rooted Vitality] Verified badge element not found!');
         }
         
-        const hasBackgroundCheck = window.practitionerData && window.practitionerData.badge_background_check;
+        const hasBackgroundCheck = window.practitionerData && window.practitionerData.background_check_status === 'passed';
         const hasLicense = window.practitionerData && window.practitionerData.badge_licensed;
         const hasCertified = window.practitionerData && window.practitionerData.badge_certified;
         const isVerified = window.practitionerData && window.practitionerData.badge_verified;
@@ -944,7 +944,7 @@ function updateCredentialsBadge() {
             hasLicense,
             hasCertified,
             isVerified,
-            badgeBackgroundCheck: window.practitionerData?.badge_background_check,
+            background_check_status: window.practitionerData?.background_check_status,
             badgeLicensed: window.practitionerData?.badge_licensed,
             badgeCertified: window.practitionerData?.badge_certified,
             badgeVerified: window.practitionerData?.badge_verified
@@ -2585,17 +2585,51 @@ function updateBackgroundCheckStatus(status) {
     const statusContainer = document.getElementById('background-check-status');
     const button = document.getElementById('start-background-check');
     
-    if (status === 'completed') {
+    if (status === 'passed') {
         statusContainer.innerHTML = `
-            <div class="background-check-status completed">
+            <div class="background-check-status passed">
                 <span class="status-icon">✓</span>
                 <div>
-                    <p>Background Check Completed</p>
-                    <p class="status-date">Your credentials have been verified</p>
+                    <p>Background Check Passed</p>
+                    <p class="status-date">Your background check has been verified</p>
                 </div>
             </div>
         `;
         if (button) button.style.display = 'none';
+    } else if (status === 'pending') {
+        statusContainer.innerHTML = `
+            <div class="background-check-status pending">
+                <span class="status-icon">⏳</span>
+                <div>
+                    <p>Background Check Pending</p>
+                    <p class="status-date">Your background check is being reviewed</p>
+                </div>
+            </div>
+        `;
+        if (button) button.style.display = 'none';
+    } else if (status === 'failed') {
+        statusContainer.innerHTML = `
+            <div class="background-check-status failed">
+                <span class="status-icon">✗</span>
+                <div>
+                    <p>Background Check Failed</p>
+                    <p class="status-date">Please contact support for more information</p>
+                </div>
+            </div>
+        `;
+        if (button) button.style.display = 'block';
+    } else {
+        // null or undefined - show start button
+        statusContainer.innerHTML = `
+            <div class="background-check-status not-started">
+                <span class="status-icon">—</span>
+                <div>
+                    <p>Background Check Not Started</p>
+                    <p class="status-date">Click the button below to begin the verification process</p>
+                </div>
+            </div>
+        `;
+        if (button) button.style.display = 'block';
     }
 }
 
