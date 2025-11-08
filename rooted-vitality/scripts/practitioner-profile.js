@@ -460,10 +460,10 @@ async function createMatchWithProjectId(projectId, practitionerId) {
  */
 async function createMatchAndRedirect(project, practitionerId, practitionerSerial) {
     try {
-        console.log('[Practitioner Profile] Creating match for project:', project.id);
+        console.log('[Practitioner Profile] Creating match for project:', project.project_id);
         
         const insertData = {
-            project_id: project.id,
+            project_id: project.project_id,  // Use project_id (INTEGER), not id (UUID)
             practitioner_id: practitionerId,
             client_serial: project.client_serial,
             practitioner_serial: practitionerSerial,
@@ -505,7 +505,7 @@ async function createMatchAndRedirect(project, practitionerId, practitionerSeria
                 await window.supabaseClient
                     .from('project_messages')
                     .insert({
-                        project_id: project.id,
+                        project_id: project.project_id,  // Use project_id (INTEGER), not id (UUID)
                         practitioner_id: practitionerId,
                         client_id: clientData.id,
                         sender_id: clientData.id,
@@ -519,7 +519,8 @@ async function createMatchAndRedirect(project, practitionerId, practitionerSeria
         }
         
         // Redirect to My Matches with project and practitioner in query params
-        const redirectUrl = `/rooted-vitality/dashboard/client/pages/my-matches.html?project_id=${project.id}&practitioner_id=${practitionerId}`;
+        // Use project_id (INTEGER serial) in URL for database lookup
+        const redirectUrl = `/rooted-vitality/dashboard/client/pages/my-matches.html?project_id=${project.project_id}&practitioner_id=${practitionerId}`;
         console.log('[Practitioner Profile] Redirecting to:', redirectUrl);
         window.location.href = redirectUrl;
         
@@ -1118,8 +1119,15 @@ function renderReviewsCard() {
             let photosHtml = '';
             if (review.photos && Array.isArray(review.photos) && review.photos.length > 0) {
                 const photoThumbnails = review.photos
-                    .map((photo, idx) => {
-                        const photoUrl = typeof photo === 'string' ? photo : photo.url;
+                    .map((photoPath, idx) => {
+                        // Convert storage path to public URL
+                        let photoUrl = photoPath;
+                        if (typeof photoPath === 'string' && photoPath.includes('review-photos/')) {
+                          const { data } = window.supabaseClient.storage
+                            .from('review-files')
+                            .getPublicUrl(photoPath);
+                          photoUrl = data?.publicUrl || photoPath;
+                        }
                         return `<img src="${photoUrl}" alt="Review photo ${idx + 1}" class="review-photo-thumbnail" loading="lazy">`;
                     })
                     .join('');

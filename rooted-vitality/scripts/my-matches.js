@@ -147,13 +147,13 @@ async function loadMatches(clientSerial) {
       const { data: projectsData, error: projectsError } = await window.supabaseClient
         .from('projects')
         .select('id, project_id, category_id, category_name')
-        .in('id', projectIds);
+        .in('project_id', projectIds);  // Match on project_id (integer) not id (UUID)
       
       if (projectsError) {
         console.warn('Warning loading project details:', projectsError);
       } else {
         (projectsData || []).forEach(p => {
-          projectsMap[p.id] = p;
+          projectsMap[p.project_id] = p;  // Map by project_id (integer)
         });
       }
     }
@@ -162,7 +162,7 @@ async function loadMatches(clientSerial) {
     allMatches = (matchesData || []).map(match => ({
       ...match,
       practitioners: practitionersMap[match.practitioner_serial] || {},
-      project: projectsMap[match.project_id] || {}
+      project: projectsMap[match.project_id] || {}  // Lookup by project_id (integer)
     }));
     filteredMatches = [...allMatches];
 
@@ -402,7 +402,7 @@ async function updateMatchStatus(matchId, newStatus) {
         const { error: projectError } = await window.supabaseClient
           .from('projects')
           .update(projectUpdateData)
-          .eq('id', selectedMatch.project_id);
+          .eq('project_id', selectedMatch.project_id);  // Use project_id (INTEGER), not id (UUID)
 
         if (projectError) {
           console.error('[My Matches] Error updating project status:', projectError);

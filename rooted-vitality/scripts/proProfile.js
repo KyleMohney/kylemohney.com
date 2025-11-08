@@ -1578,6 +1578,8 @@ async function saveMoreDetailsSection() {
         // Format insurance and payment data for saving
         const insuranceToSave = Array.isArray(paymentCheckboxData.insurance_providers) ? paymentCheckboxData.insurance_providers : [];
         const paymentToSave = Array.isArray(paymentCheckboxData.payment_methods) ? paymentCheckboxData.payment_methods : [];
+        const customInsuranceToSave = Array.isArray(paymentCheckboxData.custom_insurance_providers) ? paymentCheckboxData.custom_insurance_providers : [];
+        const customPaymentToSave = Array.isArray(paymentCheckboxData.custom_payment_methods) ? paymentCheckboxData.custom_payment_methods : [];
         
         const updateData = {
             languages: languagesToSave,
@@ -1594,9 +1596,9 @@ async function saveMoreDetailsSection() {
             },
             accepts_insurance: paymentCheckboxData.accepts_insurance === true,
             insurance_providers: JSON.stringify(insuranceToSave),
-            custom_insurance_providers: paymentCheckboxData.custom_insurance_providers || '',
+            custom_insurance_providers: customInsuranceToSave,  // Store as array, not string
             payment_methods: JSON.stringify(paymentToSave),
-            custom_payment_methods: paymentCheckboxData.custom_payment_methods || '',
+            custom_payment_methods: customPaymentToSave,  // Store as array, not string
             updated_at: new Date().toISOString()
         };
         
@@ -3858,9 +3860,9 @@ function getPaymentCheckboxValues() {
     const paymentData = {
         accepts_insurance: document.getElementById('accepts-insurance')?.checked || false,
         insurance_providers: [],
-        custom_insurance_providers: '',
+        custom_insurance_providers: [],  // Changed to array
         payment_methods: [],
-        custom_payment_methods: ''
+        custom_payment_methods: []  // Changed to array
     };
     
     // Collect selected insurance providers (excluding custom)
@@ -3878,7 +3880,7 @@ function getPaymentCheckboxValues() {
         const customInsurance = customInsuranceInput.value.trim();
         console.log('[DEBUG] Adding custom insurance provider:', customInsurance);
         paymentData.insurance_providers.push(customInsurance);
-        paymentData.custom_insurance_providers = customInsurance;
+        paymentData.custom_insurance_providers.push(customInsurance);  // Push to array
     }
     
     // Collect selected payment methods (excluding custom)
@@ -3896,7 +3898,7 @@ function getPaymentCheckboxValues() {
         const customPayment = customPaymentInput.value.trim();
         console.log('[DEBUG] Adding custom payment method:', customPayment);
         paymentData.payment_methods.push(customPayment);
-        paymentData.custom_payment_methods = customPayment;
+        paymentData.custom_payment_methods.push(customPayment);  // Push to array
     }
     
     console.log('[Rooted Vitality] Payment data collected:', paymentData);
@@ -4262,8 +4264,15 @@ function createReviewCard(review) {
     let photosHtml = '';
     if (review.photos && Array.isArray(review.photos) && review.photos.length > 0) {
         const photoThumbnails = review.photos
-            .map((photo, idx) => {
-                const photoUrl = typeof photo === 'string' ? photo : photo.url;
+            .map((photoPath, idx) => {
+                // Convert storage path to public URL
+                let photoUrl = photoPath;
+                if (typeof photoPath === 'string' && photoPath.includes('review-photos/')) {
+                  const { data } = window.supabaseClient.storage
+                    .from('review-files')
+                    .getPublicUrl(photoPath);
+                  photoUrl = data?.publicUrl || photoPath;
+                }
                 return `<img src="${photoUrl}" alt="Review photo ${idx + 1}" class="review-photo-thumbnail" loading="lazy">`;
             })
             .join('');

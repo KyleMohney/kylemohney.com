@@ -187,8 +187,15 @@ function createReviewCard(review) {
     let photosHtml = '';
     if (review.photos && Array.isArray(review.photos) && review.photos.length > 0) {
         const photoThumbnails = review.photos
-            .map((photo, idx) => {
-                const photoUrl = typeof photo === 'string' ? photo : photo.url;
+            .map((photoPath, idx) => {
+                // Convert storage path to public URL
+                let photoUrl = photoPath;
+                if (typeof photoPath === 'string' && photoPath.includes('review-photos/')) {
+                  const { data } = window.supabaseClient.storage
+                    .from('review-files')
+                    .getPublicUrl(photoPath);
+                  photoUrl = data?.publicUrl || photoPath;
+                }
                 return `<img src="${photoUrl}" alt="Review photo ${idx + 1}" class="review-photo-thumbnail" loading="lazy">`;
             })
             .join('');

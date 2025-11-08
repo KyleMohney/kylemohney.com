@@ -60,11 +60,20 @@ class MatchSettingsManager {
    */
   async createDefaultMatchSettings() {
     try {
+      // Get practitioner serial number
+      const { data: practitioner } = await this.supabase
+        .from('practitioners')
+        .select('serial_number')
+        .eq('id', this.practitionerId)
+        .single();
+
       const defaultSettings = {
         practitioner_id: this.practitionerId,
+        serial_number: practitioner?.serial_number || null,
         is_matching_active: false,
         is_paused: false,
         coverage_area_settings: this.getDefaultCoverageSettings(),
+        matching_activated_at: null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
@@ -373,11 +382,19 @@ class MatchSettingsManager {
         data = result.data;
         error = result.error;
       } else {
+        // Get practitioner serial number
+        const { data: practitioner } = await this.supabase
+          .from('practitioners')
+          .select('serial_number')
+          .eq('id', this.practitionerId)
+          .single();
+
         // Insert new service
         const result = await this.supabase
           .from('practitioner_selected_services')
           .insert({
             practitioner_id: this.practitionerId,
+            serial_number: practitioner?.serial_number || null,
             taxonomy_id: taxonomyId,
             subcategory_id: subcategoryId,
             is_active: false,  // Default to inactive
@@ -626,11 +643,12 @@ class MatchSettingsManager {
    */
   async activateMatching() {
     try {
+      const activatedAt = new Date().toISOString();
       const { data, error } = await this.supabase
         .from('practitioner_match_settings')
         .update({ 
           is_matching_active: true, 
-          matching_activated_at: new Date().toISOString(),
+          matching_activated_at: activatedAt,
           is_paused: false,
           pause_until: null,
           updated_at: new Date().toISOString()
@@ -641,7 +659,7 @@ class MatchSettingsManager {
 
       if (error) throw error;
       this.matchSettings = data;
-      console.log('[MatchSettingsManager] Matching activated');
+      console.log('[MatchSettingsManager] Matching activated at:', activatedAt);
       return data;
     } catch (error) {
       console.error('[MatchSettingsManager] Error activating matching:', error);

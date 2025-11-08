@@ -274,23 +274,52 @@ let reviewsManager = {
     try {
       console.log('[Reviews] Submitting review...');
 
-      // Step 1: Get the practitioner's user_id (FK constraint uses user_id, not id)
-      console.log('[Reviews] Looking up practitioner user_id for:', this.currentReview.practitionerId);
-      const { data: practitionerData, error: practitionerError } = await this.supabaseClient
-        .from('practitioners')
-        .select('user_id, dba_name, legal_name')
-        .eq('id', this.currentReview.practitionerId)
+      // Step 1: Read practitioner_serial and client_serial from project_practitioner_matches
+      console.log('[Reviews] Reading serial numbers from match ID:', this.currentReview.matchId);
+      const { data: matchData, error: matchError } = await this.supabaseClient
+        .from('project_practitioner_matches')
+        .select('practitioner_serial, client_serial')
+        .eq('id', this.currentReview.matchId)
         .single();
 
-      if (practitionerError || !practitionerData) {
-        throw new Error(`Practitioner not found: ${practitionerError?.message}`);
+      let practitionerSerial = null;
+      let clientSerial = null;
+
+      if (matchError || !matchData) {
+        console.warn('[Reviews] Match lookup failed, falling back to individual lookups:', matchError?.message);
+        // Fallback: Get the practitioner's serial_number if match not found
+        const { data: practitionerData, error: practitionerError } = await this.supabaseClient
+          .from('practitioners')
+          .select('serial_number')
+          .eq('id', this.currentReview.practitionerId)
+          .single();
+
+        if (practitionerError || !practitionerData) {
+          throw new Error(`Practitioner not found: ${practitionerError?.message}`);
+        }
+        practitionerSerial = practitionerData.serial_number;
+        
+        // Fallback: Get client serial_number from current user
+        const { data: { user } } = await this.supabaseClient.auth.getUser();
+        if (user) {
+          const { data: clientData } = await this.supabaseClient
+            .from('clients')
+            .select('serial_number')
+            .eq('user_id', user.id)
+            .single();
+          clientSerial = clientData?.serial_number || null;
+        }
+      } else {
+        practitionerSerial = matchData.practitioner_serial;
+        clientSerial = matchData.client_serial;
       }
 
-      const practitionerUserId = practitionerData.user_id;
-      console.log('[Reviews] Practitioner user_id found:', practitionerUserId);
+      console.log('[Reviews] Serial numbers retrieved - Practitioner:', practitionerSerial, 'Client:', clientSerial);
 
-      // Get client name from current user
+      // Get current user (client)
       const { data: { user } } = await this.supabaseClient.auth.getUser();
+      const currentUser = window.authManager?.getCurrentUser();
+      
       let clientName = 'Client';
       let clientFirstName = this.currentReview.clientFirstName || '';
       let clientLastName = this.currentReview.clientLastName || '';
@@ -307,7 +336,7 @@ let reviewsManager = {
       }
 
       // Step 2: Upload photos to Supabase Storage if any
-      let photoUrls = [];
+      let photoPaths = [];
       if (this.currentReview.photos && this.currentReview.photos.length > 0) {
         console.log('[Reviews] Uploading photos...');
         for (const photo of this.currentReview.photos) {
@@ -328,7 +357,7 @@ let reviewsManager = {
             // Generate unique filename
             const timestamp = Date.now();
             const random = Math.random().toString(36).substring(7);
-            const fileName = `review-photos/${practitionerUserId}/${timestamp}-${random}-${fileToUpload.name || 'photo.jpg'}`;
+            const fileName = `review-photos/${this.currentReview.practitionerId}/${timestamp}-${random}-${fileToUpload.name || 'photo.jpg'}`;
 
             console.log('[Reviews] Uploading photo to:', fileName);
 
@@ -342,34 +371,55 @@ let reviewsManager = {
               continue;
             }
 
-            // Get public URL
-            const { data: publicUrlData } = this.supabaseClient.storage
-              .from('review-files')
-              .getPublicUrl(fileName);
-
-            if (publicUrlData && publicUrlData.publicUrl) {
-              photoUrls.push(publicUrlData.publicUrl);
-              console.log('[Reviews] Photo uploaded successfully:', publicUrlData.publicUrl);
-            }
+            // Store the path (not the full URL) for efficient storage
+            photoPaths.push(fileName);
+            console.log('[Reviews] Photo uploaded successfully. Path stored:', fileName);
           } catch (photoError) {
             console.error('[Reviews] Error processing photo:', photoError);
           }
         }
-        console.log('[Reviews] Photos uploaded:', photoUrls.length);
+        console.log('[Reviews] Photos uploaded:', photoPaths.length);
+      }
+      
+      // Get client record for client_id
+      let clientIdToStore = this.currentReview.clientId || null;
+      if (!clientIdToStore && currentUser) {
+        const { data: clientDataForId } = await this.supabaseClient
+          .from('clients')
+          .select('id')
+          .eq('user_id', currentUser.id)
+          .single();
+        clientIdToStore = clientDataForId?.id || null;
       }
 
-      // Build review record - practitioner_id FK points to practitioners.user_id
+      // Get project serial_number if projectId provided
+      let projectSerialToStore = null;
+      if (this.currentReview.projectId) {
+        const { data: projectData } = await this.supabaseClient
+          .from('projects')
+          .select('serial_number')
+          .eq('id', this.currentReview.projectId)
+          .single();
+        projectSerialToStore = projectData?.serial_number || null;
+      }
+
+      // Convert photos array to storage paths for TEXT[] column
+      const photosArray = photoPaths && photoPaths.length > 0 ? photoPaths : [];
+
+      // Build review record - store serial_numbers as TEXT
       const reviewData = {
-        practitioner_id: practitionerUserId,
-        project_id: this.currentReview.projectId || null,
-        client_id: this.currentReview.clientId || null,
+        practitioner_id: this.currentReview.practitionerId,  // UUID for FK
+        practitioner_serial: practitionerSerial,   // Denormalized serial (P1, P2, etc.)
+        project_id: projectSerialToStore,          // Store project serial_number (1, 2, 3, etc.)
+        client_id: clientIdToStore,                // UUID for FK
+        client_serial: clientSerial,               // Denormalized serial (C1, C2, etc.)
         rating: this.currentReview.rating,
         review_text: reviewText,
         client_name: clientName,
         client_first_name: clientFirstName,
         client_last_name: clientLastName,
         practitioner_name: this.currentReview.practitionerName,
-        photos: photoUrls && photoUrls.length > 0 ? photoUrls : [],
+        photos: photosArray,                       // TEXT[] array of storage paths
         is_visible: true,
         is_approved: false,
         // NEW FIELDS
@@ -403,7 +453,7 @@ let reviewsManager = {
       // Create notification for practitioner
       try {
         const notification = {
-          practitioner_id: practitionerUserId,
+          practitioner_id: this.currentReview.practitionerId,  // Use practitionerId from currentReview
           type: 'review_posted',
           title: 'New Review',
           message: `You received a new ${this.currentReview.rating}-star review: "${reviewText.substring(0, 50)}${reviewText.length > 50 ? '...' : ''}"`,

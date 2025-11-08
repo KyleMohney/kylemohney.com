@@ -120,7 +120,7 @@ async function loadProject() {
 
     // Load practitioners for this project
     selectedProject = project;
-    sessionStorage.setItem('selectedProjectId', project.id);
+    sessionStorage.setItem('selectedProjectId', project.project_id);  // Store INTEGER serial number
     
     // Load existing matches first
     await loadExistingMatches();
@@ -177,9 +177,10 @@ async function loadExistingMatches() {
 
 async function loadPractitioners(project) {
   try {
-    console.log('[loadPractitioners] Loading matches for project:', project.id);
+    console.log('[loadPractitioners] Loading matches for project:', project.project_id);
     console.log('[loadPractitioners] Project details:', {
       id: project.id,
+      project_id: project.project_id,
       travel_preference: project.travel_preference,
       zipcode: project.zipcode,
       state: project.state,
@@ -187,6 +188,7 @@ async function loadPractitioners(project) {
     });
 
     // Try to call the matching algorithm function (RPC)
+    // Note: RPC expects project UUID (project.id), not the serial number
     let practitioners = [];
     const { data: rpcData, error: rpcError } = await supabaseClient
       .rpc('match_practitioners', { p_project_id: project.id });
@@ -289,7 +291,7 @@ function updateProjectInfo(project) {
   }
 
   selectedProject = project;
-  sessionStorage.setItem('selectedProjectId', project.id);
+  sessionStorage.setItem('selectedProjectId', project.project_id);  // Store INTEGER serial number
 }
 
 /**
@@ -301,7 +303,7 @@ async function refreshSearch() {
     return;
   }
 
-  console.log('[refreshSearch] Refreshing search for project:', selectedProject.id);
+  console.log('[refreshSearch] Refreshing search for project:', selectedProject.project_id);
   
   // Show loading state
   const refreshBtn = document.getElementById('refresh-search');
@@ -648,14 +650,14 @@ async function sendConnectionRequest(practitionerId, practitionerSerial) {
     
     const { data: matchData, error: matchQueryError } = await supabaseClient.rpc(
       'match_practitioners',
-      { v_project_id: selectedProject.id }
+      { v_project_id: selectedProject.project_id }  // Use project_id (integer), not id (UUID)
     );
 
     if (!matchQueryError && matchData && matchData.length > 0) {
       const practitionerMatch = matchData.find(m => m.practitioner_id === practitionerId);
       if (practitionerMatch) {
-        matchScore = practitionerMatch.match_score || 75;
-        distanceMiles = practitionerMatch.distance_miles || null;
+        matchScore = practitionerMatch.match_score ?? 75;
+        distanceMiles = practitionerMatch.distance_miles ?? null;
       }
     }
 
@@ -665,7 +667,7 @@ async function sendConnectionRequest(practitionerId, practitionerSerial) {
     const { data, error } = await supabaseClient
       .from('project_practitioner_matches')
       .insert({
-        project_id: selectedProject.id,
+        project_id: selectedProject.project_id,     // Integer serial number, not UUID
         practitioner_id: practitionerId,
         client_serial: selectedProject.client_serial,
         practitioner_serial: practitionerSerial,
@@ -710,7 +712,7 @@ async function sendConnectionRequest(practitionerId, practitionerSerial) {
     const { error: messageError } = await supabaseClient
       .from('project_messages')
       .insert({
-        project_id: selectedProject.id,
+        project_id: selectedProject.project_id,  // Use project_id (INTEGER), not id (UUID)
         practitioner_id: practitionerId,
         client_id: clientData.id,
         sender_id: clientData.id,
@@ -721,6 +723,20 @@ async function sendConnectionRequest(practitionerId, practitionerSerial) {
 
     if (messageError) {
       console.error('[sendConnectionRequest] Error creating auto-message:', messageError);
+    } else {
+      // Message created successfully - update contacted_at in the match
+      const { error: updateContactedError } = await supabaseClient
+        .from('project_practitioner_matches')
+        .update({
+          contacted_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .eq('project_id', selectedProject.project_id)  // Use project_id (integer), not id (UUID)
+        .eq('practitioner_id', practitionerId);
+
+      if (updateContactedError) {
+        console.error('[sendConnectionRequest] Error updating contacted_at:', updateContactedError);
+      }
     }
 
     console.log('[sendConnectionRequest] Connection request sent successfully');
