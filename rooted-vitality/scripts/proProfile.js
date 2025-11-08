@@ -759,95 +759,123 @@ function setupInputListeners() {
  */
 function updateProfileCompleteness() {
     try {
-        // Define what needs to be filled for each section
-        // 17 total sections tracked across all profile panels (location removed)
-        const sections = {
-            // About & Specializations Panel (5 sections)
-            'name': () => !!document.getElementById('profile-name')?.value?.trim(),
-            'years': () => {
-                const val = document.getElementById('profile-years')?.value;
-                return val !== null && val !== undefined && val !== '';
-            },
-            'about': () => !!document.getElementById('about-content')?.value?.trim(),
-            'approach': () => !!document.getElementById('approach-content')?.value?.trim(),
-            'conditions': () => {
-                // Complete if at least 1 condition checkbox is checked
-                const checkedConditions = document.querySelectorAll('input[name="condition"]:checked');
-                return checkedConditions && checkedConditions.length > 0;
-            },
-            
-            // Credentials Panel (3 sections)
-            'education': () => window.educationCredentials && window.educationCredentials.length > 0,
-            'licenses': () => window.licenseCredentials && window.licenseCredentials.length > 0,
-            'certifications': () => window.certificationCredentials && window.certificationCredentials.length > 0,
-            
-            // Photos & Video Panel (2 sections)
-            'photos': () => window.currentPhotos && window.currentPhotos.length > 0,
-            'video': () => window.videoData && window.videoData.url,
-            
-            // Reviews Panel (1 section)
-            'reviews': () => {
-                // Complete if they have any reviews (mock data counts for now)
-                return allReviews && allReviews.length > 0;
-            },
-            
-            // Additional Details Panel (6 sections)
-            'languages': () => {
-                const langsList = document.getElementById('languages-list');
-                return langsList && langsList.querySelectorAll('.language-tag').length > 0;
-            },
-            'faq': () => {
-                const faqList = document.getElementById('faq-list');
-                return faqList && faqList.querySelectorAll('.faq-item').length > 0;
-            },
-            'practice': () => {
-                // Complete if structure or setting selected
-                const hasStructure = window.practiceData && window.practiceData.structure;
-                return !!hasStructure;
-            },
-            'pricing': () => {
-                // Complete if any pricing info provided
-                const hasPrice = window.pricingData && (
-                    window.pricingData.fixedRate || 
-                    (window.pricingData.minRate && window.pricingData.maxRate) ||
-                    (window.pricingData.tiers && window.pricingData.tiers.length > 0)
-                );
-                return !!hasPrice;
-            },
-            'payment': () => {
-                // Complete if at least 1 payment method checkbox is checked OR custom text provided
-                const paymentMethodsSelected = document.querySelectorAll('input[name="payment-method"]:checked').length > 0;
-                const customPayment = document.getElementById('custom-payment-methods')?.value?.trim() || '';
-                return paymentMethodsSelected || !!customPayment;
-            },
-            'insurance': () => {
-                // Complete if insurance checkbox selected OR at least 1 provider checkbox checked OR custom text
-                const acceptsInsurance = document.getElementById('accepts-insurance')?.checked || false;
-                const insuranceSelected = document.querySelectorAll('input[name="insurance-provider"]:checked').length > 0;
-                const customInsurance = document.getElementById('custom-insurance-providers')?.value?.trim() || '';
-                return acceptsInsurance || insuranceSelected || !!customInsurance;
-            },
-            'social': () => {
-                // Complete if at least 1 social media field is filled
-                const socialFields = ['social-facebook', 'social-instagram', 'social-x', 'social-linkedin', 
-                                    'social-youtube', 'social-tiktok', 'social-pinterest', 'social-website'];
-                return socialFields.some(fieldId => !!document.getElementById(fieldId)?.value?.trim());
-            },
-            'continuing-education': () => window.continuingEducationCredentials && window.continuingEducationCredentials.length > 0
-        };
+        // 18-Point Profile Completeness Scoring System
+        let points = 0;
+        const totalPoints = 18;
         
-        // Calculate completed sections
-        let completedCount = 0;
-        const totalSections = Object.keys(sections).length;
-        
-        for (const [sectionName, checkFn] of Object.entries(sections)) {
-            if (checkFn()) {
-                completedCount++;
-            }
+        // 1 POINT: Base point (category/subcategory/location match)
+        const hasCategory = !!document.getElementById('profile-category')?.value?.trim();
+        const hasSubcategory = !!document.getElementById('profile-subcategory')?.value?.trim();
+        const hasLocation = !!document.getElementById('profile-location')?.value?.trim();
+        if (hasCategory && hasSubcategory && hasLocation) {
+            points += 1;
         }
         
-        // Calculate percentage
-        const percentage = Math.round((completedCount / totalSections) * 100);
+        // 2 POINTS: About You (bio field filled)
+        if (!!document.getElementById('about-content')?.value?.trim()) {
+            points += 1;
+        }
+        
+        // 3 POINTS: Your Approach & Philosophy (ethos_statement)
+        if (!!document.getElementById('approach-content')?.value?.trim()) {
+            points += 1;
+        }
+        
+        // 4 POINTS: Conditions & Specializations (conditions_treated array length > 0)
+        const checkedConditions = document.querySelectorAll('input[name="condition"]:checked');
+        if (checkedConditions && checkedConditions.length > 0) {
+            points += 1;
+        }
+        
+        // 5 POINTS: Degrees & Education
+        if (window.educationCredentials && window.educationCredentials.length > 0) {
+            points += 1;
+        }
+        
+        // 6 POINTS: Licenses
+        if (window.licenseCredentials && window.licenseCredentials.length > 0) {
+            points += 1;
+        }
+        
+        // 7 POINTS: Certifications
+        if (window.certificationCredentials && window.certificationCredentials.length > 0) {
+            points += 1;
+        }
+        
+        // 8 POINTS: Ongoing Education (continuing_education array)
+        if (window.continuingEducationCredentials && window.continuingEducationCredentials.length > 0) {
+            points += 1;
+        }
+        
+        // 9 POINTS: Background Check Badge
+        if (window.currentPractitioner && window.currentPractitioner.badge_background_check === true) {
+            points += 1;
+        }
+        
+        // 10 POINTS: Verified Badge
+        if (window.currentPractitioner && window.currentPractitioner.badge_verified === true) {
+            points += 1;
+        }
+        
+        // 11 POINTS: Professional Photos (gallery_photos array)
+        if (window.currentPhotos && window.currentPhotos.length > 0) {
+            points += 1;
+        }
+        
+        // 12 POINTS: Professional Introduction Video (intro_video_url)
+        if (window.videoData && window.videoData.url) {
+            points += 1;
+        }
+        
+        // 13 POINTS: Reviews (reviews array length > 0)
+        if (window.allReviews && window.allReviews.length > 0) {
+            points += 1;
+        }
+        
+        // 14 POINTS: Languages (languages array length > 0)
+        const langsList = document.getElementById('languages-list');
+        if (langsList && langsList.querySelectorAll('.language-tag').length > 0) {
+            points += 1;
+        }
+        
+        // 15 POINTS: Frequently Asked Questions (faq array length > 0)
+        const faqList = document.getElementById('faq-list');
+        if (faqList && faqList.querySelectorAll('.faq-item').length > 0) {
+            points += 1;
+        }
+        
+        // 16 POINTS: Social Media & Connect (social_media object with any non-empty field)
+        const socialFields = ['social-facebook', 'social-instagram', 'social-x', 'social-linkedin', 
+                            'social-youtube', 'social-tiktok', 'social-pinterest', 'social-website'];
+        if (socialFields.some(fieldId => !!document.getElementById(fieldId)?.value?.trim())) {
+            points += 1;
+        }
+        
+        // 17 POINTS: Practice Type & Setting (practice_type filled: 'private', 'clinic', or 'hospital')
+        const practiceType = document.querySelector('input[name="practice-setting"]:checked')?.value;
+        if (practiceType && ['private', 'clinic', 'hospital'].includes(practiceType)) {
+            points += 1;
+        }
+        
+        // 18 POINTS: Payments & Insurance
+        // Complete if accepts_insurance === true OR insurance_providers/custom_insurance_providers has items
+        const acceptsInsurance = document.getElementById('accepts-insurance')?.checked || false;
+        const insuranceSelected = document.querySelectorAll('input[name="insurance-provider"]:checked').length > 0;
+        const customInsurance = document.getElementById('custom-insurance-providers')?.value?.trim() || '';
+        if (acceptsInsurance || insuranceSelected || !!customInsurance) {
+            points += 1;
+        }
+        
+        // 19 POINTS: Payment Methods Accepted
+        // Complete if payment_methods or custom_payment_methods has items
+        const paymentMethodsSelected = document.querySelectorAll('input[name="payment-method"]:checked').length > 0;
+        const customPayment = document.getElementById('custom-payment-methods')?.value?.trim() || '';
+        if (paymentMethodsSelected || !!customPayment) {
+            points += 1;
+        }
+        
+        // Calculate percentage (18 points = 100%)
+        const percentage = Math.round((points / totalPoints) * 100);
         
         // Update UI
         const progressEl = document.getElementById('completeness-progress');
@@ -865,13 +893,13 @@ function updateProfileCompleteness() {
                 labelEl.textContent = '✓ Profile complete!';
                 labelEl.style.color = '#5c9a72';
             } else {
-                const remaining = totalSections - completedCount;
+                const remaining = totalPoints - points;
                 labelEl.textContent = `${remaining} section${remaining !== 1 ? 's' : ''} to go`;
                 labelEl.style.color = 'var(--placeholder)';
             }
         }
         
-        console.log(`[Rooted Vitality] Profile completeness: ${completedCount}/${totalSections} (${percentage}%)`);
+        console.log(`[Rooted Vitality] Profile completeness: ${points}/${totalPoints} (${percentage}%)`);
         
         // Update credentials badge
         updateCredentialsBadge();
