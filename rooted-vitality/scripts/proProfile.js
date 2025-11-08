@@ -1581,6 +1581,9 @@ async function saveMoreDetailsSection() {
         const customInsuranceToSave = Array.isArray(paymentCheckboxData.custom_insurance_providers) ? paymentCheckboxData.custom_insurance_providers : [];
         const customPaymentToSave = Array.isArray(paymentCheckboxData.custom_payment_methods) ? paymentCheckboxData.custom_payment_methods : [];
         
+        // Get practice type (practice-setting radio selection)
+        const practiceTypeSetting = document.querySelector('input[name="practice-setting"]:checked')?.value || null;
+        
         const updateData = {
             languages: languagesToSave,
             faq: faqToSave,
@@ -1599,10 +1602,9 @@ async function saveMoreDetailsSection() {
             custom_insurance_providers: customInsuranceToSave,  // Store as array, not string
             payment_methods: paymentToSave,  // Store as array, not JSON string
             custom_payment_methods: customPaymentToSave,  // Store as array, not string
+            practice_type: practiceTypeSetting,  // Save practice setting selection
             updated_at: new Date().toISOString()
         };
-        
-        // Remove practice_type from here (redundant - already captured in signup/hero)
         
         console.log('[SAVE] More Details section data:', updateData);
         console.log('[SAVE] Languages being saved:', updateData.languages, 'Type:', typeof updateData.languages);
@@ -3397,32 +3399,19 @@ function setupPracticeListeners() {
     deliveryCheckboxes.forEach(checkbox => checkbox.addEventListener('change', updatePracticeDisplay));
 }
 
-function loadPractice(practiceJson) {
+function loadPractice(practiceType) {
     try {
-        if (typeof practiceJson === 'string') {
-            window.practiceData = JSON.parse(practiceJson);
-        } else {
-            window.practiceData = practiceJson || window.practiceData;
-        }
-        
-        if (window.practiceData.structure) {
-            const radio = document.querySelector(`input[name="practice-structure"][value="${window.practiceData.structure}"]`);
-            if (radio) radio.checked = true;
-        }
-        
-        if (window.practiceData.setting) {
-            const radio = document.querySelector(`input[name="practice-setting"][value="${window.practiceData.setting}"]`);
-            if (radio) radio.checked = true;
-        }
-        
-        if (window.practiceData.delivery && Array.isArray(window.practiceData.delivery)) {
-            document.getElementById('practice-in-person').checked = window.practiceData.delivery.includes('in-person');
-            document.getElementById('practice-virtual').checked = window.practiceData.delivery.includes('virtual');
-            document.getElementById('practice-hybrid').checked = window.practiceData.delivery.includes('hybrid');
+        // Load practice_type (private, clinic, hospital) from database
+        if (practiceType) {
+            const radio = document.querySelector(`input[name="practice-setting"][value="${practiceType}"]`);
+            if (radio) {
+                radio.checked = true;
+                console.log('[Rooted Vitality] ✓ Checked practice-setting radio:', practiceType);
+            }
         }
         
         renderPracticeDisplay();
-        console.log('[Rooted Vitality] ✓ Practice type loaded');
+        console.log('[Rooted Vitality] ✓ Practice type loaded:', practiceType);
     } catch (error) {
         console.error('[Rooted Vitality] Error loading practice:', error);
     }
@@ -3460,25 +3449,17 @@ function renderPracticeDisplay() {
         const displayDiv = document.getElementById('practice-display-content');
         if (!displayDiv) return;
         
-        const data = window.practiceData;
+        const settingRadio = document.querySelector('input[name="practice-setting"]:checked');
         let content = '';
         
-        const structureLabels = { solo: 'Solo Practice', group: 'Group Practice' };
-        const settingLabels = { private: 'Private Practice', clinic: 'Clinic/Center', hospital: 'Hospital/Medical Facility' };
-        const deliveryLabels = { 'in-person': 'In-Person Sessions', virtual: 'Virtual/Telehealth', hybrid: 'Hybrid' };
+        const settingLabels = { 
+            private: 'Private Practice', 
+            clinic: 'Clinic/Center', 
+            hospital: 'Hospital/Medical Facility' 
+        };
         
-        if (data.structure) {
-            content += `<div class="practice-display-item"><span class="practice-badge">${structureLabels[data.structure] || data.structure}</span></div>`;
-        }
-        
-        if (data.setting) {
-            content += `<div class="practice-display-item"><span class="practice-badge">${settingLabels[data.setting] || data.setting}</span></div>`;
-        }
-        
-        if (data.delivery && data.delivery.length > 0) {
-            data.delivery.forEach(d => {
-                content += `<div class="practice-display-item"><span class="practice-badge">${deliveryLabels[d] || d}</span></div>`;
-            });
+        if (settingRadio && settingRadio.value) {
+            content += `<div class="practice-display-item"><span class="practice-badge">${settingLabels[settingRadio.value] || settingRadio.value}</span></div>`;
         }
         
         displayDiv.innerHTML = content || '<p class="placeholder-text">No practice type information provided.</p>';

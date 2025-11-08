@@ -889,48 +889,6 @@
         </div> <!-- Close profile-panels-container -->
       </div>
 
-      <!-- Report a Concern Footer Link -->
-      <div class="report-concern-footer">
-        <button id="report-concern-btn" class="report-concern-link">Report a Concern</button>
-      </div>
-
-  <!-- Report a Concern Modal -->
-  <div id="report-concern-modal" class="modal" style="display: none;">
-    <div class="modal-overlay" onclick="closeReportModal()"></div>
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Report a Concern</h2>
-        <button class="modal-close-btn" onclick="closeReportModal()">×</button>
-      </div>
-
-      <div class="modal-body">
-        <form id="report-concern-form">
-          <div class="form-group">
-            <label for="concern-type">Type of Concern</label>
-            <select id="concern-type" name="concern-type" required>
-              <option value="">Select a concern type...</option>
-              <option value="professionalism">Professionalism Issue</option>
-              <option value="safety">Safety Concern</option>
-              <option value="credentials">Credentials Question</option>
-              <option value="ethics">Ethics Concern</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="concern-description">Description</label>
-            <textarea id="concern-description" name="concern-description" rows="4" placeholder="Please describe the concern..." required></textarea>
-          </div>
-
-          <div class="form-group">
-            <button type="submit" class="btn-primary">Submit Report</button>
-            <button type="button" class="btn-secondary" onclick="closeReportModal()">Cancel</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
   <!-- Profile Picture Upload Modal -->
   <div id="profile-picture-modal" class="modal" style="display: none;">
     <div class="modal-overlay" onclick="closeProfilePictureModal()"></div>
