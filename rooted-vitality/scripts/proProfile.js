@@ -759,123 +759,73 @@ function setupInputListeners() {
  */
 function updateProfileCompleteness() {
     try {
-        // 18-Point Profile Completeness Scoring System
+        if (!window.currentPractitioner) {
+            console.log('[Rooted Vitality] No practitioner data yet');
+            return;
+        }
+        
+        const p = window.currentPractitioner;
         let points = 0;
         const totalPoints = 18;
         
-        // 1 POINT: Base point (category/subcategory/location match)
-        const hasCategory = !!document.getElementById('profile-category')?.value?.trim();
-        const hasSubcategory = !!document.getElementById('profile-subcategory')?.value?.trim();
-        const hasLocation = !!document.getElementById('profile-location')?.value?.trim();
-        if (hasCategory && hasSubcategory && hasLocation) {
-            points += 1;
-        }
+        // 1. bio - About You
+        if (p.bio?.trim()) points += 1;
         
-        // 2 POINTS: About You (bio field filled)
-        if (!!document.getElementById('about-content')?.value?.trim()) {
-            points += 1;
-        }
+        // 2. ethos_statement - Your Approach & Philosophy
+        if (p.ethos_statement?.trim()) points += 1;
         
-        // 3 POINTS: Your Approach & Philosophy (ethos_statement)
-        if (!!document.getElementById('approach-content')?.value?.trim()) {
-            points += 1;
-        }
+        // 3. conditions_treated - Conditions & Specializations
+        if (Array.isArray(p.conditions_treated) && p.conditions_treated.length > 0) points += 1;
         
-        // 4 POINTS: Conditions & Specializations (conditions_treated array length > 0)
-        const checkedConditions = document.querySelectorAll('input[name="condition"]:checked');
-        if (checkedConditions && checkedConditions.length > 0) {
-            points += 1;
-        }
+        // 4. credentials (degree) - Degrees & Education
+        if (Array.isArray(p.credentials) && p.credentials.some(c => c.credential_type === 'degree')) points += 1;
         
-        // 5 POINTS: Degrees & Education
-        if (window.educationCredentials && window.educationCredentials.length > 0) {
-            points += 1;
-        }
+        // 5. credentials (license) - Licenses
+        if (Array.isArray(p.credentials) && p.credentials.some(c => c.credential_type === 'license')) points += 1;
         
-        // 6 POINTS: Licenses
-        if (window.licenseCredentials && window.licenseCredentials.length > 0) {
-            points += 1;
-        }
+        // 6. credentials (certification) - Certifications
+        if (Array.isArray(p.credentials) && p.credentials.some(c => c.credential_type === 'certification')) points += 1;
         
-        // 7 POINTS: Certifications
-        if (window.certificationCredentials && window.certificationCredentials.length > 0) {
-            points += 1;
-        }
+        // 7. credentials (continuing_education) - Ongoing Education
+        if (Array.isArray(p.credentials) && p.credentials.some(c => c.credential_type === 'continuing_education')) points += 1;
         
-        // 8 POINTS: Ongoing Education (continuing_education array)
-        if (window.continuingEducationCredentials && window.continuingEducationCredentials.length > 0) {
-            points += 1;
-        }
+        // 8. background_check_status === 'passed' - Background Check Badge
+        if (p.background_check_status === 'passed') points += 1;
         
-        // 9 POINTS: Background Check Badge (only 'passed' status counts)
-        if (window.currentPractitioner && window.currentPractitioner.background_check_status === 'passed') {
-            points += 1;
-        }
+        // 9. badge_verified - Verified Badge
+        if (p.badge_verified === true) points += 1;
         
-        // 10 POINTS: Verified Badge
-        if (window.currentPractitioner && window.currentPractitioner.badge_verified === true) {
-            points += 1;
-        }
+        // 10. gallery_photos - Professional Photos
+        if (Array.isArray(p.gallery_photos) && p.gallery_photos.length > 0) points += 1;
         
-        // 11 POINTS: Professional Photos (gallery_photos array)
-        if (window.currentPhotos && window.currentPhotos.length > 0) {
-            points += 1;
-        }
+        // 11. intro_video_url - Professional Introduction Video
+        if (p.intro_video_url?.trim()) points += 1;
         
-        // 12 POINTS: Professional Introduction Video (intro_video_url)
-        if (window.videoData && window.videoData.url) {
-            points += 1;
-        }
+        // 12. reviews (from data, not DOM) - Reviews
+        if (window.allReviews && window.allReviews.length > 0) points += 1;
         
-        // 13 POINTS: Reviews (reviews array length > 0)
-        if (window.allReviews && window.allReviews.length > 0) {
-            points += 1;
-        }
+        // 13. languages - Languages
+        if (Array.isArray(p.languages) && p.languages.length > 0) points += 1;
         
-        // 14 POINTS: Languages (languages array length > 0)
-        const langsList = document.getElementById('languages-list');
-        if (langsList && langsList.querySelectorAll('.language-tag').length > 0) {
-            points += 1;
-        }
+        // 14. faq - Frequently Asked Questions
+        if (p.faq && Object.keys(p.faq).length > 0) points += 1;
         
-        // 15 POINTS: Frequently Asked Questions (faq array length > 0)
-        const faqList = document.getElementById('faq-list');
-        if (faqList && faqList.querySelectorAll('.faq-item').length > 0) {
-            points += 1;
-        }
+        // 15. social_media - Social Media & Connect
+        if (p.social_media && Object.keys(p.social_media).length > 0) points += 1;
         
-        // 16 POINTS: Social Media & Connect (social_media object with any non-empty field)
-        const socialFields = ['social-facebook', 'social-instagram', 'social-x', 'social-linkedin', 
-                            'social-youtube', 'social-tiktok', 'social-pinterest', 'social-website'];
-        if (socialFields.some(fieldId => !!document.getElementById(fieldId)?.value?.trim())) {
-            points += 1;
-        }
+        // 16. practice_type - Practice Type & Setting
+        if (p.practice_type && ['private', 'clinic', 'hospital'].includes(p.practice_type)) points += 1;
         
-        // 17 POINTS: Practice Type & Setting (practice_type filled: 'private', 'clinic', or 'hospital')
-        const practiceType = document.querySelector('input[name="practice-setting"]:checked')?.value;
-        if (practiceType && ['private', 'clinic', 'hospital'].includes(practiceType)) {
-            points += 1;
-        }
+        // 17. accepts_insurance OR insurance_providers - Payments & Insurance
+        if (p.accepts_insurance === true || (Array.isArray(p.insurance_providers) && p.insurance_providers.length > 0) || p.custom_insurance_providers?.trim()) points += 1;
         
-        // 18 POINTS: Payments & Insurance
-        // Complete if accepts_insurance === true OR insurance_providers/custom_insurance_providers has items
-        const acceptsInsurance = document.getElementById('accepts-insurance')?.checked || false;
-        const insuranceSelected = document.querySelectorAll('input[name="insurance-provider"]:checked').length > 0;
-        const customInsurance = document.getElementById('custom-insurance-providers')?.value?.trim() || '';
-        if (acceptsInsurance || insuranceSelected || !!customInsurance) {
-            points += 1;
-        }
-        
-        // 19 POINTS: Payment Methods Accepted
-        // Complete if payment_methods or custom_payment_methods has items
-        const paymentMethodsSelected = document.querySelectorAll('input[name="payment-method"]:checked').length > 0;
-        const customPayment = document.getElementById('custom-payment-methods')?.value?.trim() || '';
-        if (paymentMethodsSelected || !!customPayment) {
-            points += 1;
-        }
+        // 18. payment_methods - Payment Methods Accepted
+        if (p.payment_methods?.trim() || p.custom_payment_methods?.trim()) points += 1;
         
         // Calculate percentage (18 points = 100%)
         const percentage = Math.round((points / totalPoints) * 100);
+        
+        console.log(`[Rooted Vitality] Profile completeness: ${points}/${totalPoints} points = ${percentage}%`);
         
         // Update UI
         const progressEl = document.getElementById('completeness-progress');
@@ -900,6 +850,17 @@ function updateProfileCompleteness() {
         }
         
         console.log(`[Rooted Vitality] Profile completeness: ${points}/${totalPoints} (${percentage}%)`);
+        
+        // Save to database
+        if (window.currentPractitioner?.id) {
+            window.supabaseClient
+                .from('practitioners')
+                .update({ profile_completeness_percent: percentage })
+                .eq('id', window.currentPractitioner.id)
+                .then(({ error }) => {
+                    if (error) console.error('[Rooted Vitality] Error saving completeness:', error);
+                });
+        }
         
         // Update credentials badge
         updateCredentialsBadge();
