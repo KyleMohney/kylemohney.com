@@ -1016,7 +1016,7 @@ async function handleCCPARequest() {
         const { error } = await window.supabaseClient
             .from('support_tickets')
             .insert({
-                user_id: currentUser.id,
+                id: currentUser.id,
                 type: 'ccpa_request',
                 status: 'open',
                 subject: 'CCPA Data Request',
