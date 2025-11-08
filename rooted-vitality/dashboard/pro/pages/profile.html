@@ -293,6 +293,27 @@
             </div>
           </div>
 
+          <!-- Continuing Education Subsection -->
+          <div class="credentials-subsection">
+            <button class="subsection-toggle" onclick="toggleSubsection(this)" aria-expanded="true">
+              <h3>Continuing Education</h3>
+              <span class="toggle-icon">▼</span>
+            </button>
+            <div class="subsection-content">
+              <div class="section-instruction">Show clients your commitment to staying current in your field.</div>
+              <div class="section-tooltip">Add professional development courses, workshops, and training programs completed in the last 2 years. This demonstrates your dedication to continuous learning and best practices.</div>
+              
+              <!-- Edit Mode (start open) -->
+              <div id="continuing-education-edit" class="continuing-education-edit" style="display: flex;">
+                <div id="continuing-education-list" class="continuing-education-list"></div>
+                <button class="btn-add-credential" id="add-ce-btn" data-ce-type="course">+ Add Course</button>
+              </div>
+              
+              <!-- Display Mode -->
+              <div id="continuing-education-display" class="continuing-education-display"></div>
+            </div>
+          </div>
+
           <!-- Background Check Subsection -->
           <div class="credentials-subsection">
             <button class="subsection-toggle" onclick="toggleSubsection(this)" aria-expanded="true">
@@ -370,27 +391,6 @@
               <div id="verification-status-display" class="verification-status-display"></div>
             </div>
           </div>
-
-          <!-- Continuing Education Subsection -->
-          <div class="credentials-subsection">
-            <button class="subsection-toggle" onclick="toggleSubsection(this)" aria-expanded="true">
-              <h3>Continuing Education</h3>
-              <span class="toggle-icon">▼</span>
-            </button>
-            <div class="subsection-content">
-              <div class="section-instruction">Show clients your commitment to staying current in your field.</div>
-              <div class="section-tooltip">Add professional development courses, workshops, and training programs completed in the last 2 years. This demonstrates your dedication to continuous learning and best practices.</div>
-              
-              <!-- Edit Mode (start open) -->
-              <div id="continuing-education-edit" class="continuing-education-edit" style="display: flex;">
-                <div id="continuing-education-list" class="continuing-education-list"></div>
-                <button class="btn-add-credential" id="add-ce-btn" data-ce-type="course">+ Add Course</button>
-              </div>
-              
-              <!-- Display Mode -->
-              <div id="continuing-education-display" class="continuing-education-display"></div>
-            </div>
-          </div>
           
           <!-- Section Save Button -->
           <div class="section-footer">
@@ -398,7 +398,6 @@
           </div>
         </section>
 
-        <!-- Continuing Education Section -->
         <!-- Presence & Photos Section -->
         <!-- Photos & Video Section -->
         <section class="profile-panel" data-panel="photos-video">
@@ -467,16 +466,53 @@
             <div class="subsection-content">
               <div class="section-instruction">List all languages you speak professionally with clients.</div>
               <div class="section-tooltip">Multilingual practitioners can reach a broader client base. Add each language you're comfortable conducting sessions in professionally.</div>
-              <div class="languages-input-container">
-                <input 
-                  type="text" 
-                  id="language-input" 
-                  class="language-text-input" 
-                  placeholder="Type a language (e.g., English, Spanish, Mandarin) and press Enter"
-                  data-section="languages"
-                >
-                <div id="languages-list" class="languages-list"></div>
+              <div class="languages-checklist">
+                <label class="language-checkbox-item">
+                  <input type="checkbox" class="language-checkbox" value="English" onchange="updateLanguagesFromCheckboxes()">
+                  <span>English</span>
+                </label>
+                <label class="language-checkbox-item">
+                  <input type="checkbox" class="language-checkbox" value="Spanish" onchange="updateLanguagesFromCheckboxes()">
+                  <span>Spanish</span>
+                </label>
+                <label class="language-checkbox-item">
+                  <input type="checkbox" class="language-checkbox" value="French" onchange="updateLanguagesFromCheckboxes()">
+                  <span>French</span>
+                </label>
+                <label class="language-checkbox-item">
+                  <input type="checkbox" class="language-checkbox" value="German" onchange="updateLanguagesFromCheckboxes()">
+                  <span>German</span>
+                </label>
+                <label class="language-checkbox-item">
+                  <input type="checkbox" class="language-checkbox" value="Mandarin" onchange="updateLanguagesFromCheckboxes()">
+                  <span>Mandarin</span>
+                </label>
+                <label class="language-checkbox-item">
+                  <input type="checkbox" class="language-checkbox" value="Japanese" onchange="updateLanguagesFromCheckboxes()">
+                  <span>Japanese</span>
+                </label>
+                <label class="language-checkbox-item">
+                  <input type="checkbox" class="language-checkbox" value="Portuguese" onchange="updateLanguagesFromCheckboxes()">
+                  <span>Portuguese</span>
+                </label>
+                <label class="language-checkbox-item">
+                  <input type="checkbox" class="language-checkbox" value="Italian" onchange="updateLanguagesFromCheckboxes()">
+                  <span>Italian</span>
+                </label>
+                <label class="language-checkbox-item">
+                  <input type="checkbox" class="language-checkbox" value="Korean" onchange="updateLanguagesFromCheckboxes()">
+                  <span>Korean</span>
+                </label>
+                <label class="language-checkbox-item">
+                  <input type="checkbox" class="language-checkbox" value="Vietnamese" onchange="updateLanguagesFromCheckboxes()">
+                  <span>Vietnamese</span>
+                </label>
+                <label class="language-checkbox-item custom-language-checkbox">
+                  <input type="checkbox" class="language-checkbox" id="custom-language-checkbox" onchange="updateLanguagesFromCheckboxes()">
+                  <input type="text" class="language-custom-input" id="custom-language-input" placeholder="Other language..." onchange="updateLanguagesFromCheckboxes()" onkeypress="if(event.key==='Enter') updateLanguagesFromCheckboxes();">
+                </label>
               </div>
+              <div id="languages-list" class="languages-list" style="margin-top: 1rem;"></div>
             </div>
           </div>
 
@@ -548,31 +584,8 @@
             </button>
             <div class="subsection-content">
               <div class="section-instruction">Describe your practice structure, location setting, and service delivery methods.</div>
-              <div class="section-tooltip">Let clients know if you work solo or in a group, whether sessions are in-person, virtual, or hybrid. Specify your location or availability for remote services.</div>
+              <div class="section-tooltip">Let clients know your location setting and whether sessions are in-person, virtual, or hybrid.</div>
             <div id="practice-edit" class="practice-edit">
-              <!-- Practice Type Table -->
-              <div class="practice-table-wrapper">
-                <h4>Practice Type</h4>
-                <table class="practice-table">
-                  <tbody>
-                    <tr>
-                      <td>
-                        <label class="checkbox-label">
-                          <input type="radio" name="practice-type" value="solo"> Solo Practice
-                        </label>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <label class="checkbox-label">
-                          <input type="radio" name="practice-type" value="group"> Group Practice
-                        </label>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
               <!-- Setting Table -->
               <div class="practice-table-wrapper">
                 <h4>Practice Setting</h4>
@@ -627,7 +640,7 @@
                     <tr>
                       <td>
                         <label class="checkbox-label">
-                          <input type="checkbox" name="insurance-provider" value="aetna">
+                          <input type="checkbox" name="insurance-provider" value="aetna" class="insurance-checkbox" onchange="updateInsuranceSelection()">
                           Aetna
                         </label>
                       </td>
@@ -635,7 +648,7 @@
                     <tr>
                       <td>
                         <label class="checkbox-label">
-                          <input type="checkbox" name="insurance-provider" value="anthem">
+                          <input type="checkbox" name="insurance-provider" value="anthem" class="insurance-checkbox" onchange="updateInsuranceSelection()">
                           Anthem / BlueCross
                         </label>
                       </td>
@@ -643,7 +656,7 @@
                     <tr>
                       <td>
                         <label class="checkbox-label">
-                          <input type="checkbox" name="insurance-provider" value="cigna">
+                          <input type="checkbox" name="insurance-provider" value="cigna" class="insurance-checkbox" onchange="updateInsuranceSelection()">
                           Cigna
                         </label>
                       </td>
@@ -651,7 +664,7 @@
                     <tr>
                       <td>
                         <label class="checkbox-label">
-                          <input type="checkbox" name="insurance-provider" value="humana">
+                          <input type="checkbox" name="insurance-provider" value="humana" class="insurance-checkbox" onchange="updateInsuranceSelection()">
                           Humana
                         </label>
                       </td>
@@ -659,7 +672,7 @@
                     <tr>
                       <td>
                         <label class="checkbox-label">
-                          <input type="checkbox" name="insurance-provider" value="united">
+                          <input type="checkbox" name="insurance-provider" value="united" class="insurance-checkbox" onchange="updateInsuranceSelection()">
                           United Healthcare
                         </label>
                       </td>
@@ -667,7 +680,7 @@
                     <tr>
                       <td>
                         <label class="checkbox-label">
-                          <input type="checkbox" name="insurance-provider" value="medicaid">
+                          <input type="checkbox" name="insurance-provider" value="medicaid" class="insurance-checkbox" onchange="updateInsuranceSelection()">
                           Medicaid
                         </label>
                       </td>
@@ -675,7 +688,7 @@
                     <tr>
                       <td>
                         <label class="checkbox-label">
-                          <input type="checkbox" name="insurance-provider" value="medicare">
+                          <input type="checkbox" name="insurance-provider" value="medicare" class="insurance-checkbox" onchange="updateInsuranceSelection()">
                           Medicare
                         </label>
                       </td>
@@ -683,7 +696,7 @@
                     <tr>
                       <td>
                         <label class="checkbox-label">
-                          <input type="checkbox" name="insurance-provider" value="private-pay">
+                          <input type="checkbox" name="insurance-provider" value="private-pay" class="insurance-checkbox" onchange="updateInsuranceSelection()">
                           Private Pay
                         </label>
                       </td>
@@ -692,15 +705,12 @@
                 </table>
               </div>
 
-              <!-- Other Insurance Text Box -->
+              <!-- Other Insurance Providers (Checkbox + Custom Input) -->
               <div class="payment-table-wrapper">
-                <label for="custom-insurance-providers">Other Insurance Providers</label>
-                <textarea 
-                  id="custom-insurance-providers" 
-                  class="text-input" 
-                  placeholder="List any other insurance providers you accept (comma-separated)"
-                  rows="3"
-                ></textarea>
+                <label class="insurance-checkbox-item custom-insurance-checkbox">
+                  <input type="checkbox" class="insurance-checkbox" id="custom-insurance-checkbox" onchange="updateInsuranceSelection()">
+                  <input type="text" class="insurance-custom-input" id="custom-insurance-input" placeholder="Other insurance provider..." onchange="updateInsuranceSelection()" onkeypress="if(event.key==='Enter') updateInsuranceSelection();">
+                </label>
               </div>
 
               <!-- Payment Methods Table -->
@@ -711,7 +721,7 @@
                     <tr>
                       <td>
                         <label class="checkbox-label">
-                          <input type="checkbox" name="payment-method" value="stripe">
+                          <input type="checkbox" name="payment-method" value="stripe" class="payment-checkbox" onchange="debounceAutoSave('more-details')">
                           Stripe
                         </label>
                       </td>
@@ -719,7 +729,7 @@
                     <tr>
                       <td>
                         <label class="checkbox-label">
-                          <input type="checkbox" name="payment-method" value="square">
+                          <input type="checkbox" name="payment-method" value="square" class="payment-checkbox" onchange="debounceAutoSave('more-details')">
                           Square
                         </label>
                       </td>
@@ -727,7 +737,7 @@
                     <tr>
                       <td>
                         <label class="checkbox-label">
-                          <input type="checkbox" name="payment-method" value="paypal">
+                          <input type="checkbox" name="payment-method" value="paypal" class="payment-checkbox" onchange="debounceAutoSave('more-details')">
                           PayPal
                         </label>
                       </td>
@@ -735,7 +745,7 @@
                     <tr>
                       <td>
                         <label class="checkbox-label">
-                          <input type="checkbox" name="payment-method" value="cash">
+                          <input type="checkbox" name="payment-method" value="cash" class="payment-checkbox" onchange="debounceAutoSave('more-details')">
                           Cash
                         </label>
                       </td>
@@ -743,7 +753,7 @@
                     <tr>
                       <td>
                         <label class="checkbox-label">
-                          <input type="checkbox" name="payment-method" value="check">
+                          <input type="checkbox" name="payment-method" value="check" class="payment-checkbox" onchange="debounceAutoSave('more-details')">
                           Check
                         </label>
                       </td>
@@ -751,7 +761,7 @@
                     <tr>
                       <td>
                         <label class="checkbox-label">
-                          <input type="checkbox" name="payment-method" value="venmo">
+                          <input type="checkbox" name="payment-method" value="venmo" class="payment-checkbox" onchange="debounceAutoSave('more-details')">
                           Venmo
                         </label>
                       </td>
@@ -759,7 +769,7 @@
                     <tr>
                       <td>
                         <label class="checkbox-label">
-                          <input type="checkbox" name="payment-method" value="bank-transfer">
+                          <input type="checkbox" name="payment-method" value="bank-transfer" class="payment-checkbox" onchange="debounceAutoSave('more-details')">
                           Bank Transfer
                         </label>
                       </td>
@@ -767,13 +777,21 @@
                     <tr>
                       <td>
                         <label class="checkbox-label">
-                          <input type="checkbox" name="payment-method" value="credit-card">
+                          <input type="checkbox" name="payment-method" value="credit-card" class="payment-checkbox" onchange="debounceAutoSave('more-details')">
                           Credit Card
                         </label>
                       </td>
                     </tr>
                   </tbody>
                 </table>
+              </div>
+
+              <!-- Other Payment Methods (Checkbox + Custom Input) -->
+              <div class="payment-table-wrapper">
+                <label class="payment-checkbox-item custom-payment-checkbox">
+                  <input type="checkbox" class="payment-checkbox" id="custom-payment-checkbox" onchange="updatePaymentMethodSelection()">
+                  <input type="text" class="payment-custom-input" id="custom-payment-input" placeholder="Other payment method..." onchange="updatePaymentMethodSelection()" onkeypress="if(event.key==='Enter') updatePaymentMethodSelection();">
+                </label>
               </div>
             </div>
             <div id="payment-display" class="payment-display" style="display: none;">

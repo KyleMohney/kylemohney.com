@@ -520,33 +520,21 @@ async function populateProfileFields(data) {
     
     // Load payment methods
     if (data.payment_methods && Array.isArray(data.payment_methods)) {
-        window.selectedPaymentMethods = data.payment_methods;
-        console.log('[Rooted Vitality] ✓ Loaded payment_methods:', window.selectedPaymentMethods);
-        // Check the appropriate checkboxes
-        document.querySelectorAll('input[name="payment-method"]').forEach(cb => {
-            cb.checked = window.selectedPaymentMethods.includes(cb.value);
-        });
+        loadPaymentMethods(data.payment_methods);
+        console.log('[Rooted Vitality] ✓ Loaded payment_methods:', data.payment_methods);
     } else {
         window.selectedPaymentMethods = [];
     }
     
     // Load custom insurance providers text
-    if (data.custom_insurance_providers) {
-        const customInsuranceEl = document.getElementById('custom-insurance-providers');
-        if (customInsuranceEl) {
-            customInsuranceEl.value = data.custom_insurance_providers;
-            console.log('[Rooted Vitality] ✓ Loaded custom_insurance_providers:', data.custom_insurance_providers);
-        }
-    }
+    
+    // Load custom insurance providers text
+    // NOTE: Custom values are now handled as part of insurance_providers array
+    // The custom checkbox/input will be populated by renderInsuranceCheckboxes()
     
     // Load custom payment methods text
-    if (data.custom_payment_methods) {
-        const customPaymentEl = document.getElementById('custom-payment-methods');
-        if (customPaymentEl) {
-            customPaymentEl.value = data.custom_payment_methods;
-            console.log('[Rooted Vitality] ✓ Loaded custom_payment_methods:', data.custom_payment_methods);
-        }
-    }
+    // NOTE: Custom values are now handled as part of payment_methods array
+    // The custom checkbox/input will be populated by renderPaymentCheckboxes()
     
     // Load pricing information
     if (data.pricing) {
@@ -2914,8 +2902,8 @@ function loadInsurance(insuranceArray) {
 
 function renderInsuranceCheckboxes() {
     console.log('[DEBUG] renderInsuranceCheckboxes called');
-    const checkboxes = document.querySelectorAll('.insurance-checkbox');
-    console.log('[DEBUG] Found insurance checkboxes with .insurance-checkbox class:', checkboxes.length);
+    const checkboxes = document.querySelectorAll('input[name="insurance-provider"]');
+    console.log('[DEBUG] Found insurance checkboxes with name="insurance-provider":', checkboxes.length);
     console.log('[DEBUG] window.selectedInsurance:', window.selectedInsurance);
     
     checkboxes.forEach(checkbox => {
@@ -2924,11 +2912,55 @@ function renderInsuranceCheckboxes() {
         checkbox.checked = shouldCheck;
         checkbox.addEventListener('change', updateInsuranceSelection);
     });
+    
+    // Handle custom insurance checkbox + input
+    const customCheckbox = document.getElementById('custom-insurance-checkbox');
+    const customInput = document.getElementById('custom-insurance-input');
+    
+    if (customCheckbox && customInput && window.selectedInsurance) {
+        // Find any value that doesn't match the predefined insurance codes
+        const customValue = window.selectedInsurance.find(value => !['aetna', 'anthem', 'cigna', 'humana', 'united', 'medicaid', 'medicare', 'private-pay'].includes(value));
+        
+        if (customValue) {
+            customCheckbox.checked = true;
+            customInput.value = customValue;
+            console.log('[DEBUG] Custom insurance checkbox and input set to:', customValue);
+        } else {
+            customCheckbox.checked = false;
+            customInput.value = '';
+        }
+        
+        customCheckbox.addEventListener('change', updateInsuranceSelection);
+        customInput.addEventListener('change', updateInsuranceSelection);
+        customInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') updateInsuranceSelection();
+        });
+    }
 }
 
 function updateInsuranceSelection() {
-    const checkboxes = document.querySelectorAll('.insurance-checkbox:checked');
-    window.selectedInsurance = Array.from(checkboxes).map(cb => cb.value);
+    console.log('[Rooted Vitality] Updating insurance selection');
+    
+    const insurance = [];
+    
+    // Collect checked named insurance provider checkboxes
+    const checkboxes = document.querySelectorAll('input[name="insurance-provider"]:checked');
+    checkboxes.forEach(checkbox => {
+        insurance.push(checkbox.value);
+    });
+    
+    // Collect custom insurance if checkbox is checked AND text is entered
+    const customCheckbox = document.getElementById('custom-insurance-checkbox');
+    const customInput = document.getElementById('custom-insurance-input');
+    if (customCheckbox && customCheckbox.checked && customInput && customInput.value.trim()) {
+        const customValue = customInput.value.trim();
+        if (!insurance.includes(customValue)) {
+            insurance.push(customValue);
+        }
+    }
+    
+    window.selectedInsurance = insurance;
+    console.log('[Rooted Vitality] Insurance updated:', window.selectedInsurance);
     renderInsuranceDisplay();
     debounceAutoSave('more-details');
 }
@@ -2954,6 +2986,104 @@ function setupInsuranceListeners() {
         checkbox.addEventListener('change', updateInsuranceSelection);
     });
 }
+
+/* ========================================== */
+/* PAYMENT METHODS FUNCTIONS */
+/* ========================================== */
+
+window.selectedPaymentMethods = [];
+
+const PAYMENT_METHODS = {
+    stripe: 'Stripe',
+    square: 'Square',
+    paypal: 'PayPal',
+    cash: 'Cash',
+    check: 'Check',
+    venmo: 'Venmo',
+    'bank-transfer': 'Bank Transfer',
+    'credit-card': 'Credit Card'
+};
+
+function loadPaymentMethods(paymentMethodsArray) {
+    console.log('[Rooted Vitality] Loading payment methods:', paymentMethodsArray);
+    window.selectedPaymentMethods = Array.isArray(paymentMethodsArray) ? paymentMethodsArray : [];
+    renderPaymentCheckboxes();
+    renderPaymentDisplay();
+}
+
+function renderPaymentCheckboxes() {
+    console.log('[DEBUG] renderPaymentCheckboxes called');
+    const checkboxes = document.querySelectorAll('input[name="payment-method"]');
+    console.log('[DEBUG] Found payment checkboxes with name="payment-method":', checkboxes.length);
+    console.log('[DEBUG] window.selectedPaymentMethods:', window.selectedPaymentMethods);
+    
+    checkboxes.forEach(checkbox => {
+        const shouldCheck = window.selectedPaymentMethods.includes(checkbox.value);
+        console.log('[DEBUG] Checkbox', checkbox.value, '- should be checked:', shouldCheck);
+        checkbox.checked = shouldCheck;
+        checkbox.addEventListener('change', updatePaymentMethodSelection);
+    });
+    
+    // Handle custom payment checkbox + input
+    const customCheckbox = document.getElementById('custom-payment-checkbox');
+    const customInput = document.getElementById('custom-payment-input');
+    
+    if (customCheckbox && customInput && window.selectedPaymentMethods) {
+        // Find any value that doesn't match the predefined payment methods
+        const customValue = window.selectedPaymentMethods.find(value => !['stripe', 'square', 'paypal', 'cash', 'check', 'venmo', 'bank-transfer', 'credit-card'].includes(value));
+        
+        if (customValue) {
+            customCheckbox.checked = true;
+            customInput.value = customValue;
+            console.log('[DEBUG] Custom payment checkbox and input set to:', customValue);
+        } else {
+            customCheckbox.checked = false;
+            customInput.value = '';
+        }
+        
+        customCheckbox.addEventListener('change', updatePaymentMethodSelection);
+        customInput.addEventListener('change', updatePaymentMethodSelection);
+        customInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') updatePaymentMethodSelection();
+        });
+    }
+}
+
+function updatePaymentMethodSelection() {
+    console.log('[Rooted Vitality] Updating payment method selection');
+    
+    const paymentMethods = [];
+    
+    // Collect checked named payment method checkboxes
+    const checkboxes = document.querySelectorAll('input[name="payment-method"]:checked');
+    checkboxes.forEach(checkbox => {
+        paymentMethods.push(checkbox.value);
+    });
+    
+    // Collect custom payment method if checkbox is checked AND text is entered
+    const customCheckbox = document.getElementById('custom-payment-checkbox');
+    const customInput = document.getElementById('custom-payment-input');
+    if (customCheckbox && customCheckbox.checked && customInput && customInput.value.trim()) {
+        const customValue = customInput.value.trim();
+        if (!paymentMethods.includes(customValue)) {
+            paymentMethods.push(customValue);
+        }
+    }
+    
+    window.selectedPaymentMethods = paymentMethods;
+    console.log('[Rooted Vitality] Payment methods updated:', window.selectedPaymentMethods);
+    renderPaymentDisplay();
+    debounceAutoSave('more-details');
+}
+
+function setupPaymentMethodListeners() {
+    console.log('[Rooted Vitality] Setting up payment method listeners');
+    const checkboxes = document.querySelectorAll('.payment-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updatePaymentMethodSelection);
+    });
+}
+
 function createAutoSaveIndicator() {
     const indicator = document.createElement('div');
     indicator.id = 'auto-save-indicator';
@@ -3676,12 +3806,12 @@ function getPaymentCheckboxValues() {
     const paymentData = {
         accepts_insurance: document.getElementById('accepts-insurance')?.checked || false,
         insurance_providers: [],
-        custom_insurance_providers: document.getElementById('custom-insurance-providers')?.value || '',
+        custom_insurance_providers: '',
         payment_methods: [],
-        custom_payment_methods: document.getElementById('custom-payment-methods')?.value || ''
+        custom_payment_methods: ''
     };
     
-    // Collect selected insurance providers
+    // Collect selected insurance providers (excluding custom)
     const insuranceCheckboxes = document.querySelectorAll('input[name="insurance-provider"]:checked');
     console.log('[DEBUG] Found insurance checkboxes (checked):', insuranceCheckboxes.length);
     insuranceCheckboxes.forEach(cb => {
@@ -3689,13 +3819,33 @@ function getPaymentCheckboxValues() {
         paymentData.insurance_providers.push(cb.value);
     });
     
-    // Collect selected payment methods
+    // Collect custom insurance if checkbox is checked AND text is entered
+    const customInsuranceCheckbox = document.getElementById('custom-insurance-checkbox');
+    const customInsuranceInput = document.getElementById('custom-insurance-input');
+    if (customInsuranceCheckbox && customInsuranceCheckbox.checked && customInsuranceInput && customInsuranceInput.value.trim()) {
+        const customInsurance = customInsuranceInput.value.trim();
+        console.log('[DEBUG] Adding custom insurance provider:', customInsurance);
+        paymentData.insurance_providers.push(customInsurance);
+        paymentData.custom_insurance_providers = customInsurance;
+    }
+    
+    // Collect selected payment methods (excluding custom)
     const paymentCheckboxes = document.querySelectorAll('input[name="payment-method"]:checked');
     console.log('[DEBUG] Found payment checkboxes (checked):', paymentCheckboxes.length);
     paymentCheckboxes.forEach(cb => {
         console.log('[DEBUG] Adding payment method:', cb.value);
         paymentData.payment_methods.push(cb.value);
     });
+    
+    // Collect custom payment method if checkbox is checked AND text is entered
+    const customPaymentCheckbox = document.getElementById('custom-payment-checkbox');
+    const customPaymentInput = document.getElementById('custom-payment-input');
+    if (customPaymentCheckbox && customPaymentCheckbox.checked && customPaymentInput && customPaymentInput.value.trim()) {
+        const customPayment = customPaymentInput.value.trim();
+        console.log('[DEBUG] Adding custom payment method:', customPayment);
+        paymentData.payment_methods.push(customPayment);
+        paymentData.custom_payment_methods = customPayment;
+    }
     
     console.log('[Rooted Vitality] Payment data collected:', paymentData);
     return paymentData;

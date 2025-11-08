@@ -689,10 +689,10 @@
 
 .section-footer {
     display: flex;
-    justify-content: center;
-    margin-top: 2.5rem;
-    padding-top: 2rem;
-    border-top: 1px solid #f3f4f6;
+    justify-content: flex-start;
+    margin-top: 1.5rem;
+    padding-top: 0;
+    border-top: none;
 }
 
 .section-footer .section-save-btn {
@@ -1057,7 +1057,7 @@
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    margin-top: 0.5rem;
+    margin-top: 1.5rem;
 }
 
 .btn-add-credential:hover {
@@ -1461,10 +1461,10 @@
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-    padding: 1.5rem;
-    background: var(--light-bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
     margin: 1rem 0;
 }
 
@@ -1519,7 +1519,7 @@
     display: flex;
     gap: 1rem;
     justify-content: flex-start;
-    margin-top: 0.5rem;
+    margin-top: 1.5rem;
 }
 
 .verification-form-actions button {
@@ -1583,14 +1583,14 @@
 }
 
 .verification-status-display {
-    padding: 1rem;
-    border-radius: 6px;
-    background: #f5f5f5;
-    text-align: center;
-    min-height: 2rem;
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    text-align: left;
+    min-height: auto;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
 }
 
 .verification-status-display.pending {
@@ -1665,6 +1665,7 @@
     transition: all 0.2s ease;
     font-family: inherit;
     white-space: nowrap;
+    margin-top: 1.5rem;
 }
 
 .btn-accent {
@@ -1926,6 +1927,85 @@
     color: #999;
 }
 
+.languages-checklist {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.language-checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: #fafaf9;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.language-checkbox-item:hover {
+    border-color: var(--primary);
+    background: #f5f5f5;
+}
+
+.language-checkbox-item.custom-language-checkbox {
+    grid-column: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+}
+
+.language-checkbox-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    cursor: pointer;
+    accent-color: var(--primary);
+}
+
+.language-checkbox-item input[type="checkbox"]:checked + span {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.language-checkbox-item span {
+    transition: color 0.2s ease;
+}
+
+.language-custom-input {
+    flex: 1;
+    min-width: 60px;
+    max-width: 100px;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    background: white;
+    color: var(--dark-text);
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.language-custom-input::placeholder {
+    color: #999;
+}
+
+.language-custom-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.1);
+}
+
+.language-checkbox-item.custom-language-checkbox:hover {
+    border-color: var(--primary);
+    background: #f5f5f5;
+}
+
 .languages-list {
     display: flex;
     flex-wrap: wrap;
@@ -1963,6 +2043,128 @@
 
 .language-tag-remove:hover {
     transform: scale(1.1);
+}
+
+/* ========================================== */
+/* INSURANCE CHECKBOX STYLES */
+/* ========================================== */
+
+.insurance-checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: #fafaf9;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.insurance-checkbox-item:hover {
+    border-color: var(--primary);
+    background: #f5f5f5;
+}
+
+.insurance-checkbox-item.custom-insurance-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+}
+
+.insurance-checkbox-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    cursor: pointer;
+    accent-color: var(--primary);
+}
+
+.insurance-custom-input {
+    flex: 1;
+    min-width: 60px;
+    max-width: 200px;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    background: white;
+    color: var(--dark-text);
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.insurance-custom-input::placeholder {
+    color: #999;
+}
+
+.insurance-custom-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.1);
+}
+
+/* ========================================== */
+/* PAYMENT CHECKBOX STYLES */
+/* ========================================== */
+
+.payment-checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: #fafaf9;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.payment-checkbox-item:hover {
+    border-color: var(--primary);
+    background: #f5f5f5;
+}
+
+.payment-checkbox-item.custom-payment-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+}
+
+.payment-checkbox-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    cursor: pointer;
+    accent-color: var(--primary);
+}
+
+.payment-custom-input {
+    flex: 1;
+    min-width: 60px;
+    max-width: 200px;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    background: white;
+    color: var(--dark-text);
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.payment-custom-input::placeholder {
+    color: #999;
+}
+
+.payment-custom-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.1);
 }
 
 /* ========================================== */
@@ -2372,18 +2574,37 @@
 .faq-form-item {
     background: white;
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 1.5rem;
-    display: grid;
-    grid-template-columns: 1fr 1fr auto;
-    gap: 1rem;
-    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
     transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
 .faq-form-item:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    border-color: var(--primary);
+    box-shadow: 0 2px 8px rgba(92, 154, 114, 0.08);
+    border-color: rgba(92, 154, 114, 0.2);
+}
+
+.faq-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.faq-item-number {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--primary);
+    background: rgba(92, 154, 114, 0.08);
+    padding: 0.4rem 0.75rem;
+    border-radius: 6px;
 }
 
 .faq-form-group {
@@ -2406,10 +2627,15 @@
     font-size: 0.95rem;
     padding: 0.75rem;
     border: 1px solid var(--border);
-    border-radius: 6px;
+    border-radius: 8px;
     color: var(--dark-text);
     background: #fafaf9;
     transition: all 0.2s ease;
+}
+
+.faq-question-input::placeholder,
+.faq-answer-input::placeholder {
+    color: var(--placeholder);
 }
 
 .faq-question-input:focus,
@@ -2426,37 +2652,42 @@
 }
 
 .faq-delete-btn {
-    padding: 0.75rem 1rem;
-    background: #c84c5c;
-    color: white;
+    padding: 0;
+    background: none;
+    color: var(--placeholder);
     border: none;
-    border-radius: 6px;
+    border-radius: 0;
     cursor: pointer;
-    font-weight: 600;
-    font-size: 1.1rem;
+    font-weight: 500;
+    font-size: 0.85rem;
     transition: all 0.2s ease;
-    height: fit-content;
-    min-width: 40px;
+    height: auto;
+    min-width: auto;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-decoration: none;
 }
 
 .faq-delete-btn:hover {
-    background: #b83d4d;
-    transform: scale(1.05);
+    color: var(--error);
+    text-decoration: underline;
+    transform: none;
 }
 
 .faq-delete-btn:active {
-    transform: scale(0.95);
+    transform: none;
 }
 
 /* Mobile responsiveness */
 @media (max-width: 768px) {
     .faq-form-item {
-        grid-template-columns: 1fr;
-        gap: 0.75rem;
+        padding: 1.25rem;
     }
     
-    .faq-delete-btn {
-        width: 100%;
+    .faq-item-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
     }
 }
 
@@ -3423,6 +3654,7 @@
     border-radius: 8px;
     border: 1px solid var(--border);
     margin-top: 1rem;
+    margin-bottom: 2.5rem;
     display: flex;
     flex-direction: column;
     gap: 2rem;
@@ -4294,7 +4526,7 @@
 }
 
 .subsection-content {
-    max-height: 1000px;
+    max-height: 2000px;
     overflow: hidden;
     transition: max-height 0.3s ease, opacity 0.3s ease;
     opacity: 1;
@@ -4678,3 +4910,71 @@
     font-size: 1.1rem;
 }
 
+/* Background Check Prompt & Status */
+.background-check-prompt {
+    background: linear-gradient(135deg, #f5f3f0 0%, #faf8f6 100%);
+    border: 2px solid #e8d5c4;
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 1.5rem 0;
+    text-align: center;
+}
+
+.background-check-prompt .prompt-content h3 {
+    color: #2e2b28;
+    font-size: 1.3rem;
+    margin: 0 0 0.75rem 0;
+}
+
+.background-check-prompt .prompt-content p {
+    color: #6b6360;
+    font-size: 0.95rem;
+    margin: 0 0 1.5rem 0;
+}
+
+.background-check-status {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.background-check-status.in-progress {
+    background: #f0f8ff;
+    border-left: 4px solid #4a90e2;
+}
+
+.background-check-status.completed {
+    background: #f0fdf4;
+    border-left: 4px solid #22c55e;
+}
+
+.background-check-status .status-icon {
+    font-size: 1.5rem;
+    color: #22c55e;
+}
+
+.background-check-status .status-spinner {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border: 3px solid #e0e0e0;
+    border-top: 3px solid #4a90e2;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.background-check-status p {
+    margin: 0;
+}
+
+.background-check-status .status-date {
+    color: #999;
+    font-size: 0.85rem;
+    margin-top: 0.25rem !important;
+}
