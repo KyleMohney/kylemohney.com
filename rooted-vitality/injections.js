@@ -1339,8 +1339,12 @@ const RootedVitality = {
         const currentPath = window.location.pathname;
         let pathPrefix = './';
         
+        // Check if we're in /dashboard/pro/pages/ (three levels deep)
+        if (currentPath.includes('/dashboard/pro/pages/')) {
+            pathPrefix = '../../../';
+        }
         // Check if we're in /dashboard/pro/ (two levels deep)
-        if (currentPath.includes('/dashboard/pro/')) {
+        else if (currentPath.includes('/dashboard/pro/')) {
             pathPrefix = '../../';
         } 
         // Check for other first-level subdirectories
@@ -1440,15 +1444,6 @@ const RootedVitality = {
      */
     injectReportConcern: function() {
         console.log('[Rooted Vitality] injectReportConcern() called');
-        
-        // Skip injection on certain pages where it causes duplicates
-        const currentPath = window.location.pathname;
-        if (currentPath.includes('/dashboard/pro/pages/') || 
-            currentPath.includes('/dashboard/client/') ||
-            currentPath.includes('/dashboard/')) {
-            console.log('[Rooted Vitality] Skipping report concern injection on dashboard pages');
-            return;
-        }
         
         // Prevent double injection
         if (document.getElementById('report-concern-footer')) {

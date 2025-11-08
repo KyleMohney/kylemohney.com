@@ -1582,7 +1582,14 @@ async function saveMoreDetailsSection() {
         const customPaymentToSave = Array.isArray(paymentCheckboxData.custom_payment_methods) ? paymentCheckboxData.custom_payment_methods : [];
         
         // Get practice type (practice-setting radio selection)
+        const practiceSettingRadios = document.querySelectorAll('input[name="practice-setting"]');
+        console.log('[SAVE] practice-setting radios found:', practiceSettingRadios.length);
+        practiceSettingRadios.forEach((r, i) => {
+            console.log(`[SAVE]   Radio ${i}: value="${r.value}" checked=${r.checked}`);
+        });
+        
         const practiceTypeSetting = document.querySelector('input[name="practice-setting"]:checked')?.value || null;
+        console.log('[SAVE] practiceTypeSetting selected:', practiceTypeSetting);
         
         const updateData = {
             languages: languagesToSave,
