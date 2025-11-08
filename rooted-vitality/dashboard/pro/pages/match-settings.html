@@ -4465,8 +4465,29 @@
         if (errorCount === 0) {
           showToast(`Successfully saved ${successCount} service(s) to database!`, 'success');
           console.log('[Rooted Vitality] All categories saved successfully');
+          
+          // After saving all categories, sync pricing to practitioners table
+          try {
+            const { data: { user } } = await window.supabaseClient.auth.getUser();
+            if (user) {
+              await matchSettingsManager.syncServicePricingToPractitioner(user.id);
+              console.log('[Rooted Vitality] ✓ All pricing synced to practitioners table');
+            }
+          } catch (syncError) {
+            console.error('[Rooted Vitality] Error syncing pricing to practitioners:', syncError);
+          }
         } else if (successCount > 0) {
           showToast(`Saved ${successCount} service(s), but ${errorCount} had errors`, 'warning');
+          
+          // Still try to sync what was saved
+          try {
+            const { data: { user } } = await window.supabaseClient.auth.getUser();
+            if (user) {
+              await matchSettingsManager.syncServicePricingToPractitioner(user.id);
+            }
+          } catch (syncError) {
+            console.error('[Rooted Vitality] Error syncing pricing:', syncError);
+          }
         } else {
           showToast(`Failed to save services (${errorCount} errors)`, 'error');
         }
@@ -4861,6 +4882,17 @@
               console.error('[Rooted Vitality] Error saving services to database:', dbError);
               // Still close the modal even if database save fails
               showToast('Services saved locally, but database save failed. Please try again.', 'warning');
+            }
+            
+            // After services are saved, sync all pricing to practitioners table
+            try {
+              const { data: { user } } = await window.supabaseClient.auth.getUser();
+              if (user) {
+                await matchSettingsManager.syncServicePricingToPractitioner(user.id);
+                console.log('[Rooted Vitality] ✓ Pricing synced to practitioners table after adding services');
+              }
+            } catch (syncError) {
+              console.error('[Rooted Vitality] Error syncing pricing to practitioners:', syncError);
             }
           } else {
             showToast('Services saved successfully.', 'success');
