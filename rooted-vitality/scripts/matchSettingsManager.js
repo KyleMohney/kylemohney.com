@@ -224,40 +224,49 @@ class MatchSettingsManager {
    */
   async loadSelectedServices() {
     try {
-      // Query with explicit category and subcategory joins
-      const { data, error } = await this.supabase
+      // First, get all practitioner services with basic info
+      const { data: services, error: servicesError } = await this.supabase
         .from('practitioner_selected_services')
-        .select(`
-          id,
-          taxonomy_id,
-          subcategory_id,
-          is_active,
-          price_per_service,
-          created_at,
-          updated_at,
-          taxonomy!inner(
-            id,
-            name as category_name
-          ),
-          taxonomy_subcategories(
-            id,
-            name as subcategory_name
-          )
-        `)
+        .select('id, taxonomy_id, subcategory_id, is_active, price_per_service, created_at, updated_at')
         .eq('practitioner_id', this.practitionerId);
 
-      if (error) {
-        console.error('[MatchSettingsManager] Query error details:', error);
-        throw error;
+      if (servicesError) {
+        console.error('[MatchSettingsManager] Query error details:', servicesError);
+        throw servicesError;
       }
 
-      // Transform data to flatten the relationships
-      this.selectedServices = (data || []).map(service => ({
+      if (!services || services.length === 0) {
+        this.selectedServices = [];
+        console.log('[MatchSettingsManager] No selected services found');
+        return [];
+      }
+
+      // Get all taxonomy categories and subcategories in one query
+      const taxonomyIds = [...new Set(services.map(s => s.taxonomy_id))];
+      const subcategoryIds = [...new Set(services.map(s => s.subcategory_id))];
+
+      const { data: taxonomies } = await this.supabase
+        .from('holistic_health_taxonomy')
+        .select('id, name')
+        .in('id', taxonomyIds);
+
+      const { data: subcategories } = await this.supabase
+        .from('taxonomy_subcategories')
+        .select('id, name')
+        .in('id', subcategoryIds);
+
+      // Create lookup maps
+      const taxMap = {};
+      const subMap = {};
+      (taxonomies || []).forEach(t => { taxMap[t.id] = t.name; });
+      (subcategories || []).forEach(s => { subMap[s.id] = s.name; });
+
+      // Transform data to include names
+      this.selectedServices = services.map(service => ({
         ...service,
-        category_name: service.taxonomy?.name || 'Unknown',
-        category_id: service.taxonomy?.id || service.taxonomy_id,
-        subcategory_name: service.taxonomy_subcategories?.name || 'Unknown',
-        subcategory_id: service.subcategory_id
+        category_name: taxMap[service.taxonomy_id] || 'Unknown',
+        category_id: service.taxonomy_id,
+        subcategory_name: subMap[service.subcategory_id] || 'Unknown'
       }));
 
       console.log('[MatchSettingsManager] Selected services loaded:', this.selectedServices.length);
