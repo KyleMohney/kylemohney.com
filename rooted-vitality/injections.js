@@ -1004,6 +1004,7 @@ const RootedVitality = {
             const { data, error } = await window.supabaseClient
                 .from('notifications')
                 .select('*')
+                .eq('practitioner_id', user.id)
                 .order('created_at', { ascending: false });
 
             if (error) {
