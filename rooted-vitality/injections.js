@@ -1242,6 +1242,62 @@ const RootedVitality = {
             });
             console.log('[Rooted Vitality] Login modal trigger attached to Login button');
         }
+        
+        // Check auth state and update header if user is logged in
+        this.updatePublicHeaderForAuthState();
+    },
+    
+    /**
+     * Update public header for authenticated users
+     * Changes "Login" button to "Dashboard" and adds "Logout" button
+     */
+    updatePublicHeaderForAuthState: function() {
+        try {
+            if (typeof window.authManager === 'undefined') {
+                console.log('[Rooted Vitality] authManager not ready, skipping header update');
+                return;
+            }
+            
+            const userData = window.authManager.getCurrentUser();
+            if (!userData || !userData.role) {
+                console.log('[Rooted Vitality] No authenticated user, keeping public header');
+                return;
+            }
+            
+            console.log('[Rooted Vitality] User authenticated as:', userData.role, '- Updating header');
+            
+            const loginBtn = document.getElementById('rvLoginBtn');
+            if (!loginBtn) {
+                console.warn('[Rooted Vitality] Login button not found in header');
+                return;
+            }
+            
+            // Detect path prefix
+            const currentPath = window.location.pathname;
+            const isSubdirectory = currentPath.includes('/articles/') || currentPath.includes('/policies/') || currentPath.includes('/dashboard/') || currentPath.includes('/help-center/');
+            const pathPrefix = isSubdirectory ? '../' : './';
+            
+            // Replace Login button with Dashboard link
+            let dashboardUrl = pathPrefix + 'dashboard/client/pages/dashboard.html';
+            if (userData.role === 'practitioner') {
+                dashboardUrl = pathPrefix + 'dashboard/pro/index.html';
+            }
+            
+            loginBtn.textContent = 'Dashboard';
+            loginBtn.classList.remove('rv-login-btn');
+            loginBtn.style.backgroundColor = 'transparent';
+            loginBtn.style.color = 'inherit';
+            loginBtn.style.border = 'none';
+            loginBtn.style.cursor = 'pointer';
+            loginBtn.onclick = (e) => {
+                e.preventDefault();
+                window.location.href = dashboardUrl;
+            };
+            
+            console.log('[Rooted Vitality] Header updated to show Dashboard button');
+        } catch (error) {
+            console.error('[Rooted Vitality] Error updating header for auth state:', error);
+        }
     },
     
     // ======================================================
