@@ -442,6 +442,40 @@ class MatchSettingsManager {
   }
 
   /**
+   * Sync all service pricing to practitioners table as JSON array
+   * Called after any price change to keep database in sync
+   */
+  async syncServicePricingToPractitioner(practitionerId) {
+    try {
+      // Build array of all selected services with their pricing
+      const servicePricingArray = this.selectedServices.map(service => ({
+        service_id: service.id,
+        category_id: service.category_id,
+        category_name: service.category_name,
+        subcategory_name: service.subcategory_name,
+        price_per_service: service.price_per_service || null
+      }));
+
+      // Save to practitioners table as JSON in service_pricing column
+      const { error } = await this.supabase
+        .from('practitioners')
+        .update({
+          service_pricing: JSON.stringify(servicePricingArray),
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', practitionerId);
+
+      if (error) throw error;
+
+      console.log('[MatchSettingsManager] ✓ Service pricing synced to practitioners table');
+      return true;
+    } catch (error) {
+      console.error('[MatchSettingsManager] Error syncing service pricing:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Remove service category
    */
   async removeServiceCategory(serviceId) {

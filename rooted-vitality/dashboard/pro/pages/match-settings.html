@@ -4357,8 +4357,16 @@
           return;
         }
 
-        // Save to database
+        // Save to database (updates practitioner_selected_services)
         await matchSettingsManager.updateServicePrice(category.databaseId, price);
+
+        // Get current user for sync
+        const { data: { user } } = await window.supabaseClient.auth.getUser();
+
+        // Sync all pricing to practitioners table as JSON array
+        if (user) {
+          await matchSettingsManager.syncServicePricingToPractitioner(user.id);
+        }
 
         // Update local state
         if (category) {
@@ -4903,6 +4911,78 @@
       console.log('[Rooted Vitality] Matching status updated:', { isActive, isPaused });
     }
 
+    /**
+     * Save matching_enabled status to practitioners table
+     */
+    async function saveMatchingEnabledToDatabase(isEnabled) {
+      try {
+        const { data: { user }, error: userError } = await window.supabaseClient.auth.getUser();
+        if (userError || !user) {
+          console.error('[Match Settings] Failed to get current user');
+          return;
+        }
+
+        const { error } = await window.supabaseClient
+          .from('practitioners')
+          .update({
+            matching_enabled: isEnabled,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', user.id);
+
+        if (error) {
+          console.error('[Match Settings] Error saving matching_enabled:', error);
+          showToast('Failed to save matching status to database.', 'error');
+          return;
+        }
+
+        console.log('[Match Settings] ✓ Saved matching_enabled:', isEnabled);
+      } catch (error) {
+        console.error('[Match Settings] Exception saving matching_enabled:', error);
+        showToast('An error occurred while saving.', 'error');
+      }
+    }
+
+    /**
+     * Save matching_paused status to practitioners table
+     */
+    async function saveMatchingPausedToDatabase(isPaused, pauseUntilDate = null) {
+      try {
+        const { data: { user }, error: userError } = await window.supabaseClient.auth.getUser();
+        if (userError || !user) {
+          console.error('[Match Settings] Failed to get current user');
+          return;
+        }
+
+        const updateData = {
+          matching_paused: isPaused,
+          updated_at: new Date().toISOString()
+        };
+
+        // If pausing with a date, we could store it in a JSON field or separate column
+        // For now, just saving the paused flag
+        if (isPaused && pauseUntilDate) {
+          console.log('[Match Settings] Matching paused until:', pauseUntilDate);
+        }
+
+        const { error } = await window.supabaseClient
+          .from('practitioners')
+          .update(updateData)
+          .eq('user_id', user.id);
+
+        if (error) {
+          console.error('[Match Settings] Error saving matching_paused:', error);
+          showToast('Failed to save pause status to database.', 'error');
+          return;
+        }
+
+        console.log('[Match Settings] ✓ Saved matching_paused:', isPaused);
+      } catch (error) {
+        console.error('[Match Settings] Exception saving matching_paused:', error);
+        showToast('An error occurred while saving.', 'error');
+      }
+    }
+
     function toggleMatchingActivation() {
       const toggle = document.getElementById('matching-activation-toggle');
       const isNowActive = toggle.checked;
@@ -4918,6 +4998,9 @@
       
       localStorage.setItem('matchingActive', isNowActive ? 'true' : 'false');
       localStorage.removeItem('matchingPauseUntil');
+      
+      // Save to database
+      saveMatchingEnabledToDatabase(isNowActive);
       
       updateMatchingUI(isNowActive, false);
       
@@ -4962,7 +5045,10 @@
         return;
       }
       
-      // Save pause settings
+      // Save pause settings to database
+      saveMatchingPausedToDatabase(true, pauseDateTime);
+      
+      // Save pause settings to localStorage
       localStorage.setItem('matchingPauseUntil', pauseDateTime.toISOString());
       
       // Hide pause form
