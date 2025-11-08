@@ -1337,23 +1337,26 @@ const RootedVitality = {
         
         // Detect if we're in a subdirectory and adjust paths for links and images
         const currentPath = window.location.pathname;
-        let pathPrefix = './';
         
-        // Check if we're in /dashboard/pro/pages/ (three levels deep)
-        if (currentPath.includes('/dashboard/pro/pages/')) {
+        // Calculate path depth by counting slashes after /rooted-vitality/
+        const baseIndex = currentPath.indexOf('/rooted-vitality/');
+        const pathAfterBase = baseIndex !== -1 ? currentPath.substring(baseIndex + '/rooted-vitality/'.length) : currentPath;
+        const slashCount = (pathAfterBase.match(/\//g) || []).length;
+        
+        // Build pathPrefix based on depth
+        let pathPrefix = './';
+        if (slashCount >= 3) {
+            // 3+ levels deep (e.g., /dashboard/pro/pages/profile.html)
             pathPrefix = '../../../';
-        }
-        // Check if we're in /dashboard/pro/ (two levels deep)
-        else if (currentPath.includes('/dashboard/pro/')) {
+        } else if (slashCount >= 2) {
+            // 2 levels deep (e.g., /dashboard/pro/index.html or /articles/page.html)
             pathPrefix = '../../';
-        } 
-        // Check for other first-level subdirectories
-        else if (currentPath.includes('/articles/') || 
-                 currentPath.includes('/policies/') || 
-                 currentPath.includes('/dashboard/') || 
-                 currentPath.includes('/help-center/')) {
+        } else if (slashCount >= 1) {
+            // 1 level deep (e.g., /dashboard/index.html)
             pathPrefix = '../';
         }
+        
+        console.log('[Rooted Vitality] Footer path calculation:', {currentPath, pathAfterBase, slashCount, pathPrefix});
         
         const logoPath = `${pathPrefix}assets/logo_trimmed.png`;
         
@@ -1576,13 +1579,9 @@ const RootedVitality = {
         </div>
         `;
         
-        // Insert before the footer (if it exists) or at end of body
-        const footer = document.getElementById('rvFooter');
-        if (footer) {
-            footer.insertAdjacentHTML('beforebegin', reportConcernHTML);
-        } else {
-            document.body.insertAdjacentHTML('beforeend', reportConcernHTML);
-        }
+        // Insert at end of body (after all content, before footer which comes after)
+        // This ensures it appears between main content and footer
+        document.body.insertAdjacentHTML('beforeend', reportConcernHTML);
         
         console.log('[Rooted Vitality] Report concern widget successfully injected!');
         this.log('Report concern widget injected successfully');
