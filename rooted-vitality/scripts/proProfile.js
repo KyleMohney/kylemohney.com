@@ -1595,9 +1595,9 @@ async function saveMoreDetailsSection() {
                 website: document.getElementById('social-website')?.value || ''
             },
             accepts_insurance: paymentCheckboxData.accepts_insurance === true,
-            insurance_providers: JSON.stringify(insuranceToSave),
+            insurance_providers: insuranceToSave,  // Store as array, not JSON string
             custom_insurance_providers: customInsuranceToSave,  // Store as array, not string
-            payment_methods: JSON.stringify(paymentToSave),
+            payment_methods: paymentToSave,  // Store as array, not JSON string
             custom_payment_methods: customPaymentToSave,  // Store as array, not string
             updated_at: new Date().toISOString()
         };
