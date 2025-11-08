@@ -4304,13 +4304,28 @@
       try {
         if (!matchSettingsManager) {
           console.warn('[Rooted Vitality] Manager not initialized');
+          showToast('System not ready. Please refresh the page.', 'error');
           return;
         }
 
-        // Find the category in activeCategories to get all service IDs
+        // Find the category in activeCategories
         const category = activeCategories.find(ac => ac.id === categoryId);
-        if (!category || !category.serviceIds || category.serviceIds.length === 0) {
-          console.error('[Rooted Vitality] Services not found for category:', categoryId);
+        if (!category) {
+          console.error('[Rooted Vitality] Category not found:', categoryId);
+          showToast('Category not found', 'error');
+          return;
+        }
+
+        // If category has no service IDs yet, it means no subcategories were selected
+        // In this case, we can't toggle anything because there are no services in the database yet
+        if (!category.serviceIds || category.serviceIds.length === 0) {
+          console.warn('[Rooted Vitality] Category has no services selected yet. Must select subcategories first.');
+          showToast('Please select service subcategories before activating', 'info');
+          // Reset the checkbox
+          const checkbox = document.querySelector(`input[type="checkbox"][onchange="toggleCategoryActive('${categoryId}')"]`);
+          if (checkbox) {
+            checkbox.checked = category.active;
+          }
           return;
         }
 
@@ -4784,6 +4799,8 @@
         name: categoryName,
         subcategories: [],
         active: false, // Default to inactive
+        serviceIds: [], // Initialize empty - will be populated when subcategories are added
+        price_per_service: null,
         requiresLicense: fullCategory.requiresLicense,
         requiresCert: fullCategory.requiresCertification
       });
@@ -4829,10 +4846,17 @@
           if (matchSettingsManager && selectedSubs.length > 0) {
             try {
               // For each selected subcategory, add it to the database
+              const newServiceIds = [];
               for (const subcategoryName of selectedSubs) {
-                await matchSettingsManager.addServiceCategory(currentEditingCategory, subcategoryName, price);
+                const result = await matchSettingsManager.addServiceCategory(currentEditingCategory, subcategoryName, price);
+                // Capture the service ID from the result
+                if (result && result.id) {
+                  newServiceIds.push(result.id);
+                }
               }
-              console.log('[Rooted Vitality] Services saved to database:', selectedSubs.length);
+              // Update the serviceIds in activeCategories so toggle works
+              active.serviceIds = newServiceIds;
+              console.log('[Rooted Vitality] Services saved to database:', selectedSubs.length, 'Service IDs:', newServiceIds);
               showToast(`${selectedSubs.length} service(s) saved successfully.`, 'success');
             } catch (dbError) {
               console.error('[Rooted Vitality] Error saving services to database:', dbError);
