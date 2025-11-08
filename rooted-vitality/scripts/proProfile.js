@@ -220,7 +220,7 @@ async function loadProfile(userId) {
         
         
         // Fetch from practitioners table (main profile data)
-        // Query by user_id, not id
+        // Query by id, not user_id
         const { data: practitioner, error: practError } = await window.supabaseClient
             .from('practitioners')
             .select('*')
@@ -362,7 +362,7 @@ async function populateProfileFields(data) {
         console.log('[Rooted Vitality] ✓ Set profile avatar preview to:', avatarUrl);
     } else {
         // Check local storage as fallback
-        const localStorageAvatar = localStorage.getItem(`practice_logo_url_${data.id || data.user_id}`);
+        const localStorageAvatar = localStorage.getItem(`practice_logo_url_${data.id}`);
         if (localStorageAvatar) {
             avatarUrl = localStorageAvatar;
             avatarDiv.innerHTML = `<img src="${localStorageAvatar}" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;">`;
@@ -1327,7 +1327,7 @@ async function saveHeaderFields() {
         // Use UPSERT to handle both insert and update
         const { error: upsertError } = await window.supabaseClient
             .from('practitioners')
-            .upsert(headerData, { onConflict: 'user_id' });
+            .upsert(headerData, { onConflict: 'id' });
         
         if (upsertError) {
             console.error('[Rooted Vitality] Error saving header fields:', upsertError);
@@ -1976,7 +1976,7 @@ async function saveProfile() {
         // Save to practitioners table
         const { data: upsertData, error: practError } = await window.supabaseClient
             .from('practitioners')
-            .upsert(practitionerData, { onConflict: 'user_id' });
+            .upsert(practitionerData, { onConflict: 'id' });
         
         console.log('[Rooted Vitality] Upsert response - Data:', upsertData, 'Error:', practError);
         
@@ -2041,7 +2041,7 @@ async function uploadAvatar(file) {
     try {
         showSaveStatus('Uploading photo...', 'saving');
         
-        // Get the auth user_id (not the practitioner id)
+        // Get the auth id (the authenticated user's UUID)
         const { data: { user } } = await window.supabaseClient.auth.getUser();
         if (!user) {
             throw new Error('Not authenticated');

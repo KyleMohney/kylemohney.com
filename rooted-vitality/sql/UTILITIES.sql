@@ -107,8 +107,10 @@ CREATE INDEX IF NOT EXISTS idx_reviews_project_id ON reviews(project_id);
 CREATE INDEX IF NOT EXISTS idx_reviews_client_id ON reviews(client_id);
 CREATE INDEX IF NOT EXISTS idx_reviews_practitioner_id ON reviews(practitioner_id);
 
-CREATE INDEX IF NOT EXISTS idx_notifications_user_type_user_id 
-ON notifications(user_type, user_id);
+-- Note: This index references old notifications table structure (user_id, user_type)
+-- After migration to separate tables, similar indexes should be created on:
+-- - practitioner_notifications(practitioner_id)
+-- - client_notifications(client_id)
 
 CREATE INDEX IF NOT EXISTS idx_project_messages_project_id 
 ON project_messages(project_id);

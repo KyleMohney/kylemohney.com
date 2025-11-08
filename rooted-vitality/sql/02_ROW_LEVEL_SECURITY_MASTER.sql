@@ -30,18 +30,18 @@ DROP POLICY IF EXISTS "clients_update_policy" ON clients;
 -- SELECT: Users can see their own client record
 CREATE POLICY "clients_select_policy" ON clients
 FOR SELECT
-USING (user_id = auth.uid());
+USING (id = auth.uid());
 
 -- UPDATE: Users can update their own client record
 CREATE POLICY "clients_update_policy" ON clients
 FOR UPDATE
-USING (user_id = auth.uid())
-WITH CHECK (user_id = auth.uid());
+USING (id = auth.uid())
+WITH CHECK (id = auth.uid());
 
 -- INSERT: Users can insert their own client profile
 CREATE POLICY "clients_insert_policy" ON clients
 FOR INSERT
-WITH CHECK (auth.uid() = user_id);
+WITH CHECK (auth.uid() = id);
 
 -- ============================================================================
 -- SECTION 2: PRACTITIONERS TABLE
@@ -57,18 +57,18 @@ DROP POLICY IF EXISTS "Public can view approved practitioners" ON practitioners;
 -- SELECT: Practitioners see their own profile
 CREATE POLICY "Practitioners see own profile" ON practitioners
 FOR SELECT
-USING (user_id = auth.uid() OR deleted_at IS NULL);
+USING (id = auth.uid() OR deleted_at IS NULL);
 
 -- UPDATE: Practitioners can update their own profile
 CREATE POLICY "Practitioners update own profile" ON practitioners
 FOR UPDATE
-USING (user_id = auth.uid())
-WITH CHECK (user_id = auth.uid());
+USING (id = auth.uid())
+WITH CHECK (id = auth.uid());
 
 -- INSERT: Practitioners can create their own profile
 CREATE POLICY "Practitioners create profile" ON practitioners
 FOR INSERT
-WITH CHECK (user_id = auth.uid());
+WITH CHECK (id = auth.uid());
 
 -- ============================================================================
 -- SECTION 3: PROJECTS TABLE

@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!practitionerId) {
             const { data: { user } } = await window.supabaseClient.auth.getUser();
             if (user) {
-                // Get practitioner by user_id
+                // Get practitioner by id
                 const { data, error } = await window.supabaseClient
                     .from('practitioners')
                     .select('*')
@@ -633,11 +633,6 @@ function renderHero() {
     // Business Name
     const businessName = practitioner.legal_business_name || practitioner.dba_name || practitioner.legal_name || 'Practitioner';
     document.getElementById('profile-business-name').textContent = businessName;
-    
-    // Tagline
-    if (practitioner.tagline) {
-        document.getElementById('profile-tagline').textContent = practitioner.tagline;
-    }
     
     // ===== HERO BADGES =====
     console.log('[Practitioner Profile] Processing badges...');

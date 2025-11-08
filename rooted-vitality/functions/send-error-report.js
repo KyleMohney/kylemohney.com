@@ -28,15 +28,19 @@ serve(async (req) => {
     
     const {
       ticketId,
+      category,
       title,
       description,
       email,
       section,
       priority,
+      device,
       userEmail,
       timestamp,
       userId,
-      url
+      url,
+      userAgent,
+      referrer
     } = body;
 
     // Validate required fields
@@ -64,13 +68,14 @@ serve(async (req) => {
     <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
       
       <div style="background: linear-gradient(135deg, #5c9a72 0%, #4a8b62 100%); color: white; padding: 30px; border-radius: 12px 12px 0 0;">
-        <h1 style="margin: 0; font-size: 24px;">🚨 User Error Report Received</h1>
+        <h1 style="margin: 0; font-size: 24px;">🚨 User Concern Report Received</h1>
         <p style="margin: 10px 0 0 0; opacity: 0.9;">Ticket #${ticketId}</p>
       </div>
 
       <div style="background: white; padding: 30px; border: 1px solid #e8e6e3; border-top: none; border-radius: 0 0 12px 12px;">
         
         <div style="margin-bottom: 25px;">
+          <p><strong>Category:</strong> ${getCategoryLabel(category)}</p>
           <p><strong>Priority Level:</strong> <span style="background: ${getPriorityColor(priority)}; color: white; padding: 4px 12px; border-radius: 4px; font-weight: 600;">${priority.toUpperCase()}</span></p>
         </div>
 
@@ -92,7 +97,11 @@ serve(async (req) => {
           </div>
           
           <div style="margin-bottom: 10px;">
-            <p style="margin: 0; font-size: 13px;"><strong>Section:</strong> ${escapeHtml(section)}</p>
+            <p style="margin: 0; font-size: 13px;"><strong>Page/Section:</strong> ${escapeHtml(section)}</p>
+          </div>
+          
+          <div style="margin-bottom: 10px;">
+            <p style="margin: 0; font-size: 13px;"><strong>Device/Browser:</strong> ${escapeHtml(device || 'Not provided')}</p>
           </div>
           
           <div style="margin-bottom: 10px;">
@@ -104,12 +113,12 @@ serve(async (req) => {
           </div>
           
           <div style="margin-bottom: 0;">
-            <p style="margin: 0; font-size: 13px;"><strong>URL:</strong> <code style="background: white; padding: 2px 6px; border-radius: 3px; font-family: monospace; font-size: 12px; overflow-wrap: break-word;">${escapeHtml(url)}</strong></p>
+            <p style="margin: 0; font-size: 13px;"><strong>URL:</strong> <code style="background: white; padding: 2px 6px; border-radius: 3px; font-family: monospace; font-size: 12px; overflow-wrap: break-word;">${escapeHtml(url)}</code></p>
           </div>
         </div>
 
         <div style="border-top: 1px solid #e8e6e3; padding-top: 20px; font-size: 12px; color: #a8a39f;">
-          <p style="margin: 0;">This is an automated error report from the Rooted Vitality practitioner dashboard. Please address this issue and follow up with the user if necessary.</p>
+          <p style="margin: 0;">This is an automated report from the Rooted Vitality platform. Please investigate and follow up with the user if necessary. Check the CONCERNS_AND_ISSUES_LOG.md in the docs folder for tracking.</p>
         </div>
 
       </div>
@@ -161,14 +170,18 @@ serve(async (req) => {
         .from("error_reports")
         .insert({
           ticket_id: ticketId,
+          category: category,
           title: title,
           description: description,
           email: email,
           section: section,
           priority: priority,
-          user_id: userId,
+          device: device,
+          id: userId,
           url: url,
           timestamp: timestamp,
+          user_agent: userAgent,
+          referrer: referrer,
           resolved: false,
         });
 
@@ -216,6 +229,19 @@ function getPriorityColor(priority) {
     default:
       return "#5c9a72";
   }
+}
+
+function getCategoryLabel(category) {
+  const labels = {
+    "technical-issue": "🐛 Technical Issue / Bug",
+    "malfunction": "⚙️ Feature Malfunction",
+    "performance": "⚡ Performance Issue",
+    "ui-problem": "🎨 UI/UX Problem",
+    "content-issue": "📝 Content Error",
+    "security-concern": "🔒 Security Concern",
+    "other": "📌 Other"
+  };
+  return labels[category] || category;
 }
 
 function escapeHtml(text) {

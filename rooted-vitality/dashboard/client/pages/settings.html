@@ -127,39 +127,63 @@
             <p class="setting-description">When a practitioner messages you or accepts your match request</p>
             <div class="notification-channels">
               <label class="notification-channel-toggle">
-                <input type="checkbox" name="pro-messages-bell" checked class="notification-input">
+                <input type="checkbox" name="messages_in_app" checked class="notification-input">
                 <span class="toggle-label">In-App Notification</span>
               </label>
               <label class="notification-channel-toggle">
-                <input type="checkbox" name="pro-messages-email" checked class="notification-input">
+                <input type="checkbox" name="messages_email" checked class="notification-input">
                 <span class="toggle-label">Email</span>
               </label>
               <label class="notification-channel-toggle">
-                <input type="checkbox" name="pro-messages-sms" class="notification-input">
+                <input type="checkbox" name="messages_sms" checked class="notification-input">
                 <span class="toggle-label">SMS</span>
               </label>
             </div>
           </div>
         </div>
 
-        <!-- Opportunity Replies Notifications -->
+        <!-- Practitioner Matches Notifications -->
         <div class="settings-card">
           <div class="card-header">
-            <h3>Opportunity Lead Replies</h3>
+            <h3>Practitioner Matches</h3>
           </div>
           <div class="card-content">
-            <p class="setting-description">When practitioners reply to your wellness inquiries</p>
+            <p class="setting-description">When a practitioner matches with your wellness goals</p>
             <div class="notification-channels">
               <label class="notification-channel-toggle">
-                <input type="checkbox" name="opportunities-bell" checked class="notification-input">
+                <input type="checkbox" name="matches_in_app" checked class="notification-input">
                 <span class="toggle-label">In-App Notification</span>
               </label>
               <label class="notification-channel-toggle">
-                <input type="checkbox" name="opportunities-email" checked class="notification-input">
+                <input type="checkbox" name="matches_email" checked class="notification-input">
                 <span class="toggle-label">Email</span>
               </label>
               <label class="notification-channel-toggle">
-                <input type="checkbox" name="opportunities-sms" class="notification-input">
+                <input type="checkbox" name="matches_sms" checked class="notification-input">
+                <span class="toggle-label">SMS</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reviews Notifications -->
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>Reviews</h3>
+          </div>
+          <div class="card-content">
+            <p class="setting-description">Notifications about reviews and ratings</p>
+            <div class="notification-channels">
+              <label class="notification-channel-toggle">
+                <input type="checkbox" name="reviews_in_app" checked class="notification-input">
+                <span class="toggle-label">In-App Notification</span>
+              </label>
+              <label class="notification-channel-toggle">
+                <input type="checkbox" name="reviews_email" checked class="notification-input">
+                <span class="toggle-label">Email</span>
+              </label>
+              <label class="notification-channel-toggle">
+                <input type="checkbox" name="reviews_sms" checked class="notification-input">
                 <span class="toggle-label">SMS</span>
               </label>
             </div>
@@ -175,15 +199,15 @@
             <p class="setting-description">Updates about features, special offers, and wellness news</p>
             <div class="notification-channels">
               <label class="notification-channel-toggle">
-                <input type="checkbox" name="promotions-bell" class="notification-input">
+                <input type="checkbox" name="promotions_in_app" checked class="notification-input">
                 <span class="toggle-label">In-App Notification</span>
               </label>
               <label class="notification-channel-toggle">
-                <input type="checkbox" name="promotions-email" checked class="notification-input">
+                <input type="checkbox" name="promotions_email" checked class="notification-input">
                 <span class="toggle-label">Email</span>
               </label>
               <label class="notification-channel-toggle">
-                <input type="checkbox" name="promotions-sms" class="notification-input">
+                <input type="checkbox" name="promotions_sms" checked class="notification-input">
                 <span class="toggle-label">SMS</span>
               </label>
             </div>
@@ -199,16 +223,32 @@
             <p class="setting-description">Account updates, subscription alerts, and important security notifications</p>
             <div class="notification-channels">
               <label class="notification-channel-toggle">
-                <input type="checkbox" name="system-bell" checked class="notification-input">
+                <input type="checkbox" name="system_in_app" checked class="notification-input">
                 <span class="toggle-label">In-App Notification</span>
               </label>
               <label class="notification-channel-toggle">
-                <input type="checkbox" name="system-email" checked class="notification-input">
+                <input type="checkbox" name="system_email" checked class="notification-input">
                 <span class="toggle-label">Email</span>
               </label>
               <label class="notification-channel-toggle">
-                <input type="checkbox" name="system-sms" class="notification-input">
+                <input type="checkbox" name="system_sms" class="notification-input">
                 <span class="toggle-label">SMS</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Account & Security Notifications -->
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>Account & Security</h3>
+          </div>
+          <div class="card-content">
+            <p class="setting-description">Critical notifications about your account and security events</p>
+            <div class="notification-channels">
+              <label class="notification-channel-toggle">
+                <input type="checkbox" name="account_in_app" checked class="notification-input">
+                <span class="toggle-label">In-App Notification</span>
               </label>
             </div>
           </div>

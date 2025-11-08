@@ -851,7 +851,7 @@ const RootedVitality = {
             const { data: practitioner, error } = await window.supabaseClient
                 .from('practitioners')
                 .select('*')
-                .eq('user_id', user.id)
+                .eq('id', user.id)
                 .single();
             
             if (error) {
@@ -942,7 +942,7 @@ const RootedVitality = {
             const { data: client, error } = await window.supabaseClient
                 .from('clients')
                 .select('profile_picture_url, first_name')
-                .eq('user_id', user.id)
+                .eq('id', user.id)
                 .single();
             
             if (error || !client) return;
@@ -1429,6 +1429,158 @@ const RootedVitality = {
         console.log('[Rooted Vitality] Footer successfully injected!');
         this.log('Rooted Vitality Footer injected successfully');
     },
+
+    /**
+     * Inject Report a Concern Widget
+     * Universal widget for reporting issues/concerns on all pages
+     * Inserted before footer
+     * Usage: RootedVitality.injectReportConcern();
+     */
+    injectReportConcern: function() {
+        console.log('[Rooted Vitality] injectReportConcern() called');
+        
+        // Prevent double injection
+        if (document.getElementById('report-concern-footer')) {
+            console.log('[Rooted Vitality] Report concern widget already exists, skipping injection');
+            return;
+        }
+        
+        if (!document.body) {
+            console.warn('[Rooted Vitality] Body not ready for report concern injection');
+            return;
+        }
+        
+        // The actual widget HTML will be loaded from external file
+        // For now, inject a simple version
+        const reportConcernHTML = `
+        <div id="report-concern-footer" class="report-concern-footer">
+            <button id="report-concern-btn" class="report-concern-link" title="Report a technical issue or concern with the website">
+                Report a Concern
+            </button>
+        </div>
+
+        <!-- Report Concern Modal -->
+        <div id="report-concern-modal" class="modal" style="display: none;">
+            <div class="modal-content report-concern-modal-content">
+                <div class="modal-header">
+                    <h2>Report a Concern</h2>
+                    <button class="close-btn" onclick="closeReportConcernModal()">&times;</button>
+                </div>
+                
+                <form id="report-concern-form" onsubmit="submitReportConcern(event)">
+                    
+                    <!-- Category Selection -->
+                    <div class="form-group">
+                        <label for="report-category">Category *</label>
+                        <select id="report-category" name="category" required>
+                            <option value="">Select a category...</option>
+                            <option value="technical-issue">Technical Issue / Bug</option>
+                            <option value="malfunction">Feature Malfunction</option>
+                            <option value="performance">Performance Issue</option>
+                            <option value="ui-problem">UI/UX Problem</option>
+                            <option value="content-issue">Content Error</option>
+                            <option value="security-concern">Security Concern</option>
+                            <option value="other">Other Concern</option>
+                        </select>
+                    </div>
+
+                    <!-- Title -->
+                    <div class="form-group">
+                        <label for="report-title">Title of Issue *</label>
+                        <input 
+                            type="text" 
+                            id="report-title" 
+                            name="title" 
+                            placeholder="Brief description of the problem"
+                            maxlength="100"
+                            required
+                        >
+                    </div>
+
+                    <!-- Page/Section -->
+                    <div class="form-group">
+                        <label for="report-section">Page/Section *</label>
+                        <input 
+                            type="text" 
+                            id="report-section" 
+                            name="section" 
+                            placeholder="e.g., Practitioner Dashboard, Search Page"
+                            value=""
+                            required
+                        >
+                    </div>
+
+                    <!-- Description -->
+                    <div class="form-group">
+                        <label for="report-description">Description of Issue *</label>
+                        <textarea 
+                            id="report-description" 
+                            name="description" 
+                            placeholder="Please describe what happened, what you expected to happen, and any error messages you saw"
+                            rows="5"
+                            maxlength="1000"
+                            required
+                        ></textarea>
+                    </div>
+
+                    <!-- Priority -->
+                    <div class="form-group">
+                        <label for="report-priority">Priority Level *</label>
+                        <select id="report-priority" name="priority" required>
+                            <option value="">Select priority...</option>
+                            <option value="low">Low - Minor inconvenience</option>
+                            <option value="medium">Medium - Affects functionality</option>
+                            <option value="high">High - Prevents key features</option>
+                            <option value="critical">Critical - Website not usable</option>
+                        </select>
+                    </div>
+
+                    <!-- Contact Email -->
+                    <div class="form-group">
+                        <label for="report-email">Your Email *</label>
+                        <input 
+                            type="email" 
+                            id="report-email" 
+                            name="email" 
+                            placeholder="your@email.com"
+                            required
+                        >
+                    </div>
+
+                    <!-- Browser/Device Info (auto-filled) -->
+                    <div class="form-group">
+                        <label for="report-device">Device/Browser</label>
+                        <input 
+                            type="text" 
+                            id="report-device" 
+                            name="device" 
+                            placeholder="Auto-detected"
+                            readonly
+                        >
+                        <small>Auto-detected for troubleshooting purposes</small>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="closeReportConcernModal()">Cancel</button>
+                        <button type="submit" class="btn-primary">Submit Report</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        `;
+        
+        // Insert before the footer (if it exists) or at end of body
+        const footer = document.getElementById('rvFooter');
+        if (footer) {
+            footer.insertAdjacentHTML('beforebegin', reportConcernHTML);
+        } else {
+            document.body.insertAdjacentHTML('beforeend', reportConcernHTML);
+        }
+        
+        console.log('[Rooted Vitality] Report concern widget successfully injected!');
+        this.log('Report concern widget injected successfully');
+    },
     
     /**
      * Initialize all common functionality
@@ -1476,6 +1628,7 @@ const RootedVitality = {
         await this.renderHeader(headerRole, headerView);
         
         this.injectLoginModal();
+        this.injectReportConcern();
         this.injectFooter();
         this.injectBackButton();
         this.trackPageView();

@@ -25,7 +25,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     const termsAccepted = form.querySelector('#terms').checked;
 
     // ============ 2. Validate Required Fields ============
-    if (!firstName || !lastName || !email || !confirmEmail || !phone || !password || !dob) {
+    if (!firstName || !lastName || !email || !confirmEmail || !phone || !zipcode || !sex || !password || !dob) {
       alert('Please complete all required fields (marked with *).');
       return;
     }
@@ -163,7 +163,24 @@ window.addEventListener('DOMContentLoaded', async () => {
 
       console.log('✅ [Signup] Client record created successfully!');
 
-      // ============ 6. Success: Show Message & Redirect ============
+      // ============ 6. Create Welcome Notification ============
+      const welcomeNotification = {
+        client_id: authData.user.id,
+        type: 'welcome',
+        title: 'Welcome to Rooted Vitality!',
+        message: 'Thank you for joining our community! We\'re excited to help you on your wellness journey. Get started by creating your first wellness project and connecting with trusted practitioners.',
+        is_read: false,
+        created_at: new Date().toISOString()
+      };
+
+      await window.supabaseClient
+        .from('client_notifications')
+        .insert([welcomeNotification])
+        .catch(err => console.warn('Welcome notification insertion note:', err));
+
+      console.log('✅ [Signup] Welcome notification created');
+
+      // ============ 7. Success: Show Message & Redirect ============
       // Wait briefly for Supabase to persist session, then redirect
       alert('Account created! Welcome to Rooted Vitality.');
       

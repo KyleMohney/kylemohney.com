@@ -223,22 +223,75 @@ function loadNotificationPreferences() {
     try {
         console.log('[Rooted Vitality] Loading notification preferences');
         
-        // Load from localStorage
-        const preferences = JSON.parse(localStorage.getItem('notification-prefs') || '{}');
-        
-        // Set checkbox states for all notification inputs
-        document.querySelectorAll('.notification-input').forEach(checkbox => {
-            const name = checkbox.name;
-            if (name in preferences) {
-                checkbox.checked = preferences[name];
-                console.log(`[Rooted Vitality] Set ${name} to ${preferences[name]}`);
-            }
-        });
-        
-        console.log('[Rooted Vitality] Notification preferences loaded');
+        // Load from database instead of localStorage
+        loadNotificationPreferencesFromDatabase();
     } catch (error) {
         console.error('[Rooted Vitality] Error loading notification preferences:', error);
     }
+}
+
+async function loadNotificationPreferencesFromDatabase() {
+    try {
+        const { data, error } = await window.supabaseClient
+            .from('practitioner_notification_settings')
+            .select('*')
+            .eq('practitioner_id', currentUser.id)
+            .single();
+        
+        if (error && error.code !== 'PGRST116') {
+            console.error('[Rooted Vitality] Error loading notification settings:', error);
+            // Default all to checked if error
+            defaultNotificationPreferences();
+            return;
+        }
+        
+        if (data) {
+            console.log('[Rooted Vitality] Notification preferences loaded:', data);
+            // Apply saved preferences to checkboxes
+            const notificationFields = [
+                'messages_in_app', 'messages_sms', 'messages_email',
+                'matches_in_app', 'matches_sms', 'matches_email',
+                'reviews_in_app', 'reviews_sms', 'reviews_email',
+                'promotions_in_app', 'promotions_sms', 'promotions_email',
+                'system_in_app', 'system_sms', 'system_email',
+                'account_in_app'
+            ];
+            
+            notificationFields.forEach(field => {
+                const checkbox = document.querySelector(`[name="${field}"]`);
+                if (checkbox) {
+                    checkbox.checked = data[field] !== false; // Default to true if field not set
+                }
+            });
+        } else {
+            console.log('[Rooted Vitality] No notification settings found, defaulting all to checked');
+            defaultNotificationPreferences();
+        }
+    } catch (error) {
+        console.error('[Rooted Vitality] Exception loading notifications:', error);
+        defaultNotificationPreferences();
+    }
+}
+
+function defaultNotificationPreferences() {
+    // Set all notification checkboxes to checked by default
+    const notificationFields = [
+        'messages_in_app', 'messages_sms', 'messages_email',
+        'matches_in_app', 'matches_sms', 'matches_email',
+        'reviews_in_app', 'reviews_sms', 'reviews_email',
+        'promotions_in_app', 'promotions_sms', 'promotions_email',
+        'system_in_app', 'system_sms', 'system_email',
+        'account_in_app'
+    ];
+    
+    notificationFields.forEach(field => {
+        const checkbox = document.querySelector(`[name="${field}"]`);
+        if (checkbox) {
+            checkbox.checked = true;
+        }
+    });
+    
+    console.log('[Rooted Vitality] Default notification preferences applied (all checked)');
 }
 
 function saveNotificationPreferences() {
@@ -250,10 +303,54 @@ function saveNotificationPreferences() {
             preferences[checkbox.name] = checkbox.checked;
         });
         
-        localStorage.setItem('notification-prefs', JSON.stringify(preferences));
-        console.log('[Rooted Vitality] Notification preferences saved to localStorage:', preferences);
+        // Save to Supabase instead of localStorage
+        saveNotificationPreferencesToDatabase(preferences);
+        console.log('[Rooted Vitality] Notification preferences updated:', preferences);
     } catch (error) {
         console.error('[Rooted Vitality] Error saving notification preferences:', error);
+    }
+}
+
+async function saveNotificationPreferencesToDatabase(preferences) {
+    try {
+        // Ensure all fields are present with correct names
+        const fullPreferences = {
+            practitioner_id: currentUser.id,
+            messages_in_app: preferences['messages_in_app'] !== false,
+            messages_sms: preferences['messages_sms'] !== false,
+            messages_email: preferences['messages_email'] !== false,
+            matches_in_app: preferences['matches_in_app'] !== false,
+            matches_sms: preferences['matches_sms'] !== false,
+            matches_email: preferences['matches_email'] !== false,
+            reviews_in_app: preferences['reviews_in_app'] !== false,
+            reviews_sms: preferences['reviews_sms'] !== false,
+            reviews_email: preferences['reviews_email'] !== false,
+            promotions_in_app: preferences['promotions_in_app'] !== false,
+            promotions_sms: preferences['promotions_sms'] !== false,
+            promotions_email: preferences['promotions_email'] !== false,
+            system_in_app: preferences['system_in_app'] !== false,
+            system_sms: preferences['system_sms'] !== false,
+            system_email: preferences['system_email'] !== false,
+            account_in_app: preferences['account_in_app'] !== false,
+            updated_at: new Date().toISOString()
+        };
+        
+        // Save to practitioner_notification_settings table
+        const { error: notifError } = await window.supabaseClient
+            .from('practitioner_notification_settings')
+            .upsert(fullPreferences);
+        
+        if (notifError) {
+            console.error('[Rooted Vitality] Error saving preferences:', notifError);
+            showNotification('Error saving preferences', 'error');
+            return;
+        }
+
+        console.log('[Rooted Vitality] Preferences saved successfully to database');
+        showNotification('Notification preferences updated successfully', 'success');
+    } catch (error) {
+        console.error('[Rooted Vitality] Exception saving preferences to database:', error);
+        showNotification('Error saving preferences', 'error');
     }
 }
 
@@ -272,25 +369,39 @@ async function saveNotificationsToSupabase() {
             preferences[checkbox.name] = checkbox.checked;
         });
 
-        // Update practitioners table with notification preferences
+        // Update practitioner_notification_settings table with new preferences
+        const fullPreferences = {
+            practitioner_id: currentUser.id,
+            messages_in_app: preferences['messages_in_app'] !== false,
+            messages_sms: preferences['messages_sms'] !== false,
+            messages_email: preferences['messages_email'] !== false,
+            matches_in_app: preferences['matches_in_app'] !== false,
+            matches_sms: preferences['matches_sms'] !== false,
+            matches_email: preferences['matches_email'] !== false,
+            reviews_in_app: preferences['reviews_in_app'] !== false,
+            reviews_sms: preferences['reviews_sms'] !== false,
+            reviews_email: preferences['reviews_email'] !== false,
+            promotions_in_app: preferences['promotions_in_app'] !== false,
+            promotions_sms: preferences['promotions_sms'] !== false,
+            promotions_email: preferences['promotions_email'] !== false,
+            system_in_app: preferences['system_in_app'] !== false,
+            system_sms: preferences['system_sms'] !== false,
+            system_email: preferences['system_email'] !== false,
+            account_in_app: preferences['account_in_app'] !== false,
+            updated_at: new Date().toISOString()
+        };
+
         const { error } = await window.supabaseClient
-            .from('practitioners')
-            .update({
-                notification_preferences: preferences,
-                updated_at: new Date().toISOString()
-            })
-            .eq('id', currentUser.id);
+            .from('practitioner_notification_settings')
+            .upsert(fullPreferences);
 
         if (error) {
             console.error('[Rooted Vitality] Error saving to Supabase:', error);
             alert('Error saving preferences. Please try again.');
             return false;
         }
-
-        // Also save to localStorage
-        localStorage.setItem('notification-prefs', JSON.stringify(preferences));
         
-        console.log('[Rooted Vitality] Notification preferences saved to Supabase:', preferences);
+        console.log('[Rooted Vitality] Notification preferences saved to Supabase:', fullPreferences);
         
         // Show success feedback
         const btn = document.getElementById('save-notifications-btn');

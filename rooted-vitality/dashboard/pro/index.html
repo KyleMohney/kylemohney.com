@@ -613,7 +613,7 @@
                 id,
                 first_name,
                 last_name,
-                user_id
+                id
               )
             )
           `)
@@ -805,7 +805,7 @@
           .from('project_messages')
           .insert({
             project_id: currentMatchForDeclineMsg.project_id,
-            practitioner_id: currentMatchForDeclineMsg.projects?.clients?.user_id ? null : window.supabaseClient.auth.user()?.id,
+            practitioner_id: currentMatchForDeclineMsg.projects?.clients?.id ? null : window.supabaseClient.auth.user()?.id,
             client_id: currentMatchForDeclineMsg.projects?.clients?.id,
             sender_id: window.authManager?.getCurrentUser()?.id,
             sender_type: 'practitioner',
@@ -872,7 +872,7 @@
                     id,
                     first_name,
                     last_name,
-                    user_id
+                    id
                   )
                 )
               `)

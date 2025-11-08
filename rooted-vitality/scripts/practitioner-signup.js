@@ -310,7 +310,6 @@ async function registerPractitioner(event) {
             submitted_at: new Date().toISOString(),
             // Capture all practitioner table fields with proper types
             bio: null,
-            tagline: null,
             ethos_statement: null,
             modalities: [], // TEXT[] array
             conditions_treated: [], // TEXT[] array
@@ -393,6 +392,23 @@ async function registerPractitioner(event) {
         } else {
             console.log('[Signup] Practitioner record updated');
         }
+
+        // Create welcome notification for practitioner
+        const welcomeNotification = {
+            practitioner_id: state.session.id,
+            type: 'welcome',
+            title: 'Welcome to Rooted Vitality!',
+            message: 'Thank you for signing up to help others on their wellness journey! Complete your profile and set your match preferences to start connecting with clients who need your expertise.',
+            is_read: false,
+            created_at: new Date().toISOString()
+        };
+
+        await window.supabaseClient
+            .from('practitioner_notifications')
+            .insert([welcomeNotification])
+            .catch(err => console.warn('[Signup] Welcome notification insertion note:', err));
+
+        console.log('[Signup] Welcome notification created');
         
         // Hide form and show success modal
         document.getElementById('practitionerForm').style.display = 'none';

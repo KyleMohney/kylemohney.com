@@ -3772,7 +3772,7 @@
         const { data: practitioner, error: practitionerError } = await window.supabaseClient
           .from('practitioners')
           .select('id')
-          .eq('user_id', user.id)
+          .eq('id', user.id)
           .single();
         
         if (practitionerError || !practitioner) {
@@ -5002,7 +5002,7 @@
             matching_enabled: isEnabled,
             updated_at: new Date().toISOString()
           })
-          .eq('user_id', user.id);
+          .eq('id', user.id);
 
         if (error) {
           console.error('[Match Settings] Error saving matching_enabled:', error);
@@ -5042,7 +5042,7 @@
         const { error } = await window.supabaseClient
           .from('practitioners')
           .update(updateData)
-          .eq('user_id', user.id);
+          .eq('id', user.id);
 
         if (error) {
           console.error('[Match Settings] Error saving matching_paused:', error);
@@ -6448,7 +6448,7 @@
         const { data: practitioner, error } = await supabaseClient
           .from('practitioners')
           .select('in_person_enabled, in_person_option, in_person_base_zipcode, in_person_radius_miles, in_person_zipcodes, housecalls_enabled, housecalls_option, housecalls_base_zipcode, housecalls_radius_miles, housecalls_zipcodes, virtual_enabled, virtual_option, virtual_states')
-          .eq('user_id', user.id)
+          .eq('id', user.id)
           .single();
 
         if (error || !practitioner) {
@@ -6605,7 +6605,7 @@
         const { data, error } = await supabaseClient
           .from('practitioners')
           .update(coverageData)
-          .eq('user_id', user.id);
+          .eq('id', user.id);
 
         if (error) {
           console.error('[Coverage Settings] Save error:', error);
@@ -6882,7 +6882,7 @@
             timezone: selectedTimezone,
             availability_last_updated: new Date().toISOString()
           })
-          .eq('user_id', user.id);
+          .eq('id', user.id);
 
         if (error) {
           console.error('[Availability] Save error:', error);
@@ -6912,7 +6912,7 @@
         const { data: practitioner, error } = await supabaseClient
           .from('practitioners')
           .select('availability_schedule, timezone')
-          .eq('user_id', user.id)
+          .eq('id', user.id)
           .single();
 
         if (error) {

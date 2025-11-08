@@ -150,13 +150,6 @@
     margin: 0;
 }
 
-.hero-tagline {
-    font-size: 1.2rem;
-    color: var(--color-accent);
-    font-style: italic;
-    margin: 0;
-}
-
 .hero-badges {
     display: flex;
     gap: var(--spacing-sm);
