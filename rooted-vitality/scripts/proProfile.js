@@ -43,7 +43,7 @@ async function safePractitionerUpdate(updateData) {
             .from('practitioners')
             .update(updateData)
             .eq('id', currentUser.id)
-            .select()
+            .select('*')
             .single();
         
         console.log('[DB] Update response - data:', updated, 'error:', updateError);
@@ -61,7 +61,7 @@ async function safePractitionerUpdate(updateData) {
             const { data: inserted, error: insertError } = await window.supabaseClient
                 .from('practitioners')
                 .insert([insertData])
-                .select()
+                .select('*')
                 .single();
             
             if (insertError) {
