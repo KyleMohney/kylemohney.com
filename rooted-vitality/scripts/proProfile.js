@@ -22,6 +22,56 @@ window.certificationCredentials = [];
 window.continuingEducationCredentials = [];
 
 /**
+ * Safe update/insert for practitioners table
+ * Tries UPDATE first, then INSERT if record doesn't exist
+ */
+async function safePractitionerUpdate(updateData) {
+    if (!currentUser) {
+        throw new Error('No current user');
+    }
+    
+    try {
+        // Try UPDATE first
+        const { data: updated, error: updateError } = await window.supabaseClient
+            .from('practitioners')
+            .update(updateData)
+            .eq('user_id', currentUser.id)
+            .select()
+            .single();
+        
+        if (updateError && updateError.code === 'PGRST116') {
+            // Record doesn't exist, INSERT it
+            const insertData = {
+                user_id: currentUser.id,
+                email: currentUser.email || '',
+                status: 'draft',
+                created_at: new Date().toISOString(),
+                ...updateData
+            };
+            
+            const { data: inserted, error: insertError } = await window.supabaseClient
+                .from('practitioners')
+                .insert([insertData])
+                .select()
+                .single();
+            
+            if (insertError) {
+                throw insertError;
+            }
+            
+            return inserted;
+        } else if (updateError) {
+            throw updateError;
+        }
+        
+        return updated;
+    } catch (error) {
+        console.error('[Rooted Vitality] Error in safePractitionerUpdate:', error);
+        throw error;
+    }
+}
+
+/**
  * Warn user if they try to leave page with unsaved changes
  */
 window.addEventListener('beforeunload', (event) => {
@@ -831,32 +881,20 @@ async function saveHeaderInfo() {
     try {
         showAutoSaveIndicator('saving');
         
-        const practitionerData = {
-            user_id: currentUser.id,
-            email: currentUser.email || '',
+        const updateData = {
             legal_name: document.getElementById('profile-name')?.value || '',
             dba_name: document.getElementById('profile-dba-name')?.value || '',
             business_size: document.getElementById('profile-teamsize')?.value || '',
+            year_established: document.getElementById('profile-years')?.value || null,
             updated_at: new Date().toISOString()
         };
         
-        console.log('[Rooted Vitality] Saving header info with UPSERT:', practitionerData);
+        console.log('[Rooted Vitality] Saving header info:', updateData);
+        const result = await safePractitionerUpdate(updateData);
         
-        // Use UPSERT to handle both insert and update in one operation
-        const { error: upsertError } = await window.supabaseClient
-            .from('practitioners')
-            .upsert(practitionerData, { onConflict: 'user_id' });
-        
-        if (upsertError) {
-            console.error('[Rooted Vitality] Error saving header info:', upsertError);
-            showAutoSaveIndicator('error');
-            return;
-        }
-        
-        console.log('[Rooted Vitality] Header info saved successfully with UPSERT');
+        console.log('[Rooted Vitality] Header info saved successfully:', result);
+        window.practitionerData = result;
         showAutoSaveIndicator('success');
-        
-        // Update profile completeness
         updateProfileCompleteness();
         
     } catch (error) {
@@ -1242,28 +1280,19 @@ async function saveSectionData(sectionId) {
  */
 async function saveAboutSection() {
     try {
-        const practitionerData = {
-            user_id: currentUser.id,
-            email: currentUser.email || '',
+        const updateData = {
             bio: document.getElementById('about-content')?.value || '',
             ethos_statement: document.getElementById('approach-content')?.value || '',
             conditions_treated: saveConditionsData(),
             updated_at: new Date().toISOString()
         };
         
-        console.log('[SAVE] About section data:', practitionerData);
+        console.log('[SAVE] About section data:', updateData);
         
-        const { error } = await window.supabaseClient
-            .from('practitioners')
-            .upsert(practitionerData, { onConflict: 'user_id' });
-        
-        if (error) {
-            console.error('[SAVE] ❌ Error saving about section:', error);
-            showAutoSaveIndicator('error');
-            return;
-        }
+        const result = await safePractitionerUpdate(updateData);
         
         console.log('[SAVE] ✓ About section saved successfully');
+        window.practitionerData = result;
         showAutoSaveIndicator('success');
         lockSectionEdit('about');
         updateProfileCompleteness();
@@ -1326,24 +1355,15 @@ async function saveCredentialsSection(type = 'all') {
         console.log('[SAVE] All credentials to save:', allCredentials);
         
         // Save to practitioners.credentials JSONB column
-        const practitionerData = {
-            user_id: currentUser.id,
-            email: currentUser.email || '',
+        const updateData = {
             credentials: allCredentials,
             updated_at: new Date().toISOString()
         };
         
-        const { error } = await window.supabaseClient
-            .from('practitioners')
-            .upsert(practitionerData, { onConflict: 'user_id' });
-        
-        if (error) {
-            console.error('[SAVE] ❌ Error saving credentials:', error);
-            showAutoSaveIndicator('error');
-            return;
-        }
+        const result = await safePractitionerUpdate(updateData);
         
         console.log('[SAVE] ✓ Credentials saved successfully');
+        window.practitionerData = result;
         showAutoSaveIndicator('success');
         lockSectionEdit('credentials');
         updateProfileCompleteness();
@@ -1362,30 +1382,19 @@ async function saveCredentialsSection(type = 'all') {
 async function savePhotosAndVideoSection() {
     try {
         const photosData = getPhotosForSave();
-        const practitionerData = {
-            user_id: currentUser.id,
-            email: currentUser.email || '',
+        const updateData = {
             gallery_photos: photosData,
             intro_video_url: window.videoData?.url || null,
             updated_at: new Date().toISOString()
         };
         
-        console.log('[SAVE] Photos & Video section data:', practitionerData);
+        console.log('[SAVE] Photos & Video section data:', updateData);
         console.log('[SAVE] Photos data size:', JSON.stringify(photosData).length, 'characters');
         
-        const { data, error } = await window.supabaseClient
-            .from('practitioners')
-            .upsert(practitionerData, { onConflict: 'user_id' });
-        
-        if (error) {
-            console.error('[SAVE] ❌ Error saving photos & video section:', error);
-            console.error('[SAVE] ❌ Full error details:', JSON.stringify(error, null, 2));
-            console.error('[SAVE] ❌ Data being sent:', JSON.stringify(practitionerData, null, 2));
-            showAutoSaveIndicator('error');
-            return;
-        }
+        const result = await safePractitionerUpdate(updateData);
         
         console.log('[SAVE] ✓ Photos & Video section saved successfully');
+        window.practitionerData = result;
         showAutoSaveIndicator('success');
         lockSectionEdit('photos');
         updateProfileCompleteness();
@@ -1393,6 +1402,7 @@ async function savePhotosAndVideoSection() {
         
     } catch (error) {
         console.error('[SAVE] ❌ Error in savePhotosAndVideoSection:', error);
+        console.error('[SAVE] ❌ Error details:', error);
         showAutoSaveIndicator('error');
     }
 }
@@ -1405,9 +1415,7 @@ async function saveMoreDetailsSection() {
         const paymentCheckboxData = getPaymentCheckboxValues();
         const practiceData = savePracticeData();
         
-        const practitionerData = {
-            user_id: currentUser.id,
-            email: currentUser.email || '',
+        const updateData = {
             languages: getSelectedLanguages(),
             faq: window.faqItems || [],
             social_media: {
@@ -1429,19 +1437,12 @@ async function saveMoreDetailsSection() {
             updated_at: new Date().toISOString()
         };
         
-        console.log('[SAVE] More Details section data:', practitionerData);
+        console.log('[SAVE] More Details section data:', updateData);
         
-        const { error } = await window.supabaseClient
-            .from('practitioners')
-            .upsert(practitionerData, { onConflict: 'user_id' });
-        
-        if (error) {
-            console.error('[SAVE] ❌ Error saving more details section:', error);
-            showAutoSaveIndicator('error');
-            return;
-        }
+        const result = await safePractitionerUpdate(updateData);
         
         console.log('[SAVE] ✓ More Details section saved successfully');
+        window.practitionerData = result;
         showAutoSaveIndicator('success');
         lockSectionEdit('more-details');
         updateProfileCompleteness();
