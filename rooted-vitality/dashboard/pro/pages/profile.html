@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="../../../styles/components.css">
   <link rel="stylesheet" href="../../../styles/styles.css">
   <link rel="stylesheet" href="../../../styles/profile.css">
+  <link rel="stylesheet" href="../../../styles/report-concern-widget.css">
 </head>
 <body class="pro-dashboard">
   <script>
@@ -995,6 +996,20 @@
   <script src="../../../scripts/conditions-manager.js"></script>
   <script src="../../../scripts/proDashboard.js"></script>
   <script src="../../../scripts/proProfile.js"></script>
+
+  <script>
+    // Mark Profile as active in the header navigation
+    document.addEventListener('DOMContentLoaded', () => {
+      const navLinks = document.querySelectorAll('.rv-nav-link');
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        const href = link.getAttribute('href');
+        if (href && (href.includes('/profile.html') && !href.includes('practitioner-profile'))) {
+          link.classList.add('active');
+        }
+      });
+    });
+  </script>
 
 </body>
 </html>

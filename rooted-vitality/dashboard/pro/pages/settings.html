@@ -6,6 +6,7 @@
   <title>Settings | Rooted Vitality Practitioner Dashboard</title>
   <link rel="stylesheet" href="../../../styles/styles.css">
   <link rel="stylesheet" href="../styles/settings.css">
+  <link rel="stylesheet" href="../../../styles/report-concern-widget.css">
 </head>
 <body class="rooted-body practitioner-view">
   
@@ -48,12 +49,23 @@
         <div class="settings-card">
           <div class="card-header">
             <h3>Email Address</h3>
-            <button class="btn-edit-setting" data-setting="email">Edit</button>
+            <button class="btn-edit-setting" id="btn-edit-email" data-setting="email">Edit</button>
           </div>
           <div class="card-content">
-            <div class="info-group">
+            <div id="email-display-view" class="info-group">
               <p class="info-value" id="display-email">Loading...</p>
             </div>
+            <form id="email-edit-view" class="inline-edit-form" style="display: none;">
+              <div class="form-group">
+                <label for="email-inline">Email Address</label>
+                <input type="email" id="email-inline" class="form-input" placeholder="your@email.com" required>
+              </div>
+              <p class="form-help">You'll need to verify this email address before it becomes active.</p>
+              <div class="modal-footer" style="margin-top: 1.5rem;">
+                <button type="button" class="btn-secondary" id="btn-cancel-email">Cancel</button>
+                <button type="submit" class="btn-accent">Save Email</button>
+              </div>
+            </form>
           </div>
         </div>
 
@@ -61,12 +73,23 @@
         <div class="settings-card">
           <div class="card-header">
             <h3>Phone Number</h3>
-            <button class="btn-edit-setting" data-setting="phone">Edit</button>
+            <button class="btn-edit-setting" id="btn-edit-phone" data-setting="phone">Edit</button>
           </div>
           <div class="card-content">
-            <div class="info-group">
+            <div id="phone-display-view" class="info-group">
               <p class="info-value" id="display-phone">Loading...</p>
             </div>
+            <form id="phone-edit-view" class="inline-edit-form" style="display: none;">
+              <div class="form-group">
+                <label for="phone-inline">Phone Number</label>
+                <input type="tel" id="phone-inline" class="form-input" placeholder="(555) 123-4567" required>
+              </div>
+              <p class="form-help">Include area code and any extensions if applicable.</p>
+              <div class="modal-footer" style="margin-top: 1.5rem;">
+                <button type="button" class="btn-secondary" id="btn-cancel-phone">Cancel</button>
+                <button type="submit" class="btn-accent">Save Phone</button>
+              </div>
+            </form>
           </div>
         </div>
 
@@ -74,12 +97,32 @@
         <div class="settings-card">
           <div class="card-header">
             <h3>Physical Address</h3>
-            <button class="btn-edit-setting" data-setting="address">Edit</button>
+            <button class="btn-edit-setting" id="btn-edit-address" data-setting="address">Edit</button>
           </div>
           <div class="card-content">
-            <div class="info-group">
+            <div id="address-display-view" class="info-group">
               <p class="info-value" id="display-address">Loading...</p>
             </div>
+            <form id="address-edit-view" class="inline-edit-form" style="display: none;">
+              <div class="form-group">
+                <label for="address-street-inline">Street Address</label>
+                <input type="text" id="address-street-inline" class="form-input" placeholder="123 Main Street, Suite 100" required>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="address-city-inline">City</label>
+                  <input type="text" id="address-city-inline" class="form-input" placeholder="Denver" required>
+                </div>
+                <div class="form-group">
+                  <label for="address-state-inline">State</label>
+                  <input type="text" id="address-state-inline" class="form-input" placeholder="CO" required>
+                </div>
+              </div>
+              <div class="modal-footer" style="margin-top: 1.5rem;">
+                <button type="button" class="btn-secondary" id="btn-cancel-address">Cancel</button>
+                <button type="submit" class="btn-accent">Save Address</button>
+              </div>
+            </form>
           </div>
         </div>
 
@@ -330,8 +373,51 @@
             <h3>Two-Factor Authentication</h3>
           </div>
           <div class="card-content">
-            <p class="setting-description">Add an extra layer of security to your account</p>
-            <button class="btn-setting-action" id="enable-2fa-btn">Enable Two-Factor Authentication</button>
+            <!-- Status View -->
+            <div id="2fa-status-view">
+              <p class="setting-description">Add an extra layer of security to your account</p>
+              <button class="btn-setting-action" id="enable-2fa-btn">Enable Two-Factor Authentication</button>
+            </div>
+
+            <!-- Setup View -->
+            <form id="2fa-setup-view" class="inline-edit-form" style="display: none;">
+              <div class="form-group">
+                <p class="form-help"><strong>Step 1:</strong> Scan this QR code with an authenticator app (Google Authenticator, Authy, Microsoft Authenticator, etc.)</p>
+                <div id="qr-code-container" style="text-align: center; padding: 1.5rem; background: #f5f5f5; border-radius: 8px; margin: 1rem 0;">
+                  <p style="color: #999;">Loading QR code...</p>
+                </div>
+                <p class="form-help">Can't scan? Enter this code manually:</p>
+                <div style="background: #f5f5f5; padding: 1rem; border-radius: 8px; word-break: break-all; font-family: monospace; font-size: 0.9rem; margin: 0.5rem 0;" id="manual-entry-code">
+                  Loading...
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="2fa-verify-code"><strong>Step 2:</strong> Enter the 6-digit code from your authenticator app</label>
+                <input type="text" id="2fa-verify-code" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" placeholder="000000" required style="font-size: 1.5rem; text-align: center; letter-spacing: 0.5rem;">
+              </div>
+
+              <div class="form-group">
+                <p class="form-help">⚠️ <strong>Save these backup codes</strong> in a safe place. You can use them to access your account if you lose access to your authenticator.</p>
+                <div style="background: #fff3cd; border: 1px solid #ffc107; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                  <div id="backup-codes-display" style="font-family: monospace; line-height: 1.8; font-size: 0.9rem;">
+                    Loading backup codes...
+                  </div>
+                  <button type="button" id="copy-backup-codes-btn" class="btn-secondary" style="margin-top: 0.5rem; width: 100%;">Copy Backup Codes</button>
+                </div>
+              </div>
+
+              <div class="modal-footer" style="margin-top: 1.5rem;">
+                <button type="button" class="btn-secondary" id="btn-cancel-2fa">Cancel</button>
+                <button type="submit" class="btn-accent">Confirm & Enable 2FA</button>
+              </div>
+            </form>
+
+            <!-- Enabled View -->
+            <div id="2fa-enabled-view" style="display: none;">
+              <p class="setting-description" style="color: #5c9a72; font-weight: 600;">✓ Two-Factor Authentication is enabled</p>
+              <button class="btn-secondary" id="disable-2fa-btn">Disable Two-Factor Authentication</button>
+            </div>
           </div>
         </div>
 
@@ -374,88 +460,8 @@
       <!-- ========================================== -->
 
       <!-- ========================================== -->
-      <!-- EDIT MODALS -->
+      <!-- END OF SETTINGS MODALS -->
       <!-- ========================================== -->
-
-      <!-- Email Edit Modal -->
-      <div id="edit-email-modal" class="settings-modal" style="display: none;">
-        <div class="modal-overlay"></div>
-        <div class="modal-content">
-          <div class="modal-header">
-            <h2>Update Email Address</h2>
-            <button class="modal-close-btn" aria-label="Close">&times;</button>
-          </div>
-          <form id="edit-email-form" class="modal-form">
-            <div class="form-group">
-              <label for="email-input">New Email Address</label>
-              <input type="email" id="email-input" class="form-input" placeholder="your@email.com" required>
-              <p class="form-help">You'll need to verify this email address before it becomes active.</p>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn-secondary modal-cancel-btn">Cancel</button>
-              <button type="submit" class="btn-accent">Update Email</button>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      <!-- Phone Edit Modal -->
-      <div id="edit-phone-modal" class="settings-modal" style="display: none;">
-        <div class="modal-overlay"></div>
-        <div class="modal-content">
-          <div class="modal-header">
-            <h2>Update Phone Number</h2>
-            <button class="modal-close-btn" aria-label="Close">&times;</button>
-          </div>
-          <form id="edit-phone-form" class="modal-form">
-            <div class="form-group">
-              <label for="phone-input">Phone Number</label>
-              <input type="tel" id="phone-input" class="form-input" placeholder="(555) 123-4567" required>
-              <p class="form-help">Include area code and any extensions if applicable.</p>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn-secondary modal-cancel-btn">Cancel</button>
-              <button type="submit" class="btn-accent">Update Phone</button>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      <!-- Address Edit Modal -->
-      <div id="edit-address-modal" class="settings-modal" style="display: none;">
-        <div class="modal-overlay"></div>
-        <div class="modal-content">
-          <div class="modal-header">
-            <h2>Update Physical Address</h2>
-            <button class="modal-close-btn" aria-label="Close">&times;</button>
-          </div>
-          <form id="edit-address-form" class="modal-form">
-            <div class="form-group">
-              <label for="address-street-input">Street Address</label>
-              <input type="text" id="address-street-input" class="form-input" placeholder="123 Main Street, Suite 100" required>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="address-city-input">City</label>
-                <input type="text" id="address-city-input" class="form-input" placeholder="Denver" required>
-              </div>
-              <div class="form-group">
-                <label for="address-state-input">State</label>
-                <input type="text" id="address-state-input" class="form-input" placeholder="CO" required>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="address-zip-input">ZIP Code</label>
-              <input type="text" id="address-zip-input" class="form-input" placeholder="80202" required>
-            </div>
-            <p class="form-help">Your City and State will appear in your profile.</p>
-            <div class="modal-footer">
-              <button type="button" class="btn-secondary modal-cancel-btn">Cancel</button>
-              <button type="submit" class="btn-accent">Update Address</button>
-            </div>
-          </form>
-        </div>
-      </div>
 
     </div>
   </main>

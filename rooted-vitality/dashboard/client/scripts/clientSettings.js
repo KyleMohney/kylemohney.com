@@ -634,7 +634,7 @@ async function saveNotificationPreferences(e) {
         // Save to client_notification_settings table
         const { error: notifError } = await window.supabaseClient
             .from('client_notification_settings')
-            .upsert(fullPreferences);
+            .upsert(fullPreferences, { onConflict: 'client_id' });
         
         if (notifError) {
             console.error('[Rooted Vitality] Error saving preferences:', notifError);

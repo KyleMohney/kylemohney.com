@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="../../../styles/layout.css">
     <link rel="stylesheet" href="../../../styles/components.css">
     <link rel="stylesheet" href="../../../styles/inbox.css">
+    <link rel="stylesheet" href="../../../styles/report-concern-widget.css">
 </head>
 <body>
     <!-- Header Injection -->
@@ -147,6 +148,30 @@
     <script src="../../../scripts/authModal.js"></script>
     <script src="../../../scripts/authHooks.js"></script>
     <script src="../../../injections.js"></script>
+    <script>
+        // Mark Inbox as active in the header navigation
+        function setInboxNavActive() {
+            const navLinks = document.querySelectorAll('.rv-nav-link');
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                const href = link.getAttribute('href');
+                // Check if this link points to the current page (inbox.html)
+                if (href && (href.includes('inbox.html') || href.endsWith('/pages/'))) {
+                    link.classList.add('active');
+                    console.log('[Rooted Vitality] Set Inbox as active nav link, href:', href);
+                }
+            });
+        }
+        
+        // Try to set active immediately and retry if header not ready
+        if (document.querySelectorAll('.rv-nav-link').length > 0) {
+            setInboxNavActive();
+        } else {
+            document.addEventListener('DOMContentLoaded', setInboxNavActive);
+            // Also retry after a short delay in case header is still loading
+            setTimeout(setInboxNavActive, 500);
+        }
+    </script>
     <script src="../../../scripts/inboxManager.js"></script>
 </body>
 </html>

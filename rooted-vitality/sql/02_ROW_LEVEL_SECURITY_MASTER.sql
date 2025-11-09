@@ -209,7 +209,34 @@ FOR INSERT
 WITH CHECK (auth.role() = 'service_role');
 
 -- ============================================================================
--- SECTION 7: PROJECT_MESSAGES TABLE
+-- SECTION 7: PRACTITIONER_MATCH_SETTINGS TABLE
+-- ============================================================================
+-- Practitioners can manage their own match settings and service categories
+
+ALTER TABLE practitioner_match_settings ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Practitioners read own match settings" ON practitioner_match_settings;
+DROP POLICY IF EXISTS "Practitioners insert own match settings" ON practitioner_match_settings;
+DROP POLICY IF EXISTS "Practitioners update own match settings" ON practitioner_match_settings;
+
+-- SELECT: Practitioners can read their own match settings
+CREATE POLICY "Practitioners read own match settings" ON practitioner_match_settings
+FOR SELECT
+USING (practitioner_id = auth.uid());
+
+-- INSERT: Practitioners can create their own match settings
+CREATE POLICY "Practitioners insert own match settings" ON practitioner_match_settings
+FOR INSERT
+WITH CHECK (practitioner_id = auth.uid());
+
+-- UPDATE: Practitioners can update their own match settings
+CREATE POLICY "Practitioners update own match settings" ON practitioner_match_settings
+FOR UPDATE
+USING (practitioner_id = auth.uid())
+WITH CHECK (practitioner_id = auth.uid());
+
+-- ============================================================================
+-- SECTION 8: PROJECT_MESSAGES TABLE
 -- ============================================================================
 -- Participants in a match can read and send messages
 
@@ -232,6 +259,46 @@ FOR INSERT
 WITH CHECK (
   (sender_id = auth.uid())
 );
+
+-- ============================================================================
+-- SECTION 9: PRACTITIONER_SELECTED_SERVICES TABLE
+-- ============================================================================
+-- Practitioners can manage their selected service categories
+
+ALTER TABLE practitioner_selected_services ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Practitioners read own selected services" ON practitioner_selected_services;
+DROP POLICY IF EXISTS "Practitioners insert own selected services" ON practitioner_selected_services;
+DROP POLICY IF EXISTS "Practitioners update own selected services" ON practitioner_selected_services;
+DROP POLICY IF EXISTS "Practitioners delete own selected services" ON practitioner_selected_services;
+
+-- SELECT: Practitioners can read their own selected services
+CREATE POLICY "Practitioners read own selected services" ON practitioner_selected_services
+FOR SELECT
+USING (practitioner_id = auth.uid());
+
+-- INSERT: Practitioners can add their own selected services
+CREATE POLICY "Practitioners insert own selected services" ON practitioner_selected_services
+FOR INSERT
+WITH CHECK (practitioner_id = auth.uid());
+
+-- UPDATE: Practitioners can update their own selected services (pricing, active status)
+CREATE POLICY "Practitioners update own selected services" ON practitioner_selected_services
+FOR UPDATE
+USING (practitioner_id = auth.uid())
+WITH CHECK (practitioner_id = auth.uid());
+
+-- DELETE: Practitioners can remove their own selected services
+CREATE POLICY "Practitioners delete own selected services" ON practitioner_selected_services
+FOR DELETE
+USING (practitioner_id = auth.uid());
+
+-- ============================================================================
+-- SECTION 10: PROFILE COMPLETENESS MIGRATION
+-- ============================================================================
+-- Add profile completeness tracking column to practitioners table
+ALTER TABLE practitioners
+ADD COLUMN IF NOT EXISTS profile_completeness_percent INTEGER DEFAULT 0;
 
 -- ============================================================================
 -- END MASTER: ROW LEVEL SECURITY POLICIES

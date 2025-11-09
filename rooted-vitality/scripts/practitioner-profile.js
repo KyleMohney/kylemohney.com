@@ -632,7 +632,9 @@ function renderHero() {
     
     // Business Name
     const businessName = practitioner.legal_business_name || practitioner.dba_name || practitioner.legal_name || 'Practitioner';
-    document.getElementById('profile-business-name').textContent = businessName;
+    // Convert database format (with dashes/underscores) to plain English with spaces
+    const displayName = businessName.replace(/[-_]/g, ' ').replace(/\s+/g, ' ').trim();
+    document.getElementById('profile-business-name').textContent = displayName;
     
     // ===== HERO BADGES =====
     console.log('[Practitioner Profile] Processing badges...');

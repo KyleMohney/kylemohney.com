@@ -305,9 +305,11 @@ async function populateProfileFields(data) {
     
     if (fullName) {
         const nameField = document.getElementById('profile-name');
-        nameField.value = fullName;
-        nameField.title = fullName; // Show full name on hover
-        console.log('[Rooted Vitality] ✓ Set profile-name to:', fullName);
+        // Convert database format (dashes/underscores) to plain English (spaces)
+        const displayName = fullName.replace(/[-_]/g, ' ').replace(/\s+/g, ' ').trim();
+        nameField.value = displayName;
+        nameField.title = displayName; // Show full name on hover
+        console.log('[Rooted Vitality] ✓ Set profile-name to:', displayName);
     } else {
         console.warn('[Rooted Vitality] ⚠ No name field found in data');
     }
@@ -315,8 +317,10 @@ async function populateProfileFields(data) {
     // DBA Name - display name for practitioners
     const dbaName = data.dba_name || '';
     if (dbaName) {
-        document.getElementById('profile-dba-name').value = dbaName;
-        console.log('[Rooted Vitality] ✓ Set DBA name to:', dbaName);
+        // Convert database format (dashes/underscores) to plain English (spaces)
+        const displayDbaName = dbaName.replace(/[-_]/g, ' ').replace(/\s+/g, ' ').trim();
+        document.getElementById('profile-dba-name').value = displayDbaName;
+        console.log('[Rooted Vitality] ✓ Set DBA name to:', displayDbaName);
     }
     
     // Team Size - try business_size (from signup) first
@@ -759,12 +763,12 @@ function setupInputListeners() {
  */
 function updateProfileCompleteness() {
     try {
-        if (!window.currentPractitioner) {
+        if (!window.practitionerData) {
             console.log('[Rooted Vitality] No practitioner data yet');
             return;
         }
         
-        const p = window.currentPractitioner;
+        const p = window.practitionerData;
         let points = 0;
         const totalPoints = 18;
         
@@ -852,11 +856,11 @@ function updateProfileCompleteness() {
         console.log(`[Rooted Vitality] Profile completeness: ${points}/${totalPoints} (${percentage}%)`);
         
         // Save to database
-        if (window.currentPractitioner?.id) {
+        if (window.practitionerData?.id) {
             window.supabaseClient
                 .from('practitioners')
                 .update({ profile_completeness_percent: percentage })
-                .eq('id', window.currentPractitioner.id)
+                .eq('id', window.practitionerData.id)
                 .then(({ error }) => {
                     if (error) console.error('[Rooted Vitality] Error saving completeness:', error);
                 });

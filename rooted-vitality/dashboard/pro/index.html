@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="../../styles/layout.css">
   <link rel="stylesheet" href="../../styles/components.css">
   <link rel="stylesheet" href="../../styles/styles.css">
+  <link rel="stylesheet" href="../../styles/report-concern-widget.css">
   
   <style>
     /* ========================================== */
@@ -961,6 +962,29 @@
       document.addEventListener('DOMContentLoaded', initializeClientsPage);
     } else {
       setTimeout(initializeClientsPage, 500);
+    }
+
+    // Mark Clients as active in the header navigation
+    function setClientsNavActive() {
+      const navLinks = document.querySelectorAll('.rv-nav-link');
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        const href = link.getAttribute('href');
+        // Check if this link points to the clients page (index.html)
+        if (href && (href.includes('/pro/index.html') || href.endsWith('/pro/'))) {
+          link.classList.add('active');
+          console.log('[Rooted Vitality] Set Clients as active nav link, href:', href);
+        }
+      });
+    }
+    
+    // Try to set active immediately and retry if header not ready
+    if (document.querySelectorAll('.rv-nav-link').length > 0) {
+      setClientsNavActive();
+    } else {
+      document.addEventListener('DOMContentLoaded', setClientsNavActive);
+      // Also retry after a short delay in case header is still loading
+      setTimeout(setClientsNavActive, 500);
     }
   </script>
 </body>

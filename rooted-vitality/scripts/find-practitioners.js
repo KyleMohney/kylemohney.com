@@ -224,7 +224,7 @@ async function loadPractitioners(project) {
         const practitionerIds = practitioners.map(p => p.id);
         const { data: fullPractitioners, error: detailsError } = await supabaseClient
           .from('practitioners')
-          .select('id, badge_licensed, badge_certified, badge_background_check, credentials_verified')
+          .select('id, badge_licensed, badge_certified, badge_background_check, credentials_verified, profile_completeness_percent')
           .in('id', practitionerIds);
         
         if (!detailsError && fullPractitioners) {
@@ -356,9 +356,13 @@ function applySorting() {
     case 'match-score':
       filteredPractitioners.sort((a, b) => (b.match_score || 0) - (a.match_score || 0));
       break;
+    case 'profile-completeness':
+      filteredPractitioners.sort((a, b) => (b.profile_completeness_percent || 0) - (a.profile_completeness_percent || 0));
+      break;
     case 'recent':
     default:
-      // Already sorted by algorithm (best match first)
+      // Sort by profile completeness as default (best match first)
+      filteredPractitioners.sort((a, b) => (b.profile_completeness_percent || 0) - (a.profile_completeness_percent || 0));
       break;
   }
 

@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="../../../styles/layout.css">
   <link rel="stylesheet" href="../../../styles/components.css">
   <link rel="stylesheet" href="../../../styles/styles.css">
-  <link rel="stylesheet" href="../../../styles/dashboard-pro.css">
+  <link rel="stylesheet" href="../../../styles/report-concern-widget.css">
   
   <!-- Leaflet Map Library -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
@@ -192,7 +192,9 @@
     
     .search-container {
       position: relative;
-      display: contents;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
     }
     
     .search-input {
@@ -223,14 +225,16 @@
     
     .autocomplete-dropdown {
       position: absolute;
+      top: 100%;
+      left: 0;
       background: #ffffff;
       border: 1px solid #e0dcd5;
-      border-top: none;
+      border-top: 1px solid #e0dcd5;
       border-radius: 0 0 8px 8px;
-      max-height: 300px;
+      max-height: 200px;
       overflow-y: auto;
       width: 100%;
-      margin-top: -2px;
+      margin-top: 0;
       z-index: 100;
       display: none;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -278,18 +282,26 @@
       cursor: pointer;
       transition: all 0.2s ease;
       white-space: nowrap;
+      position: relative;
+      z-index: 1;
     }
     
-    .btn-add-category:hover {
+    .btn-add-category:hover:not(:disabled) {
       background: #4a7d5a;
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(92, 154, 114, 0.3);
     }
+
+    .btn-add-category:active:not(:disabled) {
+      transform: translateY(0);
+      box-shadow: 0 2px 6px rgba(92, 154, 114, 0.2);
+    }
     
     .btn-add-category:disabled {
-      background: #ccc;
+      background: #d3d3d3;
+      color: #888;
       cursor: not-allowed;
-      transform: none;
+      opacity: 0.6;
     }
 
     /* Browse Categories Button */
@@ -307,6 +319,8 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      position: relative;
+      z-index: 1;
     }
 
     .btn-browse-categories:hover {
@@ -592,10 +606,12 @@
       align-items: center;
       justify-content: center;
       z-index: 10000;
+      pointer-events: none;
     }
     
     .modal-overlay.active {
       display: flex;
+      pointer-events: auto;
     }
     
     .modal-content {
@@ -607,6 +623,7 @@
       max-height: 80vh;
       overflow-y: auto;
       animation: slideUp 0.3s ease;
+      pointer-events: auto;
     }
     
     @keyframes slideUp {
@@ -751,6 +768,45 @@
       max-height: 85vh;
     }
 
+    .browse-modal-header {
+      background: linear-gradient(135deg, #5c9a72 0%, #4a7d5a 100%);
+      padding: 2rem 1.5rem;
+      border-bottom: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .browse-modal-header h2 {
+      color: #ffffff;
+      margin: 0 0 0.5rem 0;
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .browse-modal-subtitle {
+      color: rgba(255, 255, 255, 0.9);
+      margin: 0;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      font-weight: 400;
+    }
+
+    .browse-modal-header-content {
+      flex: 1;
+    }
+
+    .browse-modal-header .modal-close-btn {
+      color: rgba(255, 255, 255, 0.8);
+      flex-shrink: 0;
+    }
+
+    .browse-modal-header .modal-close-btn:hover {
+      color: #ffffff;
+    }
+
     .browse-search-wrapper {
       padding: 0 1.5rem 1rem 1.5rem;
       border-bottom: 1px solid #e0dcd5;
@@ -866,10 +922,27 @@
       transform: none;
     }
 
-    .browse-category-icon {
-      font-size: 2.5rem;
-      margin-bottom: 0.75rem;
-      display: block;
+    .browse-category-card.added-animation {
+      animation: categoryAdded 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes categoryAdded {
+      0% {
+        opacity: 1;
+        transform: scale(1);
+        border-color: #5c9a72;
+        background: #ffffff;
+      }
+      50% {
+        transform: scale(1.05);
+        box-shadow: 0 8px 24px rgba(92, 154, 114, 0.25);
+      }
+      100% {
+        opacity: 0.6;
+        transform: scale(1);
+        border-color: #d0d0d0;
+        background: #f9f9f9;
+      }
     }
 
     .browse-category-name {
@@ -918,6 +991,8 @@
       cursor: pointer;
       transition: all 0.2s ease;
       width: 100%;
+      position: relative;
+      z-index: 1;
     }
 
     .browse-category-add-btn:hover {
@@ -2817,8 +2892,8 @@
               >
               <div id="autocomplete-dropdown" class="autocomplete-dropdown"></div>
             </div>
-            <button id="btn-add-category" class="btn-add-category" disabled>Add Category</button>
-            <button id="btn-browse-categories" class="btn-browse-categories">Browse</button>
+            <button type="button" id="btn-add-category" class="btn-add-category" disabled>Add Category</button>
+            <button type="button" id="btn-browse-categories" class="btn-browse-categories">Browse</button>
           </div>
         </div>
 
@@ -3485,8 +3560,11 @@
   <!-- ========================================== -->
   <div id="browse-categories-modal" class="modal-overlay">
     <div class="modal-content modal-large">
-      <div class="modal-header">
-        <h2>Browse Service Categories</h2>
+      <div class="modal-header browse-modal-header">
+        <div class="browse-modal-header-content">
+          <h2>Discover Service Categories</h2>
+          <p class="browse-modal-subtitle">Browse and add the services you offer. Organize by credential requirements.</p>
+        </div>
         <button class="modal-close-btn" onclick="closeBrowseCategoriesModal()">×</button>
       </div>
 
@@ -3494,30 +3572,30 @@
         <!-- License Required Categories -->
         <div class="browse-category-section">
           <div class="browse-section-header">
-            <h3>License Required</h3>
-            <p class="browse-section-subtitle">These categories require professional licenses.</p>
+            <h3>Professional License Required</h3>
+            <p class="browse-section-subtitle">Regulated by law. Practitioners must hold valid licenses.</p>
           </div>
           <div id="browse-license-required-categories" class="browse-categories-grid">
             <!-- Populated by JavaScript -->
           </div>
         </div>
 
-        <!-- Certified Categories -->
+        <!-- Certification Categories -->
         <div class="browse-category-section">
           <div class="browse-section-header">
-            <h3>Certification Available</h3>
-            <p class="browse-section-subtitle">These categories offer professional certifications.</p>
+            <h3>Certification or Licensing Available</h3>
+            <p class="browse-section-subtitle">Professional development available through certifications and licenses.</p>
           </div>
           <div id="browse-certified-categories" class="browse-categories-grid">
             <!-- Populated by JavaScript -->
           </div>
         </div>
 
-        <!-- No Requirements Categories -->
+        <!-- Open Practice Categories -->
         <div class="browse-category-section">
           <div class="browse-section-header">
-            <h3>No License or Certification Required</h3>
-            <p class="browse-section-subtitle">These categories have no legal requirements.</p>
+            <h3>Open Practice</h3>
+            <p class="browse-section-subtitle">No specific license or certification required to practice.</p>
           </div>
           <div id="browse-unrestricted-categories" class="browse-categories-grid">
             <!-- Populated by JavaScript -->
@@ -3736,7 +3814,7 @@
           link.classList.remove('active');
           // Check if this link points to match-settings.html
           const href = link.getAttribute('href') || '';
-          if (href.includes('match-settings')) {
+          if (href.includes('match-settings.html') || href.endsWith('/match-settings')) {
             link.classList.add('active');
             found = true;
             console.log('[Rooted Vitality] Highlighted Match Settings nav link');
@@ -3830,16 +3908,31 @@
 
     async function loadTaxonomy() {
       try {
-        const response = await fetch('../../../data/practitioner-categories.json');
+        console.log('[Rooted Vitality] Starting to load practitioner taxonomy...');
+        
+        const response = await fetch('/rooted-vitality/data/practitioner-categories.json');
+        
+        console.log('[Rooted Vitality] Fetch response status:', response.status, response.ok);
+        
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}`);
         }
+        
         taxonomyData = await response.json();
+        
+        console.log('[Rooted Vitality] Parsed JSON, checking for categories property');
         
         // Load all practitioner categories (already excludes Massage Therapy)
         allCategories = taxonomyData.categories || [];
         
         console.log('[Rooted Vitality] Practitioner taxonomy loaded:', allCategories.length, 'categories');
+        
+        if (allCategories.length === 0) {
+          console.error('[Rooted Vitality] WARNING: No categories found in taxonomy data');
+          console.log('[Rooted Vitality] Taxonomy data structure:', Object.keys(taxonomyData));
+        } else {
+          console.log('[Rooted Vitality] First category sample:', allCategories[0]);
+        }
       } catch (error) {
         console.error('[Rooted Vitality] Error loading practitioner taxonomy:', error);
         showToast('Could not load categories. Please refresh.', 'error');
@@ -4509,35 +4602,75 @@
     // ======================================================
 
     function setupEventListeners() {
+      console.log('[Rooted Vitality] setupEventListeners() called');
+      
       const searchInput = document.getElementById('category-search');
       const addBtn = document.getElementById('btn-add-category');
       const browseBtn = document.getElementById('btn-browse-categories');
       const dropdown = document.getElementById('autocomplete-dropdown');
       
-      if (!searchInput) return;
+      console.log('[Rooted Vitality] Element check:', {
+        searchInput: !!searchInput,
+        addBtn: !!addBtn,
+        browseBtn: !!browseBtn,
+        dropdown: !!dropdown
+      });
+      
+      if (!searchInput || !addBtn || !dropdown) {
+        console.error('[Rooted Vitality] MISSING REQUIRED ELEMENTS:', {
+          searchInput: searchInput ? 'FOUND' : 'MISSING',
+          addBtn: addBtn ? 'FOUND' : 'MISSING',
+          dropdown: dropdown ? 'FOUND' : 'MISSING'
+        });
+        return;
+      }
+      
+      console.log('[Rooted Vitality] All elements found, attaching listeners');
       
       // Browse button listener
       if (browseBtn) {
-        browseBtn.addEventListener('click', openBrowseCategoriesModal);
+        browseBtn.addEventListener('click', (e) => {
+          console.log('[Rooted Vitality] Browse button clicked');
+          openBrowseCategoriesModal(e);
+        });
+        console.log('[Rooted Vitality] Browse button listener attached');
       }
       
       searchInput.addEventListener('input', (e) => {
+        console.log('[Rooted Vitality] Search input changed:', e.target.value);
+        console.log('[Rooted Vitality] allCategories count:', allCategories ? allCategories.length : 'NOT LOADED');
+        
         const value = e.target.value.trim();
         selectedCategoryForAdd = null;
         addBtn.disabled = true;
         
         if (value.length === 0) {
           dropdown.classList.remove('active');
+          console.log('[Rooted Vitality] Search cleared, dropdown hidden');
           return;
         }
         
-        const filtered = allCategories.filter(cat =>
-          cat.name.toLowerCase().includes(value.toLowerCase()) &&
-          !activeCategories.some(ac => ac.id === cat.id)
-        );
+        // Guard against undefined allCategories
+        if (!allCategories || allCategories.length === 0) {
+          console.warn('[Rooted Vitality] allCategories is empty or not loaded');
+          dropdown.classList.remove('active');
+          return;
+        }
+        
+        const filtered = allCategories.filter(cat => {
+          if (!cat || !cat.name) {
+            console.warn('[Rooted Vitality] Found category without name:', cat);
+            return false;
+          }
+          return cat.name.toLowerCase().includes(value.toLowerCase()) &&
+                 !activeCategories.some(ac => ac.id === cat.id);
+        });
+        
+        console.log('[Rooted Vitality] Filtered categories:', filtered.length, 'from total:', allCategories.length);
         
         if (filtered.length === 0) {
           dropdown.classList.remove('active');
+          console.log('[Rooted Vitality] No matching categories');
           return;
         }
         
@@ -4554,24 +4687,42 @@
         `).join('');
         
         dropdown.classList.add('active');
+        console.log('[Rooted Vitality] Dropdown shown with', filtered.slice(0, 8).length, 'items');
       });
       
       // Close dropdown on blur
       searchInput.addEventListener('blur', () => {
         setTimeout(() => {
           dropdown.classList.remove('active');
+          console.log('[Rooted Vitality] Dropdown hidden on blur');
         }, 200);
       });
       
-      // Add button handler
-      addBtn.addEventListener('click', () => {
-        if (selectedCategoryForAdd) {
-          const fullCategory = allCategories.find(c => c.id === selectedCategoryForAdd.id);
-          if (fullCategory) {
-            addCategoryToDatabaseAndUI(selectedCategoryForAdd.id, selectedCategoryForAdd.name, fullCategory);
-          }
+      // Add button handler with proper error checking
+      addBtn.addEventListener('click', (e) => {
+        console.log('[Rooted Vitality] Add Category button CLICKED', {
+          disabled: addBtn.disabled,
+          selectedCategoryForAdd
+        });
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (!selectedCategoryForAdd) {
+          console.warn('[Rooted Vitality] No category selected for add - button should be disabled');
+          return;
+        }
+        
+        const fullCategory = allCategories.find(c => c.id === selectedCategoryForAdd.id);
+        if (fullCategory) {
+          console.log('[Rooted Vitality] Adding category:', selectedCategoryForAdd.name);
+          addCategoryToDatabaseAndUI(selectedCategoryForAdd.id, selectedCategoryForAdd.name, fullCategory);
+        } else {
+          console.error('[Rooted Vitality] Full category not found for:', selectedCategoryForAdd.id);
         }
       });
+      
+      console.log('[Rooted Vitality] Add button listener attached');
 
       // Pause modal date/time listeners
       const pauseDateInput = document.getElementById('pause-date');
@@ -4580,14 +4731,58 @@
       if (pauseDateInput && pauseTimeInput) {
         pauseDateInput.addEventListener('change', updatePausePreview);
         pauseTimeInput.addEventListener('change', updatePausePreview);
+        console.log('[Rooted Vitality] Pause date/time listeners attached');
       }
+      
+      // EVENT DELEGATION: Browse modal add buttons
+      // Use delegation so buttons work even when re-rendered
+      const browseModal = document.getElementById('browse-categories-modal');
+      if (browseModal) {
+        browseModal.addEventListener('click', (e) => {
+          const btn = e.target.closest('.browse-category-add-btn');
+          if (!btn) return;
+          
+          console.log('[Rooted Vitality] ✓✓✓ BROWSE MODAL BUTTON CLICKED via delegation');
+          e.preventDefault();
+          e.stopPropagation();
+          
+          const cardEl = btn.closest('.browse-category-card');
+          const categoryId = cardEl ? cardEl.dataset.categoryId : null;
+          const categoryName = btn.dataset.categoryName;
+          
+          console.log('[Rooted Vitality] ✓✓✓ Click details:', { categoryId, categoryName, cardFound: !!cardEl });
+          
+          if (categoryId) {
+            addCategoryFromBrowse(categoryId, categoryName);
+          } else {
+            console.error('[Rooted Vitality] Could not extract category ID from card');
+          }
+        });
+        console.log('[Rooted Vitality] Browse modal event delegation listener attached');
+      }
+      
+      console.log('[Rooted Vitality] setupEventListeners COMPLETED SUCCESSFULLY');
     }
 
     function selectFromAutocomplete(categoryId, categoryName) {
+      console.log('[Rooted Vitality] selectFromAutocomplete called:', { categoryId, categoryName });
+      
       selectedCategoryForAdd = { id: categoryId, name: categoryName };
-      document.getElementById('category-search').value = categoryName;
-      document.getElementById('btn-add-category').disabled = false;
-      document.getElementById('autocomplete-dropdown').classList.remove('active');
+      
+      const searchInput = document.getElementById('category-search');
+      const addBtn = document.getElementById('btn-add-category');
+      const dropdown = document.getElementById('autocomplete-dropdown');
+      
+      if (searchInput) searchInput.value = categoryName;
+      if (addBtn) {
+        addBtn.disabled = false;
+        console.log('[Rooted Vitality] Add button ENABLED');
+      } else {
+        console.error('[Rooted Vitality] Add button not found in selectFromAutocomplete');
+      }
+      if (dropdown) dropdown.classList.remove('active');
+      
+      console.log('[Rooted Vitality] selectFromAutocomplete complete', { selectedCategoryForAdd });
     }
 
     function addCategoryToActive(categoryInfo) {
@@ -4710,31 +4905,37 @@
 
       console.log('[Rooted Vitality] renderBrowseCategoryCards called, allCategories:', allCategories.length);
 
-      // Separate categories by primary credential emoji
+      // Separate categories by PRIMARY credential emoji (leftmost emoji)
       const licenseRequired = allCategories.filter(cat => {
         const cred = cat.credential || '';
-        return cred.includes('🔴');
+        return cred === 'License Required';
       });
 
       const certified = allCategories.filter(cat => {
         const cred = cat.credential || '';
-        return cred.includes('🟡') && !cred.includes('🔴');
+        return (cred.includes('Cert') || cred.includes('Licensed')) && !cred.includes('Open');
       });
 
-      const unrestricted = allCategories.filter(cat => {
+      const openPractice = allCategories.filter(cat => {
         const cred = cat.credential || '';
-        return cred.includes('🟢') && !cred.includes('🔴') && !cred.includes('🟡');
+        return cred.includes('Open');
       });
 
-      console.log('[Rooted Vitality] Filtered categories:', licenseRequired.length, 'red,', certified.length, 'yellow,', unrestricted.length, 'green');
-      console.log('[Rooted Vitality] Sample categories:', licenseRequired.slice(0, 2), certified.slice(0, 2), unrestricted.slice(0, 2));
+      console.log('[Rooted Vitality] Filtered categories - License:', licenseRequired.length, ', Certified:', certified.length, ', Open:', openPractice.length);
 
       // Render each category group
       licenseRequiredGrid.innerHTML = licenseRequired.map(cat => createBrowseCategoryCard(cat)).join('');
       certifiedGrid.innerHTML = certified.map(cat => createBrowseCategoryCard(cat)).join('');
-      unrestrictedGrid.innerHTML = unrestricted.map(cat => createBrowseCategoryCard(cat)).join('');
+      unrestrictedGrid.innerHTML = openPractice.map(cat => createBrowseCategoryCard(cat)).join('');
 
       console.log('[Rooted Vitality] Browse category cards rendered');
+      
+      // Check if cards are actually in the DOM
+      const allCards = document.querySelectorAll('.browse-category-card');
+      console.log('[Rooted Vitality] Total cards in DOM after render:', allCards.length);
+      
+      const allButtons = document.querySelectorAll('.browse-category-add-btn');
+      console.log('[Rooted Vitality] Total buttons in DOM:', allButtons.length);
     }
 
     function createBrowseCategoryCard(category) {
@@ -4754,7 +4955,8 @@
           <div class="browse-category-name">${category.name}</div>
           <button 
             class="browse-category-add-btn" 
-            onclick="addCategoryFromBrowse('${category.id}', '${category.name}')"
+            data-category-name="${category.name}"
+            type="button"
             title="Add ${category.name}"
           >
             + Add
@@ -4768,20 +4970,30 @@
     }
 
     function addCategoryFromBrowse(categoryId, categoryName) {
+      console.log('[Rooted Vitality] addCategoryFromBrowse called with:', { categoryId, categoryName });
+      
       // Check if already added
       if (activeCategories.some(ac => ac.id === categoryId)) {
+        console.warn('[Rooted Vitality] Category already added:', categoryId);
         showToast('This category is already added.', 'error');
         return;
       }
 
       // Get full category info
+      console.log('[Rooted Vitality] Looking for category in allCategories. Total categories:', allCategories.length);
       const fullCategory = allCategories.find(c => c.id === categoryId);
-      if (!fullCategory) return;
+      
+      if (!fullCategory) {
+        console.error('[Rooted Vitality] Category not found in allCategories:', categoryId);
+        console.log('[Rooted Vitality] Available category IDs:', allCategories.map(c => c.id).join(', '));
+        showToast('Error: Category not found. Please refresh and try again.', 'error');
+        return;
+      }
+
+      console.log('[Rooted Vitality] Found full category:', fullCategory);
 
       // Check for license requirement
       if (fullCategory.requiresLicense || fullCategory.requiresCertification) {
-        // TODO: Check if practitioner has verified credentials
-        // For now, allow but show warning
         console.log('[Rooted Vitality] Category', categoryId, 'requires license/certification');
       }
 
@@ -4797,8 +5009,21 @@
           return;
         }
 
-        // Add category to UI (no database action yet - wait for subcategory selection)
+        // Add category to UI
         addCategoryToUIOnly(categoryId, categoryName, fullCategory);
+
+        // Re-render browse cards to show updated state with animation
+        renderBrowseCategoryCards();
+        
+        // Find the button that was clicked and animate it
+        const card = document.querySelector(`[data-category-id="${categoryId}"]`);
+        if (card) {
+          card.classList.add('added-animation');
+          // Remove animation class after it completes
+          setTimeout(() => {
+            card.classList.remove('added-animation');
+          }, 600);
+        }
 
         // Close browse modal and open preferences
         closeBrowseCategoriesModal();

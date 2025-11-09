@@ -630,20 +630,34 @@ const RootedVitality = {
         
         if (switchToPractitionerBtn) {
             try {
-                if (typeof window.authManager !== 'undefined') {
-                    const userData = window.authManager.getCurrentUser();
-                    const activeView = localStorage.getItem('active_view') || 'client';
-                    console.log('[Rooted Vitality] User role:', userData?.role, 'Active view:', activeView);
-                    
-                    if (userData && userData.role === 'practitioner' && activeView === 'client') {
-                        switchToPractitionerBtn.style.display = 'block';
-                        console.log('[Rooted Vitality] ✓ Showing "Practitioner View" link for practitioner user in client view');
-                    } else {
-                        console.log('[Rooted Vitality] ✗ NOT showing Practitioner View link - role:', userData?.role, 'view:', activeView);
+                // Get user data - try authManager first, fallback to localStorage
+                let userData = null;
+                if (typeof window.authManager !== 'undefined' && window.authManager.getCurrentUser) {
+                    userData = window.authManager.getCurrentUser();
+                    console.log('[Rooted Vitality] Got userData from authManager');
+                } else {
+                    // Fallback: check localStorage for user_role
+                    const storedRole = localStorage.getItem('user_role');
+                    if (storedRole) {
+                        userData = { role: storedRole };
+                        console.log('[Rooted Vitality] Got userData from localStorage - role:', storedRole);
                     }
+                }
+                
+                const activeView = localStorage.getItem('active_view') || 'client';
+                console.log('[Rooted Vitality] User role:', userData?.role, 'Active view:', activeView);
+                
+                // Show button if: user is practitioner AND they're viewing the client dashboard
+                if (userData?.role === 'practitioner' && activeView === 'client') {
+                    switchToPractitionerBtn.style.display = 'block';
+                    console.log('[Rooted Vitality] ✓ Showing "Practitioner View" link for practitioner user in client view');
+                } else {
+                    switchToPractitionerBtn.style.display = 'none';
+                    console.log('[Rooted Vitality] ✗ Hiding Practitioner View link - role:', userData?.role, 'view:', activeView);
                 }
             } catch (error) {
                 console.log('[Rooted Vitality] Could not check practitioner status:', error);
+                switchToPractitionerBtn.style.display = 'none';
             }
         }
         

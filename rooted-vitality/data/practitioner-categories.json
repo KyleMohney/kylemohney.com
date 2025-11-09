@@ -3,8 +3,7 @@
     {
       "id": "acupuncture",
       "name": "Acupuncture & TCM",
-      "icon": "🧬",
-      "credential": "🔴 License Required",
+      "credential": "License Required",
       "subcategories": [
         "Pain Management",
         "Fertility Support",
@@ -31,8 +30,7 @@
     {
       "id": "chiropractic",
       "name": "Chiropractic Care",
-      "icon": "🔧",
-      "credential": "🔴 License Required",
+      "credential": "License Required",
       "subcategories": [
         "Spinal Adjustment/Manipulation",
         "Back Pain Treatment",
@@ -58,8 +56,7 @@
     {
       "id": "naturopathy",
       "name": "Naturopathic Medicine",
-      "icon": "🌿",
-      "credential": "🔴/🟡 Licensed/Certified",
+      "credential": "Licensed/Certified",
       "subcategories": [
         "Primary Care",
         "Digestive Health",
@@ -89,8 +86,7 @@
     {
       "id": "nutrition",
       "name": "Nutrition & Dietetics",
-      "icon": "🥗",
-      "credential": "🔴/🟡 Licensed/Certified",
+      "credential": "Licensed/Certified",
       "subcategories": [
         "Weight Loss & Management",
         "Sports Nutrition",
@@ -117,8 +113,7 @@
     {
       "id": "wellness_coaching",
       "name": "Health & Wellness Coaching",
-      "icon": "🎯",
-      "credential": "🟡/🟢 Certified/Open",
+      "credential": "Certified/Open",
       "subcategories": [
         "Lifestyle Change Coaching",
         "Stress Management",
@@ -142,8 +137,7 @@
     {
       "id": "personal_training",
       "name": "Personal Training & Fitness",
-      "icon": "💪",
-      "credential": "🟡/🟢 Certified/Open",
+      "credential": "Certified/Open",
       "subcategories": [
         "Strength Training",
         "Weight Loss Programs",
@@ -172,8 +166,7 @@
     {
       "id": "yoga",
       "name": "Yoga Instruction",
-      "icon": "🧘",
-      "credential": "🟡/🟢 Certified/Open",
+      "credential": "Certified/Open",
       "subcategories": [
         "Hatha Yoga",
         "Vinyasa/Flow Yoga",
@@ -204,8 +197,7 @@
     {
       "id": "meditation",
       "name": "Meditation & Mindfulness",
-      "icon": "🕉️",
-      "credential": "🟢 Open Practice",
+      "credential": "Open Practice",
       "subcategories": [
         "Mindfulness Meditation",
         "Transcendental Meditation",
@@ -232,8 +224,7 @@
     {
       "id": "mental_health",
       "name": "Mental Health Counseling & Therapy",
-      "icon": "🧠",
-      "credential": "🔴 License Required",
+      "credential": "License Required",
       "subcategories": [
         "Individual Therapy/Counseling",
         "Couples Therapy",
@@ -263,8 +254,7 @@
     {
       "id": "energy_healing",
       "name": "Energy Healing & Bodywork",
-      "icon": "✨",
-      "credential": "🟢 Open Practice",
+      "credential": "Open Practice",
       "subcategories": [
         "Reiki",
         "Healing Touch",
@@ -288,8 +278,7 @@
     {
       "id": "herbalism",
       "name": "Herbalism & Botanical Medicine",
-      "icon": "🌱",
-      "credential": "🟢/🟡 Open/Certified",
+      "credential": "Open/Certified",
       "subcategories": [
         "Western Herbalism",
         "Traditional Chinese Herbal Medicine",
@@ -316,8 +305,7 @@
     {
       "id": "ayurveda",
       "name": "Ayurvedic Medicine",
-      "icon": "☯️",
-      "credential": "🟢/🟡 Open/Certified",
+      "credential": "Open/Certified",
       "subcategories": [
         "Dosha Assessment",
         "Personalized Diet Plans",
@@ -341,8 +329,7 @@
     {
       "id": "homeopathy",
       "name": "Homeopathy",
-      "icon": "⚗️",
-      "credential": "🟢/🟡 Open/Licensed (3 states)",
+      "credential": "Open/Licensed (3 states)",
       "subcategories": [
         "Classical Homeopathy",
         "Constitutional Remedies",
@@ -365,8 +352,7 @@
     {
       "id": "functional_medicine",
       "name": "Functional Medicine",
-      "icon": "🔬",
-      "credential": "🔴/🟡 Licensed + Certified",
+      "credential": "Licensed + Certified",
       "subcategories": [
         "Root Cause Analysis",
         "Comprehensive Lab Testing",
@@ -393,8 +379,7 @@
     {
       "id": "physical_therapy",
       "name": "Physical Therapy",
-      "icon": "🏥",
-      "credential": "🔴 License Required",
+      "credential": "License Required",
       "subcategories": [
         "Orthopedic Physical Therapy",
         "Sports Rehabilitation",
@@ -421,8 +406,7 @@
     {
       "id": "aromatherapy",
       "name": "Aromatherapy",
-      "icon": "🌸",
-      "credential": "🟢 Open Practice",
+      "credential": "Open Practice",
       "subcategories": [
         "Clinical Aromatherapy",
         "Essential Oil Consultations",
@@ -449,8 +433,7 @@
     {
       "id": "life_coaching",
       "name": "Life Coaching",
-      "icon": "🌟",
-      "credential": "🟢 Open Practice",
+      "credential": "Open Practice",
       "subcategories": [
         "Career Coaching",
         "Executive Coaching",
@@ -476,9 +459,7 @@
     },
     {
       "id": "hypnotherapy",
-      "name": "Hypnotherapy",
-      "icon": "🌀",
-      "credential": "🟢/🟡 Certified/Some States",
+      "credential": "Certified/Some States",
       "subcategories": [
         "Weight Loss Hypnosis",
         "Smoking Cessation",
@@ -502,8 +483,7 @@
     {
       "id": "midwifery",
       "name": "Midwifery & Doula Services",
-      "icon": "👶",
-      "credential": "🔴 License Required",
+      "credential": "License Required",
       "subcategories": [
         "Birth Doula Services",
         "Postpartum Doula Services",
@@ -525,8 +505,7 @@
     {
       "id": "reflexology",
       "name": "Reflexology",
-      "icon": "🦶",
-      "credential": "🟢/🟡 Open/Certified",
+      "credential": "Open/Certified",
       "subcategories": [
         "Foot Reflexology",
         "Hand Reflexology",
@@ -548,8 +527,7 @@
     {
       "id": "osteopathy",
       "name": "Osteopathy (DO)",
-      "icon": "🦴",
-      "credential": "🔴 License Required",
+      "credential": "License Required",
       "subcategories": [
         "Osteopathic Manipulative Treatment (OMT)",
         "Primary Care",

@@ -183,10 +183,16 @@ function populateSettingsUI() {
         const addressEl = document.getElementById('display-address');
         if (addressEl) {
             let address = 'Not set';
-            if (userSettings.address_street && userSettings.address_city && userSettings.address_state) {
-                address = `${userSettings.address_street}, ${userSettings.address_city}, ${userSettings.address_state}${userSettings.address_zip ? ' ' + userSettings.address_zip : ''}`;
-            } else if (userSettings.address_street) {
-                address = userSettings.address_street;
+            // Check both old and new field names for compatibility
+            const street = userSettings.physical_address || userSettings.address_street;
+            const city = userSettings.practice_city || userSettings.address_city;
+            const state = userSettings.practice_state || userSettings.address_state;
+            const zip = userSettings.zipcode || userSettings.address_zip;
+            
+            if (street && city && state) {
+                address = `${street}, ${city}, ${state}${zip ? ' ' + zip : ''}`;
+            } else if (street) {
+                address = street;
             } else if (userSettings.location) {
                 address = userSettings.location;
             }
@@ -338,19 +344,17 @@ async function saveNotificationPreferencesToDatabase(preferences) {
         // Save to practitioner_notification_settings table
         const { error: notifError } = await window.supabaseClient
             .from('practitioner_notification_settings')
-            .upsert(fullPreferences);
+            .upsert(fullPreferences, { onConflict: 'practitioner_id' });
         
         if (notifError) {
             console.error('[Rooted Vitality] Error saving preferences:', notifError);
-            showNotification('Error saving preferences', 'error');
+            console.log('[Rooted Vitality] Failed to save notification preferences');
             return;
         }
 
         console.log('[Rooted Vitality] Preferences saved successfully to database');
-        showNotification('Notification preferences updated successfully', 'success');
     } catch (error) {
         console.error('[Rooted Vitality] Exception saving preferences to database:', error);
-        showNotification('Error saving preferences', 'error');
     }
 }
 
@@ -570,8 +574,200 @@ async function handleEditField(fieldType, fieldName) {
 }
 
 /* ========================================== */
-/* MODAL UTILITIES */
+/* INLINE ADDRESS EDITING */
 /* ========================================== */
+
+function toggleAddressEdit() {
+    const displayView = document.getElementById('address-display-view');
+    const editView = document.getElementById('address-edit-view');
+    const editBtn = document.getElementById('btn-edit-address');
+    
+    const isEditing = editView.style.display !== 'none';
+    
+    if (isEditing) {
+        // Hide edit, show display
+        editView.style.display = 'none';
+        displayView.style.display = 'block';
+        editBtn.textContent = 'Edit';
+    } else {
+        // Show edit, hide display
+        editView.style.display = 'block';
+        displayView.style.display = 'none';
+        editBtn.textContent = 'Cancel';
+        
+        // Populate fields with current values
+        document.getElementById('address-street-inline').value = userSettings.physical_address || '';
+        document.getElementById('address-city-inline').value = userSettings.practice_city || '';
+        document.getElementById('address-state-inline').value = userSettings.practice_state || '';
+    }
+}
+
+async function saveAddressChanges(e) {
+    e.preventDefault();
+    
+    try {
+        const street = document.getElementById('address-street-inline').value.trim();
+        const city = document.getElementById('address-city-inline').value.trim();
+        const state = document.getElementById('address-state-inline').value.trim();
+        
+        if (!street || !city || !state) {
+            alert('Please fill in all address fields');
+            return;
+        }
+        
+        // Update in Supabase
+        const { error } = await window.supabaseClient
+            .from('practitioners')
+            .update({
+                physical_address: street,
+                practice_city: city,
+                practice_state: state
+            })
+            .eq('id', currentUser.id);
+        
+        if (error) throw error;
+        
+        // Update local state
+        userSettings.physical_address = street;
+        userSettings.practice_city = city;
+        userSettings.practice_state = state;
+        
+        // Update display
+        document.getElementById('display-address').textContent = `${street}, ${city}, ${state}`;
+        
+        // Hide edit, show display
+        toggleAddressEdit();
+        
+        console.log('[Rooted Vitality] Address updated successfully');
+    } catch (error) {
+        console.error('[Rooted Vitality] Error saving address:', error);
+        alert('Error saving address. Please try again.');
+    }
+}
+
+/* ========================================== */
+/* INLINE EMAIL EDITING */
+/* ========================================== */
+
+function toggleEmailEdit() {
+    const displayView = document.getElementById('email-display-view');
+    const editView = document.getElementById('email-edit-view');
+    const editBtn = document.getElementById('btn-edit-email');
+    
+    const isEditing = editView.style.display !== 'none';
+    
+    if (isEditing) {
+        // Hide edit, show display
+        editView.style.display = 'none';
+        displayView.style.display = 'block';
+        editBtn.textContent = 'Edit';
+    } else {
+        // Show edit, hide display
+        editView.style.display = 'block';
+        displayView.style.display = 'none';
+        editBtn.textContent = 'Cancel';
+        
+        // Populate field with current value
+        document.getElementById('email-inline').value = currentUser.email || '';
+    }
+}
+
+async function saveEmailChanges(e) {
+    e.preventDefault();
+    
+    try {
+        const newEmail = document.getElementById('email-inline').value.trim();
+        
+        if (!newEmail || !newEmail.includes('@')) {
+            alert('Please enter a valid email address');
+            return;
+        }
+        
+        // Update email via Supabase auth
+        const { error } = await window.supabaseClient.auth.updateUser({
+            email: newEmail
+        });
+        
+        if (error) throw error;
+        
+        // Update local state
+        currentUser.email = newEmail;
+        userSettings.email = newEmail;
+        
+        // Update display
+        document.getElementById('display-email').textContent = newEmail;
+        
+        // Hide edit, show display
+        toggleEmailEdit();
+        
+        console.log('[Rooted Vitality] Email updated successfully');
+    } catch (error) {
+        console.error('[Rooted Vitality] Error saving email:', error);
+        alert('Error saving email. Please try again.');
+    }
+}
+
+/* ========================================== */
+/* INLINE PHONE EDITING */
+/* ========================================== */
+
+function togglePhoneEdit() {
+    const displayView = document.getElementById('phone-display-view');
+    const editView = document.getElementById('phone-edit-view');
+    const editBtn = document.getElementById('btn-edit-phone');
+    
+    const isEditing = editView.style.display !== 'none';
+    
+    if (isEditing) {
+        // Hide edit, show display
+        editView.style.display = 'none';
+        displayView.style.display = 'block';
+        editBtn.textContent = 'Edit';
+    } else {
+        // Show edit, hide display
+        editView.style.display = 'block';
+        displayView.style.display = 'none';
+        editBtn.textContent = 'Cancel';
+        
+        // Populate field with current value
+        document.getElementById('phone-inline').value = userSettings.phone || '';
+    }
+}
+
+async function savePhoneChanges(e) {
+    e.preventDefault();
+    
+    try {
+        const newPhone = document.getElementById('phone-inline').value.trim();
+        
+        if (!newPhone) {
+            alert('Please enter a phone number');
+            return;
+        }
+        
+        // Update in Supabase
+        const { error } = await window.supabaseClient
+            .from('practitioners')
+            .update({ phone: newPhone })
+            .eq('id', currentUser.id);
+        
+        if (error) throw error;
+        
+        // Update local state
+        userSettings.phone = newPhone;
+        
+        // Update display
+        document.getElementById('display-phone').textContent = newPhone;
+        
+        // Hide edit, show display
+        togglePhoneEdit();
+        
+        console.log('[Rooted Vitality] Phone updated successfully');
+    } catch (error) {
+        console.error('[Rooted Vitality] Error saving phone:', error);
+        alert('Error saving phone. Please try again.');
+    }
+}
 
 function setupModalHandlers() {
     // Close buttons for all modals
@@ -622,7 +818,21 @@ function setupButtonActions() {
     const editEmailBtn = document.querySelector('[data-setting="email"]');
     if (editEmailBtn) {
         editEmailBtn.addEventListener('click', () => {
-            handleEditField('email', 'Email Address');
+            toggleEmailEdit();
+        });
+    }
+    
+    // Email form handlers
+    const emailForm = document.getElementById('email-edit-view');
+    if (emailForm) {
+        emailForm.addEventListener('submit', saveEmailChanges);
+    }
+    
+    const cancelEmailBtn = document.getElementById('btn-cancel-email');
+    if (cancelEmailBtn) {
+        cancelEmailBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleEmailEdit();
         });
     }
     
@@ -630,7 +840,21 @@ function setupButtonActions() {
     const editPhoneBtn = document.querySelector('[data-setting="phone"]');
     if (editPhoneBtn) {
         editPhoneBtn.addEventListener('click', () => {
-            handleEditField('phone', 'Phone Number');
+            togglePhoneEdit();
+        });
+    }
+    
+    // Phone form handlers
+    const phoneForm = document.getElementById('phone-edit-view');
+    if (phoneForm) {
+        phoneForm.addEventListener('submit', savePhoneChanges);
+    }
+    
+    const cancelPhoneBtn = document.getElementById('btn-cancel-phone');
+    if (cancelPhoneBtn) {
+        cancelPhoneBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            togglePhoneEdit();
         });
     }
     
@@ -638,7 +862,21 @@ function setupButtonActions() {
     const editAddressBtn = document.querySelector('[data-setting="address"]');
     if (editAddressBtn) {
         editAddressBtn.addEventListener('click', () => {
-            handleEditField('address', 'Physical Address');
+            toggleAddressEdit();
+        });
+    }
+    
+    // Address form handlers
+    const addressForm = document.getElementById('address-edit-view');
+    if (addressForm) {
+        addressForm.addEventListener('submit', saveAddressChanges);
+    }
+    
+    const cancelAddressBtn = document.getElementById('btn-cancel-address');
+    if (cancelAddressBtn) {
+        cancelAddressBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleAddressEdit();
         });
     }
     
@@ -667,7 +905,25 @@ function setupButtonActions() {
     const enable2faBtn = document.getElementById('enable-2fa-btn');
     if (enable2faBtn) {
         enable2faBtn.addEventListener('click', () => {
-            handle2FA();
+            enable2FA();
+        });
+    }
+    
+    // Cancel 2FA setup
+    const cancel2faBtn = document.getElementById('btn-cancel-2fa');
+    if (cancel2faBtn) {
+        cancel2faBtn.addEventListener('click', () => {
+            document.getElementById('2fa-setup-view').style.display = 'none';
+            document.getElementById('2fa-status-view').style.display = 'block';
+            document.getElementById('2fa-setup-view').reset();
+        });
+    }
+    
+    // Disable 2FA
+    const disable2faBtn = document.getElementById('disable-2fa-btn');
+    if (disable2faBtn) {
+        disable2faBtn.addEventListener('click', () => {
+            disable2FA();
         });
     }
     
@@ -1020,9 +1276,197 @@ function handleDownloadData() {
     alert('Your data download will be prepared and sent to your email');
 }
 
-function handle2FA() {
-    console.log('[Rooted Vitality] 2FA setup clicked - TODO: Implement 2FA flow');
-    alert('Two-factor authentication setup coming soon!');
+/* ========================================== */
+/* 7. TWO-FACTOR AUTHENTICATION (2FA/MFA) */
+/* ========================================== */
+
+async function check2FAStatus() {
+    try {
+        const { data: { user } } = await window.supabaseClient.auth.getUser();
+        
+        // Check if user has MFA factors enrolled
+        const factors = await window.supabaseClient.auth.mfa.listFactors();
+        const is2faEnabled = factors.data && factors.data.totp && factors.data.totp.length > 0;
+        
+        const statusView = document.getElementById('2fa-status-view');
+        const enabledView = document.getElementById('2fa-enabled-view');
+        const enable2faBtn = document.getElementById('enable-2fa-btn');
+        const disable2faBtn = document.getElementById('disable-2fa-btn');
+        
+        if (is2faEnabled) {
+            statusView.style.display = 'none';
+            enabledView.style.display = 'block';
+            if (disable2faBtn) {
+                disable2faBtn.addEventListener('click', disable2FA);
+            }
+        } else {
+            statusView.style.display = 'block';
+            enabledView.style.display = 'none';
+            if (enable2faBtn) {
+                enable2faBtn.addEventListener('click', enable2FA);
+            }
+        }
+        
+        console.log('[Rooted Vitality] 2FA status checked:', is2faEnabled);
+    } catch (error) {
+        console.error('[Rooted Vitality] Error checking 2FA status:', error);
+    }
+}
+
+async function enable2FA() {
+    try {
+        console.log('[Rooted Vitality] Starting 2FA enrollment');
+        
+        // Enroll in TOTP (Time-based One-Time Password)
+        const { data, error: enrollError } = await window.supabaseClient.auth.mfa.enroll({
+            factorType: 'totp'
+        });
+        
+        if (enrollError) throw enrollError;
+        
+        const factorId = data?.id;
+        const secret = data?.totp?.secret;
+        const qrCode = data?.totp?.qr_code;
+        
+        console.log('[Rooted Vitality] 2FA enrollment initiated, factor ID:', factorId);
+        
+        // Hide status view, show setup form
+        document.getElementById('2fa-status-view').style.display = 'none';
+        document.getElementById('2fa-setup-view').style.display = 'block';
+        
+        const form = document.getElementById('2fa-setup-view');
+        
+        // Display QR code
+        if (qrCode) {
+            document.getElementById('qr-code-container').innerHTML = `<img src="${qrCode}" alt="2FA QR Code" style="max-width: 250px;">`;
+        }
+        
+        // Display secret key for manual entry
+        if (secret) {
+            document.getElementById('manual-entry-code').textContent = secret;
+        }
+        
+        // Generate backup codes (Supabase provides these)
+        const backupCodes = generateBackupCodes();
+        displayBackupCodes(backupCodes);
+        
+        // Handle form submission
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            
+            const verificationCode = document.getElementById('2fa-verify-code').value;
+            
+            if (verificationCode.length !== 6 || isNaN(verificationCode)) {
+                alert('Please enter a valid 6-digit code');
+                return;
+            }
+            
+            try {
+                // Verify and confirm the TOTP factor
+                const { data: { session }, error: verifyError } = await window.supabaseClient.auth.mfa.verify({
+                    factorId: factorId,
+                    code: verificationCode
+                });
+                
+                if (verifyError) throw verifyError;
+                
+                console.log('[Rooted Vitality] 2FA verification successful');
+                
+                // Save 2FA status to database
+                await window.supabaseClient
+                    .from('user_2fa_status')
+                    .upsert({
+                        user_id: currentUser.id,
+                        is_enabled: true,
+                        enrolled_at: new Date().toISOString()
+                    });
+                
+                // Close form
+                form.reset();
+                document.getElementById('2fa-setup-view').style.display = 'none';
+                
+                alert('✓ Two-Factor Authentication has been enabled successfully!\n\nYou will now be required to enter a code from your authenticator app when logging in.');
+                
+                // Refresh UI
+                check2FAStatus();
+            } catch (error) {
+                console.error('[Rooted Vitality] Error verifying 2FA:', error);
+                alert('Error verifying code. Please try again.');
+            }
+        };
+        
+        document.getElementById('2fa-verify-code').focus();
+        
+    } catch (error) {
+        console.error('[Rooted Vitality] Error starting 2FA setup:', error);
+        alert('Error starting 2FA setup. Please try again.');
+    }
+}
+
+async function disable2FA() {
+    if (!confirm('Are you sure? Disabling 2FA will reduce your account security.')) {
+        return;
+    }
+    
+    try {
+        console.log('[Rooted Vitality] Disabling 2FA');
+        
+        // Get list of TOTP factors
+        const { data: factors, error: listError } = await window.supabaseClient.auth.mfa.listFactors();
+        
+        if (listError) throw listError;
+        
+        // Unenroll all TOTP factors
+        if (factors && factors.totp) {
+            for (const factor of factors.totp) {
+                const { error: unenrollError } = await window.supabaseClient.auth.mfa.unenroll({
+                    factorId: factor.id
+                });
+                
+                if (unenrollError) throw unenrollError;
+            }
+        }
+        
+        // Update database
+        await window.supabaseClient
+            .from('user_2fa_status')
+            .update({ is_enabled: false })
+            .eq('user_id', currentUser.id);
+        
+        console.log('[Rooted Vitality] 2FA disabled');
+        alert('Two-Factor Authentication has been disabled.');
+        
+        // Refresh UI
+        check2FAStatus();
+    } catch (error) {
+        console.error('[Rooted Vitality] Error disabling 2FA:', error);
+        alert('Error disabling 2FA. Please try again.');
+    }
+}
+
+function generateBackupCodes() {
+    const codes = [];
+    for (let i = 0; i < 10; i++) {
+        const code = Math.random().toString(36).substring(2, 10).toUpperCase();
+        codes.push(code);
+    }
+    return codes;
+}
+
+function displayBackupCodes(codes) {
+    const container = document.getElementById('backup-codes-display');
+    container.innerHTML = codes.map(code => `<div>${code}</div>`).join('');
+    
+    const copyBtn = document.getElementById('copy-backup-codes-btn');
+    copyBtn.onclick = () => {
+        const text = codes.join('\n');
+        navigator.clipboard.writeText(text).then(() => {
+            copyBtn.textContent = '✓ Copied!';
+            setTimeout(() => {
+                copyBtn.textContent = 'Copy Backup Codes';
+            }, 2000);
+        });
+    };
 }
 
 function handleViewSessions() {
@@ -1154,6 +1598,7 @@ function setupSettingsListeners() {
     setupPrivacySettings();
     loadNotificationPreferences();
     loadActiveMemberships();
+    check2FAStatus();
     setupButtonActions();
     
     // Auto-save notifications when changed

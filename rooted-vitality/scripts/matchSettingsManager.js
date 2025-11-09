@@ -18,6 +18,22 @@ class MatchSettingsManager {
    */
   async initialize(practitionerId) {
     this.practitionerId = practitionerId;
+    
+    // Verify authenticated user matches practitioner ID
+    try {
+      const { data: { user } } = await this.supabase.auth.getUser();
+      if (user && user.id !== practitionerId) {
+        console.warn('[MatchSettingsManager] WARNING: Auth user ID does not match practitioner ID', {
+          authUserId: user.id,
+          practitionerId: practitionerId
+        });
+      } else if (user) {
+        console.log('[MatchSettingsManager] Auth user verified:', user.id);
+      }
+    } catch (err) {
+      console.warn('[MatchSettingsManager] Could not verify auth user:', err);
+    }
+    
     await this.loadMatchSettings();
     await this.loadSelectedServices();
     await this.loadPractitionerData();
@@ -321,26 +337,15 @@ class MatchSettingsManager {
       // Check if inputs are UUIDs or string IDs
       const isUUID = (str) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
       
-      if (isUUID(categoryIdOrTaxonomyId) && isUUID(subcategoryNameOrId)) {
-        // Already UUIDs, use directly
+      console.log('[MatchSettingsManager] addServiceCategory called with:', { categoryIdOrTaxonomyId, subcategoryNameOrId, pricePerService, isFirstUUID: isUUID(categoryIdOrTaxonomyId), isSecondUUID: isUUID(subcategoryNameOrId) });
+      
+      // If first param is UUID and second param is NOT UUID, then first is taxonomyId and second is subcategoryName
+      if (isUUID(categoryIdOrTaxonomyId) && !isUUID(subcategoryNameOrId)) {
+        // UU UUID for taxonomy, string name for subcategory
         taxonomyId = categoryIdOrTaxonomyId;
-        subcategoryId = subcategoryNameOrId;
-      } else {
-        // String IDs - look up the UUIDs
-        const categoryId = categoryIdOrTaxonomyId;
         const subcategoryName = subcategoryNameOrId;
 
-        // Look up taxonomy ID from category_id
-        const { data: taxonomyData, error: taxonomyError } = await this.supabase
-          .from('holistic_health_taxonomy')
-          .select('id')
-          .eq('category_id', categoryId)
-          .single();
-
-        if (taxonomyError || !taxonomyData) {
-          throw new Error(`Category "${categoryId}" not found in taxonomy`);
-        }
-        taxonomyId = taxonomyData.id;
+        console.log('[MatchSettingsManager] Using as UUID taxonomy + subcategory name:', { taxonomyId, subcategoryName });
 
         // Look up subcategory ID from name
         const { data: subcatData, error: subcatError } = await this.supabase
@@ -350,60 +355,120 @@ class MatchSettingsManager {
           .eq('name', subcategoryName)
           .single();
 
+        console.log('[MatchSettingsManager] Subcategory lookup result:', { subcatData, subcatError });
+
         if (subcatError || !subcatData) {
-          throw new Error(`Subcategory "${subcategoryName}" not found under category "${categoryId}"`);
+          throw new Error(`Subcategory "${subcategoryName}" not found under taxonomy "${taxonomyId}". Error: ${subcatError?.message || 'Not found'}`);
+        }
+        subcategoryId = subcatData.id;
+      } else if (isUUID(categoryIdOrTaxonomyId) && isUUID(subcategoryNameOrId)) {
+        // Both are UUIDs - use directly
+        taxonomyId = categoryIdOrTaxonomyId;
+        subcategoryId = subcategoryNameOrId;
+        console.log('[MatchSettingsManager] Using both as UUIDs directly');
+      } else {
+        // Neither are UUIDs - look up by category_id and subcategory name
+        const categoryId = categoryIdOrTaxonomyId;
+        const subcategoryName = subcategoryNameOrId;
+
+        console.log('[MatchSettingsManager] Looking up taxonomy for categoryId:', categoryId);
+        
+        // Look up taxonomy ID from category_id
+        const { data: taxonomyData, error: taxonomyError } = await this.supabase
+          .from('holistic_health_taxonomy')
+          .select('id')
+          .eq('category_id', categoryId)
+          .single();
+
+        console.log('[MatchSettingsManager] Taxonomy lookup result:', { taxonomyData, taxonomyError });
+
+        if (taxonomyError || !taxonomyData) {
+          throw new Error(`Category "${categoryId}" not found in taxonomy. Error: ${taxonomyError?.message || 'Not found'}`);
+        }
+        taxonomyId = taxonomyData.id;
+
+        console.log('[MatchSettingsManager] Looking up subcategory:', subcategoryName, 'under taxonomy:', taxonomyId);
+
+        // Look up subcategory ID from name
+        const { data: subcatData, error: subcatError } = await this.supabase
+          .from('taxonomy_subcategories')
+          .select('id')
+          .eq('taxonomy_id', taxonomyId)
+          .eq('name', subcategoryName)
+          .single();
+
+        console.log('[MatchSettingsManager] Subcategory lookup result:', { subcatData, subcatError });
+
+        if (subcatError || !subcatData) {
+          throw new Error(`Subcategory "${subcategoryName}" not found under category "${categoryId}". Error: ${subcatError?.message || 'Not found'}`);
         }
         subcategoryId = subcatData.id;
       }
 
-      // Insert or update the service (upsert)
-      // First try to find if it already exists
-      const { data: existing } = await this.supabase
-        .from('practitioner_selected_services')
-        .select('id')
-        .eq('practitioner_id', this.practitionerId)
-        .eq('taxonomy_id', taxonomyId)
-        .eq('subcategory_id', subcategoryId)
-        .single();
-
-      let data, error;
+      // Try direct INSERT with onConflict for upsert behavior
+      // This avoids separate SELECT/UPDATE queries that might trigger RLS differently
+      console.log('[MatchSettingsManager] Attempting to insert service with conflict handling');
       
-      if (existing) {
-        // Update existing service with new price
-        const result = await this.supabase
-          .from('practitioner_selected_services')
-          .update({
-            price_per_service: pricePerService,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', existing.id)
-          .select()
-          .single();
-        data = result.data;
-        error = result.error;
-      } else {
-        // Get practitioner serial number
-        const { data: practitioner } = await this.supabase
-          .from('practitioners')
-          .select('serial_number')
-          .eq('id', this.practitionerId)
-          .single();
+      const insertData = {
+        practitioner_id: this.practitionerId,
+        taxonomy_id: taxonomyId,
+        subcategory_id: subcategoryId,
+        is_active: false,  // Default to inactive
+        price_per_service: pricePerService || null
+      };
 
-        // Insert new service
-        const result = await this.supabase
+      console.log('[MatchSettingsManager] Insert data:', insertData);
+
+      // Try simple INSERT first
+      let result = await this.supabase
+        .from('practitioner_selected_services')
+        .insert([insertData])
+        .select();
+
+      let data = result.data?.[0];
+      let error = result.error;
+
+      // If unique constraint error, try update via raw SQL or different approach
+      if (error && error.code === '23505') {
+        console.log('[MatchSettingsManager] Unique constraint violation, trying alternative update');
+        
+        // Build filter to find existing row
+        const { data: existing } = await this.supabase
           .from('practitioner_selected_services')
-          .insert({
-            practitioner_id: this.practitionerId,
-            serial_number: practitioner?.serial_number || null,
-            taxonomy_id: taxonomyId,
-            subcategory_id: subcategoryId,
-            is_active: false,  // Default to inactive
-            price_per_service: pricePerService  // Optional price per service
-          })
-          .select()
-          .single();
-        data = result.data;
-        error = result.error;
+          .select('id')
+          .eq('practitioner_id', this.practitionerId)
+          .eq('taxonomy_id', taxonomyId)
+          .eq('subcategory_id', subcategoryId)
+          .maybeSingle();  // Use maybeSingle() instead of single() to avoid RLS issues
+
+        if (existing?.id) {
+          console.log('[MatchSettingsManager] Found existing service, updating:', existing.id);
+          
+          const updateResult = await this.supabase
+            .from('practitioner_selected_services')
+            .update({
+              price_per_service: pricePerService || null,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', existing.id)
+            .select()
+            .maybeSingle();
+          
+          data = updateResult.data;
+          error = updateResult.error;
+        } else {
+          console.warn('[MatchSettingsManager] Could not find existing record to update');
+        }
+      }
+
+      if (error) {
+        console.error('[MatchSettingsManager] Failed to insert/update service:', {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          status: error.status
+        });
       }
 
       if (error) throw error;

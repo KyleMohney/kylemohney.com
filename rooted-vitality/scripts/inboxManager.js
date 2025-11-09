@@ -177,22 +177,7 @@ async function loadConversations() {
         // Get all accepted matches for this practitioner
         const { data: matches, error: matchError } = await window.supabaseClient
             .from('project_practitioner_matches')
-            .select(`
-                id,
-                project_id,
-                status,
-                created_at,
-                projects (
-                    id,
-                    description,
-                    category_name,
-                    clients (
-                        id,
-                        first_name,
-                        last_name
-                    )
-                )
-            `)
+            .select('id, project_id, status, created_at')
             .eq('practitioner_id', practitionerId)
             .eq('status', 'accepted');
 
@@ -205,40 +190,65 @@ async function loadConversations() {
 
         // Load messages for each match
         for (const match of matches || []) {
-            if (!match.projects?.clients) continue;
+            try {
+                // Get project details
+                const { data: project, error: projectError } = await window.supabaseClient
+                    .from('projects')
+                    .select('id, description, category_name, client_id')
+                    .eq('id', match.project_id)
+                    .single();
 
-            const project = match.projects;
-            const client = project.clients;
-            const clientName = `${client.first_name || 'Client'} ${client.last_name || ''}`;
+                if (projectError || !project) {
+                    console.warn('[Inbox] Could not load project:', match.project_id);
+                    continue;
+                }
 
-            // Get latest messages
-            const { data: messages } = await window.supabaseClient
-                .from('project_messages')
-                .select('id, message, sender_type, created_at')
-                .eq('project_id', match.project_id)
-                .eq('practitioner_id', practitionerId)
-                .order('created_at', { ascending: false })
-                .limit(50);
+                // Get client details
+                const { data: client, error: clientError } = await window.supabaseClient
+                    .from('clients')
+                    .select('id, first_name, last_name')
+                    .eq('id', project.client_id)
+                    .single();
 
-            const lastMessage = messages?.[0];
-            const unreadCount = messages?.filter(m => !m.is_read && m.sender_type === 'client').length || 0;
+                if (clientError || !client) {
+                    console.warn('[Inbox] Could not load client for project:', match.project_id);
+                    continue;
+                }
 
-            conversations.push({
-                id: match.id,
-                matchId: match.id,
-                projectId: match.project_id,
-                clientId: client.id,
-                practitionerId: practitionerId,
-                clientName: clientName,
-                clientAvatar: generateInitialsAvatar(clientName),
-                lastMessage: lastMessage?.message || 'No messages yet',
-                lastMessageTime: lastMessage?.created_at ? new Date(lastMessage.created_at) : new Date(match.created_at),
-                isUnread: unreadCount > 0,
-                unreadCount: unreadCount,
-                status: 'online',
-                category: 'all',
-                messages: messages || []
-            });
+                const clientName = `${client.first_name || 'Client'} ${client.last_name || ''}`;
+
+                // Get latest messages
+                const { data: messages } = await window.supabaseClient
+                    .from('project_messages')
+                    .select('id, message, sender_type, created_at')
+                    .eq('project_id', match.project_id)
+                    .eq('practitioner_id', practitionerId)
+                        .order('created_at', { ascending: false })
+                    .limit(50);
+
+                const lastMessage = messages?.[0];
+                const unreadCount = messages?.filter(m => !m.is_read && m.sender_type === 'client').length || 0;
+
+                conversations.push({
+                    id: match.id,
+                    matchId: match.id,
+                    projectId: match.project_id,
+                    clientId: client.id,
+                    practitionerId: practitionerId,
+                    clientName: clientName,
+                    clientAvatar: generateInitialsAvatar(clientName),
+                    lastMessage: lastMessage?.message || 'No messages yet',
+                    lastMessageTime: lastMessage?.created_at ? new Date(lastMessage.created_at) : new Date(match.created_at),
+                    isUnread: unreadCount > 0,
+                    unreadCount: unreadCount,
+                    status: 'online',
+                    category: 'all',
+                    messages: messages || []
+                });
+            } catch (itemError) {
+                console.error('[Inbox] Error processing match:', itemError);
+                continue;
+            }
         }
 
         console.log(`[Inbox] Loaded ${conversations.length} conversations`);
