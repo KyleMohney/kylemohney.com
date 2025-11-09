@@ -1,0 +1,495 @@
+/* ========================================== */
+/* ROOTED VITALITY, INC.                      */
+/* Article Styles - Blog Posts & Stories      */
+/* Holistic Wellness · Modern Connection      */
+/* rootedvitality.com | 2025                  */
+/* ========================================== */
+
+/* TABLE OF CONTENTS
+  1. Header Styles
+  2. Article Meta
+  3. Featured Image
+  4. Body Content
+  5. Article Sections & Elements
+  6. Checklist & Related Content
+  7. Footer & CTA
+  8. Animations
+  9. Responsive Design
+*/
+
+/* ========================================== */
+/* 1. HEADER STYLES                           */
+/* ========================================== */
+
+:root {
+  --rooted-green: #5c9a72;
+  --rooted-dark: #2e2b28;
+  --rooted-light: #f5f3f0;
+  --font-inter: 'Inter', sans-serif;
+  --font-lora: 'Lora', serif;
+}
+
+.article {
+  min-height: 100vh;
+  padding: 4rem 1rem;
+  background: linear-gradient(180deg, #f9f7f5 0%, #f5f3f0 100%);
+}
+
+.article__container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* ========================================== */
+/* 2. HEADER STYLES                           */
+/* ========================================== */
+
+.article__header {
+  margin-bottom: 3rem;
+  text-align: center;
+  animation: fadeInDown 0.8s ease;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid rgba(92, 154, 114, 0.1);
+}
+
+.article__title {
+  font-family: var(--font-inter);
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: var(--rooted-dark);
+  line-height: 1.2;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.5px;
+}
+
+.article__excerpt {
+  font-family: var(--font-lora);
+  font-size: 1.35rem;
+  color: var(--rooted-green);
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+  font-style: italic;
+  font-weight: 500;
+}
+
+.article__meta {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  font-family: var(--font-inter);
+  font-size: 0.95rem;
+  color: #999;
+  letter-spacing: 0.5px;
+  flex-wrap: wrap;
+}
+
+.article__date,
+.article__reading-time,
+.article__category {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Featured Image */
+.article__featured-image {
+  margin: 2.5rem 0;
+  text-align: center;
+}
+
+.article__featured-image img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+}
+
+.article__featured-image figcaption {
+  font-family: var(--font-inter);
+  font-size: 0.9rem;
+  color: #999;
+  margin-top: 1rem;
+  font-style: italic;
+}
+
+/* Body Content */
+.article__body {
+  font-family: var(--font-lora);
+  color: var(--rooted-dark);
+  line-height: 1.85;
+  font-size: 1.1rem;
+  margin-bottom: 3rem;
+}
+
+.article__section {
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+}
+
+.article__section:not(:last-child) {
+  border-bottom: 1px solid rgba(92, 154, 114, 0.08);
+}
+
+.article__body p {
+  margin-bottom: 1.6rem;
+  color: #3d3a37;
+}
+
+.article__body strong {
+  color: var(--rooted-green);
+  font-weight: 600;
+  background: rgba(92, 154, 114, 0.05);
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+}
+
+.article__body h2 {
+  font-family: var(--font-inter);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--rooted-dark);
+  margin-top: 0;
+  margin-bottom: 1.2rem;
+  line-height: 1.3;
+  padding-top: 1rem;
+}
+
+.article__body h3 {
+  font-family: var(--font-inter);
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--rooted-dark);
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.article__body ul {
+  list-style: disc;
+  color: var(--rooted-dark);
+}
+
+.article__body ul li {
+  margin-bottom: 0.5rem;
+  color: var(--rooted-dark);
+}
+
+/* Article Sections */
+.article__section {
+  margin-bottom: 2.5rem;
+}
+
+.article__body strong {
+  color: var(--rooted-green);
+  font-weight: 600;
+}
+
+/* Checklist Styling */
+.article__checklist {
+  list-style: none;
+  padding: 0;
+  margin: 2rem 0;
+  background: #f9f7f5;
+  padding: 2rem;
+  border-radius: 12px;
+  border-left: 4px solid var(--rooted-green);
+}
+
+.article__checklist li {
+  padding: 0.8rem 0 0.8rem 2rem;
+  position: relative;
+  font-family: var(--font-lora);
+  line-height: 1.8;
+  color: var(--rooted-dark);
+  margin-bottom: 0.5rem;
+}
+
+.article__checklist li:last-child {
+  margin-bottom: 0;
+}
+
+.article__checklist li:before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--rooted-green);
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+/* Related Content */
+.article__related {
+  background: #f9f7f5;
+  padding: 2rem;
+  border-radius: 12px;
+  margin-top: 3rem;
+}
+
+.article__related h3 {
+  margin-top: 0;
+  color: var(--rooted-green);
+  font-family: var(--font-inter);
+}
+
+.article__related a {
+  color: var(--rooted-green);
+  text-decoration: none;
+  font-weight: 600;
+  transition: opacity 0.2s ease;
+}
+
+.article__related a:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+/* Footer Metadata */
+.article__footer-meta {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e0d9d0;
+  text-align: center;
+  color: #999;
+}
+
+.article__conclusion {
+  font-size: 1.2rem;
+  color: var(--rooted-dark);
+  font-weight: 600;
+  background: linear-gradient(135deg, rgba(92, 154, 114, 0.08) 0%, rgba(212, 196, 124, 0.05) 100%);
+  border-left: 4px solid var(--rooted-green);
+  border-radius: 8px;
+  padding: 1.5rem 1.5rem 1.5rem 1.5rem;
+  margin-top: 2.5rem;
+  margin-bottom: 0;
+  line-height: 1.7;
+}
+
+/* ========================================== */
+/* 7. FOOTER & CTA                            */
+/* ========================================== */
+
+/* Footer */
+.article__footer {
+  border-top: 2px solid #e0d9d0;
+  padding-top: 3rem;
+  margin-top: 4rem;
+}
+
+.article__cta {
+  background: linear-gradient(135deg, rgba(92, 154, 114, 0.1) 0%, rgba(212, 196, 124, 0.05) 100%);
+  border: 2px solid var(--rooted-green);
+  border-radius: 12px;
+  padding: 3rem;
+  margin-bottom: 3rem;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(92, 154, 114, 0.08);
+  transition: all 0.3s ease;
+}
+
+.article__cta:hover {
+  box-shadow: 0 12px 35px rgba(92, 154, 114, 0.15);
+  transform: translateY(-2px);
+}
+
+.article__cta h3 {
+  font-family: var(--font-inter);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--rooted-dark);
+  margin-bottom: 1rem;
+  margin-top: 0;
+}
+
+.article__cta p {
+  font-family: var(--font-lora);
+  color: #555;
+  margin-bottom: 2rem;
+  line-height: 1.8;
+  font-size: 1.05rem;
+}
+
+/* Share Section */
+.article__share {
+  text-align: center;
+}
+
+.article__share p {
+  font-family: var(--font-inter);
+  font-weight: 600;
+  color: var(--rooted-dark);
+  margin-bottom: 1.5rem;
+  font-size: 1.05rem;
+}
+
+.share-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.share-btn {
+  display: inline-block;
+  padding: 0.9rem 1.8rem;
+  background: var(--rooted-green);
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-family: var(--font-inter);
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.share-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(92, 154, 114, 0.3);
+  background: #4a8b62;
+}
+
+/* Animations */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================================== */
+/* 9. RESPONSIVE DESIGN                       */
+/* ========================================== */
+
+@media (max-width: 768px) {
+  .article {
+    padding: 2rem 1rem;
+  }
+
+  .article__title {
+    font-size: 2rem;
+  }
+
+  .article__excerpt {
+    font-size: 1.2rem;
+  }
+
+  .article__meta {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .article__featured-image {
+    margin: 2rem 0;
+  }
+
+  .article__body {
+    font-size: 1rem;
+    line-height: 1.8;
+  }
+
+  .article__body h2 {
+    font-size: 1.6rem;
+    margin-top: 2rem;
+  }
+
+  .article__body h3 {
+    font-size: 1.3rem;
+  }
+
+  .article__checklist {
+    padding: 1.5rem;
+  }
+
+  .article__cta {
+    padding: 2rem;
+  }
+
+  .share-buttons {
+    gap: 0.5rem;
+  }
+
+  .share-btn {
+    padding: 0.8rem 1.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .article {
+    padding: 1.5rem 1rem;
+  }
+
+  .article__title {
+    font-size: 1.6rem;
+  }
+
+  .article__excerpt {
+    font-size: 1rem;
+  }
+
+  .article__meta {
+    font-size: 0.85rem;
+  }
+
+  .article__body {
+    font-size: 0.95rem;
+    line-height: 1.75;
+  }
+
+  .article__body h2 {
+    font-size: 1.4rem;
+    margin-top: 1.5rem;
+  }
+
+  .article__body h3 {
+    font-size: 1.1rem;
+  }
+
+  .article__body p {
+    margin-bottom: 1.2rem;
+  }
+
+  .article__section {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .article__checklist {
+    padding: 1rem;
+  }
+
+  .article__checklist li {
+    padding: 0.6rem 0 0.6rem 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  .article__cta {
+    padding: 1.5rem;
+  }
+
+  .article__cta h3 {
+    font-size: 1.4rem;
+  }
+
+  .article__cta p {
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .share-buttons {
+    flex-direction: column;
+  }
+
+  .share-btn {
+    width: 100%;
+    padding: 0.8rem 1rem;
+  }
+
+  .article__conclusion {
+    font-size: 1rem;
+    padding: 1rem 1rem 1rem 1rem;
+  }
+}

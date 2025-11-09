@@ -375,5 +375,38 @@
   <script src="../../../scripts/authHooks.js"></script>
   <script src="../../../injections.js"></script>
   <script src="../../../scripts/my-projects-v2.js"></script>
+
+  <!-- Auto-open new project modal if action=new in URL and pre-fill category if provided -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('action') === 'new') {
+        console.log('[My Projects] Opening new project modal from URL parameter');
+        
+        // Extract category from URL if provided
+        const category = params.get('category');
+        
+        // Wait a moment for the modal to be initialized
+        setTimeout(() => {
+          const modal = document.getElementById('create-project-modal');
+          const categorySelect = document.getElementById('project-category');
+          
+          if (modal && categorySelect && category) {
+            // Pre-fill the category
+            categorySelect.value = category;
+            categorySelect.dispatchEvent(new Event('change'));
+            console.log('[My Projects] Pre-filled category from URL:', category);
+          }
+          
+          if (modal) {
+            modal.classList.remove('modal--hidden');
+          }
+          
+          // Clean up URL to remove the query parameters
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }, 500);
+      }
+    });
+  </script>
 </body>
 </html>

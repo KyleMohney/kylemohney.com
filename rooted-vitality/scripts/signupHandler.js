@@ -173,20 +173,31 @@ window.addEventListener('DOMContentLoaded', async () => {
         created_at: new Date().toISOString()
       };
 
-      await window.supabaseClient
-        .from('client_notifications')
-        .insert([welcomeNotification])
-        .catch(err => console.warn('Welcome notification insertion note:', err));
+      try {
+        await window.supabaseClient
+          .from('client_notifications')
+          .insert([welcomeNotification]);
+      } catch (err) {
+        console.warn('Welcome notification insertion note:', err);
+      }
 
       console.log('✅ [Signup] Welcome notification created');
 
       // ============ 7. Success: Show Message & Redirect ============
-      // Wait briefly for Supabase to persist session, then redirect
       alert('Account created! Welcome to Rooted Vitality.');
       
-      // Give Supabase time to persist the session to localStorage
+      // Check if there's a redirect URL from a previous action (like landing page CTA)
+      const redirectUrl = sessionStorage.getItem('redirectAfterAuth');
+      
+      // Give Supabase time to persist the session to localStorage, then redirect
       setTimeout(() => {
-        window.location.href = '/rooted-vitality/index.html';
+        if (redirectUrl) {
+          console.log('[Signup] Redirect URL found in sessionStorage:', redirectUrl);
+          sessionStorage.removeItem('redirectAfterAuth');
+          window.location.href = redirectUrl;
+        } else {
+          window.location.href = '/rooted-vitality/index.html';
+        }
       }, 500);
 
     } catch (error) {

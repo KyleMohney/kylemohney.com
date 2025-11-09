@@ -1,0 +1,10 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Left hand -->
+  <path d="M 30 50 L 30 30 M 30 30 L 20 20 M 30 30 L 25 15 M 30 30 L 35 15"/>
+  <!-- Right hand -->
+  <path d="M 70 50 L 70 30 M 70 30 L 80 20 M 70 30 L 75 15 M 70 30 L 65 15"/>
+  <!-- Connection -->
+  <path d="M 30 50 Q 50 60 70 50" fill="none"/>
+  <!-- Heart in center -->
+  <path d="M 50 55 L 50 70 Q 40 75 35 70 Q 30 65 30 60 Q 30 55 40 50 Q 50 45 50 45 Q 50 45 60 50 Q 70 55 70 60 Q 70 65 65 70 Q 60 75 50 70"/>
+</svg>

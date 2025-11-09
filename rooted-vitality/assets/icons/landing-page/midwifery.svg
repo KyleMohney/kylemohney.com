@@ -1,0 +1,18 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Mother -->
+  <circle cx="40" cy="30" r="8" fill="currentColor"/>
+  <!-- Mother body -->
+  <path d="M 40 38 Q 35 45 33 60" fill="none"/>
+  <!-- Mother left arm -->
+  <path d="M 40 42 L 25 50" fill="none"/>
+  <!-- Mother right arm -->
+  <path d="M 40 42 L 50 45" fill="none"/>
+  <!-- Baby -->
+  <circle cx="55" cy="35" r="6" fill="currentColor"/>
+  <!-- Baby protected -->
+  <path d="M 55 41 L 55 50" fill="none"/>
+  <!-- Protective embrace arc -->
+  <path d="M 40 60 Q 47 70 55 60" fill="none" opacity="0.6" stroke-width="1.5"/>
+  <!-- Heart connection -->
+  <path d="M 40 50 L 55 45" fill="none" opacity="0.5" stroke-dasharray="3,2"/>
+</svg>

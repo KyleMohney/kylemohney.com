@@ -1,0 +1,12 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Needle point -->
+  <circle cx="50" cy="30" r="4" fill="currentColor"/>
+  <!-- Needle shaft -->
+  <path d="M 50 34 L 50 70"/>
+  <!-- Acupuncture meridian marks -->
+  <circle cx="35" cy="50" r="3" fill="none"/>
+  <circle cx="65" cy="50" r="3" fill="none"/>
+  <!-- Relaxation curves -->
+  <path d="M 45 55 Q 50 60 55 55" fill="none"/>
+  <path d="M 45 65 Q 50 70 55 65" fill="none"/>
+</svg>

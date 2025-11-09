@@ -164,7 +164,16 @@ window.authManager = {
             
             console.log('[Rooted Vitality] Login successful');
             
-            // Redirect based on role
+            // Check if there's a redirect URL from a previous action (like landing page CTA)
+            const redirectUrl = sessionStorage.getItem('redirectAfterAuth');
+            if (redirectUrl) {
+                console.log('[Rooted Vitality] Redirect URL found in sessionStorage:', redirectUrl);
+                sessionStorage.removeItem('redirectAfterAuth');
+                window.location.href = redirectUrl;
+                return true;
+            }
+            
+            // Default redirect based on role
             const finalRole = userRole || role;
             const baseUrl = (typeof RootedVitality !== 'undefined' && RootedVitality.config.siteUrl) ? RootedVitality.config.siteUrl : '/rooted-vitality/';
             if (finalRole === 'practitioner') {

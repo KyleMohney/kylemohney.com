@@ -1,0 +1,17 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Head/shoulders -->
+  <circle cx="50" cy="25" r="8" fill="currentColor"/>
+  <!-- Body -->
+  <path d="M 50 33 L 50 55"/>
+  <!-- Left arm -->
+  <path d="M 50 40 L 35 45"/>
+  <!-- Right arm -->
+  <path d="M 50 40 L 65 45"/>
+  <!-- Left leg -->
+  <path d="M 50 55 L 42 75"/>
+  <!-- Right leg -->
+  <path d="M 50 55 L 58 75"/>
+  <!-- Massage motion lines on body -->
+  <path d="M 38 45 Q 50 50 62 45" fill="none" opacity="0.6"/>
+  <path d="M 38 60 Q 50 65 62 60" fill="none" opacity="0.6"/>
+</svg>

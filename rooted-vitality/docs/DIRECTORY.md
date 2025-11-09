@@ -1,7 +1,7 @@
 # Rooted Vitality File Directory
 
 ## Root
-- `index.html` — Homepage
+- `index.html` — Landing page (world-class, conversion-optimized)
 - `signup.html` — Client registration
 - `verify.html` — Email verification
 - `chatbot.js` — AI chatbot
@@ -33,10 +33,12 @@
 
 ## Scripts
 - `scripts/`
+  - `landing-page.js` — Landing page interactions (testimonial carousel, scroll animations, forms)
   - All JS logic for authentication, dashboard, signup, profile, matching, inbox, products, rendering, Supabase, etc.
 
 ## Styles
 - `styles/`
+  - `landing-page.css` — Landing page styles (hero, testimonials, categories, responsive, micro-interactions)
   - All CSS for base, layout, components, dashboard, projects, profile, reviews, signup, products, etc.
 
 ## Components
@@ -77,6 +79,11 @@
 
 ## Assets
 - `assets/`
+  - `icons/landing-page/` — Landing page SVG icons (11 botanical icons)
+    - `leaf-search.svg`, `hands-heart.svg`, `growing-plant.svg`
+    - `acupuncture.svg`, `nutrition.svg`, `energy-healing.svg`
+    - `massage.svg`, `mental-health.svg`, `yoga.svg`
+    - `midwifery.svg`, `naturopathic.svg`
   - Images, icons, media files (PNG, JPG, MP4, etc.)
 
 ## Articles

@@ -1,38 +1,461 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- 
+    ╔════════════════════════════════════════════════════════════════════╗
+    ║  ROOTED VITALITY, INC.                                             ║
+    ║  File: index.html                                                  ║
+    ║  Purpose: Landing page - primary entry point for platform          ║
+    ║  Holistic Wellness · Modern Connection Platform                    ║
+    ║  rootedvitality.com | 2025                                         ║
+    ╚════════════════════════════════════════════════════════════════════╝
+    
+    TABLE OF CONTENTS
+    1. Meta Tags & SEO
+    2. Styles & Fonts
+    3. Hero Section
+    4. Featured Story Section
+    5. Client Stories
+    6. Wellness Categories (Help Center)
+    7. Practitioners Gallery
+    8. Final CTA
+    9. Header/Footer (injected)
+    10. Scripts & Authentication
+  -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="robots" content="noindex,nofollow">
-  <title>Rooted Vitality</title>
+  <meta name="description" content="Find your path to whole-body wellness. Connect with verified holistic practitioners nationwide—acupuncture, nutrition, energy healing, and more.">
+  <meta name="robots" content="index,follow">
+  <title>Rooted Vitality | Find Holistic Practitioners Near You</title>
   <link rel="stylesheet" href="./styles/styles.css">
+  <link rel="stylesheet" href="./styles/landing-page-v3.css">
+  <link rel="stylesheet" href="./styles/report-concern-widget.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital@0;1&display=swap" rel="stylesheet">
 </head>
-<body class="landing-under-construction">
-  <header id="header-inject"></header>
-  <main class="container-narrow">
-    <!-- Caution Icon -->
-    <svg class="caution-icon" width="80" height="80" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <!-- Yellow Triangle Background -->
-      <polygon points="50,10 90,80 10,80" fill="#FFD700" stroke="#FFA500" stroke-width="2"/>
-      <!-- Exclamation Mark -->
-      <circle cx="50" cy="35" r="5" fill="#000"/>
-      <rect x="47" y="45" width="6" height="25" fill="#000"/>
-    </svg>
-    
-    <h1>Rooted Vitality</h1>
-    <p>This platform is currently under active development.</p>
-    <p>For documentation and articles, visit our <a href="./help-center/">Help Center</a>.</p>
+<body class="landing-page">
+  <!-- ========================================== -->
+  <!-- MAIN CONTENT (Header injected by injections.js) -->
+  <!-- ========================================== -->
+  <main>
+    <!-- ========================================== -->
+    <!-- 1. HERO SECTION - Compact with Subtle BG -->
+    <!-- ========================================== -->
+    <section class="hero">
+      <div class="hero__bg-accent">
+        <img src="assets/phero2b.png" alt="Wellness healing" loading="eager">
+      </div>
+      <div class="hero__content">
+        <h1 class="hero__headline">Your Path to Natural Balance</h1>
+        <p class="hero__subheadline">Connect with holistic practitioners who understand your wellness journey</p>
+        
+        <button id="hero-cta-btn" class="btn btn--primary btn--large" onclick="handleHeroClick()">Get Started on Your Wellness Journey</button>
+
+        <!-- Social Proof -->
+        <div class="hero__trust-indicators">
+          <div class="trust-item">
+            <span class="trust-icon">✓</span>
+            <span class="trust-text">Verified Practitioners</span>
+          </div>
+          <div class="trust-item">
+            <span class="trust-icon">✓</span>
+            <span class="trust-text">HIPAA Compliant</span>
+          </div>
+          <div class="trust-item">
+            <span class="trust-icon">✓</span>
+            <span class="trust-text">Personalized Matching</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- 2b. CATEGORIES HORIZONTAL SCROLL -->
+    <!-- ========================================== -->
+    <!-- ========================================== -->
+    <!-- 2. STORY SECTION #1 - Sidebar Layout -->
+    <!-- ========================================== -->
+    <section class="story-section">
+      <div class="story-section__container">
+        <div class="story-section__content-wrapper">
+          <div class="story-section__content">
+            <p class="story-section__label">A Natural Approach</p>
+            <h2 class="story-section__heading">Lasting Wellness</h2>
+            <p class="story-section__body">At Rooted Vitality, we believe lasting wellness comes from honoring your whole self. Our network of hand-vetted practitioners brings genuine expertise in acupuncture, yoga, energy healing, nutrition, and more.</p>
+            <p class="story-section__body">Each practitioner is verified and credentialed. No guesswork. Just authentic care focused on your unique path to healing.</p>
+          </div>
+        </div>
+        <div class="story-section__image">
+          <img src="assets/index-holistic-practice.jpg" alt="Holistic practitioner consultation" loading="lazy">
+          <svg class="story-section__leaf-accent story-section__leaf-accent--top" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <path d="M 50 10 Q 80 30 85 60 Q 80 50 50 45 Q 20 50 15 60 Q 20 30 50 10 Z" fill="#d0d0d0" opacity="0.6"/>
+          </svg>
+          <svg class="story-section__leaf-accent story-section__leaf-accent--bottom" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <path d="M 50 10 Q 80 30 85 60 Q 80 50 50 45 Q 20 50 15 60 Q 20 30 50 10 Z" fill="#d0d0d0" opacity="0.6"/>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- 3. NATURE & WELLNESS SECTION - Circle Frame -->
+    <!-- ========================================== -->
+    <section class="nature-wellness">
+      <div class="nature-wellness__container">
+        <div class="nature-wellness__image">
+          <img src="assets/index-woman-in-nature1.jpg" alt="Woman in nature" loading="lazy">
+        </div>
+        <div class="nature-wellness__content">
+          <p class="nature-wellness__label">Holistic Healing</p>
+          <h2 class="nature-wellness__heading">Wellness Rooted in Nature</h2>
+          <p class="nature-wellness__body">True healing honors the wisdom of nature. Our practitioners blend time-tested botanical remedies, energy work, and ancient healing traditions with modern wellness science—creating a path that feels both grounded and transformative.</p>
+          <ul class="nature-wellness__benefits">
+            <li>Plant-based and natural modalities</li>
+            <li>Integrated mind-body-spirit approach</li>
+            <li>Sustainable wellness practices</li>
+            <li>Personalized to your unique needs</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- 4. FEATURED STORY - Wellness That Honors You -->
+    <!-- ========================================== -->
+    <section class="featured-story">
+      <div class="featured-story__container">
+        <div class="featured-story__wrapper">
+          <div class="featured-story__image-side">
+            <div class="featured-story__image">
+              <img src="assets/index-acupuncture.jpg" alt="Holistic wellness treatment" loading="lazy">
+            </div>
+          </div>
+          <div class="featured-story__card">
+            <div class="featured-story__content">
+              <p class="featured-story__label">The Rooted Vitality Difference</p>
+              <h2 class="featured-story__title">Wellness That Honors You</h2>
+              <p class="featured-story__body">One-size-fits-all doesn't work. Your wellness journey is uniquely yours. We connect you with practitioners who see the whole you—mind, body, and spirit.</p>
+              <ul class="featured-story__benefits">
+                <li>Personalized practitioner matching</li>
+                <li>Real credentials, verified</li>
+                <li>HIPAA-compliant communication</li>
+                <li>Transparent pricing, no surprises</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- CLIENT STORY - Home Birth Journey -->
+    <!-- ========================================== -->
+    <section class="client-story">
+      <div class="client-story__container">
+        <div class="client-story__header">
+          <h2 class="client-story__title">Real Stories, Real Impact</h2>
+          <p class="client-story__subtitle">How Rooted Vitality COULD Make All The Difference</p>
+        </div>
+        <a href="/rooted-vitality/help-center/articles/home-birth-without-midwife.html" class="client-story__card">
+          <div class="client-story__image">
+            <img src="assets/index-callie.jpg" alt="Callie - Home birth story" loading="lazy">
+          </div>
+          <div class="client-story__content">
+            <div class="client-story__quote">
+              "We REALLY NEEDED this service—not just for the birth, but for finding the right practitioners. When you're in rural Ohio with no one nearby, a marketplace like this is everything. I'm using it for my third pregnancy."
+            </div>
+            <div class="client-story__details">
+              <div class="client-story__meta">
+                <h3 class="client-story__name">Callie's Home Birth Story</h3>
+                <p class="client-story__description">How Rural Ohio Taught Me Why Rooted Vitality Matters</p>
+              </div>
+              <span class="client-story__cta">Read Full Story →</span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- PRACTITIONERS SCROLL - FEATURED TOOLS     -->
+    <!-- ========================================== -->
+    <section class="practitioners-scroll">
+      <div class="practitioners-scroll__container">
+        <div class="practitioners-scroll__header">
+          <h2 class="practitioners-scroll__title">Wellness Journey Categories</h2>
+          <p class="practitioners-scroll__subtitle">Scroll to explore the wellness services available on our platform</p>
+        </div>
+        
+        <div class="practitioners-scroll-container">
+          <div class="practitioners-track">
+            <div class="practitioner-logo" data-category="Acupuncture" data-definition="Traditional Chinese medicine using needles to balance energy flow and relieve pain.">
+              <span class="practitioner-badge">Acupuncture</span>
+              <div class="practitioner-tooltip">Traditional Chinese medicine using needles to balance energy flow and relieve pain.</div>
+            </div>
+            <div class="practitioner-logo" data-category="Nutrition" data-definition="Personalized dietary guidance to nourish your body and optimize health.">
+              <span class="practitioner-badge">Nutrition</span>
+              <div class="practitioner-tooltip">Personalized dietary guidance to nourish your body and optimize health.</div>
+            </div>
+            <div class="practitioner-logo" data-category="Yoga" data-definition="Mind-body practice combining movement, breath, and meditation for wellness.">
+              <span class="practitioner-badge">Yoga</span>
+              <div class="practitioner-tooltip">Mind-body practice combining movement, breath, and meditation for wellness.</div>
+            </div>
+            <div class="practitioner-logo" data-category="Energy Work" data-definition="Therapeutic practices that work with your body's subtle energy systems.">
+              <span class="practitioner-badge">Energy Work</span>
+              <div class="practitioner-tooltip">Therapeutic practices that work with your body's subtle energy systems.</div>
+            </div>
+            <div class="practitioner-logo" data-category="Doula Services" data-definition="Compassionate birth and postpartum support for mothers and families.">
+              <span class="practitioner-badge">Doula Services</span>
+              <div class="practitioner-tooltip">Compassionate birth and postpartum support for mothers and families.</div>
+            </div>
+            <div class="practitioner-logo" data-category="Herbalism" data-definition="Plant-based remedies and herbal medicine for holistic healing.">
+              <span class="practitioner-badge">Herbalism</span>
+              <div class="practitioner-tooltip">Plant-based remedies and herbal medicine for holistic healing.</div>
+            </div>
+            <div class="practitioner-logo" data-category="Somatic Therapy" data-definition="Body-centered therapy that releases trauma and promotes healing through movement.">
+              <span class="practitioner-badge">Somatic Therapy</span>
+              <div class="practitioner-tooltip">Body-centered therapy that releases trauma and promotes healing through movement.</div>
+            </div>
+            <div class="practitioner-logo" data-category="Midwifery" data-definition="Personalized pregnancy, birth, and postpartum care focused on natural wellness.">
+              <span class="practitioner-badge">Midwifery</span>
+              <div class="practitioner-tooltip">Personalized pregnancy, birth, and postpartum care focused on natural wellness.</div>
+            </div>
+            <!-- Duplicate for seamless loop -->
+            <div class="practitioner-logo" data-category="Acupuncture" data-definition="Traditional Chinese medicine using needles to balance energy flow and relieve pain.">
+              <span class="practitioner-badge">Acupuncture</span>
+              <div class="practitioner-tooltip">Traditional Chinese medicine using needles to balance energy flow and relieve pain.</div>
+            </div>
+            <div class="practitioner-logo" data-category="Nutrition" data-definition="Personalized dietary guidance to nourish your body and optimize health.">
+              <span class="practitioner-badge">Nutrition</span>
+              <div class="practitioner-tooltip">Personalized dietary guidance to nourish your body and optimize health.</div>
+            </div>
+            <div class="practitioner-logo" data-category="Yoga" data-definition="Mind-body practice combining movement, breath, and meditation for wellness.">
+              <span class="practitioner-badge">Yoga</span>
+              <div class="practitioner-tooltip">Mind-body practice combining movement, breath, and meditation for wellness.</div>
+            </div>
+            <div class="practitioner-logo" data-category="Energy Work" data-definition="Therapeutic practices that work with your body's subtle energy systems.">
+              <span class="practitioner-badge">Energy Work</span>
+              <div class="practitioner-tooltip">Therapeutic practices that work with your body's subtle energy systems.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- WELLNESS CATEGORIES - SALES PITCH CARDS -->
+    <!-- ========================================== -->
+    <section class="wellness-categories">
+      <div class="wellness-categories__container">
+        <div class="wellness-categories__header">
+          <h2 class="wellness-categories__title">Explore Our <a href="/rooted-vitality/help-center/" class="wellness-categories__help-link">Help Center</a></h2>
+          <p class="wellness-categories__subtitle">Learn about wellness practices and how to get the most out of your journey</p>
+        </div>
+
+        <div class="wellness-categories__grid">
+          <!-- Card 1: Mindfulness & Stress Relief -->
+          <a href="/rooted-vitality/help-center/articles/mindfulness-stress-relief.html" class="wellness-card wellness-card--link">
+            <div class="wellness-card__image">
+              <img src="assets/index-yoga.jpg" alt="Mindfulness and stress relief" loading="lazy">
+              <span class="wellness-card__reading-time">5 min read</span>
+            </div>
+            <div class="wellness-card__content">
+              <h3 class="wellness-card__title">Mindfulness & Stress Relief</h3>
+              <p class="wellness-card__description">Discover powerful mindfulness techniques and stress relief practices to cultivate inner calm and emotional resilience in your daily life.</p>
+              <span class="wellness-card__link">Read Article →</span>
+            </div>
+          </a>
+
+          <!-- Card 2: Nutrition & Holistic Wellness -->
+          <a href="/rooted-vitality/help-center/articles/nutrition-holistic-wellness.html" class="wellness-card wellness-card--link">
+            <div class="wellness-card__image">
+              <img src="assets/index-nutrition.jpg" alt="Nutrition and holistic wellness" loading="lazy">
+              <span class="wellness-card__reading-time">6 min read</span>
+            </div>
+            <div class="wellness-card__content">
+              <h3 class="wellness-card__title">Nutrition & Holistic Wellness</h3>
+              <p class="wellness-card__description">Explore how mindful nutrition and holistic eating practices support your overall wellness and energy throughout your healing journey.</p>
+              <span class="wellness-card__link">Read Article →</span>
+            </div>
+          </a>
+
+          <!-- Card 3: Holistic Medicine Explained -->
+          <a href="/rooted-vitality/help-center/articles/holistic-medicine-explained.html" class="wellness-card wellness-card--link">
+            <div class="wellness-card__image">
+              <img src="assets/index-holistic-doctor.jpg" alt="Holistic medicine consultation" loading="lazy">
+              <span class="wellness-card__reading-time">7 min read</span>
+            </div>
+            <div class="wellness-card__content">
+              <h3 class="wellness-card__title">Holistic Medicine Explained</h3>
+              <p class="wellness-card__description">Understand the principles of holistic medicine and how integrative approaches address your whole self for lasting wellness.</p>
+              <span class="wellness-card__link">Read Article →</span>
+            </div>
+          </a>
+
+          <!-- Card 4: Seasonal Wellness -->
+          <a href="/rooted-vitality/help-center/articles/seasonal-wellness.html" class="wellness-card wellness-card--link">
+            <div class="wellness-card__image">
+              <img src="assets/index-seasonal.jpg" alt="Seasonal wellness practices" loading="lazy">
+              <span class="wellness-card__reading-time">4 min read</span>
+            </div>
+            <div class="wellness-card__content">
+              <h3 class="wellness-card__title">Seasonal Wellness</h3>
+              <p class="wellness-card__description">Align your wellness practices with seasonal changes to support natural cycles and optimize your health year-round.</p>
+              <span class="wellness-card__link">Read Article →</span>
+            </div>
+          </a>
+
+          <!-- Card 5: Healing Plants -->
+          <a href="/rooted-vitality/help-center/articles/healing-plants-home.html" class="wellness-card wellness-card--link">
+            <div class="wellness-card__image">
+              <img src="assets/index-plants.jpg" alt="Healing plants and herbs" loading="lazy">
+              <span class="wellness-card__reading-time">5 min read</span>
+            </div>
+            <div class="wellness-card__content">
+              <h3 class="wellness-card__title">Healing Plants & Herbs</h3>
+              <p class="wellness-card__description">Discover the power of medicinal plants and herbs that can be incorporated into your home wellness practice.</p>
+              <span class="wellness-card__link">Read Article →</span>
+            </div>
+          </a>
+
+          <!-- Card 6: Finding the Right Practitioner -->
+          <a href="/rooted-vitality/help-center/articles/finding-right-practitioner.html" class="wellness-card wellness-card--link">
+            <div class="wellness-card__image">
+              <img src="assets/index-cupping.jpg" alt="Finding the right practitioner" loading="lazy">
+              <span class="wellness-card__reading-time">6 min read</span>
+            </div>
+            <div class="wellness-card__content">
+              <h3 class="wellness-card__title">Finding Your Right Practitioner</h3>
+              <p class="wellness-card__description">Learn how to identify and connect with the perfect practitioner for your unique wellness needs and goals.</p>
+              <span class="wellness-card__link">Read Article →</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- REPORT A CONCERN WIDGET -->
+    <!-- ========================================== -->
+    <div id="report-concern-widget"></div>
   </main>
+
+  <!-- ========================================== -->
+  <!-- FOOTER INJECTION -->
+  <!-- ========================================== -->
   <footer id="footer-inject"></footer>
-  
+
+  <!-- ========================================== -->
+  <!-- SCRIPTS -->
+  <!-- ========================================== -->
   <!-- Supabase JS Client Library -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
-  <!-- Rooted Vitality Scripts (in order) -->
+  <!-- Rooted Vitality Core Scripts -->
   <script src="./scripts/config.js"></script>
   <script src="./scripts/authManager.js"></script>
   <script src="./scripts/authModal.js"></script>
   <script src="./scripts/authHooks.js"></script>
   <script src="./injections.js"></script>
+  
+  <!-- Landing Page Specific -->
+  <script src="./scripts/landing-page.js"></script>
+
+  <!-- Hero CTA Handler -->
+  <script>
+    async function handleHeroClick() {
+      try {
+        // Check if user is signed in
+        if (!window.supabaseClient) {
+          console.error('Supabase client not initialized');
+          alert('System not ready. Please refresh the page.');
+          return;
+        }
+
+        const { data: { session } } = await window.supabaseClient.auth.getSession();
+
+        if (session) {
+          // A: User is signed in - redirect to projects with new project modal
+          console.log('[Landing] A/B Test: Route A - User signed in, redirecting to projects with new modal');
+          window.location.href = '/rooted-vitality/dashboard/client/pages/my-projects.html?action=new';
+        } else {
+          // B: User not signed in - show login modal, then redirect to projects after successful login
+          console.log('[Landing] A/B Test: Route B - User not signed in, showing auth modal');
+          
+          // Set flag to redirect to new project after login
+          sessionStorage.setItem('redirectAfterAuth', '/rooted-vitality/dashboard/client/pages/my-projects.html?action=new');
+          
+          if (typeof openLoginModal === 'function') {
+            openLoginModal();
+          } else {
+            alert('Please sign in or create an account to get started.');
+          }
+        }
+      } catch (error) {
+        console.error('[Landing] Error checking auth status:', error);
+        alert('An error occurred. Please try again.');
+      }
+    }
+  </script>
+  <script src="./scripts/scroll-animations.js"></script>
+  
+  <!-- Wellness Categories Scroll Tooltip Handler -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const practitionerLogos = document.querySelectorAll('.practitioner-logo');
+      
+      practitionerLogos.forEach(logo => {
+        // Click handler - routes to my-projects with category pre-filled
+        logo.addEventListener('click', function(e) {
+          e.stopPropagation();
+          
+          const category = this.getAttribute('data-category');
+          
+          // Check if user is signed in
+          handleCategoryClick(category);
+        });
+      });
+      
+      // Click anywhere else to deactivate tooltips
+      document.addEventListener('click', function() {
+        practitionerLogos.forEach(l => l.classList.remove('active'));
+      });
+    });
+
+    async function handleCategoryClick(category) {
+      try {
+        // Check if user is signed in
+        if (!window.supabaseClient) {
+          console.error('Supabase client not initialized');
+          return;
+        }
+
+        const { data: { user } } = await window.supabaseClient.auth.getUser();
+
+        if (user) {
+          // User is signed in - go directly to my-projects with category
+          window.location.href = '/rooted-vitality/dashboard/client/pages/my-projects.html?action=new&category=' + encodeURIComponent(category);
+        } else {
+          // User not signed in - store category and redirect to signup
+          sessionStorage.setItem('redirectAfterAuth', '/rooted-vitality/dashboard/client/pages/my-projects.html?action=new&category=' + encodeURIComponent(category));
+          
+          if (typeof openLoginModal === 'function') {
+            openLoginModal();
+          } else {
+            window.location.href = '/rooted-vitality/dashboard/client/pages/signup.html';
+          }
+        }
+      } catch (error) {
+        console.error('Error handling category click:', error);
+        alert('An error occurred. Please try again.');
+      }
+    }
+  </script>
+  
+  <!-- ========================================== -->
+  <!-- END OF LANDING PAGE                        -->
+  <!-- Footer injected by injections.js           -->
+  <!-- ========================================== -->
 </body>
 </html>
