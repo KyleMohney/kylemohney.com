@@ -81,16 +81,26 @@ async function loadTaxonomy() {
   try {
     const { data, error } = await supabaseClient
       .from('holistic_health_taxonomy')
-      .select('id, name, subcategories')
-      .eq('active', true)
-      .order('name');
+      .select(`
+        id,
+        name,
+        taxonomy_subcategories(id, name)
+      `)
+      .eq('is_active', true)
+      .order('display_order', { ascending: true });
 
     if (error) throw error;
 
-    // Build taxonomy object indexed by ID
+    // Build taxonomy object indexed by ID with subcategories as array of names
     taxonomyData = {};
     data.forEach(category => {
-      taxonomyData[category.id] = category;
+      // Extract subcategory names from the nested response
+      const subcategoryNames = (category.taxonomy_subcategories || []).map(sub => sub.name);
+      taxonomyData[category.id] = {
+        id: category.id,
+        name: category.name,
+        subcategories: subcategoryNames
+      };
     });
 
     console.log('[My Projects] Taxonomy loaded, categories:', Object.keys(taxonomyData).length);

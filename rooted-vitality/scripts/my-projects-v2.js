@@ -64,11 +64,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Load user's projects
     await loadProjects();
 
-    // Initialize modal handlers
-    initModalHandlers();
-
     // Initialize form handlers
     initFormHandlers();
+    initModalHandlers();
     
     // Initialize open to contact toggle
     initOpenToContactToggle();
