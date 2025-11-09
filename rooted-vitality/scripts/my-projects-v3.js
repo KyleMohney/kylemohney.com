@@ -140,7 +140,7 @@ async function loadProjects() {
     const { data, error } = await supabaseClient
       .from('projects')
       .select('*')
-      .eq('client_id', currentUser.id)
+      .eq('id', currentUser.id)
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -367,28 +367,19 @@ async function submitCreateProject(matchNow = false) {
 
     // Build project object
     const projectData = {
-      client_id: currentUser.id,
-      client_serial: currentClientProfile.serial_number,
-      client_first_name: currentClientProfile.first_name,
-      client_last_name: currentClientProfile.last_name,
+      id: currentUser.id,
       category_id: categoryId,
       category_name: categoryName,
       subcategory_name: subcategoryNames,
       description: description,
       start_date: startDate,
       urgency: urgency,
-      travel_preference: storedTravelPreference,  // Store the original value (could be 'flexible')
+      travel_preference: storedTravelPreference,
       street: street,
       city: city,
       state: state,
       zipcode: zipcode,
-      project_status: 'pending',
-      review_left: false,
-      client_open_to_contact: currentClientProfile.open_to_contact !== false,
-      matched_practitioners: [],
-      hired_practitioner: null,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      project_status: 'pending'
     };
 
     // Insert into database

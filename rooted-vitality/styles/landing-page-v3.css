@@ -87,6 +87,7 @@
   margin-top: 3rem;
   flex-wrap: wrap;
   animation: fadeInUp 0.8s ease 0.6s both;
+  justify-content: center;
 }
 
 .trust-item {
@@ -106,7 +107,7 @@
   width: 28px;
   height: 28px;
   background: var(--rooted-green);
-  color: white;
+  color: black;
   border-radius: 50%;
   font-weight: bold;
   font-size: 0.85rem;
