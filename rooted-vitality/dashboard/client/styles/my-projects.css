@@ -1066,7 +1066,7 @@ TABLE OF CONTENTS
   margin-bottom: 0;
 }
 
-#close-project-form .form-group label {
+#close-project-form .form-group > label {
   display: none;
 }
 
