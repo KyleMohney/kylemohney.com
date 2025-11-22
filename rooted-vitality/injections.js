@@ -347,6 +347,9 @@ const RootedVitality = {
                         this.initNotificationsMenu();
                         this.initLogoutButtons();
                         
+                        // Subscribe to real-time notifications for new matches
+                        this.subscribeToNewMatches();
+                        
                         // Update avatar initial with user's first name
                         let firstName = '';
                         
@@ -1035,6 +1038,149 @@ const RootedVitality = {
     },
 
     /**
+     * Mark ALL unread notifications as read when dropdown opens
+     */
+    markAllNotificationsAsRead: async function() {
+        if (!window.supabaseClient) {
+            return;
+        }
+
+        try {
+            const { data: { user } } = await window.supabaseClient.auth.getUser();
+            if (!user) {
+                return;
+            }
+
+            const currentUser = window.authManager?.getCurrentUser?.();
+            const userRole = currentUser?.role || localStorage.getItem('rvUserRole') || 'practitioner';
+
+            let notificationTable, whereField, whereValue;
+
+            if (userRole === 'client') {
+                notificationTable = 'client_notifications';
+                whereField = 'client_serial';
+                const rvUser = JSON.parse(localStorage.getItem('rvUser') || '{}');
+                whereValue = rvUser.serial_number || user.user_metadata?.serial_number;
+            } else {
+                notificationTable = 'practitioner_notifications';
+                whereField = 'practitioner_serial';
+                whereValue = user.user_metadata?.serial_number || currentUser?.serial_number;
+            }
+
+            if (!whereValue) {
+                return;
+            }
+
+            // Update all unread notifications to read
+            const { error } = await window.supabaseClient
+                .from(notificationTable)
+                .update({ is_read: true })
+                .eq(whereField, whereValue)
+                .eq('is_read', false);
+
+            if (error) {
+                console.error('[Rooted Vitality] Error marking all notifications as read:', error);
+                return;
+            }
+
+            console.log('[Rooted Vitality] All notifications marked as read');
+            // Reload to update UI
+            this.loadNotifications();
+        } catch (error) {
+            console.error('[Rooted Vitality] Exception marking all notifications as read:', error);
+        }
+    },
+
+    /**
+     * Subscribe to real-time notifications for new matches
+     * Automatically creates notification when new match is found
+     */
+    subscribeToNewMatches: async function() {
+        if (!window.supabaseClient) {
+            return;
+        }
+
+        try {
+            const { data: { user } } = await window.supabaseClient.auth.getUser();
+            if (!user) {
+                return;
+            }
+
+            const currentUser = window.authManager?.getCurrentUser?.();
+            const userRole = currentUser?.role || localStorage.getItem('rvUserRole') || 'practitioner';
+            
+            // Only practitioners need match notifications
+            if (userRole !== 'practitioner') {
+                return;
+            }
+
+            const practitionerSerial = user.user_metadata?.serial_number || currentUser?.serial_number;
+            if (!practitionerSerial) {
+                return;
+            }
+
+            console.log('[Rooted Vitality] Setting up real-time match listener...');
+
+            // Subscribe to changes in project_practitioner_matches table
+            const subscription = window.supabaseClient
+                .channel(`matches:${practitionerSerial}`)
+                .on(
+                    'postgres_changes',
+                    {
+                        event: 'INSERT',
+                        schema: 'public',
+                        table: 'project_practitioner_matches',
+                        filter: `practitioner_serial=eq.${practitionerSerial}`
+                    },
+                    async (payload) => {
+                        console.log('[Rooted Vitality] New match detected:', payload);
+                        
+                        // Get match details to create a notification
+                        const { data: matchData } = await window.supabaseClient
+                            .from('project_practitioner_matches')
+                            .select('*, projects(*)')
+                            .eq('id', payload.new.id)
+                            .single();
+
+                        if (matchData && matchData.projects) {
+                            // Create a notification for the new match
+                            const notificationTitle = `New Match: ${matchData.projects.title || 'Wellness Journey'}`;
+                            const notificationMessage = `You've been matched with a new client. Review the project to get started.`;
+
+                            const { error } = await window.supabaseClient
+                                .from('practitioner_notifications')
+                                .insert([{
+                                    practitioner_serial: practitionerSerial,
+                                    title: notificationTitle,
+                                    message: notificationMessage,
+                                    type: 'new_match',
+                                    link: '/dashboard/pro/pages/inbox.html',
+                                    is_read: false,
+                                    created_at: new Date().toISOString()
+                                }]);
+
+                            if (error) {
+                                console.error('[Rooted Vitality] Error creating match notification:', error);
+                            } else {
+                                console.log('[Rooted Vitality] Match notification created');
+                                // Update the notification bell immediately
+                                this.loadNotifications();
+                            }
+                        }
+                    }
+                )
+                .subscribe();
+
+            // Store subscription for cleanup if needed
+            window.notificationSubscriptions = window.notificationSubscriptions || [];
+            window.notificationSubscriptions.push(subscription);
+
+        } catch (error) {
+            console.error('[Rooted Vitality] Error setting up match listener:', error);
+        }
+    },
+
+    /**
      * Load and display notifications for practitioner or client
      */
     loadNotifications: async function() {
@@ -1156,9 +1302,10 @@ const RootedVitality = {
             const isOpen = notificationsDropdown.classList.toggle('show');
             notificationsBtn.setAttribute('aria-expanded', isOpen);
             
-            // Load notifications when opening
+            // When opening, mark all as read and load notifications
             if (isOpen) {
-                console.log('[Rooted Vitality] Bell clicked, loading notifications...');
+                console.log('[Rooted Vitality] Bell clicked, marking all as read and loading notifications...');
+                this.markAllNotificationsAsRead();
                 this.loadNotifications();
             }
         });
