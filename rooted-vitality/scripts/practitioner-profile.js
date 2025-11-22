@@ -152,6 +152,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             if (!credentialsError && credentialsData) {
                 // Merge credentials data into practitioner object
+                console.log('[Practitioner Profile] Raw credentialsData:', credentialsData);
+                console.log('[Practitioner Profile] credentials field type:', typeof credentialsData.credentials);
+                console.log('[Practitioner Profile] credentials field value:', credentialsData.credentials);
+                console.log('[Practitioner Profile] badge_certified:', credentialsData.badge_certified);
+                console.log('[Practitioner Profile] badge_licensed:', credentialsData.badge_licensed);
+                console.log('[Practitioner Profile] background_check_status:', credentialsData.background_check_status);
+                
                 practitioner = {
                     ...practitioner,
                     credentials: credentialsData.credentials,
@@ -165,6 +172,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                     continuing_education: credentialsData.continuing_education
                 };
                 console.log('[Practitioner Profile] Credentials loaded from practitioner_credentials');
+                console.log('[Practitioner Profile] Merged practitioner.credentials:', practitioner.credentials);
+                console.log('[Practitioner Profile] Merged practitioner.badge_certified:', practitioner.badge_certified);
+                console.log('[Practitioner Profile] Merged practitioner.badge_licensed:', practitioner.badge_licensed);
+            } else if (credentialsError) {
+                console.error('[Practitioner Profile] Error loading credentials:', credentialsError);
+            } else {
+                console.warn('[Practitioner Profile] No credentials data found for practitioner');
             }
             
             // Fetch availability from practitioner_availability table
@@ -1088,8 +1102,17 @@ async function renderServicesCard() {
 function renderCredentialsCard() {
     let hasContent = false;
     
+    console.log('[renderCredentialsCard] Starting credential rendering...');
+    console.log('[renderCredentialsCard] practitioner.credentials:', practitioner.credentials);
+    console.log('[renderCredentialsCard] practitioner.credentials type:', typeof practitioner.credentials);
+    console.log('[renderCredentialsCard] practitioner.credentials is array?', Array.isArray(practitioner.credentials));
+    console.log('[renderCredentialsCard] practitioner.badge_certified:', practitioner.badge_certified);
+    console.log('[renderCredentialsCard] practitioner.badge_licensed:', practitioner.badge_licensed);
+    console.log('[renderCredentialsCard] practitioner.continuing_education:', practitioner.continuing_education);
+    
     // ===== CREDENTIALS =====
     if (practitioner.credentials && practitioner.credentials.length > 0) {
+        console.log('[renderCredentialsCard] Found', practitioner.credentials.length, 'credentials');
         hasContent = true;
         const credentialsHtml = practitioner.credentials
             .slice(0, 5)
@@ -1103,12 +1126,17 @@ function renderCredentialsCard() {
             `)
             .join('');
         
+        console.log('[renderCredentialsCard] Rendering credentials HTML...');
         document.getElementById('card-credentials-list').innerHTML = credentialsHtml;
         document.getElementById('card-credentials-row').style.display = 'block';
+        console.log('[renderCredentialsCard] Credentials displayed');
+    } else {
+        console.log('[renderCredentialsCard] No credentials to display');
     }
     
     // ===== CONTINUING EDUCATION =====
     if (practitioner.continuing_education && practitioner.continuing_education.length > 0) {
+        console.log('[renderCredentialsCard] Found', practitioner.continuing_education.length, 'continuing education items');
         hasContent = true;
         const ceHtml = practitioner.continuing_education
             .slice(0, 5)
@@ -1123,12 +1151,19 @@ function renderCredentialsCard() {
             `)
             .join('');
         
+        console.log('[renderCredentialsCard] Rendering continuing education HTML...');
         document.getElementById('card-continuing-ed').innerHTML = ceHtml;
         document.getElementById('card-continuing-ed-row').style.display = 'block';
+        console.log('[renderCredentialsCard] Continuing education displayed');
+    } else {
+        console.log('[renderCredentialsCard] No continuing education to display');
     }
     
     if (hasContent) {
+        console.log('[renderCredentialsCard] Has content - showing credentials-card-section');
         document.getElementById('credentials-card-section').style.display = 'block';
+    } else {
+        console.log('[renderCredentialsCard] No credentials or continuing education content - hiding credentials-card-section');
     }
 }
 
