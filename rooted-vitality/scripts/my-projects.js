@@ -749,6 +749,15 @@ async function submitCreateProjectAndFindMatches(e) {
 async function findMatchingPractitioners(project) {
   try {
     console.log('[findMatchingPractitioners] Starting match for project:', project.id, 'category:', project.category_id);
+    console.log('[findMatchingPractitioners] Project details:', {
+      id: project.id,
+      project_serial: project.project_serial,
+      category_name: project.category_name,
+      subcategory_name: project.subcategory_name,
+      travel_preference: project.travel_preference,
+      zipcode: project.zipcode,
+      state: project.state
+    });
     
     // Call the SQL matching function via RPC
     const { data: matches, error: matchError } = await supabaseClient
@@ -756,18 +765,41 @@ async function findMatchingPractitioners(project) {
 
     if (matchError) {
       console.error('[findMatchingPractitioners] RPC error:', matchError);
+      console.error('[findMatchingPractitioners] Error details:', matchError);
       throw matchError;
     }
 
     if (!matches || matches.length === 0) {
       console.warn('[findMatchingPractitioners] No matches found for project:', project.id);
-      console.log('[findMatchingPractitioners] Project details:', {
-        category_id: project.category_id,
-        category_name: project.category_name,
-        travel_preference: project.travel_preference,
-        zipcode: project.zipcode,
-        state: project.state
-      });
+      
+      // Query all practitioners to debug why they didn't match
+      const { data: allPractitioners, error: debugError } = await supabaseClient
+        .from('practitioners')
+        .select('id, serial_number, legal_name, service_category_names, in_person_enabled, housecalls_enabled, virtual_enabled, in_person_zipcodes, housecalls_zipcodes, virtual_states, matching_enabled, matching_paused, deleted_at')
+        .order('serial_number');
+      
+      if (!debugError && allPractitioners) {
+        console.log('[findMatchingPractitioners] DEBUG: All practitioners in system:');
+        allPractitioners.forEach(p => {
+          console.log(`  ${p.serial_number}: ${p.legal_name}`, {
+            categories: p.service_category_names,
+            matching_enabled: p.matching_enabled,
+            matching_paused: p.matching_paused,
+            deleted: p.deleted_at,
+            travel_modes: {
+              in_person: p.in_person_enabled,
+              housecalls: p.housecalls_enabled,
+              virtual: p.virtual_enabled
+            },
+            service_areas: {
+              in_person_zips: p.in_person_zipcodes,
+              housecalls_zips: p.housecalls_zipcodes,
+              virtual_states: p.virtual_states
+            }
+          });
+        });
+      }
+      
       return [];
     }
 
@@ -785,8 +817,8 @@ async function findMatchingPractitioners(project) {
     return matchRecords;
 
   } catch (error) {
-    console.error('[findMatchingPractitioners] Error:', error);
-    console.error('[findMatchingPractitioners] Error details:', JSON.stringify(error, null, 2));
+    console.error('[findMatchingPractitioners] Caught error:', error.message);
+    console.error('[findMatchingPractitioners] Full error:', JSON.stringify(error, null, 2));
     return [];
   }
 }
