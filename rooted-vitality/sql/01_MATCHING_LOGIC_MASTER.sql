@@ -112,10 +112,12 @@ BEGIN
     )
     
     -- 6. TRAVEL TYPE ENABLED - Practitioner offers requested travel type
+    -- Handles: 'in-person', 'housecalls', 'virtual', or 'flexible' (any of the three)
     AND (
       (v_travel_preference = 'in-person' AND p.in_person_enabled = true)
       OR (v_travel_preference = 'housecalls' AND p.housecalls_enabled = true)
       OR (v_travel_preference = 'virtual' AND p.virtual_enabled = true)
+      OR (v_travel_preference = 'flexible' AND (p.in_person_enabled = true OR p.housecalls_enabled = true OR p.virtual_enabled = true))
     )
     
     -- 7. GEOGRAPHIC MATCH - Based on travel type
@@ -137,6 +139,27 @@ BEGIN
       OR
       -- VIRTUAL (State-specific): Client state in practitioner's service states
       (v_travel_preference = 'virtual' AND v_client_state = ANY(COALESCE(p.virtual_states, ARRAY[]::TEXT[])))
+      OR
+      -- FLEXIBLE: Client is open to any travel type - match if practitioner can do ANY of them
+      (v_travel_preference = 'flexible' AND (
+        -- In-person match
+        (p.in_person_enabled = true AND (
+          v_client_zipcode = p.in_person_base_zipcode
+          OR v_client_zipcode = ANY(COALESCE(p.in_person_zipcodes, ARRAY[]::TEXT[]))
+        ))
+        OR
+        -- Housecalls match
+        (p.housecalls_enabled = true AND (
+          v_client_zipcode = p.housecalls_base_zipcode
+          OR v_client_zipcode = ANY(COALESCE(p.housecalls_zipcodes, ARRAY[]::TEXT[]))
+        ))
+        OR
+        -- Virtual nationwide match
+        (p.virtual_enabled = true AND p.virtual_states IS NULL)
+        OR
+        -- Virtual state-specific match
+        (p.virtual_enabled = true AND v_client_state = ANY(COALESCE(p.virtual_states, ARRAY[]::TEXT[])))
+      ))
     )
     
   ORDER BY match_score DESC;
