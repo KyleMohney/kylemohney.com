@@ -1233,12 +1233,18 @@ TABLE OF CONTENTS
 }
 
 #create-project-form .action-card--primary {
-  background: linear-gradient(135deg, rgba(92, 154, 114, 0.1) 0%, rgba(212, 196, 124, 0.05) 100%);
+  background: var(--rooted-primary);
   border-color: var(--rooted-primary);
 }
 
 #create-project-form .action-card--primary:hover {
-  background: linear-gradient(135deg, rgba(92, 154, 114, 0.15) 0%, rgba(212, 196, 124, 0.1) 100%);
+  background: #4a7d5a;
+  border-color: #4a7d5a;
+  box-shadow: 0 6px 16px rgba(92, 154, 114, 0.2);
+}
+
+#create-project-form .action-card--primary h4 {
+  color: white;
 }
 
 @media (max-width: 768px) {
@@ -1461,6 +1467,15 @@ TABLE OF CONTENTS
 
 .action-card--primary h4 {
   color: var(--rooted-primary);
+}
+
+/* Descriptor text above action card */
+.action-card__descriptor {
+  font-size: 0.9rem;
+  color: #666;
+  text-align: center;
+  margin: 0;
+  line-height: 1.5;
 }
 
 /* Single Action Card - Full Width CTA Button */

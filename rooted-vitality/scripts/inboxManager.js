@@ -3,6 +3,160 @@
  * Handles message threads, filtering, and UI interactions
  */
 
+// Modal state for block/unblock actions
+let pendingBlockClient = null;
+let pendingUnblockClient = null;
+
+/**
+ * Show block confirmation modal
+ */
+function showBlockModal(clientName, clientSerial, practitionerId) {
+    pendingBlockClient = { clientName, clientSerial, practitionerId };
+    document.getElementById('block-client-name').textContent = clientName;
+    document.getElementById('block-modal-overlay').classList.add('show');
+}
+
+/**
+ * Close block modal
+ */
+function closeBlockModal() {
+    pendingBlockClient = null;
+    document.getElementById('block-modal-overlay').classList.remove('show');
+}
+
+/**
+ * Confirm block action from modal
+ */
+async function confirmBlock() {
+    if (!pendingBlockClient) return;
+    
+    const { clientName, clientSerial, practitionerId } = pendingBlockClient;
+    closeBlockModal();
+    
+    try {
+        console.log(`[Inbox] BLOCK INITIATED - Client: ${clientName}, Serial: ${clientSerial}`);
+        
+        // Check if block record exists
+        const { data: existingBlock } = await window.supabaseClient
+            .from('practitioner_blocks')
+            .select('id')
+            .eq('practitioner_serial', practitionerId)
+            .eq('client_serial', clientSerial);
+        
+        if (existingBlock && existingBlock.length > 0) {
+            // Update existing block record
+            const { error: blockError } = await window.supabaseClient
+                .from('practitioner_blocks')
+                .update({ is_blocked: true })
+                .eq('practitioner_serial', practitionerId)
+                .eq('client_serial', clientSerial);
+            
+            if (blockError) throw blockError;
+        } else {
+            // Create new block record
+            const { error: blockError } = await window.supabaseClient
+                .from('practitioner_blocks')
+                .insert([{
+                    practitioner_serial: practitionerId,
+                    client_serial: clientSerial,
+                    is_blocked: true
+                }]);
+            
+            if (blockError) throw blockError;
+        }
+        
+        console.log(`[Inbox] BLOCK SUCCESSFUL - Client: ${clientName}`);
+        
+        // Notify client of decline (hiding that they were blocked)
+        if (window.notifyClientOfMatchResponse) {
+            await notifyClientOfMatchResponse({
+                clientSerial: clientSerial,
+                practitionerName: 'A practitioner',
+                projectName: 'your project',
+                action: 'declined',
+                reason: 'Not available at this time'
+            });
+        }
+        
+        // Show success and reload
+        const modal = document.createElement('div');
+        modal.style.cssText = `position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:1.5rem;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,0.15);z-index:3000;text-align:center;`;
+        modal.innerHTML = `<p style="margin:0;color:#2e2b28;font-weight:600;">${clientName} has been blocked</p>`;
+        document.body.appendChild(modal);
+        
+        setTimeout(() => {
+            modal.remove();
+            console.log(`[Inbox] Reloading conversations after block...`);
+            loadConversations();
+            renderThreadsList();
+            closeThreadView();
+        }, 1500);
+    } catch (error) {
+        console.error('[Inbox] Error blocking client:', error);
+        alert('Error blocking client');
+    }
+}
+
+/**
+ * Show unblock confirmation modal
+ */
+function showUnblockModal(clientName, clientSerial, practitionerId) {
+    pendingUnblockClient = { clientName, clientSerial, practitionerId };
+    document.getElementById('unblock-client-name').textContent = clientName;
+    document.getElementById('unblock-modal-overlay').classList.add('show');
+}
+
+/**
+ * Close unblock modal
+ */
+function closeUnblockModal() {
+    pendingUnblockClient = null;
+    document.getElementById('unblock-modal-overlay').classList.remove('show');
+}
+
+/**
+ * Confirm unblock action from modal
+ */
+async function confirmUnblock() {
+    if (!pendingUnblockClient) return;
+    
+    const { clientName, clientSerial, practitionerId } = pendingUnblockClient;
+    closeUnblockModal();
+    
+    try {
+        console.log(`[Inbox] UNBLOCK INITIATED - Client: ${clientName}, Serial: ${clientSerial}`);
+        
+        // Update practitioner_blocks to unblock (set is_blocked: false)
+        const { error: unblockError } = await window.supabaseClient
+            .from('practitioner_blocks')
+            .update({ is_blocked: false })
+            .eq('practitioner_serial', practitionerId)
+            .eq('client_serial', clientSerial);
+        
+        if (unblockError) throw unblockError;
+        
+        console.log(`[Inbox] UNBLOCK SUCCESSFUL - Client: ${clientName}`);
+        
+        // Show success and reload
+        const modal = document.createElement('div');
+        modal.style.cssText = `position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:1.5rem;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,0.15);z-index:3000;text-align:center;`;
+        modal.innerHTML = `<p style="margin:0;color:#2e2b28;font-weight:600;">${clientName} has been unblocked</p>`;
+        document.body.appendChild(modal);
+        
+        setTimeout(() => {
+            modal.remove();
+            console.log(`[Inbox] Calling loadConversations() after unblock...`);
+            loadConversations();
+            console.log(`[Inbox] loadConversations() completed, calling renderThreadsList() with filter: ${currentFilter}...`);
+            renderThreadsList();
+            closeThreadView();
+        }, 1500);
+    } catch (error) {
+        console.error('[Inbox] Error unblocking client:', error);
+        alert('Error unblocking client');
+    }
+}
+
 let currentUser = null;
 let currentFilter = 'all';
 let conversations = [];
@@ -151,6 +305,12 @@ function setupThreadCloseListener() {
 function setupBackButtonListener() {
     const backBtn = document.getElementById('back-to-threads');
     
+    // Only setup if the element exists (legacy 2-column layout)
+    if (!backBtn) {
+        console.log('[Inbox] Back button not found (3-column layout), skipping');
+        return;
+    }
+    
     backBtn.addEventListener('click', () => {
         selectedConversationId = null;
         renderThreadsList();
@@ -163,7 +323,9 @@ function setupBackButtonListener() {
  */
 async function loadConversations() {
     try {
-        // Get practitioner ID
+        console.log('[Inbox] ===== LOAD CONVERSATIONS STARTED =====');
+        
+        // Get practitioner ID and serial number
         const rvUserStr = localStorage.getItem('rvUser');
         if (!rvUserStr) {
             console.error('[Inbox] No rvUser in localStorage');
@@ -171,30 +333,46 @@ async function loadConversations() {
         }
 
         const rvUser = JSON.parse(rvUserStr);
-        const practitionerId = rvUser.id;
-        console.log('[Inbox] Loading conversations for practitioner:', practitionerId);
+        const practitionerId = rvUser.id; // UUID
+        
+        // Get practitioner serial number
+        const { data: practitioner, error: practitionerError } = await window.supabaseClient
+            .from('practitioners')
+            .select('serial_number')
+            .eq('id', practitionerId)
+            .single();
 
-        // Get all accepted matches for this practitioner
-        const { data: matches, error: matchError } = await window.supabaseClient
-            .from('project_practitioner_matches')
-            .select('id, project_serial, status, created_at')
-            .eq('practitioner_serial', practitionerId)
-            .eq('status', 'accepted');
-
-        if (matchError) {
-            console.error('[Inbox] Error loading matches:', matchError);
+        if (practitionerError || !practitioner) {
+            console.error('[Inbox] Error loading practitioner serial:', practitionerError);
             return;
         }
 
+        const practitionerSerial = practitioner.serial_number;
+        console.log('[Inbox] Loading conversations for practitioner:', practitionerSerial);
+
         conversations = [];
 
-        // Load messages for each match
-        for (const match of matches || []) {
+        // ===== LOAD ACCEPTED MATCHES (Messages Tab) =====
+        const { data: acceptedMatches, error: acceptedError } = await window.supabaseClient
+            .from('project_practitioner_matches')
+            .select('id, project_serial, status, created_at')
+            .eq('practitioner_serial', practitionerSerial)
+            .eq('status', 'accepted');
+
+        if (acceptedError) {
+            console.error('[Inbox] Error loading accepted matches:', acceptedError);
+            return;
+        }
+
+        console.log('[Inbox] Loaded accepted matches:', acceptedMatches?.length);
+
+        // Process accepted matches
+        for (const match of acceptedMatches || []) {
             try {
                 // Get project details
                 const { data: project, error: projectError } = await window.supabaseClient
                     .from('projects')
-                    .select('id, description, category_name, client_serial')
+                    .select('id, description, category_name, client_serial, zipcode, travel_preference')
                     .eq('project_serial', match.project_serial)
                     .single();
 
@@ -222,7 +400,7 @@ async function loadConversations() {
                     .from('project_messages')
                     .select('id, message, sender_type, created_at')
                     .eq('project_serial', match.project_serial)
-                    .eq('practitioner_serial', practitionerId)
+                    .eq('practitioner_serial', practitionerSerial)
                         .order('created_at', { ascending: false })
                     .limit(50);
 
@@ -234,7 +412,8 @@ async function loadConversations() {
                     matchId: match.id,
                     projectId: match.project_id,
                     clientId: client.id,
-                    practitionerId: practitionerId,
+                    clientSerial: project.client_serial,
+                    practitionerId: practitionerSerial,
                     clientName: clientName,
                     clientAvatar: generateInitialsAvatar(clientName),
                     lastMessage: lastMessage?.message || 'No messages yet',
@@ -243,7 +422,14 @@ async function loadConversations() {
                     unreadCount: unreadCount,
                     status: 'online',
                     category: 'all',
-                    messages: messages || []
+                    messages: messages || [],
+                    isArchived: false,
+                    isBlocked: false,
+                    projectDescription: project.description,
+                    projectCategory: project.category_name,
+                    projectZipcode: project.zipcode,
+                    projectTravelPreferences: project.travel_preferences,
+                    isBlocked: false
                 });
             } catch (itemError) {
                 console.error('[Inbox] Error processing match:', itemError);
@@ -251,7 +437,88 @@ async function loadConversations() {
             }
         }
 
-        console.log(`[Inbox] Loaded ${conversations.length} conversations`);
+        // ===== LOAD DECLINED MATCHES (Archive Tab) =====
+        const { data: declinedMatches, error: declinedError } = await window.supabaseClient
+            .from('project_practitioner_matches')
+            .select('id, project_serial, status, created_at')
+            .eq('practitioner_serial', practitionerSerial)
+            .eq('status', 'declined');
+
+        if (declinedError) {
+            console.error('[Inbox] Error loading declined matches:', declinedError);
+        }
+
+        console.log('[Inbox] Loaded declined matches:', declinedMatches?.length);
+
+        // Process declined matches
+        for (const match of declinedMatches || []) {
+            try {
+                // Get project details
+                const { data: project, error: projectError } = await window.supabaseClient
+                    .from('projects')
+                    .select('id, description, category_name, client_serial, zipcode, travel_preference')
+                    .eq('project_serial', match.project_serial)
+                    .single();
+
+                if (projectError || !project) continue;
+
+                // Get client details
+                const { data: client, error: clientError } = await window.supabaseClient
+                    .from('clients')
+                    .select('id, first_name, last_name')
+                    .eq('serial_number', project.client_serial)
+                    .single();
+
+                if (clientError || !client) continue;
+
+                const clientName = `${client.first_name || 'Client'} ${client.last_name || ''}`;
+
+                // Check if this client is blocked
+                const { data: blockRecords, error: blockError } = await window.supabaseClient
+                    .from('practitioner_blocks')
+                    .select('id, is_blocked')
+                    .eq('practitioner_serial', practitionerSerial)
+                    .eq('client_serial', project.client_serial);
+
+                // A client is blocked if they have a block record with is_blocked = true
+                const isBlocked = blockRecords && blockRecords.length > 0 && blockRecords[0].is_blocked === true;
+                console.log(`[Inbox] Processing declined match - Client: ${clientName}, BlockRecords: ${blockRecords?.length}, isBlocked: ${isBlocked}`);
+
+                conversations.push({
+                    id: match.id,
+                    matchId: match.id,
+                    projectId: match.project_id,
+                    clientId: client.id,
+                    clientSerial: project.client_serial,
+                    practitionerId: practitionerSerial,
+                    clientName: clientName,
+                    clientAvatar: generateInitialsAvatar(clientName),
+                    lastMessage: isBlocked ? 'Blocked' : 'Declined',
+                    lastMessageTime: new Date(match.created_at),
+                    isUnread: false,
+                    unreadCount: 0,
+                    status: isBlocked ? 'blocked' : 'archived',
+                    category: 'archive',
+                    messages: [],
+                    isArchived: true,
+                    isBlocked: isBlocked,
+                    projectDescription: project.description,
+                    projectCategory: project.category_name,
+                    projectZipcode: project.zipcode,
+                    projectTravelPreferences: project.travel_preference
+                });
+            } catch (itemError) {
+                console.error('[Inbox] Error processing declined match:', itemError);
+                continue;
+            }
+        }
+
+        // ===== LOAD BLOCKED MATCHES BY STATUS (Archive Tab) =====
+        // (No longer needed - blocked clients tracked via practitioner_blocks)
+        // Keeping this commented for reference, but we now detect blocks via practitioner_blocks table lookup above
+
+        console.log(`[Inbox] Loaded ${conversations.length} conversations (${conversations.filter(c => c.category === 'all').length} accepted, ${conversations.filter(c => c.category === 'archive' && !c.isBlocked).length} declined, ${conversations.filter(c => c.isBlocked).length} blocked)`);
+        console.log('[Inbox] ===== LOAD CONVERSATIONS COMPLETED =====');
     } catch (error) {
         console.error('[Inbox] Error loading conversations:', error);
     }
@@ -264,9 +531,12 @@ function renderThreadsList(searchQuery = '') {
     const threadsList = document.getElementById('threads-list');
     threadsList.innerHTML = '';
     
+    console.log(`[Inbox Render] Total conversations: ${conversations.length}, Current filter: ${currentFilter}`);
+    
     // Filter conversations
     let filtered = conversations.filter(conv => {
-        // Filter by category
+        // Filter by category - 'all' means only accepted (not archived/blocked)
+        if (currentFilter === 'all' && conv.category !== 'all') return false;
         if (currentFilter === 'unread' && !conv.isUnread) return false;
         if (currentFilter === 'hired' && conv.category !== 'hired') return false;
         if (currentFilter === 'archive' && conv.category !== 'archive') return false;
@@ -276,6 +546,8 @@ function renderThreadsList(searchQuery = '') {
         
         return true;
     });
+    
+    console.log(`[Inbox Render] Filtered conversations: ${filtered.length}`);
     
     // If no conversations match, show empty state
     if (filtered.length === 0) {
@@ -319,7 +591,9 @@ function createThreadElement(conversation) {
         </div>
         <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
             <span class="thread-time">${formatTime(conversation.lastMessageTime)}</span>
-            <div class="thread-status-badge ${conversation.status === 'online' ? 'online' : conversation.status === 'away' ? 'away' : ''}"></div>
+            <div style="display: flex; gap: 4px; align-items: center;">
+                <div class="thread-status-badge ${conversation.status === 'online' ? 'online' : conversation.status === 'away' ? 'away' : ''}"></div>
+            </div>
         </div>
     `;
     
@@ -351,6 +625,8 @@ function openThreadView(conversation) {
     document.getElementById('thread-avatar').src = conversation.clientAvatar;
     document.getElementById('thread-name').textContent = conversation.clientName;
     document.getElementById('thread-status').textContent = 
+        conversation.isBlocked ? 'Blocked' :
+        conversation.isArchived ? 'Declined' :
         conversation.status === 'online' ? '● Online' : 
         conversation.status === 'away' ? '◐ Away' : 
         'Offline';
@@ -366,12 +642,23 @@ function openThreadView(conversation) {
     const sendBtn = document.getElementById('send-message-btn');
     
     if (messageInput) {
-        messageInput.disabled = false;
-        messageInput.placeholder = `Message ${conversation.clientName}...`;
+        // Disable messaging for archived and blocked conversations
+        if (conversation.isArchived || conversation.isBlocked) {
+            messageInput.disabled = true;
+            messageInput.placeholder = conversation.isBlocked ? 'This client is blocked' : 'This conversation is archived';
+        } else {
+            messageInput.disabled = false;
+            messageInput.placeholder = `Message ${conversation.clientName}...`;
+        }
     }
     
     if (sendBtn) {
-        sendBtn.disabled = false;
+        // Disable send button for archived and blocked conversations
+        if (conversation.isArchived || conversation.isBlocked) {
+            sendBtn.disabled = true;
+        } else {
+            sendBtn.disabled = false;
+        }
         
         // Remove old listeners by cloning
         const newSendBtn = sendBtn.cloneNode(true);
@@ -433,43 +720,184 @@ function populateLeadDetailsHero(conversation) {
     // Update lead name
     document.getElementById('lead-name').textContent = conversation.clientName;
     
-    // Update lead status (interested, hired, etc.)
+    // Update lead status
     const leadStatus = document.getElementById('lead-status');
-    if (conversation.status === 'hired') {
-        leadStatus.textContent = '✓ Hired';
-        leadStatus.style.color = 'var(--primary)';
-    } else if (conversation.archived) {
-        leadStatus.textContent = 'Archived';
-        leadStatus.style.color = 'var(--text-tertiary)';
-    } else {
-        leadStatus.textContent = 'Interested in services';
-        leadStatus.style.color = 'var(--text-secondary)';
+    if (leadStatus) {
+        if (conversation.isBlocked) {
+            leadStatus.textContent = 'Blocked';
+            leadStatus.style.color = '#d32f2f';
+        } else if (conversation.isArchived) {
+            leadStatus.textContent = 'Declined';
+            leadStatus.style.color = 'var(--text-tertiary)';
+        } else if (conversation.status === 'hired') {
+            leadStatus.textContent = '✓ Hired';
+            leadStatus.style.color = 'var(--primary)';
+        } else {
+            leadStatus.textContent = 'Interested in services';
+            leadStatus.style.color = 'var(--text-secondary)';
+        }
     }
     
-    // Update services
+    // Update services - show project category for archived (if element exists)
     const servicesContainer = document.getElementById('lead-services-list');
-    if (conversation.services && conversation.services.length > 0) {
-        servicesContainer.innerHTML = conversation.services
-            .slice(0, 3)
-            .map(service => `<span class="lead-service-tag">${service}</span>`)
-            .join('');
-    } else {
-        servicesContainer.innerHTML = '<span style="color: var(--text-tertiary);">No services listed</span>';
+    if (servicesContainer) {
+        if (conversation.isArchived || conversation.isBlocked) {
+            if (conversation.projectCategory) {
+                servicesContainer.innerHTML = `<span class="lead-service-tag">${conversation.projectCategory}</span>`;
+            } else {
+                servicesContainer.innerHTML = '<span style="color: var(--text-tertiary);">No category listed</span>';
+            }
+        } else if (conversation.services && conversation.services.length > 0) {
+            servicesContainer.innerHTML = conversation.services
+                .slice(0, 3)
+                .map(service => `<span class="lead-service-tag">${service}</span>`)
+                .join('');
+        } else {
+            servicesContainer.innerHTML = '<span style="color: var(--text-tertiary);">No services listed</span>';
+        }
     }
     
     // Setup action buttons
     const hireBtn = document.getElementById('lead-action-hire');
     const detailsBtn = document.getElementById('lead-action-details');
     
-    // Disable hire button if already hired
-    if (conversation.status === 'hired') {
-        hireBtn.textContent = '✓ Hired';
-        hireBtn.disabled = true;
-        hireBtn.style.opacity = '0.6';
+    // Populate project details section (for all conversations)
+    populateProjectDetails(conversation);
+    
+    // For archived/blocked conversations, show project description instead of buttons
+    if (conversation.isArchived || conversation.isBlocked) {
+        // Hide or repurpose the button container to show project description
+        const heroActions = document.querySelector('.lead-hero-actions');
+        
+        if (heroActions) {
+            // Clear existing buttons
+            heroActions.innerHTML = '';
+            
+            // Add unblock button for blocked clients only
+            if (conversation.isBlocked) {
+                const unblocBtn = document.createElement('button');
+                unblocBtn.className = 'lead-action-btn lead-action-primary';
+                unblocBtn.textContent = 'Unblock';
+                unblocBtn.style.cssText = `
+                    flex-shrink: 0;
+                    white-space: nowrap;
+                    padding: 8px 16px;
+                    font-size: 0.85rem;
+                `;
+                heroActions.appendChild(unblocBtn);
+                
+                unblocBtn.addEventListener('click', async () => {
+                    showUnblockModal(conversation.clientName, conversation.clientSerial, conversation.practitionerId);
+                });
+            } else {
+                // For declined (not blocked) clients, show block button
+                const blockBtn = document.createElement('button');
+                blockBtn.className = 'lead-action-btn';
+                blockBtn.textContent = 'Block';
+                blockBtn.style.cssText = `
+                    flex-shrink: 0;
+                    white-space: nowrap;
+                    padding: 8px 16px;
+                    font-size: 0.85rem;
+                    background: #f3f1ec;
+                    color: #5a5a5a;
+                    border: 1px solid #ddd9d0;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                `;
+                heroActions.appendChild(blockBtn);
+                
+                blockBtn.addEventListener('click', async () => {
+                    showBlockModal(conversation.clientName, conversation.clientSerial, conversation.practitionerId);
+                });
+                
+                blockBtn.addEventListener('mouseover', () => {
+                    blockBtn.style.background = '#ddd9d0';
+                });
+                
+                blockBtn.addEventListener('mouseout', () => {
+                    blockBtn.style.background = '#f3f1ec';
+                });
+            }
+        }
+    } else if (conversation.status === 'hired') {
+        if (hireBtn) {
+            hireBtn.textContent = '✓ Hired';
+            hireBtn.disabled = true;
+            hireBtn.style.opacity = '0.6';
+        }
+        if (detailsBtn) {
+            detailsBtn.style.display = 'none';
+        }
     } else {
-        hireBtn.textContent = 'Hire Client';
-        hireBtn.disabled = false;
-        hireBtn.style.opacity = '1';
+        if (hireBtn) {
+            hireBtn.textContent = 'Hire Client';
+            hireBtn.disabled = false;
+            hireBtn.style.opacity = '1';
+        }
+        if (detailsBtn) {
+            detailsBtn.style.display = 'block';
+        }
+    }
+}
+
+/**
+ * Populate project details section with categories, location, travel, and description
+ */
+function populateProjectDetails(conversation) {
+    // Categories
+    const categoriesEl = document.getElementById('project-categories');
+    if (categoriesEl) {
+        if (conversation.projectCategory) {
+            const categories = conversation.projectCategory.split(',').map(c => c.trim()).filter(c => c);
+            if (categories.length > 0) {
+                categoriesEl.innerHTML = categories
+                    .map(cat => `<span class="category-tag">${escapeHtml(cat)}</span>`)
+                    .join('');
+            } else {
+                categoriesEl.innerHTML = '<span class="detail-text" style="color: var(--text-tertiary);">Not specified</span>';
+            }
+        } else {
+            categoriesEl.innerHTML = '<span class="detail-text" style="color: var(--text-tertiary);">Not specified</span>';
+        }
+    }
+    
+    // Location (zipcode)
+    const locationEl = document.getElementById('project-location');
+    if (locationEl) {
+        if (conversation.projectZipcode) {
+            locationEl.innerHTML = `<span class="detail-text">${escapeHtml(conversation.projectZipcode)}</span>`;
+        } else {
+            locationEl.innerHTML = '<span class="detail-text" style="color: var(--text-tertiary);">Not specified</span>';
+        }
+    }
+    
+    // Travel preferences
+    const travelEl = document.getElementById('project-travel');
+    if (travelEl) {
+        if (conversation.projectTravelPreferences) {
+            const travel = conversation.projectTravelPreferences.split(',').map(t => t.trim()).filter(t => t);
+            if (travel.length > 0) {
+                travelEl.innerHTML = travel
+                    .map(pref => `<span class="category-tag">${escapeHtml(pref)}</span>`)
+                    .join('');
+            } else {
+                travelEl.innerHTML = '<span class="detail-text" style="color: var(--text-tertiary);">Not specified</span>';
+            }
+        } else {
+            travelEl.innerHTML = '<span class="detail-text" style="color: var(--text-tertiary);">Not specified</span>';
+        }
+    }
+    
+    // Project description
+    const descEl = document.getElementById('project-description');
+    if (descEl) {
+        if (conversation.projectDescription) {
+            descEl.innerHTML = `<span class="detail-text long-text">${escapeHtml(conversation.projectDescription)}</span>`;
+        } else {
+            descEl.innerHTML = '<span class="detail-text" style="color: var(--text-tertiary);">No description provided</span>';
+        }
     }
 }
 
@@ -513,7 +941,7 @@ function renderMessages(messages) {
  * Update badge counts
  */
 function updateBadges() {
-    const allCount = conversations.length;
+    const allCount = conversations.filter(c => c.category === 'all').length;
     const unreadCount = conversations.filter(c => c.isUnread).length;
     const hiredCount = conversations.filter(c => c.category === 'hired').length;
     const archiveCount = conversations.filter(c => c.category === 'archive').length;

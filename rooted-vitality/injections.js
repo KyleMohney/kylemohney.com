@@ -1018,7 +1018,7 @@ const RootedVitality = {
     markNotificationAsRead: async function(notifId) {
         try {
             const { error } = await window.supabaseClient
-                .from('notifications')
+                .from('practitioner_notifications')
                 .update({ is_read: true })
                 .eq('id', notifId);
             
@@ -1035,7 +1035,7 @@ const RootedVitality = {
     },
 
     /**
-     * Load and display notifications for practitioner
+     * Load and display notifications for practitioner or client
      */
     loadNotifications: async function() {
         if (!window.supabaseClient) {
@@ -1048,10 +1048,32 @@ const RootedVitality = {
                 return;
             }
 
+            // Determine user type and get appropriate serial number
+            let notificationTable, whereField, whereValue;
+            const currentUser = window.authManager?.getCurrentUser?.();
+            const userRole = currentUser?.role || localStorage.getItem('rvUserRole') || 'practitioner';
+
+            if (userRole === 'client') {
+                notificationTable = 'client_notifications';
+                whereField = 'client_serial';
+                // Get client serial from localStorage or auth
+                const rvUser = JSON.parse(localStorage.getItem('rvUser') || '{}');
+                whereValue = rvUser.serial_number || user.user_metadata?.serial_number;
+            } else {
+                notificationTable = 'practitioner_notifications';
+                whereField = 'practitioner_serial';
+                whereValue = user.user_metadata?.serial_number || currentUser?.serial_number;
+            }
+
+            if (!whereValue) {
+                console.warn('[Rooted Vitality] Could not determine serial number for notifications');
+                return;
+            }
+
             const { data, error } = await window.supabaseClient
-                .from('notifications')
+                .from(notificationTable)
                 .select('*')
-                .eq('practitioner_serial', user.serial_number)
+                .eq(whereField, whereValue)
                 .order('created_at', { ascending: false });
 
             if (error) {

@@ -687,7 +687,8 @@
             .order('created_at', { ascending: true })
             .limit(1);
 
-          const firstMessage = messages?.[0]?.message || 'No messages yet';
+          const projectDescription = project.description || 'No project details provided';
+          const firstMessage = messages?.[0]?.message || projectDescription;
 
           // Get match quality details from the match record
           const matchScore = match.match_score || 0;
@@ -715,10 +716,8 @@
             </div>
             <div class="card-actions">
               <button class="btn-accent" data-action="accept" data-match-id="${match.id}">Accept</button>
-              <button class="btn-neutral" data-action="message" data-match-id="${match.id}">Message</button>
-              <button class="btn-neutral" data-action="decline-msg" data-match-id="${match.id}">Decline w/ Msg</button>
-              <button class="btn-danger" data-action="decline" data-match-id="${match.id}">Decline</button>
-              <button class="btn-danger" data-action="block" data-match-id="${match.id}">Block</button>
+              <button class="btn-neutral" data-action="decline" data-match-id="${match.id}">Decline</button>
+              <button class="btn-neutral" data-action="block" data-match-id="${match.id}">Block</button>
             </div>
           `;
 
@@ -726,11 +725,15 @@
           let currentMatchForDeclineMsg = null;
 
           card.querySelector('[data-action="accept"]').addEventListener('click', async () => {
-            const { data, error } = await window.supabaseClient
-              .rpc('update_practitioner_response', {
-                p_match_id: match.id,
-                p_response: 'accepted'
-              });
+            const { error } = await window.supabaseClient
+              .from('project_practitioner_matches')
+              .update({
+                status: 'accepted',
+                practitioner_response: 'accepted',
+                practitioner_responded_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', match.id);
 
             if (!error) {
               // Notify client of acceptance
@@ -750,24 +753,17 @@
             }
           });
 
-          card.querySelector('[data-action="message"]').addEventListener('click', () => {
-            window.location.href = `/rooted-vitality/dashboard/pro/pages/my-matches.html?match_id=${match.id}`;
-          });
-
-          card.querySelector('[data-action="decline-msg"]').addEventListener('click', () => {
-            currentMatchForDeclineMsg = match;
-            document.getElementById('decline-message-text').value = '';
-            const modal = document.getElementById('decline-message-modal');
-            modal.style.display = 'flex';
-          });
-
           card.querySelector('[data-action="decline"]').addEventListener('click', async () => {
             if (confirm('Are you sure you want to decline this client? They will be notified.')) {
               const { error } = await window.supabaseClient
-                .rpc('update_practitioner_response', {
-                  p_match_id: match.id,
-                  p_response: 'declined'
-                });
+                .from('project_practitioner_matches')
+                .update({
+                  status: 'declined',
+                  practitioner_response: 'declined',
+                  practitioner_responded_at: new Date().toISOString(),
+                  updated_at: new Date().toISOString()
+                })
+                .eq('id', match.id);
 
               if (!error) {
                 // Notify client of decline
@@ -783,35 +779,78 @@
                 
                 showToast('Declined', `You declined ${clientName}`, 'info');
                 card.remove();
+              } else {
+                showToast('Error', 'Failed to decline client', 'error');
               }
             }
           });
 
           card.querySelector('[data-action="block"]').addEventListener('click', async () => {
             if (confirm('Block this customer? They won\'t be able to match with you again.')) {
-              // Decline the match
-              const { error: declineError } = await window.supabaseClient
-                .rpc('update_practitioner_response', {
-                  p_match_id: match.id,
-                  p_response: 'declined'
-                });
+              // Find ALL pending matches from this client
+              const { data: allMatches, error: fetchError } = await window.supabaseClient
+                .from('project_practitioner_matches')
+                .select('id')
+                .eq('practitioner_serial', practitionerSerial)
+                .eq('client_serial', match.client_serial)
+                .eq('status', 'pending');
 
-              if (declineError) {
-                showToast('Error', 'Failed to block customer', 'error');
+              if (fetchError) {
+                showToast('Error', 'Failed to find all matches', 'error');
                 return;
               }
 
-              // Add to blocklist
+              // Decline all pending matches from this client
+              if (allMatches && allMatches.length > 0) {
+                const { error: updateError } = await window.supabaseClient
+                  .from('project_practitioner_matches')
+                  .update({
+                    status: 'declined',
+                    practitioner_response: 'declined',
+                    practitioner_responded_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                  })
+                  .eq('practitioner_serial', practitionerSerial)
+                  .eq('client_serial', match.client_serial)
+                  .eq('status', 'pending');
+
+                if (updateError) {
+                  showToast('Error', 'Failed to decline matches', 'error');
+                  console.error('Update error:', updateError);
+                  return;
+                }
+              }
+
+              // Add to blocklist (upsert if already exists)
               const { error: blockError } = await window.supabaseClient
                 .from('practitioner_blocks')
-                .insert({
+                .upsert({
+                  practitioner_id: practitionerId,
                   practitioner_serial: practitionerSerial,
-                  client_serial: match.client_serial
+                  client_serial: match.client_serial,
+                  is_blocked: true
+                }, {
+                  onConflict: 'practitioner_id,client_serial'
                 });
 
               if (!blockError) {
-                showToast('Blocked', `You blocked ${clientName}`, 'info');
-                card.remove();
+                // Notify client of decline (without revealing block)
+                if (window.notifyClientOfMatchResponse) {
+                  await notifyClientOfMatchResponse({
+                    clientSerial: match.client_serial,
+                    practitionerName: currentUser?.dba_name || currentUser?.legal_name || 'A practitioner',
+                    projectName: match.projectName || 'your project',
+                    action: 'declined',
+                    reason: 'Not available at this time'
+                  });
+                }
+
+                showToast('Blocked', `You blocked ${clientName} and all their pending requests`, 'info');
+                // Reload the clients list to refresh and remove all their cards
+                loadClientsData();
+              } else {
+                showToast('Error', 'Failed to add to blocklist', 'error');
+                console.error('Block error:', blockError);
               }
             }
           });
@@ -1007,6 +1046,106 @@
     // ============================================================================
     let practitionerIdGlobal = null;
 
+    /**
+     * Load practitioner notifications from database
+     */
+    async function loadPractitionerNotifications() {
+      try {
+        if (!window.supabaseClient || !window.authManager) {
+          console.error('[Pro Notifications] Supabase or auth not ready');
+          return;
+        }
+
+        const currentUser = window.authManager.getCurrentUser();
+        if (!currentUser) {
+          console.log('[Pro Notifications] User not authenticated');
+          return;
+        }
+
+        const rvUserStr = localStorage.getItem('rvUser');
+        if (!rvUserStr) {
+          console.error('[Pro Notifications] No rvUser in localStorage');
+          return;
+        }
+
+        const rvUser = JSON.parse(rvUserStr);
+        const practitionerId = rvUser.id;
+
+        // Get practitioner serial number
+        const { data: practitioner, error: practitionerError } = await window.supabaseClient
+          .from('practitioners')
+          .select('serial_number')
+          .eq('id', practitionerId)
+          .single();
+
+        if (practitionerError || !practitioner) {
+          console.error('[Pro Notifications] Error loading practitioner:', practitionerError);
+          return;
+        }
+
+        const practitionerSerial = practitioner.serial_number;
+        console.log('[Pro Notifications] Loading notifications for:', practitionerSerial);
+
+        const { data: notifications, error } = await window.supabaseClient
+          .from('practitioner_notifications')
+          .select('*')
+          .eq('practitioner_serial', practitionerSerial)
+          .eq('is_read', false)
+          .order('created_at', { ascending: false })
+          .limit(20);
+
+        if (error) {
+          console.error('[Pro Notifications] Error loading notifications:', error);
+          return;
+        }
+
+        console.log('[Pro Notifications] Loaded', notifications?.length || 0, 'unread notifications');
+
+        if (notifications && notifications.length > 0) {
+          // Update notification badge
+          const notificationBadge = document.querySelector('.rv-notification-badge');
+          if (notificationBadge) {
+            notificationBadge.textContent = notifications.length;
+            notificationBadge.classList.add('active');
+            notificationBadge.style.backgroundColor = '#FFD700'; // Gold color
+          }
+
+          // Update notification list
+          const notificationsList = document.querySelector('.rv-notifications-list');
+          if (notificationsList) {
+            notificationsList.innerHTML = '';
+            
+            // Fetch client details for each notification
+            for (const notif of notifications) {
+              // Get client name if this is a match notification
+              let clientName = 'Client';
+              if (notif.type === 'match_new') {
+                // Extract client serial from the database if available
+                // For now, we'll query based on the match data
+                // This should be added to the notification or we fetch separately
+                clientName = notif.client_name || 'Client';
+              }
+              
+              const notifElement = document.createElement('a');
+              notifElement.className = 'rv-notifications-item unread';
+              notifElement.href = '#';
+              notifElement.innerHTML = `
+                <p class="rv-notifications-title">${notif.title}</p>
+                <p class="rv-notifications-message">${notif.message}</p>
+                <p class="rv-notifications-time">${new Date(notif.created_at).toLocaleDateString()}</p>
+              `;
+              notifElement.addEventListener('click', (e) => {
+                e.preventDefault();
+              });
+              notificationsList.appendChild(notifElement);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('[Pro Notifications] Exception loading notifications:', error);
+      }
+    }
+
     async function initializeClientsPage() {
       try {
         if (!window.supabaseClient || !window.authManager) {
@@ -1032,6 +1171,7 @@
 
         // Load initial data
         await loadClientsData();
+        await loadPractitionerNotifications();
 
         // Setup real-time subscriptions
         await setupRealtimeSubscription(practitionerIdGlobal);
