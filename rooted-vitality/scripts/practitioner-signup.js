@@ -395,7 +395,7 @@ async function registerPractitioner(event) {
 
         // Create welcome notification for practitioner
         const welcomeNotification = {
-            practitioner_id: state.session.id,
+            practitioner_serial: state.practitionerSerial,
             type: 'welcome',
             title: 'Welcome to Rooted Vitality!',
             message: 'Thank you for signing up to help others on their wellness journey! Complete your profile and set your match preferences to start connecting with clients who need your expertise.',

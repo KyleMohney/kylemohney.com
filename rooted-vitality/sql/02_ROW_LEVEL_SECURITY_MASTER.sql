@@ -90,19 +90,19 @@ DROP POLICY IF EXISTS "Practitioners see matched projects" ON projects;
 CREATE POLICY "Clients see own projects" ON projects
 FOR SELECT
 USING (
-  client_id = auth.uid()
+  client_serial = auth.uid()
 );
 
 -- UPDATE: Clients can update their own projects
 CREATE POLICY "Clients update own projects" ON projects
 FOR UPDATE
-USING (client_id = auth.uid())
-WITH CHECK (client_id = auth.uid());
+USING (client_serial = auth.uid())
+WITH CHECK (client_serial = auth.uid());
 
 -- INSERT: Clients can create projects
 CREATE POLICY "Clients create projects" ON projects
 FOR INSERT
-WITH CHECK (client_id = auth.uid());
+WITH CHECK (client_serial = auth.uid());
 
 -- ============================================================================
 -- SECTION 4: PROJECT_PRACTITIONER_MATCHES TABLE
@@ -120,7 +120,7 @@ CREATE POLICY "Clients see project matches" ON project_practitioner_matches
 FOR SELECT
 USING (
   project_id IN (
-    SELECT project_id FROM projects WHERE client_id = auth.uid()
+    SELECT project_id FROM projects WHERE client_serial = auth.uid()
   )
 );
 
@@ -128,19 +128,19 @@ USING (
 CREATE POLICY "Practitioners see own matches" ON project_practitioner_matches
 FOR SELECT
 USING (
-  practitioner_id = auth.uid()
+  practitioner_serial = auth.uid()
 );
 
 -- UPDATE: Matches can be updated by client or practitioner
 CREATE POLICY "Participants update matches" ON project_practitioner_matches
 FOR UPDATE
 USING (
-  project_id IN (SELECT project_id FROM projects WHERE client_id = auth.uid())
-  OR practitioner_id = auth.uid()
+  project_id IN (SELECT project_id FROM projects WHERE client_serial = auth.uid())
+  OR practitioner_serial = auth.uid()
 )
 WITH CHECK (
-  project_id IN (SELECT project_id FROM projects WHERE client_id = auth.uid())
-  OR practitioner_id = auth.uid()
+  project_id IN (SELECT project_id FROM projects WHERE client_serial = auth.uid())
+  OR practitioner_serial = auth.uid()
 );
 
 -- INSERT: Matches created by service role (server-side)
@@ -169,12 +169,12 @@ USING (is_approved = true AND is_visible = true);
 -- SELECT: Practitioners can view all reviews on their profile
 CREATE POLICY "Practitioners can view own reviews" ON reviews
 FOR SELECT
-USING (practitioner_id = auth.uid());
+USING (practitioner_serial = auth.uid());
 
 -- SELECT: Clients can view their own reviews
 CREATE POLICY "Clients can view own reviews" ON reviews
 FOR SELECT
-USING (client_id = auth.uid());
+USING (client_serial = auth.uid());
 
 -- INSERT: Reviews created by service role (server-side)
 CREATE POLICY "Service role inserts reviews" ON reviews
@@ -195,13 +195,13 @@ DROP POLICY IF EXISTS "Service role inserts notifications" ON notifications;
 -- SELECT: Practitioners see their own notifications
 CREATE POLICY "Practitioners read own notifications" ON notifications
 FOR SELECT
-USING (practitioner_id = auth.uid());
+USING (practitioner_serial = auth.uid());
 
 -- UPDATE: Practitioners can mark notifications as read
 CREATE POLICY "Practitioners update own notifications" ON notifications
 FOR UPDATE
-USING (practitioner_id = auth.uid())
-WITH CHECK (practitioner_id = auth.uid());
+USING (practitioner_serial = auth.uid())
+WITH CHECK (practitioner_serial = auth.uid());
 
 -- INSERT: Notifications created by service role
 CREATE POLICY "Service role inserts notifications" ON notifications
@@ -222,18 +222,18 @@ DROP POLICY IF EXISTS "Practitioners update own match settings" ON practitioner_
 -- SELECT: Practitioners can read their own match settings
 CREATE POLICY "Practitioners read own match settings" ON practitioner_match_settings
 FOR SELECT
-USING (practitioner_id = auth.uid());
+USING (practitioner_serial = auth.uid());
 
 -- INSERT: Practitioners can create their own match settings
 CREATE POLICY "Practitioners insert own match settings" ON practitioner_match_settings
 FOR INSERT
-WITH CHECK (practitioner_id = auth.uid());
+WITH CHECK (practitioner_serial = auth.uid());
 
 -- UPDATE: Practitioners can update their own match settings
 CREATE POLICY "Practitioners update own match settings" ON practitioner_match_settings
 FOR UPDATE
-USING (practitioner_id = auth.uid())
-WITH CHECK (practitioner_id = auth.uid());
+USING (practitioner_serial = auth.uid())
+WITH CHECK (practitioner_serial = auth.uid());
 
 -- ============================================================================
 -- SECTION 8: PROJECT_MESSAGES TABLE
@@ -249,8 +249,8 @@ DROP POLICY IF EXISTS "Match participants send messages" ON project_messages;
 CREATE POLICY "Match participants see messages" ON project_messages
 FOR SELECT
 USING (
-  (project_id IN (SELECT project_id FROM projects WHERE client_id = auth.uid()))
-  OR (practitioner_id = auth.uid())
+  (project_id IN (SELECT project_id FROM projects WHERE client_serial = auth.uid()))
+  OR (practitioner_serial = auth.uid())
 );
 
 -- INSERT: Participants can send messages
@@ -275,23 +275,23 @@ DROP POLICY IF EXISTS "Practitioners delete own selected services" ON practition
 -- SELECT: Practitioners can read their own selected services
 CREATE POLICY "Practitioners read own selected services" ON practitioner_selected_services
 FOR SELECT
-USING (practitioner_id = auth.uid());
+USING (practitioner_serial = auth.uid());
 
 -- INSERT: Practitioners can add their own selected services
 CREATE POLICY "Practitioners insert own selected services" ON practitioner_selected_services
 FOR INSERT
-WITH CHECK (practitioner_id = auth.uid());
+WITH CHECK (practitioner_serial = auth.uid());
 
 -- UPDATE: Practitioners can update their own selected services (pricing, active status)
 CREATE POLICY "Practitioners update own selected services" ON practitioner_selected_services
 FOR UPDATE
-USING (practitioner_id = auth.uid())
-WITH CHECK (practitioner_id = auth.uid());
+USING (practitioner_serial = auth.uid())
+WITH CHECK (practitioner_serial = auth.uid());
 
 -- DELETE: Practitioners can remove their own selected services
 CREATE POLICY "Practitioners delete own selected services" ON practitioner_selected_services
 FOR DELETE
-USING (practitioner_id = auth.uid());
+USING (practitioner_serial = auth.uid());
 
 -- ============================================================================
 -- SECTION 10: PROFILE COMPLETENESS MIGRATION

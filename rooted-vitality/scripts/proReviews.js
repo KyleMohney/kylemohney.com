@@ -97,7 +97,7 @@ async function loadReviews() {
         const { data: dbReviews, error: reviewsError } = await window.supabaseClient
             .from('reviews')
             .select('*')
-            .eq('practitioner_id', practitionerData.id)  // Use 'id' not 'user_id'
+            .eq('practitioner_serial', practitionerData.serial_number)  // Use serial_number for queries
             .eq('is_visible', true)
             .order('created_at', { ascending: false });
         

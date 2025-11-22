@@ -34,9 +34,10 @@ class MatchSettingsManager {
       console.warn('[MatchSettingsManager] Could not verify auth user:', err);
     }
     
+    // Load practitioner data FIRST so practitionerSerial is available for other queries
+    await this.loadPractitionerData();
     await this.loadMatchSettings();
     await this.loadSelectedServices();
-    await this.loadPractitionerData();
     console.log('[MatchSettingsManager] Initialized for practitioner:', practitionerId);
   }
 
@@ -49,10 +50,14 @@ class MatchSettingsManager {
    */
   async loadMatchSettings() {
     try {
+      console.log('[MatchSettingsManager] loadMatchSettings() called');
+      console.log('[MatchSettingsManager] DEBUG - this.practitionerSerial:', this.practitionerSerial);
+      console.log('[MatchSettingsManager] DEBUG - this.practitionerId:', this.practitionerId);
+      
       const { data, error } = await this.supabase
         .from('practitioner_match_settings')
         .select('*')
-        .eq('practitioner_id', this.practitionerId);
+        .eq('practitioner_serial', this.practitionerSerial);
 
       if (error) throw error;
 
@@ -76,23 +81,34 @@ class MatchSettingsManager {
    */
   async createDefaultMatchSettings() {
     try {
-      // Get practitioner serial number
-      const { data: practitioner } = await this.supabase
+      // Debug: Check current auth user and practitioner data
+      const { data: { user } } = await this.supabase.auth.getUser();
+      console.log('[MatchSettingsManager] DEBUG - Auth user ID:', user?.id);
+      console.log('[MatchSettingsManager] DEBUG - Practitioner ID:', this.practitionerId);
+      console.log('[MatchSettingsManager] DEBUG - Practitioner Serial:', this.practitionerSerial);
+      
+      // Verify the practitioner exists with this ID
+      const { data: practitionerCheck } = await this.supabase
         .from('practitioners')
-        .select('serial_number')
+        .select('id, serial_number')
         .eq('id', this.practitionerId)
         .single();
+      console.log('[MatchSettingsManager] DEBUG - Practitioner check:', practitionerCheck);
 
       const defaultSettings = {
-        practitioner_id: this.practitionerId,
-        serial_number: practitioner?.serial_number || null,
-        is_matching_active: false,
-        is_paused: false,
-        coverage_area_settings: this.getDefaultCoverageSettings(),
-        matching_activated_at: null,
+        practitioner_serial: this.practitionerSerial,
+        matching_enabled: false,
+        matching_paused: false,
+        paused_at: null,
+        target_response_time_minutes: 24,
+        max_active_matches: 10,
+        auto_accept_matches: false,
+        notification_frequency: 'daily',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
+
+      console.log('[MatchSettingsManager] DEBUG - Attempting insert with data:', defaultSettings);
 
       const { data, error } = await this.supabase
         .from('practitioner_match_settings')
@@ -100,7 +116,10 @@ class MatchSettingsManager {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('[MatchSettingsManager] DEBUG - Insert error:', error);
+        throw error;
+      }
 
       this.matchSettings = data;
       console.log('[MatchSettingsManager] Default match settings created:', data);
@@ -109,10 +128,13 @@ class MatchSettingsManager {
       console.error('[MatchSettingsManager] Error creating default match settings:', error);
       // Return an in-memory default if we can't persist to DB
       this.matchSettings = {
-        practitioner_id: this.practitionerId,
-        is_matching_active: false,
-        is_paused: false,
-        coverage_area_settings: this.getDefaultCoverageSettings()
+        practitioner_serial: this.practitionerSerial,
+        matching_enabled: false,
+        matching_paused: false,
+        target_response_time_minutes: 24,
+        max_active_matches: 10,
+        auto_accept_matches: false,
+        notification_frequency: 'daily'
       };
       return this.matchSettings;
     }
@@ -171,11 +193,10 @@ class MatchSettingsManager {
     try {
       const current = this.getCoverageAreaSettings();
       current[travelType] = { ...current[travelType], ...settings };
-
       const { data, error } = await this.supabase
         .from('practitioner_match_settings')
         .update({ coverage_area_settings: current, updated_at: new Date().toISOString() })
-        .eq('practitioner_id', this.practitionerId)
+        .eq('practitioner_serial', this.practitionerSerial)
         .select()
         .single();
 
@@ -253,7 +274,7 @@ class MatchSettingsManager {
       const { data: services, error: servicesError } = await this.supabase
         .from('practitioner_selected_services')
         .select('id, taxonomy_id, subcategory_id, is_active, price_per_service, created_at, updated_at')
-        .eq('practitioner_id', this.practitionerId);
+        .eq('practitioner_serial', this.practitionerSerial);
 
       if (servicesError) {
         console.error('[MatchSettingsManager] Query error details:', servicesError);
@@ -410,7 +431,7 @@ class MatchSettingsManager {
       console.log('[MatchSettingsManager] Attempting to insert service with conflict handling');
       
       const insertData = {
-        practitioner_id: this.practitionerId,
+        practitioner_serial: this.practitionerSerial,
         taxonomy_id: taxonomyId,
         subcategory_id: subcategoryId,
         is_active: false,  // Default to inactive
@@ -428,6 +449,16 @@ class MatchSettingsManager {
       let data = result.data?.[0];
       let error = result.error;
 
+      // If RLS error, try getting current user info for debugging
+      if (error && error.code === '42501') {
+        try {
+          const { data: { user } } = await this.supabase.auth.getUser();
+          console.warn('[MatchSettingsManager] RLS Policy Error - Auth user:', user?.id, 'Practitioner Serial:', this.practitionerSerial);
+        } catch (e) {
+          console.warn('[MatchSettingsManager] Could not get current user for RLS debug');
+        }
+      }
+
       // If unique constraint error, try update via raw SQL or different approach
       if (error && error.code === '23505') {
         console.log('[MatchSettingsManager] Unique constraint violation, trying alternative update');
@@ -436,7 +467,7 @@ class MatchSettingsManager {
         const { data: existing } = await this.supabase
           .from('practitioner_selected_services')
           .select('id')
-          .eq('practitioner_id', this.practitionerId)
+          .eq('practitioner_serial', this.practitionerSerial)
           .eq('taxonomy_id', taxonomyId)
           .eq('subcategory_id', subcategoryId)
           .maybeSingle();  // Use maybeSingle() instead of single() to avoid RLS issues
@@ -469,6 +500,12 @@ class MatchSettingsManager {
           hint: error.hint,
           status: error.status
         });
+        
+        // If RLS error, provide helpful message
+        if (error.code === '42501') {
+          console.error('[MatchSettingsManager] RLS POLICY ERROR: The database policy is blocking this insert. Ensure the RLS policy on practitioner_selected_services allows INSERT for authenticated users with matching practitioner_serial.');
+          throw new Error(`Database permission error: The RLS policy on practitioner_selected_services is blocking this operation. Contact administrator. Details: ${error.message}`);
+        }
       }
 
       if (error) throw error;
@@ -616,13 +653,15 @@ class MatchSettingsManager {
     try {
       const { data, error } = await this.supabase
         .from('practitioners')
-        .select('id, availability_schedule')
+        .select('id, serial_number, availability_schedule')
         .eq('id', this.practitionerId)
         .single();
 
       if (error) throw error;
       this.practitioners = data;
-      console.log('[MatchSettingsManager] Practitioner data loaded');
+      // Set the practitioner serial for use in queries
+      this.practitionerSerial = data.serial_number;
+      console.log('[MatchSettingsManager] Practitioner data loaded, serial:', this.practitionerSerial);
       return data;
     } catch (error) {
       console.error('[MatchSettingsManager] Error loading practitioner data:', error);
@@ -718,7 +757,7 @@ class MatchSettingsManager {
           pause_until: null,
           updated_at: new Date().toISOString()
         })
-        .eq('practitioner_id', this.practitionerId)
+        .eq('practitioner_serial', this.practitionerSerial)
         .select()
         .single();
 
@@ -743,7 +782,7 @@ class MatchSettingsManager {
           is_matching_active: false, 
           updated_at: new Date().toISOString()
         })
-        .eq('practitioner_id', this.practitionerId)
+        .eq('practitioner_serial', this.practitionerSerial)
         .select()
         .single();
 
@@ -770,7 +809,7 @@ class MatchSettingsManager {
           pause_reason: reason,
           updated_at: new Date().toISOString()
         })
-        .eq('practitioner_id', this.practitionerId)
+        .eq('practitioner_serial', this.practitionerSerial)
         .select()
         .single();
 
@@ -796,7 +835,7 @@ class MatchSettingsManager {
           pause_until: null,
           updated_at: new Date().toISOString()
         })
-        .eq('practitioner_id', this.practitionerId)
+        .eq('practitioner_serial', this.practitionerSerial)
         .select()
         .single();
 

@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         // Get practitioner ID from URL parameters
         const urlParams = new URLSearchParams(window.location.search);
-        let practitionerId = urlParams.get('practitioner_id') || urlParams.get('id');
+        let practitionerId = urlParams.get('id');
         
         // If no ID provided, try to get logged-in user's profile
         if (!practitionerId) {
@@ -101,7 +101,23 @@ document.addEventListener('DOMContentLoaded', async () => {
                 throw new Error('No practitioner ID provided and not logged in');
             }
         } else {
-            // Fetch by practitioner ID
+            // Check if practitionerId looks like a serial (P1, P2, etc) instead of UUID
+            if (!practitionerId.includes('-')) {
+                // It's a serial number, query by serial_number first to get the UUID
+                const { data: serialData, error: serialError } = await window.supabaseClient
+                    .from('practitioners')
+                    .select('id')
+                    .eq('serial_number', practitionerId)
+                    .single();
+                
+                if (serialError || !serialData) {
+                    throw new Error(`Practitioner with serial ${practitionerId} not found`);
+                }
+                
+                practitionerId = serialData.id;
+            }
+            
+            // Fetch practitioner from practitioners table
             const { data, error } = await window.supabaseClient
                 .from('practitioners')
                 .select('*')
@@ -110,6 +126,89 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             if (error) throw error;
             practitioner = data;
+            
+            // Fetch profile content from practitioner_profiles table
+            const { data: profileContent, error: profileError } = await window.supabaseClient
+                .from('practitioner_profiles')
+                .select('*')
+                .eq('id', practitionerId)
+                .single();
+            
+            if (!profileError && profileContent) {
+                // Merge profile content into practitioner object
+                practitioner = {
+                    ...practitioner,
+                    ...profileContent
+                };
+                console.log('[Practitioner Profile] Profile content loaded from practitioner_profiles');
+            }
+            
+            // Fetch credentials from practitioner_credentials table
+            const { data: credentialsData, error: credentialsError } = await window.supabaseClient
+                .from('practitioner_credentials')
+                .select('*')
+                .eq('id', practitionerId)
+                .single();
+            
+            if (!credentialsError && credentialsData) {
+                // Merge credentials data into practitioner object
+                practitioner = {
+                    ...practitioner,
+                    credentials: credentialsData.credentials,
+                    badge_verified: credentialsData.badge_verified,
+                    badge_certified: credentialsData.badge_certified,
+                    badge_licensed: credentialsData.badge_licensed,
+                    badge_background_check_verified: credentialsData.badge_background_check_verified,
+                    credentials_verified: credentialsData.credentials_verified,
+                    background_check_status: credentialsData.background_check_status,
+                    background_check_date: credentialsData.background_check_date,
+                    continuing_education: credentialsData.continuing_education
+                };
+                console.log('[Practitioner Profile] Credentials loaded from practitioner_credentials');
+            }
+            
+            // Fetch availability from practitioner_availability table
+            const { data: availabilityData, error: availabilityError } = await window.supabaseClient
+                .from('practitioner_availability')
+                .select('*')
+                .eq('id', practitionerId)
+                .single();
+            
+            if (!availabilityError && availabilityData) {
+                // Merge availability data into practitioner object
+                practitioner = {
+                    ...practitioner,
+                    in_person_enabled: availabilityData.in_person_enabled,
+                    virtual_enabled: availabilityData.virtual_enabled,
+                    housecalls_enabled: availabilityData.housecalls_enabled,
+                    timezone: availabilityData.timezone,
+                    availability_schedule: availabilityData.availability_schedule,
+                    zipcodes: availabilityData.zipcodes,
+                    service_radius: availabilityData.service_radius,
+                    service_states: availabilityData.service_states
+                };
+                console.log('[Practitioner Profile] Availability loaded from practitioner_availability');
+            }
+            
+            // Fetch match settings from practitioner_match_settings table
+            const { data: matchSettingsData, error: matchSettingsError } = await window.supabaseClient
+                .from('practitioner_match_settings')
+                .select('*')
+                .eq('id', practitionerId)
+                .single();
+            
+            if (!matchSettingsError && matchSettingsData) {
+                // Merge match settings data into practitioner object
+                practitioner = {
+                    ...practitioner,
+                    service_categories: matchSettingsData.service_categories,
+                    pricing_model: matchSettingsData.pricing_model,
+                    accepts_insurance: matchSettingsData.accepts_insurance,
+                    insurance_providers: matchSettingsData.insurance_providers,
+                    payment_methods: matchSettingsData.payment_methods
+                };
+                console.log('[Practitioner Profile] Match settings loaded from practitioner_match_settings');
+            }
         }
         
         console.log('[Practitioner Profile] Full practitioner data loaded:', practitioner);
@@ -169,7 +268,7 @@ async function loadReviews() {
         const { data, error } = await window.supabaseClient
             .from('reviews')
             .select('*')
-            .eq('practitioner_id', practitioner.id)  // Use 'id' not 'user_id'
+            .eq('practitioner_serial', practitioner.serial_number)
             .eq('is_visible', true)
             .order('created_at', { ascending: false })
             .limit(10);
@@ -196,7 +295,7 @@ async function loadServiceCategories() {
         const { data: selectedServices, error: selectError } = await window.supabaseClient
             .from('practitioner_selected_services')
             .select('subcategory_id')
-            .eq('practitioner_id', practitioner.id)
+            .eq('practitioner_serial', practitioner.serial_number)
             .eq('is_active', true);
         
         if (selectError) {
@@ -383,7 +482,7 @@ async function openConnectionRequest(practitionerId) {
         
         if (!projects || projects.length === 0) {
             alert('Please create a project first before connecting with practitioners');
-            window.location.href = '/rooted-vitality/dashboard/client/pages/my-projects.html';
+            window.location.href = '/rooted-vitality/dashboard/client/pages/my-wellness.html';
             return;
         }
         
@@ -460,14 +559,14 @@ async function createMatchWithProjectId(projectId, practitionerId) {
  */
 async function createMatchAndRedirect(project, practitionerId, practitionerSerial) {
     try {
-        console.log('[Practitioner Profile] Creating match for project:', project.project_id);
+        console.log('[Practitioner Profile] Creating match for project:', project.project_serial);
         
         const insertData = {
-            project_id: project.project_id,  // Use project_id (INTEGER), not id (UUID)
-            practitioner_id: practitionerId,
+            project_serial: project.project_serial,
             client_serial: project.client_serial,
             practitioner_serial: practitionerSerial,
-            status: 'active'
+            status: 'active',
+            match_score: 75
         };
         console.log('[Practitioner Profile] Insert data:', insertData);
         
@@ -519,8 +618,7 @@ async function createMatchAndRedirect(project, practitionerId, practitionerSeria
         }
         
         // Redirect to My Matches with project and practitioner in query params
-        // Use project_id (INTEGER serial) in URL for database lookup
-        const redirectUrl = `/rooted-vitality/dashboard/client/pages/my-matches.html?project_id=${project.project_id}&practitioner_id=${practitionerId}`;
+        const redirectUrl = `/rooted-vitality/dashboard/client/pages/my-matches.html?project_id=${project.project_serial}&practitioner_serial=${practitionerSerial}`;
         console.log('[Practitioner Profile] Redirecting to:', redirectUrl);
         window.location.href = redirectUrl;
         
@@ -842,7 +940,7 @@ async function renderServicesCard() {
                         name
                     )
                 `)
-                .eq('practitioner_id', practitioner.id)
+                .eq('practitioner_serial', practitioner.serial_number)
                 .eq('is_active', true);
             
             console.log('[Services Card] Query result:', { services, error });

@@ -20,7 +20,7 @@ These 3 files contain all production logic. Everything else is reference/schema.
     - Travel type enabled
     - Geographic match (varies by travel type)
   - PHASE 2: Score 2-100 based on profile_completion_percent
-- Output: practitioner_id, serial, name, modalities, conditions, email, phone, match_score
+- Output: id, serial_number, legal_name, dba_name, modalities, conditions_treated, email, phone, match_score
 
 ---
 

@@ -33,8 +33,8 @@
 
 ### Projects
 - **id** (UUID): Primary key
-- **project_id** (INT): Serial number (1, 2, 3... auto-increment, NOT C1/P1)
-- **client_id** (FK): Reference to clients table
+- **project_serial** (TEXT): Serial number (1, 2, 3... auto-increment)
+- **client_serial** (TEXT): Serial of client (C1, C2, etc.)
 - **category_id** (FK): Reference to categories table
 - **subcategory_id** (FK): Reference to subcategories table
 - **name** (TEXT): Project name
@@ -47,8 +47,7 @@
 
 ### Project Practitioner Matches
 - **id** (UUID): Primary key
-- **project_id** (INT): Serial number from projects table (INTEGER, not UUID)
-- **practitioner_id** (FK): Reference to practitioners table
+- **project_serial** (TEXT): Serial from projects table
 - **client_serial** (TEXT): Serial of client (C#)
 - **practitioner_serial** (TEXT): Serial of practitioner (P#)
 - **match_score** (INT): 0-100 calculated from profile_completion_percent
@@ -57,10 +56,8 @@
 
 ### Reviews
 - **id** (UUID): Primary key
-- **project_id** (INT): Serial number (same as projects table)
-- **client_id** (FK): Reference to clients table
+- **project_serial** (TEXT): Serial from projects table
 - **client_serial** (TEXT): Serial of client (C#)
-- **practitioner_id** (FK): Reference to practitioners table
 - **practitioner_serial** (TEXT): Serial of practitioner (P#)
 - **rating** (INT): 1-5 star rating
 - **review_text** (TEXT): Written review

@@ -86,20 +86,20 @@ window.PractitionerHeaderAvatar = {
                 return;
             }
             
-            // Fetch practitioner data
-            const { data: practitioner, error } = await window.supabaseClient
+            // Fetch practitioner data from practitioners table
+            const { data: practitioner, error: practError } = await window.supabaseClient
                 .from('practitioners')
-                .select('legal_business_name, profile_photo_url, avatar_url')
+                .select('legal_business_name, serial_number')
                 .eq('id', userId)
                 .single();
             
-            console.log('[Rooted Vitality Avatar] Database query result:', { 
+            console.log('[Rooted Vitality Avatar] Practitioners query result:', { 
                 hasPractitioner: !!practitioner,
-                error: error?.message || 'none'
+                error: practError?.message || 'none'
             });
             
-            if (error && error.code !== 'PGRST116') {
-                console.warn('[Rooted Vitality Avatar] Database error:', error);
+            if (practError && practError.code !== 'PGRST116') {
+                console.warn('[Rooted Vitality Avatar] Practitioners query error:', practError);
                 this.setInitialFromUser();
                 return;
             }
@@ -110,14 +110,25 @@ window.PractitionerHeaderAvatar = {
                 return;
             }
             
+            // Fetch profile logo from practitioner_profiles table
+            let logoUrl = null;
+            if (practitioner.serial_number) {
+                const { data: profile, error: profileError } = await window.supabaseClient
+                    .from('practitioner_profiles')
+                    .select('practice_logo_url')
+                    .eq('id', userId)
+                    .single();
+                
+                if (!profileError && profile) {
+                    logoUrl = profile.practice_logo_url;
+                    console.log('[Rooted Vitality Avatar] Logo loaded from practitioner_profiles:', logoUrl);
+                }
+            }
+            
             console.log('[Rooted Vitality Avatar] Practitioner data retrieved:', {
                 name: practitioner.legal_business_name,
-                hasProfilePhotoUrl: !!practitioner.profile_photo_url,
-                hasAvatarUrl: !!practitioner.avatar_url
+                hasLogoUrl: !!logoUrl
             });
-            
-            // Determine what to show
-            const logoUrl = practitioner.profile_photo_url || practitioner.avatar_url;
             const firstName = practitioner.legal_business_name;
             
             if (logoUrl) {

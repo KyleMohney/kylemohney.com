@@ -190,14 +190,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Setup change tracking for unsaved changes warning
     setupUnsavedChangesTracking();
     
+    // Listen for conditions changes and mark as unsaved
+    window.addEventListener('conditionsUpdated', (e) => {
+        console.log('[Rooted Vitality] Conditions updated event fired:', e.detail.conditions);
+        window.markAsChanged();
+        // Also update the conditions data
+        window.conditionsData = e.detail.conditions;
+    });
+    
     // Setup event listeners for all input fields
     setupInputListeners();
+    setupConditionsListeners();
     setupLanguageListeners();
     setupInsuranceListeners();
     setupFAQListeners();
     setupPricingListeners();
     setupPracticeListeners();
-    setupConditionsListeners();
     setupVideoListeners();
     setupContinuingEducationListeners();
     setupAvatarUpload();
@@ -239,11 +247,46 @@ async function loadProfile(userId) {
             console.error('[Rooted Vitality] Error loading practitioner data:', practError);
         }
         
-        // All practitioner data is now in practitioners table, profiles table is deprecated
+        // Fetch profile content from practitioner_profiles table
+        let profileContent = null;
         if (practitioner) {
-            console.log('[Rooted Vitality] Practitioner data loaded from database:', practitioner);
+            const { data: profile, error: profileError } = await window.supabaseClient
+                .from('practitioner_profiles')
+                .select('*')
+                .eq('id', userId)
+                .single();
+            
+            if (!profileError && profile) {
+                profileContent = profile;
+                console.log('[Rooted Vitality] Profile content loaded from practitioner_profiles');
+            }
+        }
+        
+        // Fetch credentials from practitioner_credentials table
+        let credentialsData = null;
+        if (practitioner) {
+            const { data: credentials, error: credError } = await window.supabaseClient
+                .from('practitioner_credentials')
+                .select('*')
+                .eq('practitioner_serial', practitioner.serial_number)
+                .single();
+            
+            if (!credError && credentials) {
+                credentialsData = credentials;
+                console.log('[Rooted Vitality] Credentials loaded from practitioner_credentials');
+            }
+        }
+        
+        // Merge practitioner + profile content + credentials
+        if (practitioner) {
+            const mergedData = {
+                ...practitioner,
+                ...(profileContent || {}),
+                ...(credentialsData || {})
+            };
+            console.log('[Rooted Vitality] Practitioner data loaded from database:', mergedData);
             // Store practitioner data globally for badge system and form logic
-            window.practitionerData = practitioner;
+            window.practitionerData = mergedData;
             console.log('[Rooted Vitality] ✓ Practitioner data stored in window.practitionerData');
         }
         
@@ -254,7 +297,7 @@ async function loadProfile(userId) {
         // Then populate profile fields (which will set selected conditions)
         if (practitioner) {
             console.log('[Rooted Vitality] Practitioner profile found, populating fields...');
-            await populateProfileFields(practitioner);
+            await populateProfileFields(window.practitionerData);
         } else {
             // Try to get name from auth user metadata
             const { data: { user } } = await window.supabaseClient.auth.getUser();
@@ -495,10 +538,33 @@ async function populateProfileFields(data) {
         loadPhotos([]);
     }
     
-    // Background check status - from practitioners table
+    // Background check status - from practitioners table or practitioner_credentials table
     if (data.background_check_status) {
         console.log('[Rooted Vitality] ✓ Setting background check status:', data.background_check_status);
         updateBackgroundCheckStatus(data.background_check_status);
+    }
+    
+    // Load badge verification status from practitioner_credentials
+    if (data.badge_certified) {
+        const badgeCertifiedCheckbox = document.getElementById('badge-certified');
+        if (badgeCertifiedCheckbox) {
+            badgeCertifiedCheckbox.checked = true;
+            console.log('[Rooted Vitality] ✓ Set badge_certified checkbox');
+        }
+    }
+    if (data.badge_licensed) {
+        const badgeLicensedCheckbox = document.getElementById('badge-licensed');
+        if (badgeLicensedCheckbox) {
+            badgeLicensedCheckbox.checked = true;
+            console.log('[Rooted Vitality] ✓ Set badge_licensed checkbox');
+        }
+    }
+    if (data.badge_background_check_verified) {
+        const badgeBackgroundCheckCheckbox = document.getElementById('badge-background-check');
+        if (badgeBackgroundCheckCheckbox) {
+            badgeBackgroundCheckCheckbox.checked = true;
+            console.log('[Rooted Vitality] ✓ Set badge_background_check_verified checkbox');
+        }
     }
     
     // Payment information - from practitioners table
@@ -855,10 +921,10 @@ function updateProfileCompleteness() {
         
         console.log(`[Rooted Vitality] Profile completeness: ${points}/${totalPoints} (${percentage}%)`);
         
-        // Save to database
+        // Save to database (practitioner_profiles table where profile_completeness_percent now lives)
         if (window.practitionerData?.id) {
             window.supabaseClient
-                .from('practitioners')
+                .from('practitioner_profiles')
                 .update({ profile_completeness_percent: percentage })
                 .eq('id', window.practitionerData.id)
                 .then(({ error }) => {
@@ -1383,10 +1449,11 @@ async function saveSectionData(sectionId) {
         
         console.log(`[SAVE] Saving profile_completion_percent: ${profileCompletionPercent}%`);
         
+        // Save to practitioner_profiles table (where it now lives)
         const { error: updateError } = await window.supabaseClient
-            .from('practitioners')
+            .from('practitioner_profiles')
             .update({ 
-                profile_completion_percent: profileCompletionPercent,
+                profile_completeness_percent: profileCompletionPercent,
                 updated_at: new Date().toISOString()
             })
             .eq('id', currentUser.id);
@@ -1488,16 +1555,64 @@ async function saveCredentialsSection(type = 'all') {
         
         console.log('[SAVE] All credentials to save:', allCredentials);
         
-        // Save to practitioners.credentials JSONB column
-        const updateData = {
-            credentials: allCredentials,
-            updated_at: new Date().toISOString()
-        };
+        // Remove the old save to practitioners.credentials (that column no longer exists)
+        // All credentials now go to practitioner_credentials table
         
-        const result = await safePractitionerUpdate(updateData);
+        // Save to practitioner_credentials table
+        if (currentUser && window.practitionerData?.serial_number) {
+            const credentialsTableData = {
+                id: currentUser.id,  // UUID FK to practitioners.id
+                practitioner_serial: window.practitionerData.serial_number,
+                credentials: allCredentials,
+                credentials_verified: document.getElementById('credentials-verified')?.checked || false,
+                badge_verified: document.getElementById('badge-verified')?.checked || false,
+                badge_certified: document.getElementById('badge-certified')?.checked || false,
+                badge_licensed: document.getElementById('badge-licensed')?.checked || false,
+                badge_background_check_verified: document.getElementById('badge-background-check')?.checked || false,
+                background_check_status: window.practitionerData?.background_check_status || 'pending',
+                background_check_date: window.practitionerData?.background_check_date || null,
+                background_check_provider: window.practitionerData?.background_check_provider || '',
+                background_check_notes: window.practitionerData?.background_check_notes || '',
+                updated_at: new Date().toISOString()
+            };
+            
+            console.log('[SAVE] Saving to practitioner_credentials table:', credentialsTableData);
+            
+            // Check if row exists using id FK
+            const { data: existingCreds } = await window.supabaseClient
+                .from('practitioner_credentials')
+                .select('id')
+                .eq('id', currentUser.id)
+                .single();
+            
+            let credResult, credError;
+            if (existingCreds) {
+                // Update existing
+                const result = await window.supabaseClient
+                    .from('practitioner_credentials')
+                    .update(credentialsTableData)
+                    .eq('id', currentUser.id);
+                credResult = result.data;
+                credError = result.error;
+                console.log('[SAVE] Updated practitioner_credentials');
+            } else {
+                // Insert new
+                const result = await window.supabaseClient
+                    .from('practitioner_credentials')
+                    .insert(credentialsTableData);
+                credResult = result.data;
+                credError = result.error;
+                console.log('[SAVE] Inserted new practitioner_credentials');
+            }
+            
+            if (credError) {
+                console.error('[SAVE] Error saving to practitioner_credentials:', credError);
+            } else {
+                console.log('[SAVE] ✓ Credentials saved to practitioner_credentials table');
+            }
+        }
         
         console.log('[SAVE] ✓ Credentials saved successfully');
-        window.practitionerData = result;
         showAutoSaveIndicator('success');
         lockSectionEdit('credentials');
         updateProfileCompleteness();
@@ -1948,17 +2063,26 @@ async function saveProfile() {
         console.log('[Rooted Vitality] Completeness element found:', !!percentageEl);
         console.log('[Rooted Vitality] Completeness text content:', percentageEl?.textContent);
         
-        // Prepare data for practitioners table (primary practitioner profile)
-        // Support both field name conventions - schema uses legal_name, signup uses legal_business_name
+        // Prepare data for practitioners table (identity & core data only)
         const practitionerData = {
             id: currentUser.id,
             legal_name: document.getElementById('profile-name')?.value || '',
             legal_business_name: document.getElementById('profile-name')?.value || '',
             business_size: document.getElementById('profile-teamsize')?.value || '',
+            updated_at: new Date().toISOString()
+        };
+        
+        // Prepare data for practitioner_profiles table (profile content)
+        const profileContentData = {
+            id: currentUser.id,
+            practitioner_serial: window.practitionerData?.serial_number || window.practitionerData?.practitioner_serial || currentUser.user_metadata?.practitioner_serial || '',
             bio: document.getElementById('about-content')?.value || '',
             ethos_statement: document.getElementById('approach-content')?.value || '',
-            profile_completion_percent: profileCompletionPercent,
-            updated_at: new Date().toISOString()
+            profile_completeness_percent: profileCompletionPercent,
+            practice_logo_url: window.practitionerData?.practice_logo_url || '',
+            dba_name: document.getElementById('profile-dba-name')?.value || '',
+            practice_type: document.querySelector('input[name="practice-setting"]:checked')?.value || '',
+            year_established: document.getElementById('profile-years')?.value || null
         };
         
         // Social media as JSON
@@ -1972,16 +2096,17 @@ async function saveProfile() {
             pinterest: document.getElementById('social-pinterest')?.value || '',
             website: document.getElementById('social-website')?.value || ''
         };
-        practitionerData.social_media = socialData;
+        profileContentData.social_media = socialData;
         
-        console.log('[Rooted Vitality] Full practitioner data being saved:', practitionerData);
+        console.log('[Rooted Vitality] Practitioner data being saved:', practitionerData);
+        console.log('[Rooted Vitality] Profile content data being saved:', profileContentData);
         
         // Save to practitioners table
         const { data: upsertData, error: practError } = await window.supabaseClient
             .from('practitioners')
             .upsert(practitionerData, { onConflict: 'id' });
         
-        console.log('[Rooted Vitality] Upsert response - Data:', upsertData, 'Error:', practError);
+        console.log('[Rooted Vitality] Practitioners upsert response - Data:', upsertData, 'Error:', practError);
         
         if (practError) {
             console.error('[Rooted Vitality] Error saving to practitioners table:', practError);
@@ -1992,6 +2117,59 @@ async function saveProfile() {
                 hint: practError?.hint
             });
             showSaveStatus('Save failed', 'error');
+            return;
+        }
+        
+        // Save to practitioner_profiles table (profile content)
+        console.log('[Rooted Vitality] About to upsert profileContentData:', profileContentData);
+        console.log('[Rooted Vitality] profileContentData.id:', profileContentData.id);
+        console.log('[Rooted Vitality] profileContentData.practitioner_serial:', profileContentData.practitioner_serial);
+        console.log('[Rooted Vitality] profileContentData.bio:', profileContentData.bio);
+        console.log('[Rooted Vitality] profileContentData.ethos_statement:', profileContentData.ethos_statement);
+        
+        // Check if row exists first
+        const { data: existingProfile, error: checkError } = await window.supabaseClient
+            .from('practitioner_profiles')
+            .select('id')
+            .eq('id', currentUser.id)
+            .single();
+        
+        console.log('[Rooted Vitality] Check for existing profile - Exists:', !!existingProfile, 'Error code:', checkError?.code);
+        
+        let profileData, profileError;
+        if (existingProfile) {
+            // Row exists - use UPDATE
+            console.log('[Rooted Vitality] Existing profile found, using UPDATE');
+            const result = await window.supabaseClient
+                .from('practitioner_profiles')
+                .update(profileContentData)
+                .eq('id', currentUser.id);
+            profileData = result.data;
+            profileError = result.error;
+        } else {
+            // Row doesn't exist - use INSERT
+            console.log('[Rooted Vitality] No existing profile, using INSERT');
+            const result = await window.supabaseClient
+                .from('practitioner_profiles')
+                .insert(profileContentData);
+            profileData = result.data;
+            profileError = result.error;
+        }
+        
+        console.log('[Rooted Vitality] Profile content save response - Data:', profileData, 'Error:', profileError);
+        
+        if (profileError) {
+            console.error('[Rooted Vitality] Error saving to practitioner_profiles table:', profileError);
+            console.error('[Rooted Vitality] Full error object:', JSON.stringify(profileError, null, 2));
+            console.error('[Rooted Vitality] Error details:', {
+                code: profileError?.code,
+                message: profileError?.message,
+                details: profileError?.details,
+                hint: profileError?.hint,
+                status: profileError?.status
+            });
+            console.error('[Rooted Vitality] Was attempting to save:', profileContentData);
+            showSaveStatus('Save failed - see console for details', 'error');
             return;
         }
         
@@ -2068,30 +2246,29 @@ async function uploadAvatar(file) {
         const avatarUrl = data.publicUrl;
         console.log('[Rooted Vitality] Avatar uploaded to storage:', avatarUrl);
         
-        // Update practitioners table with new practice logo URL
+        // Update practitioner_profiles table with new practice logo URL
         try {
-            const { data: updateData, error: practitionerError } = await window.supabaseClient
-                .from('practitioners')
+            const { data: profileUpdateData, error: profileError } = await window.supabaseClient
+                .from('practitioner_profiles')
                 .update({ 
-                    practice_logo_url: avatarUrl, 
-                    updated_at: new Date().toISOString() 
+                    practice_logo_url: avatarUrl
                 })
                 .eq('id', authUserId);
             
-            if (practitionerError) {
-                console.error('[Rooted Vitality] Database update error:', practitionerError);
-                throw practitionerError;
+            if (profileError) {
+                console.error('[Rooted Vitality] Profile table update error:', profileError);
+                throw profileError;
             } else {
-                console.log('[Rooted Vitality] Successfully updated practitioners table:', updateData);
+                console.log('[Rooted Vitality] Successfully updated practitioner_profiles table:', profileUpdateData);
             }
-        } catch (tableError) {
-            console.error('[Rooted Vitality] Error updating practitioners table:', tableError);
-            throw tableError;
+        } catch (profileTableError) {
+            console.error('[Rooted Vitality] Error updating practitioner_profiles table:', profileTableError);
+            throw profileTableError;
         }
         
-        // Update local currentUser object so it persists
-        if (currentUser) {
-            currentUser.practice_logo_url = avatarUrl;
+        // Update local practitionerData object so it persists
+        if (window.practitionerData) {
+            window.practitionerData.practice_logo_url = avatarUrl;
         }
         
         // Update preview in avatar div
@@ -2502,12 +2679,22 @@ async function addVideoToProfile() {
 
 function renderVideoPreview() {
     const videoList = document.getElementById('video-list');
+    const addVideoBtn = document.getElementById('add-video-btn');
+    const videoUploadArea = document.querySelector('.video-upload-area');
+    
     if (!videoList) return;
     
     if (!window.videoData) {
         videoList.innerHTML = '';
+        // Show the add button if no video
+        if (addVideoBtn) addVideoBtn.style.display = 'block';
+        if (videoUploadArea) videoUploadArea.style.display = 'block';
         return;
     }
+    
+    // Hide the add button when video is present
+    if (addVideoBtn) addVideoBtn.style.display = 'none';
+    if (videoUploadArea) videoUploadArea.style.display = 'none';
     
     videoList.innerHTML = `
         <div class="video-preview-card">
@@ -2623,11 +2810,11 @@ function setupPublicProfileLink() {
     console.log('[Rooted Vitality] Setting up public profile link');
     
     const previewLink = document.getElementById('view-public-profile');
-    if (previewLink && currentUser && window.practitionerData && window.practitionerData.id) {
+    if (previewLink && currentUser && window.practitionerData && window.practitionerData.serial_number) {
         previewLink.addEventListener('click', (e) => {
             e.preventDefault();
-            // Navigate to public profile page with practitioner ID
-            const publicProfileUrl = `./practitioner-profile.html?practitioner_id=${window.practitionerData.id}`;
+            // Navigate to public profile page with practitioner serial
+            const publicProfileUrl = `./practitioner-profile.html?id=${window.practitionerData.serial_number}`;
             window.open(publicProfileUrl, '_blank');
             console.log('[Rooted Vitality] Opening public profile:', publicProfileUrl);
         });
@@ -3604,6 +3791,7 @@ function setupConditionsListeners() {
         checkboxes.forEach(checkbox => {
             checkbox.addEventListener('change', (e) => {
                 updateConditionsData();
+                window.markAsChanged(); // Mark page as unsaved when condition changes
             });
         });
         console.log('[Rooted Vitality] ✓ Conditions listeners attached');
@@ -4189,7 +4377,7 @@ async function loadReviews() {
         const { data: dbReviews, error: reviewsError } = await window.supabaseClient
             .from('reviews')
             .select('*')
-            .eq('practitioner_id', practitionerData.id)  // Use 'id' not 'user_id'
+            .eq('practitioner_serial', practitionerData.serial_number)  // Use serial_number for queries
             .eq('is_visible', true)
             .order('created_at', { ascending: false });
         

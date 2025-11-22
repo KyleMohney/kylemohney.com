@@ -18,7 +18,7 @@ CREATE INDEX IF NOT EXISTS idx_project_practitioner_matches_status_created
 ON project_practitioner_matches(status, created_at DESC);
 
 CREATE INDEX IF NOT EXISTS idx_project_practitioner_matches_practitioner_status
-ON project_practitioner_matches(practitioner_id, status);
+ON project_practitioner_matches(practitioner_serial, status);
 
 -- ============================================================================
 -- SECTION 2: NOTIFICATION DEDUPLICATION FIX
@@ -93,24 +93,24 @@ ADD COLUMN IF NOT EXISTS pricing_structure JSONB DEFAULT '{}'::jsonb;
 -- ============================================================================
 
 -- Ensure all foreign key joins are indexed
-CREATE INDEX IF NOT EXISTS idx_projects_client_id ON projects(client_id);
+CREATE INDEX IF NOT EXISTS idx_projects_client_serial ON projects(client_serial);
 CREATE INDEX IF NOT EXISTS idx_projects_category_id ON projects(category_id);
 CREATE INDEX IF NOT EXISTS idx_projects_subcategory_id ON projects(subcategory_id);
 
-CREATE INDEX IF NOT EXISTS idx_project_practitioner_matches_project_id 
-ON project_practitioner_matches(project_id);
+CREATE INDEX IF NOT EXISTS idx_project_practitioner_matches_project_serial 
+ON project_practitioner_matches(project_serial);
 
-CREATE INDEX IF NOT EXISTS idx_project_practitioner_matches_practitioner_id 
-ON project_practitioner_matches(practitioner_id);
+CREATE INDEX IF NOT EXISTS idx_project_practitioner_matches_practitioner_serial 
+ON project_practitioner_matches(practitioner_serial);
 
-CREATE INDEX IF NOT EXISTS idx_reviews_project_id ON reviews(project_id);
-CREATE INDEX IF NOT EXISTS idx_reviews_client_id ON reviews(client_id);
-CREATE INDEX IF NOT EXISTS idx_reviews_practitioner_id ON reviews(practitioner_id);
+CREATE INDEX IF NOT EXISTS idx_project_practitioner_matches_client_serial 
+ON project_practitioner_matches(client_serial);
 
--- Note: This index references old notifications table structure (user_id, user_type)
--- After migration to separate tables, similar indexes should be created on:
--- - practitioner_notifications(practitioner_id)
--- - client_notifications(client_id)
+CREATE INDEX IF NOT EXISTS idx_reviews_project_serial ON reviews(project_serial);
+CREATE INDEX IF NOT EXISTS idx_reviews_client_serial ON reviews(client_serial);
+CREATE INDEX IF NOT EXISTS idx_reviews_practitioner_serial ON reviews(practitioner_serial);
+
+-- Note: Indices now use serial fields for RLS-compatible querying
 
 CREATE INDEX IF NOT EXISTS idx_project_messages_project_id 
 ON project_messages(project_id);

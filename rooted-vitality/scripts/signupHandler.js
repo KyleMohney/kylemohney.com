@@ -132,12 +132,6 @@ window.addEventListener('DOMContentLoaded', async () => {
         two_factor_enabled: false,
         two_factor_method: null,
         profile_picture_url: null,
-        notification_settings: JSON.stringify({
-          email_matches: true,
-          email_messages: true,
-          email_updates: true,
-          push_notifications: true
-        }),
         membership_level: 'free',
         membership_started_at: new Date().toISOString(),
         membership_expires_at: null,
@@ -145,6 +139,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         settings_updated_at: new Date().toISOString(),
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
+        // Note: notification_settings will use database default
       };
       
       console.log('📝 [Signup] Creating client record:', clientData);
@@ -165,7 +160,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
       // ============ 6. Create Welcome Notification ============
       const welcomeNotification = {
-        client_id: authData.user.id,
+        client_serial: authData.user.id,
         type: 'welcome',
         title: 'Welcome to Rooted Vitality!',
         message: 'Thank you for joining our community! We\'re excited to help you on your wellness journey. Get started by creating your first wellness project and connecting with trusted practitioners.',
@@ -184,21 +179,73 @@ window.addEventListener('DOMContentLoaded', async () => {
       console.log('✅ [Signup] Welcome notification created');
 
       // ============ 7. Success: Show Message & Redirect ============
-      alert('Account created! Welcome to Rooted Vitality.');
+      alert('Account created! Welcome to Rooted Vitality. Redirecting...');
+      
+      // Disable form and show loading state
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Redirecting...';
+      form.style.opacity = '0.5';
+      form.style.pointerEvents = 'none';
       
       // Check if there's a redirect URL from a previous action (like landing page CTA)
       const redirectUrl = sessionStorage.getItem('redirectAfterAuth');
       
-      // Give Supabase time to persist the session to localStorage, then redirect
-      setTimeout(() => {
-        if (redirectUrl) {
-          console.log('[Signup] Redirect URL found in sessionStorage:', redirectUrl);
-          sessionStorage.removeItem('redirectAfterAuth');
-          window.location.href = redirectUrl;
-        } else {
-          window.location.href = '/rooted-vitality/index.html';
+      // Function to attempt redirect
+      const attemptRedirect = async () => {
+        try {
+          // Verify session is established before redirecting
+          const { data: sessionData } = await window.supabaseClient.auth.getSession();
+          
+          console.log('[Signup] Session check result:', sessionData?.session ? 'Session found' : 'No session');
+          
+          if (sessionData?.session) {
+            console.log('[Signup] Session confirmed, redirecting...');
+            if (redirectUrl) {
+              console.log('[Signup] Redirect URL found:', redirectUrl);
+              sessionStorage.removeItem('redirectAfterAuth');
+              window.location.href = redirectUrl;
+            } else {
+              console.log('[Signup] No redirect URL, going to index');
+              window.location.href = '/rooted-vitality/index.html';
+            }
+            return true; // Success
+          } else {
+            console.warn('[Signup] Session not established yet');
+            return false; // Retry
+          }
+        } catch (err) {
+          console.error('[Signup] Exception in attemptRedirect:', err);
+          return false; // Retry on error
         }
-      }, 500);
+      };
+      
+      // Try redirect with exponential backoff
+      let attempt = 0;
+      const maxAttempts = 5;
+      const tryRedirect = async () => {
+        attempt++;
+        console.log(`[Signup] Redirect attempt ${attempt}/${maxAttempts}`);
+        
+        const success = await attemptRedirect();
+        if (!success && attempt < maxAttempts) {
+          const nextDelay = 500 * attempt;
+          console.log(`[Signup] Will retry in ${nextDelay}ms`);
+          setTimeout(tryRedirect, nextDelay); // Exponential backoff
+        } else if (attempt >= maxAttempts && !success) {
+          // Fallback: Just go to index anyway
+          console.warn('[Signup] Max attempts reached, forcing redirect');
+          if (redirectUrl) {
+            sessionStorage.removeItem('redirectAfterAuth');
+            window.location.href = redirectUrl;
+          } else {
+            window.location.href = '/rooted-vitality/index.html';
+          }
+        }
+      };
+      
+      // Start redirect process after initial delay
+      console.log('[Signup] Starting redirect process...');
+      setTimeout(tryRedirect, 500);
 
     } catch (error) {
       console.error('Signup error:', error);

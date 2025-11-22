@@ -72,12 +72,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Check if redirected from contact button with auto-open params
     const urlParams = new URLSearchParams(window.location.search);
     const autoOpenProjectId = urlParams.get('project_id');
-    const autoOpenPractitionerId = urlParams.get('practitioner_id');
+    const autoOpenPractitionerSerial = urlParams.get('practitioner_serial');
     
-    if (autoOpenProjectId && autoOpenPractitionerId) {
-      console.log('[My Matches] Auto-opening messaging for project:', autoOpenProjectId, 'practitioner:', autoOpenPractitionerId);
+    if (autoOpenProjectId && autoOpenPractitionerSerial) {
+      console.log('[My Matches] Auto-opening messaging for project:', autoOpenProjectId, 'practitioner:', autoOpenPractitionerSerial);
       // Find the match and open it
-      const match = allMatches.find(m => m.project_id === autoOpenProjectId && m.practitioner_id === autoOpenPractitionerId);
+      const match = allMatches.find(m => m.project_serial === autoOpenProjectId && m.practitioner_serial === autoOpenPractitionerSerial);
       if (match) {
         openMessagingThread(match);
       } else {
@@ -114,7 +114,7 @@ async function loadMatches(clientSerial) {
     // Fetch matches
     const { data: matchesData, error: matchesError } = await window.supabaseClient
       .from('project_practitioner_matches')
-      .select('id, project_id, practitioner_id, practitioner_serial, client_serial, status, created_at')
+      .select('id, project_serial, project_id, practitioner_serial, client_serial, status, created_at')
       .eq('client_serial', clientSerial)
       .order('created_at', { ascending: false });
 
@@ -308,7 +308,7 @@ function createMatchCard(match) {
             View Profile
           </button>
           ${(match.status === 'hired' || match.status === 'not-hired') ? `
-            <button class="match-card__action-btn match-card__action-btn--review" onclick="openReviewModal('${match.id}', '${match.practitioner_id}', '${escapeHtml(match.practitioners?.dba_name || match.practitioners?.legal_name || 'Practitioner')}', '${match.project_id || ''}', '${escapeHtml(match.client_first_name || '')}', '${escapeHtml(match.client_last_name || '')}', '${match.client_id || ''}')">
+            <button class="match-card__action-btn match-card__action-btn--review" onclick="openReviewModal('${match.id}', '${match.practitioner_serial}', '${escapeHtml(match.practitioners?.dba_name || match.practitioners?.legal_name || 'Practitioner')}', '${match.project_serial || ''}', '${escapeHtml(match.client_first_name || '')}', '${escapeHtml(match.client_last_name || '')}')">
               Leave Review
             </button>
           ` : ''}
@@ -390,7 +390,7 @@ async function updateMatchStatus(matchId, newStatus) {
       } else if (newStatus === 'hired') {
         newProjectStatus = 'hired';
         // Capture which practitioner was hired
-        projectUpdateData.hired_practitioner = selectedMatch.practitioner_id;
+        projectUpdateData.hired_practitioner_serial = selectedMatch.practitioner_serial;
       } else if (newStatus === 'not-hired') {
         newProjectStatus = 'not-hired';
       }
@@ -513,15 +513,15 @@ function openMessagingThread(match) {
   }
   
   console.log('[My Matches] Initializing project messaging with:', {
-    projectId: match.project_id,
-    practitionerId: match.practitioner_id,
+    projectSerial: match.project_serial,
+    practitionerSerial: match.practitioner_serial,
     practitionerName: threadNameEl.textContent
   });
   
   // Initialize messaging
   initializeProjectMessaging(
-    match.project_id,
-    match.practitioner_id,
+    match.project_serial,
+    match.practitioner_serial,
     practitioner
   );
   

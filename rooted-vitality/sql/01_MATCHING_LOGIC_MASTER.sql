@@ -26,8 +26,8 @@ CREATE OR REPLACE FUNCTION match_practitioners(
   p_project_id UUID
 )
 RETURNS TABLE (
-  practitioner_id UUID,
-  practitioner_serial TEXT,
+  id UUID,
+  serial_number TEXT,
   legal_name TEXT,
   dba_name TEXT,
   modalities TEXT[],
@@ -49,11 +49,11 @@ BEGIN
   SELECT 
     proj.id,
     proj.category_name,
-    proj.subcategory_name,
+    string_to_array(COALESCE(proj.subcategory_name, ''), ','),
     proj.travel_preference,
     proj.zipcode,
     proj.state,
-    proj.project_id
+    proj.project_serial
   INTO 
     v_project_id,
     v_category_name,
@@ -77,14 +77,15 @@ BEGIN
     p.id,
     p.serial_number,
     p.legal_name,
-    p.dba_name,
-    p.modalities,
-    p.conditions_treated,
+    COALESCE(pp.dba_name, p.legal_name) AS dba_name,
+    COALESCE(pp.modalities, ARRAY[]::TEXT[]) AS modalities,
+    COALESCE(pp.conditions_treated, ARRAY[]::TEXT[]) AS conditions_treated,
     p.email,
     p.phone,
     -- MATCH SCORE: 2-100 based on profile completion
-    LEAST(100, GREATEST(2, 1 + COALESCE(p.profile_completion_percent, 1)))::INTEGER AS match_score
+    LEAST(100, GREATEST(2, 1 + COALESCE(pp.profile_completeness_percent, 1)))::INTEGER AS match_score
   FROM practitioners p
+  LEFT JOIN practitioner_profiles pp ON p.id = pp.id
   WHERE 
     -- HARD FILTERS - ALL MUST BE TRUE OR NO MATCH
     

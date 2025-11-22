@@ -381,15 +381,15 @@ let reviewsManager = {
         console.log('[Reviews] Photos uploaded:', photoPaths.length);
       }
       
-      // Get client record for client_id
-      let clientIdToStore = this.currentReview.clientId || null;
-      if (!clientIdToStore && currentUser) {
-        const { data: clientDataForId } = await this.supabaseClient
+      // Get client record for client_serial
+      let clientSerialToStore = this.currentReview.clientSerial || null;
+      if (!clientSerialToStore && currentUser) {
+        const { data: clientDataForSerial } = await this.supabaseClient
           .from('clients')
-          .select('id')
+          .select('serial_number')
           .eq('id', currentUser.id)
           .single();
-        clientIdToStore = clientDataForId?.id || null;
+        clientSerialToStore = clientDataForSerial?.serial_number || null;
       }
 
       // Get project serial_number if projectId provided
@@ -408,11 +408,9 @@ let reviewsManager = {
 
       // Build review record - store serial_numbers as TEXT
       const reviewData = {
-        practitioner_id: this.currentReview.practitionerId,  // UUID for FK
         practitioner_serial: practitionerSerial,   // Denormalized serial (P1, P2, etc.)
-        project_id: projectSerialToStore,          // Store project serial_number (1, 2, 3, etc.)
-        client_id: clientIdToStore,                // UUID for FK
-        client_serial: clientSerial,               // Denormalized serial (C1, C2, etc.)
+        project_serial: projectSerialToStore,      // Store project serial_number (1, 2, 3, etc.)
+        client_serial: clientSerialToStore,        // Denormalized serial (C1, C2, etc.)
         rating: this.currentReview.rating,
         review_text: reviewText,
         client_name: clientName,
@@ -453,7 +451,7 @@ let reviewsManager = {
       // Create notification for practitioner
       try {
         const notification = {
-          practitioner_id: this.currentReview.practitionerId,  // Use practitionerId from currentReview
+          practitioner_serial: practitionerSerial,  // Use practitionerSerial from stored value
           type: 'review_posted',
           title: 'New Review',
           message: `You received a new ${this.currentReview.rating}-star review: "${reviewText.substring(0, 50)}${reviewText.length > 50 ? '...' : ''}"`,

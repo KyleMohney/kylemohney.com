@@ -179,12 +179,12 @@ async function updatePractitionerStatus(userId, status) {
  * @param {object} credentialData - Credential information
  * @returns {object} Created credential data
  */
-async function createCredential(practitionerId, credentialData) {
+async function createCredential(practitionerSerial, credentialData) {
     try {
         const { data, error } = await window.supabaseClient
             .from('credentials')
             .insert([{
-                practitioner_id: practitionerId,
+                practitioner_serial: practitionerSerial,
                 ...credentialData,
                 created_at: new Date().toISOString()
             }])
@@ -232,12 +232,12 @@ async function updateCredential(credentialId, credentialData) {
  * @param {string} practitionerId - Practitioner profile ID
  * @returns {array} Array of credential records
  */
-async function getCredentials(practitionerId) {
+async function getCredentials(practitionerSerial) {
     try {
         const { data, error } = await window.supabaseClient
             .from('credentials')
             .select('*')
-            .eq('practitioner_id', practitionerId)
+            .eq('practitioner_serial', practitionerSerial)
             .order('created_at', { ascending: false });
 
         if (error) throw error;
