@@ -177,8 +177,8 @@ async function loadConversations() {
         // Get all accepted matches for this practitioner
         const { data: matches, error: matchError } = await window.supabaseClient
             .from('project_practitioner_matches')
-            .select('id, project_id, status, created_at')
-            .eq('practitioner_id', practitionerId)
+            .select('id, project_serial, status, created_at')
+            .eq('practitioner_serial', practitionerId)
             .eq('status', 'accepted');
 
         if (matchError) {
@@ -194,12 +194,12 @@ async function loadConversations() {
                 // Get project details
                 const { data: project, error: projectError } = await window.supabaseClient
                     .from('projects')
-                    .select('id, description, category_name, client_id')
-                    .eq('id', match.project_id)
+                    .select('id, description, category_name, client_serial')
+                    .eq('project_serial', match.project_serial)
                     .single();
 
                 if (projectError || !project) {
-                    console.warn('[Inbox] Could not load project:', match.project_id);
+                    console.warn('[Inbox] Could not load project:', match.project_serial);
                     continue;
                 }
 
@@ -207,11 +207,11 @@ async function loadConversations() {
                 const { data: client, error: clientError } = await window.supabaseClient
                     .from('clients')
                     .select('id, first_name, last_name')
-                    .eq('id', project.client_id)
+                    .eq('serial_number', project.client_serial)
                     .single();
 
                 if (clientError || !client) {
-                    console.warn('[Inbox] Could not load client for project:', match.project_id);
+                    console.warn('[Inbox] Could not load client for project:', match.project_serial);
                     continue;
                 }
 
@@ -221,8 +221,8 @@ async function loadConversations() {
                 const { data: messages } = await window.supabaseClient
                     .from('project_messages')
                     .select('id, message, sender_type, created_at')
-                    .eq('project_id', match.project_id)
-                    .eq('practitioner_id', practitionerId)
+                    .eq('project_serial', match.project_serial)
+                    .eq('practitioner_serial', practitionerId)
                         .order('created_at', { ascending: false })
                     .limit(50);
 
@@ -386,9 +386,9 @@ function openThreadView(conversation) {
                 const { error } = await window.supabaseClient
                     .from('project_messages')
                     .insert({
-                        project_id: conversation.projectId,
-                        practitioner_id: conversation.practitionerId,
-                        client_id: conversation.clientId,
+                        project_serial: conversation.projectSerial,
+                        practitioner_serial: conversation.practitionerSerial,
+                        client_serial: conversation.clientSerial,
                         sender_id: currentUser.id,
                         sender_type: 'practitioner',
                         message: message,

@@ -70,8 +70,8 @@ async function loadMessages() {
     const { data, error } = await supabaseClient
       .from('project_messages')
       .select('*')
-      .eq('project_id', selectedProjectId)
-      .eq('practitioner_id', selectedPractitionerId)
+      .eq('project_serial', selectedProjectId)
+      .eq('practitioner_serial', selectedPractitionerId)
       .order('created_at', { ascending: true });
 
     if (error) {
@@ -172,8 +172,8 @@ async function sendMessage() {
       const { data: matchData, error: matchError } = await supabaseClient
         .from('project_practitioner_matches')
         .select('id')
-        .eq('project_id', selectedProjectId)
-        .eq('practitioner_id', selectedPractitionerId)
+        .eq('project_serial', selectedProjectId)
+        .eq('practitioner_serial', selectedPractitionerId)
         .single();
 
       if (matchError || !matchData) {
@@ -181,11 +181,11 @@ async function sendMessage() {
         return;
       }
 
-      // Get client ID from the project
+      // Get client serial from the project
       const { data: projectData, error: projectError } = await supabaseClient
         .from('projects')
-        .select('client_id')
-        .eq('id', selectedProjectId)
+        .select('client_serial')
+        .eq('project_serial', selectedProjectId)
         .single();
 
       if (projectError || !projectData) {
@@ -193,7 +193,7 @@ async function sendMessage() {
         return;
       }
 
-      clientId = projectData.client_id;
+      clientSerialId = projectData.client_serial;
     } else {
       // Sender is client
       const { data: clientData, error: clientError } = await supabaseClient
@@ -216,9 +216,9 @@ async function sendMessage() {
     const { error: insertError } = await supabaseClient
       .from('project_messages')
       .insert({
-        project_id: selectedProjectId,
-        practitioner_id: selectedPractitionerId,
-        client_id: clientId,
+        project_serial: selectedProjectId,
+        practitioner_serial: selectedPractitionerId,
+        client_serial: clientSerialId,
         sender_id: senderId,
         sender_type: senderType,
         message: message,
@@ -238,8 +238,8 @@ async function sendMessage() {
         contacted_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       })
-      .eq('project_id', selectedProjectId)
-      .eq('practitioner_id', selectedPractitionerId);
+      .eq('project_serial', selectedProjectId)
+      .eq('practitioner_serial', selectedPractitionerId);
 
     if (matchUpdateError) {
       console.error('[Messaging] Error updating match contacted_at:', matchUpdateError);
@@ -268,8 +268,8 @@ async function markMessagesAsRead() {
     await supabaseClient
       .from('project_messages')
       .update({ is_read: true })
-      .eq('project_id', selectedProjectId)
-      .eq('practitioner_id', selectedPractitionerId)
+      .eq('project_serial', selectedProjectId)
+      .eq('practitioner_serial', selectedPractitionerId)
       .eq('sender_type', 'practitioner');
 
   } catch (error) {

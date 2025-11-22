@@ -103,6 +103,35 @@
     </section>
 
     <!-- ========================================== -->
+    <!-- CLIENT STORY - Home Birth Journey -->
+    <!-- ========================================== -->
+    <section class="client-story">
+      <div class="client-story__container">
+        <div class="client-story__header">
+          <h2 class="client-story__title">Real Stories, Real Impact</h2>
+          <p class="client-story__subtitle">How Rooted Vitality COULD Make All The Difference</p>
+        </div>
+        <a href="/rooted-vitality/help-center/articles/home-birth-without-midwife.html" class="client-story__card">
+          <div class="client-story__image">
+            <img src="assets/index-callie.jpg" alt="Callie - Home birth story" loading="lazy">
+          </div>
+          <div class="client-story__content">
+            <div class="client-story__quote">
+              "We REALLY NEEDED this service—not just for the birth, but for finding the right practitioners. When you're in rural Ohio with no one nearby, a marketplace like this is everything. I'm using it for my third pregnancy."
+            </div>
+            <div class="client-story__details">
+              <div class="client-story__meta">
+                <h3 class="client-story__name">Callie's Home Birth Story</h3>
+                <p class="client-story__description">How Rural Ohio Taught Me Why Rooted Vitality Matters</p>
+              </div>
+              <span class="client-story__cta">Read Full Story →</span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
     <!-- 3. NATURE & WELLNESS SECTION - Circle Frame -->
     <!-- ========================================== -->
     <section class="nature-wellness">
@@ -149,35 +178,6 @@
             </div>
           </div>
         </div>
-      </div>
-    </section>
-
-    <!-- ========================================== -->
-    <!-- CLIENT STORY - Home Birth Journey -->
-    <!-- ========================================== -->
-    <section class="client-story">
-      <div class="client-story__container">
-        <div class="client-story__header">
-          <h2 class="client-story__title">Real Stories, Real Impact</h2>
-          <p class="client-story__subtitle">How Rooted Vitality COULD Make All The Difference</p>
-        </div>
-        <a href="/rooted-vitality/help-center/articles/home-birth-without-midwife.html" class="client-story__card">
-          <div class="client-story__image">
-            <img src="assets/index-callie.jpg" alt="Callie - Home birth story" loading="lazy">
-          </div>
-          <div class="client-story__content">
-            <div class="client-story__quote">
-              "We REALLY NEEDED this service—not just for the birth, but for finding the right practitioners. When you're in rural Ohio with no one nearby, a marketplace like this is everything. I'm using it for my third pregnancy."
-            </div>
-            <div class="client-story__details">
-              <div class="client-story__meta">
-                <h3 class="client-story__name">Callie's Home Birth Story</h3>
-                <p class="client-story__description">How Rural Ohio Taught Me Why Rooted Vitality Matters</p>
-              </div>
-              <span class="client-story__cta">Read Full Story →</span>
-            </div>
-          </div>
-        </a>
       </div>
     </section>
 
@@ -380,15 +380,15 @@
         const { data: { session } } = await window.supabaseClient.auth.getSession();
 
         if (session) {
-          // A: User is signed in - redirect to projects with new project modal
-          console.log('[Landing] A/B Test: Route A - User signed in, redirecting to projects with new modal');
-          window.location.href = '/rooted-vitality/dashboard/client/pages/my-projects.html?action=new';
+          // A: User is signed in - redirect to wellness with new project modal
+          console.log('[Landing] A/B Test: Route A - User signed in, redirecting to wellness with new modal');
+          window.location.href = '/rooted-vitality/dashboard/client/pages/my-wellness.html?action=new';
         } else {
-          // B: User not signed in - show login modal, then redirect to projects after successful login
+          // B: User not signed in - show login modal, then redirect to wellness after successful login
           console.log('[Landing] A/B Test: Route B - User not signed in, showing auth modal');
           
-          // Set flag to redirect to new project after login
-          sessionStorage.setItem('redirectAfterAuth', '/rooted-vitality/dashboard/client/pages/my-projects.html?action=new');
+          // Set flag to redirect to new wellness after login
+          sessionStorage.setItem('redirectAfterAuth', '/rooted-vitality/dashboard/client/pages/my-wellness.html?action=new');
           
           if (typeof openLoginModal === 'function') {
             openLoginModal();
@@ -410,7 +410,7 @@
       const practitionerLogos = document.querySelectorAll('.practitioner-logo');
       
       practitionerLogos.forEach(logo => {
-        // Click handler - routes to my-projects with category pre-filled
+        // Click handler - routes to my-wellness with category pre-filled
         logo.addEventListener('click', function(e) {
           e.stopPropagation();
           
@@ -438,11 +438,11 @@
         const { data: { user } } = await window.supabaseClient.auth.getUser();
 
         if (user) {
-          // User is signed in - go directly to my-projects with category
-          window.location.href = '/rooted-vitality/dashboard/client/pages/my-projects.html?action=new&category=' + encodeURIComponent(category);
+          // User is signed in - go directly to my-wellness with category
+          window.location.href = '/rooted-vitality/dashboard/client/pages/my-wellness.html?action=new&category=' + encodeURIComponent(category);
         } else {
           // User not signed in - store category and redirect to signup
-          sessionStorage.setItem('redirectAfterAuth', '/rooted-vitality/dashboard/client/pages/my-projects.html?action=new&category=' + encodeURIComponent(category));
+          sessionStorage.setItem('redirectAfterAuth', '/rooted-vitality/dashboard/client/pages/my-wellness.html?action=new&category=' + encodeURIComponent(category));
           
           if (typeof openLoginModal === 'function') {
             openLoginModal();

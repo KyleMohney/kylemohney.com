@@ -154,12 +154,12 @@ class ReviewModerationManager {
   /**
    * Get all reviews for a practitioner (including unapproved)
    */
-  async getPractitionerAllReviews(practitionerId) {
+  async getPractitionerAllReviews(practitionerSerial) {
     try {
       const { data, error } = await this.supabaseClient
         .from('reviews')
         .select('*')
-        .eq('practitioner_id', practitionerId)
+        .eq('practitioner_serial', practitionerSerial)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -191,7 +191,7 @@ class ReviewModerationManager {
       const { error } = await this.supabaseClient
         .from('reviews')
         .insert({
-          practitioner_id: practitionerId,
+          practitioner_serial: practitionerSerial,
           rating,
           review_text: reviewText,
           client_name: clientName,

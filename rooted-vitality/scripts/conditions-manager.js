@@ -32,6 +32,9 @@ async function initConditionsManager(supabaseClient) {
     // Load taxonomy from database
     await loadConditionsTaxonomy();
     
+    // Render checkboxes after taxonomy is loaded
+    renderConditionsCheckboxes();
+    
     console.log('[Conditions Manager] ✓ Initialized successfully');
   } catch (error) {
     console.error('[Conditions Manager] Error initializing:', error);
@@ -51,7 +54,6 @@ async function loadConditionsTaxonomy() {
         id,
         category_id,
         name,
-        icon,
         display_order,
         is_active,
         taxonomy_subcategories(id, name, display_order, is_active)
@@ -67,7 +69,6 @@ async function loadConditionsTaxonomy() {
       conditionsManagerData.taxonomy[category.category_id] = {
         id: category.id,
         name: category.name,
-        icon: category.icon,
         subcategories: (category.taxonomy_subcategories || [])
           .filter(sub => sub.is_active !== false)
           .sort((a, b) => (a.display_order || 0) - (b.display_order || 0))

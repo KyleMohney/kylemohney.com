@@ -5084,8 +5084,6 @@
           if (price !== null) {
             active.price_per_service = price;
           }
-          renderActiveCategories();
-          console.log('[Rooted Vitality] Preferences saved for category:', currentEditingCategory, 'Services:', selectedSubs, 'Price:', price);
           
           // Save to database if manager is initialized
           if (matchSettingsManager && selectedSubs.length > 0) {
@@ -5095,8 +5093,12 @@
               for (const subcategoryName of selectedSubs) {
                 const result = await matchSettingsManager.addServiceCategory(currentEditingCategory, subcategoryName, price);
                 // Capture the service ID from the result
+                console.log('[Rooted Vitality] Service result:', { result, hasId: result?.id });
                 if (result && result.id) {
                   newServiceIds.push(result.id);
+                  console.log('[Rooted Vitality] Added service ID:', result.id);
+                } else {
+                  console.warn('[Rooted Vitality] Result missing ID:', result);
                 }
               }
               // Update the serviceIds in activeCategories so toggle works
@@ -5122,6 +5124,8 @@
           } else {
             showToast('Services saved successfully.', 'success');
           }
+          
+          renderActiveCategories();
         }
         
         closePreferencesModal();

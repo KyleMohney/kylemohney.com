@@ -596,29 +596,33 @@
         const practitionerId = rvUser.id;
         console.log('[Pro Clients] Loading data for practitioner:', practitionerId);
 
+        // Get practitioner serial number
+        const { data: practitioner, error: practitionerError } = await window.supabaseClient
+          .from('practitioners')
+          .select('serial_number')
+          .eq('id', practitionerId)
+          .single();
+
+        if (practitionerError || !practitioner) {
+          console.error('[Pro Clients] Error loading practitioner:', practitionerError);
+          return;
+        }
+
+        const practitionerSerial = practitioner.serial_number;
+        console.log('[Pro Clients] Practitioner serial:', practitionerSerial);
+
         // Get new clients (active matches)
         const { data: matches, error: matchError } = await window.supabaseClient
           .from('project_practitioner_matches')
           .select(`
             id,
-            project_id,
+            project_serial,
             client_serial,
             status,
             created_at,
-            projects (
-              id,
-              description,
-              category_name,
-              created_at,
-              clients (
-                id,
-                first_name,
-                last_name,
-                id
-              )
-            )
+            match_score
           `)
-          .eq('practitioner_id', practitionerId)
+          .eq('practitioner_serial', practitionerSerial)
           .eq('status', 'active');
 
         if (matchError) {
@@ -627,6 +631,30 @@
         }
 
         console.log('[Pro Clients] Loaded matches:', matches?.length);
+
+        // For each match, fetch the project and client data separately
+        for (let match of matches) {
+          // Get project details using project_serial
+          const { data: project } = await window.supabaseClient
+            .from('projects')
+            .select('id, project_serial, description, category_name, created_at, client_serial')
+            .eq('project_serial', match.project_serial)
+            .single();
+
+          if (project) {
+            // Get client details
+            const { data: client } = await window.supabaseClient
+              .from('clients')
+              .select('id, first_name, last_name')
+              .eq('serial_number', project.client_serial)
+              .single();
+
+            match.projects = project;
+            match.projects.clients = client;
+          }
+        }
+
+        console.log('[Pro Clients] Enriched matches with project and client data');
 
         // Get first message from each match
         const newClientsContainer = document.getElementById('new-clients');
@@ -651,8 +679,8 @@
           const { data: messages } = await window.supabaseClient
             .from('project_messages')
             .select('message')
-            .eq('project_id', match.project_id)
-            .eq('practitioner_id', practitionerId)
+            .eq('project_serial', match.project_serial)
+            .eq('practitioner_serial', practitionerSerial)
             .order('created_at', { ascending: true })
             .limit(1);
 
@@ -662,7 +690,6 @@
           const matchScore = match.match_score || 0;
           const matchQuality = matchScore >= 80 ? 'high' : matchScore >= 60 ? 'medium' : 'low';
           const qualityLabel = matchScore >= 80 ? 'Excellent Match' : matchScore >= 60 ? 'Good Match' : 'Potential Match';
-          const distanceMiles = match.distance_miles ? match.distance_miles.toFixed(1) : 'Unknown';
           const daysAgo = Math.floor((new Date() - new Date(match.created_at)) / (1000 * 60 * 60 * 24));
           const daysText = daysAgo === 0 ? 'Today' : daysAgo === 1 ? 'Yesterday' : `${daysAgo} days ago`;
 
@@ -678,7 +705,6 @@
                 <span class="match-quality-badge ${matchQuality}">
                   ${qualityLabel} (${matchScore}/100)
                 </span>
-                ${distanceMiles !== 'Unknown' ? `<span class="distance-badge">📍 ${distanceMiles} mi</span>` : ''}
               </div>
             </div>
             <div class="message-preview-box">
@@ -752,7 +778,7 @@
               const { error: blockError } = await window.supabaseClient
                 .from('practitioner_blocks')
                 .insert({
-                  practitioner_id: practitionerId,
+                  practitioner_serial: practitionerSerial,
                   client_serial: match.client_serial
                 });
 
@@ -805,9 +831,9 @@
         const { error: messageError } = await window.supabaseClient
           .from('project_messages')
           .insert({
-            project_id: currentMatchForDeclineMsg.project_id,
-            practitioner_id: currentMatchForDeclineMsg.projects?.clients?.id ? null : window.supabaseClient.auth.user()?.id,
-            client_id: currentMatchForDeclineMsg.projects?.clients?.id,
+            project_serial: currentMatchForDeclineMsg.project_serial,
+            practitioner_serial: currentMatchForDeclineMsg.projects?.clients?.serial_number ? null : practitionerSerial,
+            client_serial: currentMatchForDeclineMsg.projects?.clients?.serial_number,
             sender_id: window.authManager?.getCurrentUser()?.id,
             sender_type: 'practitioner',
             message: messageText,
@@ -834,10 +860,24 @@
     let realtimeSubscription = null;
     let newClientsCount = 0;
 
-    function setupRealtimeSubscription(practitionerId) {
+    async function setupRealtimeSubscription(practitionerId) {
       if (realtimeSubscription) {
         realtimeSubscription.unsubscribe();
       }
+
+      // Get practitioner serial
+      const { data: practitioner, error: practitionerError } = await window.supabaseClient
+        .from('practitioners')
+        .select('serial_number')
+        .eq('id', practitionerId)
+        .single();
+
+      if (practitionerError || !practitioner) {
+        console.error('[Real-time] Error loading practitioner:', practitionerError);
+        return;
+      }
+
+      const practitionerSerial = practitioner.serial_number;
 
       // Subscribe to new matches for this practitioner
       realtimeSubscription = window.supabaseClient
@@ -848,7 +888,7 @@
             event: 'INSERT',
             schema: 'public',
             table: 'project_practitioner_matches',
-            filter: `practitioner_id=eq.${practitionerId}`
+            filter: `practitioner_serial=eq.${practitionerSerial}`
           },
           async (payload) => {
             console.log('[Real-time] New match received:', payload);
@@ -858,58 +898,62 @@
               .from('project_practitioner_matches')
               .select(`
                 id,
-                project_id,
+                project_serial,
                 client_serial,
                 status,
                 created_at,
-                match_score,
-                distance_miles,
-                projects (
-                  id,
-                  description,
-                  category_name,
-                  created_at,
-                  clients (
-                    id,
-                    first_name,
-                    last_name,
-                    id
-                  )
-                )
+                match_score
               `)
               .eq('id', payload.new.id)
               .single();
 
             if (match && match.status === 'active') {
-              const project = match.projects;
-              const client = project.clients;
-              const clientName = `${client.first_name || 'Client'} ${client.last_name ? client.last_name[0] + '.' : ''}`;
-              
-              // Show toast notification
-              const matchScore = match.match_score || 0;
-              const qualityLabel = matchScore >= 80 ? 'Excellent Match' : matchScore >= 60 ? 'Good Match' : 'Potential Match';
-              const distanceMiles = match.distance_miles ? match.distance_miles.toFixed(1) : 'Unknown';
-              
-              showToast(
-                '🎉 New Client Match!',
-                `${clientName} from ${project.category_name || 'Wellness'} just matched with you! ${distanceMiles !== 'Unknown' ? `(${distanceMiles} mi) ` : ''}${qualityLabel}`,
-                'success',
-                0  // Keep toast until user closes it
-              );
+              // Get project details using project_serial
+              const { data: project } = await window.supabaseClient
+                .from('projects')
+                .select('id, project_serial, description, category_name, created_at, client_serial')
+                .eq('project_serial', match.project_serial)
+                .single();
 
-              // Reload the clients list to show the new match
-              if (document.querySelector('.sidebar-tab.active').dataset.tab === 'new-clients') {
-                // Reload to show new match
-                setTimeout(() => {
-                  loadClientsData();
-                }, 500);
+              // Get client details
+              let client = null;
+              if (project) {
+                const { data: clientData } = await window.supabaseClient
+                  .from('clients')
+                  .select('id, first_name, last_name')
+                  .eq('serial_number', project.client_serial)
+                  .single();
+                client = clientData;
               }
 
-              // Increment and show badge
-              newClientsCount++;
-              const badge = document.querySelector('.sidebar-tab[data-tab="new-clients"] .sidebar-tab__badge');
-              if (badge) {
-                badge.textContent = newClientsCount;
+              if (project && client) {
+                const clientName = `${client.first_name || 'Client'} ${client.last_name ? client.last_name[0] + '.' : ''}`;
+                
+                // Show toast notification
+                const matchScore = match.match_score || 0;
+                const qualityLabel = matchScore >= 80 ? 'Excellent Match' : matchScore >= 60 ? 'Good Match' : 'Potential Match';
+                
+                showToast(
+                  '🎉 New Client Match!',
+                  `${clientName} from ${project.category_name || 'Wellness'} just matched with you! ${qualityLabel}`,
+                  'success',
+                  0  // Keep toast until user closes it
+                );
+
+                // Reload the clients list to show the new match
+                if (document.querySelector('.sidebar-tab.active').dataset.tab === 'new-clients') {
+                  // Reload to show new match
+                  setTimeout(() => {
+                    loadClientsData();
+                  }, 500);
+                }
+
+                // Increment and show badge
+                newClientsCount++;
+                const badge = document.querySelector('.sidebar-tab[data-tab="new-clients"] .sidebar-tab__badge');
+                if (badge) {
+                  badge.textContent = newClientsCount;
+                }
               }
             }
           }
@@ -949,7 +993,7 @@
         await loadClientsData();
 
         // Setup real-time subscriptions
-        setupRealtimeSubscription(practitionerIdGlobal);
+        await setupRealtimeSubscription(practitionerIdGlobal);
 
         console.log('[Pro Clients] Page initialized with real-time subscriptions');
       } catch (error) {

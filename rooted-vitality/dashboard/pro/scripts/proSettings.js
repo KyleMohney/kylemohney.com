@@ -241,7 +241,7 @@ async function loadNotificationPreferencesFromDatabase() {
         const { data, error } = await window.supabaseClient
             .from('practitioner_notification_settings')
             .select('*')
-            .eq('practitioner_id', currentUser.id)
+            .eq('practitioner_serial', currentUser.serial_number)
             .single();
         
         if (error && error.code !== 'PGRST116') {
@@ -321,7 +321,7 @@ async function saveNotificationPreferencesToDatabase(preferences) {
     try {
         // Ensure all fields are present with correct names
         const fullPreferences = {
-            practitioner_id: currentUser.id,
+            practitioner_serial: currentUser.serial_number,
             messages_in_app: preferences['messages_in_app'] !== false,
             messages_sms: preferences['messages_sms'] !== false,
             messages_email: preferences['messages_email'] !== false,
@@ -344,7 +344,7 @@ async function saveNotificationPreferencesToDatabase(preferences) {
         // Save to practitioner_notification_settings table
         const { error: notifError } = await window.supabaseClient
             .from('practitioner_notification_settings')
-            .upsert(fullPreferences, { onConflict: 'practitioner_id' });
+            .upsert(fullPreferences, { onConflict: 'practitioner_serial' });
         
         if (notifError) {
             console.error('[Rooted Vitality] Error saving preferences:', notifError);
@@ -375,7 +375,7 @@ async function saveNotificationsToSupabase() {
 
         // Update practitioner_notification_settings table with new preferences
         const fullPreferences = {
-            practitioner_id: currentUser.id,
+            practitioner_serial: currentUser.serial_number,
             messages_in_app: preferences['messages_in_app'] !== false,
             messages_sms: preferences['messages_sms'] !== false,
             messages_email: preferences['messages_email'] !== false,

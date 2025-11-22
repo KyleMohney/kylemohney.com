@@ -17,7 +17,36 @@ TABLE OF CONTENTS
 console.log('[Rooted Vitality] injections.js loading...');
 
 // ======================================================
-// 1. BRANDING & CONFIG
+// GLOBAL NAVIGATION FUNCTIONS
+// ======================================================
+window.navigateToPage = function(page) {
+  console.log('[Header] navigateToPage called with:', page);
+  console.log('[Header] Current pathname:', window.location.pathname);
+  
+  // Construct the correct path from current location
+  if (window.location.pathname.includes('/rooted-vitality/dashboard/pro/')) {
+    const url = './pages/' + page + '.html';
+    console.log('[Header] Navigating to relative URL:', url);
+    window.location.href = url;
+  } else if (window.location.pathname.includes('/rooted-vitality/dashboard/client/')) {
+    const url = './pages/' + page + '.html';
+    console.log('[Header] Navigating to relative URL:', url);
+    window.location.href = url;
+  } else {
+    const url = '/rooted-vitality/dashboard/pro/pages/' + page + '.html';
+    console.log('[Header] Navigating to absolute URL:', url);
+    window.location.href = url;
+  }
+};
+
+window.logout = function() {
+  if (window.authManager && typeof window.authManager.logout === 'function') {
+    window.authManager.logout();
+  } else {
+    window.location.href = '/rooted-vitality/index.html';
+  }
+};
+
 // ======================================================
 const RootedVitality = {
     config: {
@@ -864,7 +893,7 @@ const RootedVitality = {
             console.log('[Rooted Vitality] Querying practitioners table...');
             const { data: practitioner, error } = await window.supabaseClient
                 .from('practitioners')
-                .select('*')
+                .select('legal_business_name')
                 .eq('id', user.id)
                 .single();
             
@@ -879,18 +908,22 @@ const RootedVitality = {
                 return;
             }
             
-            console.log('[Rooted Vitality] Practitioner data retrieved:', {
-                keys: Object.keys(practitioner),
-                hasLegalBusinessName: !!practitioner.legal_business_name,
-                legalBusinessName: practitioner.legal_business_name,
-                practiceLogoUrl: practitioner.practice_logo_url
-            });
+            // Fetch logo from practitioner_profiles table
+            console.log('[Rooted Vitality] Querying practitioner_profiles table for logo...');
+            const { data: profile, error: profileError } = await window.supabaseClient
+                .from('practitioner_profiles')
+                .select('practice_logo_url')
+                .eq('id', user.id)
+                .single();
             
-            // Use practice_logo_url (dedicated practitioner logo, separate from client profile_photo)
-            const logoUrl = practitioner?.practice_logo_url;
+            let logoUrl = null;
+            if (!profileError && profile) {
+                logoUrl = profile.practice_logo_url;
+            }
+            
             console.log('[Rooted Vitality] Logo URL determination:', {
-                practice_logo_url: practitioner?.practice_logo_url,
-                finalLogoUrl: logoUrl
+                practice_logo_url: logoUrl,
+                hasProfile: !!profile
             });
             
             if (logoUrl) {
@@ -1018,7 +1051,7 @@ const RootedVitality = {
             const { data, error } = await window.supabaseClient
                 .from('notifications')
                 .select('*')
-                .eq('practitioner_id', user.id)
+                .eq('practitioner_serial', user.serial_number)
                 .order('created_at', { ascending: false });
 
             if (error) {
@@ -1401,7 +1434,6 @@ const RootedVitality = {
                     <h4 class="rv-footer-heading">Links</h4>
                     <nav class="rv-footer-nav">
                         <a href="${pathPrefix}index.html">Home</a>
-                        <a href="${pathPrefix}products/">Products</a>
                         <a href="${pathPrefix}help-center/">Help Center</a>
                     </nav>
                 </div>

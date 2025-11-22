@@ -93,7 +93,7 @@ async function loadProject() {
 
     if (!projectId) {
       console.error('[loadProject] No project ID in URL');
-      showEmptyState('No Project', 'Please select a project from My Projects');
+      showEmptyState('No Wellness', 'Please select a wellness journey from My Wellness');
       return;
     }
 
@@ -155,7 +155,7 @@ async function loadExistingMatches() {
     // Get all matches for this client
     const { data: matches, error: matchesError } = await supabaseClient
       .from('project_practitioner_matches')
-      .select('practitioner_id, practitioner_serial')
+      .select('practitioner_serial')
       .eq('client_serial', clientProfile.serial_number);
     
     if (matchesError) {
@@ -163,8 +163,8 @@ async function loadExistingMatches() {
       return;
     }
     
-    // Store matched practitioner IDs
-    matchedPractitioners = (matches || []).map(m => m.practitioner_id);
+    // Store matched practitioner serials
+    matchedPractitioners = (matches || []).map(m => m.practitioner_serial);
     console.log('[loadExistingMatches] Found', matchedPractitioners.length, 'matched practitioners');
   } catch (error) {
     console.error('[loadExistingMatches] Exception:', error);
@@ -452,7 +452,7 @@ function createPractitionerCard(practitioner) {
   const card = document.createElement('div');
   
   // Check if this practitioner has already been matched
-  const isMatched = matchedPractitioners.includes(practitioner.practitioner_id);
+  const isMatched = matchedPractitioners.includes(practitioner.serial_number);
   const matchedClass = isMatched ? ' practitioner-card--matched' : '';
   card.className = `practitioner-card${matchedClass}`;
 
@@ -521,8 +521,8 @@ function createPractitionerCard(practitioner) {
       <p class="card-bio">${(practitioner.bio || '').substring(0, 150)}${(practitioner.bio || '').length > 150 ? '...' : ''}</p>
 
       <div class="card-actions">
-        <button class="card-btn card-btn--view" data-practitioner-id="${practitioner.practitioner_id}">View Profile</button>
-        <button class="card-btn card-btn--connect" data-practitioner-id="${practitioner.practitioner_id}">Connect</button>
+        <button class="card-btn card-btn--view" data-practitioner-id="${practitioner.id}" data-practitioner-serial="${practitioner.serial_number}">View Profile</button>
+        <button class="card-btn card-btn--connect" data-practitioner-id="${practitioner.id}" data-practitioner-serial="${practitioner.serial_number}">Connect</button>
       </div>
     </div>
   `;
@@ -654,30 +654,27 @@ async function sendConnectionRequest(practitionerId, practitionerSerial) {
     
     const { data: matchData, error: matchQueryError } = await supabaseClient.rpc(
       'match_practitioners',
-      { v_project_id: selectedProject.project_id }  // Use project_id (integer), not id (UUID)
+      { p_project_id: selectedProject.id }  // Use project UUID
     );
 
     if (!matchQueryError && matchData && matchData.length > 0) {
-      const practitionerMatch = matchData.find(m => m.practitioner_id === practitionerId);
+      const practitionerMatch = matchData.find(m => m.serial_number === practitionerSerial);
       if (practitionerMatch) {
         matchScore = practitionerMatch.match_score ?? 75;
-        distanceMiles = practitionerMatch.distance_miles ?? null;
       }
     }
 
-    console.log('[sendConnectionRequest] Match score:', matchScore, 'Distance:', distanceMiles);
+    console.log('[sendConnectionRequest] Match score:', matchScore);
 
     // Create match with all fields
     const { data, error } = await supabaseClient
       .from('project_practitioner_matches')
       .insert({
-        project_id: selectedProject.project_id,     // Integer serial number, not UUID
-        practitioner_id: practitionerId,
+        project_id: selectedProject.project_serial,
         client_serial: selectedProject.client_serial,
         practitioner_serial: practitionerSerial,
         status: 'active',
-        is_read: false,                              // Unread when first created
-        client_initiated: true,                      // Client sent request
+        match_score: matchScore,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         matched_at: new Date().toISOString(),
@@ -717,8 +714,8 @@ async function sendConnectionRequest(practitionerId, practitionerSerial) {
       .from('project_messages')
       .insert({
         project_id: selectedProject.project_id,  // Use project_id (INTEGER), not id (UUID)
-        practitioner_id: practitionerId,
-        client_id: clientData.id,
+        practitioner_serial: practitionerId,
+        client_serial: clientData.id,
         sender_id: clientData.id,
         sender_type: 'client',
         message: messageText,
@@ -735,8 +732,8 @@ async function sendConnectionRequest(practitionerId, practitionerSerial) {
           contacted_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         })
-        .eq('project_id', selectedProject.project_id)  // Use project_id (integer), not id (UUID)
-        .eq('practitioner_id', practitionerId);
+        .eq('project_serial', selectedProject.project_serial)
+        .eq('practitioner_serial', practitionerSerial);
 
       if (updateContactedError) {
         console.error('[sendConnectionRequest] Error updating contacted_at:', updateContactedError);
@@ -803,8 +800,8 @@ function setupEventListeners() {
   if (backButton) {
     console.log('[setupEventListeners] Back button found, attaching click handler');
     backButton.addEventListener('click', () => {
-      console.log('[Back Button] Navigating to my-projects.html');
-      window.location.href = 'my-projects.html';
+      console.log('[Back Button] Navigating to my-wellness.html');
+      window.location.href = 'my-wellness.html';
     });
   } else {
     console.error('[setupEventListeners] Back button with id "back-to-projects" not found');
@@ -844,7 +841,7 @@ function navigateToPractitionerProfile(practitionerId) {
     console.error('[Find Practitioners] No practitioner ID provided');
     return;
   }
-  const profileUrl = `/rooted-vitality/dashboard/pro/pages/practitioner-profile.html?practitioner_id=${practitionerId}`;
+  const profileUrl = `/rooted-vitality/dashboard/pro/pages/practitioner-profile.html?id=${practitionerId}`;
   console.log('[Find Practitioners] Navigating to:', profileUrl);
   window.location.href = profileUrl;
 }
