@@ -761,7 +761,7 @@ async function sendConnectionRequest(practitionerId, practitionerSerial) {
     
     // Log the returned status from RPC
     if (data && data[0]) {
-      console.log('[sendConnectionRequest] Match created with status:', data[0].match_status, 'ID:', data[0].match_id);
+      console.log('[sendConnectionRequest] Match created with status:', data[0].status, 'ID:', data[0].id);
     }
 
     // Update projects table to track matched practitioners

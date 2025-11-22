@@ -115,7 +115,7 @@ async function loadMatches(clientSerial) {
     console.log('[My Matches] loadMatches called with clientSerial:', clientSerial);
     const { data: matchesData, error: matchesError } = await window.supabaseClient
       .from('project_practitioner_matches')
-      .select('id, project_serial, practitioner_serial, client_serial, status, match_status, practitioner_response, practitioner_responded_at, created_at')
+      .select('id, project_serial, practitioner_serial, client_serial, status, practitioner_response, practitioner_responded_at, created_at')
       .eq('client_serial', clientSerial)
       .order('created_at', { ascending: false });
 
@@ -575,8 +575,8 @@ function openMessagingThread(match) {
     console.error('[My Matches] Status dropdown NOT found');
   }
   
-  // Enable/disable message input based on match_status and practitioner_response
-  const msgStatus = match.match_status || match.status;
+  // Enable/disable message input based on status and practitioner_response
+  const msgStatus = match.status;
   const msgResponse = match.practitioner_response;
   
   if (msgStatus === 'pending' && !msgResponse) {
@@ -767,8 +767,8 @@ function openPractitionerModal(matchId) {
   document.getElementById('modal-name').textContent = displayName;
   document.getElementById('modal-specialty').textContent = p.modalities?.join(', ') || 'Holistic Practitioner';
   
-  // Use match_status if available, fallback to legacy status
-  const displayStatus = match.match_status || match.status;
+  // Use status column value
+  const displayStatus = match.status;
   const displayResponse = match.practitioner_response;
   
   const statusLabel = {
@@ -788,7 +788,7 @@ function openPractitionerModal(matchId) {
   const statusContentEl = document.getElementById('status-message-content');
   
   // Determine display status
-  const msgStatus = match.match_status || match.status;
+  const msgStatus = match.status;
   const response = match.practitioner_response;
   
   if (msgStatus === 'pending' && !response) {

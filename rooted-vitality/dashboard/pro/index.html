@@ -620,13 +620,12 @@
             project_serial,
             client_serial,
             status,
-            match_status,
             practitioner_response,
             created_at,
             match_score
           `)
           .eq('practitioner_serial', practitionerSerial)
-          .eq('match_status', 'pending')
+          .eq('status', 'pending')
           .is('practitioner_response', null);
 
         if (matchError) {

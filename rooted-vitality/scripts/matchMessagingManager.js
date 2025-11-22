@@ -58,7 +58,7 @@ async function initializeProjectMessaging(projectData, practitionerData, matchDa
 
     selectedProjectId = projectId;
     selectedPractitionerId = practitionerId;
-    selectedMatchStatus = matchData?.match_status || matchData?.status;  // Use new match_status, fallback to legacy status
+    selectedMatchStatus = matchData?.status;  // Use status column
     selectedMatchResponse = matchData?.practitioner_response;  // Track practitioner response
 
     console.log('[Messaging] Initialized for project:', projectId, 'practitioner:', practitionerId, 'status:', selectedMatchStatus, 'response:', selectedMatchResponse);
