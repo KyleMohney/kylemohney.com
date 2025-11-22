@@ -1361,6 +1361,68 @@ TABLE OF CONTENTS
   color: white;
 }
 
+/* ========================================== */
+/* DARK MODE OVERRIDE - Keep Create Project Form Light */
+/* ========================================== */
+@media (prefers-color-scheme: dark) {
+  #create-project-modal .modal__header h2 {
+    color: #2e2b28 !important;
+  }
+
+  #create-project-form {
+    color-scheme: light;
+  }
+
+  #create-project-form label {
+    color: #2e2b28 !important;
+  }
+
+  #create-project-form input[type="text"],
+  #create-project-form input[type="email"],
+  #create-project-form input[type="tel"],
+  #create-project-form textarea,
+  #create-project-form select {
+    background-color: #ffffff !important;
+    color: #2e2b28 !important;
+    border-color: #ddd9d0 !important;
+  }
+
+  #create-project-form input[type="text"]:focus,
+  #create-project-form input[type="email"]:focus,
+  #create-project-form input[type="tel"]:focus,
+  #create-project-form textarea:focus,
+  #create-project-form select:focus {
+    background-color: #ffffff !important;
+    color: #2e2b28 !important;
+    border-color: #5c9a72 !important;
+  }
+
+  #create-project-form .form-hint {
+    color: #666666 !important;
+  }
+
+  #create-project-form .form-fieldset {
+    background: #fafaf8 !important;
+    border-color: #e5e5e5 !important;
+  }
+
+  #create-project-form .form-fieldset legend {
+    color: #5c9a72 !important;
+  }
+
+  #create-project-form .radio-label,
+  #create-project-form .checkbox-item {
+    background: #ffffff !important;
+    color: #2e2b28 !important;
+    border-color: #ddd9d0 !important;
+  }
+
+  #create-project-form .radio-text strong,
+  #create-project-form .checkbox-item label {
+    color: #2e2b28 !important;
+  }
+}
+
 @media (max-width: 768px) {
   #create-project-form .form-row {
     grid-template-columns: 1fr;
