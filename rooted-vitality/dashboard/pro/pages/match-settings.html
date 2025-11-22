@@ -6790,9 +6790,10 @@
             coverageData.in_person_radius_miles = parseInt(document.getElementById('inoffice-radius-slider')?.value) || null;
           } else if (zipsChecked) {
             coverageData.in_person_option = 'zipcodes';
-            // Get zipcodes from tags
-            const zipTags = document.querySelectorAll('#inoffice-zip-tags .zip-tag');
-            coverageData.in_person_zipcodes = Array.from(zipTags).map(tag => tag.textContent.replace('×', '').trim());
+            // Get zipcodes from tags - use data-zip attribute
+            const zipTags = document.querySelectorAll('#inoffice-zip-tags [data-zip]');
+            coverageData.in_person_zipcodes = Array.from(zipTags).map(tag => tag.getAttribute('data-zip'));
+            console.log('[Coverage Settings] In-Person ZIP codes:', coverageData.in_person_zipcodes);
           }
         }
 
@@ -6807,9 +6808,10 @@
             coverageData.housecalls_radius_miles = parseInt(document.getElementById('housecalls-radius-slider')?.value) || null;
           } else if (zipsChecked) {
             coverageData.housecalls_option = 'zipcodes';
-            // Get zipcodes from tags
-            const zipTags = document.querySelectorAll('#housecalls-zip-tags .zip-tag');
-            coverageData.housecalls_zipcodes = Array.from(zipTags).map(tag => tag.textContent.replace('×', '').trim());
+            // Get zipcodes from tags - use data-zip attribute
+            const zipTags = document.querySelectorAll('#housecalls-zip-tags [data-zip]');
+            coverageData.housecalls_zipcodes = Array.from(zipTags).map(tag => tag.getAttribute('data-zip'));
+            console.log('[Coverage Settings] House Calls ZIP codes:', coverageData.housecalls_zipcodes);
           }
         }
 
@@ -6822,9 +6824,10 @@
             coverageData.virtual_option = 'nationwide';
           } else if (statesChecked) {
             coverageData.virtual_option = 'states';
-            // Get states from tags
-            const stateTags = document.querySelectorAll('#virtualremote-state-tags .state-tag');
-            coverageData.virtual_states = Array.from(stateTags).map(tag => tag.textContent.replace('×', '').trim());
+            // Get states from tags - use dataset.state attribute
+            const stateTags = document.querySelectorAll('#virtualremote-state-tags [data-state]');
+            coverageData.virtual_states = Array.from(stateTags).map(tag => tag.getAttribute('data-state'));
+            console.log('[Coverage Settings] Virtual states:', coverageData.virtual_states);
           }
         }
 
