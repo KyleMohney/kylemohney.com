@@ -1051,12 +1051,32 @@ TABLE OF CONTENTS
   line-height: 1.4;
 }
 
+/* Close Project Modal - Specific Styling */
+#close-project-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+#close-project-form .form-group {
+  margin-bottom: 0;
+}
+
+#close-project-form .form-group label {
+  display: none;
+}
+
+#close-project-form .form-control {
+  resize: vertical;
+  min-height: 80px;
+}
+
 /* Radio Options in Modals */
 .radio-options {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  margin-top: 1rem;
+  margin-top: 0;
 }
 
 .radio-label {

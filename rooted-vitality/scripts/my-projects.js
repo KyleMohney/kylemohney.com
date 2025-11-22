@@ -53,10 +53,10 @@ function openCloseProjectModal(projectId) {
   }
   
   // Hide "other reason" field if shown
-  const otherReasonBox = document.getElementById('other-reason-box');
+  const otherReasonBox = document.getElementById('other-reason-group');
   if (otherReasonBox) {
     otherReasonBox.style.setProperty('display', 'none', 'important');
-    console.log('[My Projects] Other reason box hidden');
+    console.log('[My Projects] Other reason group hidden');
   }
   
   // Show the modal
@@ -479,24 +479,46 @@ function initializeModalHandlers() {
     }
   }
 
-  // Handle close-project-modal - NEW SIMPLE VERSION
+  // Handle close-project-modal - Show "other reason" field when "other" is selected
   const closeProjectModal = document.getElementById('close-project-modal');
   if (closeProjectModal) {
-    // Show "other reason" field when "other" radio is selected
-    const otherReasonBox = document.getElementById('other-reason-box');
+    const otherReasonGroup = document.getElementById('other-reason-group');
     const radios = closeProjectModal.querySelectorAll('input[name="closure-reason"]');
     
     radios.forEach(radio => {
       radio.addEventListener('change', (e) => {
-        if (otherReasonBox) {
+        if (otherReasonGroup) {
           if (e.target.value === 'other' && e.target.checked) {
-            otherReasonBox.style.display = 'block';
+            otherReasonGroup.style.display = 'block';
           } else {
-            otherReasonBox.style.display = 'none';
+            otherReasonGroup.style.display = 'none';
           }
         }
       });
     });
+
+    // Close modal handlers
+    const closeBtn = closeProjectModal.querySelector('.modal__close');
+    const cancelBtn = closeProjectModal.querySelector('.modal-cancel');
+    const overlay = closeProjectModal.querySelector('.modal__overlay');
+    
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => {
+        closeProjectModal.classList.add('modal--hidden');
+      });
+    }
+    
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', () => {
+        closeProjectModal.classList.add('modal--hidden');
+      });
+    }
+    
+    if (overlay) {
+      overlay.addEventListener('click', () => {
+        closeProjectModal.classList.add('modal--hidden');
+      });
+    }
   }
 }
 

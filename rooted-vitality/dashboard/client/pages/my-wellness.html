@@ -271,60 +271,61 @@
   <div id="close-project-modal" class="modal modal--hidden">
     <div class="modal__overlay"></div>
     <div class="modal__content modal__content--small">
-      <button class="modal__close" aria-label="Close modal">&times;</button>
-      
       <div class="modal__header">
-        <h2 class="modal__title">Close Journey</h2>
-        <p class="modal__subtitle">Please tell us the outcome of this wellness journey</p>
+        <div>
+          <h2 class="modal__title">Close Journey</h2>
+          <p class="modal__subtitle">What's the outcome of this wellness journey?</p>
+        </div>
+        <button class="modal__close" aria-label="Close modal">&times;</button>
       </div>
 
-      <form id="close-project-form">
-        <div class="form-group">
-          <label>What happened with this journey?</label>
-          
-          <div class="radio-options">
-            <label class="radio-label">
-              <input type="radio" name="closure-reason" value="hired" required>
-              <span class="radio-text">
-                <strong>Hired a Practitioner</strong>
-                <small>I found and hired someone for this journey</small>
-              </span>
-            </label>
+      <div class="modal__body">
+        <form id="close-project-form">
+          <div class="form-group">
+            <div class="radio-options">
+              <label class="radio-label">
+                <input type="radio" name="closure-reason" value="hired" required>
+                <span class="radio-text">
+                  <strong>Hired a Practitioner</strong>
+                  <small>I found and hired someone for this journey</small>
+                </span>
+              </label>
 
-            <label class="radio-label">
-              <input type="radio" name="closure-reason" value="canceled" required>
-              <span class="radio-text">
-                <strong>Canceled Journey</strong>
-                <small>I no longer need help with this</small>
-              </span>
-            </label>
+              <label class="radio-label">
+                <input type="radio" name="closure-reason" value="canceled" required>
+                <span class="radio-text">
+                  <strong>Canceled Journey</strong>
+                  <small>I no longer need help with this</small>
+                </span>
+              </label>
 
-            <label class="radio-label">
-              <input type="radio" name="closure-reason" value="other" required>
-              <span class="radio-text">
-                <strong>Other</strong>
-                <small>Something else happened</small>
-              </span>
-            </label>
+              <label class="radio-label">
+                <input type="radio" name="closure-reason" value="other" required>
+                <span class="radio-text">
+                  <strong>Other</strong>
+                  <small>Something else happened</small>
+                </span>
+              </label>
+            </div>
           </div>
-        </div>
 
-        <div class="form-group" id="other-reason-group" style="display: none;">
-          <label for="other-reason">Please explain (optional)</label>
-          <textarea 
-            id="other-reason" 
-            name="other-reason" 
-            rows="4" 
-            placeholder="Tell us what happened with this wellness journey..."
-            class="form-control"
-          ></textarea>
-        </div>
+          <div class="form-group" id="other-reason-group" style="display: none;">
+            <label for="other-reason">Please explain</label>
+            <textarea 
+              id="other-reason" 
+              name="other-reason" 
+              rows="3" 
+              placeholder="Tell us what happened with this wellness journey..."
+              class="form-control"
+            ></textarea>
+          </div>
+        </form>
+      </div>
 
-        <div class="form-actions">
-          <button type="button" class="btn btn-secondary modal-cancel">Cancel</button>
-          <button type="submit" class="btn btn-primary">Close Journey</button>
-        </div>
-      </form>
+      <div class="modal__footer">
+        <button type="button" class="btn btn-secondary modal-cancel">Cancel</button>
+        <button type="submit" class="btn btn-primary" form="close-project-form">Close Journey</button>
+      </div>
     </div>
   </div>
 
