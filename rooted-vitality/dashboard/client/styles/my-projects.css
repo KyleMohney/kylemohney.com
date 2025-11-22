@@ -1070,6 +1070,27 @@ TABLE OF CONTENTS
   display: none;
 }
 
+#close-project-form .radio-options {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.875rem !important;
+  margin-top: 1rem !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+#close-project-form .radio-label {
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  height: auto !important;
+  max-height: none !important;
+}
+
 #close-project-form .form-control {
   resize: vertical;
   min-height: 80px;
