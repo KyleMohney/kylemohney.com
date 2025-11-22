@@ -144,14 +144,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             
             // Fetch credentials from practitioner_credentials table
+            // Query by practitioner_serial (not id) to match the foreign key
+            console.log('[Practitioner Profile] Fetching credentials for serial:', practitioner.serial_number);
             const { data: credentialsData, error: credentialsError } = await window.supabaseClient
                 .from('practitioner_credentials')
                 .select('*')
-                .eq('id', practitionerId)
-                .single();
+                .eq('practitioner_serial', practitioner.serial_number)
+                .maybeSingle();
+            
+            console.log('[Practitioner Profile] Credentials query result - error:', credentialsError);
+            console.log('[Practitioner Profile] Credentials query result - data:', credentialsData);
             
             if (!credentialsError && credentialsData) {
                 // Merge credentials data into practitioner object
+                console.log('[Practitioner Profile] ✓ Credentials row found for:', practitioner.serial_number);
                 console.log('[Practitioner Profile] Raw credentialsData:', credentialsData);
                 console.log('[Practitioner Profile] credentials field type:', typeof credentialsData.credentials);
                 console.log('[Practitioner Profile] credentials field value:', credentialsData.credentials);
@@ -161,24 +167,49 @@ document.addEventListener('DOMContentLoaded', async () => {
                 
                 practitioner = {
                     ...practitioner,
-                    credentials: credentialsData.credentials,
-                    badge_verified: credentialsData.badge_verified,
-                    badge_certified: credentialsData.badge_certified,
-                    badge_licensed: credentialsData.badge_licensed,
-                    badge_background_check_verified: credentialsData.badge_background_check_verified,
-                    credentials_verified: credentialsData.credentials_verified,
-                    background_check_status: credentialsData.background_check_status,
-                    background_check_date: credentialsData.background_check_date,
-                    continuing_education: credentialsData.continuing_education
+                    credentials: credentialsData.credentials || [],
+                    badge_verified: credentialsData.badge_verified || false,
+                    badge_certified: credentialsData.badge_certified || false,
+                    badge_licensed: credentialsData.badge_licensed || false,
+                    badge_background_check_verified: credentialsData.badge_background_check_verified || false,
+                    credentials_verified: credentialsData.credentials_verified || false,
+                    background_check_status: credentialsData.background_check_status || null,
+                    background_check_date: credentialsData.background_check_date || null,
+                    continuing_education: credentialsData.continuing_education || []
                 };
-                console.log('[Practitioner Profile] Credentials loaded from practitioner_credentials');
-                console.log('[Practitioner Profile] Merged practitioner.credentials:', practitioner.credentials);
+                console.log('[Practitioner Profile] ✓ Credentials loaded from practitioner_credentials');
                 console.log('[Practitioner Profile] Merged practitioner.badge_certified:', practitioner.badge_certified);
                 console.log('[Practitioner Profile] Merged practitioner.badge_licensed:', practitioner.badge_licensed);
+                console.log('[Practitioner Profile] Merged practitioner.background_check_status:', practitioner.background_check_status);
             } else if (credentialsError) {
-                console.error('[Practitioner Profile] Error loading credentials:', credentialsError);
+                console.error('[Practitioner Profile] ✗ Error loading credentials:', credentialsError);
+                console.warn('[Practitioner Profile] Initializing credentials with defaults');
+                practitioner = {
+                    ...practitioner,
+                    credentials: [],
+                    badge_verified: false,
+                    badge_certified: false,
+                    badge_licensed: false,
+                    badge_background_check_verified: false,
+                    credentials_verified: false,
+                    background_check_status: null,
+                    background_check_date: null,
+                    continuing_education: []
+                };
             } else {
-                console.warn('[Practitioner Profile] No credentials data found for practitioner');
+                console.warn('[Practitioner Profile] No credentials row found for practitioner, initializing with defaults');
+                practitioner = {
+                    ...practitioner,
+                    credentials: [],
+                    badge_verified: false,
+                    badge_certified: false,
+                    badge_licensed: false,
+                    badge_background_check_verified: false,
+                    credentials_verified: false,
+                    background_check_status: null,
+                    background_check_date: null,
+                    continuing_education: []
+                };
             }
             
             // Fetch availability from practitioner_availability table
@@ -1102,19 +1133,58 @@ async function renderServicesCard() {
 function renderCredentialsCard() {
     let hasContent = false;
     
-    console.log('[renderCredentialsCard] Starting credential rendering...');
+    console.log('[renderCredentialsCard] ========== CREDENTIALS CARD RENDERING START ==========');
+    console.log('[renderCredentialsCard] practitioner object keys:', Object.keys(practitioner || {}));
     console.log('[renderCredentialsCard] practitioner.credentials:', practitioner.credentials);
     console.log('[renderCredentialsCard] practitioner.credentials type:', typeof practitioner.credentials);
     console.log('[renderCredentialsCard] practitioner.credentials is array?', Array.isArray(practitioner.credentials));
     console.log('[renderCredentialsCard] practitioner.badge_certified:', practitioner.badge_certified);
     console.log('[renderCredentialsCard] practitioner.badge_licensed:', practitioner.badge_licensed);
+    console.log('[renderCredentialsCard] practitioner.background_check_status:', practitioner.background_check_status);
     console.log('[renderCredentialsCard] practitioner.continuing_education:', practitioner.continuing_education);
     
-    // ===== CREDENTIALS =====
-    if (practitioner.credentials && practitioner.credentials.length > 0) {
-        console.log('[renderCredentialsCard] Found', practitioner.credentials.length, 'credentials');
+    // Build array from explicit credentials + badge pseudo-credentials
+    let allCredentials = [];
+    
+    // Add explicit credentials if they exist and are an array
+    if (Array.isArray(practitioner.credentials) && practitioner.credentials.length > 0) {
+        allCredentials = [...practitioner.credentials];
+        console.log('[renderCredentialsCard] Added', practitioner.credentials.length, 'explicit credentials');
+    }
+    
+    // Add badges as pseudo-credentials so they appear in the card
+    if (practitioner.badge_certified) {
+        allCredentials.push({
+            credential_type: 'Certification',
+            title: 'Certified Practitioner',
+            issuer: 'Rooted Vitality'
+        });
+        console.log('[renderCredentialsCard] Added badge_certified as pseudo-credential');
+    }
+    
+    if (practitioner.badge_licensed) {
+        allCredentials.push({
+            credential_type: 'License',
+            title: 'Licensed Practitioner',
+            issuer: 'Professional Board'
+        });
+        console.log('[renderCredentialsCard] Added badge_licensed as pseudo-credential');
+    }
+    
+    if (practitioner.background_check_status === 'passed') {
+        allCredentials.push({
+            credential_type: 'Verification',
+            title: 'Background Check Passed',
+            issuer: 'Rooted Vitality'
+        });
+        console.log('[renderCredentialsCard] Added background_check as pseudo-credential');
+    }
+    
+    // ===== RENDER CREDENTIALS =====
+    if (allCredentials.length > 0) {
+        console.log('[renderCredentialsCard] Found', allCredentials.length, 'total credentials to display');
         hasContent = true;
-        const credentialsHtml = practitioner.credentials
+        const credentialsHtml = allCredentials
             .slice(0, 5)
             .map(cred => `
                 <div class="credential-item-compact">
