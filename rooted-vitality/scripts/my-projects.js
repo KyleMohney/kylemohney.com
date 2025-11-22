@@ -748,48 +748,45 @@ async function submitCreateProjectAndFindMatches(e) {
  */
 async function findMatchingPractitioners(project) {
   try {
-    // Load all active practitioners
-    const { data: allPractitioners, error } = await supabaseClient
-      .from('practitioners')
-      .select('id, serial_number, specialty, service_areas, experience_level')
-      .eq('status', 'active');
+    console.log('[findMatchingPractitioners] Starting match for project:', project.id, 'category:', project.category_id);
+    
+    // Call the SQL matching function via RPC
+    const { data: matches, error: matchError } = await supabaseClient
+      .rpc('match_practitioners', { p_project_id: project.id });
 
-    if (error) throw error;
+    if (matchError) {
+      console.error('[findMatchingPractitioners] RPC error:', matchError);
+      throw matchError;
+    }
 
-    // Score each practitioner
-    const matches = allPractitioners
-      .map(practitioner => {
-        let score = 0;
+    if (!matches || matches.length === 0) {
+      console.warn('[findMatchingPractitioners] No matches found for project:', project.id);
+      console.log('[findMatchingPractitioners] Project details:', {
+        category_id: project.category_id,
+        category_name: project.category_name,
+        travel_preference: project.travel_preference,
+        zipcode: project.zipcode,
+        state: project.state
+      });
+      return [];
+    }
 
-        // Specialty match
-        if (project.category_id && practitioner.specialty) {
-          const catName = taxonomyData[project.category_id]?.name || '';
-          if (practitioner.specialty.toLowerCase().includes(catName.toLowerCase())) {
-            score += 50;
-          }
-        }
+    // Transform RPC results to match insert format
+    const matchRecords = matches.map(match => ({
+      project_serial: project.project_serial || project.id,
+      project_id: project.id,
+      client_serial: project.client_serial,
+      practitioner_serial: match.serial_number,
+      match_score: match.match_score,
+      status: 'matched'
+    }));
 
-        // Experience level bonus
-        if (practitioner.experience_level === 'expert') score += 20;
-        if (practitioner.experience_level === 'intermediate') score += 10;
-
-        return {
-          project_id: project.id,
-          client_serial: project.client_serial,
-          practitioner_serial: practitioner.serial_number,
-          match_score: Math.max(1, score),
-          match_status: 'pending'
-        };
-      })
-      .filter(m => m.match_score > 0)
-      .sort((a, b) => b.match_score - a.match_score)
-      .slice(0, 5); // Top 5 matches
-
-    console.log('[findMatchingPractitioners] Generated', matches.length, 'matches');
-    return matches;
+    console.log('[findMatchingPractitioners] Generated', matchRecords.length, 'matches with scores:', matchRecords.map(m => `${m.practitioner_serial}:${m.match_score}`).join(', '));
+    return matchRecords;
 
   } catch (error) {
     console.error('[findMatchingPractitioners] Error:', error);
+    console.error('[findMatchingPractitioners] Error details:', JSON.stringify(error, null, 2));
     return [];
   }
 }
