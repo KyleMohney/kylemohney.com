@@ -6833,11 +6833,26 @@
 
         console.log('[Coverage Settings] Saving coverage data:', coverageData);
 
-        // Update practitioners table
+        // Get the practitioner profile to find the practitioner ID (not auth user ID)
+        const { data: practitionerData, error: practitionerError } = await supabaseClient
+          .from('practitioners')
+          .select('id')
+          .eq('auth_user_id', user.id)
+          .single();
+
+        if (practitionerError || !practitionerData) {
+          console.error('[Coverage Settings] Could not find practitioner record:', practitionerError);
+          showToast('Could not find your practitioner profile. Please contact support.', 'error');
+          return;
+        }
+
+        console.log('[Coverage Settings] Found practitioner record:', practitionerData.id);
+
+        // Update practitioners table using practitioner's actual database ID
         const { data, error } = await supabaseClient
           .from('practitioners')
           .update(coverageData)
-          .eq('id', user.id);
+          .eq('id', practitionerData.id);
 
         if (error) {
           console.error('[Coverage Settings] Save error:', error);
