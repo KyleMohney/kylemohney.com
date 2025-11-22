@@ -119,9 +119,7 @@ DROP POLICY IF EXISTS "Practitioners see own matches" ON project_practitioner_ma
 CREATE POLICY "Clients see project matches" ON project_practitioner_matches
 FOR SELECT
 USING (
-  project_id IN (
-    SELECT project_id FROM projects WHERE client_serial = auth.uid()
-  )
+  client_serial IN (SELECT serial_number FROM clients WHERE id = auth.uid())
 );
 
 -- SELECT: Practitioners see matches they're involved in
@@ -135,12 +133,12 @@ USING (
 CREATE POLICY "Participants update matches" ON project_practitioner_matches
 FOR UPDATE
 USING (
-  project_id IN (SELECT project_id FROM projects WHERE client_serial = auth.uid())
-  OR practitioner_serial = auth.uid()
+  client_serial IN (SELECT serial_number FROM clients WHERE id = auth.uid())
+  OR practitioner_serial IN (SELECT serial_number FROM practitioners WHERE id = auth.uid())
 )
 WITH CHECK (
-  project_id IN (SELECT project_id FROM projects WHERE client_serial = auth.uid())
-  OR practitioner_serial = auth.uid()
+  client_serial IN (SELECT serial_number FROM clients WHERE id = auth.uid())
+  OR practitioner_serial IN (SELECT serial_number FROM practitioners WHERE id = auth.uid())
 );
 
 -- INSERT: Matches created by service role (server-side)

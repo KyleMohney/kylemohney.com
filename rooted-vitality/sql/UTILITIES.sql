@@ -116,5 +116,99 @@ CREATE INDEX IF NOT EXISTS idx_project_messages_project_id
 ON project_messages(project_id);
 
 -- ============================================================================
+-- SECTION 3: RPC FUNCTIONS FOR CLIENT OPERATIONS
+-- ============================================================================
+-- Create match function - allows clients to create matches with RLS enforcement
+
+CREATE OR REPLACE FUNCTION create_practitioner_match(
+  p_project_serial INT,
+  p_client_serial TEXT,
+  p_practitioner_serial TEXT,
+  p_match_score INT DEFAULT 75
+)
+RETURNS TABLE (match_id uuid, status text) AS $$
+DECLARE
+  v_match_id uuid;
+  v_status text;
+BEGIN
+  INSERT INTO project_practitioner_matches (
+    project_serial,
+    client_serial,
+    practitioner_serial,
+    status,
+    match_score,
+    client_initiated,
+    matched_at
+  )
+  VALUES (
+    p_project_serial,
+    p_client_serial,
+    p_practitioner_serial,
+    'pending',
+    p_match_score,
+    true,
+    NOW()
+  )
+  ON CONFLICT DO NOTHING
+  RETURNING id INTO v_match_id;
+  
+  IF v_match_id IS NULL THEN
+    -- Match already exists, fetch existing
+    SELECT id INTO v_match_id FROM project_practitioner_matches 
+    WHERE project_serial = p_project_serial 
+      AND client_serial = p_client_serial 
+      AND practitioner_serial = p_practitioner_serial;
+  END IF;
+  
+  -- Fetch match info into variables (avoid ambiguity with table columns)
+  SELECT 
+    ppm.id,
+    ppm.status
+  INTO 
+    v_match_id,
+    v_status
+  FROM project_practitioner_matches ppm
+  WHERE ppm.id = v_match_id;
+  
+  -- Return using variables
+  match_id := v_match_id;
+  status := v_status;
+  RETURN;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Create message insertion function - bypasses RLS for auto-messages
+CREATE OR REPLACE FUNCTION create_project_message(
+  p_project_id uuid,
+  p_practitioner_id uuid,
+  p_client_id uuid,
+  p_sender_id uuid,
+  p_sender_type text,
+  p_message text
+)
+RETURNS VOID AS $$
+BEGIN
+  INSERT INTO project_messages (
+    project_id,
+    practitioner_id,
+    client_id,
+    sender_id,
+    sender_type,
+    message,
+    is_read
+  )
+  VALUES (
+    p_project_id,
+    p_practitioner_id,
+    p_client_id,
+    p_sender_id,
+    p_sender_type,
+    p_message,
+    false
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- ============================================================================
 -- END UTILITIES
 -- ============================================================================

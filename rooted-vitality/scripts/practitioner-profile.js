@@ -460,14 +460,23 @@ async function openConnectionRequest(practitionerId) {
     }
     
     try {
-        // First, check if we have a project_id from sessionStorage (from find-practitioners flow)
+        // First, check if we have a project_id from URL (from find-practitioners flow)
+        const urlParams = new URLSearchParams(window.location.search);
+        let projectIdFromUrl = urlParams.get('project_id');
+        console.log('[Practitioner Profile] Project ID from URL:', projectIdFromUrl);
+        
+        // Also check sessionStorage as fallback
         const storedProjectId = sessionStorage.getItem('selectedProjectId');
         console.log('[Practitioner Profile] Stored project ID from sessionStorage:', storedProjectId);
+        console.log('[Practitioner Profile] Stored project ID type:', typeof storedProjectId);
         
-        if (storedProjectId) {
+        const projectId = projectIdFromUrl || storedProjectId;
+        console.log('[Practitioner Profile] Final project ID to use:', projectId);
+        
+        if (projectId && projectId !== 'undefined' && projectId !== '') {
             // We already know the project - use it directly
-            console.log('[Practitioner Profile] Using known project from sessionStorage');
-            await createMatchWithProjectId(storedProjectId, practitionerId);
+            console.log('[Practitioner Profile] Using known project, creating match directly');
+            await createMatchWithProjectId(projectId, practitionerId);
             return;
         }
         
@@ -509,7 +518,7 @@ async function openConnectionRequest(practitionerId) {
         
         const { data: projects, error: projectError } = await window.supabaseClient
             .from('projects')
-            .select('id, description, client_serial, category_id, category_name, project_status, created_at')
+            .select('id, project_serial, description, client_serial, category_id, category_name, project_status, created_at')
             .eq('client_serial', clientData.serial_number)
             .order('created_at', { ascending: false });
         
@@ -531,15 +540,9 @@ async function openConnectionRequest(practitionerId) {
             return;
         }
         
-        if (projects.length === 1) {
-            // Only one project - create match directly
-            console.log('[Practitioner Profile] One project found, creating match directly');
-            await createMatchAndRedirect(projects[0], practitionerId, proData.serial_number);
-        } else {
-            // Multiple projects - show selector modal
-            console.log('[Practitioner Profile] Multiple projects found, showing selector');
-            showProjectSelector(projects, practitionerId, proData.serial_number);
-        }
+        // Always use the first/most recent project (they're sorted by created_at DESC)
+        console.log('[Practitioner Profile] Using most recent project:', projects[0].id);
+        await createMatchAndRedirect(projects[0], practitionerId, proData.serial_number);
         
     } catch (error) {
         console.error('[Practitioner Profile] Error in openConnectionRequest:', error);
@@ -554,11 +557,15 @@ async function createMatchWithProjectId(projectId, practitionerId) {
     try {
         console.log('[Practitioner Profile] createMatchWithProjectId called with projectId:', projectId, 'practitionerId:', practitionerId);
         
-        if (!projectId) {
-            console.error('[Practitioner Profile] No project ID provided to createMatchWithProjectId');
-            alert('Error: No project selected');
+        if (!projectId || projectId === 'undefined' || projectId === '') {
+            console.error('[Practitioner Profile] ✗ No valid project ID provided to createMatchWithProjectId');
+            console.error('[Practitioner Profile] Project ID value:', projectId);
+            console.error('[Practitioner Profile] Project ID type:', typeof projectId);
+            alert('Error: No valid project selected');
             return;
         }
+        
+        console.log('[Practitioner Profile] ✓ Project ID is valid, proceeding...');
         
         // Fetch the project to get client_serial and practitioner serial
         console.log('[Practitioner Profile] Fetching project details...');
@@ -605,20 +612,16 @@ async function createMatchWithProjectId(projectId, practitionerId) {
 async function createMatchAndRedirect(project, practitionerId, practitionerSerial) {
     try {
         console.log('[Practitioner Profile] Creating match for project:', project.project_serial);
+        console.log('[Practitioner Profile] Project object keys:', Object.keys(project));
+        console.log('[Practitioner Profile] Full project object:', project);
         
-        const insertData = {
-            project_serial: project.project_serial,
-            client_serial: project.client_serial,
-            practitioner_serial: practitionerSerial,
-            status: 'active',
-            match_score: 75
-        };
-        console.log('[Practitioner Profile] Insert data:', insertData);
-        
-        const { data, error } = await window.supabaseClient
-            .from('project_practitioner_matches')
-            .insert(insertData)
-            .select();
+        // Use RPC function to create match (bypasses RLS restrictions)
+        const { data, error } = await window.supabaseClient.rpc('create_practitioner_match', {
+            p_project_serial: project.project_serial,
+            p_client_serial: project.client_serial,
+            p_practitioner_serial: practitionerSerial,
+            p_match_score: 75
+        });
         
         if (error) {
             // 23505 = duplicate key (match already exists - this is fine, proceed to my-matches)
@@ -630,7 +633,7 @@ async function createMatchAndRedirect(project, practitionerId, practitionerSeria
                 return;
             }
         } else {
-            console.log('[Practitioner Profile] Match created successfully:', data);
+            console.log('[Practitioner Profile] Match created successfully');
         }
 
         // Create auto-message
@@ -646,17 +649,20 @@ async function createMatchAndRedirect(project, practitionerId, practitionerSeria
                 const clientName = clientData.first_name || 'Client';
                 const messageText = `${clientName} wants connect about their wellness project!`;
 
-                await window.supabaseClient
-                    .from('project_messages')
-                    .insert({
-                        project_id: project.project_id,  // Use project_id (INTEGER), not id (UUID)
-                        practitioner_id: practitionerId,
-                        client_id: clientData.id,
-                        sender_id: clientData.id,
-                        sender_type: 'client',
-                        message: messageText,
-                        is_read: false
-                    });
+                const { error: msgInsertError } = await window.supabaseClient.rpc('create_project_message', {
+                    p_project_id: project.id,
+                    p_practitioner_id: practitionerId,
+                    p_client_id: clientData.id,
+                    p_sender_id: clientData.id,
+                    p_sender_type: 'client',
+                    p_message: messageText
+                });
+                
+                if (msgInsertError) {
+                    console.error('[Practitioner Profile] Error inserting auto-message:', msgInsertError);
+                } else {
+                    console.log('[Practitioner Profile] Auto-message created successfully');
+                }
             }
         } catch (msgError) {
             console.warn('[Practitioner Profile] Error creating auto-message:', msgError);
@@ -676,65 +682,7 @@ async function createMatchAndRedirect(project, practitionerId, practitionerSeria
 /**
  * Show project selector modal for multi-project clients
  */
-function showProjectSelector(projects, practitionerId, practitionerSerial) {
-    // Create a simple modal to select project
-    const modal = document.createElement('div');
-    modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0,0,0,0.5);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-    `;
-    
-    let projectsHtml = projects.map(p => `
-        <option value="${p.id}">${p.category_name || p.category_id || 'Project'}</option>
-    `).join('');
-    
-    modal.innerHTML = `
-        <div style="background: white; padding: 2rem; border-radius: 8px; max-width: 400px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-            <h3 style="margin-top: 0; font-family: var(--font-sans);">Select Project for Connection</h3>
-            <p style="color: #666; font-size: 0.95rem;">Which project would you like to connect this practitioner to?</p>
-            
-            <select id="project-selector" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 0.95rem; margin: 1rem 0;">
-                <option value="">Choose a project...</option>
-                ${projectsHtml}
-            </select>
-            
-            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-                <button id="cancel-selector" style="flex: 1; padding: 0.75rem; background: #ddd; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">Cancel</button>
-                <button id="confirm-selector" style="flex: 1; padding: 0.75rem; background: #5c9a72; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">Connect</button>
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    const selector = document.getElementById('project-selector');
-    const confirmBtn = document.getElementById('confirm-selector');
-    const cancelBtn = document.getElementById('cancel-selector');
-    
-    confirmBtn.addEventListener('click', async () => {
-        const selectedProjectId = selector.value;
-        if (!selectedProjectId) {
-            alert('Please select a project');
-            return;
-        }
-        
-        const selectedProject = projects.find(p => p.id === selectedProjectId);
-        document.body.removeChild(modal);
-        await createMatchAndRedirect(selectedProject, practitionerId, practitionerSerial);
-    });
-    
-    cancelBtn.addEventListener('click', () => {
-        document.body.removeChild(modal);
-    });
-}
+
 
 // ======================================================
 // 2. PROFILE RENDERING FUNCTIONS

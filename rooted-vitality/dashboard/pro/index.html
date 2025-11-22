@@ -506,6 +506,7 @@
   <script src="../../scripts/config.js"></script>
   <script src="../../scripts/authManager.js"></script>
   <script src="../../scripts/authHooks.js"></script>
+  <script src="../../scripts/notificationManager.js"></script>
   <script src="../../injections.js"></script>
   
   <script>
@@ -611,7 +612,7 @@
         const practitionerSerial = practitioner.serial_number;
         console.log('[Pro Clients] Practitioner serial:', practitionerSerial);
 
-        // Get new clients (active matches)
+        // Get new clients (pending matches waiting for practitioner response)
         const { data: matches, error: matchError } = await window.supabaseClient
           .from('project_practitioner_matches')
           .select(`
@@ -619,11 +620,14 @@
             project_serial,
             client_serial,
             status,
+            match_status,
+            practitioner_response,
             created_at,
             match_score
           `)
           .eq('practitioner_serial', practitionerSerial)
-          .eq('status', 'active');
+          .eq('match_status', 'pending')
+          .is('practitioner_response', null);
 
         if (matchError) {
           console.error('[Pro Clients] Error loading matches:', matchError);
@@ -723,12 +727,23 @@
           let currentMatchForDeclineMsg = null;
 
           card.querySelector('[data-action="accept"]').addEventListener('click', async () => {
-            const { error } = await window.supabaseClient
-              .from('project_practitioner_matches')
-              .update({ status: 'accepted' })
-              .eq('id', match.id);
+            const { data, error } = await window.supabaseClient
+              .rpc('update_practitioner_response', {
+                p_match_id: match.id,
+                p_response: 'accepted'
+              });
 
             if (!error) {
+              // Notify client of acceptance
+              if (window.notifyClientOfMatchResponse) {
+                await notifyClientOfMatchResponse({
+                  clientSerial: match.client_serial,
+                  practitionerName: currentUser?.dba_name || currentUser?.legal_name || 'A practitioner',
+                  projectName: match.projectName || 'your project',
+                  action: 'accepted'
+                });
+              }
+              
               showToast('Client Accepted', `You accepted ${clientName}. Check your inbox to message them!`, 'success');
               card.remove();
             } else {
@@ -750,11 +765,23 @@
           card.querySelector('[data-action="decline"]').addEventListener('click', async () => {
             if (confirm('Are you sure you want to decline this client? They will be notified.')) {
               const { error } = await window.supabaseClient
-                .from('project_practitioner_matches')
-                .update({ status: 'declined' })
-                .eq('id', match.id);
+                .rpc('update_practitioner_response', {
+                  p_match_id: match.id,
+                  p_response: 'declined'
+                });
 
               if (!error) {
+                // Notify client of decline
+                if (window.notifyClientOfMatchResponse) {
+                  await notifyClientOfMatchResponse({
+                    clientSerial: match.client_serial,
+                    practitionerName: currentUser?.dba_name || currentUser?.legal_name || 'A practitioner',
+                    projectName: match.projectName || 'your project',
+                    action: 'declined',
+                    reason: 'Not available at this time'
+                  });
+                }
+                
                 showToast('Declined', `You declined ${clientName}`, 'info');
                 card.remove();
               }
@@ -765,9 +792,10 @@
             if (confirm('Block this customer? They won\'t be able to match with you again.')) {
               // Decline the match
               const { error: declineError } = await window.supabaseClient
-                .from('project_practitioner_matches')
-                .update({ status: 'declined' })
-                .eq('id', match.id);
+                .rpc('update_practitioner_response', {
+                  p_match_id: match.id,
+                  p_response: 'declined'
+                });
 
               if (declineError) {
                 showToast('Error', 'Failed to block customer', 'error');
@@ -816,11 +844,13 @@
       }
 
       try {
-        // Decline the match
+        // Decline the match with reason
         const { error: declineError } = await window.supabaseClient
-          .from('project_practitioner_matches')
-          .update({ status: 'declined' })
-          .eq('id', currentMatchForDeclineMsg.id);
+          .rpc('update_practitioner_response', {
+            p_match_id: currentMatchForDeclineMsg.id,
+            p_response: 'declined_with_message',
+            p_reason: messageText
+          });
 
         if (declineError) {
           alert('Error declining');
@@ -841,6 +871,18 @@
           });
 
         if (!messageError) {
+          // Notify client of decline with message
+          if (window.notifyClientOfMatchResponse) {
+            const currentUser = window.authManager?.getCurrentUser();
+            await notifyClientOfMatchResponse({
+              clientSerial: currentMatchForDeclineMsg.client_serial,
+              practitionerName: currentUser?.dba_name || currentUser?.legal_name || 'A practitioner',
+              projectName: currentMatchForDeclineMsg.projectName || 'your project',
+              action: 'declined',
+              reason: messageText
+            });
+          }
+          
           document.getElementById('decline-message-modal').style.display = 'none';
           // Remove card from UI
           const cards = document.querySelectorAll('[data-match-id="' + currentMatchForDeclineMsg.id + '"]');

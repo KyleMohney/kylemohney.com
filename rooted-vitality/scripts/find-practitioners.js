@@ -97,7 +97,7 @@ async function loadProject() {
       return;
     }
 
-    // Get project
+    // Get project - explicitly select all fields including project_serial (INTEGER for matching)
     const { data: project, error: projectError } = await supabaseClient
       .from('projects')
       .select('*')
@@ -105,6 +105,10 @@ async function loadProject() {
       .single();
 
     console.log('[loadProject] Query result - Project:', project, 'Error:', projectError);
+    if (project) {
+      console.log('[loadProject] Project fields available:', Object.keys(project).join(', '));
+      console.log('[loadProject] project.project_serial (INTEGER for matching):', project.project_serial);
+    }
 
     if (projectError || !project) {
       console.error('[loadProject] Error fetching project:', projectError);
@@ -120,7 +124,6 @@ async function loadProject() {
 
     // Load practitioners for this project
     selectedProject = project;
-    sessionStorage.setItem('selectedProjectId', project.project_id);  // Store INTEGER serial number
     
     // Load existing matches first
     await loadExistingMatches();
@@ -152,11 +155,13 @@ async function loadExistingMatches() {
       return;
     }
     
-    // Get all matches for this client
+    // Get all matches for this client ON THIS PROJECT ONLY
+    // project_practitioner_matches.project_serial is INTEGER (project serial number)
     const { data: matches, error: matchesError } = await supabaseClient
       .from('project_practitioner_matches')
       .select('practitioner_serial')
-      .eq('client_serial', clientProfile.serial_number);
+      .eq('client_serial', clientProfile.serial_number)
+      .eq('project_serial', selectedProject.project_serial);
     
     if (matchesError) {
       console.warn('[loadExistingMatches] Error loading matches:', matchesError);
@@ -219,37 +224,8 @@ async function loadPractitioners(project) {
       console.log('[loadPractitioners] Found', practitioners.length, 'matching practitioners');
       console.log('[loadPractitioners] Practitioners data:', practitioners);
       
-      // Fetch full practitioner details including badge fields
-      if (practitioners.length > 0) {
-        const practitionerIds = practitioners.map(p => p.id);
-        const { data: fullPractitioners, error: detailsError } = await supabaseClient
-          .from('practitioners')
-          .select('id, badge_licensed, badge_certified, badge_background_check, credentials_verified, profile_completeness_percent')
-          .in('id', practitionerIds);
-        
-        if (!detailsError && fullPractitioners) {
-          console.log('[loadPractitioners] Full practitioner details:', fullPractitioners);
-          
-          // Merge badge fields into practitioners data
-          const badgeMap = {};
-          fullPractitioners.forEach(p => {
-            badgeMap[p.id] = {
-              badge_licensed: p.badge_licensed,
-              badge_certified: p.badge_certified,
-              badge_background_check: p.badge_background_check,
-              credentials_verified: p.credentials_verified
-            };
-          });
-          
-          // Update practitioners with badge fields
-          practitioners = practitioners.map(p => ({
-            ...p,
-            ...badgeMap[p.id]
-          }));
-          
-          console.log('[loadPractitioners] Merged practitioners with badges:', practitioners);
-        }
-      }
+      // Enrich practitioners with profile data (photos, badges, etc)
+      await enrichPractitionersWithProfileData(practitioners);
       
       allPractitioners = practitioners;
 
@@ -265,33 +241,131 @@ async function loadPractitioners(project) {
   }
 }
 
+/**
+ * Enrich practitioners with profile data from practitioner_profiles table
+ * and credentials data from practitioner_credentials table
+ * This adds photos, badges, and other profile fields needed for display
+ */
+async function enrichPractitionersWithProfileData(practitioners) {
+  if (!practitioners || practitioners.length === 0) return;
+
+  try {
+    console.log('[enrichPractitionersWithProfileData] Enriching', practitioners.length, 'practitioners');
+
+    // Get serial numbers to fetch profiles
+    const serialNumbers = practitioners.map(p => p.serial_number);
+
+    // Fetch profile data for all practitioners at once
+    const { data: profiles, error: profileError } = await supabaseClient
+      .from('practitioner_profiles')
+      .select('practitioner_serial, practice_logo_url, bio, dba_name')
+      .in('practitioner_serial', serialNumbers);
+
+    if (profileError) {
+      console.warn('[enrichPractitionersWithProfileData] Error fetching profiles:', profileError);
+      // Continue without profiles - not critical
+    }
+
+    // Fetch credentials data for badges
+    const { data: credentials, error: credentialsError } = await supabaseClient
+      .from('practitioner_credentials')
+      .select('practitioner_serial, credentials_verified, badge_licensed, badge_certified, background_check_status')
+      .in('practitioner_serial', serialNumbers);
+
+    if (credentialsError) {
+      console.warn('[enrichPractitionersWithProfileData] Error fetching credentials:', credentialsError);
+      // Continue without credentials - not critical
+    }
+
+    console.log('[enrichPractitionersWithProfileData] Fetched', profiles?.length || 0, 'profiles and', credentials?.length || 0, 'credentials');
+
+    // Create lookup maps for quick access
+    const profileMap = {};
+    profiles?.forEach(profile => {
+      profileMap[profile.practitioner_serial] = profile;
+    });
+
+    const credentialsMap = {};
+    credentials?.forEach(cred => {
+      credentialsMap[cred.practitioner_serial] = cred;
+    });
+
+    // Merge profile and credentials data into practitioners
+    practitioners.forEach(practitioner => {
+      const profile = profileMap[practitioner.serial_number];
+      const cred = credentialsMap[practitioner.serial_number];
+
+      if (profile) {
+        // Add profile fields to practitioner object
+        practitioner.profile_photo_url = profile.practice_logo_url;
+        
+        // Use profile bio if available, otherwise empty (card will handle)
+        if (profile.bio && !practitioner.bio) {
+          practitioner.bio = profile.bio;
+        }
+        
+        // Use profile dba_name if we don't have it
+        if (profile.dba_name && !practitioner.dba_name) {
+          practitioner.dba_name = profile.dba_name;
+        }
+      } else {
+        // Ensure photo field exists even without profile data
+        practitioner.profile_photo_url = null;
+      }
+
+      if (cred) {
+        // Add credentials/badge fields to practitioner object
+        practitioner.credentials_verified = cred.credentials_verified;
+        practitioner.badge_licensed = cred.badge_licensed;
+        practitioner.badge_certified = cred.badge_certified;
+        practitioner.background_check_status = cred.background_check_status;
+      }
+    });
+
+    console.log('[enrichPractitionersWithProfileData] Enrichment complete');
+  } catch (error) {
+    console.error('[enrichPractitionersWithProfileData] Exception:', error);
+    // Continue without enrichment - it's not critical
+  }
+}
+
 function updateProjectInfo(project) {
-  const subtitle = document.getElementById('directory-subtitle');
-  const infoDisplay = document.getElementById('project-info-display');
+  // Update project name/title
+  const projectName = document.getElementById('project-name');
+  if (projectName) {
+    projectName.textContent = project.custom_name || `${project.category_name} Project`;
+  }
+
+  // Update category
+  const projectCategory = document.getElementById('project-category');
+  if (projectCategory) {
+    projectCategory.textContent = project.category_name;
+  }
+
+  // Update description
+  const projectDescription = document.getElementById('project-description');
+  if (projectDescription) {
+    projectDescription.textContent = project.description;
+  }
+
+  // Update location
   const locationDisplay = document.getElementById('project-location');
-  const preferenceDisplay = document.getElementById('preference-display');
-
-  // Safely update subtitle (always exists)
-  if (subtitle) {
-    subtitle.textContent = `${project.description.substring(0, 60)}...`;
-  }
-
-  // Only update optional elements if they exist
-  if (infoDisplay) {
-    infoDisplay.textContent = project.description.substring(0, 150) + (project.description.length > 150 ? '...' : '');
-  }
-
   if (locationDisplay) {
-    locationDisplay.textContent = `📍 ${project.zipcode}, ${project.state}`;
-    locationDisplay.style.display = 'block';
+    const city = project.city || '';
+    const state = project.state || '';
+    const zipcode = project.zipcode || '';
+    const locationText = [city, state, zipcode].filter(Boolean).join(', ') || 'Not specified';
+    locationDisplay.textContent = locationText;
   }
 
+  // Update travel preference (session type)
+  const preferenceDisplay = document.getElementById('project-preference');
   if (preferenceDisplay) {
-    preferenceDisplay.textContent = capitalizeFirst(project.travel_preference);
+    const preference = capitalizeFirst(project.travel_preference);
+    preferenceDisplay.textContent = preference;
   }
 
   selectedProject = project;
-  sessionStorage.setItem('selectedProjectId', project.project_id);  // Store INTEGER serial number
 }
 
 /**
@@ -496,12 +570,14 @@ function createPractitionerCard(practitioner) {
     ${isMatched ? '<div class="matched-overlay"><div class="matched-label">Matched</div></div>' : ''}
     <div class="card-header">
       <div class="card-avatar-section">
-        <img src="${practitioner.profile_photo_url || 'https://via.placeholder.com/140?text=No+Photo'}" 
-             alt="${displayName}"
-             class="card-avatar"
-             onerror="this.src='https://via.placeholder.com/140?text=No+Photo'">
+        <div class="card-avatar-container">
+          <img src="${practitioner.profile_photo_url || 'https://via.placeholder.com/140?text=No+Photo'}" 
+               alt="${displayName}"
+               class="card-avatar"
+               onerror="this.src='https://via.placeholder.com/140?text=No+Photo'">
+          ${badgesHtml}
+        </div>
       </div>
-      ${badgesHtml}
     </div>
 
     <div class="card-body">
@@ -666,28 +742,26 @@ async function sendConnectionRequest(practitionerId, practitionerSerial) {
 
     console.log('[sendConnectionRequest] Match score:', matchScore);
 
-    // Create match with all fields
+    // Use RPC function to bypass RLS policy
     const { data, error } = await supabaseClient
-      .from('project_practitioner_matches')
-      .insert({
-        project_id: selectedProject.project_serial,
-        client_serial: selectedProject.client_serial,
-        practitioner_serial: practitionerSerial,
-        status: 'active',
-        match_score: matchScore,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        matched_at: new Date().toISOString(),
-        contacted_at: null,                          // Will be set when practitioner responds
-        match_score: matchScore,                     // Quality score from matching algorithm
-        distance_miles: distanceMiles,               // Distance to practitioner
-        matched_concerns: selectedProject.description ? [selectedProject.description] : []
+      .rpc('create_practitioner_match', {
+        p_project_serial: parseInt(selectedProject.project_serial),
+        p_client_serial: selectedProject.client_serial,
+        p_practitioner_serial: practitionerSerial,
+        p_match_score: matchScore
       });
 
+    console.log('[sendConnectionRequest] RPC Response - data:', data, 'error:', error);
+    
     if (error) {
       console.error('[sendConnectionRequest] Error:', error);
       alert('Error sending connection request');
       return;
+    }
+    
+    // Log the returned status from RPC
+    if (data && data[0]) {
+      console.log('[sendConnectionRequest] Match created with status:', data[0].match_status, 'ID:', data[0].match_id);
     }
 
     // Update projects table to track matched practitioners
@@ -706,20 +780,18 @@ async function sendConnectionRequest(practitionerId, practitionerSerial) {
       }
     }
 
-    // Create auto-message
+    // Create auto-message via RPC
     const clientName = clientData.first_name || 'Client';
     const messageText = `${clientName} wants connect about their wellness project!`;
 
     const { error: messageError } = await supabaseClient
-      .from('project_messages')
-      .insert({
-        project_id: selectedProject.project_id,  // Use project_id (INTEGER), not id (UUID)
-        practitioner_serial: practitionerId,
-        client_serial: clientData.id,
-        sender_id: clientData.id,
-        sender_type: 'client',
-        message: messageText,
-        is_read: false
+      .rpc('create_project_message', {
+        p_project_id: selectedProject.id,  // UUID of project
+        p_practitioner_id: practitionerId,  // UUID of practitioner
+        p_client_id: clientData.id,  // UUID of client
+        p_sender_id: clientData.id,  // Client is sender of auto-message
+        p_sender_type: 'client',
+        p_message: messageText
       });
 
     if (messageError) {
@@ -741,7 +813,9 @@ async function sendConnectionRequest(practitionerId, practitionerSerial) {
     }
 
     console.log('[sendConnectionRequest] Connection request sent successfully');
-    alert('Connection established! Message them in "My Matches".');
+    
+    // Redirect to My Matches page
+    window.location.href = `/rooted-vitality/dashboard/client/pages/my-matches.html?project_id=${selectedProject.id}&practitioner_serial=${practitionerSerial}`;
 
   } catch (error) {
     console.error('[sendConnectionRequest] Exception:', error);
@@ -841,7 +915,14 @@ function navigateToPractitionerProfile(practitionerId) {
     console.error('[Find Practitioners] No practitioner ID provided');
     return;
   }
-  const profileUrl = `/rooted-vitality/dashboard/pro/pages/practitioner-profile.html?id=${practitionerId}`;
+  
+  // Include the project_id from selectedProject so practitioner profile knows which project to use
+  let profileUrl = `/rooted-vitality/dashboard/pro/pages/practitioner-profile.html?id=${practitionerId}`;
+  if (selectedProject && selectedProject.id) {
+    profileUrl += `&project_id=${selectedProject.id}`;
+    console.log('[Find Practitioners] Added project_id to URL:', selectedProject.id);
+  }
+  
   console.log('[Find Practitioners] Navigating to:', profileUrl);
   window.location.href = profileUrl;
 }

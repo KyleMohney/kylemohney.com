@@ -11,8 +11,11 @@
 let supabaseClient;
 let currentUser;
 let messagePollingInterval;
+let lastMessageSentTime = 0;  // Track last message send time to debounce polling
 let selectedProjectId;
 let selectedPractitionerId;
+let selectedMatchStatus;  // Track match status for UI updates
+let selectedMatchResponse;  // Track practitioner response (accepted/declined/null)
 
 /**
  * Initialize messaging for a specific project + practitioner
@@ -20,7 +23,7 @@ let selectedPractitionerId;
  * @param {string} practitionerId - Practitioner UUID
  * @param {object} practitioner - Practitioner object with name/info
  */
-async function initializeProjectMessaging(projectId, practitionerId, practitioner) {
+async function initializeProjectMessaging(projectData, practitionerData, matchData) {
   try {
     supabaseClient = window.supabaseClient;
     if (!supabaseClient) {
@@ -40,10 +43,25 @@ async function initializeProjectMessaging(projectId, practitionerId, practitione
       return;
     }
 
+    // Extract IDs from objects
+    const projectId = projectData?.id;
+    const practitionerId = practitionerData?.id;
+    
+    if (!projectId) {
+      console.error('[Messaging] No project ID available');
+      return;
+    }
+    if (!practitionerId) {
+      console.error('[Messaging] No practitioner ID available');
+      return;
+    }
+
     selectedProjectId = projectId;
     selectedPractitionerId = practitionerId;
+    selectedMatchStatus = matchData?.match_status || matchData?.status;  // Use new match_status, fallback to legacy status
+    selectedMatchResponse = matchData?.practitioner_response;  // Track practitioner response
 
-    console.log('[Messaging] Initialized for project:', projectId, 'practitioner:', practitionerId);
+    console.log('[Messaging] Initialized for project:', projectId, 'practitioner:', practitionerId, 'status:', selectedMatchStatus, 'response:', selectedMatchResponse);
 
     // Load and display existing messages
     await loadMessages();
@@ -51,9 +69,15 @@ async function initializeProjectMessaging(projectId, practitionerId, practitione
     // Set up message input
     setupMessageInput();
 
-    // Start polling for new messages every 2 seconds
+    // Start polling for new messages every 5 seconds (reduced from 2 to prevent excessive refreshes)
+    // Only poll if messages are actually being sent/received
     if (messagePollingInterval) clearInterval(messagePollingInterval);
-    messagePollingInterval = setInterval(loadMessages, 2000);
+    messagePollingInterval = setInterval(async () => {
+      // Only reload if we haven't just sent a message
+      if (Date.now() - lastMessageSentTime > 1000) {
+        await loadMessages();
+      }
+    }, 5000);
 
   } catch (error) {
     console.error('[Messaging] Initialization error:', error);
@@ -64,16 +88,22 @@ async function initializeProjectMessaging(projectId, practitionerId, practitione
  * Load all messages for this project
  */
 async function loadMessages() {
-  if (!selectedProjectId || !selectedPractitionerId) return;
+  if (!selectedProjectId || !selectedPractitionerId) {
+    console.log('[Messaging] loadMessages skipped - missing IDs:', { selectedProjectId, selectedPractitionerId });
+    return;
+  }
 
   try {
+    console.log('[Messaging] Loading messages for project:', selectedProjectId, 'practitioner:', selectedPractitionerId);
     const { data, error } = await supabaseClient
       .from('project_messages')
       .select('*')
-      .eq('project_serial', selectedProjectId)
-      .eq('practitioner_serial', selectedPractitionerId)
+      .eq('project_id', selectedProjectId)
+      .eq('practitioner_id', selectedPractitionerId)
       .order('created_at', { ascending: true });
 
+    console.log('[Messaging] Message load result - data:', data, 'error:', error);
+    
     if (error) {
       console.error('[Messaging] Error loading messages:', error);
       return;
@@ -87,7 +117,7 @@ async function loadMessages() {
 }
 
 /**
- * Display messages in thread
+ * Display messages in thread - only add new messages, don't rebuild entire DOM
  */
 function displayMessages(messages) {
   const messageThread = document.getElementById('message-thread');
@@ -96,33 +126,96 @@ function displayMessages(messages) {
     return;
   }
 
-  // Clear existing
-  messageThread.innerHTML = '';
-
-  if (messages.length === 0) {
-    messageThread.innerHTML = '<div class="message-empty">No messages yet. Start the conversation!</div>';
+  // Count existing messages to see if we need to add new ones
+  const existingMessageCount = messageThread.querySelectorAll('.message').length;
+  
+  // If no messages exist and we have messages to display
+  if (existingMessageCount === 0 && messages.length === 0) {
+    // Show appropriate empty state message
+    let emptyMessageHTML = '<p>No messages yet. Start the conversation!</p>';
+    
+    if (selectedMatchStatus === 'pending' && !selectedMatchResponse) {
+      console.log('[Messaging] Showing pending response message');
+      emptyMessageHTML = `
+        <div style="padding: 2rem; text-align: center; color: #666; line-height: 1.6;">
+          <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem; color: #4a90e2;">Awaiting Practitioner Response</p>
+          <p style="margin: 0.5rem 0;">You've sent a connection request with an automatic introduction message.</p>
+          <p style="margin: 0.5rem 0;">Once they accept, you'll be able to message them here.</p>
+        </div>
+      `;
+    } else if (selectedMatchResponse === 'declined') {
+      console.log('[Messaging] Showing declined response message');
+      emptyMessageHTML = `
+        <div style="padding: 2rem; text-align: center; color: #999; line-height: 1.6;">
+          <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem;">Connection Declined</p>
+          <p style="margin: 0.5rem 0;">This practitioner has declined your request.</p>
+        </div>
+      `;
+    } else if (selectedMatchResponse === 'accepted' && (selectedMatchStatus === 'active' || selectedMatchStatus === 'in-progress')) {
+      console.log('[Messaging] Showing accepted status message');
+      emptyMessageHTML = `
+        <div style="padding: 2rem; text-align: center; color: #666; line-height: 1.6;">
+          <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem; color: #52a35e;">Connection Active</p>
+          <p style="margin: 0.5rem 0;">Start your conversation with this practitioner here.</p>
+        </div>
+      `;
+    }
+    
+    messageThread.innerHTML = `<div class="message-empty" style="display: flex; align-items: center; justify-content: center; height: 100%; min-height: 300px; background-color: #fafafa; border-radius: 8px;">${emptyMessageHTML}</div>`;
     return;
   }
 
-  // Add each message
-  messages.forEach(msg => {
-    const isClient = msg.sender_type === 'client';
-    const messageEl = document.createElement('div');
-    messageEl.className = `message ${isClient ? 'message--client' : 'message--practitioner'}`;
-    messageEl.innerHTML = `
-      <div class="message-bubble">
-        <p class="message-text">${escapeHtml(msg.message)}</p>
-        <time class="message-time">${formatTime(msg.created_at)}</time>
-      </div>
-    `;
-    messageThread.appendChild(messageEl);
-  });
+  // If we have messages and they should be displayed
+  if (messages.length > 0) {
+    // Remove empty state if it exists
+    const emptyState = messageThread.querySelector('.message-empty');
+    if (emptyState) {
+      emptyState.remove();
+    }
 
-  // Auto-scroll to bottom
-  messageThread.scrollTop = messageThread.scrollHeight;
+    // Only add NEW messages (not already in DOM)
+    messages.forEach((msg, index) => {
+      // Check if this message already exists in the DOM by checking the message ID
+      const existingMsg = messageThread.querySelector(`[data-message-id="${msg.id}"]`);
+      if (existingMsg) {
+        // Message already displayed, skip
+        return;
+      }
 
-  // Mark as read
-  markMessagesAsRead();
+      // Create new message element
+      const isClient = msg.sender_type === 'client';
+      const messageEl = document.createElement('div');
+      messageEl.className = `message ${isClient ? 'message--client' : 'message--practitioner'}`;
+      messageEl.setAttribute('data-message-id', msg.id);
+      messageEl.innerHTML = `
+        <div class="message-bubble">
+          <p class="message-text">${escapeHtml(msg.message)}</p>
+          <time class="message-time">${formatTime(msg.created_at)}</time>
+        </div>
+      `;
+      messageThread.appendChild(messageEl);
+    });
+
+    // Add pending status message at the bottom if awaiting response
+    if (selectedMatchStatus === 'pending' && !selectedMatchResponse) {
+      // Check if pending message already exists
+      const existingPendingMsg = messageThread.querySelector('[data-message-type="pending-status"]');
+      if (!existingPendingMsg) {
+        const pendingMsgEl = document.createElement('div');
+        pendingMsgEl.className = 'message-pending-status';
+        pendingMsgEl.setAttribute('data-message-type', 'pending-status');
+        pendingMsgEl.innerHTML = `
+          <div style="padding: 1rem; background: #f0f4f8; border-radius: 8px; text-align: center; color: #4a90e2; font-size: 0.9rem; margin-top: 1rem; border-left: 4px solid #4a90e2;">
+            <p style="margin: 0;">This match is pending the practitioner's response. Once they accept, you'll be able to exchange messages.</p>
+          </div>
+        `;
+        messageThread.appendChild(pendingMsgEl);
+      }
+    }
+
+    // Scroll to bottom
+    messageThread.scrollTop = messageThread.scrollHeight;
+  }
 }
 
 /**
@@ -249,6 +342,9 @@ async function sendMessage() {
     messageInput.value = '';
     messageInput.focus();
 
+    // Track message send time to debounce polling
+    lastMessageSentTime = Date.now();
+
     // Reload messages immediately
     await loadMessages();
 
@@ -268,8 +364,8 @@ async function markMessagesAsRead() {
     await supabaseClient
       .from('project_messages')
       .update({ is_read: true })
-      .eq('project_serial', selectedProjectId)
-      .eq('practitioner_serial', selectedPractitionerId)
+      .eq('project_id', selectedProjectId)
+      .eq('practitioner_id', selectedPractitionerId)
       .eq('sender_type', 'practitioner');
 
   } catch (error) {

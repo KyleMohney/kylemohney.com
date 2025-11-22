@@ -68,6 +68,94 @@ TABLE OF CONTENTS:
   color: rgba(255, 255, 255, 0.9);
 }
 
+/* Project Information Card in Hero */
+.project-info-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
+  backdrop-filter: blur(4px);
+}
+
+.project-info-header {
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+
+.project-info-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.25rem 0;
+}
+
+.project-info-category {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.project-info-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.project-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.project-info-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #5c9a72;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.project-info-value {
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  color: #374151;
+  margin: 0;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.project-info-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .project-info-row {
+    grid-template-columns: 1fr;
+  }
+
+  .project-info-card {
+    padding: 1rem;
+  }
+
+  .project-info-title {
+    font-size: 1.25rem;
+  }
+}
+
 /* ============================================================================
    3. SIDEBAR STYLING
    ============================================================================ */
@@ -309,12 +397,13 @@ TABLE OF CONTENTS:
 }
 
 .card-avatar-section {
-  height: 180px;
   background: linear-gradient(135deg, #5c9a72 0%, #4a7a5e 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+  overflow: visible;
+  padding: 1.25rem 0.75rem;
+  min-height: 200px;
 }
 
 .card-avatar {
@@ -885,42 +974,53 @@ TABLE OF CONTENTS:
 
 .card-header {
   position: relative;
-  height: 180px;
+  height: auto;
+  min-height: 180px;
   background: linear-gradient(135deg, #5c9a72 0%, #4a7a5e 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  padding: 1rem 0.5rem;
 }
 
 .card-avatar-section {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
+}
+
+.card-avatar-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
 }
 
 .card-header-badges {
-  position: absolute;
-  top: 10px;
-  right: 10px;
   list-style: none;
   padding: 0;
   margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
   font-size: 0.8rem;
   font-weight: 500;
+  width: 100%;
 }
 
 .badge-item {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.4rem;
   color: white;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
   white-space: nowrap;
   list-style: none;
+  padding: 0.25rem 0;
 }
 
 .badge-check {

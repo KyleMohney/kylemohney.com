@@ -15,7 +15,7 @@
     <!-- Hero Section -->
     <section class="matches-hero">
       <div class="matches-hero__content">
-        <h1 class="matches-hero__title">My Matches</h1>
+        <h1 class="matches-hero__title">My Team</h1>
         <p class="matches-hero__subtitle">Practitioners you've connected with</p>
       </div>
     </section>
@@ -125,10 +125,10 @@
             <!-- Status Dropdown -->
             <div class="thread-header__actions">
               <select id="status-dropdown" class="status-dropdown" style="display: none;">
-                <option value="">Mark As...</option>
+                <option value="pending">Pending</option>
                 <option value="in-progress">In-Progress</option>
-                <option value="hired">Hired</option>
-                <option value="not-hired">Not Hired</option>
+                <option value="hired">Complete: Hired</option>
+                <option value="not-hired">Complete: Not Hired</option>
               </select>
             </div>
           </div>
@@ -176,6 +176,11 @@
 
       <div class="modal__body">
         <div class="practitioner-details">
+          <!-- Status Message -->
+          <section class="modal-section" id="modal-status-message" style="display:none; background-color: #f0f8ff; padding: 1rem; border-radius: 8px; border-left: 4px solid #4a90e2;">
+            <div id="status-message-content"></div>
+          </section>
+
           <!-- Bio -->
           <section class="modal-section">
             <h3 class="modal-section__title">About</h3>
@@ -290,6 +295,7 @@
   <script src="../../../scripts/authManager.js"></script>
   <script src="../../../scripts/authHooks.js"></script>
   <script src="../../../injections.js"></script>
+  <script src="../../../scripts/notificationManager.js"></script>
   <script src="../../../scripts/matchMessagingManager.js"></script>
   <script src="../../../scripts/reviewsManager.js"></script>
   <script src="../../../scripts/my-matches.js"></script>
