@@ -484,6 +484,42 @@
     </div>
   </main>
 
+  <!-- Confirm Decline Modal -->
+  <div id="confirm-decline-modal" class="modal modal--hidden">
+    <div class="modal__overlay"></div>
+    <div class="modal__content modal__content--small">
+      <div class="modal__header">
+        <h2>Decline Match?</h2>
+        <button class="modal__close" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal__body">
+        <p>Are you sure you want to decline this client? They will be notified about your decision.</p>
+      </div>
+      <div class="modal__footer">
+        <button id="confirm-decline-cancel" class="btn btn--secondary">Cancel</button>
+        <button id="confirm-decline-confirm" class="btn btn--danger">Decline</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Block Modal -->
+  <div id="confirm-block-modal" class="modal modal--hidden">
+    <div class="modal__overlay"></div>
+    <div class="modal__content modal__content--small">
+      <div class="modal__header">
+        <h2>Block Client?</h2>
+        <button class="modal__close" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal__body">
+        <p>Block this client? They won't be able to match with you again, and all pending matches will be declined.</p>
+      </div>
+      <div class="modal__footer">
+        <button id="confirm-block-cancel" class="btn btn--secondary">Cancel</button>
+        <button id="confirm-block-confirm" class="btn btn--danger">Block</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Decline with Message Modal -->
   <div id="decline-message-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
     <div style="background: white; border-radius: 12px; padding: 2rem; max-width: 500px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
@@ -569,6 +605,169 @@
         document.getElementById(tabName).style.display = 'grid';
       });
     });
+
+    // ============================================================================
+    // MODAL CONFIRMATION HELPERS
+    // ============================================================================
+    let pendingDeclineMatch = null;
+    let pendingBlockClientSerial = null;
+
+    function showConfirmDeclineModal() {
+      const modal = document.getElementById('confirm-decline-modal');
+      modal.classList.remove('modal--hidden');
+      
+      const closeBtn = modal.querySelector('.modal__close');
+      const cancelBtn = document.getElementById('confirm-decline-cancel');
+      const confirmBtn = document.getElementById('confirm-decline-confirm');
+
+      const handleClose = () => {
+        modal.classList.add('modal--hidden');
+        pendingDeclineMatch = null;
+      };
+
+      closeBtn.addEventListener('click', handleClose, { once: true });
+      cancelBtn.addEventListener('click', handleClose, { once: true });
+      confirmBtn.addEventListener('click', () => {
+        modal.classList.add('modal--hidden');
+        confirmBtn.disabled = true;
+        handleDeclineConfirmed();
+      }, { once: true });
+
+      // Close on overlay click
+      const overlay = modal.querySelector('.modal__overlay');
+      overlay.addEventListener('click', handleClose, { once: true });
+    }
+
+    function showConfirmBlockModal() {
+      const modal = document.getElementById('confirm-block-modal');
+      modal.classList.remove('modal--hidden');
+      
+      const closeBtn = modal.querySelector('.modal__close');
+      const cancelBtn = document.getElementById('confirm-block-cancel');
+      const confirmBtn = document.getElementById('confirm-block-confirm');
+
+      const handleClose = () => {
+        modal.classList.add('modal--hidden');
+        pendingBlockClientSerial = null;
+      };
+
+      closeBtn.addEventListener('click', handleClose, { once: true });
+      cancelBtn.addEventListener('click', handleClose, { once: true });
+      confirmBtn.addEventListener('click', () => {
+        modal.classList.add('modal--hidden');
+        confirmBtn.disabled = true;
+        handleBlockConfirmed();
+      }, { once: true });
+
+      // Close on overlay click
+      const overlay = modal.querySelector('.modal__overlay');
+      overlay.addEventListener('click', handleClose, { once: true });
+    }
+
+    async function handleDeclineConfirmed() {
+      if (!pendingDeclineMatch) return;
+      
+      const match = pendingDeclineMatch;
+      const { error } = await window.supabaseClient
+        .from('project_practitioner_matches')
+        .update({
+          status: 'declined',
+          practitioner_response: 'declined',
+          practitioner_responded_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', match.id);
+
+      if (!error) {
+        const currentUser = window.authManager.getCurrentUser();
+        if (window.notifyClientOfMatchResponse) {
+          await notifyClientOfMatchResponse({
+            clientSerial: match.client_serial,
+            practitionerName: currentUser?.dba_name || currentUser?.legal_name || 'A practitioner',
+            projectName: match.projectName || 'your project',
+            action: 'declined',
+            reason: 'Not available at this time'
+          });
+        }
+        
+        const clientName = `${match.projects?.clients?.first_name || 'Client'}`;
+        showToast('Declined', `You declined ${clientName}`, 'info');
+        // Remove the card from the DOM
+        const card = document.querySelector(`[data-match-id="${match.id}"]`)?.closest('.client-card');
+        if (card) card.remove();
+      } else {
+        showToast('Error', 'Failed to decline client', 'error');
+      }
+      
+      pendingDeclineMatch = null;
+      document.getElementById('confirm-decline-confirm').disabled = false;
+    }
+
+    async function handleBlockConfirmed() {
+      if (!pendingBlockClientSerial) return;
+
+      const clientSerial = pendingBlockClientSerial;
+      const currentUser = window.authManager.getCurrentUser();
+      const practitionerSerial = currentUser?.serial_number;
+
+      const { data: allMatches, error: fetchError } = await window.supabaseClient
+        .from('project_practitioner_matches')
+        .select('id')
+        .eq('practitioner_serial', practitionerSerial)
+        .eq('client_serial', clientSerial)
+        .eq('status', 'pending');
+
+      if (fetchError) {
+        showToast('Error', 'Failed to find all matches', 'error');
+        pendingBlockClientSerial = null;
+        document.getElementById('confirm-block-confirm').disabled = false;
+        return;
+      }
+
+      if (allMatches && allMatches.length > 0) {
+        const { error: updateError } = await window.supabaseClient
+          .from('project_practitioner_matches')
+          .update({
+            status: 'declined',
+            practitioner_response: 'declined',
+            practitioner_responded_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
+          .in('id', allMatches.map(m => m.id));
+
+        if (!updateError) {
+          // Add to blocklist
+          const rvUser = JSON.parse(localStorage.getItem('rvUser') || '{}');
+          const practitionerId = rvUser.id;
+          
+          const { error: blockError } = await window.supabaseClient
+            .from('practitioner_blocks')
+            .upsert({
+              practitioner_id: practitionerId,
+              practitioner_serial: practitionerSerial,
+              client_serial: clientSerial,
+              is_blocked: true
+            }, {
+              onConflict: 'practitioner_id,client_serial'
+            });
+
+          if (!blockError) {
+            showToast('Blocked', 'Client blocked successfully', 'info');
+            // Remove all cards for this client
+            document.querySelectorAll(`.client-card`).forEach(card => {
+              const cardClientSerial = card.getAttribute('data-client-serial');
+              if (cardClientSerial === pendingBlockClientSerial) {
+                card.remove();
+              }
+          });
+        } else {
+          showToast('Error', 'Failed to block client', 'error');
+        }
+      }
+
+      pendingBlockClientSerial = null;
+      document.getElementById('confirm-block-confirm').disabled = false;
+    }
 
     // ============================================================================
     // LOAD CLIENT DATA & REAL-TIME SUBSCRIPTIONS
@@ -699,6 +898,7 @@
 
           const card = document.createElement('div');
           card.className = 'client-card';
+          card.setAttribute('data-client-serial', match.client_serial);
           card.innerHTML = `
             <div class="card-header">
               <div class="client-avatar">${initials}</div>
@@ -754,105 +954,13 @@
           });
 
           card.querySelector('[data-action="decline"]').addEventListener('click', async () => {
-            if (confirm('Are you sure you want to decline this client? They will be notified.')) {
-              const { error } = await window.supabaseClient
-                .from('project_practitioner_matches')
-                .update({
-                  status: 'declined',
-                  practitioner_response: 'declined',
-                  practitioner_responded_at: new Date().toISOString(),
-                  updated_at: new Date().toISOString()
-                })
-                .eq('id', match.id);
-
-              if (!error) {
-                // Notify client of decline
-                if (window.notifyClientOfMatchResponse) {
-                  await notifyClientOfMatchResponse({
-                    clientSerial: match.client_serial,
-                    practitionerName: currentUser?.dba_name || currentUser?.legal_name || 'A practitioner',
-                    projectName: match.projectName || 'your project',
-                    action: 'declined',
-                    reason: 'Not available at this time'
-                  });
-                }
-                
-                showToast('Declined', `You declined ${clientName}`, 'info');
-                card.remove();
-              } else {
-                showToast('Error', 'Failed to decline client', 'error');
-              }
-            }
+            pendingDeclineMatch = match;
+            showConfirmDeclineModal();
           });
 
           card.querySelector('[data-action="block"]').addEventListener('click', async () => {
-            if (confirm('Block this customer? They won\'t be able to match with you again.')) {
-              // Find ALL pending matches from this client
-              const { data: allMatches, error: fetchError } = await window.supabaseClient
-                .from('project_practitioner_matches')
-                .select('id')
-                .eq('practitioner_serial', practitionerSerial)
-                .eq('client_serial', match.client_serial)
-                .eq('status', 'pending');
-
-              if (fetchError) {
-                showToast('Error', 'Failed to find all matches', 'error');
-                return;
-              }
-
-              // Decline all pending matches from this client
-              if (allMatches && allMatches.length > 0) {
-                const { error: updateError } = await window.supabaseClient
-                  .from('project_practitioner_matches')
-                  .update({
-                    status: 'declined',
-                    practitioner_response: 'declined',
-                    practitioner_responded_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString()
-                  })
-                  .eq('practitioner_serial', practitionerSerial)
-                  .eq('client_serial', match.client_serial)
-                  .eq('status', 'pending');
-
-                if (updateError) {
-                  showToast('Error', 'Failed to decline matches', 'error');
-                  console.error('Update error:', updateError);
-                  return;
-                }
-              }
-
-              // Add to blocklist (upsert if already exists)
-              const { error: blockError } = await window.supabaseClient
-                .from('practitioner_blocks')
-                .upsert({
-                  practitioner_id: practitionerId,
-                  practitioner_serial: practitionerSerial,
-                  client_serial: match.client_serial,
-                  is_blocked: true
-                }, {
-                  onConflict: 'practitioner_id,client_serial'
-                });
-
-              if (!blockError) {
-                // Notify client of decline (without revealing block)
-                if (window.notifyClientOfMatchResponse) {
-                  await notifyClientOfMatchResponse({
-                    clientSerial: match.client_serial,
-                    practitionerName: currentUser?.dba_name || currentUser?.legal_name || 'A practitioner',
-                    projectName: match.projectName || 'your project',
-                    action: 'declined',
-                    reason: 'Not available at this time'
-                  });
-                }
-
-                showToast('Blocked', `You blocked ${clientName} and all their pending requests`, 'info');
-                // Reload the clients list to refresh and remove all their cards
-                loadClientsData();
-              } else {
-                showToast('Error', 'Failed to add to blocklist', 'error');
-                console.error('Block error:', blockError);
-              }
-            }
+            pendingBlockClientSerial = match.client_serial;
+            showConfirmBlockModal();
           });
 
           newClientsContainer.appendChild(card);
