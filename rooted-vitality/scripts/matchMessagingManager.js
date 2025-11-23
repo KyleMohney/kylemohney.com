@@ -13,7 +13,9 @@ let currentUser;
 let messagePollingInterval;
 let lastMessageSentTime = 0;  // Track last message send time to debounce polling
 let selectedProjectId;
+let selectedProjectUUID;  // UUID of the project
 let selectedPractitionerId;
+let selectedPractitionerUUID;  // UUID of the practitioner
 let selectedMatchStatus;  // Track match status for UI updates
 let selectedMatchResponse;  // Track practitioner response (accepted/declined/null)
 
@@ -45,7 +47,9 @@ async function initializeProjectMessaging(projectData, practitionerData, matchDa
 
     // Extract IDs from objects
     const projectId = projectData?.id;
+    const projectSerial = projectData?.project_serial;
     const practitionerId = practitionerData?.id;
+    const practitionerSerial = practitionerData?.serial_number;
     
     if (!projectId) {
       console.error('[Messaging] No project ID available');
@@ -56,12 +60,14 @@ async function initializeProjectMessaging(projectData, practitionerData, matchDa
       return;
     }
 
-    selectedProjectId = projectId;
-    selectedPractitionerId = practitionerId;
+    selectedProjectId = projectSerial;  // Store serial (used for lookups)
+    selectedProjectUUID = projectId;  // Store UUID (used for inserts)
+    selectedPractitionerId = practitionerSerial;  // Store serial
+    selectedPractitionerUUID = practitionerId;  // Store UUID
     selectedMatchStatus = matchData?.status;  // Use status column
     selectedMatchResponse = matchData?.practitioner_response;  // Track practitioner response
 
-    console.log('[Messaging] Initialized for project:', projectId, 'practitioner:', practitionerId, 'status:', selectedMatchStatus, 'response:', selectedMatchResponse);
+    console.log('[Messaging] Initialized for project:', projectSerial, '(', projectId, ') practitioner:', practitionerSerial, '(', practitionerId, ') status:', selectedMatchStatus, 'response:', selectedMatchResponse);
 
     // Load and display existing messages
     await loadMessages();
@@ -261,23 +267,10 @@ async function sendMessage() {
       senderId = selectedPractitionerId;
       senderType = 'practitioner';
       
-      // Get client ID from the project_practitioner_matches
-      const { data: matchData, error: matchError } = await supabaseClient
-        .from('project_practitioner_matches')
-        .select('id')
-        .eq('project_serial', selectedProjectId)
-        .eq('practitioner_serial', selectedPractitionerId)
-        .single();
-
-      if (matchError || !matchData) {
-        console.error('[Messaging] Could not find match record');
-        return;
-      }
-
-      // Get client serial from the project
+      // Get client ID and project ID from the project
       const { data: projectData, error: projectError } = await supabaseClient
         .from('projects')
-        .select('client_serial')
+        .select('id, client_serial')
         .eq('project_serial', selectedProjectId)
         .single();
 
@@ -286,12 +279,27 @@ async function sendMessage() {
         return;
       }
 
+      selectedProjectUUID = projectData.id;
       clientSerialId = projectData.client_serial;
+
+      // Get client ID from serial
+      const { data: clientData, error: clientError } = await supabaseClient
+        .from('clients')
+        .select('id')
+        .eq('serial_number', clientSerialId)
+        .single();
+
+      if (clientError || !clientData) {
+        console.error('[Messaging] Could not find client');
+        return;
+      }
+
+      clientId = clientData.id;
     } else {
       // Sender is client
       const { data: clientData, error: clientError } = await supabaseClient
         .from('clients')
-        .select('id')
+        .select('id, serial_number')
         .eq('id', currentUser.id)
         .single();
 
@@ -303,23 +311,42 @@ async function sendMessage() {
       senderId = clientData.id;
       senderType = 'client';
       clientId = clientData.id;
+      clientSerialId = clientData.serial_number;
+
+      // Get project UUID
+      const { data: projectData, error: projectError } = await supabaseClient
+        .from('projects')
+        .select('id')
+        .eq('project_serial', selectedProjectId)
+        .single();
+
+      if (projectError || !projectData) {
+        console.error('[Messaging] Could not find project');
+        return;
+      }
+
+      selectedProjectUUID = projectData.id;
     }
 
-    // Insert message
+    // Insert message with all required UUID fields
     const { error: insertError } = await supabaseClient
       .from('project_messages')
       .insert({
-        project_serial: selectedProjectId,
-        practitioner_serial: selectedPractitionerId,
-        client_serial: clientSerialId,
+        project_id: selectedProjectUUID,
+        practitioner_id: selectedPractitionerId,
+        client_id: clientId,
         sender_id: senderId,
         sender_type: senderType,
         message: message,
-        is_read: false
+        is_read: false,
+        project_serial: selectedProjectId,
+        practitioner_serial: selectedPractitionerId,
+        client_serial: clientSerialId
       });
 
     if (insertError) {
       console.error('[Messaging] Error sending message:', insertError);
+      console.error('[Messaging] Insert error details:', JSON.stringify(insertError));
       alert('Error sending message');
       return;
     }

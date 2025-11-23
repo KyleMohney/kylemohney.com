@@ -489,10 +489,12 @@ async function loadConversations() {
                 conversations.push({
                     id: match.id,
                     matchId: match.id,
-                    projectId: match.project_id,
+                    projectId: project.id,  // Use project.id (UUID), not match.project_id
+                    projectSerial: match.project_serial,
                     clientId: client.id,
                     clientSerial: project.client_serial,
-                    practitionerId: practitionerSerial,
+                    practitionerId: currentUser.id,  // Use actual practitioner UUID
+                    practitionerSerial: practitionerSerial,
                     clientName: clientName,
                     clientAvatar: clientAvatarUrl,
                     lastMessage: lastMessage?.message || 'No messages yet',
@@ -768,25 +770,50 @@ function openThreadView(conversation) {
             if (!message) return;
             
             try {
+                console.log('[Inbox] Sending message with:', {
+                    project_id: conversation.projectId,
+                    practitioner_id: conversation.practitionerId,
+                    client_id: conversation.clientId,
+                    sender_id: currentUser.id,
+                    sender_type: 'practitioner',
+                    project_serial: conversation.projectSerial,
+                    practitioner_serial: conversation.practitionerSerial,
+                    client_serial: conversation.clientSerial
+                });
+                
                 const { error } = await window.supabaseClient
                     .from('project_messages')
                     .insert({
-                        project_serial: conversation.projectSerial,
-                        practitioner_serial: conversation.practitionerSerial,
-                        client_serial: conversation.clientSerial,
+                        project_id: conversation.projectId,
+                        practitioner_id: conversation.practitionerId,
+                        client_id: conversation.clientId,
                         sender_id: currentUser.id,
                         sender_type: 'practitioner',
                         message: message,
-                        is_read: false
+                        is_read: false,
+                        project_serial: conversation.projectSerial,
+                        practitioner_serial: conversation.practitionerSerial,
+                        client_serial: conversation.clientSerial
                     });
                 
                 if (!error) {
+                    console.log('[Inbox] Message sent successfully');
+                    
+                    // Add message to local conversation immediately
+                    conversation.messages.push({
+                        sender_type: 'practitioner',
+                        message: message,
+                        created_at: new Date().toISOString()
+                    });
+                    
+                    // Re-render messages in thread
+                    renderMessages(conversation.messages);
+                    
+                    // Clear input
                     messageInput.value = '';
                     messageInput.focus();
-                    // Reload conversation
-                    await loadConversations();
-                    renderThreadsList();
                 } else {
+                    console.error('[Inbox] Error sending message:', error);
                     alert('Error sending message');
                 }
             } catch (error) {
@@ -1019,11 +1046,13 @@ function renderMessages(messages) {
     
     messages.forEach(message => {
         const groupEl = document.createElement('div');
-        groupEl.className = `message-group ${message.sender === 'practitioner' ? 'own' : 'other'}`;
+        const isSentByPractitioner = message.sender_type === 'practitioner';
+        groupEl.className = `message-group ${isSentByPractitioner ? 'own' : 'other'}`;
         
+        const messageTime = formatTime(new Date(message.created_at));
         groupEl.innerHTML = `
-            <div class="message-bubble">${escapeHtml(message.text)}</div>
-            <span class="message-timestamp">${formatTime(message.timestamp)}</span>
+            <div class="message-bubble">${escapeHtml(message.message)}</div>
+            <span class="message-timestamp">${messageTime}</span>
         `;
         
         messagesContainer.appendChild(groupEl);
