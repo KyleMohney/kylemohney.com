@@ -474,7 +474,7 @@ async function loadConversations() {
                     ? client.profile_picture_url 
                     : generateInitialsAvatar(clientName);
 
-                // Get latest messages
+                // Get latest messages (reversed because they come in descending order)
                 const { data: messages } = await window.supabaseClient
                     .from('project_messages')
                     .select('id, message, sender_type, created_at')
@@ -503,7 +503,7 @@ async function loadConversations() {
                     unreadCount: unreadCount,
                     status: 'online',
                     category: 'all',
-                    messages: messages || [],
+                    messages: messages ? [...messages].reverse() : [],  // Reverse to show oldest first
                     isArchived: false,
                     isBlocked: false,
                     projectDescription: project.description,
@@ -736,6 +736,9 @@ function openThreadView(conversation) {
     
     // Render messages
     renderMessages(conversation.messages);
+    
+    // Set up real-time subscription for new messages
+    setupConversationRealtimeSubscription(conversation);
     
     // Enable message input and set up send handler
     const messageInput = document.getElementById('message-input');
@@ -1038,30 +1041,87 @@ function closeThreadView() {
 }
 
 /**
+ * Set up real-time subscription for conversation messages
+ */
+function setupConversationRealtimeSubscription(conversation) {
+    if (!window.supabaseClient || !conversation.projectId) {
+        console.error('[Inbox] Cannot set up real-time subscription - missing client or project ID');
+        return;
+    }
+
+    // Unsubscribe from previous subscription if exists
+    if (conversation._realtimeSubscription) {
+        window.supabaseClient.removeChannel(conversation._realtimeSubscription);
+    }
+
+    // Subscribe to new messages for this project
+    conversation._realtimeSubscription = window.supabaseClient
+        .channel(`project_messages_${conversation.projectId}`)
+        .on(
+            'postgres_changes',
+            {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'project_messages',
+                filter: `project_id=eq.${conversation.projectId}`
+            },
+            (payload) => {
+                console.log('[Inbox] New message received via real-time:', payload.new);
+                
+                // Add new message to conversation
+                if (!conversation.messages) {
+                    conversation.messages = [];
+                }
+                
+                conversation.messages.push({
+                    id: payload.new.id,
+                    sender_type: payload.new.sender_type,
+                    message: payload.new.message,
+                    created_at: payload.new.created_at,
+                    is_read: payload.new.is_read
+                });
+                
+                // Re-render messages immediately
+                renderMessages(conversation.messages);
+                
+                // Scroll to bottom to show new message
+                const messagesContainer = document.getElementById('messages-container');
+                if (messagesContainer) {
+                    setTimeout(() => {
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    }, 50);
+                }
+            }
+        )
+        .subscribe((status) => {
+            if (status === 'SUBSCRIBED') {
+                console.log('[Inbox] Real-time subscription active for project:', conversation.projectId);
+            } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
+                console.warn('[Inbox] Real-time subscription error, will rely on polling');
+            }
+        });
+}
+
+/**
  * Render messages in the thread
  */
 function renderMessages(messages) {
     const messagesContainer = document.getElementById('thread-messages');
-    messagesContainer.innerHTML = '';
+    if (!messagesContainer) return;
     
-    messages.forEach(message => {
-        const groupEl = document.createElement('div');
-        const isSentByPractitioner = message.sender_type === 'practitioner';
-        groupEl.className = `message-group ${isSentByPractitioner ? 'own' : 'other'}`;
-        
-        const messageTime = formatTime(new Date(message.created_at));
-        groupEl.innerHTML = `
-            <div class="message-bubble">${escapeHtml(message.message)}</div>
-            <span class="message-timestamp">${messageTime}</span>
-        `;
-        
-        messagesContainer.appendChild(groupEl);
-    });
+    // Get client name for display
+    const clientName = document.getElementById('thread-name')?.textContent || 'Client';
     
-    // Scroll to bottom
-    setTimeout(() => {
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }, 100);
+    // Use unified messaging renderer
+    renderUnifiedMessages(
+        messages,
+        messagesContainer,
+        'practitioner',
+        {
+            name: clientName,
+            avatar: document.getElementById('thread-avatar')?.src || null
+        }
+    );
 }
 
 /**

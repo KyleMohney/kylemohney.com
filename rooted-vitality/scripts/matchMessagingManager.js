@@ -178,16 +178,14 @@ function displayMessages(messages) {
     return;
   }
 
-  // Count existing messages to see if we need to add new ones
-  const existingMessageCount = messageThread.querySelectorAll('.message').length;
+  // Get practitioner name for display
+  const practitionerName = document.getElementById('thread-practitioner-name')?.textContent || 'Practitioner';
   
-  // If no messages exist and we have messages to display
-  if (existingMessageCount === 0 && messages.length === 0) {
-    // Show appropriate empty state message
+  // If no messages, show empty state
+  if (!messages || messages.length === 0) {
     let emptyMessageHTML = '<p>No messages yet. Start the conversation!</p>';
     
     if (selectedMatchStatus === 'pending' && !selectedMatchResponse) {
-      console.log('[Messaging] Showing pending response message');
       emptyMessageHTML = `
         <div style="padding: 2rem; text-align: center; color: #666; line-height: 1.6;">
           <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem; color: #4a90e2;">Awaiting Practitioner Response</p>
@@ -196,7 +194,6 @@ function displayMessages(messages) {
         </div>
       `;
     } else if (selectedMatchResponse === 'declined') {
-      console.log('[Messaging] Showing declined response message');
       emptyMessageHTML = `
         <div style="padding: 2rem; text-align: center; color: #999; line-height: 1.6;">
           <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem;">Connection Declined</p>
@@ -204,7 +201,6 @@ function displayMessages(messages) {
         </div>
       `;
     } else if (selectedMatchResponse === 'accepted' && (selectedMatchStatus === 'active' || selectedMatchStatus === 'in-progress')) {
-      console.log('[Messaging] Showing accepted status message');
       emptyMessageHTML = `
         <div style="padding: 2rem; text-align: center; color: #666; line-height: 1.6;">
           <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem; color: #52a35e;">Connection Active</p>
@@ -217,57 +213,16 @@ function displayMessages(messages) {
     return;
   }
 
-  // If we have messages and they should be displayed
-  if (messages.length > 0) {
-    // Remove empty state if it exists
-    const emptyState = messageThread.querySelector('.message-empty');
-    if (emptyState) {
-      emptyState.remove();
+  // Use unified messaging renderer
+  renderUnifiedMessages(
+    messages,
+    messageThread,
+    'client',
+    {
+      name: practitionerName,
+      avatar: null  // Can add practitioner avatar if available
     }
-
-    // Only add NEW messages (not already in DOM)
-    messages.forEach((msg, index) => {
-      // Check if this message already exists in the DOM by checking the message ID
-      const existingMsg = messageThread.querySelector(`[data-message-id="${msg.id}"]`);
-      if (existingMsg) {
-        // Message already displayed, skip
-        return;
-      }
-
-      // Create new message element
-      const isClient = msg.sender_type === 'client';
-      const messageEl = document.createElement('div');
-      messageEl.className = `message ${isClient ? 'message--client' : 'message--practitioner'}`;
-      messageEl.setAttribute('data-message-id', msg.id);
-      messageEl.innerHTML = `
-        <div class="message-bubble">
-          <p class="message-text">${escapeHtml(msg.message)}</p>
-          <time class="message-time">${formatTime(msg.created_at)}</time>
-        </div>
-      `;
-      messageThread.appendChild(messageEl);
-    });
-
-    // Add pending status message at the bottom if awaiting response
-    if (selectedMatchStatus === 'pending' && !selectedMatchResponse) {
-      // Check if pending message already exists
-      const existingPendingMsg = messageThread.querySelector('[data-message-type="pending-status"]');
-      if (!existingPendingMsg) {
-        const pendingMsgEl = document.createElement('div');
-        pendingMsgEl.className = 'message-pending-status';
-        pendingMsgEl.setAttribute('data-message-type', 'pending-status');
-        pendingMsgEl.innerHTML = `
-          <div style="padding: 1rem; background: #f0f4f8; border-radius: 8px; text-align: center; color: #4a90e2; font-size: 0.9rem; margin-top: 1rem; border-left: 4px solid #4a90e2;">
-            <p style="margin: 0;">This match is pending the practitioner's response. Once they accept, you'll be able to exchange messages.</p>
-          </div>
-        `;
-        messageThread.appendChild(pendingMsgEl);
-      }
-    }
-
-    // Scroll to bottom
-    messageThread.scrollTop = messageThread.scrollHeight;
-  }
+  );
 }
 
 /**
