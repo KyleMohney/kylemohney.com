@@ -328,12 +328,23 @@ async function sendMessage() {
       selectedProjectUUID = projectData.id;
     }
 
+    console.log('[Messaging] Sending message as:', senderType, 'with data:', {
+      project_id: selectedProjectUUID,
+      practitioner_id: selectedPractitionerUUID,
+      client_id: clientId,
+      sender_id: senderId,
+      sender_type: senderType,
+      project_serial: selectedProjectId,
+      practitioner_serial: selectedPractitionerId,
+      client_serial: clientSerialId
+    });
+
     // Insert message with all required UUID fields
     const { error: insertError } = await supabaseClient
       .from('project_messages')
       .insert({
         project_id: selectedProjectUUID,
-        practitioner_id: selectedPractitionerId,
+        practitioner_id: selectedPractitionerUUID,
         client_id: clientId,
         sender_id: senderId,
         sender_type: senderType,
@@ -350,6 +361,8 @@ async function sendMessage() {
       alert('Error sending message');
       return;
     }
+
+    console.log('[Messaging] Message sent successfully');
 
     // Update match's contacted_at timestamp on first message
     const { error: matchUpdateError } = await supabaseClient
