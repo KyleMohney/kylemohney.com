@@ -1080,7 +1080,20 @@ const RootedVitality = {
             } else {
                 notificationTable = 'practitioner_notifications';
                 whereField = 'practitioner_serial';
-                whereValue = user.user_metadata?.serial_number || currentUser?.serial_number;
+                
+                // Get practitioner serial from practitioners table
+                const { data: practData, error: practError } = await window.supabaseClient
+                    .from('practitioners')
+                    .select('serial_number')
+                    .eq('id', user.id)
+                    .single();
+                
+                if (practError || !practData) {
+                    console.warn('[Rooted Vitality] Could not fetch practitioner serial for marking as read:', practError);
+                    return;
+                }
+                
+                whereValue = practData.serial_number;
             }
 
             if (!whereValue) {

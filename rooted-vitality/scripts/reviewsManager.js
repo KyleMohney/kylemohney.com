@@ -496,7 +496,7 @@ let reviewsManager = {
         practitioner_name: this.currentReview.practitionerName,
         photos: photosArray,                       // TEXT[] array of storage paths
         is_visible: true,
-        is_approved: false,
+        is_approved: true,  // Auto-approve reviews (can be changed by admin later)
         is_verified: false,                         // Will be verified by admin/system
         is_featured: false,                         // Will be set by admin for featured reviews
         review_date: new Date().toISOString(),      // When review was written

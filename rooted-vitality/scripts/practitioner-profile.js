@@ -294,6 +294,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
         
+        // Reload reviews when page becomes visible (e.g., tab switch)
+        document.addEventListener('visibilitychange', async () => {
+            if (document.visibilityState === 'visible') {
+                console.log('[Practitioner Profile] Page became visible, reloading reviews');
+                await loadReviews();
+            }
+        });
+        
     } catch (error) {
         console.error('[Practitioner Profile] Error loading profile:', error);
         document.getElementById('profile-loading').style.display = 'none';
@@ -310,6 +318,16 @@ document.addEventListener('DOMContentLoaded', async () => {
  */
 async function loadReviews() {
     try {
+        console.log('[Practitioner Profile] 🔍 LOADING REVIEWS');
+        console.log('[Practitioner Profile] Practitioner object:', practitioner);
+        console.log('[Practitioner Profile] Practitioner serial_number:', practitioner?.serial_number);
+        
+        if (!practitioner?.serial_number) {
+            console.error('[Practitioner Profile] ❌ No practitioner serial number available');
+            reviews = [];
+            return;
+        }
+        
         console.log('[Practitioner Profile] 🔍 Loading reviews for practitioner_serial:', practitioner.serial_number);
         
         const { data, error } = await window.supabaseClient
@@ -327,7 +345,14 @@ async function loadReviews() {
         } else {
             reviews = data || [];
             console.log('[Practitioner Profile] ✅ Loaded', reviews.length, 'reviews');
-            console.log('[Practitioner Profile] Review data:', reviews);
+            if (reviews.length > 0) {
+                console.log('[Practitioner Profile] First review:', reviews[0]);
+            } else {
+                console.log('[Practitioner Profile] ℹ️ No reviews found for serial:', practitioner.serial_number);
+            }
+            
+            // Render immediately
+            renderReviewsCard();
             
             // Setup realtime listener for new reviews
             setupReviewsRealtimeListener();
@@ -348,6 +373,7 @@ function setupReviewsRealtimeListener() {
     }
     
     console.log('[Practitioner Profile] 🔌 Setting up realtime listener for new reviews');
+    console.log('[Practitioner Profile] Watching for practitioner_serial:', practitioner.serial_number);
     
     const channel = window.supabaseClient
         .channel(`reviews:${practitioner.serial_number}`)
@@ -361,22 +387,59 @@ function setupReviewsRealtimeListener() {
             },
             (payload) => {
                 console.log('[Practitioner Profile] 🔔 NEW REVIEW RECEIVED via Realtime!');
-                console.log('[Practitioner Profile] Review data:', payload.new);
+                console.log('[Practitioner Profile] Review ID:', payload.new.id);
+                console.log('[Practitioner Profile] Review practitioner_serial:', payload.new.practitioner_serial);
+                console.log('[Practitioner Profile] Review is_visible:', payload.new.is_visible);
+                console.log('[Practitioner Profile] Full review data:', payload.new);
                 
                 // Only add if visible
                 if (payload.new.is_visible) {
-                    reviews.unshift(payload.new);  // Add to beginning (newest first)
-                    console.log('[Practitioner Profile] ✅ Review added to local array - total:', reviews.length);
-                    renderReviewsCard();
+                    // Check if already in array (avoid duplicates)
+                    const exists = reviews.some(r => r.id === payload.new.id);
+                    if (!exists) {
+                        reviews.unshift(payload.new);  // Add to beginning (newest first)
+                        console.log('[Practitioner Profile] ✅ Review added to local array - total:', reviews.length);
+                        renderReviewsCard();
+                    } else {
+                        console.log('[Practitioner Profile] ℹ️ Review already in array, skipping');
+                    }
                 } else {
-                    console.log('[Practitioner Profile] ℹ️ Review not visible yet, skipping');
+                    console.log('[Practitioner Profile] ℹ️ Review not visible yet (is_visible=false), skipping');
+                }
+            }
+        )
+        .on(
+            'postgres_changes',
+            {
+                event: 'UPDATE',
+                schema: 'public',
+                table: 'reviews',
+                filter: `practitioner_serial=eq.${practitioner.serial_number}`
+            },
+            (payload) => {
+                console.log('[Practitioner Profile] 🔄 REVIEW UPDATED via Realtime!');
+                console.log('[Practitioner Profile] Updated review:', payload.new);
+                
+                // Update review if is_visible changed to true
+                if (payload.new.is_visible) {
+                    const existingIndex = reviews.findIndex(r => r.id === payload.new.id);
+                    if (existingIndex >= 0) {
+                        reviews[existingIndex] = payload.new;
+                        console.log('[Practitioner Profile] ✅ Review updated in local array');
+                    } else {
+                        reviews.unshift(payload.new);
+                        console.log('[Practitioner Profile] ✅ Review added to local array (was hidden, now visible)');
+                    }
+                    renderReviewsCard();
                 }
             }
         )
         .subscribe((status) => {
             console.log('[Practitioner Profile] Realtime subscription status:', status);
             if (status === 'SUBSCRIBED') {
-                console.log('[Practitioner Profile] ✅ Reviews Realtime SUBSCRIBED');
+                console.log('[Practitioner Profile] ✅ Reviews Realtime SUBSCRIBED - listening for changes');
+            } else if (status === 'CHANNEL_ERROR') {
+                console.error('[Practitioner Profile] ❌ Realtime channel error!');
             }
         });
 }
