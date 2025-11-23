@@ -19,6 +19,7 @@ let selectedPractitionerUUID;  // UUID of the practitioner
 let selectedMatchStatus;  // Track match status for UI updates
 let selectedMatchResponse;  // Track practitioner response (accepted/declined/null)
 let messageRealtimeSubscription;  // Real-time subscription for messages
+let loadedMessageIds = new Set();  // Track which messages have been rendered to avoid re-rendering
 
 /**
  * Initialize messaging for a specific project + practitioner
@@ -183,46 +184,89 @@ function displayMessages(messages) {
   
   // If no messages, show empty state
   if (!messages || messages.length === 0) {
-    let emptyMessageHTML = '<p>No messages yet. Start the conversation!</p>';
-    
-    if (selectedMatchStatus === 'pending' && !selectedMatchResponse) {
-      emptyMessageHTML = `
-        <div style="padding: 2rem; text-align: center; color: #666; line-height: 1.6;">
-          <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem; color: #4a90e2;">Awaiting Practitioner Response</p>
-          <p style="margin: 0.5rem 0;">You've sent a connection request with an automatic introduction message.</p>
-          <p style="margin: 0.5rem 0;">Once they accept, you'll be able to message them here.</p>
-        </div>
-      `;
-    } else if (selectedMatchResponse === 'declined') {
-      emptyMessageHTML = `
-        <div style="padding: 2rem; text-align: center; color: #999; line-height: 1.6;">
-          <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem;">Connection Declined</p>
-          <p style="margin: 0.5rem 0;">This practitioner has declined your request.</p>
-        </div>
-      `;
-    } else if (selectedMatchResponse === 'accepted' && (selectedMatchStatus === 'active' || selectedMatchStatus === 'in-progress')) {
-      emptyMessageHTML = `
-        <div style="padding: 2rem; text-align: center; color: #666; line-height: 1.6;">
-          <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem; color: #52a35e;">Connection Active</p>
-          <p style="margin: 0.5rem 0;">Start your conversation with this practitioner here.</p>
-        </div>
-      `;
+    // Only update if we haven't already shown messages
+    if (loadedMessageIds.size === 0) {
+      let emptyMessageHTML = '<p>No messages yet. Start the conversation!</p>';
+      
+      if (selectedMatchStatus === 'pending' && !selectedMatchResponse) {
+        emptyMessageHTML = `
+          <div style="padding: 2rem; text-align: center; color: #666; line-height: 1.6;">
+            <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem; color: #4a90e2;">Awaiting Practitioner Response</p>
+            <p style="margin: 0.5rem 0;">You've sent a connection request with an automatic introduction message.</p>
+            <p style="margin: 0.5rem 0;">Once they accept, you'll be able to message them here.</p>
+          </div>
+        `;
+      } else if (selectedMatchResponse === 'declined') {
+        emptyMessageHTML = `
+          <div style="padding: 2rem; text-align: center; color: #999; line-height: 1.6;">
+            <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem;">Connection Declined</p>
+            <p style="margin: 0.5rem 0;">This practitioner has declined your request.</p>
+          </div>
+        `;
+      } else if (selectedMatchResponse === 'accepted' && (selectedMatchStatus === 'active' || selectedMatchStatus === 'in-progress')) {
+        emptyMessageHTML = `
+          <div style="padding: 2rem; text-align: center; color: #666; line-height: 1.6;">
+            <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem; color: #52a35e;">Connection Active</p>
+            <p style="margin: 0.5rem 0;">Start your conversation with this practitioner here.</p>
+          </div>
+        `;
+      }
+      
+      messageThread.innerHTML = `<div class="message-empty" style="display: flex; align-items: center; justify-content: center; height: 100%; min-height: 300px; background-color: #fafafa; border-radius: 8px;">${emptyMessageHTML}</div>`;
     }
-    
-    messageThread.innerHTML = `<div class="message-empty" style="display: flex; align-items: center; justify-content: center; height: 100%; min-height: 300px; background-color: #fafafa; border-radius: 8px;">${emptyMessageHTML}</div>`;
     return;
   }
 
-  // Use unified messaging renderer
+  // Check if messages have changed (by comparing message IDs)
+  const currentMessageIds = new Set(messages.map(m => m.id));
+  
+  // If all messages have already been loaded, don't re-render
+  if (currentMessageIds.size === loadedMessageIds.size && 
+      [...currentMessageIds].every(id => loadedMessageIds.has(id))) {
+    console.log('[Messaging] No new messages - skipping re-render');
+    return;
+  }
+
+  // If this is the first load, render all messages
+  if (loadedMessageIds.size === 0) {
+    console.log('[Messaging] First load - rendering all messages');
+    renderUnifiedMessages(
+      messages,
+      'message-thread',
+      'client',
+      {
+        name: practitionerName,
+        avatar: null
+      }
+    );
+    // Mark all messages as loaded
+    messages.forEach(msg => loadedMessageIds.add(msg.id));
+    return;
+  }
+
+  // Find new messages that haven't been rendered yet
+  const newMessages = messages.filter(msg => !loadedMessageIds.has(msg.id));
+  
+  if (newMessages.length === 0) {
+    console.log('[Messaging] No new messages to display');
+    return;
+  }
+
+  console.log('[Messaging] Found', newMessages.length, 'new messages - re-rendering');
+  
+  // Re-render with all messages when new ones arrive
   renderUnifiedMessages(
     messages,
     'message-thread',
     'client',
     {
       name: practitionerName,
-      avatar: null  // Can add practitioner avatar if available
+      avatar: null
     }
   );
+  
+  // Mark all messages as loaded
+  messages.forEach(msg => loadedMessageIds.add(msg.id));
 }
 
 /**

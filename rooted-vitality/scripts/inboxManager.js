@@ -509,7 +509,7 @@ async function loadConversations() {
                     projectDescription: project.description,
                     projectCategory: project.category_name,
                     projectZipcode: project.zipcode,
-                    projectTravelPreferences: project.travel_preferences,
+                    projectTravelPreferences: project.travel_preference,
                     isBlocked: false
                 });
             } catch (itemError) {
@@ -667,20 +667,101 @@ function createThreadElement(conversation) {
     }
     
     item.innerHTML = `
-        <div class="thread-avatar-small">
-            <img src="${conversation.clientAvatar}" alt="${conversation.clientName}">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; width: 100%;">
+            <div class="thread-avatar-small">
+                <img src="${conversation.clientAvatar}" alt="${conversation.clientName}">
+            </div>
+            <p class="thread-name">${conversation.clientName}</p>
+            <div class="thread-status-badge ${conversation.status === 'online' ? 'online' : conversation.status === 'away' ? 'away' : ''}"></div>
+            <span class="thread-time" style="margin-left: auto;">${formatTime(conversation.lastMessageTime)}</span>
+            <div class="thread-menu-wrapper" style="position: relative;">
+                <button class="thread-menu-btn" title="Options" data-thread-id="${conversation.id}">⋮</button>
+                <div class="thread-menu-dropdown" style="display: none; position: absolute; right: 0; top: 100%; background: white; border: 1px solid var(--border-light); border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); z-index: 100; min-width: 140px;">
+                    <button class="thread-menu-item archive-option" style="width: 100%; text-align: left; padding: 10px 12px; border: none; background: none; cursor: pointer; font-size: 0.9rem; color: var(--text-primary); border-bottom: 1px solid var(--border-light);">Archive</button>
+                    <button class="thread-menu-item block-option" style="width: 100%; text-align: left; padding: 10px 12px; border: none; background: none; cursor: pointer; font-size: 0.9rem; color: var(--text-primary);">Block</button>
+                </div>
+            </div>
         </div>
         <div class="thread-meta">
-            <p class="thread-name">${conversation.clientName}</p>
-            <p class="thread-preview">${conversation.lastMessage}</p>
-        </div>
-        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
-            <span class="thread-time">${formatTime(conversation.lastMessageTime)}</span>
-            <div style="display: flex; gap: 4px; align-items: center;">
-                <div class="thread-status-badge ${conversation.status === 'online' ? 'online' : conversation.status === 'away' ? 'away' : ''}"></div>
+            <!-- Project Details in Middle Column -->
+            <div class="thread-project-details">
+                <div class="project-detail-row">
+                    <div class="project-detail-item">
+                        <span class="detail-label">Services Needed</span>
+                        <span class="detail-value" id="thread-services-${conversation.clientSerial}">-</span>
+                    </div>
+                    <div class="project-detail-item">
+                        <span class="detail-label">Location</span>
+                        <span class="detail-value" id="thread-location-${conversation.clientSerial}">-</span>
+                    </div>
+                    <div class="project-detail-item">
+                        <span class="detail-label">Travel Preferences</span>
+                        <span class="detail-value" id="thread-travel-${conversation.clientSerial}">-</span>
+                    </div>
+                </div>
+                <div class="project-detail-item">
+                    <span class="detail-label">Project Description</span>
+                    <span class="detail-value" id="thread-description-${conversation.clientSerial}">-</span>
+                </div>
             </div>
         </div>
     `;
+    
+    // Populate project details in the thread item
+    const servicesElement = item.querySelector(`#thread-services-${conversation.clientSerial}`);
+    const locationElement = item.querySelector(`#thread-location-${conversation.clientSerial}`);
+    const travelElement = item.querySelector(`#thread-travel-${conversation.clientSerial}`);
+    const descriptionElement = item.querySelector(`#thread-description-${conversation.clientSerial}`);
+    
+    if (servicesElement && conversation.projectCategory) {
+        servicesElement.textContent = conversation.projectCategory;
+    }
+    
+    if (locationElement && conversation.projectZipcode) {
+        locationElement.textContent = conversation.projectZipcode;
+    }
+    
+    if (travelElement && conversation.projectTravelPreferences) {
+        travelElement.textContent = conversation.projectTravelPreferences;
+    }
+    
+    if (descriptionElement && conversation.projectDescription) {
+        descriptionElement.textContent = conversation.projectDescription;
+    }
+    
+    // Add menu button handler
+    const menuBtn = item.querySelector('.thread-menu-btn');
+    const menuDropdown = item.querySelector('.thread-menu-dropdown');
+    const archiveOption = item.querySelector('.archive-option');
+    const blockOption = item.querySelector('.block-option');
+    
+    if (menuBtn && menuDropdown) {
+        menuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            menuDropdown.style.display = menuDropdown.style.display === 'none' ? 'block' : 'none';
+        });
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', () => {
+            menuDropdown.style.display = 'none';
+        });
+    }
+    
+    if (archiveOption) {
+        archiveOption.addEventListener('click', (e) => {
+            e.stopPropagation();
+            menuDropdown.style.display = 'none';
+            archiveConversation(conversation);
+        });
+    }
+    
+    if (blockOption) {
+        blockOption.addEventListener('click', (e) => {
+            e.stopPropagation();
+            menuDropdown.style.display = 'none';
+            blockConversation(conversation);
+        });
+    }
     
     item.addEventListener('click', () => {
         selectedConversationId = conversation.id;
@@ -834,6 +915,18 @@ function openThreadView(conversation) {
         });
     }
     
+    // Set up profile link handler
+    const threadHeaderLink = document.getElementById('thread-header-link');
+    const clientProfileUrl = `/rooted-vitality/dashboard/pro/pages/client-profile.html?client_serial=${conversation.clientSerial}`;
+    
+    if (threadHeaderLink) {
+        threadHeaderLink.href = clientProfileUrl;
+        threadHeaderLink.onclick = (e) => {
+            e.preventDefault();
+            window.location.href = clientProfileUrl;
+        };
+    }
+    
     // Show thread view
     threadView.style.display = 'flex';
 }
@@ -842,12 +935,6 @@ function openThreadView(conversation) {
  * Populate the lead details hero section with client information
  */
 function populateLeadDetailsHero(conversation) {
-    // Update lead avatar
-    document.getElementById('lead-avatar-large').src = conversation.clientAvatar;
-    
-    // Update lead name
-    document.getElementById('lead-name').textContent = conversation.clientName;
-    
     // Update lead status
     const leadStatus = document.getElementById('lead-status');
     if (leadStatus) {
@@ -1038,6 +1125,64 @@ function closeThreadView() {
     
     threadView.style.display = 'none';
     emptyState.style.display = 'flex';
+}
+
+/**
+ * Archive/decline a conversation
+ */
+async function archiveConversation(conversation) {
+    try {
+        // Update the match status to 'declined'
+        const { error } = await window.supabaseClient
+            .from('matches')
+            .update({ status: 'declined' })
+            .eq('id', conversation.matchId);
+        
+        if (error) {
+            console.error('[Inbox] Error archiving conversation:', error);
+            alert('Failed to archive conversation');
+            return;
+        }
+        
+        // Remove from conversations list and close thread view
+        conversations = conversations.filter(c => c.id !== conversation.id);
+        closeThreadView();
+        
+        // Reload conversations to update UI
+        loadConversations();
+    } catch (error) {
+        console.error('[Inbox] Exception archiving conversation:', error);
+        alert('Error archiving conversation');
+    }
+}
+
+/**
+ * Block a client conversation
+ */
+async function blockConversation(conversation) {
+    try {
+        // Update the match status to 'declined' and mark as blocked
+        const { error } = await window.supabaseClient
+            .from('matches')
+            .update({ status: 'declined', is_blocked: true })
+            .eq('id', conversation.matchId);
+        
+        if (error) {
+            console.error('[Inbox] Error blocking conversation:', error);
+            alert('Failed to block client');
+            return;
+        }
+        
+        // Remove from conversations list and close thread view
+        conversations = conversations.filter(c => c.id !== conversation.id);
+        closeThreadView();
+        
+        // Reload conversations to update UI
+        loadConversations();
+    } catch (error) {
+        console.error('[Inbox] Exception blocking conversation:', error);
+        alert('Error blocking client');
+    }
 }
 
 /**

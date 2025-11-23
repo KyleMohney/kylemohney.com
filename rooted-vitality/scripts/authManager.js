@@ -164,25 +164,28 @@ window.authManager = {
             
             console.log('[Rooted Vitality] Login successful');
             
-            // Check if there's a redirect URL from a previous action (like landing page CTA)
-            const redirectUrl = sessionStorage.getItem('redirectAfterAuth');
-            if (redirectUrl) {
-                console.log('[Rooted Vitality] Redirect URL found in sessionStorage:', redirectUrl);
-                sessionStorage.removeItem('redirectAfterAuth');
-                window.location.href = redirectUrl;
-                return true;
-            }
+            // ALWAYS clear any redirect URLs on login - go to role-specific dashboard
+            sessionStorage.removeItem('redirectAfterAuth');
             
-            // Default redirect based on role
+            // Determine final role and redirect
             const finalRole = userRole || role;
             const baseUrl = (typeof RootedVitality !== 'undefined' && RootedVitality.config.siteUrl) ? RootedVitality.config.siteUrl : '/rooted-vitality/';
+            
+            let redirectPath;
             if (finalRole === 'practitioner') {
                 console.log('[Rooted Vitality] Redirecting to practitioner dashboard');
-                window.location.href = baseUrl + 'dashboard/pro/index.html';
+                redirectPath = baseUrl + 'dashboard/pro/index.html';
             } else if (finalRole === 'client') {
-                console.log('[Rooted Vitality] Redirecting to client dashboard');
-                window.location.href = baseUrl + 'dashboard/client/pages/dashboard.html';
+                console.log('[Rooted Vitality] Redirecting to client index');
+                redirectPath = baseUrl + 'index.html';
             }
+            
+            if (redirectPath) {
+                console.log('[Rooted Vitality] Final redirect URL:', redirectPath);
+                window.location.href = redirectPath;
+                return true;
+            }
+
             
             return true;
         } catch (error) {
@@ -404,7 +407,7 @@ window.authManager = {
                 .from('practitioners')
                 .select('*')
                 .eq('id', userId)
-                .single();
+                .maybeSingle();
             
             if (practitioner && !practError) {
                 console.log('[Rooted Vitality] User found in practitioners table');
@@ -416,7 +419,7 @@ window.authManager = {
                 .from('clients')
                 .select('*')
                 .eq('id', userId)
-                .single();
+                .maybeSingle();
             
             if (client && !clientError) {
                 console.log('[Rooted Vitality] User found in clients table');

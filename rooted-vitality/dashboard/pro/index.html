@@ -22,17 +22,18 @@
     }
     
     .clients-container {
-      max-width: 1300px;
+      max-width: 1600px;
       margin: 0 auto;
       padding: 0 1rem;
       display: grid;
-      grid-template-columns: 280px 1fr;
+      grid-template-columns: 280px 1fr 450px;
       gap: 2rem;
+      width: 100%;
     }
 
     @media (max-width: 1024px) {
       .clients-container {
-        grid-template-columns: 240px 1fr;
+        grid-template-columns: 240px 1fr 400px;
         gap: 1.5rem;
       }
     }
@@ -44,8 +45,30 @@
     }
     
     .clients-header {
-      grid-column: 1 / -1;
-      margin-bottom: 1rem;
+      display: none;
+    }
+    
+    .clients-grid-3col {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 0 1rem;
+      display: grid;
+      grid-template-columns: 280px 1fr 450px;
+      gap: 2rem;
+      width: 100%;
+    }
+
+    @media (max-width: 1024px) {
+      .clients-grid-3col {
+        grid-template-columns: 240px 1fr 400px;
+        gap: 1.5rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .clients-grid-3col {
+        grid-template-columns: 1fr;
+      }
     }
     
     .clients-header h1 {
@@ -100,17 +123,128 @@
       line-height: 1.4;
     }
     
+    /* Message Thread Column */
+    .message-thread-column {
+      background: white;
+      border: 1px solid #e5e5e5;
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      max-height: calc(100vh - 250px);
+      overflow-y: auto;
+    }
+    
+    .message-thread-panel {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    
+    .thread-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #e5e5e5;
+      margin-bottom: 1rem;
+    }
+    
+    .thread-header__content {
+      flex: 1;
+    }
+    
+    .thread-header__title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin: 0;
+    }
+    
+    .thread-header__meta {
+      font-size: 0.85rem;
+      color: #999;
+      margin-top: 0.25rem;
+    }
+    
+    .message-thread {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      padding: 0.5rem 0;
+    }
+    
+    .message-item {
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      max-width: 85%;
+      word-wrap: break-word;
+      font-size: 0.9rem;
+    }
+    
+    .message-item.client {
+      align-self: flex-start;
+      background: #f0f0f0;
+      color: #333;
+    }
+    
+    .message-item.practitioner {
+      align-self: flex-end;
+      background: #5c9a72;
+      color: white;
+    }
+    
+    .message-input-area {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      border-top: 1px solid #e5e5e5;
+      padding-top: 1rem;
+      margin-top: auto;
+    }
+    
+    .message-input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+      min-height: 60px;
+    }
+    
+    .message-input:disabled {
+      background: #f5f5f5;
+      color: #999;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 3rem 2rem;
+      color: #999;
+    }
+    
     /* Main Content */
     .clients-main-content {
       display: flex;
       flex-direction: column;
-      gap: 2rem;
+      gap: 1.5rem;
+      background: white;
+      border: 1px solid #e5e5e5;
+      border-radius: 12px;
+      padding: 1.5rem;
+      overflow-y: auto;
+      max-height: calc(100vh - 250px);
     }
     
     .clients-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
     }
     
     .client-card {
@@ -451,12 +585,8 @@
     <!-- Toast Container for Notifications -->
     <div id="toast-container" class="toast-container"></div>
 
-    <div class="clients-container">
-      <div class="clients-header">
-        <h1>Clients</h1>
-      </div>
-      
-      <!-- Sidebar -->
+    <div class="clients-grid-3col">
+      <!-- LEFT COLUMN: Tab Navigation -->
       <aside class="clients-sidebar">
         <div class="sidebar-tab active" data-tab="new-clients">
           <h3 class="sidebar-tab__title">New Clients</h3>
@@ -468,11 +598,11 @@
           <p class="sidebar-tab__description">Clients open to contact who haven't matched yet</p>
         </div>
       </aside>
-      
-      <!-- Main Content -->
-      <div class="clients-main-content">
+
+      <!-- MIDDLE COLUMN: Clients List -->
+      <section class="clients-main-content">
         <!-- New Clients Tab -->
-        <div id="new-clients" class="clients-list" style="display: grid;">
+        <div id="new-clients" class="clients-list" style="display: flex;">
           <!-- Client cards will be populated here by JavaScript -->
         </div>
         
@@ -480,7 +610,39 @@
         <div id="opportunities" class="clients-list" style="display: none;">
           <!-- Opportunity cards will be populated here by JavaScript -->
         </div>
-      </div>
+      </section>
+
+      <!-- RIGHT COLUMN: Message Thread -->
+      <section class="message-thread-column">
+        <div class="message-thread-panel" id="message-thread-panel">
+          <!-- Header with Status Dropdown -->
+          <div class="thread-header">
+            <div class="thread-header__content">
+              <h3 id="thread-client-name" class="thread-header__title">Select a client</h3>
+              <div class="thread-header__meta" id="thread-client-meta"></div>
+            </div>
+          </div>
+          
+          <!-- Messages Area -->
+          <div id="message-thread" class="message-thread">
+            <div class="empty-state">
+              <p>Select a client to view message history</p>
+            </div>
+          </div>
+
+          <!-- Message Input -->
+          <div class="message-input-area">
+            <textarea 
+              id="message-input" 
+              class="message-input" 
+              placeholder="Type your message..." 
+              rows="3"
+              disabled
+            ></textarea>
+            <button id="send-message-btn" class="btn btn-primary" disabled>Send Message</button>
+          </div>
+        </div>
+      </section>
     </div>
   </main>
 
@@ -602,7 +764,7 @@
         
         // Show/hide content
         document.querySelectorAll('.clients-list').forEach(list => list.style.display = 'none');
-        document.getElementById(tabName).style.display = 'grid';
+        document.getElementById(tabName).style.display = 'flex';
       });
     });
 

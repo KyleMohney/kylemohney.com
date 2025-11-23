@@ -149,13 +149,13 @@ async function loadTaxonomy() {
 
 async function loadMatches(clientSerial) {
   try {
-    // Fetch matches
+    // Fetch matches with all necessary fields
     console.log('[My Matches] loadMatches called with clientSerial:', clientSerial);
     const { data: matchesData, error: matchesError } = await window.supabaseClient
       .from('project_practitioner_matches')
-      .select('id, project_serial, practitioner_serial, client_serial, status, practitioner_response, practitioner_responded_at, created_at')
+      .select('id, project_serial, practitioner_serial, client_serial, status, practitioner_response, practitioner_responded_at, created_at, updated_at')
       .eq('client_serial', clientSerial)
-      .order('created_at', { ascending: false });
+      .order('updated_at', { ascending: false });
 
     console.log('[My Matches] Query result - matchesData:', matchesData, 'error:', matchesError);
     
@@ -204,13 +204,13 @@ async function loadMatches(clientSerial) {
       }
     }
 
-    // Fetch project details for all matches
+    // Fetch project details for all matches - INCLUDE ALL NECESSARY FIELDS
     const projectSerials = [...new Set((matchesData || []).map(m => m.project_serial).filter(Boolean))];
     let projectsMap = {};
     if (projectSerials.length > 0) {
       const { data: projectsData, error: projectsError } = await window.supabaseClient
         .from('projects')
-        .select('id, project_serial, category_id, category_name')
+        .select('id, project_serial, category_id, category_name, zipcode, travel_preference, description, custom_name')
         .in('project_serial', projectSerials);  // Match on project_serial (integer)
       
       if (projectsError) {
@@ -222,11 +222,34 @@ async function loadMatches(clientSerial) {
       }
     }
 
-    // Merge practitioner and project data into matches
+    // Fetch latest messages for each match
+    let messagesMap = {};
+    if (matchesData && matchesData.length > 0) {
+      const matchIds = matchesData.map(m => m.id);
+      const { data: messagesData, error: messagesError } = await window.supabaseClient
+        .from('project_messages')
+        .select('id, match_id, message_text, sender_role, created_at')
+        .in('match_id', matchIds)
+        .order('created_at', { ascending: false });
+      
+      if (messagesError) {
+        console.warn('Warning loading latest messages:', messagesError);
+      } else {
+        // Group messages by match_id and get the latest one
+        (messagesData || []).forEach(msg => {
+          if (!messagesMap[msg.match_id]) {
+            messagesMap[msg.match_id] = msg;
+          }
+        });
+      }
+    }
+
+    // Merge practitioner, project, and message data into matches
     allMatches = (matchesData || []).map(match => ({
       ...match,
       practitioners: practitionersMap[match.practitioner_serial] || {},
-      project: projectsMap[match.project_serial] || {}  // Lookup by project_serial (integer)
+      project: projectsMap[match.project_serial] || {},
+      last_message: messagesMap[match.id]?.message_text || 'No messages yet'
     }));
     filteredMatches = [...allMatches];
 
@@ -238,13 +261,14 @@ async function loadMatches(clientSerial) {
     if (allMatches.length > 0) {
       console.log('[My Matches] First match full object:', allMatches[0]);
       console.log('[My Matches] First match practitioners:', allMatches[0].practitioners);
+      console.log('[My Matches] First match last message:', allMatches[0].last_message);
     }
-
-    // Update total count
-    document.getElementById('total-connections').textContent = allMatches.length;
 
     // Display matches
     displayMatches(1);
+    
+    // Update badge counts
+    await updateBadgeCounts();
 
   } catch (error) {
     console.error('Error loading matches:', error);
@@ -252,51 +276,176 @@ async function loadMatches(clientSerial) {
   }
 }
 
+/**
+ * Update badge counts for Messages, Unread, and Completed tabs
+ * - Messages: Total matched practitioners (active or in-progress status)
+ * - Unread: Count of unread messages 
+ * - Completed: Total completed entries (hired, not_hired, or declined)
+ */
+async function updateBadgeCounts() {
+  try {
+    // Count messages (active/in-progress matches)
+    const messagesCount = allMatches.filter(m => m.status === 'active' || m.status === 'in-progress').length;
+    const messagesBadge = document.getElementById('messages-badge');
+    if (messagesBadge) messagesBadge.textContent = messagesCount;
+
+    // Count completed (hired/not_hired/declined)
+    const completedCount = allMatches.filter(m => m.status === 'hired' || m.status === 'not_hired' || m.status === 'declined').length;
+    const completedBadge = document.getElementById('completed-badge');
+    if (completedBadge) completedBadge.textContent = completedCount;
+
+    // Count unread messages - query project_messages where is_read=false
+    const unreadBadge = document.getElementById('unread-badge');
+    if (allMatches.length > 0) {
+      const matchIds = allMatches.map(m => m.id);
+      const { data: unreadMessages, error: unreadError } = await window.supabaseClient
+        .from('project_messages')
+        .select('id')
+        .in('match_id', matchIds)
+        .eq('is_read', false);
+      
+      if (unreadError) {
+        console.warn('[My Matches] Error fetching unread count:', unreadError);
+        if (unreadBadge) unreadBadge.textContent = '0';
+      } else {
+        const unreadCount = (unreadMessages || []).length;
+        if (unreadBadge) unreadBadge.textContent = unreadCount;
+      }
+    } else {
+      if (unreadBadge) unreadBadge.textContent = '0';
+    }
+
+    console.log('[My Matches] Badge counts updated - Messages:', messagesCount, 'Unread:', unreadBadge?.textContent, 'Completed:', completedCount);
+  } catch (error) {
+    console.error('[My Matches] Error updating badge counts:', error);
+  }
+}
+
 function displayMatches(page) {
   currentPage = page;
-  const container = document.getElementById('matches-container');
-  const startIdx = (page - 1) * itemsPerPage;
-  const endIdx = startIdx + itemsPerPage;
-  const pageMatches = filteredMatches.slice(startIdx, endIdx);
-
-  if (pageMatches.length === 0) {
+  const container = document.getElementById('threads-list');
+  
+  if (filteredMatches.length === 0) {
     container.innerHTML = `
-      <div class="matches-empty">
-        <p>No connections found.</p>
+      <div class="empty-state" style="padding: 2rem; text-align: center; color: var(--text-tertiary);">
+        <p>No practitioners found.</p>
       </div>
     `;
     return;
   }
 
   container.innerHTML = '';
-  pageMatches.forEach(match => {
-    const card = createMatchCard(match);
+  filteredMatches.forEach(match => {
+    const item = createThreadItem(match);
     
-    // Add click handler to open messaging thread
-    card.addEventListener('click', (e) => {
-      // Don't trigger on action buttons
-      if (e.target.tagName === 'BUTTON') return;
+    // Add click handler to open messaging thread and set active state
+    item.addEventListener('click', (e) => {
+      // Don't trigger on menu button
+      if (e.target.closest('.thread-menu-btn')) return;
+      
+      // Remove active class from all thread items
+      document.querySelectorAll('.thread-item').forEach(t => t.classList.remove('active'));
+      
+      // Add active class to clicked item
+      item.classList.add('active');
       
       openMessagingThread(match);
     });
     
-    container.appendChild(card);
+    container.appendChild(item);
   });
 
-  // Update showing count
-  document.getElementById('showing-count').textContent = 
-    filteredMatches.length > 0 ? `${pageMatches.length} of ${filteredMatches.length}` : '0';
-
-  // Show/hide pagination
+  // Hide pagination - thread list doesn't use it
   const paginationContainer = document.getElementById('pagination-container');
-  const totalPages = Math.ceil(filteredMatches.length / itemsPerPage);
-  
-  if (totalPages > 1) {
-    paginationContainer.style.display = 'flex';
-    renderPagination(totalPages);
-  } else {
+  if (paginationContainer) {
     paginationContainer.style.display = 'none';
   }
+}
+
+/**
+ * Create a thread item element (for practitioner list in client view)
+ */
+function createThreadItem(match) {
+  const practitioner = match.practitioners;
+  if (!practitioner) return document.createElement('div');
+
+  const displayName = formatPractitionerName(practitioner.dba_name || practitioner.legal_name || 'Practitioner');
+  const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase();
+  
+  // Use practice logo for avatar
+  const logoUrl = practitioner.practice_logo_url;
+  const avatarHtml = logoUrl 
+    ? `<img src="${logoUrl}" alt="${escapeHtml(displayName)}" style="width: 100%; height: 100%; object-fit: cover;">`
+    : initials;
+
+  // Get modalities/specialty
+  const specialty = escapeHtml(practitioner.modalities?.join(', ') || 'Holistic Practitioner');
+  
+  // Get last message time formatted
+  const lastMessageTime = match.updated_at ? new Date(match.updated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now';
+
+  // Get project details
+  const project = match.project || {};
+  const services = getCategoryName(project);
+  const location = project.zipcode || '-';
+  const travelPrefs = project.travel_preference || '-';
+  const description = project.description?.substring(0, 50) + '...' || '-';
+  
+  // Check if status is completed
+  const isClosed = match.status === 'hired' || match.status === 'not_hired' || match.status === 'declined';
+  const isReviewable = match.status === 'hired' || match.status === 'not_hired';
+
+  const item = document.createElement('button');
+  item.className = `thread-item${isClosed ? ' thread-item--closed' : ''}`;
+  item.setAttribute('data-match-id', match.id);
+  item.setAttribute('data-practitioner-serial', match.practitioner_serial);
+  item.setAttribute('data-status', match.status);
+  
+  item.innerHTML = `
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; width: 100%;">
+      <div class="thread-avatar-small">
+        ${logoUrl ? `<img src="${logoUrl}" alt="${escapeHtml(displayName)}" style="width: 100%; height: 100%; object-fit: cover;">` : `<span style="color: white; font-weight: 700; font-size: 0.95rem;">${initials}</span>`}
+      </div>
+      <div style="flex: 1; min-width: 0;">
+        <p class="thread-name">${escapeHtml(displayName)}</p>
+        <p class="thread-preview">${escapeHtml(specialty)}</p>
+      </div>
+      <span class="thread-time">${lastMessageTime}</span>
+      <div class="thread-menu-wrapper">
+        <button class="thread-menu-btn" title="Options">⋮</button>
+      </div>
+    </div>
+    <div class="thread-meta">
+      <!-- Project Details -->
+      <div class="thread-project-details">
+        <div class="project-detail-row">
+          <div class="project-detail-item">
+            <span class="detail-label">Services Needed</span>
+            <span class="detail-value">${escapeHtml(services)}</span>
+          </div>
+          <div class="project-detail-item">
+            <span class="detail-label">Location</span>
+            <span class="detail-value">${escapeHtml(location)}</span>
+          </div>
+          <div class="project-detail-item">
+            <span class="detail-label">Travel Preferences</span>
+            <span class="detail-value">${escapeHtml(travelPrefs)}</span>
+          </div>
+        </div>
+        <div class="project-detail-item">
+          <span class="detail-label">Project Description</span>
+          <span class="detail-value">${escapeHtml(description)}</span>
+        </div>
+      </div>
+      ${isReviewable ? `
+        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #ede9e2;">
+          <button class="thread-review-btn" onclick="openReviewModal('${match.id}', '${match.practitioner_serial}', '${escapeHtml(displayName)}', '${match.project_serial || ''}', '${escapeHtml(match.client_first_name || '')}', '${escapeHtml(match.client_last_name || '')}')">Leave Review</button>
+        </div>
+      ` : ''}
+    </div>
+  `;
+  
+  return item;
 }
 
 // Helper: Get category name from category_id using taxonomy mapping
@@ -318,99 +467,82 @@ function getCategoryName(project) {
   return project.category_id || 'Project';
 }
 
-function createMatchCard(match) {
-  const practitioner = match.practitioners;
-  if (!practitioner) return document.createElement('div');
-
-  const displayName = formatPractitionerName(practitioner.dba_name || practitioner.legal_name || 'Practitioner');
-  const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase();
-  
-  // Use practice logo, fallback to initials
-  const logoUrl = practitioner.practice_logo_url;
-  const avatarHtml = logoUrl 
-    ? `<img src="${logoUrl}" alt="${escapeHtml(displayName)}" class="match-card__avatar-img">`
-    : `<div class="match-card__avatar-initials">${initials}</div>`;
-
-  const statusLabel = {
-    'in-progress': 'In-Progress',
-    hired: 'Hired',
-    'not-hired': 'Not Hired',
-    declined: 'Declined'
-  }[match.status] || match.status;
-
-  const statusClass = `match-card__status-pill--${match.status}`;
-  const services = [
-    practitioner.in_person_enabled && 'In-Person',
-    practitioner.housecalls_enabled && 'House Calls',
-    practitioner.virtual_enabled && 'Virtual'
-  ].filter(Boolean).join(', ');
-
-  // Get project category info
-  const project = match.project || {};
-  const projectDisplay = getCategoryName(project);
-
-  const card = document.createElement('div');
-  const closedClass = (match.status === 'hired' || match.status === 'not-hired' || match.status === 'declined') ? ' match-card--closed' : '';
-  card.className = `match-card${closedClass}`;
-  card.setAttribute('data-match-id', match.id);
-  card.innerHTML = `
-    <div class="match-card__avatar">${avatarHtml}</div>
-    
-    <div class="match-card__content">
-      <div class="match-card__header">
-        <div class="match-card__title">
-          <h3 class="match-card__name">${escapeHtml(displayName)}</h3>
-          <p class="match-card__specialty">${escapeHtml(practitioner.modalities?.join(', ') || 'Holistic Practitioner')}</p>
-        </div>
-        <div class="match-card__project-tag">${escapeHtml(projectDisplay)}</div>
-      </div>
-
-      <div class="match-card__meta">
-        <div class="match-card__meta-item">${services || 'Services TBD'}</div>
-        <div class="match-card__meta-item">${practitioner.practice_city && practitioner.practice_state ? `${practitioner.practice_city}, ${practitioner.practice_state}` : 'Location TBD'}</div>
-      </div>
-
-      <p class="match-card__bio">${escapeHtml(practitioner.bio || 'No bio available')}</p>
-
-      <div class="match-card__footer">
-        <div class="match-card__actions">
-          <button class="match-card__action-btn match-card__action-btn--primary" onclick="openPractitionerModal('${match.id}')">
-            View Profile
-          </button>
-          ${(match.status === 'hired' || match.status === 'not-hired') ? `
-            <button class="match-card__action-btn match-card__action-btn--review" onclick="openReviewModal('${match.id}', '${match.practitioner_serial}', '${escapeHtml(formatPractitionerName(match.practitioners?.dba_name || match.practitioners?.legal_name || 'Practitioner'))}', '${match.project_serial || ''}', '${escapeHtml(match.client_first_name || '')}', '${escapeHtml(match.client_last_name || '')}')">
-              Leave Review
-            </button>
-          ` : ''}
-        </div>
-        <span class="match-card__status-pill match-card__status-pill--${match.status.replace('-', '_')}">${statusLabel}</span>
-      </div>
-    </div>
-  `;
-
-  return card;
-}
-
 // ========================================== 
 // FILTERS & SORTING
 // ========================================== 
 
 function initFilterHandlers() {
-  const statusFilter = document.getElementById('filter-status');
-  const serviceFilter = document.getElementById('filter-service-type');
-  const resetBtn = document.getElementById('btn-reset-filters');
+  // Tab navigation
+  const tabs = document.querySelectorAll('.sidebar-tab');
   const sortSelect = document.getElementById('sort-connections');
+  const searchInput = document.getElementById('search-conversations');
 
-  statusFilter.addEventListener('change', applyFilters);
-  serviceFilter.addEventListener('change', applyFilters);
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      // Remove active class from all tabs
+      tabs.forEach(t => t.classList.remove('active'));
+      // Add active class to clicked tab
+      tab.classList.add('active');
+      
+      const tabName = tab.getAttribute('data-tab');
+      console.log('[My Matches] Switched to tab:', tabName);
+      
+      applyTabFilter(tabName);
+    });
+  });
+
   sortSelect.addEventListener('change', applySorting);
   
-  resetBtn.addEventListener('click', () => {
-    statusFilter.value = '';
-    serviceFilter.value = '';
-    sortSelect.value = 'recent';
-    applyFilters();
-  });
+  // Search functionality
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase();
+      console.log('[My Matches] Searching for:', searchTerm);
+      
+      if (searchTerm.trim() === '') {
+        // Reset to current tab filter
+        displayMatches(1);
+      } else {
+        // Filter matches by practitioner name or specialty
+        filteredMatches = allMatches.filter(m => {
+          const practitioner = m.practitioners;
+          if (!practitioner) return false;
+          
+          const name = (practitioner.dba_name || practitioner.legal_name || '').toLowerCase();
+          const specialty = (practitioner.modalities?.join(', ') || '').toLowerCase();
+          
+          return name.includes(searchTerm) || specialty.includes(searchTerm);
+        });
+        
+        displayMatches(1);
+      }
+    });
+  }
+}
+
+/**
+ * Filter matches based on selected tab
+ */
+function applyTabFilter(tabName) {
+  switch(tabName) {
+    case 'messages':
+      // Active conversations
+      filteredMatches = allMatches.filter(m => m.status === 'active' || m.status === 'in-progress');
+      break;
+    case 'unread':
+      // Pending responses or new messages
+      filteredMatches = allMatches.filter(m => m.status === 'pending');
+      break;
+    case 'completed':
+      // Hired or archived
+      filteredMatches = allMatches.filter(m => m.status === 'hired' || m.status === 'not_hired' || m.status === 'declined');
+      break;
+    default:
+      filteredMatches = [...allMatches];
+  }
+  
+  displayMatches(1);
+  updateBadgeCounts();
 }
 
 function initMessageThreadHandlers() {
@@ -546,6 +678,73 @@ async function updateMatchStatus(matchId, newStatus) {
   }
 }
 
+// ==========================================
+// MESSAGING THREAD HANDLERS
+// ==========================================
+
+/**
+ * Close the messaging thread without changing status
+ */
+function closeMessagingThread() {
+  console.log('[My Matches] Closing messaging thread');
+  
+  // Stop message polling
+  if (typeof window !== 'undefined' && window.messagePollingInterval) {
+    clearInterval(window.messagePollingInterval);
+    window.messagePollingInterval = null;
+  }
+  
+  // Reset loaded message tracking
+  if (typeof window !== 'undefined') {
+    window.loadedMessageIds = new Set();
+  }
+  
+  // Hide the message thread
+  const messageThreadEl = document.getElementById('message-thread');
+  const messageInputAreaEl = document.querySelector('.message-input-area');
+  
+  if (messageThreadEl) {
+    messageThreadEl.innerHTML = '<div class="empty-state"><p>Select a practitioner to view message history</p></div>';
+    messageThreadEl.querySelector('.empty-state').style.display = 'block';
+  }
+  
+  if (messageInputAreaEl) {
+    messageInputAreaEl.style.display = 'none';
+  }
+  
+  // Reset header
+  const threadNameEl = document.getElementById('thread-practitioner-name');
+  const closeThreadBtnEl = document.getElementById('close-thread-btn');
+  const statusDropdownEl = document.getElementById('status-dropdown');
+  const threadAvatarEl = document.getElementById('thread-avatar');
+  const threadStatusTextEl = document.getElementById('thread-status-text');
+  
+  if (threadNameEl) threadNameEl.textContent = 'Select a practitioner';
+  if (threadStatusTextEl) threadStatusTextEl.textContent = 'Offline';
+  if (closeThreadBtnEl) closeThreadBtnEl.style.display = 'none';
+  if (statusDropdownEl) statusDropdownEl.style.display = 'none';
+  if (threadAvatarEl) {
+    const imgEl = threadAvatarEl.querySelector('#thread-avatar-img');
+    const initialsEl = threadAvatarEl.querySelector('#thread-avatar-initials');
+    if (imgEl) {
+      imgEl.src = '';
+      imgEl.style.display = 'none';
+    }
+    if (initialsEl) {
+      initialsEl.textContent = 'S';
+      initialsEl.style.display = 'block';
+    }
+  }
+  
+  // Remove active state from thread items
+  document.querySelectorAll('.thread-item').forEach(item => {
+    item.classList.remove('active');
+  });
+  
+  // Clear selected match
+  selectedMatch = null;
+}
+
 function openMessagingThread(match) {
   console.log('[My Matches] openMessagingThread called with match:', match);
   
@@ -564,6 +763,10 @@ function openMessagingThread(match) {
   const threadPanelEl = document.getElementById('message-thread-panel');
   const threadNameEl = document.getElementById('thread-practitioner-name');
   const threadMetaEl = document.getElementById('thread-practitioner-meta');
+  const threadAvatarEl = document.getElementById('thread-avatar');
+  const threadOnlineStatusEl = document.getElementById('thread-online-status');
+  const threadStatusTextEl = document.getElementById('thread-status-text');
+  const closeThreadBtnEl = document.getElementById('close-thread-btn');
   const statusDropdownEl = document.getElementById('status-dropdown');
   const messageInputEl = document.getElementById('message-input');
   const sendBtnEl = document.getElementById('send-message-btn');
@@ -583,11 +786,52 @@ function openMessagingThread(match) {
     }
   }
   
-  // Update header with practitioner name and project category
+  // Update header with practitioner name
   threadNameEl.textContent = formatPractitionerName(practitioner.dba_name || practitioner.legal_name || 'Practitioner');
-  if (threadMetaEl) {
-    const projectDisplay = getCategoryName(project);
-    threadMetaEl.textContent = `${projectDisplay} • ${practitioner.modalities?.join(', ') || 'Practitioner'} • ${match.status || 'pending'}`;
+  
+  // Update avatar
+  if (threadAvatarEl) {
+    const imgEl = threadAvatarEl.querySelector('#thread-avatar-img');
+    const initialsEl = threadAvatarEl.querySelector('#thread-avatar-initials');
+    
+    if (practitioner.practice_logo_url) {
+      // Show image, hide initials
+      if (imgEl) {
+        imgEl.src = practitioner.practice_logo_url;
+        imgEl.style.display = 'block';
+      }
+      if (initialsEl) {
+        initialsEl.style.display = 'none';
+      }
+    } else {
+      // Show initials, hide image
+      if (imgEl) {
+        imgEl.style.display = 'none';
+      }
+      if (initialsEl) {
+        const displayName = formatPractitionerName(practitioner.dba_name || practitioner.legal_name || 'Practitioner');
+        initialsEl.textContent = displayName.split(' ').map(n => n[0]).join('').toUpperCase();
+        initialsEl.style.display = 'block';
+      }
+    }
+  }
+  
+  // Update online status indicator (for now, default to offline)
+  if (threadOnlineStatusEl && threadStatusTextEl) {
+    threadOnlineStatusEl.style.background = '#ccc'; // Default offline
+    threadStatusTextEl.textContent = 'Offline';
+  }
+  
+  // Update close button handler
+  if (closeThreadBtnEl) {
+    closeThreadBtnEl.style.display = 'block';
+    // Remove previous listeners
+    const newCloseBtn = closeThreadBtnEl.cloneNode(true);
+    closeThreadBtnEl.parentNode.replaceChild(newCloseBtn, closeThreadBtnEl);
+    
+    // Re-query and add new listener
+    const updatedCloseBtnEl = document.getElementById('close-thread-btn');
+    updatedCloseBtnEl.addEventListener('click', closeMessagingThread);
   }
   
   // Update status dropdown
@@ -685,26 +929,6 @@ function openMessagingThread(match) {
   if (selectedCard) {
     selectedCard.classList.add('match-card--selected');
   }
-}
-
-function applyFilters() {
-  const statusFilter = document.getElementById('filter-status').value;
-  const serviceFilter = document.getElementById('filter-service-type').value;
-
-  filteredMatches = allMatches.filter(match => {
-    const matchStatus = !statusFilter || match.status === statusFilter;
-    const matchService = !serviceFilter || hasService(match.practitioners, serviceFilter);
-    return matchStatus && matchService;
-  });
-
-  applySorting();
-}
-
-function hasService(practitioner, serviceType) {
-  if (serviceType === 'in-person') return practitioner.in_person_enabled;
-  if (serviceType === 'house-calls') return practitioner.housecalls_enabled;
-  if (serviceType === 'virtual') return practitioner.virtual_enabled;
-  return true;
 }
 
 function applySorting() {

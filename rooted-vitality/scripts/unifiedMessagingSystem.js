@@ -21,6 +21,8 @@
  * @param {object} otherUserInfo - Info about the other person {name, avatar}
  */
 function renderUnifiedMessages(messages, containerSelector, currentUserType, otherUserInfo = {}) {
+  console.log('[Unified Messaging] renderUnifiedMessages called with currentUserType:', currentUserType, 'messages count:', messages?.length);
+  
   // Handle case where an HTMLElement is passed instead of a string
   let container;
   
@@ -59,7 +61,9 @@ function renderUnifiedMessages(messages, containerSelector, currentUserType, oth
   groupedMessages.forEach((group, idx) => {
     const isCurrentUser = group.sender_type === currentUserType;
     const groupEl = document.createElement('div');
-    groupEl.className = `message-group ${isCurrentUser ? 'message-group--sent' : 'message-group--received'}`;
+    const className = `message-group ${isCurrentUser ? 'message-group--sent' : 'message-group--received'}`;
+    groupEl.className = className;
+    console.log('[Unified Messaging] Message group', idx, '- sender_type:', group.sender_type, 'isCurrentUser:', isCurrentUser, 'className:', className);
 
     // Message bubbles container
     const bubblesContainer = document.createElement('div');
@@ -249,6 +253,7 @@ function injectUnifiedMessagingStyles() {
     .message-group--sent {
       justify-content: flex-end;
       padding-right: 0;
+      width: 100%;
     }
 
     .message-group--received {
@@ -266,7 +271,9 @@ function injectUnifiedMessagingStyles() {
 
     .message-group--sent .message-bubbles-container {
       align-items: flex-end;
-      max-width: 75%;
+      max-width: 95%;
+      margin-left: auto;
+      width: 100%;
     }
 
     .message-group--received .message-bubbles-container {
@@ -288,12 +295,21 @@ function injectUnifiedMessagingStyles() {
       background: linear-gradient(135deg, #5c9a72 0%, #4a8460 100%);
       color: white;
       border-bottom-right-radius: 6px;
+      margin-left: auto;
+      max-width: none;
+      width: auto;
+    }
+
+    .message-group--sent .bubble-text {
+      color: white !important;
     }
 
     .message-group--received .message-bubble {
       background: #f3f1ec;
       color: #333;
       border-bottom-left-radius: 6px;
+      max-width: none;
+      width: auto;
     }
 
     .bubble-text {
