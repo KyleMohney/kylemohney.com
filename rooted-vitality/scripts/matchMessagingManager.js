@@ -216,7 +216,7 @@ function displayMessages(messages) {
   // Use unified messaging renderer
   renderUnifiedMessages(
     messages,
-    messageThread,
+    'message-thread',
     'client',
     {
       name: practitionerName,

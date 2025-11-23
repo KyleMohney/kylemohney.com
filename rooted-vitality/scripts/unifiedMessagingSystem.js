@@ -49,21 +49,6 @@ function renderUnifiedMessages(messages, containerSelector, currentUserType, oth
     const isCurrentUser = group.sender_type === currentUserType;
     const groupEl = document.createElement('div');
     groupEl.className = `message-group ${isCurrentUser ? 'message-group--sent' : 'message-group--received'}`;
-    
-    // Add avatar for received messages
-    if (!isCurrentUser) {
-      const avatarEl = document.createElement('div');
-      avatarEl.className = 'message-avatar';
-      
-      if (otherUserInfo.avatar && otherUserInfo.avatar.startsWith('http')) {
-        avatarEl.innerHTML = `<img src="${otherUserInfo.avatar}" alt="${otherUserInfo.name || 'User'}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Crect fill=%22%23ddd%22 width=%2224%22 height=%2224%22/%3E%3C/svg%3E'">`;
-      } else {
-        const initials = (otherUserInfo.name || 'U').split(' ').map(n => n[0]).join('').toUpperCase();
-        avatarEl.innerHTML = `<div class="avatar-initials">${initials}</div>`;
-      }
-      
-      groupEl.appendChild(avatarEl);
-    }
 
     // Message bubbles container
     const bubblesContainer = document.createElement('div');
@@ -77,13 +62,21 @@ function renderUnifiedMessages(messages, containerSelector, currentUserType, oth
       const time = formatMessageTime(new Date(msg.created_at));
       
       bubbleEl.innerHTML = `
-        <div class="bubble-content">
-          <p class="bubble-text">${escapeHtml(msg.message)}</p>
-        </div>
-        <span class="bubble-time">${time}</span>
+        <p class="bubble-text">${escapeHtml(msg.message)}</p>
       `;
       
-      bubblesContainer.appendChild(bubbleEl);
+      // Create timestamp element outside bubble
+      const timestampEl = document.createElement('span');
+      timestampEl.className = 'message-timestamp';
+      timestampEl.textContent = time;
+      
+      // Create wrapper for bubble and timestamp
+      const messageWrapper = document.createElement('div');
+      messageWrapper.className = 'message-item';
+      messageWrapper.appendChild(bubbleEl);
+      messageWrapper.appendChild(timestampEl);
+      
+      bubblesContainer.appendChild(messageWrapper);
     });
 
     groupEl.appendChild(bubblesContainer);
@@ -252,32 +245,6 @@ function injectUnifiedMessagingStyles() {
       padding-left: 0;
     }
 
-    /* Avatar */
-    .message-avatar {
-      width: 40px;
-      height: 40px;
-      min-width: 40px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      flex-shrink: 0;
-    }
-
-    .message-avatar img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .avatar-initials {
-      color: white;
-      font-weight: bold;
-      font-size: 0.9rem;
-    }
-
     /* Bubbles Container */
     .message-bubbles-container {
       display: flex;
@@ -298,29 +265,24 @@ function injectUnifiedMessagingStyles() {
 
     /* Message Bubble */
     .message-bubble {
-      padding: 0.75rem 1rem;
+      padding: 12px 16px;
       border-radius: 18px;
       word-wrap: break-word;
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
       display: flex;
-      gap: 0.5rem;
-      align-items: flex-end;
+      flex-direction: column;
     }
 
     .message-group--sent .message-bubble {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #5c9a72 0%, #4a8460 100%);
       color: white;
-      border-bottom-right-radius: 4px;
+      border-bottom-right-radius: 6px;
     }
 
     .message-group--received .message-bubble {
-      background: #e9ecef;
+      background: #f3f1ec;
       color: #333;
-      border-bottom-left-radius: 4px;
-    }
-
-    .bubble-content {
-      flex: 1;
+      border-bottom-left-radius: 6px;
     }
 
     .bubble-text {
@@ -332,15 +294,19 @@ function injectUnifiedMessagingStyles() {
       overflow-wrap: break-word;
     }
 
-    .bubble-time {
-      font-size: 0.75rem;
-      opacity: 0.7;
-      margin-left: 0.25rem;
-      white-space: nowrap;
-      flex-shrink: 0;
+    .message-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
     }
 
-    .message-group--sent .bubble-time {
+    .message-timestamp {
+      font-size: 0.75rem;
+      opacity: 0.7;
+      margin: 0 8px;
+    }
+
+    .message-group--sent .message-timestamp {
       opacity: 0.8;
     }
 
