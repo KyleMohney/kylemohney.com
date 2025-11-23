@@ -24,6 +24,12 @@ let filteredMatches = [];
 let selectedMatch = null;
 let taxonomyData = {}; // Store category name mappings
 
+// Utility function to format practitioner names (replace underscores with spaces)
+function formatPractitionerName(name) {
+  if (!name) return 'Practitioner';
+  return name.replace(/_/g, ' ');
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   try {
     if (!window.supabaseClient) {
@@ -316,7 +322,7 @@ function createMatchCard(match) {
   const practitioner = match.practitioners;
   if (!practitioner) return document.createElement('div');
 
-  const displayName = practitioner.dba_name || practitioner.legal_name || 'Practitioner';
+  const displayName = formatPractitionerName(practitioner.dba_name || practitioner.legal_name || 'Practitioner');
   const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase();
   
   // Use practice logo, fallback to initials
@@ -372,7 +378,7 @@ function createMatchCard(match) {
             View Profile
           </button>
           ${(match.status === 'hired' || match.status === 'not-hired') ? `
-            <button class="match-card__action-btn match-card__action-btn--review" onclick="openReviewModal('${match.id}', '${match.practitioner_serial}', '${escapeHtml(match.practitioners?.dba_name || match.practitioners?.legal_name || 'Practitioner')}', '${match.project_serial || ''}', '${escapeHtml(match.client_first_name || '')}', '${escapeHtml(match.client_last_name || '')}')">
+            <button class="match-card__action-btn match-card__action-btn--review" onclick="openReviewModal('${match.id}', '${match.practitioner_serial}', '${escapeHtml(formatPractitionerName(match.practitioners?.dba_name || match.practitioners?.legal_name || 'Practitioner'))}', '${match.project_serial || ''}', '${escapeHtml(match.client_first_name || '')}', '${escapeHtml(match.client_last_name || '')}')">
               Leave Review
             </button>
           ` : ''}
@@ -578,7 +584,7 @@ function openMessagingThread(match) {
   }
   
   // Update header with practitioner name and project category
-  threadNameEl.textContent = practitioner.dba_name || practitioner.legal_name || 'Practitioner';
+  threadNameEl.textContent = formatPractitionerName(practitioner.dba_name || practitioner.legal_name || 'Practitioner');
   if (threadMetaEl) {
     const projectDisplay = getCategoryName(project);
     threadMetaEl.textContent = `${projectDisplay} • ${practitioner.modalities?.join(', ') || 'Practitioner'} • ${match.status || 'pending'}`;
@@ -710,8 +716,8 @@ function applySorting() {
     filteredMatches.sort((a, b) => (b.practitioners?.rating || 0) - (a.practitioners?.rating || 0));
   } else if (sortValue === 'name') {
     filteredMatches.sort((a, b) => {
-      const nameA = a.practitioners?.dba_name || a.practitioners?.legal_name || '';
-      const nameB = b.practitioners?.dba_name || b.practitioners?.legal_name || '';
+      const nameA = formatPractitionerName(a.practitioners?.dba_name || a.practitioners?.legal_name || '');
+      const nameB = formatPractitionerName(b.practitioners?.dba_name || b.practitioners?.legal_name || '');
       return nameA.localeCompare(nameB);
     });
   }
@@ -784,7 +790,7 @@ function openPractitionerModal(matchId) {
   if (!match || !match.practitioners) return;
 
   const p = match.practitioners;
-  const displayName = p.dba_name || p.legal_name || 'Practitioner';
+  const displayName = formatPractitionerName(p.dba_name || p.legal_name || 'Practitioner');
   const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase();
   
   // Set avatar (image or initials)
@@ -907,11 +913,6 @@ function openPractitionerModal(matchId) {
 
   const modal = document.getElementById('practitioner-modal');
   modal.classList.remove('modal--hidden');
-}
-
-function sendMessage(matchId) {
-  // TODO: Implement messaging system
-  showNotification('Messaging feature coming soon!', 'info');
 }
 
 // ========================================== 

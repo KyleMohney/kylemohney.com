@@ -18,6 +18,7 @@ let selectedPractitionerId;
 let selectedPractitionerUUID;  // UUID of the practitioner
 let selectedMatchStatus;  // Track match status for UI updates
 let selectedMatchResponse;  // Track practitioner response (accepted/declined/null)
+let messageRealtimeSubscription;  // Real-time subscription for messages
 
 /**
  * Initialize messaging for a specific project + practitioner
@@ -75,6 +76,9 @@ async function initializeProjectMessaging(projectData, practitionerData, matchDa
     // Set up message input
     setupMessageInput();
 
+    // Set up real-time subscription for new messages
+    setupRealtimeSubscription(projectId, practitionerId);
+
     // Start polling for new messages every 5 seconds (reduced from 2 to prevent excessive refreshes)
     // Only poll if messages are actually being sent/received
     if (messagePollingInterval) clearInterval(messagePollingInterval);
@@ -88,6 +92,46 @@ async function initializeProjectMessaging(projectData, practitionerData, matchDa
   } catch (error) {
     console.error('[Messaging] Initialization error:', error);
   }
+}
+
+/**
+ * Set up real-time subscription for messages
+ */
+function setupRealtimeSubscription(projectId, practitionerId) {
+  if (!supabaseClient) {
+    console.error('[Messaging] Supabase client not initialized for real-time');
+    return;
+  }
+
+  // Unsubscribe from previous subscription if any
+  if (messageRealtimeSubscription) {
+    supabaseClient.removeChannel(messageRealtimeSubscription);
+  }
+
+  // Subscribe to changes on project_messages table for this project and practitioner
+  messageRealtimeSubscription = supabaseClient
+    .channel(`project_messages_${projectId}`)
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'project_messages',
+        filter: `project_id=eq.${projectId}`
+      },
+      (payload) => {
+        console.log('[Messaging] Real-time message received:', payload);
+        // Reload messages when a new message is inserted
+        loadMessages();
+      }
+    )
+    .subscribe((status) => {
+      if (status === 'SUBSCRIBED') {
+        console.log('[Messaging] Real-time subscription active for project:', projectId);
+      } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
+        console.warn('[Messaging] Real-time subscription error, will rely on polling');
+      }
+    });
 }
 
 /**
@@ -450,6 +494,14 @@ function escapeHtml(text) {
  */
 function closeMessageThread() {
   if (messagePollingInterval) clearInterval(messagePollingInterval);
+  
+  // Unsubscribe from real-time messages
+  if (messageRealtimeSubscription && supabaseClient) {
+    supabaseClient.removeChannel(messageRealtimeSubscription);
+    messageRealtimeSubscription = null;
+    console.log('[Messaging] Real-time subscription closed');
+  }
+  
   selectedProjectId = null;
   selectedPractitionerId = null;
 
@@ -458,4 +510,10 @@ function closeMessageThread() {
     threadPanel.style.display = 'none';
   }
 }
+
+// Expose functions to window for external use
+window.initializeProjectMessaging = initializeProjectMessaging;
+window.sendMessage = sendMessage;
+window.loadMessages = loadMessages;
+window.closeMessageThread = closeMessageThread;
 

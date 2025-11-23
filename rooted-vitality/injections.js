@@ -1020,8 +1020,12 @@ const RootedVitality = {
      */
     markNotificationAsRead: async function(notifId) {
         try {
+            // Determine if user is client or practitioner
+            const userRole = window.authManager?.getCurrentUser()?.role || 'client';
+            const table = userRole === 'client' ? 'client_notifications' : 'practitioner_notifications';
+            
             const { error } = await window.supabaseClient
-                .from('practitioner_notifications')
+                .from(table)
                 .update({ is_read: true })
                 .eq('id', notifId);
             
@@ -1030,7 +1034,7 @@ const RootedVitality = {
                 return;
             }
             
-            console.log('[Rooted Vitality] Notification marked as read:', notifId);
+            console.log('[Rooted Vitality] Notification marked as read:', notifId, 'in table:', table);
             this.loadNotifications(); // Refresh to update bell state
         } catch (error) {
             console.error('[Rooted Vitality] Exception marking notification as read:', error);
