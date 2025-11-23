@@ -94,27 +94,29 @@ async function initializeProjectMessaging(projectData, practitionerData, matchDa
  * Load all messages for this project
  */
 async function loadMessages() {
-  if (!selectedProjectId || !selectedPractitionerId) {
-    console.log('[Messaging] loadMessages skipped - missing IDs:', { selectedProjectId, selectedPractitionerId });
+  if (!selectedProjectUUID || !selectedPractitionerUUID) {
+    console.log('[Messaging] loadMessages skipped - missing UUIDs:', { selectedProjectUUID, selectedPractitionerUUID });
     return;
   }
 
   try {
-    console.log('[Messaging] Loading messages for project:', selectedProjectId, 'practitioner:', selectedPractitionerId);
+    console.log('[Messaging] Loading messages for project UUID:', selectedProjectUUID, 'practitioner UUID:', selectedPractitionerUUID);
     const { data, error } = await supabaseClient
       .from('project_messages')
       .select('*')
-      .eq('project_id', selectedProjectId)
-      .eq('practitioner_id', selectedPractitionerId)
+      .eq('project_id', selectedProjectUUID)
+      .eq('practitioner_id', selectedPractitionerUUID)
       .order('created_at', { ascending: true });
 
-    console.log('[Messaging] Message load result - data:', data, 'error:', error);
-    
     if (error) {
       console.error('[Messaging] Error loading messages:', error);
+      console.error('[Messaging] Error status:', error.status);
+      console.error('[Messaging] Error message:', error.message);
+      console.error('[Messaging] Error details:', JSON.stringify(error));
       return;
     }
 
+    console.log('[Messaging] Loaded', data?.length || 0, 'messages');
     displayMessages(data || []);
 
   } catch (error) {
