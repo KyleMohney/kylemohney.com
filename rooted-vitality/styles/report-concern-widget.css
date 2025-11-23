@@ -288,6 +288,7 @@
     display: flex;
     gap: 12px;
     justify-content: flex-end;
+    align-items: center;
     margin-top: 30px;
     padding-top: 20px;
     border-top: 1px solid #e8e6e3;
@@ -304,12 +305,17 @@
     border: none;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    flex: 1;
+    min-width: 120px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-primary {
     background: linear-gradient(135deg, #5c9a72 0%, #4a8b62 100%);
     color: white;
-    flex: 1;
 }
 
 .btn-primary:hover:not(:disabled) {
