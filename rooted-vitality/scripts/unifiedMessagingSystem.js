@@ -21,7 +21,18 @@
  * @param {object} otherUserInfo - Info about the other person {name, avatar}
  */
 function renderUnifiedMessages(messages, containerSelector, currentUserType, otherUserInfo = {}) {
-  const container = document.querySelector(containerSelector) || document.getElementById(containerSelector);
+  // Handle case where an HTMLElement is passed instead of a string
+  let container;
+  
+  if (containerSelector instanceof HTMLElement) {
+    console.warn('[Messaging] Container passed as HTMLElement, using directly');
+    container = containerSelector;
+  } else if (typeof containerSelector === 'string') {
+    container = document.querySelector(containerSelector) || document.getElementById(containerSelector);
+  } else {
+    console.error('[Messaging] Invalid containerSelector type:', typeof containerSelector, containerSelector);
+    return;
+  }
   
   if (!container) {
     console.error('[Messaging] Container not found:', containerSelector);
