@@ -885,9 +885,10 @@ async function updateMatchStatus(matchId, newStatus) {
       
       // ONLY update project if match status changes to "hired"
       if (newStatus === 'hired') {
+        // Store practitioner serial (e.g., "P1", "P2") in hired_practitioner_serial
         const projectUpdateData = {
           project_status: 'hired',
-          hired_practitioner_serial: selectedMatch.practitioner_serial,
+          hired_practitioner_serial: selectedMatch.practitioner_serial,  // TEXT: "P1", "P2", etc.
           updated_at: new Date().toISOString()
         };
         
@@ -897,6 +898,7 @@ async function updateMatchStatus(matchId, newStatus) {
         const lookupField = useProjectSerial ? 'project_serial' : 'id';
         
         console.log(`[My Matches] Match hired - CLOSING PROJECT. Using ${lookupField}=${lookupValue}`, 'Update data:', projectUpdateData);
+        console.log('[My Matches] Setting hired_practitioner_serial:', selectedMatch.practitioner_serial);
         
         const query = window.supabaseClient
           .from('projects')

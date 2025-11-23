@@ -277,7 +277,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderProfile();
         
         // Setup Contact button
-        setupContactButton();
+        await setupContactButton();
         
         // Hide loading, show content
         document.getElementById('profile-loading').style.display = 'none';
@@ -310,6 +310,8 @@ document.addEventListener('DOMContentLoaded', async () => {
  */
 async function loadReviews() {
     try {
+        console.log('[Practitioner Profile] 🔍 Loading reviews for practitioner_serial:', practitioner.serial_number);
+        
         const { data, error } = await window.supabaseClient
             .from('reviews')
             .select('*')
@@ -319,16 +321,64 @@ async function loadReviews() {
             .limit(10);
         
         if (error) {
-            console.warn('[Practitioner Profile] Error loading reviews:', error);
+            console.warn('[Practitioner Profile] ⚠️ Error loading reviews:', error);
+            console.warn('[Practitioner Profile] Error code:', error.code, 'Message:', error.message);
             reviews = [];
         } else {
             reviews = data || [];
-            console.log('[Practitioner Profile] Loaded', reviews.length, 'reviews');
+            console.log('[Practitioner Profile] ✅ Loaded', reviews.length, 'reviews');
+            console.log('[Practitioner Profile] Review data:', reviews);
+            
+            // Setup realtime listener for new reviews
+            setupReviewsRealtimeListener();
         }
     } catch (error) {
-        console.error('[Practitioner Profile] Error loading reviews:', error);
+        console.error('[Practitioner Profile] ❌ Unexpected error loading reviews:', error);
         reviews = [];
     }
+}
+
+/**
+ * Setup realtime listener for new reviews
+ */
+function setupReviewsRealtimeListener() {
+    if (!practitioner || !practitioner.serial_number) {
+        console.warn('[Practitioner Profile] Cannot setup reviews listener - no practitioner serial');
+        return;
+    }
+    
+    console.log('[Practitioner Profile] 🔌 Setting up realtime listener for new reviews');
+    
+    const channel = window.supabaseClient
+        .channel(`reviews:${practitioner.serial_number}`)
+        .on(
+            'postgres_changes',
+            {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'reviews',
+                filter: `practitioner_serial=eq.${practitioner.serial_number}`
+            },
+            (payload) => {
+                console.log('[Practitioner Profile] 🔔 NEW REVIEW RECEIVED via Realtime!');
+                console.log('[Practitioner Profile] Review data:', payload.new);
+                
+                // Only add if visible
+                if (payload.new.is_visible) {
+                    reviews.unshift(payload.new);  // Add to beginning (newest first)
+                    console.log('[Practitioner Profile] ✅ Review added to local array - total:', reviews.length);
+                    renderReviewsCard();
+                } else {
+                    console.log('[Practitioner Profile] ℹ️ Review not visible yet, skipping');
+                }
+            }
+        )
+        .subscribe((status) => {
+            console.log('[Practitioner Profile] Realtime subscription status:', status);
+            if (status === 'SUBSCRIBED') {
+                console.log('[Practitioner Profile] ✅ Reviews Realtime SUBSCRIBED');
+            }
+        });
 }
 
 /**
@@ -382,7 +432,7 @@ async function loadServiceCategories() {
 /**
  * Setup Contact button - check user role and disable if practitioner
  */
-function setupContactButton() {
+async function setupContactButton() {
     console.log('[Practitioner Profile] setupContactButton() called');
     const contactBtn = document.getElementById('btn-contact');
     console.log('[Practitioner Profile] Contact button found:', !!contactBtn);
@@ -421,20 +471,96 @@ function setupContactButton() {
         console.log('[Practitioner Profile] User role:', userRole);
         
         if (userRole === 'practitioner') {
-            // Practitioner viewing another profile - disable button
-            console.log('[Practitioner Profile] Disabling button for practitioner');
-            contactBtn.disabled = true;
-            contactBtn.textContent = "Can't contact yourself";
-            contactBtn.style.opacity = '0.6';
-            contactBtn.style.cursor = 'not-allowed';
-            contactBtn.title = 'Practitioners cannot contact other practitioners';
+            // Practitioner viewing profile - check if it's their own
+            console.log('[Practitioner Profile] Practitioner user - checking if own profile');
+            
+            if (currentUser.id === practitioner.id) {
+                // Viewing their own profile - grey out button like a customer would see it
+                console.log('[Practitioner Profile] Practitioner viewing own profile - greying out button');
+                contactBtn.disabled = true;
+                contactBtn.style.opacity = '0.5';
+                contactBtn.style.cursor = 'not-allowed';
+                // Keep text as "Contact" so they see what customer sees
+            } else {
+                // Viewing another practitioner's profile - disable with message
+                console.log('[Practitioner Profile] Practitioner viewing another practitioner profile');
+                contactBtn.disabled = true;
+                contactBtn.textContent = "Can't contact";
+                contactBtn.style.opacity = '0.6';
+                contactBtn.style.cursor = 'not-allowed';
+                contactBtn.title = 'Practitioners cannot contact other practitioners';
+            }
         } else if (userRole === 'client') {
-            // Client - button is active
-            console.log('[Practitioner Profile] Setting up button for client');
-            contactBtn.addEventListener('click', () => {
-                console.log('[Practitioner Profile] Client clicked Contact');
-                openConnectionRequest(practitioner.id);
-            });
+            // Client - check if already matched with this practitioner
+            console.log('[Practitioner Profile] Setting up button for client - checking for existing matches');
+            
+            // Get client's serial number
+            const { data: clientData, error: clientError } = await window.supabaseClient
+                .from('clients')
+                .select('serial_number')
+                .eq('id', currentUser.id)
+                .single();
+            
+            if (clientError || !clientData) {
+                console.error('[Practitioner Profile] Error fetching client serial:', clientError);
+                // Default to active button if we can't check
+                contactBtn.addEventListener('click', () => {
+                    console.log('[Practitioner Profile] Client clicked Contact');
+                    openConnectionRequest(practitioner.id);
+                });
+                return;
+            }
+            
+            // Get practitioner's serial number
+            const { data: proData, error: proError } = await window.supabaseClient
+                .from('practitioners')
+                .select('serial_number')
+                .eq('id', practitioner.id)
+                .single();
+            
+            if (proError || !proData) {
+                console.error('[Practitioner Profile] Error fetching practitioner serial:', proError);
+                // Default to active button if we can't check
+                contactBtn.addEventListener('click', () => {
+                    console.log('[Practitioner Profile] Client clicked Contact');
+                    openConnectionRequest(practitioner.id);
+                });
+                return;
+            }
+            
+            // Check for existing matches
+            const { data: existingMatches, error: matchError } = await window.supabaseClient
+                .from('project_practitioner_matches')
+                .select('id')
+                .eq('client_serial', clientData.serial_number)
+                .eq('practitioner_serial', proData.serial_number);
+            
+            if (matchError) {
+                console.error('[Practitioner Profile] Error checking matches:', matchError);
+                // Default to active button if we can't check
+                contactBtn.addEventListener('click', () => {
+                    console.log('[Practitioner Profile] Client clicked Contact');
+                    openConnectionRequest(practitioner.id);
+                });
+                return;
+            }
+            
+            if (existingMatches && existingMatches.length > 0) {
+                // Already matched - disable button and show Matched
+                console.log('[Practitioner Profile] Already matched with this practitioner');
+                contactBtn.disabled = true;
+                contactBtn.textContent = 'Matched';
+                contactBtn.style.opacity = '0.6';
+                contactBtn.style.cursor = 'not-allowed';
+                contactBtn.title = 'You are already matched with this practitioner';
+            } else {
+                // Not matched - button is active
+                console.log('[Practitioner Profile] Not matched yet - button is active');
+                contactBtn.addEventListener('click', () => {
+                    console.log('[Practitioner Profile] Client clicked Contact');
+                    openConnectionRequest(practitioner.id);
+                });
+            }
         }
     } catch (error) {
         console.error('[Practitioner Profile] Error setting up Contact button:', error);
@@ -1501,4 +1627,11 @@ function openImageModal(imageUrl) {
 }
 
 console.log('[Practitioner Profile] Script loaded');
+
+// Initialize review notifications once page is ready
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.supabaseClient && window.authManager && window.reviewNotificationManager) {
+    window.reviewNotificationManager.init(window.supabaseClient, window.authManager);
+  }
+});
 

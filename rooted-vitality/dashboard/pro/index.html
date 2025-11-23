@@ -705,6 +705,7 @@
   <script src="../../scripts/authManager.js"></script>
   <script src="../../scripts/authHooks.js"></script>
   <script src="../../scripts/notificationManager.js"></script>
+  <script src="../../scripts/proOpportunitiesManager.js"></script>
   <script src="../../injections.js"></script>
   
   <script>
@@ -1402,6 +1403,63 @@
     let practitionerIdGlobal = null;
 
     /**
+     * Mark all unread notifications as read
+     */
+    async function markNotificationsAsRead() {
+      try {
+        const currentUser = window.authManager?.getCurrentUser();
+        if (!currentUser) return;
+
+        const rvUserStr = localStorage.getItem('rvUser');
+        if (!rvUserStr) return;
+
+        const rvUser = JSON.parse(rvUserStr);
+        const practitionerId = rvUser.id;
+
+        // Get practitioner serial
+        const { data: practitioner } = await window.supabaseClient
+          .from('practitioners')
+          .select('serial_number')
+          .eq('id', practitionerId)
+          .single();
+
+        if (!practitioner) return;
+
+        console.log('[Pro Notifications] Marking notifications as read for:', practitioner.serial_number);
+
+        // Update all unread notifications to read
+        const { error } = await window.supabaseClient
+          .from('practitioner_notifications')
+          .update({
+            is_read: true,
+            updated_at: new Date().toISOString()
+          })
+          .eq('practitioner_serial', practitioner.serial_number)
+          .eq('is_read', false);
+
+        if (error) {
+          console.error('[Pro Notifications] Error marking as read:', error);
+          return;
+        }
+
+        console.log('[Pro Notifications] ✅ All notifications marked as read');
+
+        // Clear badge
+        const notificationBadge = document.querySelector('.rv-notification-badge');
+        if (notificationBadge) {
+          notificationBadge.textContent = '0';
+          notificationBadge.classList.remove('active');
+          notificationBadge.style.backgroundColor = '';
+        }
+
+        // Reload notifications to show no unread
+        await loadPractitionerNotifications();
+      } catch (error) {
+        console.error('[Pro Notifications] Exception marking as read:', error);
+      }
+    }
+
+    /**
      * Load practitioner notifications from database
      */
     async function loadPractitionerNotifications() {
@@ -1530,10 +1588,66 @@
 
         // Setup real-time subscriptions
         await setupRealtimeSubscription(practitionerIdGlobal);
+        
+        // Setup notifications realtime listener to auto-refresh when notifications change
+        await setupNotificationsRealtimeListener();
 
         console.log('[Pro Clients] Page initialized with real-time subscriptions');
       } catch (error) {
         console.error('[Pro Clients] Initialization error:', error);
+      }
+    }
+    
+    /**
+     * Setup realtime listener for practitioner notifications
+     * Auto-refreshes local notification list when notifications change in database
+     */
+    async function setupNotificationsRealtimeListener() {
+      try {
+        const currentUser = window.authManager?.getCurrentUser();
+        if (!currentUser) return;
+
+        const rvUserStr = localStorage.getItem('rvUser');
+        if (!rvUserStr) return;
+
+        const rvUser = JSON.parse(rvUserStr);
+        const practitionerId = rvUser.id;
+
+        // Get practitioner serial
+        const { data: practitioner } = await window.supabaseClient
+          .from('practitioners')
+          .select('serial_number')
+          .eq('id', practitionerId)
+          .single();
+
+        if (!practitioner) return;
+
+        console.log('[Pro Notifications] 🔌 Setting up realtime listener for notifications');
+
+        const channel = window.supabaseClient
+          .channel(`prac-notif:${practitioner.serial_number}`)
+          .on(
+            'postgres_changes',
+            {
+              event: '*',  // Listen for all changes (INSERT, UPDATE, DELETE)
+              schema: 'public',
+              table: 'practitioner_notifications',
+              filter: `practitioner_serial=eq.${practitioner.serial_number}`
+            },
+            (payload) => {
+              console.log('[Pro Notifications] 🔔 Notifications changed via realtime, reloading...', payload.eventType);
+              // Reload notifications to reflect changes (e.g., marked as read)
+              loadPractitionerNotifications();
+            }
+          )
+          .subscribe((status) => {
+            console.log('[Pro Notifications] Realtime subscription status:', status);
+            if (status === 'SUBSCRIBED') {
+              console.log('[Pro Notifications] ✅ Notifications realtime SUBSCRIBED');
+            }
+          });
+      } catch (error) {
+        console.error('[Pro Notifications] Error setting up realtime listener:', error);
       }
     }
 

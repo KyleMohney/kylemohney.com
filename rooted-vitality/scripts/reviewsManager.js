@@ -16,6 +16,14 @@ ARCHITECTURE:
 - UUIDs: Every table has id (UUID) at column 1 - this is the system foundation
 */
 
+// Helper function to escape HTML
+function escapeHtmlReview(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
 let reviewsManager = {
   supabaseClient: null,
   authManager: null,
@@ -91,6 +99,7 @@ let reviewsManager = {
 
   openReviewModal(matchId, practitionerId, practitionerName, projectId, clientFirstName, clientLastName, clientId) {
     console.log('[Reviews] Opening modal for:', practitionerName, 'UUID:', practitionerId);
+    console.log('[Reviews] Modal data:', { matchId, practitionerId, projectId, clientId });
 
     this.currentReview = {
       matchId,
@@ -106,13 +115,83 @@ let reviewsManager = {
 
     this.resetForm();
 
+    // Check if review already exists
+    this.checkForExistingReview(projectId, practitionerId, clientId);
+
     const nameEl = document.getElementById('review-practitioner-name');
-    if (nameEl) nameEl.textContent = this.currentReview.practitionerName;
+    if (nameEl) {
+      nameEl.textContent = this.currentReview.practitionerName;
+      console.log('[Reviews] Set practitioner name:', this.currentReview.practitionerName);
+    } else {
+      console.error('[Reviews] Name element not found');
+    }
 
     const modal = document.getElementById('review-modal');
+    console.log('[Reviews] Modal element found:', !!modal);
     if (modal) {
+      console.log('[Reviews] Removing modal--hidden class');
       modal.classList.remove('modal--hidden');
       document.body.style.overflow = 'hidden';
+      console.log('[Reviews] Modal shown');
+    } else {
+      console.error('[Reviews] Modal element not found!');
+    }
+  },
+
+  // Check if review already exists for this match
+  async checkForExistingReview(projectId, practitionerId, clientId) {
+    if (!projectId || !practitionerId || !clientId) {
+      console.warn('[Reviews] Missing required IDs to check for existing review');
+      return;
+    }
+
+    try {
+      const { data: existingReview, error } = await this.supabaseClient
+        .from('reviews')
+        .select('id, rating, review_text')
+        .eq('project_serial', projectId)
+        .eq('practitioner_id', practitionerId)
+        .eq('client_id', clientId)
+        .single();
+
+      if (existingReview) {
+        console.log('[Reviews] Existing review found:', existingReview);
+        // Show message that review already exists
+        const form = document.getElementById('review-form');
+        const submitBtn = document.getElementById('btn-submit-review');
+        if (form && submitBtn) {
+          // Store the existing review info
+          this.currentReview.existingReviewId = existingReview.id;
+          this.currentReview.isUpdating = true;
+          
+          // Change form state
+          const formMessage = document.createElement('div');
+          formMessage.className = 'review-form__message review-form__message--info';
+          formMessage.innerHTML = `
+            <p><strong>You already left a review:</strong></p>
+            <p style="margin: 8px 0 0 0; font-size: 0.9rem;">${escapeHtmlReview(existingReview.review_text.substring(0, 100))}...</p>
+            <p style="margin: 8px 0 0 0; font-size: 0.85rem; color: #999;">Rating: ${existingReview.rating} / 5 stars</p>
+            <p style="margin: 8px 0 0 0; font-size: 0.85rem; font-style: italic;">You can submit a new review to update it.</p>
+          `;
+          
+          // Insert at the top of the form
+          const firstSection = form.querySelector('.review-form__section');
+          if (firstSection) {
+            form.insertBefore(formMessage, firstSection);
+          }
+          
+          submitBtn.textContent = 'Update Review';
+        }
+
+        return true; // Review exists
+      }
+
+      return false; // No review found
+    } catch (error) {
+      if (error.code !== 'PGRST116') { // PGRST116 = no rows returned
+        console.warn('[Reviews] Error checking for existing review:', error);
+      }
+      return false;
     }
   },
 
@@ -127,7 +206,12 @@ let reviewsManager = {
 
   resetForm() {
     const form = document.getElementById('review-form');
-    if (form) form.reset();
+    if (form) {
+      form.reset();
+      // Remove any existing review message
+      const existingMessage = form.querySelector('.review-form__message');
+      if (existingMessage) existingMessage.remove();
+    }
 
     document.querySelectorAll('.star-btn').forEach(btn => btn.classList.remove('star-btn--active'));
     const ratingInput = document.getElementById('review-rating');
@@ -140,6 +224,10 @@ let reviewsManager = {
     const photoPreview = document.getElementById('photo-preview');
     if (photoPreview) photoPreview.innerHTML = '';
     this.currentReview.photos = [];
+
+    // Reset submit button text
+    const submitBtn = document.getElementById('btn-submit-review');
+    if (submitBtn) submitBtn.textContent = 'Submit Review';
   },
 
   // ======================================================
@@ -315,8 +403,6 @@ let reviewsManager = {
       }
 
       console.log('[Reviews] Serial numbers retrieved - Practitioner:', practitionerSerial, 'Client:', clientSerial);
-
-      // Get current user (client)
       const { data: { user } } = await this.supabaseClient.auth.getUser();
       const currentUser = window.authManager?.getCurrentUser();
       
@@ -392,25 +478,16 @@ let reviewsManager = {
         clientSerialToStore = clientDataForSerial?.serial_number || null;
       }
 
-      // Get project serial_number if projectId provided
-      let projectSerialToStore = null;
-      if (this.currentReview.projectId) {
-        const { data: projectData } = await this.supabaseClient
-          .from('projects')
-          .select('serial_number')
-          .eq('id', this.currentReview.projectId)
-          .single();
-        projectSerialToStore = projectData?.serial_number || null;
-      }
-
       // Convert photos array to storage paths for TEXT[] column
       const photosArray = photoPaths && photoPaths.length > 0 ? photoPaths : [];
 
       // Build review record - store serial_numbers as TEXT
       const reviewData = {
-        practitioner_serial: practitionerSerial,   // Denormalized serial (P1, P2, etc.)
-        project_serial: projectSerialToStore,      // Store project serial_number (1, 2, 3, etc.)
-        client_serial: clientSerialToStore,        // Denormalized serial (C1, C2, etc.)
+        practitioner_id: this.currentReview.practitionerId,  // UUID for RLS
+        client_id: this.currentReview.clientId,              // UUID for RLS
+        practitioner_serial: practitionerSerial,             // Denormalized serial (P1, P2, etc.)
+        project_serial: this.currentReview.projectId,        // Store actual project serial (integer)
+        client_serial: clientSerialToStore,                  // Denormalized serial (C1, C2, etc.)
         rating: this.currentReview.rating,
         review_text: reviewText,
         client_name: clientName,
@@ -420,20 +497,23 @@ let reviewsManager = {
         photos: photosArray,                       // TEXT[] array of storage paths
         is_visible: true,
         is_approved: false,
-        // NEW FIELDS
         is_verified: false,                         // Will be verified by admin/system
         is_featured: false,                         // Will be set by admin for featured reviews
         review_date: new Date().toISOString(),      // When review was written
         created_at: new Date().toISOString(),       // When record created
         updated_at: new Date().toISOString(),       // When record updated
-        source: 'rooted_vitality',                  // Internal platform source
         external_platform: null,                    // For external reviews (google, yelp, etc)
         external_url: null,                         // URL to external review if imported
         external_review_id: null,                   // ID of review on external platform
         moderation_notes: ''                        // Admin notes during moderation
       };
 
-      console.log('[Reviews] Review data:', reviewData);
+      console.log('[Reviews] 📋 REVIEW DATA BEFORE INSERT:');
+      console.log('[Reviews]   - practitioner_serial:', reviewData.practitioner_serial);
+      console.log('[Reviews]   - practitioner_id:', reviewData.practitioner_id);
+      console.log('[Reviews]   - is_visible:', reviewData.is_visible);
+      console.log('[Reviews]   - rating:', reviewData.rating);
+      console.log('[Reviews] Full review data:', reviewData);
 
       // Insert into database
       const { data, error } = await this.supabaseClient
@@ -442,34 +522,47 @@ let reviewsManager = {
         .select();
 
       if (error) {
-        console.error('[Reviews] Insert failed:', error);
+        console.error('[Reviews] ❌ INSERT FAILED:', error);
+        console.error('[Reviews] Error code:', error.code);
+        console.error('[Reviews] Error message:', error.message);
         throw error;
       }
 
-      console.log('[Reviews] Review inserted successfully:', data);
+      console.log('[Reviews] ✅ Review inserted successfully!');
+      console.log('[Reviews] Inserted data:', data);
+      
+      if (data && data[0]) {
+        console.log('[Reviews] ✅ STORED practitioner_serial in DB:', data[0].practitioner_serial);
+        console.log('[Reviews] ✅ STORED is_visible in DB:', data[0].is_visible);
+      }
 
-      // Create notification for practitioner
-      try {
-        const notification = {
-          practitioner_serial: practitionerSerial,  // Use practitionerSerial from stored value
-          type: 'review_posted',
-          title: 'New Review',
-          message: `You received a new ${this.currentReview.rating}-star review: "${reviewText.substring(0, 50)}${reviewText.length > 50 ? '...' : ''}"`,
-          link: '/rooted-vitality/dashboard/pro/pages/practitioner-profile.html?section=reviews',
-          is_read: false
-        };
-
-        const { error: notifError } = await this.supabaseClient
-          .from('notifications')
-          .insert([notification]);
-
-        if (notifError) {
-          console.warn('[Reviews] Failed to create notification:', notifError);
+      // Update projects table to set review_left = true
+      if (this.currentReview.projectId) {
+        console.log('[Reviews] 📝 Updating projects table - setting review_left=true for project_serial:', this.currentReview.projectId);
+        
+        const { error: projectUpdateError } = await this.supabaseClient
+          .from('projects')
+          .update({
+            review_left: true,
+            updated_at: new Date().toISOString()
+          })
+          .eq('project_serial', this.currentReview.projectId);
+        
+        if (projectUpdateError) {
+          console.warn('[Reviews] ⚠️ Failed to update projects table:', projectUpdateError);
         } else {
-          console.log('[Reviews] Notification created for practitioner');
+          console.log('[Reviews] ✅ Projects table updated - review_left set to true');
         }
-      } catch (notifError) {
-        console.warn('[Reviews] Notification error (non-blocking):', notifError);
+      }
+
+      // Trigger real-time notification for practitioner
+      if (window.reviewNotificationManager && data && data.length > 0) {
+        try {
+          window.reviewNotificationManager.handleNewReview(data[0]);
+          console.log('[Reviews] Real-time notification triggered for practitioner');
+        } catch (notifError) {
+          console.warn('[Reviews] Error triggering notification (non-blocking):', notifError);
+        }
       }
 
       alert('Thank you! Your review has been posted.');
@@ -482,6 +575,10 @@ let reviewsManager = {
   }
 };
 
+// Make reviewsManager available globally
+window.reviewsManager = reviewsManager;
+
 function openReviewModal(matchId, practitionerId, practitionerName) {
   reviewsManager.openReviewModal(matchId, practitionerId, practitionerName);
 }
+
