@@ -1853,6 +1853,53 @@ const RootedVitality = {
         
         console.log('[Rooted Vitality] Report concern widget successfully injected!');
         this.log('Report concern widget injected successfully');
+        
+        // Load and initialize the report concern system
+        this.initializeReportConcernSystem();
+    },
+    
+    /**
+     * Load report concern script and initialize system
+     */
+    initializeReportConcernSystem: function() {
+        console.log('[Rooted Vitality] Initializing report concern system...');
+        
+        // Ensure CSS is loaded (as fallback if not in HTML head)
+        const cssPath = '/rooted-vitality/styles/report-concern-widget.css';
+        if (!document.querySelector(`link[href="${cssPath}"]`)) {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = cssPath;
+            document.head.appendChild(link);
+            console.log('[Rooted Vitality] Report concern CSS loaded');
+        }
+        
+        // Check if script already loaded
+        if (window.initializeReportConcernSystem) {
+            console.log('[Rooted Vitality] Report concern system already loaded, initializing...');
+            window.initializeReportConcernSystem();
+            return;
+        }
+        
+        // Load script dynamically
+        const scriptPath = '/rooted-vitality/scripts/report-concern-universal.js';
+        const script = document.createElement('script');
+        script.src = scriptPath;
+        script.async = true;
+        
+        script.onload = () => {
+            console.log('[Rooted Vitality] Report concern script loaded successfully');
+            // Initialize the system
+            if (window.initializeReportConcernSystem) {
+                window.initializeReportConcernSystem();
+            }
+        };
+        
+        script.onerror = () => {
+            console.error('[Rooted Vitality] Failed to load report concern script:', scriptPath);
+        };
+        
+        document.head.appendChild(script);
     },
     
     /**
