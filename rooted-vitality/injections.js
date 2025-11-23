@@ -1063,8 +1063,20 @@ const RootedVitality = {
             if (userRole === 'client') {
                 notificationTable = 'client_notifications';
                 whereField = 'client_serial';
-                const rvUser = JSON.parse(localStorage.getItem('rvUser') || '{}');
-                whereValue = rvUser.serial_number || user.user_metadata?.serial_number;
+                
+                // Fetch client serial from clients table using auth user ID
+                const { data: clientData, error: clientError } = await window.supabaseClient
+                    .from('clients')
+                    .select('serial_number')
+                    .eq('id', user.id)
+                    .single();
+                
+                if (clientError || !clientData) {
+                    console.warn('[Rooted Vitality] Could not fetch client serial for marking as read:', clientError);
+                    return;
+                }
+                
+                whereValue = clientData.serial_number;
             } else {
                 notificationTable = 'practitioner_notifications';
                 whereField = 'practitioner_serial';
@@ -1206,9 +1218,20 @@ const RootedVitality = {
             if (userRole === 'client') {
                 notificationTable = 'client_notifications';
                 whereField = 'client_serial';
-                // Get client serial from localStorage or auth
-                const rvUser = JSON.parse(localStorage.getItem('rvUser') || '{}');
-                whereValue = rvUser.serial_number || user.user_metadata?.serial_number;
+                
+                // Fetch client serial from clients table using auth user ID
+                const { data: clientData, error: clientError } = await window.supabaseClient
+                    .from('clients')
+                    .select('serial_number')
+                    .eq('id', user.id)
+                    .single();
+                
+                if (clientError || !clientData) {
+                    console.warn('[Rooted Vitality] Could not fetch client serial:', clientError);
+                    return;
+                }
+                
+                whereValue = clientData.serial_number;
             } else {
                 notificationTable = 'practitioner_notifications';
                 whereField = 'practitioner_serial';
