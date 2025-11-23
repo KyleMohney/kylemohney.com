@@ -228,7 +228,7 @@ async function loadMatches(clientSerial) {
       const matchIds = matchesData.map(m => m.id);
       const { data: messagesData, error: messagesError } = await window.supabaseClient
         .from('project_messages')
-        .select('id, match_id, message_text, sender_role, created_at')
+        .select('id, match_id, sender_type, created_at')
         .in('match_id', matchIds)
         .order('created_at', { ascending: false });
       
@@ -249,8 +249,101 @@ async function loadMatches(clientSerial) {
       ...match,
       practitioners: practitionersMap[match.practitioner_serial] || {},
       project: projectsMap[match.project_serial] || {},
-      last_message: messagesMap[match.id]?.message_text || 'No messages yet'
+      last_message: 'Message thread',
+      is_opportunity_message: false
     }));
+
+    // Load opportunity messages and merge them into allMatches
+    try {
+      const { data: oppMessages, error: oppError } = await window.supabaseClient
+        .from('project_messages')
+        .select(`
+          id,
+          created_at,
+          updated_at,
+          opportunities (
+            id,
+            project_serial,
+            practitioner_serial,
+            client_serial,
+            status,
+            converted_to_match,
+            declined_by_client,
+            is_archived
+          ),
+          practitioners (
+            serial_number,
+            id,
+            legal_name,
+            phone,
+            practice_city,
+            practice_state,
+            in_person_enabled,
+            housecalls_enabled,
+            virtual_enabled,
+            timezone,
+            email
+          ),
+          practitioner_profiles (
+            practitioner_serial,
+            bio,
+            dba_name,
+            practice_logo_url,
+            modalities
+          ),
+          projects (
+            id,
+            project_serial,
+            category_id,
+            category_name,
+            zipcode,
+            travel_preference,
+            description,
+            custom_name
+          )
+        `)
+        .eq('is_opportunity_message', true)
+        .eq('project_client_serial', clientSerial)
+        .order('created_at', { ascending: false });
+
+      if (!oppError && oppMessages) {
+        // Filter to only active opportunities (not declined, not converted, not archived)
+        const activeOppMessages = oppMessages.filter(msg => {
+          if (!msg.opportunities) return false;
+          const opp = msg.opportunities;
+          return !opp.declined_by_client && !opp.converted_to_match && !opp.is_archived;
+        });
+
+        // Merge opportunity messages into allMatches as special items
+        const oppItems = activeOppMessages.map(msg => ({
+          id: msg.id,
+          is_opportunity_message: true,
+          opportunity_id: msg.opportunities?.id,
+          project_serial: msg.opportunities?.project_serial,
+          practitioner_serial: msg.opportunities?.practitioner_serial,
+          client_serial: msg.opportunities?.client_serial,
+          status: 'opportunity', // Mark as opportunity status
+          created_at: msg.created_at,
+          updated_at: msg.updated_at,
+          practitioners: msg.practitioners ? {
+            ...msg.practitioners,
+            ...msg.practitioner_profiles
+          } : {},
+          project: msg.projects || {},
+          last_message: 'Opportunity',
+          opportunity_message_text: 'Interested in connecting with you about this project.'
+        }));
+
+        allMatches = [...allMatches, ...oppItems].sort((a, b) => 
+          new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at)
+        );
+
+        console.log('[My Matches] Loaded opportunity messages:', activeOppMessages.length);
+      }
+    } catch (oppLoadError) {
+      console.warn('[My Matches] Warning loading opportunity messages:', oppLoadError);
+    }
+
     filteredMatches = [...allMatches];
 
     console.log('[My Matches] Loaded matches:', allMatches);
@@ -289,8 +382,8 @@ async function updateBadgeCounts() {
     const messagesBadge = document.getElementById('messages-badge');
     if (messagesBadge) messagesBadge.textContent = messagesCount;
 
-    // Count completed (hired/not_hired/declined)
-    const completedCount = allMatches.filter(m => m.status === 'hired' || m.status === 'not_hired' || m.status === 'declined').length;
+    // Count completed (hired/not-hired/declined)
+    const completedCount = allMatches.filter(m => m.status === 'hired' || m.status === 'not-hired' || m.status === 'declined').length;
     const completedBadge = document.getElementById('completed-badge');
     if (completedBadge) completedBadge.textContent = completedCount;
 
@@ -340,8 +433,8 @@ function displayMatches(page) {
     
     // Add click handler to open messaging thread and set active state
     item.addEventListener('click', (e) => {
-      // Don't trigger on menu button
-      if (e.target.closest('.thread-menu-btn')) return;
+      // Don't trigger on menu button or opportunity buttons (accept/decline) or review button
+      if (e.target.closest('.thread-menu-btn') || e.target.closest('.opportunity-accept-btn') || e.target.closest('.opportunity-decline-btn') || e.target.closest('.thread-review-btn')) return;
       
       // Remove active class from all thread items
       document.querySelectorAll('.thread-item').forEach(t => t.classList.remove('active'));
@@ -355,10 +448,163 @@ function displayMatches(page) {
     container.appendChild(item);
   });
 
+  // Attach opportunity button listeners
+  attachOpportunityButtonListeners();
+
   // Hide pagination - thread list doesn't use it
   const paginationContainer = document.getElementById('pagination-container');
   if (paginationContainer) {
     paginationContainer.style.display = 'none';
+  }
+}
+
+/**
+ * Attach event listeners to opportunity accept/decline buttons
+ */
+function attachOpportunityButtonListeners() {
+  // Accept buttons
+  document.querySelectorAll('.opportunity-accept-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const opportunityId = btn.dataset.opportunityId;
+      const messageId = btn.dataset.messageId;
+      const projectSerial = btn.dataset.projectSerial;
+      const practitionerSerial = btn.dataset.practitionerSerial;
+
+      console.log('[My Matches] Accept opportunity:', { opportunityId, messageId, projectSerial, practitionerSerial });
+
+      if (typeof window.acceptOpportunityMessage === 'function') {
+        await window.acceptOpportunityMessage(opportunityId, projectSerial, practitionerSerial);
+        // Reload matches to show the newly created match
+        const clientProfile = await window.supabaseClient
+          .from('clients')
+          .select('serial_number')
+          .eq('id', window.authManager.getCurrentUser().id)
+          .single();
+        if (clientProfile.data) {
+          await loadMatches(clientProfile.data.serial_number);
+        }
+      }
+    });
+  });
+
+  // Decline buttons
+  document.querySelectorAll('.opportunity-decline-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const opportunityId = btn.dataset.opportunityId;
+
+      console.log('[My Matches] Decline opportunity:', opportunityId);
+
+      if (typeof window.declineOpportunityMessage === 'function') {
+        await window.declineOpportunityMessage(opportunityId);
+        // Reload matches to remove the declined opportunity
+        const clientProfile = await window.supabaseClient
+          .from('clients')
+          .select('serial_number')
+          .eq('id', window.authManager.getCurrentUser().id)
+          .single();
+        if (clientProfile.data) {
+          await loadMatches(clientProfile.data.serial_number);
+        }
+      }
+    });
+  });
+
+  // Attach review button listeners
+  attachReviewButtonListeners();
+}
+
+/**
+ * Attach event listeners to review buttons
+ */
+function attachReviewButtonListeners() {
+  const reviewBtns = document.querySelectorAll('.thread-review-btn');
+  console.log('[My Matches] Found review buttons:', reviewBtns.length);
+  
+  reviewBtns.forEach(btn => {
+    // Check on initial load if review already exists and update button text
+    initializeReviewButtonText(btn);
+    
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const matchId = btn.dataset.matchId;
+      const practitionerId = btn.dataset.practitionerId;
+      const practitionerName = btn.dataset.practitionerName;
+      const projectId = btn.dataset.projectId;
+      const clientFirstName = btn.dataset.clientFirstName;
+      const clientLastName = btn.dataset.clientLastName;
+      const clientId = window.authManager?.getCurrentUser()?.id;
+
+      console.log('[My Matches] Review button clicked:', { matchId, practitionerId, projectId });
+
+      if (window.reviewsManager && typeof window.reviewsManager.openReviewModal === 'function') {
+        console.log('[My Matches] Calling openReviewModal');
+        
+        // Check for existing review and update button text
+        try {
+          const hasExistingReview = await window.reviewsManager.checkForExistingReview(
+            projectId,
+            practitionerId,
+            clientId
+          );
+          
+          if (hasExistingReview) {
+            console.log('[My Matches] Existing review found, updating button text');
+            btn.textContent = 'Update Review';
+          } else {
+            btn.textContent = 'Leave Review';
+          }
+        } catch (e) {
+          console.warn('[My Matches] Error checking for existing review:', e);
+        }
+        
+        // Open the modal
+        window.reviewsManager.openReviewModal(
+          matchId,
+          practitionerId,
+          practitionerName,
+          projectId,
+          clientFirstName,
+          clientLastName,
+          clientId
+        );
+      } else {
+        console.error('[My Matches] reviewsManager not available or openReviewModal not a function');
+      }
+    });
+  });
+}
+
+/**
+ * Initialize review button text based on existing reviews
+ */
+async function initializeReviewButtonText(btn) {
+  const projectId = btn.dataset.projectId;
+  const practitionerId = btn.dataset.practitionerId;
+  const clientId = window.authManager?.getCurrentUser()?.id;
+
+  if (!projectId || !practitionerId || !clientId || !window.reviewsManager) {
+    return;
+  }
+
+  try {
+    const hasExistingReview = await window.reviewsManager.checkForExistingReview(
+      projectId,
+      practitionerId,
+      clientId
+    );
+    
+    if (hasExistingReview) {
+      btn.textContent = 'Update Review';
+      console.log('[My Matches] Review button initialized as "Update Review"');
+    }
+  } catch (e) {
+    console.warn('[My Matches] Error initializing review button text:', e);
   }
 }
 
@@ -391,15 +637,19 @@ function createThreadItem(match) {
   const travelPrefs = project.travel_preference || '-';
   const description = project.description?.substring(0, 50) + '...' || '-';
   
+  // Check if this is an opportunity message
+  const isOpportunity = match.is_opportunity_message === true;
+  
   // Check if status is completed
-  const isClosed = match.status === 'hired' || match.status === 'not_hired' || match.status === 'declined';
-  const isReviewable = match.status === 'hired' || match.status === 'not_hired';
+  const isClosed = match.status === 'hired' || match.status === 'not-hired' || match.status === 'declined';
+  const isReviewable = match.status === 'hired' || match.status === 'not-hired';
 
   const item = document.createElement('button');
-  item.className = `thread-item${isClosed ? ' thread-item--closed' : ''}`;
+  item.className = `thread-item${isClosed ? ' thread-item--closed' : ''}${isOpportunity ? ' thread-item--opportunity' : ''}`;
   item.setAttribute('data-match-id', match.id);
   item.setAttribute('data-practitioner-serial', match.practitioner_serial);
   item.setAttribute('data-status', match.status);
+  item.setAttribute('data-is-opportunity', isOpportunity);
   
   item.innerHTML = `
     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; width: 100%;">
@@ -409,11 +659,14 @@ function createThreadItem(match) {
       <div style="flex: 1; min-width: 0;">
         <p class="thread-name">${escapeHtml(displayName)}</p>
         <p class="thread-preview">${escapeHtml(specialty)}</p>
+        ${isOpportunity ? `<p class="thread-opportunity-badge" style="font-size: 0.75rem; color: #5c9a72; font-weight: 600; margin-top: 2px;">⭐ OPPORTUNITY</p>` : ''}
       </div>
       <span class="thread-time">${lastMessageTime}</span>
-      <div class="thread-menu-wrapper">
-        <button class="thread-menu-btn" title="Options">⋮</button>
-      </div>
+      ${!isOpportunity ? `
+        <div class="thread-menu-wrapper">
+          <button class="thread-menu-btn" title="Options">⋮</button>
+        </div>
+      ` : ''}
     </div>
     <div class="thread-meta">
       <!-- Project Details -->
@@ -437,11 +690,20 @@ function createThreadItem(match) {
           <span class="detail-value">${escapeHtml(description)}</span>
         </div>
       </div>
-      ${isReviewable ? `
+      ${isOpportunity ? `
         <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #ede9e2;">
-          <button class="thread-review-btn" onclick="openReviewModal('${match.id}', '${match.practitioner_serial}', '${escapeHtml(displayName)}', '${match.project_serial || ''}', '${escapeHtml(match.client_first_name || '')}', '${escapeHtml(match.client_last_name || '')}')">Leave Review</button>
+          <p style="margin: 0 0 8px 0; font-size: 0.9rem; color: #666;">Message from Practitioner:</p>
+          <p style="margin: 0 0 12px 0; font-size: 0.9rem; color: #333; line-height: 1.4; font-style: italic;">"${escapeHtml(match.opportunity_message_text)}"</p>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-sm btn-success opportunity-accept-btn" data-opportunity-id="${match.opportunity_id}" data-message-id="${match.id}" data-project-serial="${project.project_serial}" data-practitioner-serial="${match.practitioner_serial}">Accept</button>
+            <button class="btn btn-sm btn-secondary opportunity-decline-btn" data-opportunity-id="${match.opportunity_id}">Decline</button>
+          </div>
         </div>
-      ` : ''}
+      ` : (isReviewable ? `
+        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #ede9e2;">
+          <button class="thread-review-btn" data-match-id="${match.id}" data-practitioner-id="${match.practitioners?.id || ''}" data-practitioner-name="${escapeHtml(displayName)}" data-project-id="${match.project_serial || ''}" data-client-first-name="${escapeHtml(match.client_first_name || '')}" data-client-last-name="${escapeHtml(match.client_last_name || '')}">Leave Review</button>
+        </div>
+      ` : '')}
     </div>
   `;
   
@@ -491,7 +753,10 @@ function initFilterHandlers() {
     });
   });
 
-  sortSelect.addEventListener('change', applySorting);
+  // Only add sort listener if element exists
+  if (sortSelect) {
+    sortSelect.addEventListener('change', applySorting);
+  }
   
   // Search functionality
   if (searchInput) {
@@ -526,8 +791,10 @@ function initFilterHandlers() {
 function applyTabFilter(tabName) {
   switch(tabName) {
     case 'messages':
-      // Active conversations
-      filteredMatches = allMatches.filter(m => m.status === 'active' || m.status === 'in-progress');
+      // Active conversations and active opportunities
+      filteredMatches = allMatches.filter(m => 
+        m.status === 'active' || m.status === 'in-progress' || m.status === 'opportunity'
+      );
       break;
     case 'unread':
       // Pending responses or new messages
@@ -535,7 +802,7 @@ function applyTabFilter(tabName) {
       break;
     case 'completed':
       // Hired or archived
-      filteredMatches = allMatches.filter(m => m.status === 'hired' || m.status === 'not_hired' || m.status === 'declined');
+      filteredMatches = allMatches.filter(m => m.status === 'hired' || m.status === 'not-hired' || m.status === 'declined');
       break;
     default:
       filteredMatches = [...allMatches];
@@ -580,7 +847,13 @@ async function updateMatchStatus(matchId, newStatus) {
       return;
     }
 
-    console.log('[My Matches] Match status updated successfully');
+    console.log('[My Matches] Match status updated successfully to:', newStatus);
+    
+    // Update the selected match object locally
+    if (selectedMatch && selectedMatch.id === matchId) {
+      selectedMatch.status = newStatus;
+      console.log('[My Matches] Updated local selectedMatch status to:', newStatus);
+    }
     
     // When client closes a match (hired/not-hired), also update pro's version
     if ((newStatus === 'hired' || newStatus === 'not-hired') && selectedMatch) {
@@ -602,36 +875,62 @@ async function updateMatchStatus(matchId, newStatus) {
       }
     }
     
-    // Update project status based on match status
-    if (selectedMatch && selectedMatch.project_serial) {
-      let newProjectStatus = null;
-      let projectUpdateData = {};
+    // Update project status ONLY when match is hired
+    // CRITICAL: Project and Match statuses are independent!
+    // - Match status: pending/in-progress/active/hired/not-hired/declined (per individual match)
+    // - Project status: pending/active/in-progress/hired/not-hired (overall project state)
+    // They only interact when match=hired, which also closes the project=hired
+    if (selectedMatch) {
+      console.log('[My Matches] Project update check - newStatus:', newStatus, 'project_serial:', selectedMatch.project_serial, 'practitioner_serial:', selectedMatch.practitioner_serial);
       
-      if (newStatus === 'in-progress') {
-        newProjectStatus = 'in-progress';
-      } else if (newStatus === 'hired') {
-        newProjectStatus = 'hired';
-        // Capture which practitioner was hired
-        projectUpdateData.hired_practitioner_serial = selectedMatch.practitioner_serial;
-      } else if (newStatus === 'not-hired') {
-        newProjectStatus = 'not-hired';
-      }
-
-      if (newProjectStatus) {
-        projectUpdateData.project_status = newProjectStatus;
-        projectUpdateData.updated_at = new Date().toISOString();
+      // ONLY update project if match status changes to "hired"
+      if (newStatus === 'hired') {
+        const projectUpdateData = {
+          project_status: 'hired',
+          hired_practitioner_serial: selectedMatch.practitioner_serial,
+          updated_at: new Date().toISOString()
+        };
         
-        const { error: projectError } = await window.supabaseClient
+        // Try to update using project_serial first (preferred), fallback to id if missing
+        const useProjectSerial = !!selectedMatch.project_serial;
+        const lookupValue = useProjectSerial ? selectedMatch.project_serial : selectedMatch.id;
+        const lookupField = useProjectSerial ? 'project_serial' : 'id';
+        
+        console.log(`[My Matches] Match hired - CLOSING PROJECT. Using ${lookupField}=${lookupValue}`, 'Update data:', projectUpdateData);
+        
+        const query = window.supabaseClient
           .from('projects')
-          .update(projectUpdateData)
-          .eq('project_serial', selectedMatch.project_serial);  // Use project_serial (INTEGER)
+          .update(projectUpdateData);
+        
+        if (useProjectSerial) {
+          query.eq('project_serial', lookupValue);
+        } else {
+          query.eq('id', lookupValue);
+        }
+        
+        const { data: updateResult, error: projectError } = await query.select();
 
         if (projectError) {
-          console.error('[My Matches] Error updating project status:', projectError);
+          console.error('[My Matches] Error closing project:', projectError);
+          console.error('[My Matches] Error details:', projectError.message, projectError.code);
+        } else if (!updateResult || updateResult.length === 0) {
+          console.error('[My Matches] Project update returned no results! Check that lookupValue exists:', lookupValue);
         } else {
-          console.log('[My Matches] Project status updated to:', newProjectStatus, 'with data:', projectUpdateData);
+          console.log('[My Matches] ✅ Project closed successfully. Result:', updateResult);
+          console.log('[My Matches] 🔔 Realtime UPDATE event should fire now for:', lookupValue);
+          // Trigger a realtime event update if my-wellness page is open
+          if (window.location.pathname.includes('my-wellness')) {
+            console.log('[My Matches] On my-wellness page - project update will be reflected via realtime');
+          }
         }
+      } else {
+        // For all other match statuses (pending, in-progress, not-hired, declined)
+        // The project status is NOT affected - it stays in its current state
+        // This allows the client to have multiple matches at different stages
+        console.log('[My Matches] Match status:', newStatus, '- Project status unchanged (project still open for other matches)');
       }
+    } else {
+      console.error('[My Matches] Cannot update project - selectedMatch is null or undefined');
     }
     
     // Update local match
@@ -662,6 +961,15 @@ async function updateMatchStatus(matchId, newStatus) {
     // Refresh display to show updated status
     displayMatches(currentPage);
     
+    // Re-open the current match thread to update the thread panel with new status
+    if (selectedMatch && selectedMatch.id === matchId) {
+      const updatedMatch = allMatches.find(m => m.id === matchId);
+      if (updatedMatch) {
+        console.log('[My Matches] Re-opening match thread with new status:', updatedMatch.status);
+        openMessagingThread(updatedMatch);
+      }
+    }
+    
     // Show feedback with correct status label
     const statusLabels = {
       'in-progress': 'In-Progress',
@@ -670,6 +978,7 @@ async function updateMatchStatus(matchId, newStatus) {
       'declined': 'Declined'
     };
     const label = statusLabels[newStatus] || newStatus;
+    console.log('[My Matches] Status updated successfully - showing alert for:', label);
     alert(`Status changed to "${label}"`);
     
   } catch (error) {
@@ -787,7 +1096,31 @@ function openMessagingThread(match) {
   }
   
   // Update header with practitioner name
-  threadNameEl.textContent = formatPractitionerName(practitioner.dba_name || practitioner.legal_name || 'Practitioner');
+  const practitionerDisplayName = formatPractitionerName(practitioner.dba_name || practitioner.legal_name || 'Practitioner');
+  threadNameEl.textContent = practitionerDisplayName;
+  threadNameEl.style.cursor = 'pointer';
+  threadNameEl.style.color = '#5c9a72';
+  threadNameEl.title = 'View practitioner profile';
+  
+  // Make name clickable to view public preview profile
+  threadNameEl.onclick = () => {
+    if (practitioner.id) {
+      // Navigate to public practitioner preview profile
+      window.location.href = `/rooted-vitality/dashboard/pro/pages/practitioner-profile.html?id=${practitioner.id}`;
+    }
+  };
+  
+  // Make avatar clickable too
+  const threadAvatarClickable = threadAvatarEl;
+  if (threadAvatarClickable) {
+    threadAvatarClickable.style.cursor = 'pointer';
+    threadAvatarClickable.onclick = () => {
+      if (practitioner.id) {
+        // Navigate to public practitioner preview profile
+        window.location.href = `/rooted-vitality/dashboard/pro/pages/practitioner-profile.html?id=${practitioner.id}`;
+      }
+    };
+  }
   
   // Update avatar
   if (threadAvatarEl) {
@@ -837,22 +1170,45 @@ function openMessagingThread(match) {
   // Update status dropdown
   if (statusDropdownEl) {
     console.log('[My Matches] Status dropdown found, setting display to block');
-    // Set to actual match status, not hardcoded pending
-    statusDropdownEl.value = match.status || 'pending';
-    statusDropdownEl.style.display = 'block';
     
-    // Lock dropdown until pro accepts/rejects - only unlock if pro has responded
-    const msgResponse = match.practitioner_response;
-    const isLocked = match.status === 'pending' && !msgResponse;
-    statusDropdownEl.disabled = isLocked;
-    
-    // Remove any previous listeners and add new one
+    // First, remove any existing change listeners by cloning and replacing
     const newDropdown = statusDropdownEl.cloneNode(true);
     statusDropdownEl.parentNode.replaceChild(newDropdown, statusDropdownEl);
     
     // Re-query the dropdown element after clone
     const updatedDropdownEl = document.getElementById('status-dropdown');
-    updatedDropdownEl.addEventListener('change', (e) => updateMatchStatus(match.id, e.target.value));
+    
+    // NOW set the value after cloning (on the new element)
+    const statusValue = match.status || 'pending';
+    updatedDropdownEl.value = statusValue;
+    console.log('[My Matches] Set dropdown value to:', statusValue);
+    updatedDropdownEl.style.display = 'block';
+    
+    // Lock dropdown until pro accepts/rejects - only unlock if pro has responded
+    const msgResponse = match.practitioner_response;
+    const isLocked = match.status === 'pending' && !msgResponse;
+    updatedDropdownEl.disabled = isLocked;
+    console.log('[My Matches] Dropdown locked:', isLocked);
+    
+    // Add change listener
+    if (updatedDropdownEl) {
+      updatedDropdownEl.addEventListener('change', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const selectedStatus = e.target.value;
+        const matchId = match.id;
+        console.log('[My Matches] Dropdown changed to value:', selectedStatus, 'for match:', matchId);
+        await updateMatchStatus(matchId, selectedStatus);
+        // Get the updated match from allMatches
+        const updatedMatch = allMatches.find(m => m.id === matchId);
+        if (updatedMatch) {
+          console.log('[My Matches] Re-opening thread with updated match, status:', updatedMatch.status);
+          openMessagingThread(updatedMatch);
+        }
+      });
+    } else {
+      console.error('[My Matches] Failed to re-query dropdown after clone');
+    }
   } else {
     console.error('[My Matches] Status dropdown NOT found');
   }

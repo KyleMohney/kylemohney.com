@@ -255,16 +255,108 @@ window.authManager = {
             this._resetHeader();
             
             console.log('[Rooted Vitality] Logout successful');
-            alert('You have been signed out.');
             
-            // Redirect to rooted vitality home
-            window.location.href = '/rooted-vitality/index.html';
+            // Show logout modal instead of alert
+            this._showLogoutModal();
             
             return true;
         } catch (error) {
             console.error('[Rooted Vitality] Unexpected logout error:', error);
             return false;
         }
+    },
+
+    /**
+     * Show logout confirmation modal
+     * @private
+     */
+    _showLogoutModal() {
+        // Create modal overlay
+        const overlay = document.createElement('div');
+        overlay.id = 'logout-modal-overlay';
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        `;
+
+        // Create modal
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            animation: slideIn 0.3s ease-out;
+        `;
+
+        modal.innerHTML = `
+            <div style="margin-bottom: 1.5rem;">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#5c9a72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto; display: block;">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </div>
+            <h2 style="margin: 0 0 0.5rem 0; font-size: 1.25rem; font-weight: 600; color: #2e2b28;">Signed Out</h2>
+            <p style="margin: 0 0 1.5rem 0; color: #666; font-size: 0.95rem;">You have been successfully signed out.</p>
+            <button id="logout-modal-close" style="
+                background: #5c9a72;
+                color: white;
+                border: none;
+                border-radius: 6px;
+                padding: 0.75rem 1.5rem;
+                font-size: 0.95rem;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                width: 100%;
+            ">Continue</button>
+        `;
+
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
+
+        // Add hover effect
+        const button = document.getElementById('logout-modal-close');
+        button.addEventListener('mouseover', () => {
+            button.style.background = '#4a7d5a';
+        });
+        button.addEventListener('mouseout', () => {
+            button.style.background = '#5c9a72';
+        });
+        button.addEventListener('click', () => {
+            overlay.style.opacity = '0';
+            overlay.style.transition = 'opacity 0.3s ease-out';
+            setTimeout(() => {
+                overlay.remove();
+                // Redirect to home
+                window.location.href = '/rooted-vitality/index.html';
+            }, 300);
+        });
+
+        // Add animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        `;
+        document.head.appendChild(style);
     },
     
     // ======================================================

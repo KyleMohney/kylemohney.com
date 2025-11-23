@@ -28,6 +28,7 @@ let projects = [];
 let practitioners = [];
 let taxonomyData = {};
 let selectedSubcategories = [];
+let projectsRealtimeChannel = null;  // Store channel reference to keep it alive
 
 /**
  * Open the close project modal - TOP LEVEL FUNCTION
@@ -98,7 +99,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Load client profile
     const { data: clientProfile, error: clientError } = await supabaseClient
       .from('clients')
-      .select('id, serial_number, first_name, last_name, open_to_contact')
+      .select('id, serial_number, first_name, last_name, open_to_contact, open_to_match')
       .eq('id', currentUser.id)
       .single();
 
@@ -110,6 +111,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     currentClientProfile = clientProfile;
     console.log('[My Projects] Client profile loaded:', currentClientProfile);
 
+    // Set the Open to Match toggle based on saved state
+    const openToMatchToggle = document.getElementById('open-to-match-toggle');
+    if (openToMatchToggle) {
+      openToMatchToggle.checked = clientProfile.open_to_match || false;
+      console.log('[My Projects] Open to Match toggle set to:', openToMatchToggle.checked);
+    }
+
     // Load taxonomy for category dropdown
     await loadTaxonomy();
 
@@ -118,6 +126,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Load existing projects
     await loadProjects();
+
+    // Setup realtime listener for project updates
+    setupProjectRealtimeListener();
 
     // Initialize all handlers
     initializeFormHandlers();
@@ -256,6 +267,83 @@ async function loadProjects() {
   } catch (error) {
     console.error('[My Projects] Error loading projects:', error);
   }
+}
+
+/**
+ * Setup Realtime listener for project status changes
+ * Automatically refreshes UI when projects are updated (e.g., when a match is hired)
+ */
+function setupProjectRealtimeListener() {
+  if (!currentClientProfile) {
+    console.warn('[My Projects] Client profile not loaded yet');
+    return;
+  }
+
+  // Avoid duplicate subscriptions
+  if (projectsRealtimeChannel) {
+    console.log('[My Projects] Realtime channel already exists, unsubscribing first');
+    projectsRealtimeChannel.unsubscribe();
+  }
+
+  console.log('[My Projects] 🔌 Setting up realtime listener for projects with client_serial:', currentClientProfile.serial_number);
+
+  // Subscribe to project updates for this client
+  projectsRealtimeChannel = supabaseClient
+    .channel(`projects:${currentClientProfile.serial_number}`)
+    .on(
+      'postgres_changes',
+      {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'projects',
+        filter: `client_serial=eq.${currentClientProfile.serial_number}`
+      },
+      (payload) => {
+        console.log('[My Projects] 🔔 REALTIME UPDATE RECEIVED!');
+        console.log('[My Projects] Project ID:', payload.new.id);
+        console.log('[My Projects] Project Serial:', payload.new.project_serial);
+        console.log('[My Projects] Status change:', payload.old.project_status, '→', payload.new.project_status);
+        
+        // Find the updated project in our array by ID first
+        let updatedProjectIndex = projects.findIndex(p => p.id === payload.new.id);
+        
+        if (updatedProjectIndex < 0) {
+          // Fallback: find by project_serial
+          console.log('[My Projects] ⚠️ Project not found by UUID, searching by project_serial...');
+          updatedProjectIndex = projects.findIndex(p => p.project_serial === payload.new.project_serial);
+        }
+        
+        if (updatedProjectIndex >= 0) {
+          console.log('[My Projects] ✓ Found project at index:', updatedProjectIndex);
+          
+          // Update the project data
+          projects[updatedProjectIndex] = {
+            ...projects[updatedProjectIndex],
+            ...payload.new
+          };
+          console.log('[My Projects] ✓ Local project updated - NEW STATUS:', projects[updatedProjectIndex].project_status);
+          
+          // Re-render the grid to show updated status
+          console.log('[My Projects] 🔄 Re-rendering grid with updated status...');
+          renderProjectsGrid();
+          updateStats();
+          console.log('[My Projects] ✅ GRID RE-RENDERED WITH NEW STATUS');
+        } else {
+          console.error('[My Projects] ❌ Project not found in array! ID:', payload.new.id, 'Serial:', payload.new.project_serial);
+          console.error('[My Projects] Current projects array:', projects.map(p => ({ id: p.id, serial: p.project_serial })));
+        }
+      }
+    )
+    .subscribe((status) => {
+      console.log('[My Projects] Realtime subscription status:', status);
+      if (status === 'SUBSCRIBED') {
+        console.log('[My Projects] ✅✅✅ REALTIME SUBSCRIBED - READY TO RECEIVE UPDATES ✅✅✅');
+      } else if (status === 'CLOSED') {
+        console.error('[My Projects] ❌ Realtime subscription CLOSED - will not receive updates!');
+      } else if (status === 'CHANNEL_ERROR') {
+        console.error('[My Projects] ❌ Realtime channel error!');
+      }
+    });
 }
 
 /**
@@ -883,6 +971,15 @@ function showNotification(message, type = 'info') {
 // ======================================================
 
 function attachEventListeners() {
+  // Open to Match Toggle
+  const openToMatchToggle = document.getElementById('open-to-match-toggle');
+  if (openToMatchToggle) {
+    console.log('[attachEventListeners] Open to Match toggle found, attaching handler');
+    openToMatchToggle.addEventListener('change', async (e) => {
+      await handleOpenToMatchToggle(e.target.checked);
+    });
+  }
+
   // Create project button
   const createBtn = document.getElementById('create-project-btn');
   console.log('[attachEventListeners] Looking for create-project-btn:', createBtn ? 'FOUND' : 'NOT FOUND');
@@ -1121,8 +1218,23 @@ async function submitCloseProject(e) {
       modal.style.setProperty('display', 'none', 'important');
     }
 
-    // Reload projects to reflect changes
-    await loadProjects();
+    // Update the local projects array with the new status (instead of reloading everything)
+    // This allows realtime events from the inbox to work properly
+    const projectIndex = projects.findIndex(p => p.id === projectId);
+    if (projectIndex >= 0 && data && data[0]) {
+      console.log('[My Projects] Updating local project array with closed status');
+      projects[projectIndex] = {
+        ...projects[projectIndex],
+        ...data[0]
+      };
+      console.log('[My Projects] Local project updated - status:', projects[projectIndex].project_status);
+      renderProjectsGrid();
+      updateStats();
+      console.log('[My Projects] Grid re-rendered with updated status');
+    } else {
+      console.warn('[My Projects] Could not update local array, falling back to full reload');
+      await loadProjects();
+    }
 
     // Show success message
     showNotification(`Project ${closureReason === 'hired' ? 'marked as hired' : 'closed'} successfully!`, 'success');
@@ -1149,6 +1261,151 @@ function updateStats() {
   
   if (totalEl) totalEl.textContent = totalProjects;
   if (practEl) practEl.textContent = totalPractitionersCount.size;
+}
+
+/**
+ * Handle Open to Match Toggle - Updates opportunities table for pending projects
+ */
+async function handleOpenToMatchToggle(isEnabled) {
+  try {
+    console.log('[My Projects] Open to Match toggle:', isEnabled ? 'ENABLED' : 'DISABLED');
+
+    // Get all pending projects for this client
+    const pendingProjects = projects.filter(p => p.project_status === 'pending');
+    
+    if (pendingProjects.length === 0) {
+      console.log('[My Projects] No pending projects found');
+      alert('No pending wellness journeys to update.');
+      return;
+    }
+
+    console.log('[My Projects] Found', pendingProjects.length, 'pending projects');
+
+    // Prepare opportunities updates - get project IDs
+    const projectIds = pendingProjects.map(p => p.id);
+    
+    // First, get or create opportunities for these projects
+    const { data: existingOpportunities, error: fetchError } = await supabaseClient
+      .from('opportunities')
+      .select('*')
+      .eq('client_id', currentUser.id)
+      .in('project_id', projectIds);
+
+    if (fetchError) throw fetchError;
+
+    console.log('[My Projects] Found', existingOpportunities?.length || 0, 'existing opportunities');
+
+    // Update or create opportunities with open_to_match status
+    const updates = [];
+    
+    // Update existing opportunities
+    if (existingOpportunities && existingOpportunities.length > 0) {
+      for (const opportunity of existingOpportunities) {
+        updates.push(
+          supabaseClient
+            .from('opportunities')
+            .update({ status: isEnabled ? 'open_to_match' : 'closed' })
+            .eq('id', opportunity.id)
+        );
+      }
+    }
+
+    // Create new opportunities for projects without one
+    const opportunityProjectIds = new Set(existingOpportunities?.map(o => o.project_id) || []);
+    const newOpportunities = pendingProjects
+      .filter(p => !opportunityProjectIds.has(p.id))
+      .map(p => ({
+        client_id: currentUser.id,
+        project_id: p.id,
+        service_type: p.category_name || 'General',
+        description: p.description || p.custom_name,
+        status: isEnabled ? 'open_to_match' : 'closed',
+        serial_number: `OPP-${currentUser.id.substring(0, 8)}-${Date.now()}`
+      }));
+
+    if (newOpportunities.length > 0) {
+      updates.push(
+        supabaseClient
+          .from('opportunities')
+          .insert(newOpportunities)
+      );
+    }
+
+    // Also update the clients table to track this state
+    updates.push(
+      supabaseClient
+        .from('clients')
+        .update({ 
+          open_to_match: isEnabled,
+          open_to_match_updated_at: new Date().toISOString()
+        })
+        .eq('id', currentUser.id)
+    );
+
+    // Execute all updates
+    await Promise.all(updates);
+
+    console.log('[My Projects] Opportunities and client state updated successfully');
+    
+    // Show elegant modal instead of alert
+    showOpenToMatchModal(isEnabled, pendingProjects.length);
+
+  } catch (error) {
+    console.error('[My Projects] Error handling Open to Match toggle:', error);
+    
+    // Show error modal
+    const modal = document.getElementById('open-to-match-modal');
+    if (modal) {
+      document.getElementById('otm-title').textContent = 'Unable to Update';
+      document.getElementById('otm-message').textContent = 'Something went wrong';
+      document.getElementById('otm-details').textContent = 'Failed to update wellness journey status. Please try again.';
+      modal.classList.remove('modal--hidden');
+      modal.style.display = 'flex';
+    } else {
+      alert('Failed to update wellness journey status. Please try again.');
+    }
+    
+    // Reset toggle on error
+    const toggle = document.getElementById('open-to-match-toggle');
+    if (toggle) {
+      toggle.checked = !toggle.checked;
+    }
+  }
+}
+
+/**
+ * Show elegant modal for Open to Match status
+ */
+function showOpenToMatchModal(isEnabled, journeyCount) {
+  const modal = document.getElementById('open-to-match-modal');
+  if (!modal) {
+    console.error('[My Projects] Modal not found');
+    return;
+  }
+
+  const titleEl = document.getElementById('otm-title');
+  const messageEl = document.getElementById('otm-message');
+  const detailsEl = document.getElementById('otm-details');
+
+  if (isEnabled) {
+    titleEl.textContent = 'Journey Open to Matches';
+    messageEl.textContent = 'Your wellness journey is now visible to qualified practitioners.';
+    detailsEl.innerHTML = `
+      <strong>${journeyCount} journey${journeyCount > 1 ? 's' : ''} is now open to matches.</strong><br><br>
+      Practitioners who can help with your wellness goals will be able to see and respond to your journey. You can turn this off anytime from your wellness dashboard.
+    `;
+  } else {
+    titleEl.textContent = 'Journey Closed to Matches';
+    messageEl.textContent = 'Your wellness journey is no longer visible to practitioners.';
+    detailsEl.innerHTML = `
+      <strong>${journeyCount} journey${journeyCount > 1 ? 's' : ''} is now closed to matches.</strong><br><br>
+      When you're ready to receive practitioner connections again, you can enable this setting anytime.
+    `;
+  }
+
+  // Show modal
+  modal.classList.remove('modal--hidden');
+  modal.style.display = 'flex';
 }
 
 /**
