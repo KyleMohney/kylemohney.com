@@ -306,7 +306,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         filter: `practitioner_serial=eq.${practitionerSerial}`,
                     }, (payload) => {
                         console.log('[Inbox] Match update received:', payload);
-                        if (payload.new.status === 'active' && payload.old.status === 'pending') {
+                        if ((payload.new.status === 'in-progress' || payload.new.status === 'active') && payload.old.status === 'pending') {
                             console.log('[Inbox] New accepted match detected! Reloading conversations...');
                             loadConversations().then(() => {
                                 renderThreadsList();

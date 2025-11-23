@@ -950,17 +950,15 @@
           let currentMatchForDeclineMsg = null;
 
           card.querySelector('[data-action="accept"]').addEventListener('click', async () => {
-            const { error } = await window.supabaseClient
-              .from('project_practitioner_matches')
-              .update({
-                status: 'active',
-                practitioner_response: 'accepted',
-                practitioner_responded_at: new Date().toISOString(),
-                updated_at: new Date().toISOString()
-              })
-              .eq('id', match.id);
-
-            if (!error) {
+              const { error } = await window.supabaseClient
+                .from('project_practitioner_matches')
+                .update({
+                  status: 'in-progress',
+                  practitioner_response: 'accepted',
+                  practitioner_responded_at: new Date().toISOString(),
+                  updated_at: new Date().toISOString()
+                })
+                .eq('id', match.id);            if (!error) {
               // Create initial message from client to practitioner
               // This is the match notification message that appears in the inbox
               const clientFullName = match.projects?.clients?.first_name && match.projects?.clients?.last_name 

@@ -99,15 +99,15 @@ document.addEventListener('DOMContentLoaded', async () => {
           filter: `client_serial=eq.${clientSerial}`,
         }, (payload) => {
           console.log('[My Matches] Match update received:', payload);
-          // If match went from pending to active, reload matches
-          if (payload.old.status === 'pending' && (payload.new.status === 'active' || payload.new.status === 'in-progress' || payload.new.status === 'hired')) {
+          // If match went from pending to in-progress/active/hired, reload matches
+          if (payload.old.status === 'pending' && (payload.new.status === 'in-progress' || payload.new.status === 'active' || payload.new.status === 'hired')) {
             console.log('[My Matches] Practitioner accepted! Reloading matches...');
             loadMatches(clientSerial).then(() => {
               renderMatches();
               // Show toast notification
-              const practitioner = allMatches.find(m => m.project_serial === payload.new.project_serial);
-              if (practitioner) {
-                console.log('[My Matches] Showing acceptance toast for:', practitioner.dba_name || practitioner.legal_name);
+              const updatedMatch = allMatches.find(m => m.id === payload.new.id);
+              if (updatedMatch && updatedMatch.practitioners) {
+                console.log('[My Matches] Match updated to:', payload.new.status);
               }
             });
           }
@@ -587,8 +587,8 @@ function openMessagingThread(match) {
   // Update status dropdown
   if (statusDropdownEl) {
     console.log('[My Matches] Status dropdown found, setting display to block');
-    // Always default to 'pending'
-    statusDropdownEl.value = 'pending';
+    // Set to actual match status, not hardcoded pending
+    statusDropdownEl.value = match.status || 'pending';
     statusDropdownEl.style.display = 'block';
     
     // Lock dropdown until pro accepts/rejects - only unlock if pro has responded
