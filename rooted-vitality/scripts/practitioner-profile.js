@@ -279,6 +279,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Setup Contact button
         await setupContactButton();
         
+        // Setup Back to Profile button
+        await setupBackToProfileButton();
+        
         // Hide loading, show content
         document.getElementById('profile-loading').style.display = 'none';
         document.getElementById('profile-content').style.display = 'block';
@@ -627,6 +630,53 @@ async function setupContactButton() {
         }
     } catch (error) {
         console.error('[Practitioner Profile] Error setting up Contact button:', error);
+    }
+}
+
+/**
+ * Setup Back to Profile button - only show when practitioner views own profile
+ */
+async function setupBackToProfileButton() {
+    console.log('[Practitioner Profile] setupBackToProfileButton() called');
+    const backBtn = document.getElementById('btn-back-to-profile');
+    if (!backBtn) return;
+    
+    try {
+        const currentUser = window.authManager ? window.authManager.getCurrentUser() : null;
+        
+        if (!currentUser) {
+            // Public user - hide button
+            console.log('[Practitioner Profile] Public user - hiding back button');
+            return;
+        }
+        
+        // Check if current user is a practitioner viewing their own profile
+        const rvUserStr = localStorage.getItem('rvUser');
+        if (!rvUserStr) {
+            // Client - hide button
+            console.log('[Practitioner Profile] Client user - hiding back button');
+            return;
+        }
+        
+        const rvUser = JSON.parse(rvUserStr);
+        const userRole = rvUser.role;
+        
+        if (userRole === 'practitioner' && currentUser.id === practitioner.id) {
+            // Practitioner viewing own profile - show button
+            console.log('[Practitioner Profile] Practitioner viewing own profile - showing back button');
+            backBtn.style.display = 'block';
+            
+            // Add click handler
+            backBtn.addEventListener('click', () => {
+                console.log('[Practitioner Profile] Back to Profile clicked');
+                window.location.href = '/rooted-vitality/dashboard/pro/pages/profile.html';
+            });
+        } else {
+            // Not their profile - hide button
+            console.log('[Practitioner Profile] Not own profile - hiding back button');
+        }
+    } catch (error) {
+        console.error('[Practitioner Profile] Error setting up Back to Profile button:', error);
     }
 }
 

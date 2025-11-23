@@ -4362,7 +4362,7 @@ async function loadReviews() {
         // Get practitioner ID
         const { data: practitionerData, error: practitionerError } = await window.supabaseClient
             .from('practitioners')
-            .select('id')
+            .select('id, serial_number')
             .eq('id', user.id)
             .single();
         
