@@ -1302,9 +1302,22 @@ const RootedVitality = {
             const isOpen = notificationsDropdown.classList.toggle('show');
             notificationsBtn.setAttribute('aria-expanded', isOpen);
             
-            // When opening, mark all as read and load notifications
+            // When opening, immediately clear the bell badge and mark all as read
             if (isOpen) {
-                console.log('[Rooted Vitality] Bell clicked, marking all as read and loading notifications...');
+                console.log('[Rooted Vitality] Bell clicked, clearing badge and marking all as read...');
+                
+                // Immediately hide badge and reset bell color for instant feedback
+                const bellIcon = document.querySelector('.rv-bell-icon');
+                const badge = document.querySelector('.rv-notification-badge');
+                if (bellIcon) {
+                    bellIcon.style.color = 'currentColor'; // Reset to normal color
+                }
+                if (badge) {
+                    badge.style.display = 'none';
+                    badge.textContent = '';
+                }
+                
+                // Then mark all as read and load notifications in background
                 this.markAllNotificationsAsRead();
                 this.loadNotifications();
             }

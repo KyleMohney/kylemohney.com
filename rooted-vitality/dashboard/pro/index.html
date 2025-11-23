@@ -614,6 +614,7 @@
 
     function showConfirmDeclineModal() {
       const modal = document.getElementById('confirm-decline-modal');
+      const overlay = modal.querySelector('.modal__overlay');
       modal.classList.remove('modal--hidden');
       
       const closeBtn = modal.querySelector('.modal__close');
@@ -623,23 +624,32 @@
       const handleClose = () => {
         modal.classList.add('modal--hidden');
         pendingDeclineMatch = null;
+        // Remove listeners when closing
+        closeBtn.removeEventListener('click', handleClose);
+        cancelBtn.removeEventListener('click', handleClose);
+        overlay.removeEventListener('click', handleClose);
       };
 
-      closeBtn.addEventListener('click', handleClose, { once: true });
-      cancelBtn.addEventListener('click', handleClose, { once: true });
-      confirmBtn.addEventListener('click', () => {
+      const handleConfirm = async () => {
         modal.classList.add('modal--hidden');
         confirmBtn.disabled = true;
-        handleDeclineConfirmed();
-      }, { once: true });
+        await handleDeclineConfirmed();
+        confirmBtn.disabled = false;
+        confirmBtn.removeEventListener('click', handleConfirm);
+        closeBtn.removeEventListener('click', handleClose);
+        cancelBtn.removeEventListener('click', handleClose);
+        overlay.removeEventListener('click', handleClose);
+      };
 
-      // Close on overlay click
-      const overlay = modal.querySelector('.modal__overlay');
-      overlay.addEventListener('click', handleClose, { once: true });
+      closeBtn.addEventListener('click', handleClose);
+      cancelBtn.addEventListener('click', handleClose);
+      confirmBtn.addEventListener('click', handleConfirm);
+      overlay.addEventListener('click', handleClose);
     }
 
     function showConfirmBlockModal() {
       const modal = document.getElementById('confirm-block-modal');
+      const overlay = modal.querySelector('.modal__overlay');
       modal.classList.remove('modal--hidden');
       
       const closeBtn = modal.querySelector('.modal__close');
@@ -649,19 +659,27 @@
       const handleClose = () => {
         modal.classList.add('modal--hidden');
         pendingBlockClientSerial = null;
+        // Remove listeners when closing
+        closeBtn.removeEventListener('click', handleClose);
+        cancelBtn.removeEventListener('click', handleClose);
+        overlay.removeEventListener('click', handleClose);
       };
 
-      closeBtn.addEventListener('click', handleClose, { once: true });
-      cancelBtn.addEventListener('click', handleClose, { once: true });
-      confirmBtn.addEventListener('click', () => {
+      const handleConfirm = async () => {
         modal.classList.add('modal--hidden');
         confirmBtn.disabled = true;
-        handleBlockConfirmed();
-      }, { once: true });
+        await handleBlockConfirmed();
+        confirmBtn.disabled = false;
+        confirmBtn.removeEventListener('click', handleConfirm);
+        closeBtn.removeEventListener('click', handleClose);
+        cancelBtn.removeEventListener('click', handleClose);
+        overlay.removeEventListener('click', handleClose);
+      };
 
-      // Close on overlay click
-      const overlay = modal.querySelector('.modal__overlay');
-      overlay.addEventListener('click', handleClose, { once: true });
+      closeBtn.addEventListener('click', handleClose);
+      cancelBtn.addEventListener('click', handleClose);
+      confirmBtn.addEventListener('click', handleConfirm);
+      overlay.addEventListener('click', handleClose);
     }
 
     async function handleDeclineConfirmed() {
@@ -759,9 +777,10 @@
               if (cardClientSerial === pendingBlockClientSerial) {
                 card.remove();
               }
-          });
-        } else {
-          showToast('Error', 'Failed to block client', 'error');
+            });
+          } else {
+            showToast('Error', 'Failed to block client', 'error');
+          }
         }
       }
 
@@ -847,7 +866,7 @@
             // Get client details
             const { data: client } = await window.supabaseClient
               .from('clients')
-              .select('id, first_name, last_name')
+              .select('id, first_name, last_name, profile_picture_url')
               .eq('serial_number', project.client_serial)
               .single();
 
@@ -876,6 +895,12 @@
           const client = project.clients;
           const clientName = `${client.first_name || 'Client'} ${client.last_name ? client.last_name[0] + '.' : ''}`;
           const initials = (client.first_name?.[0] || 'C') + (client.last_name?.[0] || 'L');
+          
+          // Use profile picture if available, otherwise show initials
+          const profilePictureUrl = client.profile_picture_url;
+          const avatarHTML = profilePictureUrl 
+            ? `<img src="${profilePictureUrl}" alt="${clientName}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`
+            : `<span style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">${initials}</span>`;
 
           // Get first message
           const { data: messages } = await window.supabaseClient
@@ -901,7 +926,7 @@
           card.setAttribute('data-client-serial', match.client_serial);
           card.innerHTML = `
             <div class="card-header">
-              <div class="client-avatar">${initials}</div>
+              <div class="client-avatar">${avatarHTML}</div>
               <div class="client-info">
                 <h3 class="client-name">${clientName}</h3>
                 <p class="client-service">${project.category_name || 'Wellness'}</p>
@@ -928,7 +953,7 @@
             const { error } = await window.supabaseClient
               .from('project_practitioner_matches')
               .update({
-                status: 'accepted',
+                status: 'active',
                 practitioner_response: 'accepted',
                 practitioner_responded_at: new Date().toISOString(),
                 updated_at: new Date().toISOString()
@@ -936,6 +961,63 @@
               .eq('id', match.id);
 
             if (!error) {
+              // Create initial message from client to practitioner
+              // This is the match notification message that appears in the inbox
+              const clientFullName = match.projects?.clients?.first_name && match.projects?.clients?.last_name 
+                ? `${match.projects.clients.first_name} ${match.projects.clients.last_name}`
+                : match.projects?.clients?.first_name || 'A client';
+              
+              const defaultMessage = `${clientFullName} has matched with you and is interested in your services for: ${match.projects?.category_name || 'wellness services'}.`;
+              
+              console.log('[Pro Clients] Creating initial message with data:', {
+                project_id: match.projects?.id,
+                practitioner_id: currentUser?.id,
+                client_id: match.projects?.clients?.id,
+                sender_id: match.projects?.clients?.id,
+                project_serial: match.project_serial,
+                practitioner_serial: practitionerSerial,
+                client_serial: match.client_serial,
+                message: defaultMessage
+              });
+              
+              // Get project and client IDs for the message
+              const projectId = match.projects?.id;
+              const clientId = match.projects?.clients?.id;
+              
+              console.log('[Pro Clients] Message insert data:', {
+                project_id: projectId,
+                practitioner_id: currentUser?.id,
+                client_id: clientId,
+                sender_id: currentUser?.id, // Practitioner is sending the initial message
+                project_serial: match.project_serial,
+                practitioner_serial: practitionerSerial,
+                client_serial: match.client_serial,
+                sender_type: 'practitioner', // Practitioner sending initial message
+                message: defaultMessage,
+                is_read: false
+              });
+              
+              const { data: msgData, error: msgError } = await window.supabaseClient
+                .from('project_messages')
+                .insert({
+                  project_id: projectId,
+                  practitioner_id: currentUser?.id,
+                  client_id: clientId,
+                  sender_id: currentUser?.id, // Practitioner is sending the initial message
+                  project_serial: match.project_serial,
+                  practitioner_serial: practitionerSerial,
+                  client_serial: match.client_serial,
+                  sender_type: 'practitioner', // Practitioner sending initial message
+                  message: defaultMessage,
+                  is_read: false
+                });
+
+              if (msgError) {
+                console.error('[Pro Clients] Error creating initial message:', msgError);
+              } else {
+                console.log('[Pro Clients] Initial message created successfully:', msgData);
+              }
+              
               // Notify client of acceptance
               if (window.notifyClientOfMatchResponse) {
                 await notifyClientOfMatchResponse({
@@ -946,8 +1028,13 @@
                 });
               }
               
-              showToast('Client Accepted', `You accepted ${clientName}. Check your inbox to message them!`, 'success');
+              showToast('Client Accepted', `You accepted ${clientName}. Opening your inbox...`, 'success');
               card.remove();
+              
+              // Navigate to Inbox and auto-open the conversation
+              setTimeout(() => {
+                window.location.href = `/rooted-vitality/dashboard/pro/pages/inbox.html?clientSerial=${match.client_serial}`;
+              }, 500);
             } else {
               showToast('Error', 'Failed to accept client', 'error');
             }

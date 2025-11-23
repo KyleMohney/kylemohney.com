@@ -85,6 +85,38 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
 
+    // Set up real-time subscription for match acceptance
+    if (clientProfile.data?.serial_number) {
+      const clientSerial = clientProfile.data.serial_number;
+      console.log('[My Matches] Setting up real-time subscription for client:', clientSerial);
+      
+      window.supabaseClient
+        .channel(`client-matches:${clientSerial}`)
+        .on('postgres_changes', {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'project_practitioner_matches',
+          filter: `client_serial=eq.${clientSerial}`,
+        }, (payload) => {
+          console.log('[My Matches] Match update received:', payload);
+          // If match went from pending to active, reload matches
+          if (payload.old.status === 'pending' && (payload.new.status === 'active' || payload.new.status === 'in-progress' || payload.new.status === 'hired')) {
+            console.log('[My Matches] Practitioner accepted! Reloading matches...');
+            loadMatches(clientSerial).then(() => {
+              renderMatches();
+              // Show toast notification
+              const practitioner = allMatches.find(m => m.project_serial === payload.new.project_serial);
+              if (practitioner) {
+                console.log('[My Matches] Showing acceptance toast for:', practitioner.dba_name || practitioner.legal_name);
+              }
+            });
+          }
+        })
+        .subscribe((status) => {
+          console.log('[My Matches] Real-time subscription status:', status);
+        });
+    }
+
   } catch (error) {
     console.error('Error initializing My Matches page:', error);
   }

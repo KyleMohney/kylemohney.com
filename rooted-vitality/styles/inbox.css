@@ -418,6 +418,29 @@
     font-family: 'Inter', sans-serif;
 }
 
+#thread-status.status-online {
+    color: #10b981;
+    font-weight: 600;
+}
+
+#thread-status.status-away {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+#thread-status.status-offline {
+    color: var(--text-tertiary);
+}
+
+#thread-status.status-blocked {
+    color: #ef4444;
+    font-weight: 600;
+}
+
+#thread-status.status-declined {
+    color: var(--text-tertiary);
+}
+
 .thread-close-btn {
     background: transparent;
     border: none;
@@ -815,6 +838,10 @@
     flex-shrink: 0;
     font-size: 0.85rem;
     box-shadow: 0 2px 8px rgba(92, 154, 114, 0.2);
+}
+
+.message-send-btn span {
+    color: white;
 }
 
 .message-send-btn:hover:not(:disabled) {

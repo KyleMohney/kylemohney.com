@@ -245,6 +245,81 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderThreadsList();
         updateBadges();
         
+        // Check for auto-open parameter (e.g., from accept match flow)
+        const urlParams = new URLSearchParams(window.location.search);
+        const clientSerialToOpen = urlParams.get('clientSerial');
+        if (clientSerialToOpen) {
+            console.log('[Inbox] Auto-open requested for clientSerial:', clientSerialToOpen);
+            console.log('[Inbox] Available conversations:', conversations.map(c => c.clientSerial));
+            
+            // Try to find and open the conversation with retries
+            let retryCount = 0;
+            const maxRetries = 5;
+            
+            const tryAutoOpen = () => {
+                const conversation = conversations.find(c => c.clientSerial === clientSerialToOpen);
+                if (conversation) {
+                    console.log('[Inbox] Found conversation for auto-open, opening now');
+                    const threadItem = document.querySelector(`.thread-item[data-client-serial="${clientSerialToOpen}"]`);
+                    if (threadItem) {
+                        threadItem.click();
+                        console.log('[Inbox] Auto-opened conversation');
+                    } else {
+                        console.log('[Inbox] Thread item found but DOM element not ready yet, retrying...');
+                        if (retryCount < maxRetries) {
+                            retryCount++;
+                            setTimeout(tryAutoOpen, 500);
+                        }
+                    }
+                } else {
+                    console.log('[Inbox] Conversation not found yet, retrying... Attempt', retryCount + 1);
+                    if (retryCount < maxRetries) {
+                        retryCount++;
+                        // Reload conversations and try again
+                        loadConversations().then(() => {
+                            setTimeout(tryAutoOpen, 500);
+                        });
+                    } else {
+                        console.log('[Inbox] Max retries reached, giving up on auto-open');
+                    }
+                }
+            };
+            
+            // Start trying after a brief delay
+            setTimeout(tryAutoOpen, 500);
+        }
+        
+        // Set up real-time subscription for new accepted matches
+        const rvUserStr = localStorage.getItem('rvUser');
+        if (rvUserStr) {
+            const rvUser = JSON.parse(rvUserStr);
+            const practitionerSerial = currentUser?.serial_number;
+            
+            if (practitionerSerial) {
+                console.log('[Inbox] Setting up real-time subscription for accepted matches');
+                window.supabaseClient
+                    .channel(`accepted-matches:${practitionerSerial}`)
+                    .on('postgres_changes', {
+                        event: 'UPDATE',
+                        schema: 'public',
+                        table: 'project_practitioner_matches',
+                        filter: `practitioner_serial=eq.${practitionerSerial}`,
+                    }, (payload) => {
+                        console.log('[Inbox] Match update received:', payload);
+                        if (payload.new.status === 'active' && payload.old.status === 'pending') {
+                            console.log('[Inbox] New accepted match detected! Reloading conversations...');
+                            loadConversations().then(() => {
+                                renderThreadsList();
+                                updateBadges();
+                            });
+                        }
+                    })
+                    .subscribe((status) => {
+                        console.log('[Inbox] Real-time subscription status:', status);
+                    });
+            }
+        }
+        
         console.log('[Rooted Vitality] Inbox initialized successfully');
     } catch (error) {
         console.error('[Rooted Vitality] Error initializing inbox:', error);
@@ -357,7 +432,7 @@ async function loadConversations() {
             .from('project_practitioner_matches')
             .select('id, project_serial, status, created_at')
             .eq('practitioner_serial', practitionerSerial)
-            .eq('status', 'accepted');
+            .in('status', ['active', 'in-progress', 'hired']);
 
         if (acceptedError) {
             console.error('[Inbox] Error loading accepted matches:', acceptedError);
@@ -384,7 +459,7 @@ async function loadConversations() {
                 // Get client details
                 const { data: client, error: clientError } = await window.supabaseClient
                     .from('clients')
-                    .select('id, first_name, last_name')
+                    .select('id, first_name, last_name, profile_picture_url')
                     .eq('serial_number', project.client_serial)
                     .single();
 
@@ -394,6 +469,10 @@ async function loadConversations() {
                 }
 
                 const clientName = `${client.first_name || 'Client'} ${client.last_name || ''}`;
+                const initials = `${client.first_name?.[0] || ''}${client.last_name?.[0] || ''}`.toUpperCase();
+                const clientAvatarUrl = client.profile_picture_url 
+                    ? client.profile_picture_url 
+                    : generateInitialsAvatar(clientName);
 
                 // Get latest messages
                 const { data: messages } = await window.supabaseClient
@@ -415,7 +494,7 @@ async function loadConversations() {
                     clientSerial: project.client_serial,
                     practitionerId: practitionerSerial,
                     clientName: clientName,
-                    clientAvatar: generateInitialsAvatar(clientName),
+                    clientAvatar: clientAvatarUrl,
                     lastMessage: lastMessage?.message || 'No messages yet',
                     lastMessageTime: lastMessage?.created_at ? new Date(lastMessage.created_at) : new Date(match.created_at),
                     isUnread: unreadCount > 0,
@@ -465,13 +544,16 @@ async function loadConversations() {
                 // Get client details
                 const { data: client, error: clientError } = await window.supabaseClient
                     .from('clients')
-                    .select('id, first_name, last_name')
+                    .select('id, first_name, last_name, profile_picture_url')
                     .eq('serial_number', project.client_serial)
                     .single();
 
                 if (clientError || !client) continue;
 
                 const clientName = `${client.first_name || 'Client'} ${client.last_name || ''}`;
+                const clientAvatarUrl = client.profile_picture_url 
+                    ? client.profile_picture_url 
+                    : generateInitialsAvatar(clientName);
 
                 // Check if this client is blocked
                 const { data: blockRecords, error: blockError } = await window.supabaseClient
@@ -492,7 +574,7 @@ async function loadConversations() {
                     clientSerial: project.client_serial,
                     practitionerId: practitionerSerial,
                     clientName: clientName,
-                    clientAvatar: generateInitialsAvatar(clientName),
+                    clientAvatar: clientAvatarUrl,
                     lastMessage: isBlocked ? 'Blocked' : 'Declined',
                     lastMessageTime: new Date(match.created_at),
                     isUnread: false,
@@ -572,6 +654,7 @@ function renderThreadsList(searchQuery = '') {
 function createThreadElement(conversation) {
     const item = document.createElement('button');
     item.className = 'thread-item';
+    item.setAttribute('data-client-serial', conversation.clientSerial);
     
     if (selectedConversationId === conversation.id) {
         item.classList.add('active');
@@ -624,12 +707,27 @@ function openThreadView(conversation) {
     // Update thread header
     document.getElementById('thread-avatar').src = conversation.clientAvatar;
     document.getElementById('thread-name').textContent = conversation.clientName;
-    document.getElementById('thread-status').textContent = 
+    const threadStatusEl = document.getElementById('thread-status');
+    threadStatusEl.textContent = 
         conversation.isBlocked ? 'Blocked' :
         conversation.isArchived ? 'Declined' :
         conversation.status === 'online' ? '● Online' : 
         conversation.status === 'away' ? '◐ Away' : 
         'Offline';
+    
+    // Update status color based on online status
+    threadStatusEl.classList.remove('status-online', 'status-away', 'status-offline', 'status-blocked', 'status-declined');
+    if (conversation.isBlocked) {
+        threadStatusEl.classList.add('status-blocked');
+    } else if (conversation.isArchived) {
+        threadStatusEl.classList.add('status-declined');
+    } else if (conversation.status === 'online') {
+        threadStatusEl.classList.add('status-online');
+    } else if (conversation.status === 'away') {
+        threadStatusEl.classList.add('status-away');
+    } else {
+        threadStatusEl.classList.add('status-offline');
+    }
     
     // Update lead details hero
     populateLeadDetailsHero(conversation);

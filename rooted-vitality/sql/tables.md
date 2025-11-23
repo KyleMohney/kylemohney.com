@@ -268,6 +268,10 @@ project_messages
 | project_serial      | integer                  |
 | practitioner_serial | text                     |
 | client_serial       | text                     |
+| is_automated        | boolean                  |
+| match_id            | uuid                     |
+| message_type        | text                     |
+| automated_trigger   | text                     |
 
 ===================
 3: CLIENT TABLES
