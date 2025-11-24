@@ -421,10 +421,85 @@ function setupEditListeners() {
     });
 }
 
-function handleChangePassword() {
-    console.log('[Rooted Vitality] Change password clicked');
-    // TODO: Implement password change via Supabase auth.updateUser()
-    alert('Change password functionality to be implemented');
+async function handleChangePassword() {
+    console.log('[Rooted Vitality] Change password initiated');
+    
+    if (!currentUser || !currentUser.email) {
+        alert('Error: User email not found');
+        return;
+    }
+
+    try {
+        // Show confirmation
+        const confirmed = confirm(`We'll send a password reset link to ${currentUser.email}. Please check your inbox to complete the password reset.`);
+        
+        if (!confirmed) {
+            console.log('[Rooted Vitality] Password reset cancelled');
+            return;
+        }
+
+        console.log('[Rooted Vitality] Sending password reset email to:', currentUser.email);
+
+        // Send password reset email
+        const { error } = await window.supabaseClient.auth.resetPasswordForEmail(currentUser.email, {
+            redirectTo: `${window.location.origin}/rooted-vitality/reset.html`
+        });
+
+        if (error) {
+            console.error('[Rooted Vitality] Password reset error:', error);
+            alert(`Error sending reset email: ${error.message}`);
+            return;
+        }
+
+        console.log('[Rooted Vitality] Password reset email sent successfully');
+        
+        // Show success message
+        showPasswordResetSuccessModal();
+    } catch (error) {
+        console.error('[Rooted Vitality] Unexpected error during password reset:', error);
+        alert('An unexpected error occurred. Please try again.');
+    }
+}
+
+function showPasswordResetSuccessModal() {
+    const modalHTML = `
+        <div class="modal-overlay" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+            <div class="modal-content" style="background: white; border-radius: 12px; padding: 40px; max-width: 420px; width: 90%; box-shadow: 0 10px 40px rgba(0,0,0,0.15); text-align: center;">
+                <div style="font-size: 48px; margin-bottom: 16px;">✓</div>
+                <h2 style="font-size: 20px; color: #2e2b28; margin-bottom: 12px; font-weight: 600;">
+                    Check Your Email
+                </h2>
+                <p style="font-size: 14px; color: #888; line-height: 1.6; margin-bottom: 16px;">
+                    We've sent a password reset link to your email. Click the link in the email to create a new password. 
+                    The link expires in 24 hours.
+                </p>
+                <p style="font-size: 13px; color: #aaa; margin-bottom: 24px;">
+                    <strong>Tip:</strong> Check your spam folder if you don't see the email
+                </p>
+                <button id="close-success-btn" style="width: 100%; padding: 12px; background: #c4a57b; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">Done</button>
+            </div>
+        </div>
+    `;
+    
+    // Remove existing modal if present
+    const existingModal = document.querySelector('[style*="modal-overlay"]');
+    if (existingModal) existingModal.remove();
+    
+    // Insert modal into DOM
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // Setup close handler
+    const doneBtn = document.getElementById('close-success-btn');
+    const overlay = document.querySelector('[style*="modal-overlay"]');
+    
+    const closeModal = () => {
+        if (overlay) overlay.remove();
+    };
+    
+    doneBtn.addEventListener('click', closeModal);
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) closeModal();
+    });
 }
 
 /**

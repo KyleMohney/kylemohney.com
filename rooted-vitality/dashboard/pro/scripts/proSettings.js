@@ -1001,8 +1001,102 @@ function setupButtonActions() {
 }
 
 async function handleChangePassword() {
-    // Show password reset modal
-    showPasswordResetModal();
+    console.log('[Rooted Vitality] Change password initiated');
+    
+    if (!currentUser || !currentUser.email) {
+        alert('Error: User email not found');
+        return;
+    }
+
+    try {
+        // Show confirmation
+        const confirmed = confirm(`We'll send a password reset link to ${currentUser.email}. Please check your inbox to complete the password reset.`);
+        
+        if (!confirmed) {
+            console.log('[Rooted Vitality] Password reset cancelled');
+            return;
+        }
+
+        console.log('[Rooted Vitality] Sending password reset email to:', currentUser.email);
+
+        // Send password reset email
+        const { error } = await window.supabaseClient.auth.resetPasswordForEmail(currentUser.email, {
+            redirectTo: `${window.location.origin}/rooted-vitality/reset.html`
+        });
+
+        if (error) {
+            console.error('[Rooted Vitality] Password reset error:', error);
+            alert(`Error sending reset email: ${error.message}`);
+            return;
+        }
+
+        console.log('[Rooted Vitality] Password reset email sent successfully');
+        
+        // Show success message
+        showPasswordResetSuccessModal();
+    } catch (error) {
+        console.error('[Rooted Vitality] Unexpected error during password reset:', error);
+        alert('An unexpected error occurred. Please try again.');
+    }
+}
+
+function showPasswordResetSuccessModal() {
+    const modalHTML = `
+        <div class="password-reset-modal-overlay">
+            <div class="password-reset-modal" style="max-width: 420px;">
+                <div class="modal-header">
+                    <h2>Check Your Email</h2>
+                    <button class="modal-close-btn" id="close-success-modal">&times;</button>
+                </div>
+                
+                <div class="modal-content">
+                    <div style="text-align: center; padding: 20px 0;">
+                        <div style="font-size: 48px; margin-bottom: 16px;">✓</div>
+                        <p style="font-size: 16px; color: #2e2b28; margin-bottom: 12px; font-weight: 500;">
+                            Password Reset Email Sent
+                        </p>
+                        <p style="font-size: 14px; color: #888; line-height: 1.6;">
+                            We've sent a password reset link to your email. Click the link in the email to create a new password. 
+                            The link expires in 24 hours.
+                        </p>
+                        <p style="font-size: 13px; color: #aaa; margin-top: 16px;">
+                            <strong>Tip:</strong> Check your spam folder if you don't see the email
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button class="btn-accent" id="close-success-btn" style="width: 100%;">Done</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Remove existing modal if present
+    const existingModal = document.querySelector('.password-reset-modal-overlay');
+    if (existingModal) existingModal.remove();
+    
+    // Insert modal into DOM
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // Setup close handlers
+    const closeBtn = document.getElementById('close-success-modal');
+    const doneBtn = document.getElementById('close-success-btn');
+    
+    const closeModal = () => {
+        const modal = document.querySelector('.password-reset-modal-overlay');
+        if (modal) modal.remove();
+    };
+    
+    closeBtn.addEventListener('click', closeModal);
+    doneBtn.addEventListener('click', closeModal);
+    
+    // Close on outside click
+    document.querySelector('.password-reset-modal-overlay').addEventListener('click', (e) => {
+        if (e.target.classList.contains('password-reset-modal-overlay')) {
+            closeModal();
+        }
+    });
 }
 
 function showPasswordResetModal() {
