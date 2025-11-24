@@ -426,38 +426,51 @@ async function loadMatches(clientSerial) {
 
 /**
  * Update badge counts for Messages, Unread, and Completed tabs
- * - Messages: Total matched practitioners (active or in-progress status)
- * - Unread: Count of unread messages 
- * - Completed: Total completed entries (hired, not_hired, or declined)
+ * - Messages: Total matched practitioners (active or in-progress status, excluding completed)
+ * - Unread: Count of unread messages for active matches (excluding completed)
+ * - Completed: Total completed entries (hired, not_hired, declined, or completed)
  */
 async function updateBadgeCounts() {
   try {
-    // Count messages (active/in-progress matches)
-    const messagesCount = allMatches.filter(m => m.status === 'active' || m.status === 'in-progress').length;
+    // Count messages (active/in-progress matches, excluding completed)
+    const messagesCount = allMatches.filter(m => 
+      (m.status === 'active' || m.status === 'in-progress') &&
+      m.status !== 'hired' && m.status !== 'not-hired' && m.status !== 'declined' && m.status !== 'completed'
+    ).length;
     const messagesBadge = document.getElementById('messages-badge');
     if (messagesBadge) messagesBadge.textContent = messagesCount;
 
-    // Count completed (hired/not-hired/declined)
-    const completedCount = allMatches.filter(m => m.status === 'hired' || m.status === 'not-hired' || m.status === 'declined').length;
+    // Count completed (hired/not-hired/declined/completed ONLY)
+    const completedCount = allMatches.filter(m => 
+      m.status === 'hired' || m.status === 'not-hired' || m.status === 'declined' || m.status === 'completed'
+    ).length;
     const completedBadge = document.getElementById('completed-badge');
     if (completedBadge) completedBadge.textContent = completedCount;
 
-    // Count unread messages - query project_messages where is_read=false
+    // Count unread messages - query project_messages where is_read=false for ACTIVE matches only (not completed)
     const unreadBadge = document.getElementById('unread-badge');
     if (allMatches.length > 0) {
-      const matchIds = allMatches.map(m => m.id);
-      const { data: unreadMessages, error: unreadError } = await window.supabaseClient
-        .from('project_messages')
-        .select('id')
-        .in('match_id', matchIds)
-        .eq('is_read', false);
+      // Only count unread for non-completed matches
+      const activeMatchIds = allMatches
+        .filter(m => m.status !== 'hired' && m.status !== 'not-hired' && m.status !== 'declined' && m.status !== 'completed')
+        .map(m => m.id);
       
-      if (unreadError) {
-        console.warn('[My Matches] Error fetching unread count:', unreadError);
-        if (unreadBadge) unreadBadge.textContent = '0';
+      if (activeMatchIds.length > 0) {
+        const { data: unreadMessages, error: unreadError } = await window.supabaseClient
+          .from('project_messages')
+          .select('id')
+          .in('match_id', activeMatchIds)
+          .eq('is_read', false);
+        
+        if (unreadError) {
+          console.warn('[My Matches] Error fetching unread count:', unreadError);
+          if (unreadBadge) unreadBadge.textContent = '0';
+        } else {
+          const unreadCount = (unreadMessages || []).length;
+          if (unreadBadge) unreadBadge.textContent = unreadCount;
+        }
       } else {
-        const unreadCount = (unreadMessages || []).length;
-        if (unreadBadge) unreadBadge.textContent = unreadCount;
+        if (unreadBadge) unreadBadge.textContent = '0';
       }
     } else {
       if (unreadBadge) unreadBadge.textContent = '0';
@@ -849,18 +862,21 @@ function initFilterHandlers() {
 function applyTabFilter(tabName) {
   switch(tabName) {
     case 'messages':
-      // Active conversations and active opportunities
+      // Only show active conversations (not pending, not completed)
       filteredMatches = allMatches.filter(m => 
-        m.status === 'active' || m.status === 'in-progress' || m.status === 'opportunity'
+        (m.status === 'active' || m.status === 'in-progress' || m.status === 'opportunity') &&
+        m.status !== 'hired' && m.status !== 'not-hired' && m.status !== 'declined' && m.status !== 'completed'
       );
       break;
     case 'unread':
-      // Pending responses or new messages
+      // Only show pending matches (awaiting practitioner response)
       filteredMatches = allMatches.filter(m => m.status === 'pending');
       break;
     case 'completed':
-      // Hired or archived
-      filteredMatches = allMatches.filter(m => m.status === 'hired' || m.status === 'not-hired' || m.status === 'declined');
+      // Show only completed/closed projects (hired, not-hired, declined, completed)
+      filteredMatches = allMatches.filter(m => 
+        m.status === 'hired' || m.status === 'not-hired' || m.status === 'declined' || m.status === 'completed'
+      );
       break;
     default:
       filteredMatches = [...allMatches];
