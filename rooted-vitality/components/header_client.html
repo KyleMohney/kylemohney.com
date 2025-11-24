@@ -13,7 +13,7 @@
       
       <a href="/rooted-vitality/dashboard/client/pages/my-matches.html" class="rv-nav-link">Inbox</a>
       
-      <a href="/rooted-vitality/dashboard/client/pages/dashboard.html" class="rv-nav-link">My Profile</a>
+      <a href="/rooted-vitality/dashboard/client/pages/dashboard.html" class="rv-nav-link">Profile</a>
     </nav>
     
     <!-- Become a Practitioner Button -->
@@ -48,7 +48,7 @@
         <hr class="rv-dropdown-divider">
         <!-- View Switcher for Practitioners -->
         <a href="#" data-switch-view="practitioner" role="menuitem" class="rv-dropdown-item" style="display: none;" id="switchToPractitioner">Practitioner View</a>
-        <a href="/rooted-vitality/index.html" role="menuitem" class="rv-dropdown-item rv-logout-item">Log out</a>
+        <a href="#" onclick="if(window.authManager) window.authManager.logout(); return false;" role="menuitem" class="rv-dropdown-item rv-logout-item">Log out</a>
       </div>
     </div>
     

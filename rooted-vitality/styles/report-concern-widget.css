@@ -50,10 +50,10 @@
 }
 
 /* ============================================================
-   MODAL STYLES
+   MODAL STYLES (Report Concern Widget Only)
    ============================================================ */
 
-.modal {
+#report-concern-modal {
     display: none;
     position: fixed;
     z-index: 1000;
@@ -68,15 +68,11 @@
     animation: fadeIn 0.2s ease;
 }
 
-.modal:not(.modal--hidden) {
+#report-concern-modal.show {
     display: flex;
 }
 
-.modal--hidden {
-    display: none !important;
-}
-
-.modal__content {
+#report-concern-modal .modal-content {
     background-color: white;
     border-radius: 12px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
@@ -84,66 +80,9 @@
     min-width: 400px;
 }
 
-.modal__content--small {
+#report-concern-modal .modal-content--small {
     max-width: 500px;
     width: 90vw;
-}
-
-.modal__overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    cursor: pointer;
-}
-
-.modal__header {
-    background: linear-gradient(135deg, #5c9a72 0%, #4a8b62 100%);
-    color: white;
-    padding: 20px;
-    border-radius: 12px 12px 0 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.modal__header h2 {
-    margin: 0;
-    font-size: 20px;
-    font-weight: 600;
-    color: white;
-}
-
-.modal__close {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 28px;
-    cursor: pointer;
-    padding: 0;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.modal__close:hover {
-    opacity: 0.8;
-}
-
-.modal__body {
-    padding: 20px;
-    color: #2e2b28;
-}
-
-.modal__footer {
-    padding: 15px 20px;
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-    border-top: 1px solid #e0e0e0;
 }
 
 @keyframes slideDown {

@@ -486,7 +486,7 @@ const RootedVitality = {
         
         let targetHref = this.config.siteUrl + 'index.html';
         if (role === 'practitioner' && view === 'practitioner') {
-            targetHref = this.config.siteUrl + 'dashboard/pro/index.html';
+            targetHref = this.config.siteUrl + 'dashboard/pro/pages/index.html';
         }
         
         logo.setAttribute('href', targetHref);
@@ -526,7 +526,7 @@ const RootedVitality = {
                 
                 let targetUrl = '';
                 if (newView === 'practitioner') {
-                    targetUrl = '/rooted-vitality/dashboard/pro/index.html';
+                    targetUrl = '/rooted-vitality/dashboard/pro/pages/index.html';
                     console.log('[Rooted Vitality] Practitioner view selected, targetUrl set to:', targetUrl);
                 } else {
                     targetUrl = '/rooted-vitality/dashboard/client/pages/dashboard.html';
@@ -1549,7 +1549,7 @@ const RootedVitality = {
             // Replace Login button with Dashboard link
             let dashboardUrl = pathPrefix + 'dashboard/client/pages/dashboard.html';
             if (userData.role === 'practitioner') {
-                dashboardUrl = pathPrefix + 'dashboard/pro/index.html';
+                dashboardUrl = pathPrefix + 'dashboard/pro/pages/index.html';
             }
             
             loginBtn.textContent = 'Dashboard';

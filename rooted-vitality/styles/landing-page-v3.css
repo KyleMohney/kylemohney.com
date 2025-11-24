@@ -347,6 +347,31 @@
   }
 }
 
+/* Story Section Layout Modifiers */
+.story-section--image-right .story-section__container {
+  grid-template-columns: 1fr 1.2fr;
+}
+
+.story-section--image-right .story-section__content-wrapper {
+  order: 2;
+}
+
+.story-section--image-right .story-section__image {
+  order: 1;
+}
+
+.story-section--image-left .story-section__container {
+  grid-template-columns: 1.2fr 1fr;
+}
+
+.story-section--image-left .story-section__content-wrapper {
+  order: 1;
+}
+
+.story-section--image-left .story-section__image {
+  order: 2;
+}
+
 /* ========================================== */
 /* 2b. CATEGORIES HORIZONTAL SCROLL          */
 /* ========================================== */
@@ -711,6 +736,23 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* Featured Story Layout Modifiers */
+.featured-story--image-right .featured-story__card {
+  order: -1;
+}
+
+.featured-story--image-right .featured-story__image-side {
+  order: 1;
+}
+
+.featured-story--image-left .featured-story__card {
+  order: 1;
+}
+
+.featured-story--image-left .featured-story__image-side {
+  order: -1;
 }
 
 /* Tablet */

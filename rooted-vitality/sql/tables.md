@@ -1,10 +1,38 @@
-NOTES:
-all tables have an id column for UUID
-all tables have a serial_number column for HUMAN TRACKING
-NO NEW DOCUMENTATION UNLESS I ASK
-DO NOT PUSH TO GIT UNLESS I ASK
-ALL SQL PROVIDED TO ME IN CHAT
-          |
+# Database Schema Reference
+
+**IMPORTANT NOTES:**
+- All tables have an `id` column for UUID (primary key)
+- All tables have a `serial_number` or equivalent column for human-readable tracking
+- When you add/remove columns, update this file
+- **DO NOT PUSH TO GIT UNLESS ASKED**
+- **ALL SQL PROVIDED IN CHAT**
+
+---
+
+## Design Patterns
+
+### Serial Numbers (Auto-Generated)
+- **Clients**: `C1`, `C2`, `C3`... (stored in `clients.serial_number`)
+- **Practitioners**: `P1`, `P2`, `P3`... (stored in `practitioners.serial_number`)
+- **Projects**: `1`, `2`, `3`... (stored in `projects.project_serial` as INTEGER)
+
+### ID Types
+- `id` = UUID (system primary key for all table relationships)
+- `serial_number`/`project_serial` = Human-readable for UI display
+- Foreign keys use `id` (UUID)
+- Serial lookups use text/int serials
+
+### Key Relationships
+- **Practitioners** → **Projects** via `project_serial` lookup
+- **Clients** → **Projects** via `client_serial` lookup
+- **Matches** → **Practitioners** & **Projects** via serials
+- **Reviews** → **Practitioners** & **Projects** via serials
+- **Messages** → **Projects** via `project_id` and `project_serial`
+
+---
+
+## Complete Table Documentation
+
 ===================
 1: PRACTITIONER TABLES
 ===================
@@ -62,6 +90,8 @@ practitioners
 | service_subcategory_names  | ARRAY                       |
 | last_login                 | timestamp with time zone    |
 | pricing                    | jsonb                       |
+| dba_name                   | text                        |
+
 
 ====================================
 practitioner_profiles
@@ -84,9 +114,9 @@ practitioner_profiles
 | created_at                   | timestamp without time zone |
 | updated_at                   | timestamp without time zone |
 | practice_logo_url            | text                        |
-| dba_name                     | text                        |
 | practice_type                | text                        |
 | year_established             | integer                     |
+
 
 ====================================
 practitioner_blocks
@@ -100,6 +130,8 @@ practitioner_blocks
 | created_at          | timestamp with time zone |
 | is_blocked          | boolean                  |
 | practitioner_serial | text                     |
+| from_opportunity    | boolean                  |
+
 
 ====================================
 practitioner_selected_services
@@ -115,6 +147,7 @@ practitioner_selected_services
 | updated_at          | timestamp with time zone |
 | price_per_service   | numeric                  |
 | practitioner_serial | text                     |
+
 
 ====================================
 practitioner_credentials
@@ -141,6 +174,7 @@ practitioner_credentials
 | badge_verified                  | boolean                     |
 | credentials_verified            | boolean                     |
 
+
 ====================================
 practitioner_notifications
 ====================================
@@ -157,6 +191,7 @@ practitioner_notifications
 | created_at          | timestamp with time zone |
 | updated_at          | timestamp with time zone |
 | client_serial       | text                     |
+
 
 ====================================
 practitioner_notification_settings
@@ -185,45 +220,48 @@ practitioner_notification_settings
 | updated_at          | timestamp with time zone |
 | practitioner_serial | text                     |
 
+
 ===================
 2: PROJECT TABLES
 ===================
+
 
 ====================================
 projects
 ====================================
 
-| column_name            | data_type                |
-| ---------------------- | ------------------------ |
-| id                     | uuid                     |
-| client_serial          | text                     |
-| category_id            | text                     |
-| description            | text                     |
-| street                 | text                     |
-| zipcode                | text                     |
-| state                  | text                     |
-| start_date             | date                     |
-| urgency                | text                     |
-| project_status         | text                     |
-| client_open_to_contact | boolean                  |
-| created_at             | timestamp with time zone |
-| updated_at             | timestamp with time zone |
-| review_left            | boolean                  |
-| travel_preference      | text                     |
-| subcategory_name       | text                     |
-| category_name          | text                     |
-| custom_name            | text                     |
-| city                   | text                     |
-| closed_date            | date                     |
-| reopened_date          | date                     |
-| matched_practitioners  | text                     |
-| hired_practitioner     | character varying        |
-| client_first_name      | text                     |
-| client_last_name       | text                     |
-| client_id              | uuid                     |
-| closure_reason         | text                     |
-| closure_notes          | text                     |
-| project_serial         | integer                  |
+| column_name               | data_type                |
+| ------------------------- | ------------------------ |
+| id                        | uuid                     |
+| client_serial             | text                     |
+| category_id               | text                     |
+| description               | text                     |
+| street                    | text                     |
+| zipcode                   | text                     |
+| state                     | text                     |
+| start_date                | date                     |
+| urgency                   | text                     |
+| project_status            | text                     |
+| client_open_to_contact    | boolean                  |
+| created_at                | timestamp with time zone |
+| updated_at                | timestamp with time zone |
+| review_left               | boolean                  |
+| travel_preference         | text                     |
+| subcategory_name          | text                     |
+| category_name             | text                     |
+| custom_name               | text                     |
+| city                      | text                     |
+| closed_date               | date                     |
+| reopened_date             | date                     |
+| matched_practitioners     | text                     |
+| client_first_name         | text                     |
+| client_last_name          | text                     |
+| client_id                 | uuid                     |
+| closure_reason            | text                     |
+| closure_notes             | text                     |
+| project_serial            | integer                  |
+| hired_practitioner_serial | text                     |
+
 
 ====================================
 project_practitioner_matches
@@ -249,63 +287,132 @@ project_practitioner_matches
 | practitioner_responded_at    | timestamp with time zone |
 | project_serial               | integer        
 
+
 ============================
 project_messages
 ============================
 
-| column_name         | data_type                |
-| ------------------- | ------------------------ |
-| id                  | uuid                     |
-| project_id          | uuid                     |
-| practitioner_id     | uuid                     |
-| client_id           | uuid                     |
-| sender_id           | uuid                     |
-| sender_type         | text                     |
-| message             | text                     |
-| is_read             | boolean                  |
-| created_at          | timestamp with time zone |
-| updated_at          | timestamp with time zone |
-| project_serial      | integer                  |
-| practitioner_serial | text                     |
-| client_serial       | text                     |
-| is_automated        | boolean                  |
-| match_id            | uuid                     |
-| message_type        | text                     |
-| automated_trigger   | text                     |
+| column_name            | data_type                |
+| ---------------------- | ------------------------ |
+| id                     | uuid                     |
+| project_id             | uuid                     |
+| practitioner_id        | uuid                     |
+| client_id              | uuid                     |
+| sender_id              | uuid                     |
+| sender_type            | text                     |
+| message                | text                     |
+| is_read                | boolean                  |
+| created_at             | timestamp with time zone |
+| updated_at             | timestamp with time zone |
+| project_serial         | integer                  |
+| practitioner_serial    | text                     |
+| client_serial          | text                     |
+| is_automated           | boolean                  |
+| match_id               | uuid                     |
+| message_type           | text                     |
+| automated_trigger      | text                     |
+| is_opportunity_message | boolean                  |
+| opportunity_id         | uuid                     |
+
+
+============================
+opportunities
+============================
+
+| column_name              | data_type                |
+| ------------------------ | ------------------------ |
+| id                       | uuid                     |
+| serial_number            | text                     |
+| client_id                | uuid                     |
+| practitioner_id          | uuid                     |
+| service_type             | text                     |
+| description              | text                     |
+| status                   | text                     |
+| created_at               | timestamp with time zone |
+| updated_at               | timestamp with time zone |
+| project_id               | uuid                     |
+| open_to_match            | boolean                  |
+| is_active                | boolean                  |
+| message_sent             | boolean                  |
+| message_count            | integer                  |
+| declined_by_practitioner | boolean                  |
+| declined_by_client       | boolean                  |
+| is_archived              | boolean                  |
+| practitioner_blocked     | boolean                  |
+| converted_to_match       | boolean                  |
+| match_id                 | uuid                     |
+
+
+====================================
+reviews
+====================================
+
+| column_name         | data_type                   |
+| ------------------- | --------------------------- |
+| id                  | uuid                        |
+| practitioner_id     | uuid                        |
+| client_id           | uuid                        |
+| client_name         | text                        |
+| rating              | integer                     |
+| review_text         | text                        |
+| source              | text                        |
+| is_verified         | boolean                     |
+| is_featured         | boolean                     |
+| is_visible          | boolean                     |
+| external_platform   | text                        |
+| external_url        | text                        |
+| external_review_id  | text                        |
+| is_approved         | boolean                     |
+| moderation_notes    | text                        |
+| review_date         | timestamp without time zone |
+| created_at          | timestamp without time zone |
+| updated_at          | timestamp without time zone |
+| photos              | ARRAY                       |
+| project_serial      | integer                     |
+| practitioner_name   | text                        |
+| client_first_name   | text                        |
+| client_last_name    | text                        |
+| practitioner_serial | text                        |
+| client_serial       | text                        |
+
 
 ===================
 3: CLIENT TABLES
 ===================
 
+
 ====================================
 clients
 ====================================
 
-| column_name           | data_type                   |
-| --------------------- | --------------------------- |
-| id                    | uuid                        |
-| first_name            | character varying           |
-| last_name             | character varying           |
-| email                 | character varying           |
-| phone                 | character varying           |
-| zipcode               | character varying           |
-| account_status        | character varying           |
-| account_standing      | character varying           |
-| two_factor_enabled    | boolean                     |
-| two_factor_method     | character varying           |
-| created_at            | timestamp with time zone    |
-| updated_at            | timestamp with time zone    |
-| last_login            | timestamp with time zone    |
-| settings_updated_at   | timestamp with time zone    |
-| profile_picture_url   | character varying           |
-| age                   | integer                     |
-| sex                   | text                        |
-| notification_settings | jsonb                       |
-| membership_level      | text                        |
-| membership_started_at | timestamp without time zone |
-| membership_expires_at | timestamp without time zone |
-| serial_number         | text                        |
-| open_to_contact       | boolean                     |
+| column_name              | data_type                   |
+| ------------------------ | --------------------------- |
+| id                       | uuid                        |
+| first_name               | character varying           |
+| last_name                | character varying           |
+| email                    | character varying           |
+| phone                    | character varying           |
+| zipcode                  | character varying           |
+| account_status           | character varying           |
+| account_standing         | character varying           |
+| two_factor_enabled       | boolean                     |
+| two_factor_method        | character varying           |
+| created_at               | timestamp with time zone    |
+| updated_at               | timestamp with time zone    |
+| last_login               | timestamp with time zone    |
+| settings_updated_at      | timestamp with time zone    |
+| profile_picture_url      | character varying           |
+| age                      | integer                     |
+| sex                      | text                        |
+| notification_settings    | jsonb                       |
+| membership_level         | text                        |
+| membership_started_at    | timestamp without time zone |
+| membership_expires_at    | timestamp without time zone |
+| serial_number            | text                        |
+| open_to_contact          | boolean                     |
+| open_to_match            | boolean                     |
+| open_to_match_updated_at | timestamp with time zone    |
+
 
 ====================================
 client_notifications
@@ -322,6 +429,7 @@ client_notifications
 | is_read       | boolean                  |
 | created_at    | timestamp with time zone |
 | updated_at    | timestamp with time zone |
+
 
 ====================================
 client_notification_settings
@@ -349,3 +457,5 @@ client_notification_settings
 | created_at        | timestamp with time zone |
 | updated_at        | timestamp with time zone |
 | client_serial     | text                     |
+
+

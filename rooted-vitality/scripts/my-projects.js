@@ -1179,7 +1179,8 @@ async function submitCloseProject(e) {
     // Build update object - only include fields that exist
     const updateData = {
       project_status: projectStatus,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
+      closed_date: new Date().toISOString().split('T')[0]  // Capture today's date (YYYY-MM-DD format)
     };
     
     // Try to add closure_reason if it exists (it may not be defined or may have constraints)

@@ -47,6 +47,13 @@ async function initializeProjectMessaging(projectData, practitionerData, matchDa
       return;
     }
 
+    // Clear previous conversation state when switching practitioners
+    loadedMessageIds.clear();
+    const messageThread = document.getElementById('message-thread');
+    if (messageThread) {
+      messageThread.innerHTML = '';
+    }
+
     // Extract IDs from objects
     const projectId = projectData?.id;
     const projectSerial = projectData?.project_serial;
@@ -515,4 +522,122 @@ window.initializeProjectMessaging = initializeProjectMessaging;
 window.sendMessage = sendMessage;
 window.loadMessages = loadMessages;
 window.closeMessageThread = closeMessageThread;
+window.acceptOpportunityMessage = acceptOpportunityMessage;
+window.declineOpportunityMessage = declineOpportunityMessage;
+
+/**
+ * Accept an opportunity message - converts to regular match
+ */
+async function acceptOpportunityMessage(opportunityId, projectId, practitionerId) {
+  try {
+    console.log('[Messaging] Accepting opportunity message:', { opportunityId, projectId, practitionerId });
+
+    if (!supabaseClient) {
+      supabaseClient = window.supabaseClient;
+    }
+
+    if (!currentUser) {
+      currentUser = window.authManager.getCurrentUser();
+    }
+
+    // Get the opportunity details
+    const { data: opp, error: oppError } = await supabaseClient
+      .from('opportunities')
+      .select('*')
+      .eq('id', opportunityId)
+      .single();
+
+    if (oppError) throw oppError;
+
+    // Create a match from the opportunity
+    const { data: newMatch, error: matchError } = await supabaseClient
+      .from('project_practitioner_matches')
+      .insert({
+        project_serial: opp.project_serial,
+        practitioner_serial: opp.practitioner_serial,
+        client_serial: opp.client_serial,
+        status: 'in-progress',  // ✅ Automatically set to in-progress
+        match_score: 85, // Default score for opportunity matches
+        client_initiated: false,
+        contacted_at: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .select()
+      .single();
+
+    if (matchError) throw matchError;
+
+    // Update opportunity to mark as accepted and converted to match
+    const { error: oppUpdateError } = await supabaseClient
+      .from('opportunities')
+      .update({
+        converted_to_match: true,
+        match_id: newMatch.id,
+        status: 'accepted'
+      })
+      .eq('id', opportunityId);
+
+    if (oppUpdateError) throw oppUpdateError;
+
+    console.log('[Messaging] Opportunity accepted and converted to match:', newMatch.id);
+    
+    // Reload the matches to show the new status
+    if (window.loadMatches) {
+      await window.loadMatches();
+    }
+
+    // Show notification
+    if (window.showNotification) {
+      window.showNotification('Match accepted! Status set to In-Progress.', 'success');
+    }
+
+    return newMatch;
+
+  } catch (error) {
+    console.error('[Messaging] Error accepting opportunity:', error);
+    if (window.showNotification) {
+      window.showNotification('Failed to accept opportunity', 'error');
+    }
+  }
+}
+
+/**
+ * Decline an opportunity message - archives it
+ */
+async function declineOpportunityMessage(opportunityId) {
+  try {
+    console.log('[Messaging] Declining opportunity message:', opportunityId);
+
+    if (!supabaseClient) {
+      supabaseClient = window.supabaseClient;
+    }
+
+    // Update opportunity to mark as declined by client
+    const { error: oppUpdateError } = await supabaseClient
+      .from('opportunities')
+      .update({
+        declined_by_client: true,
+        is_archived: true
+      })
+      .eq('id', opportunityId);
+
+    if (oppUpdateError) throw oppUpdateError;
+
+    console.log('[Messaging] Opportunity declined and archived');
+
+    // Show notification
+    if (window.showNotification) {
+      window.showNotification('Opportunity declined.', 'info');
+    }
+
+    return true;
+
+  } catch (error) {
+    console.error('[Messaging] Error declining opportunity:', error);
+    if (window.showNotification) {
+      window.showNotification('Failed to decline opportunity', 'error');
+    }
+  }
+}
 

@@ -30,6 +30,22 @@ function formatPractitionerName(name) {
   return name.replace(/_/g, ' ');
 }
 
+function formatPhoneNumber(phone) {
+  if (!phone) return 'No phone on file';
+  // Remove all non-digit characters
+  const cleaned = phone.replace(/\D/g, '');
+  // If it's 10 digits, format as x-xxx-xxx-xxxx
+  if (cleaned.length === 10) {
+    return cleaned.replace(/(\d)(\d{3})(\d{3})(\d{4})/, '$1-$2-$3-$4');
+  }
+  // If it's 11 digits (US with country code), format as x-xxx-xxx-xxxx
+  if (cleaned.length === 11) {
+    return cleaned.replace(/(\d)(\d{3})(\d{3})(\d{4})/, '$1-$2-$3-$4');
+  }
+  // Otherwise return as-is
+  return phone;
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   try {
     if (!window.supabaseClient) {
@@ -105,15 +121,54 @@ document.addEventListener('DOMContentLoaded', async () => {
           filter: `client_serial=eq.${clientSerial}`,
         }, (payload) => {
           console.log('[My Matches] Match update received:', payload);
-          // If match went from pending to in-progress/active/hired, reload matches
-          if (payload.old.status === 'pending' && (payload.new.status === 'in-progress' || payload.new.status === 'active' || payload.new.status === 'hired')) {
+          
+          const oldStatus = payload.old.status;
+          const newStatus = payload.new.status;
+          const newResponse = payload.new.practitioner_response;
+          const oldResponse = payload.old.practitioner_response;
+          
+          // If practitioner declined or blocked (practitioner_response changed to 'declined')
+          if ((oldResponse !== 'declined' && newResponse === 'declined') || 
+              (oldStatus === 'pending' && newStatus === 'declined')) {
+            console.log('[My Matches] Practitioner declined! Auto-setting to not-hired and moving to completed...');
+            
+            // Auto-update status to not-hired in the database
+            window.supabaseClient
+              .from('project_practitioner_matches')
+              .update({ 
+                status: 'not-hired',
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', payload.new.id)
+              .then(({ error }) => {
+                if (error) {
+                  console.error('[My Matches] Error auto-updating status to not-hired:', error);
+                } else {
+                  console.log('[My Matches] Status auto-updated to not-hired');
+                  // Reload matches to reflect the change
+                  loadMatches(clientSerial).then(() => {
+                    renderMatches();
+                  });
+                }
+              });
+          }
+          // If match went from pending/active to hired/not-hired
+          else if ((oldStatus === 'pending' || oldStatus === 'active' || oldStatus === 'in-progress') && 
+                   (newStatus === 'hired' || newStatus === 'not-hired' || newStatus === 'completed')) {
+            console.log('[My Matches] Match completed! Moving to completed section...');
+            loadMatches(clientSerial).then(() => {
+              renderMatches();
+            });
+          }
+          // If match went from pending to in-progress/active (practitioner accepted)
+          else if (oldStatus === 'pending' && (newStatus === 'in-progress' || newStatus === 'active')) {
             console.log('[My Matches] Practitioner accepted! Reloading matches...');
             loadMatches(clientSerial).then(() => {
               renderMatches();
               // Show toast notification
               const updatedMatch = allMatches.find(m => m.id === payload.new.id);
               if (updatedMatch && updatedMatch.practitioners) {
-                console.log('[My Matches] Match updated to:', payload.new.status);
+                console.log('[My Matches] Match updated to:', newStatus);
               }
             });
           }
@@ -169,7 +224,7 @@ async function loadMatches(clientSerial) {
       // Fetch core practitioner data
       const { data: practitionersData, error: practitionersError } = await window.supabaseClient
         .from('practitioners')
-        .select('serial_number, id, legal_name, phone, practice_city, practice_state, in_person_enabled, housecalls_enabled, virtual_enabled, timezone, email')
+        .select('serial_number, id, legal_name, dba_name, phone, practice_city, practice_state, in_person_enabled, housecalls_enabled, virtual_enabled, timezone, email')
         .in('serial_number', practitionerSerials);
       
       if (practitionersError) {
@@ -178,7 +233,7 @@ async function loadMatches(clientSerial) {
         // Fetch practitioner profile data
         const { data: profilesData, error: profilesError } = await window.supabaseClient
           .from('practitioner_profiles')
-          .select('practitioner_serial, bio, dba_name, practice_logo_url, modalities')
+          .select('practitioner_serial, bio, practice_logo_url, modalities')
           .in('practitioner_serial', practitionerSerials);
         
         if (profilesError) {
@@ -195,7 +250,7 @@ async function loadMatches(clientSerial) {
           const profile = profilesMap[p.serial_number] || {};
           practitionersMap[p.serial_number] = {
             ...p,
-            dba_name: profile.dba_name,
+            dba_name: p.dba_name,
             bio: profile.bio,
             practice_logo_url: profile.practice_logo_url,
             modalities: profile.modalities
@@ -627,7 +682,10 @@ function createThreadItem(match) {
   // Get modalities/specialty
   const specialty = escapeHtml(practitioner.modalities?.join(', ') || 'Holistic Practitioner');
   
-  // Get last message time formatted
+  // Get phone number - hide if pending match (not yet accepted)
+  const isPending = match.status === 'pending' && !match.practitioner_response;
+  const phoneDisplay = isPending ? 'Phone available after acceptance' : formatPhoneNumber(practitioner.phone);
+  
   const lastMessageTime = match.updated_at ? new Date(match.updated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now';
 
   // Get project details
@@ -658,7 +716,7 @@ function createThreadItem(match) {
       </div>
       <div style="flex: 1; min-width: 0;">
         <p class="thread-name">${escapeHtml(displayName)}</p>
-        <p class="thread-preview">${escapeHtml(specialty)}</p>
+        <p class="thread-preview">${escapeHtml(phoneDisplay)}</p>
         ${isOpportunity ? `<p class="thread-opportunity-badge" style="font-size: 0.75rem; color: #5c9a72; font-weight: 600; margin-top: 2px;">⭐ OPPORTUNITY</p>` : ''}
       </div>
       <span class="thread-time">${lastMessageTime}</span>
@@ -1151,10 +1209,13 @@ function openMessagingThread(match) {
     }
   }
   
-  // Update online status indicator (for now, default to offline)
-  if (threadOnlineStatusEl && threadStatusTextEl) {
-    threadOnlineStatusEl.style.background = '#ccc'; // Default offline
-    threadStatusTextEl.textContent = 'Offline';
+  // Update practitioner meta info - show online/offline status
+  if (threadMetaEl) {
+    const onlineStatus = 'Offline'; // Default to offline for now
+    threadMetaEl.innerHTML = `
+      <div id="thread-online-status" style="width: 8px; height: 8px; border-radius: 50%; background: #ccc;"></div>
+      <span id="thread-status-text" style="font-size: 13px; color: #666;">${onlineStatus}</span>
+    `;
   }
   
   // Update close button handler
@@ -1189,8 +1250,10 @@ function openMessagingThread(match) {
     // Lock dropdown until pro accepts/rejects - only unlock if pro has responded
     const msgResponse = match.practitioner_response;
     const isLocked = match.status === 'pending' && !msgResponse;
-    updatedDropdownEl.disabled = isLocked;
-    console.log('[My Matches] Dropdown locked:', isLocked);
+    // Also lock if already completed (not-hired, hired, declined)
+    const isCompleted = match.status === 'not-hired' || match.status === 'hired' || match.status === 'declined' || match.status === 'completed';
+    updatedDropdownEl.disabled = isLocked || isCompleted;
+    console.log('[My Matches] Dropdown locked:', isLocked || isCompleted, '(pending and no response:', isLocked, ', completed:', isCompleted, ')');
     
     // Add change listener
     if (updatedDropdownEl) {
@@ -1220,9 +1283,38 @@ function openMessagingThread(match) {
   const msgResponse = match.practitioner_response;
   
   if (msgStatus === 'pending' && !msgResponse) {
-    // Pending with no response: cannot send messages until practitioner responds
+    // Pending with no response: show pending status message
     if (messageInputAreaEl) {
-      messageInputAreaEl.style.display = 'none';
+      messageInputAreaEl.style.display = 'flex';
+      messageInputAreaEl.style.flexDirection = 'column';
+      messageInputAreaEl.style.alignItems = 'center';
+      messageInputAreaEl.style.justifyContent = 'center';
+      messageInputAreaEl.style.padding = '24px';
+      messageInputAreaEl.style.gap = '12px';
+      
+      // Hide input and button, show pending message
+      if (messageInputEl) messageInputEl.style.display = 'none';
+      if (sendBtnEl) sendBtnEl.style.display = 'none';
+      
+      // Create or update pending message div
+      let pendingMsgEl = messageInputAreaEl.querySelector('.pending-message-notice');
+      if (!pendingMsgEl) {
+        pendingMsgEl = document.createElement('div');
+        pendingMsgEl.className = 'pending-message-notice';
+        messageInputAreaEl.appendChild(pendingMsgEl);
+      }
+      
+      pendingMsgEl.innerHTML = `
+        <div style="text-align: center; color: #666;">
+          <div style="font-size: 14px; font-weight: 500; margin-bottom: 8px;">
+            Waiting for practitioner response
+          </div>
+          <div style="font-size: 13px; color: #888; line-height: 1.5;">
+            Once ${practitioner.dba_name || practitioner.legal_name || 'the practitioner'} accepts your request,<br/>
+            you'll be able to message them directly here.
+          </div>
+        </div>
+      `;
     }
     if (messageInputEl) {
       messageInputEl.disabled = true;
@@ -1233,7 +1325,31 @@ function openMessagingThread(match) {
   } else if (msgResponse === 'declined') {
     // Declined: cannot send messages, only view history
     if (messageInputAreaEl) {
-      messageInputAreaEl.style.display = 'none';
+      messageInputAreaEl.style.display = 'flex';
+      messageInputAreaEl.style.flexDirection = 'column';
+      messageInputAreaEl.style.alignItems = 'center';
+      messageInputAreaEl.style.justifyContent = 'center';
+      messageInputAreaEl.style.padding = '24px';
+      
+      // Hide input and button
+      if (messageInputEl) messageInputEl.style.display = 'none';
+      if (sendBtnEl) sendBtnEl.style.display = 'none';
+      
+      // Create or update declined message div
+      let declinedMsgEl = messageInputAreaEl.querySelector('.declined-message-notice');
+      if (!declinedMsgEl) {
+        declinedMsgEl = document.createElement('div');
+        declinedMsgEl.className = 'declined-message-notice';
+        messageInputAreaEl.appendChild(declinedMsgEl);
+      }
+      
+      declinedMsgEl.innerHTML = `
+        <div style="text-align: center; color: #d32f2f;">
+          <div style="font-size: 14px; font-weight: 500;">
+            ✗ Practitioner has declined
+          </div>
+        </div>
+      `;
     }
     if (messageInputEl) {
       messageInputEl.disabled = true;
@@ -1245,6 +1361,23 @@ function openMessagingThread(match) {
     // Accepted or active engagement: can send messages
     if (messageInputAreaEl) {
       messageInputAreaEl.style.display = 'flex';
+      messageInputAreaEl.style.flexDirection = 'row';
+      messageInputAreaEl.style.padding = '';  // Reset padding
+      messageInputAreaEl.style.gap = '';  // Reset gap
+      
+      // Show input and button, remove any pending/declined messages
+      if (messageInputEl) {
+        messageInputEl.style.display = 'block';
+      }
+      if (sendBtnEl) {
+        sendBtnEl.style.display = 'block';
+      }
+      
+      const pendingMsg = messageInputAreaEl.querySelector('.pending-message-notice');
+      if (pendingMsg) pendingMsg.remove();
+      
+      const declinedMsg = messageInputAreaEl.querySelector('.declined-message-notice');
+      if (declinedMsg) declinedMsg.remove();
     }
     if (messageInputEl) {
       messageInputEl.disabled = false;
@@ -1271,6 +1404,11 @@ function openMessagingThread(match) {
     practitionerId: practitioner.id,
     practitionerName: threadNameEl.textContent
   });
+  
+  // Clear message thread to show loading state
+  if (messageThreadEl) {
+    messageThreadEl.innerHTML = '<div style="text-align: center; padding: 20px; color: #999;">Loading messages...</div>';
+  }
   
   // Initialize messaging - pass project data to get UUID
   initializeProjectMessaging(

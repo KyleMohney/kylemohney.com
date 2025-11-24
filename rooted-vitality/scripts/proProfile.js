@@ -2068,6 +2068,7 @@ async function saveProfile() {
             id: currentUser.id,
             legal_name: document.getElementById('profile-name')?.value || '',
             legal_business_name: document.getElementById('profile-name')?.value || '',
+            dba_name: document.getElementById('profile-dba-name')?.value || '',
             business_size: document.getElementById('profile-teamsize')?.value || '',
             updated_at: new Date().toISOString()
         };
@@ -2080,7 +2081,6 @@ async function saveProfile() {
             ethos_statement: document.getElementById('approach-content')?.value || '',
             profile_completeness_percent: profileCompletionPercent,
             practice_logo_url: window.practitionerData?.practice_logo_url || '',
-            dba_name: document.getElementById('profile-dba-name')?.value || '',
             practice_type: document.querySelector('input[name="practice-setting"]:checked')?.value || '',
             year_established: document.getElementById('profile-years')?.value || null
         };

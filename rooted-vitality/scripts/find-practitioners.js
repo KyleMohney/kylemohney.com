@@ -258,7 +258,7 @@ async function enrichPractitionersWithProfileData(practitioners) {
     // Fetch profile data for all practitioners at once
     const { data: profiles, error: profileError } = await supabaseClient
       .from('practitioner_profiles')
-      .select('practitioner_serial, practice_logo_url, bio, dba_name')
+      .select('practitioner_serial, practice_logo_url, bio')
       .in('practitioner_serial', serialNumbers);
 
     if (profileError) {
@@ -277,7 +277,18 @@ async function enrichPractitionersWithProfileData(practitioners) {
       // Continue without credentials - not critical
     }
 
-    console.log('[enrichPractitionersWithProfileData] Fetched', profiles?.length || 0, 'profiles and', credentials?.length || 0, 'credentials');
+    // Fetch reviews count for each practitioner
+    const { data: reviews, error: reviewsError } = await supabaseClient
+      .from('reviews')
+      .select('practitioner_serial, rating')
+      .in('practitioner_serial', serialNumbers);
+
+    if (reviewsError) {
+      console.warn('[enrichPractitionersWithProfileData] Error fetching reviews:', reviewsError);
+      // Continue without reviews - not critical
+    }
+
+    console.log('[enrichPractitionersWithProfileData] Fetched', profiles?.length || 0, 'profiles,', credentials?.length || 0, 'credentials, and reviews for', serialNumbers.length, 'practitioners');
 
     // Create lookup maps for quick access
     const profileMap = {};
@@ -290,10 +301,20 @@ async function enrichPractitionersWithProfileData(practitioners) {
       credentialsMap[cred.practitioner_serial] = cred;
     });
 
+    const reviewsMap = {};
+    reviews?.forEach(review => {
+      if (!reviewsMap[review.practitioner_serial]) {
+        reviewsMap[review.practitioner_serial] = { count: 0, totalRating: 0 };
+      }
+      reviewsMap[review.practitioner_serial].count += 1;
+      reviewsMap[review.practitioner_serial].totalRating += (review.rating || 0);
+    });
+
     // Merge profile and credentials data into practitioners
     practitioners.forEach(practitioner => {
       const profile = profileMap[practitioner.serial_number];
       const cred = credentialsMap[practitioner.serial_number];
+      const reviewData = reviewsMap[practitioner.serial_number];
 
       if (profile) {
         // Add profile fields to practitioner object
@@ -302,11 +323,6 @@ async function enrichPractitionersWithProfileData(practitioners) {
         // Use profile bio if available, otherwise empty (card will handle)
         if (profile.bio && !practitioner.bio) {
           practitioner.bio = profile.bio;
-        }
-        
-        // Use profile dba_name if we don't have it
-        if (profile.dba_name && !practitioner.dba_name) {
-          practitioner.dba_name = profile.dba_name;
         }
       } else {
         // Ensure photo field exists even without profile data
@@ -319,6 +335,16 @@ async function enrichPractitionersWithProfileData(practitioners) {
         practitioner.badge_licensed = cred.badge_licensed;
         practitioner.badge_certified = cred.badge_certified;
         practitioner.background_check_status = cred.background_check_status;
+      }
+
+      // Add reviews count and calculate average rating
+      if (reviewData) {
+        practitioner.reviews_count = reviewData.count;
+        practitioner.rating = reviewData.totalRating / reviewData.count;
+        console.log(`[enrichPractitionersWithProfileData] ${practitioner.serial_number}: ${reviewData.count} reviews, ${practitioner.rating.toFixed(1)} avg rating`);
+      } else {
+        practitioner.reviews_count = 0;
+        practitioner.rating = 0;
       }
     });
 
@@ -755,7 +781,20 @@ async function sendConnectionRequest(practitionerId, practitionerSerial) {
     
     if (error) {
       console.error('[sendConnectionRequest] Error:', error);
-      alert('Error sending connection request');
+      console.error('[sendConnectionRequest] Error details:', {
+        message: error?.message,
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        status: error?.status
+      });
+      console.error('[sendConnectionRequest] Parameters sent:', {
+        p_project_serial: parseInt(selectedProject.project_serial),
+        p_client_serial: selectedProject.client_serial,
+        p_practitioner_serial: practitionerSerial,
+        p_match_score: matchScore
+      });
+      alert('Error sending connection request: ' + (error?.message || 'Unknown error'));
       return;
     }
     

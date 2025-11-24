@@ -143,6 +143,87 @@
   line-height: 1.5;
 }
 
+/* Sidebar Tips Section - Grey styling without card wrapper */
+.sidebar-tips-section {
+  background: #f9faf8;
+  border-radius: 0;
+  padding: 1rem;
+  margin: 0;
+  border: none;
+}
+
+.sidebar-tips-section .sidebar-section__title {
+  color: #8a8a8a;
+  margin: 0 0 0.75rem 0;
+}
+
+/* Filter Styles */
+.sidebar-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filter-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #666;
+  font-family: 'Inter', sans-serif;
+}
+
+.filter-select {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #ddd9d0;
+  border-radius: 6px;
+  background: white;
+  color: #2e2b28;
+  font-size: 0.85rem;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-select:hover {
+  border-color: #bfb5a8;
+  background: #faf8f5;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #5c9a72;
+  box-shadow: 0 0 0 2px rgba(92, 154, 114, 0.1);
+}
+
+.btn-clear-filters {
+  padding: 0.6rem 1rem;
+  background: #f3f1ec;
+  color: #5c9a72;
+  border: 1px solid #ddd9d0;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Inter', sans-serif;
+}
+
+.btn-clear-filters:hover {
+  background: #ede9e2;
+  border-color: #5c9a72;
+}
+
+.btn-clear-filters:active {
+  transform: scale(0.98);
+}
+
 /* Navigation - Hidden (using new sidebar-tab styling) */
 .inbox-nav {
     display: none;
@@ -899,58 +980,67 @@
 /* Message Input Area */
 .thread-input-area {
     display: flex;
-    gap: 10px;
-    padding: 16px 16px;
+    gap: 0.75rem;
+    padding: 12px 16px;
     background: white;
     border-top: 1px solid var(--border-light);
     box-shadow: var(--shadow-sm);
+    align-items: flex-end;
 }
 
 .message-input {
     flex: 1;
-    padding: 12px 16px;
-    border: 1px solid var(--border-light);
-    border-radius: 24px;
-    font-size: 0.95rem;
+    padding: 0.5rem 0.75rem;
+    border: 1.5px solid #d0c8ba;
+    border-radius: 6px;
+    font-size: 0.9rem;
     color: var(--text-primary);
-    background: var(--hover);
-    transition: var(--transition);
+    background: white;
+    transition: all 0.2s ease;
     font-family: 'Inter', sans-serif;
+    min-height: 36px;
+    line-height: 1.4;
 }
 
 .message-input:focus {
     outline: none;
     border-color: var(--primary);
     background: white;
-    box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.1);
+    box-shadow: 0 0 0 2px rgba(92, 154, 114, 0.1);
+}
+
+.message-input:hover:not(:focus) {
+    border-color: #bfb5a8;
 }
 
 .message-input:disabled {
     background: var(--inbox-bg);
     color: var(--text-tertiary);
     cursor: not-allowed;
+    border-color: var(--border-light);
 }
 
 .message-input::placeholder {
-    color: var(--text-tertiary);
+    color: #999;
+    opacity: 1;
 }
 
 .message-send-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
+    padding: 0.4rem 0.8rem;
+    height: 36px;
+    border-radius: 6px;
     background: var(--primary);
     color: white;
     border: none;
-    font-weight: 700;
+    font-weight: 600;
+    font-size: 0.8rem;
     cursor: pointer;
-    transition: var(--transition);
+    transition: background 0.2s ease;
     flex-shrink: 0;
-    font-size: 0.85rem;
-    box-shadow: 0 2px 8px rgba(92, 154, 114, 0.2);
+    white-space: nowrap;
 }
 
 .message-send-btn span {
@@ -958,20 +1048,16 @@
 }
 
 .message-send-btn:hover:not(:disabled) {
-    background: var(--primary-dark);
-    transform: scale(1.08);
-    box-shadow: 0 4px 12px rgba(92, 154, 114, 0.3);
+    background: #3a6d4a;
+}
+
+.message-send-btn:disabled {
+    background: var(--border-light);
+    cursor: not-allowed;
 }
 
 .message-send-btn:active:not(:disabled) {
     transform: scale(0.96);
-}
-
-.message-send-btn:disabled {
-    background: var(--border-darker);
-    cursor: not-allowed;
-    opacity: 0.5;
-    box-shadow: none;
 }
 
 /* Conversation List View */

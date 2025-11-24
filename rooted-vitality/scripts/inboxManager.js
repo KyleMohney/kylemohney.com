@@ -6,6 +6,7 @@
 // Modal state for block/unblock actions
 let pendingBlockClient = null;
 let pendingUnblockClient = null;
+let currentOpenConversation = null; // Track currently open conversation for polling cleanup
 
 /**
  * Show block confirmation modal
@@ -235,6 +236,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Setup event listeners
         setupNavigationListeners();
         setupSearchListener();
+        setupFilterListeners();
         setupThreadCloseListener();
         setupBackButtonListener();
         
@@ -361,6 +363,66 @@ function setupSearchListener() {
         const query = e.target.value.toLowerCase();
         renderThreadsList(query);
     });
+}
+
+/**
+ * Setup filter functionality
+ */
+function setupFilterListeners() {
+    const categoryFilter = document.getElementById('filter-category');
+    const serviceFilter = document.getElementById('filter-service');
+    const clearBtn = document.getElementById('btn-clear-filters');
+    
+    if (categoryFilter) {
+        categoryFilter.addEventListener('change', () => {
+            applyFilters();
+        });
+    }
+    
+    if (serviceFilter) {
+        serviceFilter.addEventListener('change', () => {
+            applyFilters();
+        });
+    }
+    
+    if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+            if (categoryFilter) categoryFilter.value = '';
+            if (serviceFilter) serviceFilter.value = '';
+            applyFilters();
+        });
+    }
+}
+
+/**
+ * Apply category and service type filters
+ */
+function applyFilters() {
+    const categoryFilter = document.getElementById('filter-category')?.value || '';
+    const serviceFilter = document.getElementById('filter-service')?.value || '';
+    
+    console.log('[Inbox] Applying filters - Category:', categoryFilter, 'Service:', serviceFilter);
+    
+    // Filter conversations based on selected criteria
+    let filtered = [...conversations];
+    
+    if (categoryFilter) {
+        filtered = filtered.filter(conv => {
+            // Match conversation's category with filter
+            return conv.category && conv.category.toLowerCase() === categoryFilter.toLowerCase();
+        });
+    }
+    
+    if (serviceFilter) {
+        filtered = filtered.filter(conv => {
+            // Match conversation's service type with filter
+            return conv.serviceType && conv.serviceType.toLowerCase() === serviceFilter.toLowerCase();
+        });
+    }
+    
+    // Store filtered results and re-render
+    window.filteredConversations = filtered;
+    renderThreadsList();
 }
 
 /**
@@ -617,8 +679,11 @@ function renderThreadsList(searchQuery = '') {
     
     console.log(`[Inbox Render] Total conversations: ${conversations.length}, Current filter: ${currentFilter}`);
     
+    // Use filtered conversations if they exist (from category/service filters), otherwise use all
+    let baseConversations = window.filteredConversations || conversations;
+    
     // Filter conversations
-    let filtered = conversations.filter(conv => {
+    let filtered = baseConversations.filter(conv => {
         // Filter by category - 'all' means only accepted (not archived/blocked)
         if (currentFilter === 'all' && conv.category !== 'all') return false;
         if (currentFilter === 'unread' && !conv.isUnread) return false;
@@ -781,6 +846,15 @@ function createThreadElement(conversation) {
  * Open and display a conversation thread
  */
 function openThreadView(conversation) {
+    // Stop polling from previous conversation if one was open
+    if (currentOpenConversation && currentOpenConversation._pollingInterval) {
+        clearInterval(currentOpenConversation._pollingInterval);
+        console.log('[Inbox] Stopped polling for previous conversation');
+    }
+
+    // Track current open conversation
+    currentOpenConversation = conversation;
+
     const emptyState = document.getElementById('empty-state');
     const threadView = document.getElementById('conversation-thread');
     
@@ -1120,6 +1194,14 @@ function populateProjectDetails(conversation) {
  * Close the thread view and show empty state
  */
 function closeThreadView() {
+    // Stop polling when closing thread
+    if (currentOpenConversation && currentOpenConversation._pollingInterval) {
+        clearInterval(currentOpenConversation._pollingInterval);
+        console.log('[Inbox] Stopped polling for closed conversation');
+    }
+    
+    currentOpenConversation = null;
+
     const emptyState = document.getElementById('empty-state');
     const threadView = document.getElementById('conversation-thread');
     
@@ -1245,6 +1327,80 @@ function setupConversationRealtimeSubscription(conversation) {
                 console.warn('[Inbox] Real-time subscription error, will rely on polling');
             }
         });
+
+    // Set up polling as fallback to catch messages if real-time subscription fails
+    setupConversationMessagePolling(conversation);
+}
+
+/**
+ * Poll for new messages as a fallback to real-time subscriptions
+ */
+function setupConversationMessagePolling(conversation) {
+    if (!conversation.projectSerial || !conversation.practitionerSerial) {
+        console.warn('[Inbox] Cannot set up polling - missing project or practitioner serial');
+        return;
+    }
+
+    // Clear any existing polling interval
+    if (conversation._pollingInterval) {
+        clearInterval(conversation._pollingInterval);
+    }
+
+    let lastMessageCount = conversation.messages?.length || 0;
+
+    // Poll every 3 seconds for new messages when thread is open
+    conversation._pollingInterval = setInterval(async () => {
+        try {
+            // Check if thread is still visible
+            const threadView = document.getElementById('conversation-thread');
+            if (!threadView || threadView.style.display === 'none') {
+                // Thread closed, stop polling
+                clearInterval(conversation._pollingInterval);
+                return;
+            }
+
+            // Fetch latest messages
+            const { data: messages, error } = await window.supabaseClient
+                .from('project_messages')
+                .select('id, message, sender_type, created_at, is_read')
+                .eq('project_serial', conversation.projectSerial)
+                .eq('practitioner_serial', conversation.practitionerSerial)
+                .order('created_at', { ascending: true });
+
+            if (error) {
+                console.error('[Inbox] Error polling for messages:', error);
+                return;
+            }
+
+            // Check if there are new messages since last poll
+            if (messages && messages.length > lastMessageCount) {
+                const newMessages = messages.slice(lastMessageCount);
+                console.log('[Inbox] New messages detected via polling:', newMessages.length);
+                
+                // Add new messages to conversation
+                conversation.messages = messages;
+                lastMessageCount = messages.length;
+                
+                // Re-render messages
+                renderMessages(conversation.messages);
+                
+                // Scroll to bottom
+                const messagesContainer = document.getElementById('thread-messages');
+                if (messagesContainer) {
+                    setTimeout(() => {
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    }, 50);
+                }
+                
+                // Update unread badge
+                updateBadges();
+            }
+        } catch (error) {
+            console.error('[Inbox] Polling error:', error);
+        }
+    }, 3000); // Poll every 3 seconds
+
+    console.log('[Inbox] Message polling started for project:', conversation.projectSerial);
 }
 
 /**

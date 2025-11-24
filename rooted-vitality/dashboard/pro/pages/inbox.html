@@ -38,8 +38,39 @@
                 <div class="sidebar-tab__badge" id="badge-archive">0</div>
             </div>
 
-            <!-- Tips Section Card -->
+            <!-- Filters Section -->
             <div class="sidebar-section">
+                <h4 class="sidebar-section__title">Filter</h4>
+                <div class="sidebar-filters">
+                    <div class="filter-group">
+                        <label class="filter-label">Category</label>
+                        <select id="filter-category" class="filter-select">
+                            <option value="">All Categories</option>
+                            <option value="acupuncture">Acupuncture</option>
+                            <option value="nutrition">Nutrition</option>
+                            <option value="yoga">Yoga</option>
+                            <option value="energy-work">Energy Work</option>
+                            <option value="herbalism">Herbalism</option>
+                            <option value="massage">Massage</option>
+                            <option value="meditation">Meditation</option>
+                            <option value="coaching">Coaching</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Service Type</label>
+                        <select id="filter-service" class="filter-select">
+                            <option value="">All Types</option>
+                            <option value="in-person">In-Person</option>
+                            <option value="virtual">Virtual</option>
+                            <option value="housecalls">House Calls</option>
+                        </select>
+                    </div>
+                    <button id="btn-clear-filters" class="btn-clear-filters">Clear Filters</button>
+                </div>
+            </div>
+
+            <!-- Tips Section -->
+            <div class="sidebar-tips-section">
                 <h4 class="sidebar-section__title">TIPS</h4>
                 <ul class="sidebar-tips">
                     <li>Reply within 60 seconds for best results</li>

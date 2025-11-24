@@ -231,12 +231,7 @@ MAINTAIN THESE 4 FILES (no more):
    - Update when adding new files
    - Organize by folder
 
-3. BUG_TRACKER.md
-   - Known issues and status
-   - Format: Priority, description, status
-   - Mark resolved bugs as FIXED
-
-4. README.md
+3. README.md
    - Project overview
    - Setup instructions
    - How to run locally

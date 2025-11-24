@@ -167,12 +167,12 @@ USING (is_approved = true AND is_visible = true);
 -- SELECT: Practitioners can view all reviews on their profile
 CREATE POLICY "Practitioners can view own reviews" ON reviews
 FOR SELECT
-USING (practitioner_serial = auth.uid());
+USING (practitioner_id = auth.uid());
 
 -- SELECT: Clients can view their own reviews
 CREATE POLICY "Clients can view own reviews" ON reviews
 FOR SELECT
-USING (client_serial = auth.uid());
+USING (client_id = auth.uid());
 
 -- INSERT: Reviews created by service role (server-side)
 CREATE POLICY "Service role inserts reviews" ON reviews

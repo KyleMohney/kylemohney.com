@@ -1,7 +1,7 @@
 <!-- PHASE 3: Practitioner (Logged-in) Header -->
 <header id="rvHeader" class="rv-header rv-header-practitioner">
   <div class="rv-header-inner container-wide">
-    <a href="/rooted-vitality/dashboard/pro/index.html" class="rv-logo rv-logo-practitioner" aria-label="Rooted Vitality Practitioner Dashboard">
+    <a href="/rooted-vitality/dashboard/pro/pages/index.html" class="rv-logo rv-logo-practitioner" aria-label="Rooted Vitality Practitioner Dashboard">
       <img src="/rooted-vitality/assets/logo_trimmed.png" alt="Rooted Vitality" class="rv-logo-img">
       <span class="rv-brand-text">
         <span class="rv-brand-name">Rooted</span>
@@ -10,7 +10,7 @@
     </a>
     <nav class="rv-nav" aria-label="Practitioner Navigation">
       <!-- Main Navigation Buttons -->
-      <a href="/rooted-vitality/dashboard/pro/index.html" class="rv-nav-link">Clients</a>
+      <a href="/rooted-vitality/dashboard/pro/pages/index.html" class="rv-nav-link">Clients</a>
       <a href="/rooted-vitality/dashboard/pro/pages/inbox.html" class="rv-nav-link">Inbox</a>
       <a href="/rooted-vitality/dashboard/pro/pages/match-settings.html" class="rv-nav-link">Match Settings</a>
       <a href="/rooted-vitality/dashboard/pro/pages/profile.html" class="rv-nav-link">Profile</a>
@@ -44,7 +44,7 @@
         <a href="#" onclick="navigateToPage('settings'); return false;" role="menuitem" class="rv-dropdown-item">Settings</a>
         <hr class="rv-dropdown-divider">
         <a href="#" data-switch-view="client" role="menuitem" class="rv-dropdown-item">Client View</a>
-        <a href="#" onclick="logout(); return false;" role="menuitem" class="rv-dropdown-item rv-logout-item">Sign Out</a>
+        <a href="#" onclick="if(window.authManager) window.authManager.logout(); return false;" role="menuitem" class="rv-dropdown-item rv-logout-item">Sign Out</a>
       </div>
     </div>
     

@@ -4,11 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Clients | Rooted Vitality</title>
-  <link rel="stylesheet" href="../../styles/base.css">
-  <link rel="stylesheet" href="../../styles/layout.css">
-  <link rel="stylesheet" href="../../styles/components.css">
-  <link rel="stylesheet" href="../../styles/styles.css">
-  <link rel="stylesheet" href="../../styles/report-concern-widget.css">
+  <link rel="stylesheet" href="../../../styles/base.css">
+  <link rel="stylesheet" href="../../../styles/layout.css">
+  <link rel="stylesheet" href="../../../styles/components.css">
+  <link rel="stylesheet" href="../../../styles/styles.css">
+  <link rel="stylesheet" href="../../../styles/report-concern-widget.css">
   
   <style>
     /* ========================================== */
@@ -26,14 +26,14 @@
       margin: 0 auto;
       padding: 0 1rem;
       display: grid;
-      grid-template-columns: 280px 1fr 450px;
+      grid-template-columns: 280px 1fr;
       gap: 2rem;
       width: 100%;
     }
 
     @media (max-width: 1024px) {
       .clients-container {
-        grid-template-columns: 240px 1fr 400px;
+        grid-template-columns: 240px 1fr;
         gap: 1.5rem;
       }
     }
@@ -53,14 +53,14 @@
       margin: 0 auto;
       padding: 0 1rem;
       display: grid;
-      grid-template-columns: 280px 1fr 450px;
+      grid-template-columns: 280px 1fr;
       gap: 2rem;
       width: 100%;
     }
 
     @media (max-width: 1024px) {
       .clients-grid-3col {
-        grid-template-columns: 240px 1fr 400px;
+        grid-template-columns: 240px 1fr;
         gap: 1.5rem;
       }
     }
@@ -121,111 +121,6 @@
       color: #666;
       margin: 0;
       line-height: 1.4;
-    }
-    
-    /* Message Thread Column */
-    .message-thread-column {
-      background: white;
-      border: 1px solid #e5e5e5;
-      border-radius: 12px;
-      padding: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      max-height: calc(100vh - 250px);
-      overflow-y: auto;
-    }
-    
-    .message-thread-panel {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-    }
-    
-    .thread-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid #e5e5e5;
-      margin-bottom: 1rem;
-    }
-    
-    .thread-header__content {
-      flex: 1;
-    }
-    
-    .thread-header__title {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: #2d2d2d;
-      margin: 0;
-    }
-    
-    .thread-header__meta {
-      font-size: 0.85rem;
-      color: #999;
-      margin-top: 0.25rem;
-    }
-    
-    .message-thread {
-      flex: 1;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      margin-bottom: 1rem;
-      padding: 0.5rem 0;
-    }
-    
-    .message-item {
-      padding: 0.75rem 1rem;
-      border-radius: 8px;
-      max-width: 85%;
-      word-wrap: break-word;
-      font-size: 0.9rem;
-    }
-    
-    .message-item.client {
-      align-self: flex-start;
-      background: #f0f0f0;
-      color: #333;
-    }
-    
-    .message-item.practitioner {
-      align-self: flex-end;
-      background: #5c9a72;
-      color: white;
-    }
-    
-    .message-input-area {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      border-top: 1px solid #e5e5e5;
-      padding-top: 1rem;
-      margin-top: auto;
-    }
-    
-    .message-input {
-      width: 100%;
-      padding: 0.75rem;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      font-family: inherit;
-      font-size: 0.9rem;
-      resize: vertical;
-      min-height: 60px;
-    }
-    
-    .message-input:disabled {
-      background: #f5f5f5;
-      color: #999;
-    }
-    
-    .empty-state {
-      text-align: center;
-      padding: 3rem 2rem;
-      color: #999;
     }
     
     /* Main Content */
@@ -572,6 +467,11 @@
         right: 10px;
       }
     }
+
+    /* Modal Hidden State */
+    .modal--hidden {
+      display: none !important;
+    }
   </style>
 </head>
 <body class="pro-dashboard">
@@ -609,38 +509,6 @@
         <!-- Opportunities Tab -->
         <div id="opportunities" class="clients-list" style="display: none;">
           <!-- Opportunity cards will be populated here by JavaScript -->
-        </div>
-      </section>
-
-      <!-- RIGHT COLUMN: Message Thread -->
-      <section class="message-thread-column">
-        <div class="message-thread-panel" id="message-thread-panel">
-          <!-- Header with Status Dropdown -->
-          <div class="thread-header">
-            <div class="thread-header__content">
-              <h3 id="thread-client-name" class="thread-header__title">Select a client</h3>
-              <div class="thread-header__meta" id="thread-client-meta"></div>
-            </div>
-          </div>
-          
-          <!-- Messages Area -->
-          <div id="message-thread" class="message-thread">
-            <div class="empty-state">
-              <p>Select a client to view message history</p>
-            </div>
-          </div>
-
-          <!-- Message Input -->
-          <div class="message-input-area">
-            <textarea 
-              id="message-input" 
-              class="message-input" 
-              placeholder="Type your message..." 
-              rows="3"
-              disabled
-            ></textarea>
-            <button id="send-message-btn" class="btn btn-primary" disabled>Send Message</button>
-          </div>
         </div>
       </section>
     </div>
@@ -683,17 +551,6 @@
   </div>
 
   <!-- Decline with Message Modal -->
-  <div id="decline-message-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
-    <div style="background: white; border-radius: 12px; padding: 2rem; max-width: 500px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
-      <h2 style="margin: 0 0 1rem 0; font-size: 1.3rem; color: #2d2d2d;">Send Decline Message</h2>
-      <p style="color: #666; margin: 0 0 1rem 0;">Let the client know why you're declining:</p>
-      <textarea id="decline-message-text" style="width: 100%; height: 120px; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; font-size: 0.95rem; resize: vertical;" placeholder="Type your message..."></textarea>
-      <div style="display: flex; gap: 0.5rem; margin-top: 1.5rem;">
-        <button id="decline-message-cancel" style="flex: 1; padding: 0.75rem; border: none; border-radius: 6px; background: #e8e8e8; color: #333; font-weight: 600; cursor: pointer;">Cancel</button>
-        <button id="decline-message-send" style="flex: 1; padding: 0.75rem; border: none; border-radius: 6px; background: #c33; color: white; font-weight: 600; cursor: pointer;">Send & Decline</button>
-      </div>
-    </div>
-  </div>
 
   <footer id="footer-inject"></footer>
 
@@ -701,12 +558,12 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <!-- Rooted Vitality Scripts -->
-  <script src="../../scripts/config.js"></script>
-  <script src="../../scripts/authManager.js"></script>
-  <script src="../../scripts/authHooks.js"></script>
-  <script src="../../scripts/notificationManager.js"></script>
-  <script src="../../scripts/proOpportunitiesManager.js"></script>
-  <script src="../../injections.js"></script>
+  <script src="../../../scripts/config.js"></script>
+  <script src="../../../scripts/authManager.js"></script>
+  <script src="../../../scripts/authHooks.js"></script>
+  <script src="../../../scripts/notificationManager.js"></script>
+  <script src="../../../scripts/proOpportunitiesManager.js"></script>
+  <script src="../../../injections.js"></script>
   
   <script>
     // ============================================================================
@@ -1065,17 +922,8 @@
             ? `<img src="${profilePictureUrl}" alt="${clientName}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`
             : `<span style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">${initials}</span>`;
 
-          // Get first message
-          const { data: messages } = await window.supabaseClient
-            .from('project_messages')
-            .select('message')
-            .eq('project_serial', match.project_serial)
-            .eq('practitioner_serial', practitionerSerial)
-            .order('created_at', { ascending: true })
-            .limit(1);
-
+          // Display project description details provided by the client
           const projectDescription = project.description || 'No project details provided';
-          const firstMessage = messages?.[0]?.message || projectDescription;
 
           // Get match quality details from the match record
           const matchScore = match.match_score || 0;
@@ -1100,7 +948,7 @@
               </div>
             </div>
             <div class="message-preview-box">
-              <p class="message-text">${firstMessage}</p>
+              <p class="message-text">${projectDescription}</p>
             </div>
             <div class="card-actions">
               <button class="btn-accent" data-action="accept" data-match-id="${match.id}">Accept</button>
@@ -1219,76 +1067,6 @@
         console.error('[Pro Clients] Error:', error);
       }
     }
-
-    // Modal handlers for decline with message
-    let currentMatchForDeclineMsg = null;
-
-    document.getElementById('decline-message-cancel').addEventListener('click', () => {
-      document.getElementById('decline-message-modal').style.display = 'none';
-      currentMatchForDeclineMsg = null;
-    });
-
-    document.getElementById('decline-message-send').addEventListener('click', async () => {
-      if (!currentMatchForDeclineMsg) return;
-
-      const messageText = document.getElementById('decline-message-text').value.trim();
-      if (!messageText) {
-        alert('Please type a message');
-        return;
-      }
-
-      try {
-        // Decline the match with reason
-        const { error: declineError } = await window.supabaseClient
-          .rpc('update_practitioner_response', {
-            p_match_id: currentMatchForDeclineMsg.id,
-            p_response: 'declined_with_message',
-            p_reason: messageText
-          });
-
-        if (declineError) {
-          alert('Error declining');
-          return;
-        }
-
-        // Send message to client
-        const { error: messageError } = await window.supabaseClient
-          .from('project_messages')
-          .insert({
-            project_serial: currentMatchForDeclineMsg.project_serial,
-            practitioner_serial: currentMatchForDeclineMsg.projects?.clients?.serial_number ? null : practitionerSerial,
-            client_serial: currentMatchForDeclineMsg.projects?.clients?.serial_number,
-            sender_id: window.authManager?.getCurrentUser()?.id,
-            sender_type: 'practitioner',
-            message: messageText,
-            is_read: false
-          });
-
-        if (!messageError) {
-          // Notify client of decline with message
-          if (window.notifyClientOfMatchResponse) {
-            const currentUser = window.authManager?.getCurrentUser();
-            await notifyClientOfMatchResponse({
-              clientSerial: currentMatchForDeclineMsg.client_serial,
-              practitionerName: currentUser?.dba_name || currentUser?.legal_name || 'A practitioner',
-              projectName: currentMatchForDeclineMsg.projectName || 'your project',
-              action: 'declined',
-              reason: messageText
-            });
-          }
-          
-          document.getElementById('decline-message-modal').style.display = 'none';
-          // Remove card from UI
-          const cards = document.querySelectorAll('[data-match-id="' + currentMatchForDeclineMsg.id + '"]');
-          cards.forEach(c => c.closest('.client-card')?.remove());
-          currentMatchForDeclineMsg = null;
-          showToast('Declined', 'Your message has been sent to the client', 'success');
-        }
-      } catch (error) {
-        console.error('[Pro Clients] Error sending decline message:', error);
-        showToast('Error', 'Failed to send decline message', 'error');
-      }
-    });
 
     // ============================================================================
     // REAL-TIME SUBSCRIPTIONS FOR NEW MATCHES
@@ -1665,7 +1443,7 @@
         link.classList.remove('active');
         const href = link.getAttribute('href');
         // Check if this link points to the clients page (index.html)
-        if (href && (href.includes('/pro/index.html') || href.endsWith('/pro/'))) {
+        if (href && (href.includes('/pro/pages/index.html') || href.includes('/pro/index.html') || href.endsWith('/pro/'))) {
           link.classList.add('active');
           console.log('[Rooted Vitality] Set Clients as active nav link, href:', href);
         }
