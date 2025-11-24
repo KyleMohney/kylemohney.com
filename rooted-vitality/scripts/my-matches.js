@@ -930,6 +930,24 @@ async function updateMatchStatus(matchId, newStatus) {
         console.warn('[My Matches] Warning syncing status to pro side:', syncError);
       } else {
         console.log('[My Matches] Pro match status synced to:', newStatus);
+        
+        // Broadcast event to practitioner's inbox to update/move card
+        if (window.supabaseClient) {
+          const channel = window.supabaseClient.channel('match-status-changes');
+          channel.send('broadcast', {
+            event: 'match_status_changed',
+            payload: {
+              practitioner_serial: selectedMatch.practitioner_serial,
+              project_serial: selectedMatch.project_serial,
+              status: newStatus,
+              timestamp: new Date().toISOString()
+            }
+          });
+          console.log('[My Matches] Broadcast sent to practitioner inbox:', {
+            practitioner_serial: selectedMatch.practitioner_serial,
+            status: newStatus
+          });
+        }
       }
     }
     

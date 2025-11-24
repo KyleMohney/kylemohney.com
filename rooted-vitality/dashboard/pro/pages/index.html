@@ -729,10 +729,15 @@
         }
         
         const clientName = `${match.projects?.clients?.first_name || 'Client'}`;
-        showToast('Declined', `You declined ${clientName}`, 'info');
+        showToast('Declined', `You declined ${clientName}. Opening your inbox...`, 'info');
         // Remove the card from the DOM
         const card = document.querySelector(`[data-match-id="${match.id}"]`)?.closest('.client-card');
         if (card) card.remove();
+        
+        // Navigate to Inbox archive tab to show the declined match
+        setTimeout(() => {
+          window.location.href = `/rooted-vitality/dashboard/pro/pages/inbox.html?tab=archive&clientSerial=${match.client_serial}`;
+        }, 500);
       } else {
         showToast('Error', 'Failed to decline client', 'error');
       }

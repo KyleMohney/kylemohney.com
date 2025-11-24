@@ -1219,37 +1219,35 @@ TABLE OF CONTENTS:
   padding: 12px 16px;
   border-top: 1px solid var(--color-border);
   background: var(--color-bg-light);
-  align-items: flex-end;
+  align-items: center;
 }
 
-.message-input-area textarea {
+.message-input-area input {
   flex: 1;
   padding: 0.5rem 0.75rem;
   border: 1.5px solid #d0c8ba;
   border-radius: 6px;
   font-family: inherit;
   font-size: 0.9rem;
-  resize: none;
-  max-height: 100px;
-  min-height: 36px;
+  height: 36px;
   line-height: 1.4;
   transition: all 0.2s ease;
   background: white;
   color: #2e2b28;
 }
 
-.message-input-area textarea::placeholder {
+.message-input-area input::placeholder {
   color: #999;
   opacity: 1;
 }
 
-.message-input-area textarea:focus {
+.message-input-area input:focus {
   outline: none;
   border-color: var(--rooted-primary);
   box-shadow: 0 0 0 2px rgba(92, 154, 114, 0.1);
 }
 
-.message-input-area textarea:hover:not(:focus) {
+.message-input-area input:hover:not(:focus) {
   border-color: #bfb5a8;
 }
 
@@ -1397,7 +1395,7 @@ TABLE OF CONTENTS:
     padding: 1rem;
   }
 
-  .message-input-area textarea {
+  .message-input-area input {
     font-size: 16px; /* Prevent zoom on iOS */
   }
 

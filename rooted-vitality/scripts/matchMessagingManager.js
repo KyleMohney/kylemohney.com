@@ -248,6 +248,9 @@ function displayMessages(messages) {
     );
     // Mark all messages as loaded
     messages.forEach(msg => loadedMessageIds.add(msg.id));
+    
+    // Mark unread practitioner messages as read
+    await markMessagesAsRead();
     return;
   }
 
@@ -450,16 +453,21 @@ async function sendMessage() {
  * Mark messages as read
  */
 async function markMessagesAsRead() {
-  if (!selectedProjectId || !selectedPractitionerId) return;
+  if (!selectedProjectUUID || !selectedPractitionerUUID) return;
 
   try {
-    await supabaseClient
+    const { error } = await supabaseClient
       .from('project_messages')
       .update({ is_read: true })
-      .eq('project_id', selectedProjectId)
-      .eq('practitioner_id', selectedPractitionerId)
+      .eq('project_id', selectedProjectUUID)
+      .eq('practitioner_id', selectedPractitionerUUID)
       .eq('sender_type', 'practitioner');
 
+    if (error) {
+      console.error('[Messaging] Error marking as read:', error);
+    } else {
+      console.log('[Messaging] Marked practitioner messages as read');
+    }
   } catch (error) {
     console.error('[Messaging] Error marking as read:', error);
   }

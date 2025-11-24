@@ -247,8 +247,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderThreadsList();
         updateBadges();
         
-        // Check for auto-open parameter (e.g., from accept match flow)
+        // Check for tab parameter in URL (e.g., from decline flow)
         const urlParams = new URLSearchParams(window.location.search);
+        const tabParam = urlParams.get('tab');
+        if (tabParam && ['all', 'unread', 'hired', 'archive'].includes(tabParam)) {
+            console.log('[Inbox] Setting initial tab from URL:', tabParam);
+            currentFilter = tabParam;
+            
+            // Update active tab UI
+            document.querySelectorAll('.sidebar-tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.getAttribute('data-tab') === tabParam) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            renderThreadsList();
+        }
+        
+        // Check for auto-open parameter (e.g., from accept/decline match flow)
         const clientSerialToOpen = urlParams.get('clientSerial');
         if (clientSerialToOpen) {
             console.log('[Inbox] Auto-open requested for clientSerial:', clientSerialToOpen);
@@ -322,6 +339,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
         
+        // Setup listener for match status changes from client side
+        setupMatchStatusChangeListener();
+        
         console.log('[Rooted Vitality] Inbox initialized successfully');
     } catch (error) {
         console.error('[Rooted Vitality] Error initializing inbox:', error);
@@ -332,18 +352,18 @@ document.addEventListener('DOMContentLoaded', async () => {
  * Setup navigation filter buttons
  */
 function setupNavigationListeners() {
-    const navItems = document.querySelectorAll('.inbox-nav-item');
+    const navItems = document.querySelectorAll('.sidebar-tab');
     
     navItems.forEach(item => {
         item.addEventListener('click', () => {
             // Update active state
-            document.querySelectorAll('.inbox-nav-item').forEach(i => {
+            document.querySelectorAll('.sidebar-tab').forEach(i => {
                 i.classList.remove('active');
             });
             item.classList.add('active');
             
             // Update filter and re-render
-            currentFilter = item.getAttribute('data-filter');
+            currentFilter = item.getAttribute('data-tab');
             renderThreadsList();
             
             // Clear selection
@@ -490,11 +510,12 @@ async function loadConversations() {
         conversations = [];
 
         // ===== LOAD ACCEPTED MATCHES (Messages Tab) =====
+        // Query for ALL accepted statuses including hired/not-hired so we can categorize them properly
         const { data: acceptedMatches, error: acceptedError } = await window.supabaseClient
             .from('project_practitioner_matches')
             .select('id, project_serial, status, created_at')
             .eq('practitioner_serial', practitionerSerial)
-            .in('status', ['active', 'in-progress', 'hired']);
+            .in('status', ['active', 'in-progress', 'hired', 'not-hired']);
 
         if (acceptedError) {
             console.error('[Inbox] Error loading accepted matches:', acceptedError);
@@ -539,7 +560,7 @@ async function loadConversations() {
                 // Get latest messages (reversed because they come in descending order)
                 const { data: messages } = await window.supabaseClient
                     .from('project_messages')
-                    .select('id, message, sender_type, created_at')
+                    .select('id, message, sender_type, created_at, is_read')
                     .eq('project_serial', match.project_serial)
                     .eq('practitioner_serial', practitionerSerial)
                         .order('created_at', { ascending: false })
@@ -547,6 +568,17 @@ async function loadConversations() {
 
                 const lastMessage = messages?.[0];
                 const unreadCount = messages?.filter(m => !m.is_read && m.sender_type === 'client').length || 0;
+
+                // Determine category based on match status
+                let category = 'all';
+                let isArchived = false;
+                if (match.status === 'hired') {
+                    category = 'hired';
+                    isArchived = true;
+                } else if (match.status === 'not-hired') {
+                    category = 'archive';
+                    isArchived = true;
+                }
 
                 conversations.push({
                     id: match.id,
@@ -564,15 +596,15 @@ async function loadConversations() {
                     isUnread: unreadCount > 0,
                     unreadCount: unreadCount,
                     status: 'online',
-                    category: 'all',
+                    category: category,
                     messages: messages ? [...messages].reverse() : [],  // Reverse to show oldest first
-                    isArchived: false,
+                    isArchived: isArchived,
                     isBlocked: false,
                     projectDescription: project.description,
                     projectCategory: project.category_name,
                     projectZipcode: project.zipcode,
                     projectTravelPreferences: project.travel_preference,
-                    isBlocked: false
+                    matchStatus: match.status
                 });
             } catch (itemError) {
                 console.error('[Inbox] Error processing match:', itemError);
@@ -891,6 +923,39 @@ function openThreadView(conversation) {
     
     // Render messages
     renderMessages(conversation.messages);
+    
+    // Mark unread client messages as read when opening thread
+    if (conversation.messages && conversation.messages.length > 0) {
+        const unreadClientMessageIds = conversation.messages
+            .filter(m => !m.is_read && m.sender_type === 'client')
+            .map(m => m.id);
+        
+        if (unreadClientMessageIds.length > 0) {
+            // Mark messages as read in database
+            window.supabaseClient
+                .from('project_messages')
+                .update({ is_read: true })
+                .in('id', unreadClientMessageIds)
+                .then(() => {
+                    console.log('[Inbox] Marked', unreadClientMessageIds.length, 'messages as read');
+                    
+                    // Update local conversation object
+                    conversation.messages.forEach(m => {
+                        if (unreadClientMessageIds.includes(m.id)) {
+                            m.is_read = true;
+                        }
+                    });
+                    
+                    // Recalculate unread count and update badges
+                    const updatedUnreadCount = conversation.messages.filter(m => !m.is_read && m.sender_type === 'client').length;
+                    conversation.isUnread = updatedUnreadCount > 0;
+                    conversation.unreadCount = updatedUnreadCount;
+                    updateBadges();
+                    renderThreadsList();
+                })
+                .catch(error => console.error('[Inbox] Error marking messages as read:', error));
+        }
+    }
     
     // Set up real-time subscription for new messages
     setupConversationRealtimeSubscription(conversation);
@@ -1466,3 +1531,87 @@ function escapeHtml(text) {
     div.textContent = text;
     return div.innerHTML;
 }
+
+/**
+ * Setup listener for match status changes from client side
+ * When client changes dropdown to "Hired" or "Not-Hired", move card accordingly
+ */
+function setupMatchStatusChangeListener() {
+    if (!window.supabaseClient) {
+        console.warn('[Inbox] Supabase client not available for status change listener');
+        return;
+    }
+    
+    try {
+        const channel = window.supabaseClient.channel('match-status-changes');
+        
+        channel.on('broadcast', { event: 'match_status_changed' }, async (payload) => {
+            console.log('[Inbox] Broadcast received - match status changed:', payload.payload);
+            
+            const { practitioner_serial, project_serial, status } = payload.payload;
+            
+            // Only process if this is for the current practitioner
+            const rvUserStr = localStorage.getItem('rvUser');
+            if (!rvUserStr) return;
+            
+            const rvUser = JSON.parse(rvUserStr);
+            const { data: practitioner } = await window.supabaseClient
+                .from('practitioners')
+                .select('serial_number')
+                .eq('id', rvUser.id)
+                .single();
+            
+            if (!practitioner || practitioner.serial_number !== practitioner_serial) {
+                return; // Not for this practitioner
+            }
+            
+            console.log('[Inbox] Status change is for current practitioner, updating UI');
+            
+            // Find the conversation(s) with this project_serial
+            const conversationsToUpdate = conversations.filter(c => c.projectSerial === project_serial);
+            
+            conversationsToUpdate.forEach(conv => {
+                // Update conversation status
+                if (status === 'hired') {
+                    conv.category = 'hired';
+                    conv.status = 'hired';
+                    conv.isArchived = true;
+                    // Greyed out effect
+                    const threadEl = document.querySelector(`.thread-item[data-client-serial="${conv.clientSerial}"]`);
+                    if (threadEl) {
+                        threadEl.style.opacity = '0.6';
+                    }
+                    console.log('[Inbox] Moved card to Hired category:', conv.clientName);
+                } else if (status === 'not-hired') {
+                    conv.category = 'archive';
+                    conv.status = 'archived';
+                    conv.isArchived = true;
+                    // Greyed out effect
+                    const threadEl = document.querySelector(`.thread-item[data-client-serial="${conv.clientSerial}"]`);
+                    if (threadEl) {
+                        threadEl.style.opacity = '0.6';
+                    }
+                    console.log('[Inbox] Moved card to Archive category:', conv.clientName);
+                }
+            });
+            
+            // Re-render the threads list to reflect changes
+            renderThreadsList();
+            updateBadges();
+            
+            // Close thread view if it was open for an updated conversation
+            if (currentOpenConversation && conversationsToUpdate.some(c => c.id === currentOpenConversation.id)) {
+                closeThreadView();
+            }
+        });
+        
+        channel.subscribe((status) => {
+            console.log('[Inbox] Match status change listener subscription status:', status);
+        });
+        
+        console.log('[Inbox] Match status change listener initialized');
+    } catch (error) {
+        console.error('[Inbox] Error setting up match status change listener:', error);
+    }
+}
+
