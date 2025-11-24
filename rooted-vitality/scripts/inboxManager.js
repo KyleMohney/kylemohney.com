@@ -69,6 +69,25 @@ async function confirmBlock() {
         
         console.log(`[Inbox] BLOCK SUCCESSFUL - Client: ${clientName}`);
         
+        // Create notification for the client (show as "declined", not "blocked")
+        const { error: notifError } = await window.supabaseClient
+            .from('client_notifications')
+            .insert({
+                client_serial: clientSerial,
+                type: 'match_declined',
+                title: 'Match Declined',
+                message: 'A practitioner has declined your match request.',
+                practitioner_name: 'A practitioner',
+                is_read: false,
+                created_at: new Date().toISOString()
+            });
+        
+        if (notifError) {
+            console.warn('[Inbox] Warning creating block notification:', notifError);
+        } else {
+            console.log('[Inbox] Block notification (shown as declined) created for client');
+        }
+        
         // Notify client of decline (hiding that they were blocked)
         if (window.notifyClientOfMatchResponse) {
             await notifyClientOfMatchResponse({
@@ -158,6 +177,28 @@ async function confirmDecline() {
         if (error) throw error;
         
         console.log(`[Inbox] Match declined successfully`);
+        
+        // Create notification for the client
+        if (conversation) {
+            const { error: notifError } = await window.supabaseClient
+                .from('client_notifications')
+                .insert({
+                    client_serial: conversation.clientSerial,
+                    type: 'match_declined',
+                    title: 'Match Declined',
+                    message: 'A practitioner has declined your match request.',
+                    practitioner_name: 'A practitioner',
+                    match_id: matchId,
+                    is_read: false,
+                    created_at: new Date().toISOString()
+                });
+            
+            if (notifError) {
+                console.warn('[Inbox] Warning creating decline notification:', notifError);
+            } else {
+                console.log('[Inbox] Decline notification created for client');
+            }
+        }
         
         // Show success and reload
         const modal = document.createElement('div');

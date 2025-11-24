@@ -134,14 +134,9 @@ async function loadOpportunities() {
           client_serial,
           client_first_name,
           client_last_name
-        ),
-        clients (
-          id,
-          first_name,
-          last_name,
-          profile_picture_url
         )
       `)
+      .eq('practitioner_id', currentPractitioner.id)
       .eq('status', 'open_to_match')
       .eq('is_archived', false)
       .eq('declined_by_practitioner', false)
@@ -183,10 +178,9 @@ function renderOpportunities() {
   }
 
   container.innerHTML = opportunities.map(opp => {
-    const client = opp.clients[0];
     const project = opp.projects[0];
-    const clientName = client ? `${client.first_name} ${client.last_name}` : 'Unknown Client';
-    const avatar = client?.first_name?.charAt(0).toUpperCase() || 'C';
+    const clientName = project ? `${project.client_first_name} ${project.client_last_name}` : 'Unknown Client';
+    const avatar = project?.client_first_name?.charAt(0).toUpperCase() || 'C';
     const canMessage = !opp.message_sent && opp.message_count === 0;
 
     return `

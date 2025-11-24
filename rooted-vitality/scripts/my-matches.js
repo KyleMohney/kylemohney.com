@@ -22,6 +22,7 @@ const itemsPerPage = 10;
 let allMatches = [];
 let filteredMatches = [];
 let selectedMatch = null;
+let currentTab = 'messages';
 let taxonomyData = {}; // Store category name mappings
 
 // Utility function to format practitioner names (replace underscores with spaces)
@@ -162,7 +163,32 @@ document.addEventListener('DOMContentLoaded', async () => {
           }
           // If match went from pending to in-progress/active (practitioner accepted)
           else if (oldStatus === 'pending' && (newStatus === 'in-progress' || newStatus === 'active')) {
-            console.log('[My Matches] Practitioner accepted! Reloading matches...');
+            console.log('[My Matches] Practitioner accepted! Creating notification and reloading matches...');
+            
+            // Create notification for the client
+            const practitionerName = payload.new.practitioner_name || 'A practitioner';
+            const clientSerial = payload.new.client_serial;
+            
+            window.supabaseClient
+              .from('client_notifications')
+              .insert({
+                client_serial: clientSerial,
+                type: 'match_accepted',
+                title: 'Match Accepted!',
+                message: `${practitionerName} has accepted your match request!`,
+                practitioner_name: practitionerName,
+                match_id: payload.new.id,
+                is_read: false,
+                created_at: new Date().toISOString()
+              })
+              .then(({ error }) => {
+                if (error) {
+                  console.warn('[My Matches] Warning creating accept notification:', error);
+                } else {
+                  console.log('[My Matches] Accept notification created for client');
+                }
+              });
+            
             loadMatches(clientSerial).then(() => {
               renderMatches();
               // Show toast notification
@@ -176,11 +202,110 @@ document.addEventListener('DOMContentLoaded', async () => {
         .subscribe((status) => {
           console.log('[My Matches] Real-time subscription status:', status);
         });
+
+      // Set up real-time listener for client notifications
+      console.log('[My Matches] Setting up real-time listener for client notifications');
+      
+      window.supabaseClient
+        .channel(`client-notif:${clientSerial}`)
+        .on('postgres_changes', {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'client_notifications',
+          filter: `client_serial=eq.${clientSerial}`,
+        }, (payload) => {
+          const notification = payload.new;
+          console.log('[My Matches] Real-time notification received:', notification);
+          
+          // Show notification toast
+          const notificationDiv = document.createElement('div');
+          notificationDiv.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-left: 4px solid #4CAF50;
+            padding: 16px 20px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 10000;
+            font-size: 14px;
+            max-width: 350px;
+            animation: slideIn 0.3s ease-out;
+          `;
+          
+          if (notification.type === 'match_accepted') {
+            notificationDiv.style.borderLeftColor = '#4CAF50';
+            notificationDiv.innerHTML = `
+              <p style="margin: 0 0 8px 0; font-weight: 600; color: #2e2b28;">${notification.title}</p>
+              <p style="margin: 0; color: #555;">${notification.message}</p>
+            `;
+          } else if (notification.type === 'match_declined') {
+            notificationDiv.style.borderLeftColor = '#f44336';
+            notificationDiv.innerHTML = `
+              <p style="margin: 0 0 8px 0; font-weight: 600; color: #2e2b28;">${notification.title}</p>
+              <p style="margin: 0; color: #555;">${notification.message}</p>
+            `;
+          }
+          
+          document.body.appendChild(notificationDiv);
+          
+          // Remove notification after 5 seconds
+          setTimeout(() => {
+            notificationDiv.style.animation = 'slideOut 0.3s ease-out';
+            setTimeout(() => {
+              notificationDiv.remove();
+            }, 300);
+          }, 5000);
+          
+          // Add CSS animations if not already present
+          if (!document.querySelector('style[data-notif-anim]')) {
+            const style = document.createElement('style');
+            style.setAttribute('data-notif-anim', 'true');
+            style.textContent = `
+              @keyframes slideIn {
+                from {
+                  transform: translateX(400px);
+                  opacity: 0;
+                }
+                to {
+                  transform: translateX(0);
+                  opacity: 1;
+                }
+              }
+              @keyframes slideOut {
+                from {
+                  transform: translateX(0);
+                  opacity: 1;
+                }
+                to {
+                  transform: translateX(400px);
+                  opacity: 0;
+                }
+              }
+            `;
+            document.head.appendChild(style);
+          }
+          
+          // Reload matches to show updated status
+          loadMatches(clientSerial).then(() => {
+            renderMatches();
+          });
+        })
+        .subscribe((status) => {
+          console.log('[My Matches] Notifications realtime subscription status:', status);
+        });
     }
 
   } catch (error) {
     console.error('Error initializing My Matches page:', error);
   }
+  
+  // Expose global variables for matchMessagingManager
+  window.allMatches = window.allMatches || allMatches;
+  window.selectedMatchId = window.selectedMatchId || null;
+  window.currentTab = currentTab;
+  window.applyTabFilter = applyTabFilter;
 });
 
 // ========================================== 
@@ -208,7 +333,7 @@ async function loadMatches(clientSerial) {
     console.log('[My Matches] loadMatches called with clientSerial:', clientSerial);
     const { data: matchesData, error: matchesError } = await window.supabaseClient
       .from('project_practitioner_matches')
-      .select('id, project_serial, practitioner_serial, client_serial, status, practitioner_response, practitioner_responded_at, created_at, updated_at')
+      .select('id, project_serial, practitioner_serial, client_serial, status, practitioner_response, practitioner_responded_at, contacted_at, created_at, updated_at')
       .eq('client_serial', clientSerial)
       .order('updated_at', { ascending: false });
 
@@ -283,30 +408,36 @@ async function loadMatches(clientSerial) {
       const matchIds = matchesData.map(m => m.id);
       const { data: messagesData, error: messagesError } = await window.supabaseClient
         .from('project_messages')
-        .select('id, match_id, sender_type, created_at')
+        .select('id, match_id, sender_type, is_read, created_at')
         .in('match_id', matchIds)
         .order('created_at', { ascending: false });
       
       if (messagesError) {
         console.warn('Warning loading latest messages:', messagesError);
       } else {
-        // Group messages by match_id and get the latest one
+        // Group messages by match_id - keep ALL messages to check for unread from practitioner
         (messagesData || []).forEach(msg => {
           if (!messagesMap[msg.match_id]) {
-            messagesMap[msg.match_id] = msg;
+            messagesMap[msg.match_id] = [];
           }
+          messagesMap[msg.match_id].push(msg);
         });
       }
     }
 
     // Merge practitioner, project, and message data into matches
-    allMatches = (matchesData || []).map(match => ({
-      ...match,
-      practitioners: practitionersMap[match.practitioner_serial] || {},
-      project: projectsMap[match.project_serial] || {},
-      last_message: 'Message thread',
-      is_opportunity_message: false
-    }));
+    allMatches = (matchesData || []).map(match => {
+      const messages = messagesMap[match.id] || [];
+      console.log('[My Matches] Match:', match.id, 'Status:', match.status, 'Messages:', messages.length, 'Message details:', messages.map(m => ({sender_type: m.sender_type, is_read: m.is_read})));
+      return {
+        ...match,
+        project_messages: messages,
+        practitioners: practitionersMap[match.practitioner_serial] || {},
+        project: projectsMap[match.project_serial] || {},
+        last_message: 'Message thread',
+        is_opportunity_message: false
+      };
+    });
 
     // Load opportunity messages and merge them into allMatches
     try {
@@ -412,8 +543,8 @@ async function loadMatches(clientSerial) {
       console.log('[My Matches] First match last message:', allMatches[0].last_message);
     }
 
-    // Display matches
-    displayMatches(1);
+    // Apply initial filter for Messages tab (only active/in-progress, no closed projects)
+    applyTabFilter('messages');
     
     // Update badge counts
     await updateBadgeCounts();
@@ -432,11 +563,22 @@ async function loadMatches(clientSerial) {
  */
 async function updateBadgeCounts() {
   try {
-    // Count messages (active/in-progress matches, excluding completed)
-    const messagesCount = allMatches.filter(m => 
-      (m.status === 'active' || m.status === 'in-progress') &&
-      m.status !== 'hired' && m.status !== 'not-hired' && m.status !== 'declined' && m.status !== 'completed'
-    ).length;
+    // Count messages (pending/active/in-progress matches WITHOUT unread practitioner messages)
+    const messagesCount = allMatches.filter(m => {
+      const isOngoingMatch = m.status === 'pending' || m.status === 'active' || m.status === 'in-progress';
+      if (!isOngoingMatch) return false;
+      
+      // Exclude if it has unread messages from practitioner
+      if (m.project_messages && m.project_messages.length > 0) {
+        const hasUnreadFromPractitioner = m.project_messages.some(msg => 
+          msg.sender_type === 'practitioner' && !msg.is_read
+        );
+        if (hasUnreadFromPractitioner) {
+          return false;
+        }
+      }
+      return true;
+    }).length;
     const messagesBadge = document.getElementById('messages-badge');
     if (messagesBadge) messagesBadge.textContent = messagesCount;
 
@@ -447,36 +589,19 @@ async function updateBadgeCounts() {
     const completedBadge = document.getElementById('completed-badge');
     if (completedBadge) completedBadge.textContent = completedCount;
 
-    // Count unread messages - query project_messages where is_read=false for ACTIVE matches only (not completed)
+    // Count unread messages - matches with unread messages FROM practitioner
     const unreadBadge = document.getElementById('unread-badge');
-    if (allMatches.length > 0) {
-      // Only count unread for non-completed matches
-      const activeMatchIds = allMatches
-        .filter(m => m.status !== 'hired' && m.status !== 'not-hired' && m.status !== 'declined' && m.status !== 'completed')
-        .map(m => m.id);
-      
-      if (activeMatchIds.length > 0) {
-        const { data: unreadMessages, error: unreadError } = await window.supabaseClient
-          .from('project_messages')
-          .select('id')
-          .in('match_id', activeMatchIds)
-          .eq('is_read', false);
-        
-        if (unreadError) {
-          console.warn('[My Matches] Error fetching unread count:', unreadError);
-          if (unreadBadge) unreadBadge.textContent = '0';
-        } else {
-          const unreadCount = (unreadMessages || []).length;
-          if (unreadBadge) unreadBadge.textContent = unreadCount;
-        }
-      } else {
-        if (unreadBadge) unreadBadge.textContent = '0';
+    const unreadCount = allMatches.filter(m => {
+      if (!m.project_messages || m.project_messages.length === 0) {
+        return false;
       }
-    } else {
-      if (unreadBadge) unreadBadge.textContent = '0';
-    }
+      return m.project_messages.some(msg => 
+        msg.sender_type === 'practitioner' && !msg.is_read
+      );
+    }).length;
+    if (unreadBadge) unreadBadge.textContent = unreadCount;
 
-    console.log('[My Matches] Badge counts updated - Messages:', messagesCount, 'Unread:', unreadBadge?.textContent, 'Completed:', completedCount);
+    console.log('[My Matches] Badge counts updated - Messages:', messagesCount, 'Unread:', unreadCount, 'Completed:', completedCount);
   } catch (error) {
     console.error('[My Matches] Error updating badge counts:', error);
   }
@@ -818,6 +943,7 @@ function initFilterHandlers() {
       tab.classList.add('active');
       
       const tabName = tab.getAttribute('data-tab');
+      currentTab = tabName;
       console.log('[My Matches] Switched to tab:', tabName);
       
       applyTabFilter(tabName);
@@ -862,15 +988,35 @@ function initFilterHandlers() {
 function applyTabFilter(tabName) {
   switch(tabName) {
     case 'messages':
-      // Only show active conversations (not pending, not completed)
-      filteredMatches = allMatches.filter(m => 
-        (m.status === 'active' || m.status === 'in-progress' || m.status === 'opportunity') &&
-        m.status !== 'hired' && m.status !== 'not-hired' && m.status !== 'declined' && m.status !== 'completed'
-      );
+      // Show all pending/active/in-progress matches EXCEPT those with unread practitioner messages
+      filteredMatches = allMatches.filter(m => {
+        const isOngoingMatch = m.status === 'pending' || m.status === 'active' || m.status === 'in-progress';
+        if (!isOngoingMatch) return false;
+        
+        // Exclude if it has unread messages from practitioner
+        if (m.project_messages && m.project_messages.length > 0) {
+          const hasUnreadFromPractitioner = m.project_messages.some(msg => 
+            msg.sender_type === 'practitioner' && !msg.is_read
+          );
+          if (hasUnreadFromPractitioner) {
+            return false;
+          }
+        }
+        return true;
+      });
       break;
     case 'unread':
-      // Only show pending matches (awaiting practitioner response)
-      filteredMatches = allMatches.filter(m => m.status === 'pending');
+      // Only show matches with unread messages FROM the practitioner
+      filteredMatches = allMatches.filter(m => {
+        // Must have messages
+        if (!m.project_messages || m.project_messages.length === 0) {
+          return false;
+        }
+        // Must have at least one unread message from practitioner
+        return m.project_messages.some(msg => 
+          msg.sender_type === 'practitioner' && !msg.is_read
+        );
+      });
       break;
     case 'completed':
       // Show only completed/closed projects (hired, not-hired, declined, completed)
@@ -1158,6 +1304,7 @@ function openMessagingThread(match) {
   
   // Store selected match for status updates
   selectedMatch = match;
+  window.selectedMatchId = match.id;
   
   const practitioner = match.practitioners;
   const project = match.project || {};
