@@ -557,8 +557,8 @@ async function setupContactButton() {
                 contactBtn.title = 'Practitioners cannot contact other practitioners';
             }
         } else if (userRole === 'client') {
-            // Client - check if already matched with this practitioner
-            console.log('[Practitioner Profile] Setting up button for client - checking for existing matches');
+            // Client - check if already matched with this practitioner ON THIS PROJECT
+            console.log('[Practitioner Profile] Setting up button for client - checking for existing matches on this project');
             
             // Get client's serial number
             const { data: clientData, error: clientError } = await window.supabaseClient
@@ -594,34 +594,57 @@ async function setupContactButton() {
                 return;
             }
             
-            // Check for existing matches
-            const { data: existingMatches, error: matchError } = await window.supabaseClient
-                .from('project_practitioner_matches')
-                .select('id')
-                .eq('client_serial', clientData.serial_number)
-                .eq('practitioner_serial', proData.serial_number);
+            // Check if there's a project_id from the URL (from find-practitioners flow)
+            const urlParams = new URLSearchParams(window.location.search);
+            const projectIdFromUrl = urlParams.get('project_id');
+            const projectSerialFromUrl = urlParams.get('project_serial');
             
-            if (matchError) {
-                console.error('[Practitioner Profile] Error checking matches:', matchError);
-                // Default to active button if we can't check
-                contactBtn.addEventListener('click', () => {
-                    console.log('[Practitioner Profile] Client clicked Contact');
-                    openConnectionRequest(practitioner.id);
-                });
-                return;
+            let hasMatchOnThisProject = false;
+            
+            // If we have a specific project, check for match on THAT project only
+            if (projectIdFromUrl || projectSerialFromUrl) {
+                console.log('[Practitioner Profile] Checking for match on specific project');
+                
+                // Get project serial from project ID if needed
+                let projectSerial = projectSerialFromUrl;
+                if (!projectSerial && projectIdFromUrl) {
+                    const { data: projectData, error: projectError } = await window.supabaseClient
+                        .from('projects')
+                        .select('project_serial')
+                        .eq('id', projectIdFromUrl)
+                        .single();
+                    
+                    if (!projectError && projectData) {
+                        projectSerial = projectData.project_serial;
+                    }
+                }
+                
+                if (projectSerial) {
+                    const { data: existingMatches, error: matchError } = await window.supabaseClient
+                        .from('project_practitioner_matches')
+                        .select('id')
+                        .eq('client_serial', clientData.serial_number)
+                        .eq('practitioner_serial', proData.serial_number)
+                        .eq('project_serial', projectSerial);
+                    
+                    if (!matchError && existingMatches && existingMatches.length > 0) {
+                        hasMatchOnThisProject = true;
+                        console.log('[Practitioner Profile] Already matched on THIS project');
+                    }
+                }
             }
             
-            if (existingMatches && existingMatches.length > 0) {
-                // Already matched - disable button and show Matched
-                console.log('[Practitioner Profile] Already matched with this practitioner');
+            if (hasMatchOnThisProject) {
+                // Already matched on this specific project - disable button
+                console.log('[Practitioner Profile] Already matched on this project - disabling button');
                 contactBtn.disabled = true;
                 contactBtn.textContent = 'Matched';
                 contactBtn.style.opacity = '0.6';
                 contactBtn.style.cursor = 'not-allowed';
-                contactBtn.title = 'You are already matched with this practitioner';
+                contactBtn.title = 'You are already matched with this practitioner on this project';
             } else {
-                // Not matched - button is active
-                console.log('[Practitioner Profile] Not matched yet - button is active');
+                // Not matched on this project - button is active (can match on different projects)
+                console.log('[Practitioner Profile] Not matched on this project - button is active');
                 contactBtn.addEventListener('click', () => {
                     console.log('[Practitioner Profile] Client clicked Contact');
                     openConnectionRequest(practitioner.id);
@@ -704,24 +727,6 @@ async function openConnectionRequest(practitionerId) {
         let projectIdFromUrl = urlParams.get('project_id');
         console.log('[Practitioner Profile] Project ID from URL:', projectIdFromUrl);
         
-        // Also check sessionStorage as fallback
-        const storedProjectId = sessionStorage.getItem('selectedProjectId');
-        console.log('[Practitioner Profile] Stored project ID from sessionStorage:', storedProjectId);
-        console.log('[Practitioner Profile] Stored project ID type:', typeof storedProjectId);
-        
-        const projectId = projectIdFromUrl || storedProjectId;
-        console.log('[Practitioner Profile] Final project ID to use:', projectId);
-        
-        if (projectId && projectId !== 'undefined' && projectId !== '') {
-            // We already know the project - use it directly
-            console.log('[Practitioner Profile] Using known project, creating match directly');
-            await createMatchWithProjectId(projectId, practitionerId);
-            return;
-        }
-        
-        // Otherwise, fetch all projects and let user choose
-        console.log('[Practitioner Profile] No project in sessionStorage, fetching all projects');
-        
         // Get client's projects
         const { data: clientData, error: clientError } = await window.supabaseClient
             .from('clients')
@@ -753,7 +758,6 @@ async function openConnectionRequest(practitionerId) {
         
         // Get client's projects (with category info)
         console.log('[Practitioner Profile] Fetching client projects...');
-        console.log('[Practitioner Profile] Query params - client_serial:', clientData.serial_number);
         
         const { data: projects, error: projectError } = await window.supabaseClient
             .from('projects')
@@ -779,9 +783,30 @@ async function openConnectionRequest(practitionerId) {
             return;
         }
         
-        // Always use the first/most recent project (they're sorted by created_at DESC)
-        console.log('[Practitioner Profile] Using most recent project:', projects[0].id);
-        await createMatchAndRedirect(projects[0], practitionerId, proData.serial_number);
+        // If we have a project from URL, use it; otherwise use most recent
+        let selectedProject = null;
+        if (projectIdFromUrl) {
+            selectedProject = projects.find(p => p.id === projectIdFromUrl);
+            if (!selectedProject) {
+                console.warn('[Practitioner Profile] Project from URL not found, using most recent');
+                selectedProject = projects[0];
+            }
+        } else {
+            selectedProject = projects[0];
+        }
+        
+        console.log('[Practitioner Profile] Using project:', selectedProject.id);
+        
+        // Show confirmation modal
+        const practitionerName = practitioner.legal_name || 'Practitioner';
+        document.getElementById('request-practitioner-name').textContent = practitionerName;
+        document.getElementById('connection-request-modal').classList.add('active');
+        
+        // Handle submission - use same RPC approach as find-practitioners
+        document.getElementById('request-modal-close').onclick = async () => {
+            await sendPractitionerMatch(selectedProject, practitionerId, proData.serial_number);
+            document.getElementById('connection-request-modal').classList.remove('active');
+        };
         
     } catch (error) {
         console.error('[Practitioner Profile] Error in openConnectionRequest:', error);
@@ -792,128 +817,131 @@ async function openConnectionRequest(practitionerId) {
 /**
  * Create match with a known project ID
  */
-async function createMatchWithProjectId(projectId, practitionerId) {
-    try {
-        console.log('[Practitioner Profile] createMatchWithProjectId called with projectId:', projectId, 'practitionerId:', practitionerId);
-        
-        if (!projectId || projectId === 'undefined' || projectId === '') {
-            console.error('[Practitioner Profile] ✗ No valid project ID provided to createMatchWithProjectId');
-            console.error('[Practitioner Profile] Project ID value:', projectId);
-            console.error('[Practitioner Profile] Project ID type:', typeof projectId);
-            alert('Error: No valid project selected');
-            return;
-        }
-        
-        console.log('[Practitioner Profile] ✓ Project ID is valid, proceeding...');
-        
-        // Fetch the project to get client_serial and practitioner serial
-        console.log('[Practitioner Profile] Fetching project details...');
-        const { data: project, error: projectError } = await window.supabaseClient
-            .from('projects')
-            .select('client_serial')
-            .eq('id', projectId)
-            .single();
-        
-        if (projectError || !project) {
-            console.error('[Practitioner Profile] Project fetch error:', projectError);
-            alert('Error: Could not find your project');
-            return;
-        }
-        console.log('[Practitioner Profile] Project fetched successfully:', project);
-        
-        // Get practitioner's serial number
-        console.log('[Practitioner Profile] Fetching practitioner details...');
-        const { data: proData, error: proError } = await window.supabaseClient
-            .from('practitioners')
-            .select('serial_number')
-            .eq('id', practitionerId)
-            .single();
-        
-        if (proError || !proData) {
-            console.error('[Practitioner Profile] Practitioner fetch error:', proError);
-            alert('Error: Could not find practitioner details');
-            return;
-        }
-        console.log('[Practitioner Profile] Practitioner fetched successfully:', proData);
-        
-        console.log('[Practitioner Profile] Calling createMatchAndRedirect with:', { id: projectId, client_serial: project.client_serial }, practitionerId, proData.serial_number);
-        await createMatchAndRedirect({ id: projectId, client_serial: project.client_serial }, practitionerId, proData.serial_number);
-        
-    } catch (error) {
-        console.error('[Practitioner Profile] Exception in createMatchWithProjectId:', error);
-        alert('Error creating connection');
-    }
-}
-
 /**
  * Create match and redirect to My Matches with messaging open
  */
-async function createMatchAndRedirect(project, practitionerId, practitionerSerial) {
+/**
+ * Send connection request using RPC (same as find-practitioners.js)
+ */
+async function sendPractitionerMatch(project, practitionerId, practitionerSerial) {
+    if (!project) return;
+
     try {
-        console.log('[Practitioner Profile] Creating match for project:', project.project_serial);
-        console.log('[Practitioner Profile] Project object keys:', Object.keys(project));
-        console.log('[Practitioner Profile] Full project object:', project);
+        console.log('[sendPractitionerMatch] Creating match...');
+
+        // Get client ID and name
+        const currentUser = window.authManager?.getCurrentUser();
+        if (!currentUser) {
+            alert('Error: Not authenticated');
+            return;
+        }
+
+        const { data: clientData, error: clientError } = await window.supabaseClient
+            .from('clients')
+            .select('id, first_name, last_name')
+            .eq('id', currentUser.id)
+            .single();
+
+        if (clientError || !clientData) {
+            console.error('[sendPractitionerMatch] Could not find client:', clientError);
+            alert('Error retrieving client information');
+            return;
+        }
+
+        // Get match score from the matching algorithm
+        let matchScore = 75;
         
-        // Use RPC function to create match (bypasses RLS restrictions)
-        const { data, error } = await window.supabaseClient.rpc('create_practitioner_match', {
-            p_project_serial: project.project_serial,
-            p_client_serial: project.client_serial,
-            p_practitioner_serial: practitionerSerial,
-            p_match_score: 75
-        });
+        const { data: matchData, error: matchQueryError } = await window.supabaseClient.rpc(
+            'match_practitioners',
+            { p_project_id: project.id }  // Use project UUID
+        );
+
+        if (!matchQueryError && matchData && matchData.length > 0) {
+            const practitionerMatch = matchData.find(m => m.serial_number === practitionerSerial);
+            if (practitionerMatch) {
+                matchScore = practitionerMatch.match_score ?? 75;
+            }
+        }
+
+        console.log('[sendPractitionerMatch] Match score:', matchScore);
+
+        // Use RPC function to bypass RLS policy (same as find-practitioners)
+        const { data, error } = await window.supabaseClient
+            .rpc('create_practitioner_match', {
+                p_project_serial: parseInt(project.project_serial),
+                p_client_serial: project.client_serial,
+                p_practitioner_serial: practitionerSerial,
+                p_match_score: matchScore
+            });
+
+        console.log('[sendPractitionerMatch] RPC Response - data:', data, 'error:', error);
         
         if (error) {
-            // 23505 = duplicate key (match already exists - this is fine, proceed to my-matches)
-            if (error.code === '23505') {
-                console.log('[Practitioner Profile] Match already exists, proceeding to my-matches');
-            } else {
-                console.error('[Practitioner Profile] Error creating match:', error);
-                alert('Error creating connection');
-                return;
+            console.error('[sendPractitionerMatch] Error:', error);
+            console.error('[sendPractitionerMatch] Error details:', {
+                message: error?.message,
+                code: error?.code,
+                details: error?.details,
+                hint: error?.hint,
+                status: error?.status
+            });
+            console.error('[sendPractitionerMatch] Parameters sent:', {
+                p_project_serial: parseInt(project.project_serial),
+                p_client_serial: project.client_serial,
+                p_practitioner_serial: practitionerSerial,
+                p_match_score: matchScore
+            });
+            alert('Error sending connection request: ' + (error?.message || 'Unknown error'));
+            return;
+        }
+        
+        // Log the returned status from RPC
+        if (data && data[0]) {
+            console.log('[sendPractitionerMatch] Match created with status:', data[0].status, 'ID:', data[0].id);
+        }
+
+        // Update projects table to track matched practitioners
+        const currentMatched = project.matched_practitioners || [];
+        if (!currentMatched.includes(practitionerId)) {
+            const { error: projectUpdateError } = await window.supabaseClient
+                .from('projects')
+                .update({ matched_practitioners: [...currentMatched, practitionerId] })
+                .eq('id', project.id);
+
+            if (projectUpdateError) {
+                console.warn('[sendPractitionerMatch] Warning updating matched_practitioners:', projectUpdateError);
             }
-        } else {
-            console.log('[Practitioner Profile] Match created successfully');
         }
 
         // Create auto-message
         try {
-            const currentUser = window.authManager.getCurrentUser();
-            const { data: clientData, error: clientError } = await window.supabaseClient
-                .from('clients')
-                .select('id, first_name')
-                .eq('id', currentUser.id)
-                .single();
+            const clientName = clientData.first_name || 'Client';
+            const messageText = `${clientName} wants connect about their wellness project!`;
 
-            if (!clientError && clientData) {
-                const clientName = clientData.first_name || 'Client';
-                const messageText = `${clientName} wants connect about their wellness project!`;
-
-                const { error: msgInsertError } = await window.supabaseClient.rpc('create_project_message', {
-                    p_project_id: project.id,
-                    p_practitioner_id: practitionerId,
-                    p_client_id: clientData.id,
-                    p_sender_id: clientData.id,
-                    p_sender_type: 'client',
-                    p_message: messageText
-                });
-                
-                if (msgInsertError) {
-                    console.error('[Practitioner Profile] Error inserting auto-message:', msgInsertError);
-                } else {
-                    console.log('[Practitioner Profile] Auto-message created successfully');
-                }
+            const { error: msgInsertError } = await window.supabaseClient.rpc('create_project_message', {
+                p_project_id: project.id,
+                p_practitioner_id: practitionerId,
+                p_client_id: clientData.id,
+                p_sender_id: clientData.id,
+                p_sender_type: 'client',
+                p_message: messageText
+            });
+            
+            if (msgInsertError) {
+                console.warn('[sendPractitionerMatch] Warning creating auto-message:', msgInsertError);
+            } else {
+                console.log('[sendPractitionerMatch] Auto-message created successfully');
             }
         } catch (msgError) {
-            console.warn('[Practitioner Profile] Error creating auto-message:', msgError);
+            console.warn('[sendPractitionerMatch] Error creating auto-message:', msgError);
         }
-        
-        // Redirect to My Matches with project and practitioner in query params
-        const redirectUrl = `/rooted-vitality/dashboard/client/pages/my-matches.html?project_id=${project.project_serial}&practitioner_serial=${practitionerSerial}`;
-        console.log('[Practitioner Profile] Redirecting to:', redirectUrl);
-        window.location.href = redirectUrl;
+
+        // Redirect to My Matches
+        console.log('[sendPractitionerMatch] Redirecting to my-matches');
+        window.location.href = `/rooted-vitality/dashboard/client/pages/my-matches.html?project_id=${project.id}&practitioner_serial=${practitionerSerial}`;
         
     } catch (error) {
-        console.error('[Practitioner Profile] Exception creating match:', error);
+        console.error('[sendPractitionerMatch] Exception creating match:', error);
         alert('Error creating connection');
     }
 }

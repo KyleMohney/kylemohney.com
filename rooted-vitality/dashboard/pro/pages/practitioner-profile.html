@@ -370,6 +370,30 @@ DESIGN SYSTEM
         </div>
     </div>
 
+    <!-- Connection Request Modal -->
+    <div id="connection-request-modal" class="modal">
+        <div class="modal__overlay"></div>
+        <div class="modal__content">
+            <div class="modal__header">
+                <h2>Connection Request</h2>
+                <button class="modal__close" aria-label="Close modal">&times;</button>
+            </div>
+
+            <div class="modal__body">
+                <p id="request-confirmation-text">
+                    Your connection request has been sent to <strong id="request-practitioner-name">Practitioner Name</strong>.
+                </p>
+                <p class="form-hint">
+                    They'll be notified and can accept or decline your request. You can track all your connections in "My Matches".
+                </p>
+            </div>
+
+            <div class="modal__footer">
+                <button id="request-modal-close" class="btn btn--primary">Got It</button>
+            </div>
+        </div>
+    </div>
+
     <!-- ========================================== -->
     <!-- 4. FOOTER (Injected by injections.js) -->
     <!-- ========================================== -->

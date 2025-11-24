@@ -6,6 +6,7 @@
 // Modal state for block/unblock actions
 let pendingBlockClient = null;
 let pendingUnblockClient = null;
+let pendingDeclineMatch = null;
 let currentOpenConversation = null; // Track currently open conversation for polling cleanup
 
 /**
@@ -99,7 +100,86 @@ async function confirmBlock() {
 }
 
 /**
- * Show unblock confirmation modal
+ * Show decline confirmation modal
+ */
+function showDeclineModal(clientName, matchId, conversation) {
+    console.log('[Inbox] showDeclineModal called for:', clientName);
+    pendingDeclineMatch = { clientName, matchId, conversation };
+    
+    const clientNameEl = document.getElementById('decline-client-name');
+    const modalOverlay = document.getElementById('decline-modal-overlay');
+    
+    if (clientNameEl) {
+        clientNameEl.textContent = clientName;
+    }
+    
+    if (modalOverlay) {
+        console.log('[Inbox] Adding show class to decline modal');
+        modalOverlay.classList.add('show');
+    } else {
+        console.error('[Inbox] decline-modal-overlay not found!');
+    }
+}
+
+/**
+ * Close decline modal
+ */
+function closeDeclineModal() {
+    console.log('[Inbox] closeDeclineModal called');
+    pendingDeclineMatch = null;
+    
+    const modalOverlay = document.getElementById('decline-modal-overlay');
+    if (modalOverlay) {
+        console.log('[Inbox] Removing show class from decline modal');
+        modalOverlay.classList.remove('show');
+    } else {
+        console.error('[Inbox] decline-modal-overlay not found!');
+    }
+}
+
+/**
+ * Confirm decline action from modal
+ */
+async function confirmDecline() {
+    if (!pendingDeclineMatch) return;
+    
+    const { clientName, matchId, conversation } = pendingDeclineMatch;
+    closeDeclineModal();
+    
+    try {
+        console.log(`[Inbox] DECLINE INITIATED - Client: ${clientName}, Match ID: ${matchId}`);
+        
+        // Update match status to declined
+        const { error } = await window.supabaseClient
+            .from('project_practitioner_matches')
+            .update({ status: 'declined', updated_at: new Date().toISOString() })
+            .eq('id', matchId);
+        
+        if (error) throw error;
+        
+        console.log(`[Inbox] Match declined successfully`);
+        
+        // Show success and reload
+        const modal = document.createElement('div');
+        modal.style.cssText = `position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:1.5rem;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,0.15);z-index:3000;text-align:center;`;
+        modal.innerHTML = `<p style="margin:0;color:#2e2b28;font-weight:600;">${clientName}'s project has been declined</p>`;
+        document.body.appendChild(modal);
+        
+        setTimeout(() => {
+            modal.remove();
+            console.log(`[Inbox] Reloading conversations after decline...`);
+            loadConversations();
+            renderThreadsList();
+            closeThreadView();
+        }, 1500);
+    } catch (error) {
+        console.error('[Inbox] Error declining match:', error);
+        alert('Error declining match');
+    }
+}
+
+/**
+ * Show unblock modal
  */
 function showUnblockModal(clientName, clientSerial, practitionerId) {
     pendingUnblockClient = { clientName, clientSerial, practitionerId };
@@ -509,13 +589,13 @@ async function loadConversations() {
 
         conversations = [];
 
-        // ===== LOAD ACCEPTED MATCHES (Messages Tab) =====
-        // Query for ALL accepted statuses including hired/not-hired so we can categorize them properly
+        // ===== LOAD ALL MATCHES (Messages, New Leads, Archive) =====
+        // Query for ALL statuses including pending (new leads), active, in-progress, hired/not-hired (completed)
         const { data: acceptedMatches, error: acceptedError } = await window.supabaseClient
             .from('project_practitioner_matches')
             .select('id, project_serial, status, created_at')
             .eq('practitioner_serial', practitionerSerial)
-            .in('status', ['active', 'in-progress', 'hired', 'not-hired']);
+            .in('status', ['pending', 'active', 'in-progress', 'hired', 'not-hired']);
 
         if (acceptedError) {
             console.error('[Inbox] Error loading accepted matches:', acceptedError);
@@ -569,16 +649,31 @@ async function loadConversations() {
                 const lastMessage = messages?.[0];
                 const unreadCount = messages?.filter(m => !m.is_read && m.sender_type === 'client').length || 0;
 
+                // Check if client has reviewed this project
+                const { data: reviews } = await window.supabaseClient
+                    .from('reviews')
+                    .select('id')
+                    .eq('practitioner_serial', practitionerSerial)
+                    .eq('project_serial', match.project_serial)
+                    .limit(1);
+
+                const hasReview = reviews && reviews.length > 0;
+
                 // Determine category based on match status
                 let category = 'all';
                 let isArchived = false;
-                if (match.status === 'hired') {
+                let isPending = false;
+                if (match.status === 'pending') {
+                    category = 'pending';
+                    isPending = true;
+                } else if (match.status === 'hired') {
                     category = 'hired';
                     isArchived = true;
                 } else if (match.status === 'not-hired') {
                     category = 'archive';
                     isArchived = true;
                 }
+                // active and in-progress stay as category 'all'
 
                 conversations.push({
                     id: match.id,
@@ -599,7 +694,9 @@ async function loadConversations() {
                     category: category,
                     messages: messages ? [...messages].reverse() : [],  // Reverse to show oldest first
                     isArchived: isArchived,
+                    isPending: isPending,
                     isBlocked: false,
+                    hasReview: hasReview,
                     projectDescription: project.description,
                     projectCategory: project.category_name,
                     projectZipcode: project.zipcode,
@@ -662,6 +759,16 @@ async function loadConversations() {
                 const isBlocked = blockRecords && blockRecords.length > 0 && blockRecords[0].is_blocked === true;
                 console.log(`[Inbox] Processing declined match - Client: ${clientName}, BlockRecords: ${blockRecords?.length}, isBlocked: ${isBlocked}`);
 
+                // Check if client has reviewed this project
+                const { data: reviews } = await window.supabaseClient
+                    .from('reviews')
+                    .select('id')
+                    .eq('practitioner_serial', practitionerSerial)
+                    .eq('project_serial', match.project_serial)
+                    .limit(1);
+
+                const hasReview = reviews && reviews.length > 0;
+
                 conversations.push({
                     id: match.id,
                     matchId: match.id,
@@ -680,6 +787,7 @@ async function loadConversations() {
                     messages: [],
                     isArchived: true,
                     isBlocked: isBlocked,
+                    hasReview: hasReview,
                     projectDescription: project.description,
                     projectCategory: project.category_name,
                     projectZipcode: project.zipcode,
@@ -716,11 +824,20 @@ function renderThreadsList(searchQuery = '') {
     
     // Filter conversations
     let filtered = baseConversations.filter(conv => {
-        // Filter by category - 'all' means only accepted (not archived/blocked)
-        if (currentFilter === 'all' && conv.category !== 'all') return false;
-        if (currentFilter === 'unread' && !conv.isUnread) return false;
-        if (currentFilter === 'hired' && conv.category !== 'hired') return false;
-        if (currentFilter === 'archive' && conv.category !== 'archive') return false;
+        // Filter by tab/category
+        if (currentFilter === 'all') {
+            // Messages tab: only active/in-progress (not archived, not blocked, not pending)
+            if (conv.category !== 'all') return false;
+        } else if (currentFilter === 'unread') {
+            // Unread tab: only if has unread messages AND not archived/blocked
+            if (!conv.isUnread || conv.isArchived || conv.isBlocked) return false;
+        } else if (currentFilter === 'hired') {
+            // Hired tab: only hired matches
+            if (conv.category !== 'hired') return false;
+        } else if (currentFilter === 'archive') {
+            // Archive tab: declined, not-hired, and blocked
+            if (conv.category !== 'archive' && !conv.isBlocked) return false;
+        }
         
         // Filter by search query
         if (searchQuery && !conv.clientName.toLowerCase().includes(searchQuery)) return false;
@@ -763,6 +880,33 @@ function createThreadElement(conversation) {
         item.classList.add('unread');
     }
     
+    // Add visual indicators for archived/blocked status
+    if (conversation.isBlocked) {
+        item.classList.add('blocked');
+        item.style.opacity = '0.6';
+        item.style.backgroundColor = 'rgba(255, 0, 0, 0.05)';
+    } else if (conversation.isArchived) {
+        item.classList.add('archived');
+        item.style.opacity = '0.7';
+        item.style.backgroundColor = 'rgba(100, 100, 100, 0.03)';
+    }
+    
+    // Determine status label
+    let statusLabel = '';
+    let reviewLabel = '';
+    
+    if (conversation.isBlocked) {
+        statusLabel = '<span style="margin-left: auto; padding: 2px 8px; background: #fee; color: #c33; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">BLOCKED</span>';
+    } else if (conversation.category === 'archive' && !conversation.isBlocked) {
+        statusLabel = '<span style="margin-left: auto; padding: 2px 8px; background: #eee; color: #666; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">DECLINED</span>';
+    } else if (conversation.category === 'hired') {
+        statusLabel = '<span style="margin-left: auto; padding: 2px 8px; background: #efe; color: #363; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">HIRED</span>';
+    }
+    
+    if (conversation.hasReview) {
+        reviewLabel = '<span style="padding: 2px 8px; background: #ffd700; color: #996600; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">Reviewed</span>';
+    }
+    
     item.innerHTML = `
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; width: 100%;">
             <div class="thread-avatar-small">
@@ -771,6 +915,8 @@ function createThreadElement(conversation) {
             <p class="thread-name">${conversation.clientName}</p>
             <div class="thread-status-badge ${conversation.status === 'online' ? 'online' : conversation.status === 'away' ? 'away' : ''}"></div>
             <span class="thread-time" style="margin-left: auto;">${formatTime(conversation.lastMessageTime)}</span>
+            ${reviewLabel}
+            ${statusLabel}
             <div class="thread-menu-wrapper" style="position: relative;">
                 <button class="thread-menu-btn" title="Options" data-thread-id="${conversation.id}">⋮</button>
                 <div class="thread-menu-dropdown" style="display: none; position: absolute; right: 0; top: 100%; background: white; border: 1px solid var(--border-light); border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); z-index: 100; min-width: 140px;">
@@ -1118,8 +1264,91 @@ function populateLeadDetailsHero(conversation) {
     // Populate project details section (for all conversations)
     populateProjectDetails(conversation);
     
-    // For archived/blocked conversations, show project description instead of buttons
-    if (conversation.isArchived || conversation.isBlocked) {
+    // For pending (new lead) conversations, show Accept/Decline buttons
+    if (conversation.isPending) {
+        const heroActions = document.querySelector('.lead-hero-actions');
+        
+        if (heroActions) {
+            // Clear existing buttons
+            heroActions.innerHTML = '';
+            
+            // Add Accept button
+            const acceptBtn = document.createElement('button');
+            acceptBtn.className = 'lead-action-btn lead-action-primary';
+            acceptBtn.textContent = 'Accept';
+            acceptBtn.style.cssText = `
+                flex-shrink: 0;
+                white-space: nowrap;
+                padding: 8px 16px;
+                font-size: 0.85rem;
+                background: #5c9a72;
+                color: white;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            `;
+            heroActions.appendChild(acceptBtn);
+            
+            acceptBtn.addEventListener('click', async () => {
+                console.log('[Inbox] Accept button clicked for:', conversation.clientName);
+                // Update match status to active
+                const { error } = await window.supabaseClient
+                    .from('project_practitioner_matches')
+                    .update({ status: 'active', updated_at: new Date().toISOString() })
+                    .eq('id', conversation.matchId);
+                
+                if (error) {
+                    console.error('[Inbox] Error accepting match:', error);
+                    alert('Error accepting match');
+                } else {
+                    console.log('[Inbox] Match accepted');
+                    // Reload conversations
+                    await loadConversations();
+                    renderThreadsList();
+                }
+            });
+            
+            acceptBtn.addEventListener('mouseover', () => {
+                acceptBtn.style.background = '#4a8b62';
+            });
+            
+            acceptBtn.addEventListener('mouseout', () => {
+                acceptBtn.style.background = '#5c9a72';
+            });
+            
+            // Add Decline button
+            const declineBtn = document.createElement('button');
+            declineBtn.className = 'lead-action-btn';
+            declineBtn.textContent = 'Decline';
+            declineBtn.style.cssText = `
+                flex-shrink: 0;
+                white-space: nowrap;
+                padding: 8px 16px;
+                font-size: 0.85rem;
+                background: #f3f1ec;
+                color: #5a5a5a;
+                border: 1px solid #ddd9d0;
+                border-radius: 6px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            `;
+            heroActions.appendChild(declineBtn);
+            
+            declineBtn.addEventListener('click', async () => {
+                console.log('[Inbox] Decline button clicked for:', conversation.clientName);
+                showDeclineModal(conversation.clientName, conversation.matchId, conversation);
+            });
+            
+            declineBtn.addEventListener('mouseover', () => {
+                declineBtn.style.background = '#ddd9d0';
+            });
+            
+            declineBtn.addEventListener('mouseout', () => {
+                declineBtn.style.background = '#f3f1ec';
+            });
+        }
+    } else if (conversation.isArchived || conversation.isBlocked) {
         // Hide or repurpose the button container to show project description
         const heroActions = document.querySelector('.lead-hero-actions');
         
@@ -1495,9 +1724,9 @@ function renderMessages(messages) {
  */
 function updateBadges() {
     const allCount = conversations.filter(c => c.category === 'all').length;
-    const unreadCount = conversations.filter(c => c.isUnread).length;
+    const unreadCount = conversations.filter(c => c.isUnread && !c.isArchived && !c.isBlocked).length;
     const hiredCount = conversations.filter(c => c.category === 'hired').length;
-    const archiveCount = conversations.filter(c => c.category === 'archive').length;
+    const archiveCount = conversations.filter(c => c.category === 'archive' || c.isBlocked).length;
     
     document.getElementById('badge-all').textContent = allCount;
     document.getElementById('badge-unread').textContent = unreadCount;
