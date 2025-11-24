@@ -457,5 +457,3 @@ client_notification_settings
 | created_at        | timestamp with time zone |
 | updated_at        | timestamp with time zone |
 | client_serial     | text                     |
-
-

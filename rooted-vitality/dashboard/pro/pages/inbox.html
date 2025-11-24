@@ -210,6 +210,23 @@
         </div>
     </div>
 
+    <div id="decline-modal-overlay" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Decline Project Match</h2>
+                <button class="modal-close" onclick="closeDeclineModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-intro">You're about to decline <strong id="decline-client-name"></strong>'s project match request. This will move them to your Archive.</p>
+                <p class="modal-intro" style="color: #d97706; margin-top: 1rem;">You can still block them later if needed.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeDeclineModal()">Cancel</button>
+                <button class="btn btn-danger" onclick="confirmDecline()" style="background: #dc2626; color: white;">Decline Match</button>
+            </div>
+        </div>
+    </div>
+
     <script src="../../../scripts/inboxManager.js"></script>
 </body>
 </html>

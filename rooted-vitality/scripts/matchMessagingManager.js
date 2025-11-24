@@ -179,7 +179,7 @@ async function loadMessages() {
 /**
  * Display messages in thread - only add new messages, don't rebuild entire DOM
  */
-function displayMessages(messages) {
+async function displayMessages(messages) {
   const messageThread = document.getElementById('message-thread');
   if (!messageThread) {
     console.warn('[Messaging] Message thread container not found');
@@ -467,6 +467,25 @@ async function markMessagesAsRead() {
       console.error('[Messaging] Error marking as read:', error);
     } else {
       console.log('[Messaging] Marked practitioner messages as read');
+      
+      // Update local project_messages data for the selected match
+      if (window.allMatches) {
+        const selectedMatch = window.allMatches.find(m => m.id === window.selectedMatchId);
+        if (selectedMatch && selectedMatch.project_messages) {
+          // Mark all practitioner messages as read in local state
+          selectedMatch.project_messages.forEach(msg => {
+            if (msg.sender_type === 'practitioner') {
+              msg.is_read = true;
+            }
+          });
+          
+          // Re-apply tab filter to move match to appropriate tab
+          if (window.applyTabFilter) {
+            console.log('[Messaging] Re-applying tab filter after marking messages as read');
+            window.applyTabFilter(window.currentTab || 'messages');
+          }
+        }
+      }
     }
   } catch (error) {
     console.error('[Messaging] Error marking as read:', error);

@@ -282,6 +282,34 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Setup Back to Profile button
         await setupBackToProfileButton();
         
+        // Setup Connection Request Modal handlers
+        const connectionModal = document.getElementById('connection-request-modal');
+        if (connectionModal) {
+            // Close button
+            const closeBtn = connectionModal.querySelector('#request-modal-close');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    connectionModal.classList.remove('active');
+                });
+            }
+            
+            // X button
+            const xBtn = connectionModal.querySelector('.modal__close');
+            if (xBtn) {
+                xBtn.addEventListener('click', () => {
+                    connectionModal.classList.remove('active');
+                });
+            }
+            
+            // Overlay click
+            const overlay = connectionModal.querySelector('.modal__overlay');
+            if (overlay) {
+                overlay.addEventListener('click', () => {
+                    connectionModal.classList.remove('active');
+                });
+            }
+        }
+        
         // Hide loading, show content
         document.getElementById('profile-loading').style.display = 'none';
         document.getElementById('profile-content').style.display = 'block';
@@ -798,14 +826,28 @@ async function openConnectionRequest(practitionerId) {
         console.log('[Practitioner Profile] Using project:', selectedProject.id);
         
         // Show confirmation modal
+        const modalElement = document.getElementById('connection-request-modal');
+        const nameElement = document.getElementById('request-practitioner-name');
+        const closeBtn = document.getElementById('request-modal-close');
+        
+        console.log('[Practitioner Profile] Modal element found:', !!modalElement);
+        console.log('[Practitioner Profile] Name element found:', !!nameElement);
+        console.log('[Practitioner Profile] Close button found:', !!closeBtn);
+        
+        if (!modalElement || !nameElement || !closeBtn) {
+            console.error('[Practitioner Profile] Missing modal elements - modal:', !!modalElement, 'name:', !!nameElement, 'button:', !!closeBtn);
+            alert('Error: Could not display connection modal');
+            return;
+        }
+        
         const practitionerName = practitioner.legal_name || 'Practitioner';
-        document.getElementById('request-practitioner-name').textContent = practitionerName;
-        document.getElementById('connection-request-modal').classList.add('active');
+        nameElement.textContent = practitionerName;
+        modalElement.classList.add('active');
         
         // Handle submission - use same RPC approach as find-practitioners
-        document.getElementById('request-modal-close').onclick = async () => {
+        closeBtn.onclick = async () => {
             await sendPractitionerMatch(selectedProject, practitionerId, proData.serial_number);
-            document.getElementById('connection-request-modal').classList.remove('active');
+            modalElement.classList.remove('active');
         };
         
     } catch (error) {
@@ -900,6 +942,41 @@ async function sendPractitionerMatch(project, practitionerId, practitionerSerial
             console.log('[sendPractitionerMatch] Match created with status:', data[0].status, 'ID:', data[0].id);
         }
 
+        // Get practitioner data for notification
+        const { data: practitionerData, error: practitionerError } = await window.supabaseClient
+            .from('practitioners')
+            .select('id, serial_number, legal_name')
+            .eq('serial_number', practitionerSerial)
+            .single();
+
+        if (practitionerData && !practitionerError) {
+            // Create notification for the practitioner
+            const clientName = clientData.first_name || 'Client';
+            const notificationTitle = `New Match: ${clientName}`;
+            const notificationMessage = `${clientName} has matched with you!`;
+
+            const { error: notifError } = await window.supabaseClient
+                .from('practitioner_notifications')
+                .insert({
+                    practitioner_id: practitionerData.id,
+                    practitioner_serial: practitionerData.serial_number,
+                    type: 'match_new',
+                    title: notificationTitle,
+                    message: notificationMessage,
+                    client_name: clientName,
+                    client_serial: project.client_serial,
+                    match_id: data?.[0]?.id,
+                    is_read: false,
+                    created_at: new Date().toISOString()
+                });
+
+            if (notifError) {
+                console.warn('[sendPractitionerMatch] Warning creating notification:', notifError);
+            } else {
+                console.log('[sendPractitionerMatch] Notification created successfully');
+            }
+        }
+
         // Update projects table to track matched practitioners
         const currentMatched = project.matched_practitioners || [];
         if (!currentMatched.includes(practitionerId)) {
@@ -931,6 +1008,20 @@ async function sendPractitionerMatch(project, practitionerId, practitionerSerial
                 console.warn('[sendPractitionerMatch] Warning creating auto-message:', msgInsertError);
             } else {
                 console.log('[sendPractitionerMatch] Auto-message created successfully');
+                
+                // Update contacted_at in the match to mark conversation as started
+                const { error: updateContactedError } = await window.supabaseClient
+                    .from('project_practitioner_matches')
+                    .update({
+                        contacted_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('project_serial', project.project_serial)
+                    .eq('practitioner_serial', practitionerSerial);
+
+                if (updateContactedError) {
+                    console.warn('[sendPractitionerMatch] Warning updating contacted_at:', updateContactedError);
+                }
             }
         } catch (msgError) {
             console.warn('[sendPractitionerMatch] Error creating auto-message:', msgError);

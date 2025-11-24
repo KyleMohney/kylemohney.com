@@ -514,43 +514,39 @@
     </div>
   </main>
 
-  <!-- Confirm Decline Modal -->
-  <div id="confirm-decline-modal" class="modal modal--hidden">
-    <div class="modal__overlay"></div>
-    <div class="modal__content modal__content--small">
-      <div class="modal__header">
+  <!-- Decline Confirmation Modal -->
+  <div id="decline-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
         <h2>Decline Match?</h2>
-        <button class="modal__close" aria-label="Close modal">&times;</button>
+        <button class="modal-close" onclick="closeDeclineModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--color-text);">&times;</button>
       </div>
-      <div class="modal__body">
+      <div class="modal-body" style="margin: 1rem 0;">
         <p>Are you sure you want to decline this client? They will be notified about your decision.</p>
       </div>
-      <div class="modal__footer">
-        <button id="confirm-decline-cancel" class="btn btn--secondary">Cancel</button>
-        <button id="confirm-decline-confirm" class="btn btn--danger">Decline</button>
+      <div class="modal-footer" style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+        <button class="btn btn--secondary" onclick="closeDeclineModal()">Cancel</button>
+        <button class="btn btn--danger" onclick="confirmDecline()">Decline</button>
       </div>
     </div>
   </div>
 
-  <!-- Confirm Block Modal -->
-  <div id="confirm-block-modal" class="modal modal--hidden">
-    <div class="modal__overlay"></div>
-    <div class="modal__content modal__content--small">
-      <div class="modal__header">
+  <!-- Block Confirmation Modal -->
+  <div id="block-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
         <h2>Block Client?</h2>
-        <button class="modal__close" aria-label="Close modal">&times;</button>
+        <button class="modal-close" onclick="closeBlockModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--color-text);">&times;</button>
       </div>
-      <div class="modal__body">
+      <div class="modal-body" style="margin: 1rem 0;">
         <p>Block this client? They won't be able to match with you again, and all pending matches will be declined.</p>
       </div>
-      <div class="modal__footer">
-        <button id="confirm-block-cancel" class="btn btn--secondary">Cancel</button>
-        <button id="confirm-block-confirm" class="btn btn--danger">Block</button>
+      <div class="modal-footer" style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+        <button class="btn btn--secondary" onclick="closeBlockModal()">Cancel</button>
+        <button class="btn btn--danger" onclick="confirmBlock()">Block</button>
       </div>
     </div>
   </div>
-
-  <!-- Decline with Message Modal -->
 
   <footer id="footer-inject"></footer>
 
@@ -633,73 +629,59 @@
     let pendingBlockClientSerial = null;
 
     function showConfirmDeclineModal() {
-      const modal = document.getElementById('confirm-decline-modal');
-      const overlay = modal.querySelector('.modal__overlay');
-      modal.classList.remove('modal--hidden');
+      const modal = document.getElementById('decline-modal');
+      modal.style.display = 'flex';
+      modal.onclick = (e) => {
+        if (e.target === modal) closeDeclineModal();
+      };
+    }
+
+    function closeDeclineModal() {
+      const modal = document.getElementById('decline-modal');
+      modal.style.display = 'none';
+      pendingDeclineMatch = null;
+    }
+
+    async function confirmDecline() {
+      if (!pendingDeclineMatch) return;
       
-      const closeBtn = modal.querySelector('.modal__close');
-      const cancelBtn = document.getElementById('confirm-decline-cancel');
-      const confirmBtn = document.getElementById('confirm-decline-confirm');
-
-      const handleClose = () => {
-        modal.classList.add('modal--hidden');
-        pendingDeclineMatch = null;
-        // Remove listeners when closing
-        closeBtn.removeEventListener('click', handleClose);
-        cancelBtn.removeEventListener('click', handleClose);
-        overlay.removeEventListener('click', handleClose);
-      };
-
-      const handleConfirm = async () => {
-        modal.classList.add('modal--hidden');
-        confirmBtn.disabled = true;
-        await handleDeclineConfirmed();
-        confirmBtn.disabled = false;
-        confirmBtn.removeEventListener('click', handleConfirm);
-        closeBtn.removeEventListener('click', handleClose);
-        cancelBtn.removeEventListener('click', handleClose);
-        overlay.removeEventListener('click', handleClose);
-      };
-
-      closeBtn.addEventListener('click', handleClose);
-      cancelBtn.addEventListener('click', handleClose);
-      confirmBtn.addEventListener('click', handleConfirm);
-      overlay.addEventListener('click', handleClose);
+      const confirmBtn = event.target;
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = 'Processing...';
+      
+      await handleDeclineConfirmed();
+      
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = 'Decline';
+      closeDeclineModal();
     }
 
     function showConfirmBlockModal() {
-      const modal = document.getElementById('confirm-block-modal');
-      const overlay = modal.querySelector('.modal__overlay');
-      modal.classList.remove('modal--hidden');
+      const modal = document.getElementById('block-modal');
+      modal.style.display = 'flex';
+      modal.onclick = (e) => {
+        if (e.target === modal) closeBlockModal();
+      };
+    }
+
+    function closeBlockModal() {
+      const modal = document.getElementById('block-modal');
+      modal.style.display = 'none';
+      pendingBlockClientSerial = null;
+    }
+
+    async function confirmBlock() {
+      if (!pendingBlockClientSerial) return;
       
-      const closeBtn = modal.querySelector('.modal__close');
-      const cancelBtn = document.getElementById('confirm-block-cancel');
-      const confirmBtn = document.getElementById('confirm-block-confirm');
-
-      const handleClose = () => {
-        modal.classList.add('modal--hidden');
-        pendingBlockClientSerial = null;
-        // Remove listeners when closing
-        closeBtn.removeEventListener('click', handleClose);
-        cancelBtn.removeEventListener('click', handleClose);
-        overlay.removeEventListener('click', handleClose);
-      };
-
-      const handleConfirm = async () => {
-        modal.classList.add('modal--hidden');
-        confirmBtn.disabled = true;
-        await handleBlockConfirmed();
-        confirmBtn.disabled = false;
-        confirmBtn.removeEventListener('click', handleConfirm);
-        closeBtn.removeEventListener('click', handleClose);
-        cancelBtn.removeEventListener('click', handleClose);
-        overlay.removeEventListener('click', handleClose);
-      };
-
-      closeBtn.addEventListener('click', handleClose);
-      cancelBtn.addEventListener('click', handleClose);
-      confirmBtn.addEventListener('click', handleConfirm);
-      overlay.addEventListener('click', handleClose);
+      const confirmBtn = event.target;
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = 'Processing...';
+      
+      await handleBlockConfirmed();
+      
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = 'Block';
+      closeBlockModal();
     }
 
     async function handleDeclineConfirmed() {
@@ -729,15 +711,12 @@
         }
         
         const clientName = `${match.projects?.clients?.first_name || 'Client'}`;
-        showToast('Declined', `You declined ${clientName}. Opening your inbox...`, 'info');
+        showToast('Declined', `You declined ${clientName}`, 'info');
         // Remove the card from the DOM
         const card = document.querySelector(`[data-match-id="${match.id}"]`)?.closest('.client-card');
         if (card) card.remove();
         
-        // Navigate to Inbox archive tab to show the declined match
-        setTimeout(() => {
-          window.location.href = `/rooted-vitality/dashboard/pro/pages/inbox.html?tab=archive&clientSerial=${match.client_serial}`;
-        }, 500);
+        pendingDeclineMatch = null;
       } else {
         showToast('Error', 'Failed to decline client', 'error');
       }
@@ -1282,11 +1261,22 @@
         const practitionerSerial = practitioner.serial_number;
         console.log('[Pro Notifications] Loading notifications for:', practitionerSerial);
 
+        // First, mark all unread notifications as read
+        const { error: markError } = await window.supabaseClient
+          .from('practitioner_notifications')
+          .update({ is_read: true, updated_at: new Date().toISOString() })
+          .eq('practitioner_serial', practitionerSerial)
+          .eq('is_read', false);
+
+        if (markError) {
+          console.warn('[Pro Notifications] Error marking notifications as read:', markError);
+        }
+
+        // Then fetch all notifications (read and unread) 
         const { data: notifications, error } = await window.supabaseClient
           .from('practitioner_notifications')
           .select('*')
           .eq('practitioner_serial', practitionerSerial)
-          .eq('is_read', false)
           .order('created_at', { ascending: false })
           .limit(20);
 
@@ -1295,17 +1285,17 @@
           return;
         }
 
-        console.log('[Pro Notifications] Loaded', notifications?.length || 0, 'unread notifications');
+        console.log('[Pro Notifications] Loaded', notifications?.length || 0, 'notifications');
+
+        // Update notification badge - now should be 0 since we marked them all as read
+        const notificationBadge = document.querySelector('.rv-notification-badge');
+        if (notificationBadge) {
+          notificationBadge.textContent = '0';
+          notificationBadge.classList.remove('active');
+          notificationBadge.style.backgroundColor = '';
+        }
 
         if (notifications && notifications.length > 0) {
-          // Update notification badge
-          const notificationBadge = document.querySelector('.rv-notification-badge');
-          if (notificationBadge) {
-            notificationBadge.textContent = notifications.length;
-            notificationBadge.classList.add('active');
-            notificationBadge.style.backgroundColor = '#FFD700'; // Gold color
-          }
-
           // Update notification list
           const notificationsList = document.querySelector('.rv-notifications-list');
           if (notificationsList) {
@@ -1323,7 +1313,7 @@
               }
               
               const notifElement = document.createElement('a');
-              notifElement.className = 'rv-notifications-item unread';
+              notifElement.className = 'rv-notifications-item';  // Remove 'unread' class since we just marked them all as read
               notifElement.href = '#';
               notifElement.innerHTML = `
                 <p class="rv-notifications-title">${notif.title}</p>
@@ -1418,9 +1408,51 @@
               filter: `practitioner_serial=eq.${practitioner.serial_number}`
             },
             (payload) => {
-              console.log('[Pro Notifications] 🔔 Notifications changed via realtime, reloading...', payload.eventType);
-              // Reload notifications to reflect changes (e.g., marked as read)
-              loadPractitionerNotifications();
+              console.log('[Pro Notifications] 🔔 Notifications changed via realtime:', payload.eventType, payload);
+              
+              // Handle new notifications (INSERT)
+              if (payload.eventType === 'INSERT' && payload.new) {
+                const newNotif = payload.new;
+                console.log('[Pro Notifications] New notification received:', newNotif);
+                
+                // Update badge to show there's an unread notification
+                const notificationBadge = document.querySelector('.rv-notification-badge');
+                if (notificationBadge) {
+                  const currentCount = parseInt(notificationBadge.textContent) || 0;
+                  notificationBadge.textContent = currentCount + 1;
+                  notificationBadge.classList.add('active');
+                  notificationBadge.style.backgroundColor = '#FFD700'; // Gold color
+                  console.log('[Pro Notifications] Badge updated to:', currentCount + 1);
+                }
+                
+                // Add notification to the list at the top
+                const notificationsList = document.querySelector('.rv-notifications-list');
+                if (notificationsList) {
+                  const notifElement = document.createElement('a');
+                  notifElement.className = 'rv-notifications-item unread';
+                  notifElement.href = '#';
+                  notifElement.innerHTML = `
+                    <p class="rv-notifications-title">${newNotif.title}</p>
+                    <p class="rv-notifications-message">${newNotif.message}</p>
+                    <p class="rv-notifications-time">${new Date(newNotif.created_at).toLocaleDateString()}</p>
+                  `;
+                  notifElement.addEventListener('click', (e) => {
+                    e.preventDefault();
+                  });
+                  
+                  // Insert at the top of the list
+                  if (notificationsList.firstChild) {
+                    notificationsList.insertBefore(notifElement, notificationsList.firstChild);
+                  } else {
+                    notificationsList.appendChild(notifElement);
+                  }
+                  console.log('[Pro Notifications] Notification added to list');
+                }
+              } else {
+                // For other changes (UPDATE, DELETE), reload notifications
+                console.log('[Pro Notifications] Reloading notifications for:', payload.eventType);
+                loadPractitionerNotifications();
+              }
             }
           )
           .subscribe((status) => {
