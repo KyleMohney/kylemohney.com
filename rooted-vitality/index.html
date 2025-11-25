@@ -362,34 +362,8 @@
   <!-- Landing Page Specific -->
   <script src="./scripts/landing-page.js"></script>
 
-  <!-- First-time User Onboarding -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Show onboarding modal for first-time users not signed in
-      setTimeout(async () => {
-        try {
-          if (!window.supabaseClient) {
-            console.log('[Landing] Supabase client not ready yet');
-            return;
-          }
-
-          const { data: { session } } = await window.supabaseClient.auth.getSession();
-
-          // Only show for users NOT signed in (first-time visitors)
-          if (!session) {
-            console.log('[Landing] First-time user detected, showing onboarding modal');
-            if (typeof showOnboardingModal === 'function') {
-              showOnboardingModal();
-            } else {
-              console.warn('[Landing] showOnboardingModal function not found');
-            }
-          }
-        } catch (error) {
-          console.error('[Landing] Error checking if first-time user:', error);
-        }
-      }, 1000); // Give time for auth to initialize
-    });
-  </script>
+  <!-- First-time User Onboarding - DISABLED: Modal now only shows on user action -->
+  <!-- Previously showed onboarding modal automatically for first-time users -->
 
   <!-- Hero CTA Handler -->
   <script>

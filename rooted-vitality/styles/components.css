@@ -311,6 +311,14 @@ label {
     margin-bottom: 0.5rem;
 }
 
+.form-helper {
+    font-size: 0.85rem;
+    color: #7a7370;
+    margin-top: 0.4rem;
+    font-weight: 500;
+    display: block;
+}
+
 /* ========================================== */
 /* 5. MODALS & OVERLAYS */
 /* ========================================== */

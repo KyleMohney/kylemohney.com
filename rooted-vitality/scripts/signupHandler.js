@@ -6,10 +6,29 @@
 // ======================================================
 
 window.addEventListener('DOMContentLoaded', async () => {
+  console.log('[Signup] Page loaded, initializing signup handler...');
+  
+  // Check if Supabase is loaded
+  if (!window.supabaseClient) {
+    console.error('[Signup] CRITICAL: Supabase client not initialized!');
+    console.error('[Signup] window.supabaseClient:', window.supabaseClient);
+    alert('Authentication system not ready. Please refresh the page.');
+    return;
+  }
+  
+  console.log('[Signup] Supabase client confirmed initialized');
+  
   const form = document.getElementById('rvSignupForm');
+  
+  if (!form) {
+    console.error('[Signup] CRITICAL: Signup form not found in DOM!');
+    alert('Page not ready. Please refresh.');
+    return;
+  }
 
   form.addEventListener('submit', async e => {
     e.preventDefault();
+    console.log('[Signup] Form submitted');
 
     // ============ 1. Collect Form Data ============
     const firstName = form.querySelector('#firstName').value.trim();
@@ -153,7 +172,21 @@ window.addEventListener('DOMContentLoaded', async () => {
         console.error('❌ [Signup] Error code:', clientError.code);
         console.error('❌ [Signup] Error message:', clientError.message);
         console.error('[Signup] Error hint:', clientError.hint);
-        throw new Error(`Client record creation failed: ${clientError.message}`);
+        console.error('[Signup] Full error object:', JSON.stringify(clientError, null, 2));
+        
+        // Provide user-friendly error message
+        let friendlyMsg = 'Failed to create your profile. ';
+        if (clientError.message.includes('duplicate')) {
+          friendlyMsg += 'This email is already in use.';
+        } else if (clientError.message.includes('not_unique')) {
+          friendlyMsg += 'This email is already in use.';
+        } else if (clientError.message.includes('relation does not exist')) {
+          friendlyMsg += 'System configuration issue. Please contact support.';
+        } else {
+          friendlyMsg += clientError.message;
+        }
+        
+        throw new Error(friendlyMsg);
       }
 
       console.log('[Signup] Client record created successfully!');

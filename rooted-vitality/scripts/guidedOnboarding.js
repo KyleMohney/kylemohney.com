@@ -392,7 +392,7 @@ async function initializeReturningMemberFlow() {
                             <div class="form-group">
                                 <label for="returning-category">What area of wellness speaks to you? *</label>
                                 <select id="returning-category" name="category" required>
-                                    <option value="">ú® What are you feeling drawn to? ú®</option>
+                                    <option value="">ÔøΩÔøΩ What are you feeling drawn to? ÔøΩÔøΩ</option>
                                     ${WELLNESS_CATEGORIES.map(cat => `
                                         <option value="${cat.id}">${cat.name}</option>
                                     `).join('')}
@@ -445,7 +445,7 @@ async function initializeReturningMemberFlow() {
 
                         <div class="form-actions">
                             <button type="button" class="btn-secondary returning-cancel">Close</button>
-                            <button type="submit" class="btn-primary">Begin this journey Üí</button>
+                            <button type="submit" class="btn-primary">Begin this journey ÔøΩÔøΩ</button>
                         </div>
                     </form>
                 </div>
@@ -714,7 +714,7 @@ function setupReturningMemberListeners(userId, firstName) {
             window.showAlertModal('Error creating project: ' + error.message);
             const submitBtn = modal.querySelector('button[type="submit"]');
             submitBtn.disabled = false;
-            submitBtn.textContent = 'Begin This Journey Üí';
+            submitBtn.textContent = 'Begin This Journey ÔøΩÔøΩ';
         }
     });
 }
@@ -729,11 +729,11 @@ function showReturningMemberCelebration(firstName, callback) {
         <div class="onboarding-overlay"></div>
         <div class="celebration-modal">
             <div class="celebration-content">
-                <div class="celebration-emoji">ú®</div>
+                <div class="celebration-emoji">ÔøΩÔøΩ</div>
                 <h2>We're so glad you're back, ${firstName}!</h2>
                 <p>Your new wellness chapter is being created...</p>
                 <p class="celebration-subtext">Get ready to meet practitioners who understand your journey üíö</p>
-                <button class="btn-primary celebration-continue">Continue Üí</button>
+                <button class="btn-primary celebration-continue">Continue ÔøΩÔøΩ</button>
             </div>
         </div>
     `;
@@ -906,8 +906,8 @@ function initializeGuidedOnboarding(showLoginFirst = false) {
                         </div>
 
                         <div class="form-actions">
-                            <button type="button" class="btn-secondary onboarding-back" style="display: none;">Üê Back</button>
-                            <button type="submit" class="btn-primary">Sign in Üí</button>
+                            <button type="button" class="btn-secondary onboarding-back" style="display: none;">ÔøΩÔøΩ Back</button>
+                            <button type="submit" class="btn-primary">Sign in ÔøΩÔøΩ</button>
                         </div>
 
                         <p class="login-help">
@@ -937,7 +937,7 @@ function initializeGuidedOnboarding(showLoginFirst = false) {
                     </div>
 
                     <div class="form-actions">
-                        <button type="button" class="btn-secondary onboarding-back" style="display: none;">Üê Back</button>
+                        <button type="button" class="btn-secondary onboarding-back" style="display: none;">ÔøΩÔøΩ Back</button>
                     </div>
                 </div>
             </div>
@@ -969,8 +969,8 @@ function initializeGuidedOnboarding(showLoginFirst = false) {
                         </div>
 
                         <div class="form-actions">
-                            <button type="button" class="btn-secondary onboarding-back">Üê Back</button>
-                            <button type="submit" class="btn-primary onboarding-next">Continue Üí</button>
+                            <button type="button" class="btn-secondary onboarding-back">ÔøΩÔøΩ Back</button>
+                            <button type="submit" class="btn-primary onboarding-next">Continue ÔøΩÔøΩ</button>
                         </div>
                     </form>
                 </div>
@@ -998,8 +998,8 @@ function initializeGuidedOnboarding(showLoginFirst = false) {
                         </div>
 
                         <div class="form-actions">
-                            <button type="button" class="btn-secondary onboarding-back">Üê Back</button>
-                            <button type="submit" class="btn-primary onboarding-next">Let's find your match Üí</button>
+                            <button type="button" class="btn-secondary onboarding-back">ÔøΩÔøΩ Back</button>
+                            <button type="submit" class="btn-primary onboarding-next">Let's find your match ÔøΩÔøΩ</button>
                         </div>
                     </form>
                 </div>
@@ -1022,11 +1022,11 @@ function initializeGuidedOnboarding(showLoginFirst = false) {
 
                     <div class="confirmation-actions">
                         <button type="button" class="btn-secondary" id="change-match-btn">That's not quite right</button>
-                        <button type="button" class="btn-primary" id="confirm-match-btn">Yes, that's it Üí</button>
+                        <button type="button" class="btn-primary" id="confirm-match-btn">Yes, that's it ÔøΩÔøΩ</button>
                     </div>
 
                     <div class="form-actions">
-                        <button type="button" class="btn-secondary onboarding-back">Üê Back</button>
+                        <button type="button" class="btn-secondary onboarding-back">ÔøΩÔøΩ Back</button>
                     </div>
                 </div>
             </div>
@@ -1052,8 +1052,8 @@ function initializeGuidedOnboarding(showLoginFirst = false) {
                         </div>
 
                         <div class="form-actions">
-                            <button type="button" class="btn-secondary onboarding-back">Üê Back</button>
-                            <button type="submit" class="btn-primary onboarding-next">Let's continue Üí</button>
+                            <button type="button" class="btn-secondary onboarding-back">ÔøΩÔøΩ Back</button>
+                            <button type="submit" class="btn-primary onboarding-next">Let's continue ÔøΩÔøΩ</button>
                         </div>
                     </form>
                 </div>
@@ -1079,8 +1079,8 @@ function initializeGuidedOnboarding(showLoginFirst = false) {
                         </div>
 
                         <div class="form-actions">
-                            <button type="button" class="btn-secondary onboarding-back">Üê Back</button>
-                            <button type="submit" class="btn-primary onboarding-next">Next Üí</button>
+                            <button type="button" class="btn-secondary onboarding-back">ÔøΩÔøΩ Back</button>
+                            <button type="submit" class="btn-primary onboarding-next">Next ÔøΩÔøΩ</button>
                         </div>
                     </form>
                 </div>
@@ -1123,8 +1123,8 @@ function initializeGuidedOnboarding(showLoginFirst = false) {
                         </div>
 
                         <div class="form-actions">
-                            <button type="button" class="btn-secondary onboarding-back">Üê Back</button>
-                            <button type="submit" class="btn-primary onboarding-next">Create account Üí</button>
+                            <button type="button" class="btn-secondary onboarding-back">ÔøΩÔøΩ Back</button>
+                            <button type="submit" class="btn-primary onboarding-next">Create account ÔøΩÔøΩ</button>
                         </div>
                     </form>
                 </div>
@@ -1142,6 +1142,7 @@ function initializeGuidedOnboarding(showLoginFirst = false) {
                         <div class="form-group">
                             <label for="onboarding-password">Create a password *</label>
                             <input type="password" id="onboarding-password" name="password" placeholder="At least 6 characters" required>
+                            <small class="form-helper">Minimum 6 characters required</small>
                         </div>
 
                         <div class="form-group">
@@ -1150,8 +1151,8 @@ function initializeGuidedOnboarding(showLoginFirst = false) {
                         </div>
 
                         <div class="form-actions">
-                            <button type="button" class="btn-secondary onboarding-back">Üê Back</button>
-                            <button type="submit" class="btn-primary onboarding-next">Let's go Üí</button>
+                            <button type="button" class="btn-secondary onboarding-back">ÔøΩÔøΩ Back</button>
+                            <button type="submit" class="btn-primary onboarding-next">Let's go ÔøΩÔøΩ</button>
                         </div>
                     </form>
                 </div>
@@ -1197,8 +1198,8 @@ function initializeGuidedOnboarding(showLoginFirst = false) {
                         </div>
 
                         <div class="form-actions">
-                            <button type="button" class="btn-secondary onboarding-back">Üê Back</button>
-                            <button type="button" class="btn-primary onboarding-next" id="step-9-next">Create account & continue Üí</button>
+                            <button type="button" class="btn-secondary onboarding-back">ÔøΩÔøΩ Back</button>
+                            <button type="button" class="btn-primary onboarding-next" id="step-9-next">Create account & continue ÔøΩÔøΩ</button>
                         </div>
                     </div>
                 </div>
@@ -2340,7 +2341,7 @@ function setupOnboardingListeners() {
                 window.showAlertModal('Login failed: ' + error.message);
                 const submitBtn = loginForm.querySelector('button[type="submit"]');
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'Sign in Üí';
+                submitBtn.textContent = 'Sign in ÔøΩÔøΩ';
             }
         });
 
@@ -2558,7 +2559,22 @@ function setupOnboardingListeners() {
                 });
 
                 if (authError) {
-                    throw authError;
+                    console.error('[Onboarding] Auth signup error details:', authError);
+                    console.error('[Onboarding] Auth error message:', authError.message);
+                    console.error('[Onboarding] Auth error status:', authError.status);
+                    console.error('[Onboarding] Auth error code:', authError.code);
+                    
+                    let friendlyMessage = 'Signup failed. Please try again.';
+                    if (authError.message.includes('already registered')) {
+                        friendlyMessage = 'This email is already registered. Please log in instead.';
+                    } else if (authError.message.includes('invalid email')) {
+                        friendlyMessage = 'Please enter a valid email address.';
+                    } else if (authError.message.includes('password')) {
+                        friendlyMessage = 'Password is too weak. Use at least 6 characters.';
+                    } else {
+                        friendlyMessage = authError.message;
+                    }
+                    throw new Error(friendlyMessage);
                 }
 
                 console.log('[Onboarding] User signed up:', authData.user.email);
@@ -2579,7 +2595,15 @@ function setupOnboardingListeners() {
                     });
 
                 if (clientError) {
-                    console.error('[Onboarding] Client profile error:', clientError);
+                    console.error('[Onboarding] Client profile error details:', clientError);
+                    console.error('[Onboarding] Error code:', clientError.code);
+                    console.error('[Onboarding] Error message:', clientError.message);
+                    console.error('[Onboarding] Error hint:', clientError.hint);
+                    console.error('[Onboarding] Full error object:', JSON.stringify(clientError, null, 2));
+                    
+                    // Provide detailed error info even if we continue
+                    let errorMsg = 'Note: Profile creation had an issue: ' + clientError.message;
+                    console.warn('[Onboarding]', errorMsg);
                 }
 
                 onboardingData.userId = authData.user.id;
@@ -2609,13 +2633,13 @@ function setupOnboardingListeners() {
                 goToStep(10);
 
                 step9NextBtn.disabled = false;
-                step9NextBtn.textContent = 'Continue Üí';
+                step9NextBtn.textContent = 'Continue ÔøΩÔøΩ';
 
             } catch (error) {
                 console.error('[Onboarding] Signup error:', error);
                 window.showAlertModal('Something went wrong. Please try again: ' + error.message);
                 step9NextBtn.disabled = false;
-                step9NextBtn.textContent = 'Create account & continue Üí';
+                step9NextBtn.textContent = 'Create account & continue ÔøΩÔøΩ';
             }
         });
     }
