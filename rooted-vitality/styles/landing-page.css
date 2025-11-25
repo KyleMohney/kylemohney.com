@@ -1082,7 +1082,7 @@ body.landing-page main {
   font-family: 'Lora', serif;
   font-size: 1.05rem;
   line-height: 1.6;
-  color: rgba(255, 255, 255, 0.95);
+  color: rgba(251, 247, 236, 0.95);
   margin: 0 0 2rem 0;
 }
 
@@ -1245,13 +1245,13 @@ body.landing-page main {
 
 .btn--outline:hover {
   transform: scale(1.02);
-  background-color: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.2);
+  background-color: rgba(251, 247, 236, 0.1);
+  box-shadow: 0 8px 20px rgba(251, 247, 236, 0.2);
 }
 
 .btn--outline:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3), 0 8px 20px rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 0 3px rgba(251, 247, 236, 0.3), 0 8px 20px rgba(251, 247, 236, 0.2);
 }
 
 .btn--outline:active {
@@ -1634,7 +1634,7 @@ body.landing-page main {
   }
 
   body {
-    background-color: white;
+    background-color: #fbf7ec;
   }
 
   a {
@@ -1681,3 +1681,30 @@ body.landing-page main {
     color: var(--rooted-light);
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

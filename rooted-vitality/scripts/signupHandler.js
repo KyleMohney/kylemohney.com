@@ -152,11 +152,11 @@ window.addEventListener('DOMContentLoaded', async () => {
         console.error('❌ [Signup] Client record error details:', clientError);
         console.error('❌ [Signup] Error code:', clientError.code);
         console.error('❌ [Signup] Error message:', clientError.message);
-        console.error('❌ [Signup] Error hint:', clientError.hint);
+        console.error('[Signup] Error hint:', clientError.hint);
         throw new Error(`Client record creation failed: ${clientError.message}`);
       }
 
-      console.log('✅ [Signup] Client record created successfully!');
+      console.log('[Signup] Client record created successfully!');
 
       // ============ 6. Create Welcome Notification ============
       const welcomeNotification = {
@@ -176,7 +176,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         console.warn('Welcome notification insertion note:', err);
       }
 
-      console.log('✅ [Signup] Welcome notification created');
+      console.log('[Signup] Welcome notification created');
 
       // ============ 7. Success: Show Message & Redirect ============
       alert('Account created! Welcome to Rooted Vitality. Redirecting...');
@@ -257,3 +257,59 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
   });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

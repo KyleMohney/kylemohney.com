@@ -43,7 +43,7 @@
 }
 
 .modal__content {
-    background: white;
+    background: #fbf7ec;
     border-radius: 12px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
     max-width: 500px;
@@ -65,8 +65,8 @@
 }
 
 .modal__header {
-    background: linear-gradient(135deg, #5c9a72 0%, #4a8b62 100%);
-    color: white;
+    background: linear-gradient(135deg, #77883e 0%, #4a8b62 100%);
+    color: #fbf7ec;
     padding: 25px;
     border-radius: 12px 12px 0 0;
     display: flex;
@@ -79,13 +79,13 @@
     margin: 0;
     font-size: 22px;
     font-weight: 600;
-    color: white;
+    color: #fbf7ec;
 }
 
 .modal__close {
     background: none;
     border: none;
-    color: white;
+    color: #fbf7ec;
     font-size: 28px;
     cursor: pointer;
     padding: 0;
@@ -99,7 +99,7 @@
 }
 
 .modal__close:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(251, 247, 236, 0.1);
 }
 
 .modal__body {
@@ -127,8 +127,8 @@
     display: flex;
     gap: 12px;
     justify-content: flex-end;
-    border-top: 1px solid #e8e6e3;
-    background: #fafaf8;
+    border-top: 1px solid #fbf7ec;
+    background: #fbf7ec;
 }
 
 .btn {
@@ -142,8 +142,8 @@
 }
 
 .btn--primary {
-    background: linear-gradient(135deg, #5c9a72 0%, #4a8b62 100%);
-    color: white;
+    background: linear-gradient(135deg, #77883e 0%, #4a8b62 100%);
+    color: #fbf7ec;
 }
 
 .btn--primary:hover:not(:disabled) {
@@ -159,3 +159,61 @@
     opacity: 0.6;
     cursor: not-allowed;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

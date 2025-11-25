@@ -66,7 +66,7 @@
   margin-top: 2rem;
   font-size: 1rem;
   padding: 1rem 2.5rem;
-  background: white;
+  background: #fbf7ec;
   color: var(--rooted-dark);
   border: 2.5px solid var(--rooted-dark);
   font-weight: 700;
@@ -75,7 +75,7 @@
 
 .hero #hero-cta-btn:hover {
   background: var(--rooted-dark);
-  color: white;
+  color: #fbf7ec;
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(46, 43, 40, 0.2);
 }
@@ -627,7 +627,7 @@
 }
 
 .featured-story__card {
-  background: white;
+  background: #fbf7ec;
   border-radius: 12px;
   padding: 3rem;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
@@ -825,7 +825,7 @@
   height: 20px;
   margin-right: 0.5rem;
   background: var(--rooted-green);
-  color: white;
+  color: #fbf7ec;
   border-radius: 50%;
   text-align: center;
   line-height: 20px;
@@ -866,7 +866,7 @@
 
 .feature-card {
   padding: 2rem;
-  background: white;
+  background: #fbf7ec;
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -916,7 +916,7 @@
 }
 
 .stat {
-  color: white;
+  color: #fbf7ec;
 }
 
 .stat__number {
@@ -953,7 +953,7 @@
 
 .how-it-works {
   padding: 5rem 1rem;
-  background: white;
+  background: #fbf7ec;
 }
 
 .how-it-works__container {
@@ -1057,7 +1057,7 @@
 
 .category-card {
   padding: 2rem;
-  background: white;
+  background: #fbf7ec;
   border-radius: 12px;
   text-align: center;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
@@ -1112,7 +1112,7 @@
 .practitioner-cta {
   padding: 5rem 1rem;
   background: linear-gradient(135deg, var(--rooted-green) 0%, var(--rooted-light) 100%);
-  color: white;
+  color: #fbf7ec;
 }
 
 .practitioner-cta__container {
@@ -1148,7 +1148,7 @@
 }
 
 .practitioner-cta__button {
-  background: white;
+  background: #fbf7ec;
   color: var(--rooted-green);
   font-weight: 600;
   padding: 1rem 2rem;
@@ -1203,7 +1203,7 @@
 
 .trust-badge {
   padding: 2rem;
-  background: white;
+  background: #fbf7ec;
   border-radius: 12px;
   text-align: center;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
@@ -1252,7 +1252,7 @@
 
 .final-cta {
   padding: 4rem 1rem;
-  background: white;
+  background: #fbf7ec;
 }
 
 .final-cta__container {
@@ -1384,14 +1384,14 @@
   font-family: var(--font-inter);
   font-size: 1.2rem;
   font-weight: 600;
-  color: white;
+  color: #fbf7ec;
   margin: 0 0 0.5rem 0;
 }
 
 .gallery-card__specialty {
   font-family: var(--font-lora);
   font-size: 0.95rem;
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(251, 247, 236, 0.9);
   margin: 0;
 }
 
@@ -1414,14 +1414,14 @@
   font-family: var(--font-inter);
   font-size: 2.2rem;
   font-weight: 700;
-  color: white;
+  color: #fbf7ec;
   margin-bottom: 1rem;
 }
 
 .wellness-cta__body {
   font-family: var(--font-lora);
   font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.95);
+  color: rgba(251, 247, 236, 0.95);
   margin-bottom: 2rem;
   line-height: 1.6;
 }
@@ -1465,7 +1465,7 @@
 
 .client-story {
   padding: 6rem 1rem;
-  background: white;
+  background: #fbf7ec;
 }
 
 .client-story__container {
@@ -1497,7 +1497,7 @@
   display: flex;
   align-items: center;
   gap: 2rem;
-  background: white;
+  background: #fbf7ec;
   border-left: 4px solid var(--rooted-green);
   border-radius: 12px;
   overflow: hidden;
@@ -1592,7 +1592,7 @@
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--rooted-green);
-  white-space: nowrap;
+  #fbf7ec-space: nowrap;
   transition: color 0.2s ease;
 }
 
@@ -1720,12 +1720,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: white;
+  background: #fbf7ec;
   padding: 1rem;
   border-radius: 10px;
   border: 2px solid var(--rooted-green);
   transition: all 0.3s ease;
-  white-space: nowrap;
+  #fbf7ec-space: nowrap;
   min-width: 140px;
   height: 60px;
   flex-shrink: 0;
@@ -1749,7 +1749,7 @@
   left: 50%;
   transform: translateX(-50%);
   background: var(--rooted-green);
-  color: white;
+  color: #fbf7ec;
   padding: 1rem;
   border-radius: 10px;
   font-family: var(--font-lora);
@@ -1757,14 +1757,14 @@
   line-height: 1.5;
   width: 180px;
   text-align: center;
-  white-space: normal;
+  #fbf7ec-space: normal;
   opacity: 0;
   visibility: hidden;
   transition: all 0.2s ease;
   z-index: 100;
   pointer-events: none;
   box-shadow: 0 12px 30px rgba(92, 154, 114, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(251, 247, 236, 0.2);
   backdrop-filter: blur(8px);
 }
 
@@ -1789,7 +1789,7 @@
 }
 
 .practitioner-logo:hover .practitioner-badge {
-  color: white;
+  color: #fbf7ec;
 }
 
 .practitioner-logo:hover .practitioners-track {
@@ -1900,7 +1900,7 @@
 
 .wellness-categories {
   padding: 6rem 1rem;
-  background: white;
+  background: #fbf7ec;
 }
 
 .wellness-categories__container {
@@ -1966,7 +1966,7 @@
 
 /* Wellness Card */
 .wellness-card {
-  background: white;
+  background: #fbf7ec;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
@@ -1991,7 +1991,7 @@
   width: 100%;
   padding-bottom: 66.67%;
   overflow: hidden;
-  background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+  background: linear-gradient(135deg, #fbf7ec 0%, #e8e8e8 100%);
 }
 
 .wellness-card__image img {
@@ -2013,7 +2013,7 @@
   top: 12px;
   right: 12px;
   background: rgba(92, 154, 114, 0.95);
-  color: white;
+  color: #fbf7ec;
   padding: 0.4rem 0.8rem;
   border-radius: 20px;
   font-family: var(--font-inter);
@@ -2056,7 +2056,7 @@
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  background: white;
+  background: #fbf7ec;
 }
 
 .wellness-card__title {
@@ -2159,3 +2159,60 @@
     margin-bottom: 1rem;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

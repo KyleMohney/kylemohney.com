@@ -274,13 +274,13 @@ window.authManager = {
         // Simple inline HTML with onclick in the HTML itself
         const html = `
             <div id="logout-modal-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 10000;">
-                <div style="background: white; border-radius: 12px; padding: 2rem; max-width: 400px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15); text-align: center; z-index: 10001;">
+                <div style="background: #fbf7ec; border-radius: 12px; padding: 2rem; max-width: 400px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15); text-align: center; z-index: 10001;">
                     <div style="margin-bottom: 1.5rem;">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#5c9a72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto; display: block;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#77883e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto; display: block;"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     </div>
                     <h2 style="margin: 0 0 0.5rem 0; font-size: 1.25rem; font-weight: 600; color: #2e2b28;">Signed Out</h2>
                     <p style="margin: 0 0 1.5rem 0; color: #666; font-size: 0.95rem;">You have been successfully signed out.</p>
-                    <button onclick="document.getElementById('logout-modal-overlay').remove(); window.location.href='/rooted-vitality/index.html';" style="background: #5c9a72; color: white; border: none; border-radius: 6px; padding: 0.75rem 1.5rem; font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; width: 100%;">Continue</button>
+                    <button onclick="document.getElementById('logout-modal-overlay').remove(); window.location.href='/rooted-vitality/index.html';" style="background: #77883e; color: #fbf7ec; border: none; border-radius: 6px; padding: 0.75rem 1.5rem; font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; width: 100%;">Continue</button>
                 </div>
             </div>
         `;
@@ -659,4 +659,60 @@ window.addEventListener('DOMContentLoaded', async () => {
 console.log('[Rooted Vitality] authManager ready (Supabase integration)');
 
 // End of authManager.js — Rooted Vitality Supabase Authentication Module
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

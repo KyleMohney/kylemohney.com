@@ -294,7 +294,7 @@ function openOpportunityMessageModal(opp) {
         <button class="modal__close" aria-label="Close modal">&times;</button>
       </div>
       <div class="modal__body">
-        <div style="background: #f5f5f5; padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem;">
+        <div style="background: #fbf7ec; padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem;">
           <p style="margin: 0; font-size: 0.85rem; color: #666;"><strong>Project:</strong> ${project?.custom_name}</p>
           <p style="margin: 0.5rem 0 0 0; font-size: 0.85rem; color: #666;"><strong>Need:</strong> ${project?.category_name}</p>
         </div>
@@ -302,7 +302,7 @@ function openOpportunityMessageModal(opp) {
         <textarea 
           id="opp-message-text" 
           placeholder="Introduce yourself and why you're a good fit for their needs..."
-          style="width: 100%; height: 120px; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; font-size: 0.9rem; resize: vertical;"
+          style="width: 100%; height: 120px; padding: 0.75rem; border: 1px solid #fbf7ec; border-radius: 6px; font-family: inherit; font-size: 0.9rem; resize: vertical;"
         ></textarea>
         <p style="font-size: 0.8rem; color: #999; margin: 0.5rem 0 0 0;">💡 Tip: This is your only message. Make it count!</p>
       </div>
@@ -501,7 +501,7 @@ function showToast(message, type = 'info') {
   toast.textContent = message;
   toast.style.cssText = `
     background: ${type === 'success' ? '#4caf50' : type === 'error' ? '#f44336' : '#2196f3'};
-    color: white;
+    color: #fbf7ec;
     padding: 1rem 1.5rem;
     border-radius: 6px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
@@ -513,3 +513,59 @@ function showToast(message, type = 'info') {
 }
 
 console.log('[Pro Opportunities] Manager initialized and ready');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

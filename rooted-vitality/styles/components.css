@@ -84,7 +84,7 @@ Extracted from: styles_legacy.css
     left: -100%;
     width: 100%;
     height: 100%;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(251, 247, 236, 0.2);
     transition: left 0.3s ease;
     z-index: -1;
 }
@@ -577,7 +577,7 @@ label {
 
 .rv-logo:hover .rv-brand-name,
 .rv-logo-container:hover .rv-brand-name {
-    color: #5c9a72;
+    color: #77883e;
 }
 
 /* Desktop navigation - nav + icons in a row */
@@ -606,7 +606,7 @@ label {
     left: 0;
     width: 0%;
     height: 2px;
-    background: #5c9a72;
+    background: #77883e;
     transition: width 0.3s ease;
 }
 
@@ -615,11 +615,11 @@ label {
 }
 
 .rv-nav a:hover {
-    color: #5c9a72;
+    color: #77883e;
 }
 
 .rv-nav a:focus {
-    outline: 2px solid #5c9a72;
+    outline: 2px solid #77883e;
     outline-offset: 4px;
     border-radius: 4px;
 }
@@ -644,7 +644,7 @@ label {
 }
 
 .rv-nav .cta:focus {
-    outline: 2px solid #5c9a72;
+    outline: 2px solid #77883e;
     outline-offset: 4px;
 }
 
@@ -695,7 +695,7 @@ label {
 .rv-dashboard-btn:hover,
 .rv-logout-btn:hover {
     background: var(--rooted-primary);
-    color: #fff;
+    color: #fbf7ec;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(92, 154, 114, 0.2);
 }
@@ -718,7 +718,7 @@ label {
 
 .rv-menu-toggle:hover {
     transform: scale(1.15);
-    color: #5c9a72;
+    color: #77883e;
 }
 
 /* ======================================================
@@ -741,7 +741,7 @@ label {
 
 .rv-header-public .rv-nav-link:hover {
     text-decoration: underline;
-    color: #5c9a72;
+    color: #77883e;
 }
 
 .rv-header-public .rv-btn-accent {
@@ -770,7 +770,7 @@ label {
 }
 
 .rv-header-public .rv-nav-login:hover {
-    color: #5c9a72;
+    color: #77883e;
 }
 
 .rv-header-public .rv-nav-login:focus-visible {
@@ -816,7 +816,7 @@ label {
 }
 
 .rv-logo-public:hover .rv-brand-name {
-    color: #5c9a72;
+    color: #77883e;
 }
 
 /* ======================================================
@@ -867,7 +867,7 @@ label {
 }
 
 .rv-logo-client:hover .rv-brand-name {
-    color: #5c9a72;
+    color: #77883e;
 }
 
 .rv-header-client .rv-nav-link {
@@ -880,11 +880,11 @@ label {
 
 .rv-header-client .rv-nav-link:hover {
     text-decoration: underline;
-    color: #5c9a72;
+    color: #77883e;
 }
 
 .rv-header-client .rv-nav-link:focus {
-    outline: 2px solid #5c9a72;
+    outline: 2px solid #77883e;
     outline-offset: 4px;
 }
 
@@ -898,11 +898,11 @@ label {
 }
 
 .rv-header-client .rv-practitioner-btn:hover {
-    color: #5c9a72;
+    color: #77883e;
 }
 
 .rv-header-client .rv-practitioner-btn:focus {
-    outline: 2px solid #5c9a72;
+    outline: 2px solid #77883e;
     outline-offset: 4px;
 }
 
@@ -933,11 +933,11 @@ label {
 
 .rv-header-client .rv-sign-out-btn:hover {
     text-decoration: underline;
-    color: #5c9a72;
+    color: #77883e;
 }
 
 .rv-header-client .rv-sign-out-btn:focus {
-    outline: 2px solid #5c9a72;
+    outline: 2px solid #77883e;
     outline-offset: 4px;
 }
 
@@ -1027,8 +1027,8 @@ label {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #5c9a72 0%, #4a8360 100%);
-    color: white;
+    background: linear-gradient(135deg, #77883e 0%, #4a8360 100%);
+    color: #fbf7ec;
     font-weight: 700;
     font-size: 16px;
     font-family: 'Inter', sans-serif;
@@ -1036,11 +1036,11 @@ label {
 }
 
 .rv-avatar-btn:hover {
-    box-shadow: 0 0 0 2px #5c9a72;
+    box-shadow: 0 0 0 2px #77883e;
 }
 
 .rv-avatar-btn:focus {
-    outline: 2px solid #5c9a72;
+    outline: 2px solid #77883e;
     outline-offset: 2px;
 }
 
@@ -1049,7 +1049,7 @@ label {
     position: absolute;
     top: 100%;
     right: 0;
-    background: white;
+    background: #fbf7ec;
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 6px;
     min-width: 200px;
@@ -1081,12 +1081,12 @@ label {
 
 .rv-dropdown-item:hover {
     background: rgba(92, 154, 114, 0.05);
-    color: #5c9a72;
+    color: #77883e;
 }
 
 .rv-dropdown-item:focus {
     background: rgba(92, 154, 114, 0.1);
-    outline: 2px solid #5c9a72;
+    outline: 2px solid #77883e;
     outline-offset: -2px;
 }
 
@@ -1117,7 +1117,7 @@ label {
     position: absolute;
     top: 100%;
     right: 0;
-    background: white;
+    background: #fbf7ec;
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 6px;
     width: 340px;
@@ -1173,7 +1173,7 @@ label {
 
 .rv-notifications-item:hover {
     background: rgba(92, 154, 114, 0.05);
-    border-left-color: #5c9a72;
+    border-left-color: #77883e;
 }
 
 .rv-notifications-item.unread {
@@ -1249,7 +1249,7 @@ label {
 }
 
 .rv-logo-practitioner:hover .rv-brand-name {
-    color: #5c9a72;
+    color: #77883e;
 }
 
 /* Practitioner Header Navigation */
@@ -1268,16 +1268,16 @@ label {
 
 .rv-header-practitioner .rv-nav-link:hover {
     text-decoration: underline;
-    color: #5c9a72;
+    color: #77883e;
 }
 
 .rv-header-practitioner .rv-nav-link.active {
     text-decoration: underline;
-    color: #5c9a72;
+    color: #77883e;
 }
 
 .rv-header-practitioner .rv-nav-link:focus {
-    outline: 2px solid #5c9a72;
+    outline: 2px solid #77883e;
     outline-offset: 4px;
 }
 
@@ -1311,11 +1311,11 @@ label {
 }
 
 .rv-header-practitioner .rv-avatar-btn:hover {
-    box-shadow: 0 0 0 2px #5c9a72;
+    box-shadow: 0 0 0 2px #77883e;
 }
 
 .rv-header-practitioner .rv-avatar-btn:focus {
-    outline: 2px solid #5c9a72;
+    outline: 2px solid #77883e;
     outline-offset: 2px;
 }
 
@@ -1324,8 +1324,8 @@ label {
    ====================================================== */
 
 .rv-footer {
-    background: #5c9a72;
-    color: #ffffff;
+    background: #77883e;
+    color: #fbf7ec;
     position: relative;
     overflow: hidden;
     padding: 3.5rem 0 1rem 0;
@@ -1391,7 +1391,7 @@ label {
     font-weight: 700;
     line-height: 1.1;
     margin: 0;
-    color: #ffffff;
+    color: #fbf7ec;
     letter-spacing: 0.5px;
 }
 
@@ -1403,7 +1403,7 @@ label {
 .rv-footer-phone,
 .rv-footer-email {
     margin: 0.3rem 0;
-    color: rgba(255, 255, 255, 0.95);
+    color: rgba(251, 247, 236, 0.95);
 }
 
 .rv-footer-socials {
@@ -1418,9 +1418,9 @@ label {
     justify-content: center;
     width: 36px;
     height: 36px;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(251, 247, 236, 0.2);
     border-radius: 50%;
-    color: #ffffff;
+    color: #fbf7ec;
     text-decoration: none;
     font-weight: 700;
     transition: all 0.3s ease;
@@ -1429,7 +1429,7 @@ label {
 
 .rv-social-link:hover {
     background: #d4c47c;
-    color: #5c9a72;
+    color: #77883e;
     transform: translateY(-2px);
 }
 
@@ -1438,7 +1438,7 @@ label {
     font-size: 1.1rem;
     font-weight: 700;
     margin: 0 0 1.2rem 0;
-    color: #ffffff;
+    color: #fbf7ec;
     letter-spacing: 0.3px;
 }
 
@@ -1449,7 +1449,7 @@ label {
 }
 
 .rv-footer-nav a {
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(251, 247, 236, 0.9);
     text-decoration: none;
     font-size: 0.9rem;
     transition: all 0.3s ease;
@@ -1478,7 +1478,7 @@ label {
 .rv-footer-bottom {
     text-align: center;
     padding-top: 2rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    border-top: 1px solid rgba(251, 247, 236, 0.2);
     width: 100%;
     padding-left: 1.5rem;
     padding-right: 1.5rem;
@@ -1492,7 +1492,7 @@ label {
 
 .rv-footer-copyright {
     font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(251, 247, 236, 0.7);
     margin: 0;
     letter-spacing: 0.2px;
 }
@@ -1501,20 +1501,20 @@ label {
     display: inline-block;
     padding: 0.6rem 1.2rem;
     background: #d4c47c;
-    color: #5c9a72;
+    color: #77883e;
     border-radius: 6px;
     text-decoration: none;
     font-weight: 700;
     font-size: 0.8rem;
     transition: all 0.3s ease;
-    white-space: nowrap;
+    #fbf7ec-space: nowrap;
 }
 
 .rv-footer-help-btn:hover {
-    background: #ffffff;
-    color: #5c9a72;
+    background: #fbf7ec;
+    color: #77883e;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(251, 247, 236, 0.3);
 }
 
 .rv-footer-plant {
@@ -1824,7 +1824,7 @@ label {
     padding: 0.6rem 0.8rem;
     border: 1px solid rgba(46, 43, 40, 0.2);
     border-radius: 6px;
-    background: #fff;
+    background: #fbf7ec;
     font-size: 1rem;
     color: var(--rooted-dark);
     transition: border 0.3s ease, box-shadow 0.3s ease;
@@ -1877,7 +1877,7 @@ label {
     border: none;
     border-radius: 8px;
     background: var(--rooted-primary);
-    color: #fff;
+    color: #fbf7ec;
     font-weight: 700;
     font-size: 1rem;
     cursor: pointer;
@@ -1905,3 +1905,60 @@ label {
     font-size: 0.9rem;
     color: var(--rooted-dark);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

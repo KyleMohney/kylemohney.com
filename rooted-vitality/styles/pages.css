@@ -205,7 +205,7 @@ Note: Page-specific selectors wrapped with logical body classes where applicable
 
 .tab-btn {
     padding: 0.7rem 2rem;
-    border: 2px solid #ddd;
+    border: 2px solid #fbf7ec;
     background: var(--color-white);
     color: var(--color-text-light);
     font-family: var(--font-sans);
@@ -282,7 +282,7 @@ Note: Page-specific selectors wrapped with logical body classes where applicable
     max-width: 500px;
     padding: 0.8rem 1.2rem;
     font-size: 1rem;
-    border: 2px solid #ddd;
+    border: 2px solid #fbf7ec;
     border-radius: 8px;
     background: var(--color-white);
     color: var(--color-text);
@@ -373,7 +373,7 @@ Note: Page-specific selectors wrapped with logical body classes where applicable
 /* ========================================== */
 body.dashboard-pro,
 body.dashboard-client {
-    background: #fafaf8;
+    background: #fbf7ec;
 }
 
 body.dashboard-pro .dashboard-wrapper,
@@ -422,7 +422,7 @@ body.signup .progress-section {
 .signup-hero h1 {
     font-size: 2.2rem;
     font-weight: 700;
-    color: var(--rooted-primary, #5c9a72);
+    color: var(--rooted-primary, #77883e);
     margin-bottom: 0.8rem;
     line-height: 1.2;
 }
@@ -434,7 +434,7 @@ body.signup .progress-section {
 }
 
 .signup-form {
-    background: white;
+    background: #fbf7ec;
     border: 1px solid rgba(92, 154, 114, 0.15);
     border-radius: 12px;
     padding: 2.5rem;
@@ -477,8 +477,8 @@ body.signup .progress-section {
 .form-grid input:focus,
 .form-grid select:focus {
     outline: none;
-    border-color: var(--rooted-primary, #5c9a72);
-    background: white;
+    border-color: var(--rooted-primary, #77883e);
+    background: #fbf7ec;
     box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.1);
 }
 
@@ -507,11 +507,11 @@ body.signup .progress-section {
     width: 20px;
     height: 20px;
     cursor: pointer;
-    accent-color: var(--rooted-primary, #5c9a72);
+    accent-color: var(--rooted-primary, #77883e);
 }
 
 .signup-consent a {
-    color: var(--rooted-primary, #5c9a72);
+    color: var(--rooted-primary, #77883e);
     text-decoration: underline;
     transition: color 0.3s ease;
 }
@@ -524,8 +524,8 @@ body.signup .progress-section {
     display: block;
     width: 100%;
     padding: 1rem 1.5rem;
-    background: var(--rooted-primary, #5c9a72);
-    color: white;
+    background: var(--rooted-primary, #77883e);
+    color: #fbf7ec;
     border: none;
     border-radius: 6px;
     font-weight: 700;
@@ -762,7 +762,7 @@ body.policy .container-narrow {
     align-items: center;
     justify-content: center;
     text-align: center;
-    background: white;
+    background: #fbf7ec;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     max-width: 600px;
@@ -789,7 +789,7 @@ JMNUY69
 /* PRACTITIONER DASHBOARD - Single Page Tabs */
 /* ========================================== */
 body.pro-dashboard {
-    background: #f5f3f0;
+    background: #fbf7ec;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -820,12 +820,12 @@ body.pro-dashboard main {
 }
 
 .pro-tabs .tab:hover {
-    color: #5c9a72;
+    color: #77883e;
 }
 
 .pro-tabs .tab.active {
-    color: #5c9a72;
-    border-bottom: 2px solid #5c9a72;
+    color: #77883e;
+    border-bottom: 2px solid #77883e;
 }
 
 .tab-panel {
@@ -856,7 +856,7 @@ body.pro-dashboard main {
     width: 100%;
     border-collapse: collapse;
     margin-top: 1rem;
-    background: white;
+    background: #fbf7ec;
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -879,12 +879,12 @@ body.pro-dashboard main {
 }
 
 .placeholder-table tr:hover {
-    background: #faf8f6;
+    background: #fbf7ec;
 }
 
 .placeholder-table .btn-accent {
-    background: #5c9a72;
-    color: white;
+    background: #77883e;
+    color: #fbf7ec;
     border: none;
     padding: 0.5rem 1rem;
     border-radius: 4px;
@@ -898,7 +898,7 @@ body.pro-dashboard main {
 }
 
 .placeholder-table .btn-neutral {
-    background: #e8e6e3;
+    background: #fbf7ec;
     color: #2e2b28;
     border: 1px solid #d0ccc7;
     padding: 0.5rem 1rem;
@@ -916,7 +916,7 @@ body.pro-dashboard main {
 
 .placeholder-table .btn-danger {
     background: #d9534f;
-    color: white;
+    color: #fbf7ec;
     border: 1px solid #c9302c;
     padding: 0.5rem 1rem;
     border-radius: 4px;
@@ -947,7 +947,7 @@ body.pro-dashboard main {
 }
 
 .landing-under-construction main a {
-    color: #5c9a72;
+    color: #77883e;
     text-decoration: none;
     font-weight: 600;
     transition: text-decoration 0.3s ease;
@@ -968,7 +968,7 @@ body.pro-dashboard main {
     display: flex;
     gap: 1rem;
     margin: 2rem 0 1.5rem;
-    border-bottom: 1px solid #e8e6e3;
+    border-bottom: 1px solid #fbf7ec;
     padding-bottom: 1rem;
 }
 
@@ -987,12 +987,12 @@ body.pro-dashboard main {
 }
 
 .clients-tab:hover {
-    color: #5c9a72;
+    color: #77883e;
 }
 
 .clients-tab.active {
-    color: #5c9a72;
-    border-bottom-color: #5c9a72;
+    color: #77883e;
+    border-bottom-color: #77883e;
 }
 
 /* Scrollable client lists */
@@ -1011,7 +1011,7 @@ body.pro-dashboard main {
 
 /* Client Cards */
 .client-card {
-    background: white;
+    background: #fbf7ec;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     padding: 1.5rem;
@@ -1062,12 +1062,12 @@ body.pro-dashboard main {
 
 .card-divider {
     height: 1px;
-    background: #e8e6e3;
+    background: #fbf7ec;
     margin: 1rem 0;
 }
 
 .message-preview-box {
-    background: #faf8f6;
+    background: #fbf7ec;
     border-radius: 6px;
     padding: 1rem;
     position: relative;
@@ -1090,7 +1090,7 @@ body.pro-dashboard main {
 .read-more-toggle {
     display: inline-block;
     margin-top: 0.5rem;
-    color: #5c9a72;
+    color: #77883e;
     font-weight: 600;
     text-decoration: none;
     cursor: pointer;
@@ -1121,8 +1121,8 @@ body.pro-dashboard main {
 }
 
 .card-actions .btn-accent {
-    background: #5c9a72;
-    color: white;
+    background: #77883e;
+    color: #fbf7ec;
 }
 
 .card-actions .btn-accent:hover {
@@ -1130,7 +1130,7 @@ body.pro-dashboard main {
 }
 
 .card-actions .btn-neutral {
-    background: #e8e6e3;
+    background: #fbf7ec;
     color: #2e2b28;
     border: 1px solid #d0ccc7;
 }
@@ -1142,7 +1142,7 @@ body.pro-dashboard main {
 
 .card-actions .btn-danger {
     background: #d9534f;
-    color: white;
+    color: #fbf7ec;
     border: 1px solid #c9302c;
 }
 
@@ -1150,4 +1150,62 @@ body.pro-dashboard main {
     background: #ac2925;
     border-color: #8b1f1a;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

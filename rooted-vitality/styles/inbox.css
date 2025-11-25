@@ -1,24 +1,24 @@
 /* Inbox Page Styles - Modern, Polished Design */
 
 :root {
-    --inbox-bg: #f9faf8;
-    --sidebar-bg: #ffffff;
-    --thread-bg: #ffffff;
-    --border-light: #ede9e2;
-    --border-darker: #ddd9d0;
+    --inbox-bg: #fbf7ec;
+    --sidebar-bg: #fbf7ec;
+    --thread-bg: #fbf7ec;
+    --border-light: #fbf7ec;
+    --border-darker: #fbf7ec9d0;
     --text-primary: #2e2b28;
     --text-secondary: #5a5a5a;
     --text-tertiary: #8a8a8a;
-    --primary: #5c9a72;
-    --primary-light: #f0f7f3;
+    --primary: #77883e;
+    --primary-light: #fbf7ec;
     --primary-dark: #4a8460;
     --accent: #d4c47c;
-    --accent-light: #f5f3e8;
-    --message-own-bg: linear-gradient(135deg, #5c9a72 0%, #4a8460 100%);
-    --message-other-bg: #f3f1ec;
-    --message-own-text: #ffffff;
+    --accent-light: #fbf7ec;
+    --message-own-bg: linear-gradient(135deg, #77883e 0%, #4a8460 100%);
+    --message-other-bg: #fbf7ec;
+    --message-own-text: #fbf7ec;
     --message-other-text: #2e2b28;
-    --hover: #faf8f5;
+    --hover: #fbf7ec;
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
@@ -54,7 +54,7 @@
 
 /* Sidebar Tabs */
 .sidebar-tab {
-  background: white;
+  background: #fbf7ec;
   border: 2px solid transparent;
   border-radius: 12px;
   padding: 1.5rem;
@@ -69,13 +69,13 @@
 }
 
 .sidebar-tab:hover {
-  border-color: #5c9a72;
+  border-color: #77883e;
   box-shadow: 0 4px 12px rgba(92, 154, 114, 0.1);
 }
 
 .sidebar-tab.active {
-  border-color: #5c9a72;
-  background: #f0f9f6;
+  border-color: #77883e;
+  background: #fbf7ec;
   box-shadow: 0 4px 12px rgba(92, 154, 114, 0.15);
 }
 
@@ -88,7 +88,7 @@
 }
 
 .sidebar-tab.active .sidebar-tab__title {
-  color: #5c9a72;
+  color: #77883e;
 }
 
 .sidebar-tab__badge {
@@ -107,13 +107,13 @@
 
 .sidebar-tab:hover .sidebar-tab__badge,
 .sidebar-tab.active .sidebar-tab__badge {
-  background: #5c9a72;
-  color: white;
+  background: #77883e;
+  color: #fbf7ec;
 }
 
 /* Sidebar Sections */
 .sidebar-section {
-  background: white;
+  background: #fbf7ec;
   border-radius: 12px;
   padding: 1.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -145,7 +145,7 @@
 
 /* Sidebar Tips Section - Grey styling without card wrapper */
 .sidebar-tips-section {
-  background: #f9faf8;
+  background: #fbf7ec;
   border-radius: 0;
   padding: 1rem;
   margin: 0;
@@ -181,9 +181,9 @@
 
 .filter-select {
   padding: 0.6rem 0.75rem;
-  border: 1px solid #ddd9d0;
+  border: 1px solid #fbf7ec9d0;
   border-radius: 6px;
-  background: white;
+  background: #fbf7ec;
   color: #2e2b28;
   font-size: 0.85rem;
   font-family: 'Inter', sans-serif;
@@ -193,20 +193,20 @@
 
 .filter-select:hover {
   border-color: #bfb5a8;
-  background: #faf8f5;
+  background: #fbf7ec;
 }
 
 .filter-select:focus {
   outline: none;
-  border-color: #5c9a72;
+  border-color: #77883e;
   box-shadow: 0 0 0 2px rgba(92, 154, 114, 0.1);
 }
 
 .btn-clear-filters {
   padding: 0.6rem 1rem;
-  background: #f3f1ec;
-  color: #5c9a72;
-  border: 1px solid #ddd9d0;
+  background: #fbf7ec;
+  color: #77883e;
+  border: 1px solid #fbf7ec9d0;
   border-radius: 6px;
   font-size: 0.85rem;
   font-weight: 600;
@@ -216,8 +216,8 @@
 }
 
 .btn-clear-filters:hover {
-  background: #ede9e2;
-  border-color: #5c9a72;
+  background: #fbf7ec;
+  border-color: #77883e;
 }
 
 .btn-clear-filters:active {
@@ -263,7 +263,7 @@
 .search-input:focus {
     outline: none;
     border-color: var(--primary);
-    background: white;
+    background: #fbf7ec;
     box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.1);
 }
 
@@ -399,7 +399,7 @@
     font-size: 0.85rem;
     color: var(--text-tertiary);
     margin: 0 0 0.75rem 0;
-    white-space: nowrap;
+    #fbf7ec-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     font-family: 'Inter', sans-serif;
@@ -455,7 +455,7 @@
     border-radius: 50%;
     background: var(--text-tertiary);
     flex-shrink: 0;
-    box-shadow: 0 0 0 2px white;
+    box-shadow: 0 0 0 2px #fbf7ec;
 }
 
 .thread-status-badge.online {
@@ -652,7 +652,7 @@
     width: 64px;
     height: 64px;
     border-radius: 50%;
-    background: white;
+    background: #fbf7ec;
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -691,7 +691,7 @@
 }
 
 .lead-name-link:hover h3 {
-    color: #5c9a72;
+    color: #77883e;
 }
 
 .lead-hero-info h3 {
@@ -725,7 +725,7 @@
 .lead-service-tag {
     display: inline-block;
     padding: 4px 10px;
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(251, 247, 236, 0.7);
     border-radius: 12px;
     font-size: 0.75rem;
     font-weight: 600;
@@ -754,7 +754,7 @@
 
 .lead-action-primary {
     background: var(--primary);
-    color: white;
+    color: #fbf7ec;
     box-shadow: 0 2px 8px rgba(92, 154, 114, 0.2);
 }
 
@@ -769,13 +769,13 @@
 }
 
 .lead-action-secondary {
-    background: white;
+    background: #fbf7ec;
     color: var(--primary);
     border: 1px solid var(--primary);
 }
 
 .lead-action-secondary:hover {
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(251, 247, 236, 0.9);
     transform: translateY(-2px);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -787,7 +787,7 @@
 /* ===== PROJECT DETAILS SECTION ===== */
 .lead-project-details {
     padding: 24px;
-    background: white;
+    background: #fbf7ec;
     border-bottom: 1px solid var(--border-light);
     max-height: 400px;
     overflow-y: auto;
@@ -834,7 +834,7 @@
 }
 
 .detail-text.long-text {
-    white-space: pre-wrap;
+    #fbf7ec-space: pre-wrap;
     word-break: break-word;
     max-height: 120px;
     overflow-y: auto;
@@ -952,13 +952,13 @@
 
 .message-group.own .message-bubble {
     background: var(--message-own-bg);
-    color: white !important;
+    color: #fbf7ec !important;
     border-bottom-right-radius: 6px;
     margin-left: auto !important;
 }
 
 .message-group--sent .message-bubble {
-    color: white !important;
+    color: #fbf7ec !important;
     margin-left: auto !important;
 }
 
@@ -982,7 +982,7 @@
     display: flex;
     gap: 0.75rem;
     padding: 12px 16px;
-    background: white;
+    background: #fbf7ec;
     border-top: 1px solid var(--border-light);
     box-shadow: var(--shadow-sm);
     align-items: flex-end;
@@ -991,11 +991,11 @@
 .message-input {
     flex: 1;
     padding: 0.5rem 0.75rem;
-    border: 1.5px solid #d0c8ba;
+    border: 1.5px solid #fbf7ec;
     border-radius: 6px;
     font-size: 0.9rem;
     color: var(--text-primary);
-    background: white;
+    background: #fbf7ec;
     transition: all 0.2s ease;
     font-family: 'Inter', sans-serif;
     min-height: 36px;
@@ -1005,7 +1005,7 @@
 .message-input:focus {
     outline: none;
     border-color: var(--primary);
-    background: white;
+    background: #fbf7ec;
     box-shadow: 0 0 0 2px rgba(92, 154, 114, 0.1);
 }
 
@@ -1033,18 +1033,18 @@
     height: 36px;
     border-radius: 6px;
     background: var(--primary);
-    color: white;
+    color: #fbf7ec;
     border: none;
     font-weight: 600;
     font-size: 0.8rem;
     cursor: pointer;
     transition: background 0.2s ease;
     flex-shrink: 0;
-    white-space: nowrap;
+    #fbf7ec-space: nowrap;
 }
 
 .message-send-btn span {
-    color: white;
+    color: #fbf7ec;
 }
 
 .message-send-btn:hover:not(:disabled) {
@@ -1161,7 +1161,7 @@
     font-size: 0.85rem;
     color: var(--text-tertiary);
     margin: 0;
-    white-space: nowrap;
+    #fbf7ec-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     font-family: 'Inter', sans-serif;
@@ -1237,7 +1237,7 @@
         width: 280px;
         height: calc(100vh - 80px);
         z-index: 1000;
-        background: white;
+        background: #fbf7ec;
         box-shadow: var(--shadow-lg);
     }
 
@@ -1313,7 +1313,7 @@
 }
 
 .modal-content {
-    background: white;
+    background: #fbf7ec;
     border-radius: 10px;
     max-width: 450px;
     width: 100%;
@@ -1404,7 +1404,7 @@
 
 .btn-primary {
     background: var(--primary);
-    color: white;
+    color: #fbf7ec;
 }
 
 .btn-primary:hover {
@@ -1419,12 +1419,12 @@
 }
 
 .btn-secondary:hover {
-    background: #ddd9d0;
+    background: #fbf7ec9d0;
 }
 
 .btn-danger {
     background: #dc2626;
-    color: white;
+    color: #fbf7ec;
 }
 
 .btn-danger:hover {
@@ -1432,3 +1432,61 @@
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

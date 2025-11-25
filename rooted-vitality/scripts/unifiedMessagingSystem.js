@@ -208,7 +208,7 @@ function injectUnifiedMessagingStyles() {
       justify-content: center;
       height: 100%;
       min-height: 300px;
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      background: linear-gradient(135deg, #fbf7ec 0%, #c3cfe2 100%);
       border-radius: 12px;
       padding: 2rem;
     }
@@ -292,8 +292,8 @@ function injectUnifiedMessagingStyles() {
     }
 
     .message-group--sent .message-bubble {
-      background: linear-gradient(135deg, #5c9a72 0%, #4a8460 100%);
-      color: white;
+      background: linear-gradient(135deg, #77883e 0%, #4a8460 100%);
+      color: #fbf7ec;
       border-bottom-right-radius: 6px;
       margin-left: auto;
       max-width: none;
@@ -301,7 +301,7 @@ function injectUnifiedMessagingStyles() {
     }
 
     .message-group--sent .bubble-text {
-      color: white !important;
+      color: #fbf7ec !important;
     }
 
     .message-group--received .message-bubble {
@@ -317,7 +317,7 @@ function injectUnifiedMessagingStyles() {
       font-size: 0.95rem;
       line-height: 1.4;
       word-break: break-word;
-      white-space: pre-wrap;
+      #fbf7ec-space: pre-wrap;
       overflow-wrap: break-word;
     }
 
@@ -367,3 +367,60 @@ if (document.readyState === 'loading') {
 } else {
   injectUnifiedMessagingStyles();
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

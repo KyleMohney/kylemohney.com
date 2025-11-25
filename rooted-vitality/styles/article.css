@@ -22,9 +22,9 @@
 /* ========================================== */
 
 :root {
-  --rooted-green: #5c9a72;
+  --rooted-green: #77883e;
   --rooted-dark: #2e2b28;
-  --rooted-light: #f5f3f0;
+  --rooted-light: #fbf7ec;
   --font-inter: 'Inter', sans-serif;
   --font-lora: 'Lora', serif;
 }
@@ -32,7 +32,7 @@
 .article {
   min-height: 100vh;
   padding: 4rem 1rem;
-  background: linear-gradient(180deg, #f9f7f5 0%, #f5f3f0 100%);
+  background: linear-gradient(180deg, #f9f7f5 0%, #fbf7ec 100%);
 }
 
 .article__container {
@@ -332,7 +332,7 @@
   display: inline-block;
   padding: 0.9rem 1.8rem;
   background: var(--rooted-green);
-  color: white;
+  color: #fbf7ec;
   text-decoration: none;
   border-radius: 8px;
   font-family: var(--font-inter);
@@ -493,3 +493,60 @@
     padding: 1rem 1rem 1rem 1rem;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

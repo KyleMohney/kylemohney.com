@@ -1,0 +1,319 @@
+/*
+╔════════════════════════════════════════════════════════════════════╗
+║  ROOTED VITALITY, INC. - NY STATE COMPLIANCE DOCUMENTATION         ║
+║  Legal Requirement: HARD BLOCK for all NY state submissions        ║
+║  ⚖️  DO NOT MODIFY WITHOUT LEGAL REVIEW ⚖️                      ║
+╚════════════════════════════════════════════════════════════════════╝
+
+FILE: docs/NY_STATE_COMPLIANCE_MANIFEST.txt
+DATE: November 24, 2025
+MANDATE: Enforce complete prohibition on submissions from NY state
+
+========================================== 
+COMPLIANCE RULE (UNBREAKABLE)
+========================================== 
+
+NO submissions of ANY kind from New York state residents:
+  ✓ Client project creation/requests - BLOCKED
+  ✓ Client remote service requests - BLOCKED
+  ✓ Client in-person service requests - BLOCKED
+  ✓ Practitioner profile creation - BLOCKED
+  ✓ Practitioner service registration - BLOCKED
+  ✓ Practitioner coverage area updates - BLOCKED
+  ✓ All travel types (in-person, remote, house-calls, hybrid) - BLOCKED
+
+Applies to:
+  ✓ ALL NY state zipcodes (10001-14980+)
+  ✓ ALL service categories and subcategories
+  ✓ ALL user types (clients and practitioners)
+  ✓ ALL situations (no exceptions)
+
+Legal Basis:
+  Regulatory requirement mandated by New York state
+  Litigation protection mandate
+  Cannot be bypassed or disabled
+
+
+========================================== 
+IMPLEMENTATION LOCATIONS
+========================================== 
+
+1. CORE COMPLIANCE MODULE
+   File: scripts/ny-state-compliance.js
+   - Complete NY zipcode database (2000+ zipcodes)
+   - Functions for validation and blocking
+   - Guardian enforcement mechanism
+   - Called on ALL submission attempts
+
+2. CLIENT PROJECT SUBMISSIONS
+   File: scripts/my-projects.js
+   Functions:
+     - submitCreateProject()  [Line ~775 - NY BLOCK ADDED]
+     - submitCreateProjectAndFindMatches()  [Line ~870 - NY BLOCK ADDED]
+   
+   Action: Validates state/zipcode BEFORE database insert
+   
+3. PRACTITIONER PROFILE SAVES
+   File: scripts/proProfile.js
+   Function:
+     - saveProfile()  [Line ~2055 - NY BLOCK ADDED]
+   
+   Action: Validates state/zipcode BEFORE saving profile
+
+4. PRACTITIONER COVERAGE AREA
+   File: dashboard/pro/pages/coverage-area.html
+   Function:
+     - saveCoverageType()  [Line ~1010 - NY BLOCK ADDED]
+   
+   Actions:
+     ✓ Blocks NY zipcodes in all coverage types
+     ✓ Blocks NY state selection for virtual/remote
+     ✓ Prevents hybrid configurations with NY
+     ✓ Works for in-office, house-calls, virtual, hybrid
+
+
+========================================== 
+HOW THE BLOCKS WORK
+========================================== 
+
+VALIDATION FLOW:
+  1. User attempts form submission
+  2. Gather form data (state, zipcode, etc.)
+  3. Call NYStateCompliance.validateNYStateCompliance()
+  4. If NY detected:
+     → Log error with timestamp
+     → Alert user with friendly message
+     → STOP submission (return early)
+     → Never reach database
+  5. If not NY:
+     → Continue with normal submission
+     → Proceed to database insert
+
+GUARDIAN CHECK (Backup):
+  - guardianCheckBeforeSubmit() provides secondary check
+  - Called at LAST POSSIBLE MOMENT before database
+  - If any NY state detected:
+     → Execute error callback
+     → Log critical error
+     → Block submission
+  - If validation passes:
+     → Execute success callback
+     → Allow submission
+
+
+========================================== 
+SCRIPT INCLUSION LOCATIONS
+========================================== 
+
+HTML Files where ny-state-compliance.js is loaded:
+
+1. rooted-vitality/dashboard/client/pages/my-wellness.html
+   - Loaded BEFORE my-projects.js
+   - Protects client project submissions
+
+2. rooted-vitality/dashboard/pro/pages/profile.html
+   - Loaded BEFORE proProfile.js
+   - Protects practitioner profile saves
+
+3. rooted-vitality/dashboard/pro/pages/coverage-area.html
+   - Loaded inline before script section
+   - Protects coverage area configurations
+
+
+========================================== 
+NY ZIPCODE DATABASE
+========================================== 
+
+Complete Coverage:
+  - NYC (all 5 boroughs): 2000+ zipcodes
+  - Upstate regions: All major cities and areas
+  - Metropolitan areas: All suburbs included
+  - Rural NY: Complete coverage from 10001-14980+
+
+Database Structure:
+  const NY_STATE_ZIPCODES = new Set([...])
+  - Uses JavaScript Set for O(1) lookup performance
+  - Contains 2000+ zipcode strings
+  - Easy to update if new zipcodes discovered
+
+Validation Function:
+  isNewYorkZipcode(zipcode) → boolean
+  - Extracts first 5 digits
+  - Checks against NY_STATE_ZIPCODES set
+  - Returns true if NY, false otherwise
+
+
+========================================== 
+ERROR MESSAGES FOR USERS
+========================================== 
+
+Client Submission Blocked:
+  "We're currently unable to serve clients in New York state. 
+   We apologize for any inconvenience. Please contact 
+   support@rootedvitality.com for more information."
+
+Practitioner Profile Blocked:
+  "We cannot onboard practitioners from New York at this time. 
+   This is due to regulatory requirements. Please contact 
+   support for more information."
+
+Coverage Area Blocked:
+  "We are unable to service practitioners in New York state 
+   at this time. Please remove NY zipcodes."
+
+
+========================================== 
+LOGGING & AUDIT TRAIL
+========================================== 
+
+All blocks are logged to browser console:
+
+Format:
+  [NY COMPLIANCE] ⚖️ BLOCKED: [submission_type] submission from NY zipcode [code]
+  [NY COMPLIANCE GUARDIAN] 🚫 SUBMISSION BLOCKED - NY STATE DETECTED
+
+Examples:
+  [NY COMPLIANCE] ⚖️ BLOCKED: project submission from NY zipcode 10001
+  [submitCreateProject] ⚖️ NY STATE COMPLIANCE VIOLATION - PROJECT BLOCKED
+  [Coverage Area] ⚖️ NY STATE COMPLIANCE VIOLATION - NY ZIPCODE DETECTED: 10001
+
+Browser Console Visibility:
+  - All violations logged to console
+  - Can be monitored for compliance audits
+  - Timestamp automatically included
+  - No silent failures
+
+
+========================================== 
+TESTING COMPLIANCE
+========================================== 
+
+Test Cases:
+
+1. Client Try to Submit Project from NY Zipcode:
+   - Fill create project form
+   - Enter zipcode 10001 (NYC)
+   - Click submit
+   - Expected: Alert shown, submission blocked, nothing saved
+
+2. Practitioner Try to Save Coverage with NY Zipcode:
+   - Go to coverage area page
+   - Add zipcode 14604 (Rochester)
+   - Click save
+   - Expected: Alert shown, not saved
+
+3. Practitioner Try Virtual Coverage for NY:
+   - Go to coverage area
+   - Enable Virtual/Remote
+   - Try to add "NY" as licensed state
+   - Click save
+   - Expected: Alert shown, NY not added
+
+4. Valid Non-NY Submissions:
+   - All submissions from non-NY states should work normally
+   - No alerts or blocks
+   - Data saves successfully
+
+
+========================================== 
+MAINTENANCE & UPDATES
+========================================== 
+
+If NY Zipcodes Change:
+  1. Update NY_STATE_ZIPCODES set in ny-state-compliance.js
+  2. Add/remove zipcodes as needed
+  3. Keep documentation updated
+  4. Test with new zipcodes
+  5. Verify no false positives/negatives
+
+Legal Review Required For:
+  - Any modification to validation logic
+  - Changes to error messages
+  - Removal or bypassing of checks
+  - Expansion to other states
+
+
+========================================== 
+CRITICAL NOTES
+========================================== 
+
+DO NOT:
+  ❌ Remove ny-state-compliance.js from any file
+  ❌ Disable or comment out compliance checks
+  ❌ Modify validation logic without legal review
+  ❌ Create workarounds or bypass mechanisms
+  ❌ Allow NY state submissions in any scenario
+  ❌ Modify error messages to be less clear
+
+DO:
+  ✅ Keep compliance script up to date
+  ✅ Monitor console for violations
+  ✅ Document any compliance changes
+  ✅ Test all new features for NY blocking
+  ✅ Keep backups of NY zipcode database
+  ✅ Report any bypass attempts immediately
+
+
+========================================== 
+EMERGENCY PROCEDURES
+========================================== 
+
+If NY Submissions Somehow Get Through:
+  1. IMMEDIATELY disable affected form
+  2. Contact legal team
+  3. Audit database for unauthorized NY entries
+  4. Remove any NY submissions from database
+  5. Investigate how block was bypassed
+  6. Strengthen validation before re-enabling
+
+If Block Prevents Valid Non-NY Submission:
+  1. Check submitted zipcode carefully
+  2. Verify it's actually outside NY
+  3. Update NY_STATE_ZIPCODES if needed
+  4. Test with known valid zipcodes
+  5. Document false positive
+  6. Report to development team
+
+
+========================================== 
+COMPLIANCE VERIFICATION CHECKLIST
+========================================== 
+
+Before Deployment:
+  ☐ ny-state-compliance.js loads without errors
+  ☐ All NY zipcodes in database are correct
+  ☐ Validation functions work on test cases
+  ☐ Client submission blocks NY projects
+  ☐ Practitioner coverage blocks NY areas
+  ☐ Non-NY submissions work normally
+  ☐ Error messages display correctly
+  ☐ Console logging works
+  ☐ No console errors or warnings
+  ☐ HTML files load compliance script
+
+After Deployment:
+  ☐ Monitor console for violations
+  ☐ Test with actual NY zipcodes
+  ☐ Test with valid non-NY zipcodes
+  ☐ Verify no NY entries in database
+  ☐ Keep audit trail for 90+ days
+
+
+========================================== 
+CONTACT & ESCALATION
+========================================== 
+
+Questions About Compliance:
+  - Contact legal@rootedvitality.com
+  - Do NOT modify without approval
+
+Technical Issues:
+  - Contact dev@rootedvitality.com
+  - Include console logs and zipcodes
+
+Suspected Bypass:
+  - Contact security@rootedvitality.com
+  - Include detailed information
+  - URGENT - Respond within 1 hour
+
+*/

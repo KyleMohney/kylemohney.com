@@ -481,7 +481,7 @@ FEATURES:
                 bottom: 24px;
                 right: 24px;
                 background: var(--color-button, #5d6a3e);
-                color: white;
+                color: #fbf7ec;
                 border: none;
                 border-radius: 50px;
                 padding: 14px 24px;
@@ -523,7 +523,7 @@ FEATURES:
                 max-width: calc(100vw - 48px);
                 height: 600px;
                 max-height: calc(100vh - 100px);
-                background: white;
+                background: #fbf7ec;
                 border-radius: 16px;
                 box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
                 display: flex;
@@ -547,7 +547,7 @@ FEATURES:
             /* Chat Header */
             .rv-chat-header {
                 background: linear-gradient(135deg, #5d6a3e 0%, #4a5531 100%);
-                color: white;
+                color: #fbf7ec;
                 padding: 16px;
                 display: flex;
                 justify-content: space-between;
@@ -565,7 +565,7 @@ FEATURES:
                 font-size: 24px;
                 width: 40px;
                 height: 40px;
-                background: rgba(255, 255, 255, 0.2);
+                background: rgba(251, 247, 236, 0.2);
                 border-radius: 50%;
                 display: flex;
                 align-items: center;
@@ -589,7 +589,7 @@ FEATURES:
             #rv-chat-close {
                 background: transparent;
                 border: none;
-                color: white;
+                color: #fbf7ec;
                 cursor: pointer;
                 padding: 4px;
                 display: flex;
@@ -600,7 +600,7 @@ FEATURES:
             }
 
             #rv-chat-close:hover {
-                background: rgba(255, 255, 255, 0.2);
+                background: rgba(251, 247, 236, 0.2);
             }
 
             /* Chat Messages */
@@ -608,7 +608,7 @@ FEATURES:
                 flex: 1;
                 overflow-y: auto;
                 padding: 16px;
-                background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+                background: linear-gradient(135deg, #fafafa 0%, #fbf7ec 100%);
                 display: flex;
                 flex-direction: column;
                 gap: 14px;
@@ -658,12 +658,12 @@ FEATURES:
                 justify-content: center;
                 font-size: 18px;
                 flex-shrink: 0;
-                background: white;
+                background: #fbf7ec;
                 box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             }
 
             .rv-message-content {
-                background: white;
+                background: #fbf7ec;
                 padding: 12px 16px;
                 border-radius: 12px;
                 box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -674,7 +674,7 @@ FEATURES:
             }
             
             .rv-bot-message .rv-message-content {
-                background: linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%);
+                background: linear-gradient(135deg, #fbf7ec 0%, #fbf7ec 100%);
                 border: 1px solid rgba(93, 106, 62, 0.15);
             }
             
@@ -688,14 +688,14 @@ FEATURES:
 
             .rv-user-message .rv-message-content {
                 background: linear-gradient(135deg, #5d6a3e 0%, #4a5531 100%);
-                color: white !important;
+                color: #fbf7ec !important;
                 box-shadow: 0 2px 8px rgba(93, 106, 62, 0.25);
             }
             
             .rv-user-message .rv-message-content p,
             .rv-user-message .rv-message-content span,
             .rv-user-message .rv-message-content div {
-                color: white !important;
+                color: #fbf7ec !important;
             }
             
             .rv-user-message .rv-message-avatar {
@@ -704,7 +704,7 @@ FEATURES:
 
             .rv-message-content p {
                 margin: 0 0 8px 0;
-                white-space: pre-line;
+                #fbf7ec-space: pre-line;
             }
 
             .rv-message-content p:last-child {
@@ -751,7 +751,7 @@ FEATURES:
 
             .rv-article-link a:hover, .rv-support-link a:hover {
                 background: linear-gradient(135deg, #5d6a3e 0%, #4a5531 100%);
-                color: white;
+                color: #fbf7ec;
                 transform: translateY(-1px);
                 box-shadow: 0 4px 12px rgba(93, 106, 62, 0.25);
             }
@@ -759,7 +759,7 @@ FEATURES:
             /* Chat Input */
             .rv-chat-input-wrapper {
                 padding: 16px;
-                background: linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%);
+                background: linear-gradient(135deg, #fbf7ec 0%, #fbf7ec 100%);
                 border-top: 1px solid rgba(93, 106, 62, 0.15);
                 display: flex;
                 gap: 10px;
@@ -774,7 +774,7 @@ FEATURES:
                 font-size: 14px;
                 outline: none;
                 transition: all 0.2s;
-                background: white;
+                background: #fbf7ec;
             }
 
             #rv-chat-input:focus {
@@ -789,7 +789,7 @@ FEATURES:
                 height: 44px;
                 border: none;
                 background: linear-gradient(135deg, #5d6a3e 0%, #4a5531 100%);
-                color: white;
+                color: #fbf7ec;
                 border-radius: 50%;
                 cursor: pointer;
                 display: flex;
@@ -875,3 +875,60 @@ FEATURES:
     init();
 
 })();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

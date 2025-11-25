@@ -467,7 +467,7 @@ async function handleChangePassword() {
 function showPasswordResetSuccessModal() {
     const modalHTML = `
         <div class="modal-overlay" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;">
-            <div class="modal-content" style="background: white; border-radius: 12px; padding: 40px; max-width: 420px; width: 90%; box-shadow: 0 10px 40px rgba(0,0,0,0.15); text-align: center;">
+            <div class="modal-content" style="background: #fbf7ec; border-radius: 12px; padding: 40px; max-width: 420px; width: 90%; box-shadow: 0 10px 40px rgba(0,0,0,0.15); text-align: center;">
                 <div style="font-size: 48px; margin-bottom: 16px;">✓</div>
                 <h2 style="font-size: 20px; color: #2e2b28; margin-bottom: 12px; font-weight: 600;">
                     Check Your Email
@@ -479,7 +479,7 @@ function showPasswordResetSuccessModal() {
                 <p style="font-size: 13px; color: #aaa; margin-bottom: 24px;">
                     <strong>Tip:</strong> Check your spam folder if you don't see the email
                 </p>
-                <button id="close-success-btn" style="width: 100%; padding: 12px; background: #c4a57b; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">Done</button>
+                <button id="close-success-btn" style="width: 100%; padding: 12px; background: #c4a57b; color: #fbf7ec; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">Done</button>
             </div>
         </div>
     `;
@@ -589,8 +589,8 @@ function showNotification(message, type = 'success') {
         top: 100px;
         right: 20px;
         padding: 1rem 1.5rem;
-        background: ${type === 'success' ? '#5c9a72' : '#d4534f'};
-        color: white;
+        background: ${type === 'success' ? '#77883e' : '#d4534f'};
+        color: #fbf7ec;
         border-radius: 8px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         z-index: 10000;
@@ -815,8 +815,8 @@ function showInAppNotification(notification) {
         position: fixed;
         top: 20px;
         right: 20px;
-        background: #5c9a72;
-        color: white;
+        background: #77883e;
+        color: #fbf7ec;
         padding: 1rem 1.5rem;
         border-radius: 8px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -833,7 +833,7 @@ function showInAppNotification(notification) {
         <div style="font-size: 0.9rem; opacity: 0.95;">${message}</div>
         <div style="margin-top: 1rem;">
             <button onclick="this.closest('.in-app-notification-toast').remove()" 
-                    style="background: rgba(255,255,255,0.2); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-weight: 500;">
+                    style="background: rgba(251, 247, 236, 0.2); color: #fbf7ec; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-weight: 500;">
                 Dismiss
             </button>
         </div>
@@ -912,3 +912,59 @@ if (document.readyState === 'loading') {
 } else {
     initializeWhenReady();
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

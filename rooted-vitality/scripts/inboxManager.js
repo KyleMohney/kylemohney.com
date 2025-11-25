@@ -789,20 +789,7 @@ async function loadConversations() {
         // Use a single query with joins instead of N+1 queries
         const { data: acceptedMatches, error: acceptedError } = await window.supabaseClient
             .from('project_practitioner_matches')
-            .select(`
-                id,
-                project_serial,
-                status,
-                created_at,
-                projects:project_serial (
-                    id,
-                    description,
-                    category_name,
-                    client_serial,
-                    zipcode,
-                    travel_preference
-                )
-            `)
+            .select('id, project_serial, status, created_at')
             .eq('practitioner_serial', practitionerSerial)
             .in('status', ['pending', 'active', 'in-progress', 'hired', 'not-hired']);
 
@@ -813,17 +800,56 @@ async function loadConversations() {
 
         console.log('[Inbox] Loaded accepted matches:', acceptedMatches?.length);
 
-        // Get all unique client IDs and project serials from matches
-        const clientSerials = [...new Set(acceptedMatches?.map(m => m.projects?.client_serial).filter(Boolean) || [])];
-        const projectSerials = [...new Set(acceptedMatches?.map(m => m.project_serial) || [])];
+        // Load declined matches now
+        const { data: declinedMatches, error: declinedError } = await window.supabaseClient
+            .from('project_practitioner_matches')
+            .select('id, project_serial, status, created_at')
+            .eq('practitioner_serial', practitionerSerial)
+            .eq('status', 'declined');
+
+        if (declinedError) {
+            console.error('[Inbox] Error loading declined matches:', declinedError);
+        }
+
+        console.log('[Inbox] Loaded declined matches:', declinedMatches?.length);
+
+        // Get ALL unique project serials from BOTH accepted and declined matches
+        const allProjectSerials = [...new Set([
+            ...(acceptedMatches?.map(m => m.project_serial) || []),
+            ...(declinedMatches?.map(m => m.project_serial) || [])
+        ])];
+        
+        // Fetch projects for ALL matches (accepted + declined)
+        let projectsData = [];
+        if (allProjectSerials.length > 0) {
+            const { data: projects, error: projectsError } = await window.supabaseClient
+                .from('projects')
+                .select('id, project_serial, description, category_name, client_serial, zipcode, travel_preference')
+                .in('project_serial', allProjectSerials);
+            
+            if (projectsError) {
+                console.error('[Inbox] Error fetching projects:', projectsError);
+            } else {
+                projectsData = projects || [];
+            }
+        }
+
+        // Get all unique client IDs from projects
+        const clientSerials = [...new Set(projectsData?.map(p => p.client_serial).filter(Boolean) || [])];
 
         // Batch fetch all clients
-        const { data: allClients } = await window.supabaseClient
-            .from('clients')
-            .select('id, first_name, last_name, profile_picture_url, serial_number')
-            .in('serial_number', clientSerials);
+        let clientsMap = new Map();
+        if (clientSerials.length > 0) {
+            const { data: allClients } = await window.supabaseClient
+                .from('clients')
+                .select('id, first_name, last_name, profile_picture_url, serial_number')
+                .in('serial_number', clientSerials);
 
-        const clientsMap = new Map(allClients?.map(c => [c.serial_number, c]) || []);
+            clientsMap = new Map(allClients?.map(c => [c.serial_number, c]) || []);
+        }
+
+        // Create projects map for easy lookup
+        const projectsMap = new Map(projectsData?.map(p => [p.project_serial, p]) || []);
 
         // Batch fetch all messages for all projects
         const { data: allMessages } = await window.supabaseClient
@@ -863,7 +889,7 @@ async function loadConversations() {
         // Process accepted matches with pre-fetched data
         for (const match of acceptedMatches || []) {
             try {
-                const project = match.projects;
+                const project = projectsMap.get(match.project_serial);
                 if (!project) continue;
 
                 const client = clientsMap.get(project.client_serial);
@@ -932,36 +958,10 @@ async function loadConversations() {
             }
         }
 
-        // ===== LOAD DECLINED MATCHES (Archive Tab) =====
-        const { data: declinedMatches, error: declinedError } = await window.supabaseClient
-            .from('project_practitioner_matches')
-            .select(`
-                id,
-                project_serial,
-                status,
-                created_at,
-                projects:project_serial (
-                    id,
-                    description,
-                    category_name,
-                    client_serial,
-                    zipcode,
-                    travel_preference
-                )
-            `)
-            .eq('practitioner_serial', practitionerSerial)
-            .eq('status', 'declined');
-
-        if (declinedError) {
-            console.error('[Inbox] Error loading declined matches:', declinedError);
-        }
-
-        console.log('[Inbox] Loaded declined matches:', declinedMatches?.length);
-
         // Process declined matches (already have clients and blocks from batch fetches above)
         for (const match of declinedMatches || []) {
             try {
-                const project = match.projects;
+                const project = projectsMap.get(match.project_serial);
                 if (!project) continue;
 
                 const client = clientsMap.get(project.client_serial);

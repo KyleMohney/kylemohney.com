@@ -67,29 +67,29 @@ serve(async (req) => {
     
     <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
       
-      <div style="background: linear-gradient(135deg, #5c9a72 0%, #4a8b62 100%); color: white; padding: 30px; border-radius: 12px 12px 0 0;">
+      <div style="background: linear-gradient(135deg, #77883e 0%, #4a8b62 100%); color: #fbf7ec; padding: 30px; border-radius: 12px 12px 0 0;">
         <h1 style="margin: 0; font-size: 24px;">🚨 User Concern Report Received</h1>
         <p style="margin: 10px 0 0 0; opacity: 0.9;">Ticket #${ticketId}</p>
       </div>
 
-      <div style="background: white; padding: 30px; border: 1px solid #e8e6e3; border-top: none; border-radius: 0 0 12px 12px;">
+      <div style="background: #fbf7ec; padding: 30px; border: 1px solid #fbf7ec; border-top: none; border-radius: 0 0 12px 12px;">
         
         <div style="margin-bottom: 25px;">
           <p><strong>Category:</strong> ${getCategoryLabel(category)}</p>
-          <p><strong>Priority Level:</strong> <span style="background: ${getPriorityColor(priority)}; color: white; padding: 4px 12px; border-radius: 4px; font-weight: 600;">${priority.toUpperCase()}</span></p>
+          <p><strong>Priority Level:</strong> <span style="background: ${getPriorityColor(priority)}; color: #fbf7ec; padding: 4px 12px; border-radius: 4px; font-weight: 600;">${priority.toUpperCase()}</span></p>
         </div>
 
-        <div style="border-left: 4px solid #5c9a72; padding-left: 15px; margin-bottom: 25px;">
+        <div style="border-left: 4px solid #77883e; padding-left: 15px; margin-bottom: 25px;">
           <h3 style="margin: 0 0 10px 0; color: #2e2b28;">Issue Title</h3>
           <p style="margin: 0; font-size: 16px; font-weight: 500;">${escapeHtml(title)}</p>
         </div>
 
-        <div style="border-left: 4px solid #5c9a72; padding-left: 15px; margin-bottom: 25px;">
+        <div style="border-left: 4px solid #77883e; padding-left: 15px; margin-bottom: 25px;">
           <h3 style="margin: 0 0 10px 0; color: #2e2b28;">Description</h3>
-          <p style="margin: 0; white-space: pre-wrap;">${escapeHtml(description)}</p>
+          <p style="margin: 0; #fbf7ec-space: pre-wrap;">${escapeHtml(description)}</p>
         </div>
 
-        <div style="background: #fafaf9; padding: 15px; border-radius: 8px; margin-bottom: 25px;">
+        <div style="background: #fbf7ec; padding: 15px; border-radius: 8px; margin-bottom: 25px;">
           <h3 style="margin: 0 0 15px 0; color: #2e2b28; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Report Details</h3>
           
           <div style="margin-bottom: 10px;">
@@ -113,11 +113,11 @@ serve(async (req) => {
           </div>
           
           <div style="margin-bottom: 0;">
-            <p style="margin: 0; font-size: 13px;"><strong>URL:</strong> <code style="background: white; padding: 2px 6px; border-radius: 3px; font-family: monospace; font-size: 12px; overflow-wrap: break-word;">${escapeHtml(url)}</code></p>
+            <p style="margin: 0; font-size: 13px;"><strong>URL:</strong> <code style="background: #fbf7ec; padding: 2px 6px; border-radius: 3px; font-family: monospace; font-size: 12px; overflow-wrap: break-word;">${escapeHtml(url)}</code></p>
           </div>
         </div>
 
-        <div style="border-top: 1px solid #e8e6e3; padding-top: 20px; font-size: 12px; color: #a8a39f;">
+        <div style="border-top: 1px solid #fbf7ec; padding-top: 20px; font-size: 12px; color: #a8a39f;">
           <p style="margin: 0;">This is an automated report from the Rooted Vitality platform. Please investigate and follow up with the user if necessary. Check the CONCERNS_AND_ISSUES_LOG.md in the docs folder for tracking.</p>
         </div>
 
@@ -223,11 +223,11 @@ function getPriorityColor(priority) {
     case "high":
       return "#d4a574";
     case "medium":
-      return "#5c9a72";
+      return "#77883e";
     case "low":
       return "#a8a39f";
     default:
-      return "#5c9a72";
+      return "#77883e";
   }
 }
 
@@ -254,3 +254,59 @@ function escapeHtml(text) {
   };
   return text.replace(/[&<>"']/g, (m) => map[m]);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

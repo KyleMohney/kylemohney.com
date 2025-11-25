@@ -223,7 +223,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             position: fixed;
             top: 20px;
             right: 20px;
-            background: white;
+            background: #fbf7ec;
             border-left: 4px solid #4CAF50;
             padding: 16px 20px;
             border-radius: 6px;
@@ -451,6 +451,7 @@ async function loadMatches(clientSerial) {
           id,
           created_at,
           updated_at,
+          project_serial,
           opportunities (
             id,
             project_serial,
@@ -489,16 +490,21 @@ async function loadMatches(clientSerial) {
             zipcode,
             travel_preference,
             description,
-            custom_name
+            custom_name,
+            client_serial
           )
         `)
         .eq('is_opportunity_message', true)
-        .eq('project_client_serial', clientSerial)
         .order('created_at', { ascending: false });
 
       if (!oppError && oppMessages) {
+        // Filter to only opportunities for this client (by checking project.client_serial)
+        const clientOppMessages = oppMessages.filter(msg => {
+          return msg.projects?.client_serial === clientSerial;
+        });
+
         // Filter to only active opportunities (not declined, not converted, not archived)
-        const activeOppMessages = oppMessages.filter(msg => {
+        const activeOppMessages = clientOppMessages.filter(msg => {
           if (!msg.opportunities) return false;
           const opp = msg.opportunities;
           return !opp.declined_by_client && !opp.converted_to_match && !opp.is_archived;
@@ -865,12 +871,12 @@ function createThreadItem(match) {
   item.innerHTML = `
     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; width: 100%;">
       <div class="thread-avatar-small">
-        ${logoUrl ? `<img src="${logoUrl}" alt="${escapeHtml(displayName)}" style="width: 100%; height: 100%; object-fit: cover;">` : `<span style="color: white; font-weight: 700; font-size: 0.95rem;">${initials}</span>`}
+        ${logoUrl ? `<img src="${logoUrl}" alt="${escapeHtml(displayName)}" style="width: 100%; height: 100%; object-fit: cover;">` : `<span style="color: #fbf7ec; font-weight: 700; font-size: 0.95rem;">${initials}</span>`}
       </div>
       <div style="flex: 1; min-width: 0;">
         <p class="thread-name">${escapeHtml(displayName)}</p>
         <p class="thread-preview">${escapeHtml(phoneDisplay)}</p>
-        ${isOpportunity ? `<p class="thread-opportunity-badge" style="font-size: 0.75rem; color: #5c9a72; font-weight: 600; margin-top: 2px;">⭐ OPPORTUNITY</p>` : ''}
+        ${isOpportunity ? `<p class="thread-opportunity-badge" style="font-size: 0.75rem; color: #77883e; font-weight: 600; margin-top: 2px;">⭐ OPPORTUNITY</p>` : ''}
       </div>
       <span class="thread-time">${lastMessageTime}</span>
       ${!isOpportunity ? `
@@ -1388,7 +1394,7 @@ function openMessagingThread(match) {
   const practitionerDisplayName = formatPractitionerName(practitioner.dba_name || practitioner.legal_name || 'Practitioner');
   threadNameEl.textContent = practitionerDisplayName;
   threadNameEl.style.cursor = 'pointer';
-  threadNameEl.style.color = '#5c9a72';
+  threadNameEl.style.color = '#77883e';
   threadNameEl.title = 'View practitioner profile';
   
   // Make name clickable to view public preview profile
@@ -1878,4 +1884,60 @@ function showNotification(message, type = 'info') {
   console.log(`[${type.toUpperCase()}] ${message}`);
   // TODO: Implement toast notification UI
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

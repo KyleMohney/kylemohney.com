@@ -27,7 +27,7 @@ TABLE OF CONTENTS:
 .find-practitioners-container {
   width: 100%;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #f0f4f8 100%);
+  background: linear-gradient(135deg, #fbf7ec 0%, #fbf7ec 100%);
 }
 
 .directory-grid {
@@ -44,7 +44,7 @@ TABLE OF CONTENTS:
    ============================================================================ */
 
 .directory-hero {
-  background: linear-gradient(135deg, #5c9a72 0%, #4a7a5e 100%);
+  background: linear-gradient(135deg, #77883e 0%, #4a7a5e 100%);
   padding: 3rem 2rem;
   text-align: center;
 }
@@ -58,19 +58,19 @@ TABLE OF CONTENTS:
   font-family: 'Inter', sans-serif;
   font-size: 2.5rem;
   font-weight: 700;
-  color: #fff;
+  color: #fbf7ec;
   margin-bottom: 0.5rem;
 }
 
 .directory-hero__subtitle {
   font-family: 'Lora', serif;
   font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(251, 247, 236, 0.9);
 }
 
 /* Project Information Card in Hero */
 .project-info-card {
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(251, 247, 236, 0.95);
   border-radius: 12px;
   padding: 1.5rem;
   margin-top: 2rem;
@@ -121,7 +121,7 @@ TABLE OF CONTENTS:
   font-family: 'Inter', sans-serif;
   font-size: 0.8rem;
   font-weight: 600;
-  color: #5c9a72;
+  color: #77883e;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -170,7 +170,7 @@ TABLE OF CONTENTS:
 }
 
 .directory-sidebar__card {
-  background: #fff;
+  background: #fbf7ec;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   padding: 1.5rem;
@@ -183,7 +183,7 @@ TABLE OF CONTENTS:
 }
 
 .directory-sidebar__card--featured {
-  background: linear-gradient(135deg, #f0f9ff 0%, #f5f7fa 100%);
+  background: linear-gradient(135deg, #fbf7ec 0%, #fbf7ec 100%);
   border: 1.5px solid #3b82f6;
 }
 
@@ -204,7 +204,7 @@ TABLE OF CONTENTS:
   font-family: 'Inter', sans-serif;
   font-size: 0.95rem;
   color: #374151;
-  background: #fff;
+  background: #fbf7ec;
   transition: border-color 0.2s ease;
 }
 
@@ -290,7 +290,7 @@ TABLE OF CONTENTS:
   width: 1.1rem;
   height: 1.1rem;
   cursor: pointer;
-  accent-color: #5c9a72;
+  accent-color: #77883e;
 }
 
 .checkbox-text {
@@ -311,7 +311,7 @@ TABLE OF CONTENTS:
   align-items: center;
   margin-bottom: 2rem;
   padding: 1.5rem;
-  background: #fff;
+  background: #fbf7ec;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
 }
@@ -343,7 +343,7 @@ TABLE OF CONTENTS:
 }
 
 .practitioner-card {
-  background: #fff;
+  background: #fbf7ec;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   overflow: hidden;
@@ -356,13 +356,13 @@ TABLE OF CONTENTS:
 
 .practitioner-card:hover {
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
-  border-color: #5c9a72;
+  border-color: #77883e;
   transform: translateY(-4px);
 }
 
 .practitioner-card--matched {
   opacity: 0.65;
-  background: #f9fafb;
+  background: #fbf7ec;
 }
 
 .practitioner-card--matched:hover {
@@ -387,7 +387,7 @@ TABLE OF CONTENTS:
 .matched-label {
   font-size: 2.5rem;
   font-weight: 800;
-  color: white;
+  color: #fbf7ec;
   text-shadow: 
     0 2px 4px rgba(0, 0, 0, 0.5),
     0 4px 8px rgba(0, 0, 0, 0.4),
@@ -397,7 +397,7 @@ TABLE OF CONTENTS:
 }
 
 .card-avatar-section {
-  background: linear-gradient(135deg, #5c9a72 0%, #4a7a5e 100%);
+  background: linear-gradient(135deg, #77883e 0%, #4a7a5e 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -411,7 +411,7 @@ TABLE OF CONTENTS:
   height: 140px;
   border-radius: 50%;
   object-fit: cover;
-  border: 4px solid rgba(255, 255, 255, 0.2);
+  border: 4px solid rgba(251, 247, 236, 0.2);
 }
 
 .card-body {
@@ -463,7 +463,7 @@ TABLE OF CONTENTS:
 .service-badge {
   display: inline-block;
   padding: 0.4rem 0.8rem;
-  background: #f3f4f6;
+  background: #fbf7ec;
   border: 1px solid #d1d5db;
   border-radius: 20px;
   font-family: 'Inter', sans-serif;
@@ -473,7 +473,7 @@ TABLE OF CONTENTS:
 }
 
 .service-badge--available {
-  background: #d1fae5;
+  background: #fbf7ec;
   border-color: #a7f3d0;
   color: #065f46;
 }
@@ -507,7 +507,7 @@ TABLE OF CONTENTS:
 }
 
 .card-btn--view {
-  background: #f3f4f6;
+  background: #fbf7ec;
   color: #374151;
   border: 1px solid #d1d5db;
 }
@@ -527,8 +527,8 @@ TABLE OF CONTENTS:
 }
 
 .card-btn--connect {
-  background: #5c9a72;
-  color: #fff;
+  background: #77883e;
+  color: #fbf7ec;
 }
 
 .card-btn--connect:hover {
@@ -573,7 +573,7 @@ TABLE OF CONTENTS:
 .modal__content {
   position: relative;
   z-index: 1001;
-  background: #fff;
+  background: #fbf7ec;
   border-radius: 16px;
   max-width: 500px;
   width: 90%;
@@ -645,7 +645,7 @@ TABLE OF CONTENTS:
   height: 120px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid #5c9a72;
+  border: 3px solid #77883e;
 }
 
 .profile-info {
@@ -685,7 +685,7 @@ TABLE OF CONTENTS:
 }
 
 .profile-section {
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid #fbf7ec;
   padding-top: 1.5rem;
 }
 
@@ -704,7 +704,7 @@ TABLE OF CONTENTS:
 }
 
 .services-badges .service-badge {
-  background: #d1fae5;
+  background: #fbf7ec;
   border-color: #a7f3d0;
   color: #065f46;
 }
@@ -762,7 +762,7 @@ TABLE OF CONTENTS:
   align-items: center;
   gap: 1rem;
   padding: 2rem;
-  background: #fff;
+  background: #fbf7ec;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
 }
@@ -779,7 +779,7 @@ TABLE OF CONTENTS:
 .empty-state {
   text-align: center;
   padding: 4rem 2rem;
-  background: #fff;
+  background: #fbf7ec;
   border: 2px dashed #d1d5db;
   border-radius: 12px;
 }
@@ -926,8 +926,8 @@ TABLE OF CONTENTS:
 }
 
 .btn--primary {
-  background: #5c9a72;
-  color: #fff;
+  background: #77883e;
+  color: #fbf7ec;
 }
 
 .btn--primary:hover {
@@ -935,7 +935,7 @@ TABLE OF CONTENTS:
 }
 
 .btn--secondary {
-  background: #f3f4f6;
+  background: #fbf7ec;
   color: #374151;
   border: 1px solid #d1d5db;
 }
@@ -971,7 +971,7 @@ TABLE OF CONTENTS:
 }
 
 .badge--verified {
-  background: #d1fae5;
+  background: #fbf7ec;
   color: #047857;
   border: 1px solid #6ee7b7;
 }
@@ -986,7 +986,7 @@ TABLE OF CONTENTS:
   position: relative;
   height: auto;
   min-height: 180px;
-  background: linear-gradient(135deg, #5c9a72 0%, #4a7a5e 100%);
+  background: linear-gradient(135deg, #77883e 0%, #4a7a5e 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1026,9 +1026,9 @@ TABLE OF CONTENTS:
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  color: white;
+  color: #fbf7ec;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-  white-space: nowrap;
+  #fbf7ec-space: nowrap;
   list-style: none;
   padding: 0.25rem 0;
 }
@@ -1041,16 +1041,74 @@ TABLE OF CONTENTS:
   height: 1.1em;
   font-weight: 700;
   font-size: 1.1em;
-  color: white;
+  color: #fbf7ec;
 }
 
 .match-score {
   display: inline-block;
   padding: 0.25rem 0.6rem;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(251, 247, 236, 0.2);
   color: #10b981;
   font-weight: 600;
   border-radius: 4px;
   font-size: 0.8rem;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

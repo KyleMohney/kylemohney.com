@@ -365,7 +365,7 @@ select {
     border-radius: var(--radius-sm);
     font-size: 0.85rem;
     font-weight: 400;
-    white-space: nowrap;
+    #fbf7ec-space: nowrap;
     z-index: 10;
     transition: all 0.3s ease;
 }
@@ -457,7 +457,7 @@ select {
     top: 1.5rem;
     right: 1.5rem;
     background: rgba(211, 47, 47, 0.9);
-    color: white;
+    color: #fbf7ec;
     border: none;
     padding: 0.5rem 1rem;
     border-radius: var(--radius-sm);
@@ -505,7 +505,7 @@ select {
 
 .btn-remove-file:hover {
     background: #d32f2f;
-    color: white;
+    color: #fbf7ec;
 }
 
 .gallery-preview {
@@ -536,7 +536,7 @@ select {
     height: 28px;
     border-radius: 50%;
     background: rgba(211, 47, 47, 0.9);
-    color: white;
+    color: #fbf7ec;
     border: none;
     font-size: 1.25rem;
     font-weight: bold;
@@ -926,7 +926,7 @@ select {
 }
 
 .modal-content {
-    background-color: white;
+    background-color: #fbf7ec;
     border-radius: 12px;
     padding: 2.5rem;
     max-width: 500px;
@@ -940,7 +940,7 @@ select {
     width: 60px;
     height: 60px;
     background-color: #2d7d3d;
-    color: white;
+    color: #fbf7ec;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -982,3 +982,60 @@ select {
         opacity: 1;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

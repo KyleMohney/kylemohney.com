@@ -85,7 +85,7 @@
     font-size: 0.95rem;
     transition: all 0.2s ease;
     border: 1px solid #e0dcd5;
-    background: #ffffff;
+    background: #fbf7ec;
     text-align: left;
 }
 
@@ -96,9 +96,9 @@
 }
 
 .settings-nav-link.active {
-    background: #5c9a72;
-    color: #ffffff;
-    border-color: #5c9a72;
+    background: #77883e;
+    color: #fbf7ec;
+    border-color: #77883e;
     font-weight: 500;
     box-shadow: 0 2px 8px rgba(92, 154, 114, 0.2);
 }
@@ -108,10 +108,10 @@
 /* ========================================== */
 
 .settings-content {
-    background: white;
+    background: #fbf7ec;
     border-radius: 12px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-    border: 1px solid #f3f4f6;
+    border: 1px solid #fbf7ec;
     overflow: hidden;
 }
 
@@ -153,7 +153,7 @@
 /* ========================================== */
 
 .settings-card {
-    background: white;
+    background: #fbf7ec;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
     padding: 1.5rem;
@@ -191,8 +191,8 @@
     visibility: visible;
     padding: 0.5rem 1rem;
     font-size: 0.85rem;
-    background: #5c9a72;
-    color: white;
+    background: #77883e;
+    color: #fbf7ec;
     border: none;
     border-radius: 6px;
     font-weight: 600;
@@ -274,7 +274,7 @@
     font-family: inherit;
     font-size: 0.95rem;
     color: var(--dark-text);
-    background: white;
+    background: #fbf7ec;
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -294,7 +294,7 @@
 /* ========================================== */
 
 .notification-info-banner {
-    background: #f0f9f7;
+    background: #fbf7ec;
     border: 1px solid #d1e9e6;
     border-radius: 8px;
     padding: 1rem;
@@ -339,12 +339,12 @@
     width: 18px;
     height: 18px;
     cursor: pointer;
-    accent-color: #5c9a72;
+    accent-color: #77883e;
     flex-shrink: 0;
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
-    background: white;
+    background: #fbf7ec;
     border: 2px solid #d1d5db;
     border-radius: 4px;
     outline: none;
@@ -352,13 +352,13 @@
 }
 
 .notification-channel-toggle input[type="checkbox"]:hover {
-    border-color: #5c9a72;
+    border-color: #77883e;
 }
 
 .notification-channel-toggle input[type="checkbox"]:checked {
-    background: #5c9a72;
-    border-color: #5c9a72;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='white' d='M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 11.94l6.72-6.72a.75.75 0 011.06 0z'/%3E%3C/svg%3E");
+    background: #77883e;
+    border-color: #77883e;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='#fbf7ec' d='M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 11.94l6.72-6.72a.75.75 0 011.06 0z'/%3E%3C/svg%3E");
     background-size: 100% 100%;
     background-position: center;
     background-repeat: no-repeat;
@@ -393,7 +393,7 @@
 }
 
 .status-badge.inactive {
-    background: #fee2e2;
+    background: #fbf7ec;
     color: #991b1b;
 }
 
@@ -423,8 +423,8 @@
 .btn-edit-setting,
 .btn-setting-action,
 .btn-primary {
-    background: #5c9a72;
-    color: white;
+    background: #77883e;
+    color: #fbf7ec;
 }
 
 .btn-accent:hover,
@@ -432,7 +432,7 @@
 .btn-setting-action:hover,
 .btn-primary:hover,
 .card-header .btn-edit-setting:hover {
-    background: #4a7d5a;
+    background: #5f7030;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(92, 154, 114, 0.25);
 }
@@ -446,15 +446,15 @@
 }
 
 .card-content .btn-setting-action {
-    background: #5c9a72;
-    color: white !important;
+    background: #77883e;
+    color: #fbf7ec !important;
     display: inline-block !important;
     visibility: visible !important;
 }
 
 #change-password-btn {
-    background: #5c9a72 !important;
-    color: white !important;
+    background: #77883e !important;
+    color: #fbf7ec !important;
     padding: 0.75rem 1.5rem !important;
     border: none !important;
     border-radius: 8px !important;
@@ -475,8 +475,8 @@
 
 .btn-secondary:hover {
     background: rgba(92, 154, 114, 0.05);
-    border-color: #4a7d5a;
-    color: #4a7d5a;
+    border-color: #5f7030;
+    color: #5f7030;
 }
 
 /* ========================================== */
@@ -504,7 +504,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #ccc;
+    background-color: #fbf7ec;
     transition: all 0.3s ease;
     border-radius: 28px;
 }
@@ -516,13 +516,13 @@
     width: 20px;
     left: 4px;
     bottom: 4px;
-    background-color: white;
+    background-color: #fbf7ec;
     transition: all 0.3s ease;
     border-radius: 50%;
 }
 
 .toggle-switch input:checked + .toggle-slider {
-    background-color: #5c9a72;
+    background-color: #77883e;
 }
 
 .toggle-switch input:checked + .toggle-slider:before {
@@ -535,8 +535,8 @@
 
 /* Featured Card (for important settings) */
 .settings-card--featured {
-    border: 2px solid #5c9a72;
-    background: linear-gradient(135deg, #f0f9f7 0%, #ffffff 100%);
+    border: 2px solid #77883e;
+    background: linear-gradient(135deg, #fbf7ec 0%, #fbf7ec 100%);
 }
 
 .settings-card--featured .card-header {
@@ -590,8 +590,8 @@
 #view-billing-btn,
 #manage-payment-btn,
 #view-history-btn {
-    background: #5c9a72;
-    color: white;
+    background: #77883e;
+    color: #fbf7ec;
     padding: 0.75rem 1.5rem;
     border: none;
     border-radius: 8px;
@@ -600,14 +600,14 @@
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: inline-block;
-    white-space: nowrap;
+    #fbf7ec-space: nowrap;
 }
 
 #upgrade-plan-btn:hover,
 #view-billing-btn:hover,
 #manage-payment-btn:hover,
 #view-history-btn:hover {
-    background: #4a7d5a;
+    background: #5f7030;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(92, 154, 114, 0.25);
 }
@@ -642,7 +642,7 @@
     .settings-nav-link {
         padding: 0.5rem 1rem;
         font-size: 0.85rem;
-        white-space: nowrap;
+        #fbf7ec-space: nowrap;
     }
 
     .settings-content {
@@ -772,7 +772,7 @@
 
 .edit-inline-input:focus {
     outline: none;
-    border-color: #4a7d5a;
+    border-color: #5f7030;
     box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.1);
 }
 
@@ -795,19 +795,77 @@
 
 .btn-inline-save {
     background-color: var(--rooted-primary);
-    color: white;
+    color: #fbf7ec;
 }
 
 .btn-inline-save:hover {
-    background-color: #4a7d5a;
+    background-color: #5f7030;
     transform: translateY(-1px);
 }
 
 .btn-inline-cancel {
-    background-color: #f0f0f0;
+    background-color: #fbf7ec;
     color: var(--rooted-dark);
 }
 
 .btn-inline-cancel:hover {
     background-color: #e0e0e0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

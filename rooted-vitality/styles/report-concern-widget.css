@@ -25,7 +25,7 @@
 .report-concern-link {
     background: none;
     border: none;
-    color: #5c9a72;
+    color: #77883e;
     padding: 0;
     border-radius: 0;
     font-size: 14px;
@@ -73,7 +73,7 @@
 }
 
 #report-concern-modal .modal-content {
-    background-color: white;
+    background-color: #fbf7ec;
     border-radius: 12px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
     animation: slideDown 0.3s ease;
@@ -97,7 +97,7 @@
 }
 
 .report-concern-modal-content {
-    background-color: white;
+    background-color: #fbf7ec;
     padding: 0;
     border-radius: 12px;
     width: 90%;
@@ -121,8 +121,8 @@
 
 /* Modal Header */
 .modal-header {
-    background: linear-gradient(135deg, #5c9a72 0%, #4a8b62 100%);
-    color: white;
+    background: linear-gradient(135deg, #77883e 0%, #4a8b62 100%);
+    color: #fbf7ec;
     padding: 25px;
     border-radius: 12px 12px 0 0;
     display: flex;
@@ -135,13 +135,13 @@
     margin: 0;
     font-size: 22px;
     font-weight: 600;
-    color: white;
+    color: #fbf7ec;
 }
 
 .close-btn {
     background: none;
     border: none;
-    color: white;
+    color: #fbf7ec;
     font-size: 28px;
     cursor: pointer;
     padding: 0;
@@ -155,7 +155,7 @@
 }
 
 .close-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(251, 247, 236, 0.1);
 }
 
 /* Modal Form */
@@ -184,7 +184,7 @@
     border-radius: 6px;
     font-family: inherit;
     font-size: 14px;
-    background: white;
+    background: #fbf7ec;
     color: #2e2b28;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
     box-sizing: border-box;
@@ -194,7 +194,7 @@
 .form-group textarea:focus,
 .form-group select:focus {
     outline: none;
-    border-color: #5c9a72;
+    border-color: #77883e;
     box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.1);
 }
 
@@ -230,7 +230,7 @@
     align-items: center;
     margin-top: 30px;
     padding-top: 20px;
-    border-top: 1px solid #e8e6e3;
+    border-top: 1px solid #fbf7ec;
 }
 
 .btn-primary,
@@ -253,8 +253,8 @@
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #5c9a72 0%, #4a8b62 100%);
-    color: white;
+    background: linear-gradient(135deg, #77883e 0%, #4a8b62 100%);
+    color: #fbf7ec;
 }
 
 .btn-primary:hover:not(:disabled) {
@@ -272,13 +272,13 @@
 }
 
 .btn-secondary {
-    background: #f5f3f0;
-    color: #5c9a72;
-    border: 1px solid #e8e6e3;
+    background: #fbf7ec;
+    color: #77883e;
+    border: 1px solid #fbf7ec;
 }
 
 .btn-secondary:hover {
-    background: #e8e6e3;
+    background: #fbf7ec;
 }
 
 /* ============================================================
@@ -330,29 +330,29 @@
 @media (prefers-color-scheme: dark) {
     .report-concern-modal-content {
         background-color: #2e2b28;
-        color: #f5f3f0;
+        color: #fbf7ec;
     }
 
     .modal-header h2 {
-        color: #f5f3f0;
+        color: #fbf7ec;
     }
 
     .form-group label {
-        color: #f5f3f0;
+        color: #fbf7ec;
     }
 
     .form-group input,
     .form-group textarea,
     .form-group select {
         background-color: #3d3935;
-        color: #f5f3f0;
+        color: #fbf7ec;
         border-color: #4d4935;
     }
 
     .form-group input:focus,
     .form-group textarea:focus,
     .form-group select:focus {
-        border-color: #5c9a72;
+        border-color: #77883e;
         box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.2);
     }
 
@@ -362,7 +362,7 @@
 
     .btn-secondary {
         background: #3d3935;
-        color: #5c9a72;
+        color: #77883e;
         border-color: #4d4935;
     }
 
@@ -371,6 +371,63 @@
     }
 
     .close-btn:hover {
-        background: rgba(255, 255, 255, 0.05);
+        background: rgba(251, 247, 236, 0.05);
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

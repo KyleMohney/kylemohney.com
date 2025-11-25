@@ -22,25 +22,25 @@ Extracted from: styles_legacy.css (lines 1-890)
 /* ========================================== */
 :root {
     /* Brand Palette */
-    --rooted-primary: #5c9a72;
+    --rooted-primary: #77883e;
     --rooted-accent: #d4c47c;
-    --rooted-neutral: #f7f5f1;
-    --rooted-sage: #e9ede8;
+    --rooted-neutral: #fbf7ec;
+    --rooted-sage: #fbf7ec;
     --rooted-dark: #2e2b28;
-    --rooted-light: #ffffff;
+    --rooted-light: #fbf7ec;
     
     /* Legacy Support */
     --color-hero-green: #ebf6e8;
     --color-hero-cream: #fbf7ec;
     --color-hero-peach: #fae2ca;
     --color-hover: #fde8a9;
-    --color-button: #5c9a72;
+    --color-button: #77883e;
     
     /* Text Colors */
     --color-text: #2e2b28;
     --color-text-light: #4a4540;
     --color-text-muted: #888888;
-    --color-white: #ffffff;
+    --color-white: #fbf7ec;
     
     /* Shadow System */
     --shadow-minimal: 0 2px 8px rgba(46, 43, 40, 0.08);
@@ -69,9 +69,9 @@ Extracted from: styles_legacy.css (lines 1-890)
     --font-weight-bold: 700;
     
     /* Glass-morphism */
-    --glass-white: rgba(255, 255, 255, 0.65);
-    --glass-light: rgba(255, 255, 255, 0.80);
-    --glass-overlay: rgba(255, 255, 255, 0.95);
+    --glass-white: rgba(251, 247, 236, 0.65);
+    --glass-light: rgba(251, 247, 236, 0.80);
+    --glass-overlay: rgba(251, 247, 236, 0.95);
 }
 
 /* ========================================== */
@@ -102,7 +102,7 @@ Extracted from: styles_legacy.css (lines 1-890)
 }
 
 html {
-    background: linear-gradient(135deg, var(--rooted-neutral) 0%, var(--rooted-sage) 100%);
+    background: linear-gradient(135deg, #fbf7ec 0%, #fbf7ec 100%);
     background-attachment: fixed;
     width: 100%;
     overflow-x: hidden;
@@ -150,8 +150,8 @@ body::after {
             45deg,
             transparent,
             transparent 80px,
-            rgba(255, 255, 255, 0.15) 80px,
-            rgba(255, 255, 255, 0.15) 82px
+            rgba(251, 247, 236, 0.15) 80px,
+            rgba(251, 247, 236, 0.15) 82px
         ),
         repeating-linear-gradient(
             -45deg,
@@ -249,7 +249,7 @@ select:focus-visible {
         --shadow-light: 0 8px 24px rgba(0, 0, 0, 0.25);
         --shadow-medium: 0 8px 24px rgba(0, 0, 0, 0.20);
     }
-    .glass-white, .glass-light { background: rgba(255, 255, 255, 0.95); }
+    .glass-#fbf7ec, .glass-light { background: rgba(251, 247, 236, 0.95); }
 }
 
 /* Responsive Watermark Scaling */
@@ -264,3 +264,61 @@ select:focus-visible {
 @media (max-width: 480px) {
     body::before { width: 700px; height: 700px; opacity: 0.08; }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -911,7 +911,7 @@ function updateProfileCompleteness() {
         if (labelEl) {
             if (percentage === 100) {
                 labelEl.textContent = '✓ Profile complete!';
-                labelEl.style.color = '#5c9a72';
+                labelEl.style.color = '#77883e';
             } else {
                 const remaining = totalPoints - points;
                 labelEl.textContent = `${remaining} section${remaining !== 1 ? 's' : ''} to go`;
@@ -4668,5 +4668,61 @@ function attachReviewEventListeners() {
 }
 
 console.log('[Rooted Vitality] proProfile.js loaded');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

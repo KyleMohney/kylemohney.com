@@ -38,7 +38,7 @@ const RootedVitality = {
     config: {
         siteName: 'Rooted Vitality',
         siteUrl: '/rooted-vitality/',
-        brandColor: '#5c9a72',
+        brandColor: '#77883e',
         accentGold: '#d4c47c',
         accentGreen: '#ebf6e8',
         accentCream: '#fbf7ec',
@@ -143,7 +143,7 @@ const RootedVitality = {
      * Usage: RootedVitality.log('Custom message');
      */
     log: function(message, type = 'info') {
-        const style = 'color: #5c9a72; font-weight: bold;';
+        const style = 'color: #77883e; font-weight: bold;';
         console.log(`%c[${this.config.siteName}] ${message}`, style);
     },
     
@@ -1419,7 +1419,7 @@ const RootedVitality = {
                         badge.style.display = 'block';
                     }
                 } else {
-                    bellIcon.style.color = 'currentColor'; // White/normal
+                    bellIcon.style.color = 'currentColor'; // #fbf7ec/normal
                     if (badge) {
                         badge.style.display = 'none';
                     }
@@ -1826,11 +1826,11 @@ const RootedVitality = {
                 <path d="M 100 350 Q 130 380 150 400" stroke="#a8b8a8" stroke-width="6" fill="none" stroke-linecap="round"/>
                 <path d="M 100 350 Q 100 390 100 410" stroke="#a8b8a8" stroke-width="5" fill="none" stroke-linecap="round"/>
                 <!-- Leaves -->
-                <ellipse cx="75" cy="250" rx="15" ry="30" fill="#5c9a72" opacity="0.8" transform="rotate(-35 75 250)"/>
+                <ellipse cx="75" cy="250" rx="15" ry="30" fill="#77883e" opacity="0.8" transform="rotate(-35 75 250)"/>
                 <ellipse cx="125" cy="250" rx="15" ry="30" fill="#6ba87f" opacity="0.8" transform="rotate(35 125 250)"/>
-                <ellipse cx="70" cy="200" rx="12" ry="28" fill="#5c9a72" opacity="0.7" transform="rotate(-45 70 200)"/>
+                <ellipse cx="70" cy="200" rx="12" ry="28" fill="#77883e" opacity="0.7" transform="rotate(-45 70 200)"/>
                 <ellipse cx="130" cy="200" rx="12" ry="28" fill="#6ba87f" opacity="0.7" transform="rotate(45 130 200)"/>
-                <ellipse cx="60" cy="140" rx="13" ry="26" fill="#5c9a72" opacity="0.9" transform="rotate(-55 60 140)"/>
+                <ellipse cx="60" cy="140" rx="13" ry="26" fill="#77883e" opacity="0.9" transform="rotate(-55 60 140)"/>
                 <ellipse cx="140" cy="140" rx="13" ry="26" fill="#6ba87f" opacity="0.9" transform="rotate(55 140 140)"/>
                 <!-- Flower -->
                 <circle cx="100" cy="100" r="12" fill="#d4c47c" opacity="0.9"/>
@@ -2118,3 +2118,59 @@ if (typeof module !== 'undefined' && module.exports) {
 }
 
 // End of injections.js — Rooted Vitality Global Utilities
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

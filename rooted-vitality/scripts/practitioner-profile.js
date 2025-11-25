@@ -16,7 +16,7 @@ TABLE OF CONTENTS
 
 ═══════════════════════════════════════════════════════════════════
 DESIGN SYSTEM
-  Colors: --rooted-primary (#5c9a72), --rooted-accent (#d4c47c)
+  Colors: --rooted-primary (#77883e), --rooted-accent (#d4c47c)
   Typography: Inter (headings), Lora (body), minimum 16px
   Spacing: Generous, mobile-first responsive (360px+)
   Styles: practitioner-profile-compact.css
@@ -1866,4 +1866,60 @@ document.addEventListener('DOMContentLoaded', () => {
     window.reviewNotificationManager.init(window.supabaseClient, window.authManager);
   }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

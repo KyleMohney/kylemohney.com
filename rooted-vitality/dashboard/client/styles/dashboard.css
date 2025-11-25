@@ -13,7 +13,7 @@
    ============================================ */
 
 :root {
-    --rv-primary: #5c9a72;
+    --rv-primary: #77883e;
     --rv-primary-light: #7aad90;
     --rv-secondary: #f5f1e8;
     --rv-accent: #d4a574;
@@ -31,7 +31,7 @@
 
 .dashboard-wrapper {
     min-height: calc(100vh - 200px);
-    background-color: #fafaf8;
+    background-color: #fbf7ec;
     padding: 3rem 0;
 }
 
@@ -75,7 +75,7 @@
     top: 0;
     right: 0;
     background: var(--rv-primary);
-    color: white;
+    color: #fbf7ec;
     padding: 0.75rem 1.5rem;
     border-radius: 6px;
     font-family: 'Inter', sans-serif;
@@ -86,7 +86,7 @@
     cursor: pointer;
     transition: all 0.2s ease;
     box-shadow: 0 2px 8px rgba(92, 154, 114, 0.2);
-    white-space: nowrap;
+    #fbf7ec-space: nowrap;
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
@@ -94,7 +94,7 @@
 }
 
 .btn-practitioner-header:hover {
-    background: #4a7d5a;
+    background: #5f7030;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(92, 154, 114, 0.3);
 }
@@ -113,7 +113,7 @@
    ============================================ */
 
 .dashboard-section {
-    background-color: #ffffff;
+    background-color: #fbf7ec;
     border: 1px solid var(--rv-border);
     border-radius: 10px;
     padding: 2rem;
@@ -194,7 +194,7 @@
     padding: 0.75rem 1rem;
     border: 1px solid var(--rv-border);
     border-radius: 6px;
-    background-color: #fafaf8;
+    background-color: #fbf7ec;
     color: var(--rv-text-dark);
     transition: all 0.3s ease;
 }
@@ -204,13 +204,13 @@
 .form-group textarea:focus {
     outline: none;
     border-color: var(--rv-primary);
-    background-color: #fff;
+    background-color: #fbf7ec;
     box-shadow: 0 0 0 3px rgba(45, 80, 22, 0.1);
 }
 
 .form-group input:disabled,
 .form-group input[readonly] {
-    background-color: #f0f0f0;
+    background-color: #fbf7ec;
     color: var(--rv-text-light);
     cursor: not-allowed;
 }
@@ -271,7 +271,7 @@
 
 .btn-primary {
     background-color: var(--rv-primary);
-    color: #ffffff;
+    color: #fbf7ec;
 }
 
 .btn-primary:hover {
@@ -291,13 +291,13 @@
 }
 
 .btn-secondary:hover {
-    background-color: #f0ebe0;
+    background-color: #fbf7ec;
     transform: translateY(-2px);
 }
 
 .btn-danger {
     background-color: var(--rv-danger);
-    color: #ffffff;
+    color: #fbf7ec;
 }
 
 .btn-danger:hover {
@@ -307,7 +307,7 @@
 }
 
 .btn-danger:disabled {
-    background-color: #ccc;
+    background-color: #fbf7ec;
     cursor: not-allowed;
     transform: none;
 }
@@ -330,7 +330,7 @@
 }
 
 .membership-badge {
-    background: #f8f9fa;
+    background: #fbf7ec;
     border: 1px solid var(--rv-border);
     border-radius: 10px;
     padding: 1.75rem;
@@ -431,7 +431,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #ccc;
+    background-color: #fbf7ec;
     transition: 0.4s;
     border-radius: 32px;
 }
@@ -443,7 +443,7 @@
     width: 24px;
     left: 4px;
     bottom: 4px;
-    background-color: white;
+    background-color: #fbf7ec;
     transition: 0.4s;
     border-radius: 50%;
 }
@@ -471,7 +471,7 @@
     flex-direction: column;
     gap: 1rem;
     padding: 2rem;
-    background: #ffffff;
+    background: #fbf7ec;
     border: 1px solid var(--rv-border);
     border-radius: 10px;
     text-decoration: none;
@@ -556,7 +556,7 @@
 
 .danger-message {
     padding: 1.25rem;
-    background-color: #fef2f2;
+    background-color: #fbf7ec;
     border-left: 3px solid #dc2626;
     border-radius: 6px;
 }
@@ -600,7 +600,7 @@
 }
 
 .modal-content {
-    background-color: white;
+    background-color: #fbf7ec;
     border-radius: 12px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
     max-width: 500px;
@@ -701,7 +701,7 @@
     right: 2rem;
     padding: 1rem 1.5rem;
     background-color: var(--rv-primary);
-    color: white;
+    color: #fbf7ec;
     border-radius: 6px;
     box-shadow: 0 4px 12px rgba(45, 80, 22, 0.3);
     font-family: 'Inter', sans-serif;
@@ -739,7 +739,7 @@
     font-family: 'Inter', sans-serif;
     font-size: 0.85rem;
     color: var(--rv-text-light);
-    background-color: #f8f9fa;
+    background-color: #fbf7ec;
     border-left: 3px solid #cbd5e1;
     padding: 0.875rem 1rem;
     border-radius: 4px;
@@ -883,13 +883,13 @@
     width: 40px;
     height: 40px;
     background-color: var(--rv-primary);
-    border: 2px solid white;
+    border: 2px solid #fbf7ec;
     border-radius: 50%;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: #fbf7ec;
     transition: all 0.2s ease;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
@@ -904,4 +904,62 @@
     height: 20px;
     stroke: currentColor;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

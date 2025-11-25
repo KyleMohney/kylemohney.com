@@ -53,13 +53,13 @@ let notificationToast = {
     toast.className = 'notification-toast notification-toast--review';
     
     // Determine color based on rating
-    let ratingColor = '#5c9a72'; // green for default
+    let ratingColor = '#77883e'; // green for default
     if (notification.rating <= 2) {
       ratingColor = '#e8a517'; // amber for lower ratings
     }
     
     toast.style.cssText = `
-      background: white;
+      background: #fbf7ec;
       border-left: 4px solid ${ratingColor};
       border-radius: 8px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -93,7 +93,7 @@ let notificationToast = {
         <button style="
           background: none;
           border: none;
-          color: #ccc;
+          color: #fbf7ec;
           font-size: 20px;
           cursor: pointer;
           padding: 0;
@@ -185,3 +185,59 @@ window.showNotificationToast = (notification) => notificationToast.show(notifica
 document.addEventListener('DOMContentLoaded', () => {
   notificationToast.init();
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
