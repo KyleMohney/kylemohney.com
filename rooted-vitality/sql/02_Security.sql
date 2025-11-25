@@ -207,6 +207,105 @@ FOR INSERT
 WITH CHECK (auth.role() = 'service_role');
 
 -- ============================================================================
+-- SECTION 6B: PRACTITIONER_NOTIFICATIONS TABLE
+-- ============================================================================
+-- Practitioners can read and update their own notifications
+-- Service role can insert notifications
+
+ALTER TABLE practitioner_notifications ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Practitioners view own notifications" ON practitioner_notifications;
+DROP POLICY IF EXISTS "Service role inserts practitioner notifications" ON practitioner_notifications;
+DROP POLICY IF EXISTS "Practitioners update own notifications" ON practitioner_notifications;
+DROP POLICY IF EXISTS "Service role deletes practitioner notifications" ON practitioner_notifications;
+
+-- SELECT: Practitioners can view their own notifications (via serial lookup)
+CREATE POLICY "Practitioners view own notifications" ON practitioner_notifications
+FOR SELECT
+USING (
+  practitioner_serial IN (
+    SELECT serial_number FROM practitioners WHERE id = auth.uid()
+  )
+);
+
+-- INSERT: Service role (backend) can insert notifications
+CREATE POLICY "Service role inserts practitioner notifications" ON practitioner_notifications
+FOR INSERT
+WITH CHECK (auth.role() = 'service_role');
+
+-- UPDATE: Practitioners can mark their notifications as read
+CREATE POLICY "Practitioners update own notifications" ON practitioner_notifications
+FOR UPDATE
+USING (
+  practitioner_serial IN (
+    SELECT serial_number FROM practitioners WHERE id = auth.uid()
+  )
+)
+WITH CHECK (
+  practitioner_serial IN (
+    SELECT serial_number FROM practitioners WHERE id = auth.uid()
+  )
+);
+
+-- DELETE: Service role can delete notifications
+CREATE POLICY "Service role deletes practitioner notifications" ON practitioner_notifications
+FOR DELETE
+USING (auth.role() = 'service_role');
+
+-- ============================================================================
+-- SECTION 6C: PRACTITIONER_NOTIFICATION_SETTINGS TABLE
+-- ============================================================================
+-- Practitioners manage their own notification preferences
+
+ALTER TABLE practitioner_notification_settings ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Practitioners view own notification settings" ON practitioner_notification_settings;
+DROP POLICY IF EXISTS "Practitioners insert own notification settings" ON practitioner_notification_settings;
+DROP POLICY IF EXISTS "Practitioners update own notification settings" ON practitioner_notification_settings;
+DROP POLICY IF EXISTS "Service role manages practitioner notification settings" ON practitioner_notification_settings;
+
+-- SELECT: Practitioners can view their own notification settings (via serial lookup)
+CREATE POLICY "Practitioners view own notification settings" ON practitioner_notification_settings
+FOR SELECT
+USING (
+  practitioner_serial IN (
+    SELECT serial_number FROM practitioners WHERE id = auth.uid()
+  )
+);
+
+-- INSERT: Practitioners or service role can create notification settings
+CREATE POLICY "Practitioners insert own notification settings" ON practitioner_notification_settings
+FOR INSERT
+WITH CHECK (
+  auth.role() = 'service_role' OR
+  practitioner_serial IN (
+    SELECT serial_number FROM practitioners WHERE id = auth.uid()
+  )
+);
+
+-- UPDATE: Practitioners or service role can update notification settings
+CREATE POLICY "Practitioners update own notification settings" ON practitioner_notification_settings
+FOR UPDATE
+USING (
+  auth.role() = 'service_role' OR
+  practitioner_serial IN (
+    SELECT serial_number FROM practitioners WHERE id = auth.uid()
+  )
+)
+WITH CHECK (
+  auth.role() = 'service_role' OR
+  practitioner_serial IN (
+    SELECT serial_number FROM practitioners WHERE id = auth.uid()
+  )
+);
+
+-- Additional policy for service role to manage all practitioner notification settings (for backend operations)
+CREATE POLICY "Service role manages practitioner notification settings" ON practitioner_notification_settings
+FOR ALL
+USING (auth.role() = 'service_role')
+WITH CHECK (auth.role() = 'service_role');
+
+-- ============================================================================
 -- SECTION 7: PRACTITIONER_MATCH_SETTINGS TABLE
 -- ============================================================================
 -- Practitioners can manage their own match settings and service categories
@@ -236,24 +335,16 @@ WITH CHECK (practitioner_serial = auth.uid());
 -- ============================================================================
 -- SECTION 8: PROJECT_MESSAGES TABLE
 -- ============================================================================
--- Participants in a match can read and send messages
+-- Participants in a match can read, send, and update message status
 
 ALTER TABLE project_messages ENABLE ROW LEVEL SECURITY;
 
-DROP POLICY IF EXISTS "Match participants see messages" ON project_messages;
-DROP POLICY IF EXISTS "Match participants send messages" ON project_messages;
-
--- SELECT: Participants see messages for their matches
-CREATE POLICY "Match participants see messages" ON project_messages
-FOR SELECT
+-- UPDATE: Participants can update message read status
+CREATE POLICY IF NOT EXISTS "Match participants update messages" ON project_messages
+FOR UPDATE
 USING (
-  (project_id IN (SELECT project_id FROM projects WHERE client_serial = auth.uid()))
-  OR (practitioner_serial = auth.uid())
-);
-
--- INSERT: Participants can send messages
-CREATE POLICY "Match participants send messages" ON project_messages
-FOR INSERT
+  (sender_id = auth.uid())
+)
 WITH CHECK (
   (sender_id = auth.uid())
 );
@@ -292,7 +383,106 @@ FOR DELETE
 USING (practitioner_serial = auth.uid());
 
 -- ============================================================================
--- SECTION 10: PROFILE COMPLETENESS MIGRATION
+-- SECTION 10: CLIENT_NOTIFICATIONS TABLE
+-- ============================================================================
+-- Clients can view their own notifications
+-- Service role can insert notifications
+
+ALTER TABLE client_notifications ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Clients view own notifications" ON client_notifications;
+DROP POLICY IF EXISTS "Service role inserts client notifications" ON client_notifications;
+DROP POLICY IF EXISTS "Clients update own notifications" ON client_notifications;
+DROP POLICY IF EXISTS "Service role deletes client notifications" ON client_notifications;
+
+-- SELECT: Clients can view their own notifications (via serial lookup)
+CREATE POLICY "Clients view own notifications" ON client_notifications
+FOR SELECT
+USING (
+  client_serial IN (
+    SELECT serial_number FROM clients WHERE id = auth.uid()
+  )
+);
+
+-- INSERT: Service role (backend) can insert notifications
+CREATE POLICY "Service role inserts client notifications" ON client_notifications
+FOR INSERT
+WITH CHECK (auth.role() = 'service_role');
+
+-- UPDATE: Clients can mark their notifications as read
+CREATE POLICY "Clients update own notifications" ON client_notifications
+FOR UPDATE
+USING (
+  client_serial IN (
+    SELECT serial_number FROM clients WHERE id = auth.uid()
+  )
+)
+WITH CHECK (
+  client_serial IN (
+    SELECT serial_number FROM clients WHERE id = auth.uid()
+  )
+);
+
+-- DELETE: Service role can delete notifications
+CREATE POLICY "Service role deletes client notifications" ON client_notifications
+FOR DELETE
+USING (auth.role() = 'service_role');
+
+-- ============================================================================
+-- SECTION 11: CLIENT_NOTIFICATION_SETTINGS TABLE
+-- ============================================================================
+-- Clients manage their own notification preferences
+
+ALTER TABLE client_notification_settings ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Clients view own notification settings" ON client_notification_settings;
+DROP POLICY IF EXISTS "Clients insert own notification settings" ON client_notification_settings;
+DROP POLICY IF EXISTS "Clients update own notification settings" ON client_notification_settings;
+DROP POLICY IF EXISTS "Service role manages notification settings" ON client_notification_settings;
+
+-- SELECT: Clients can view their own notification settings (via serial lookup)
+CREATE POLICY "Clients view own notification settings" ON client_notification_settings
+FOR SELECT
+USING (
+  client_serial IN (
+    SELECT serial_number FROM clients WHERE id = auth.uid()
+  )
+);
+
+-- INSERT: Clients or service role can create notification settings
+CREATE POLICY "Clients insert own notification settings" ON client_notification_settings
+FOR INSERT
+WITH CHECK (
+  auth.role() = 'service_role' OR
+  client_serial IN (
+    SELECT serial_number FROM clients WHERE id = auth.uid()
+  )
+);
+
+-- UPDATE: Clients or service role can update notification settings
+CREATE POLICY "Clients update own notification settings" ON client_notification_settings
+FOR UPDATE
+USING (
+  auth.role() = 'service_role' OR
+  client_serial IN (
+    SELECT serial_number FROM clients WHERE id = auth.uid()
+  )
+)
+WITH CHECK (
+  auth.role() = 'service_role' OR
+  client_serial IN (
+    SELECT serial_number FROM clients WHERE id = auth.uid()
+  )
+);
+
+-- Additional policy for service role to manage all notification settings (for backend operations)
+CREATE POLICY "Service role manages notification settings" ON client_notification_settings
+FOR ALL
+USING (auth.role() = 'service_role')
+WITH CHECK (auth.role() = 'service_role');
+
+-- ============================================================================
+-- SECTION 12: PROFILE COMPLETENESS MIGRATION
 -- ============================================================================
 -- Add profile completeness tracking column to practitioners table
 ALTER TABLE practitioners

@@ -124,11 +124,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Load practitioners for matching reference
     await loadPractitioners();
 
-    // Load existing projects
+    // Load existing projects (fresh from database, not cached)
     await loadProjects();
 
     // Setup realtime listener for project updates
     setupProjectRealtimeListener();
+
+    // If we detect stale data (projects loaded before backfill), reload after a short delay
+    // This catches the case where backfill happened while page was open
+    setTimeout(async () => {
+      console.log('[My Projects] Background refresh to catch any database backfills or updates');
+      await loadProjects();
+    }, 2000);
 
     // Initialize all handlers
     initializeFormHandlers();
@@ -245,7 +252,22 @@ async function loadProjects() {
 
     projects = data || [];
     console.log('[My Projects] Loaded', projects.length, 'projects');
-    console.log('[My Projects] Projects data:', projects);
+    
+    // Log status breakdown for debugging
+    const statusCounts = {};
+    projects.forEach(p => {
+      statusCounts[p.project_status] = (statusCounts[p.project_status] || 0) + 1;
+    });
+    console.log('[My Projects] Status breakdown:', statusCounts);
+    
+    // DETAILED LOG: Show ALL projects with their full status info
+    console.log('[My Projects] ========== DETAILED PROJECT LIST ==========');
+    projects.forEach(p => {
+      console.log(`Project ${p.project_serial}: "${p.custom_name || p.category_name}" | status="${p.project_status}" | hired_practitioner="${p.hired_practitioner_serial}" | matches=${(p.project_practitioner_matches || []).length}`);
+    });
+    console.log('[My Projects] ==========================================');
+    
+    console.log('[My Projects] Projects with hired status:', projects.filter(p => p.project_status === 'hired').map(p => ({ serial: p.project_serial, hired_practitioner: p.hired_practitioner_serial })));
 
     // Load matches for each project
     for (let project of projects) {
@@ -344,6 +366,51 @@ function setupProjectRealtimeListener() {
         console.error('[My Projects] ❌ Realtime channel error!');
       }
     });
+
+  // ALSO listen for broadcast updates from My Matches page (project-status-updates channel)
+  // This is for IMMEDIATE notification when client selects "Hired" on a match
+  console.log('[My Projects] 📢 Setting up broadcast listener for project-status-updates...');
+  const broadcastChannel = supabaseClient.channel('project-status-updates');
+  
+  broadcastChannel.on('broadcast', { event: 'project_status_changed' }, (payload) => {
+    console.log('[My Projects] 📨 BROADCAST RECEIVED from My Matches page!');
+    console.log('[My Projects] Broadcast payload:', payload.payload);
+    
+    const { project_id, project_serial, new_status, hired_practitioner_serial, timestamp } = payload.payload;
+    
+    console.log(`[My Projects] Project status change: ${project_serial || project_id} → ${new_status}`);
+    
+    // Find project in array
+    let projectIndex = projects.findIndex(p => 
+      p.id === project_id || p.project_serial === project_serial
+    );
+    
+    if (projectIndex >= 0) {
+      console.log('[My Projects] ✓ Found broadcast-updated project at index:', projectIndex);
+      
+      // Update the project with new status
+      projects[projectIndex].project_status = new_status;
+      if (hired_practitioner_serial) {
+        projects[projectIndex].hired_practitioner_serial = hired_practitioner_serial;
+      }
+      projects[projectIndex].updated_at = timestamp || new Date().toISOString();
+      
+      console.log('[My Projects] ✓ Project updated with new status:', new_status);
+      
+      // Re-render immediately
+      console.log('[My Projects] 🔄 Re-rendering grid with broadcast update...');
+      renderProjectsGrid();
+      updateStats();
+      console.log('[My Projects] ✅ GRID RE-RENDERED WITH BROADCAST UPDATE');
+    } else {
+      console.warn('[My Projects] ⚠️ Project not found for broadcast update:', project_id, project_serial);
+    }
+  }).subscribe((status) => {
+    console.log('[My Projects] Broadcast subscription status:', status);
+    if (status === 'SUBSCRIBED') {
+      console.log('[My Projects] ✅ BROADCAST LISTENER READY - will update immediately when client marks match as Hired');
+    }
+  });
 }
 
 /**
@@ -365,7 +432,7 @@ function renderProjectsGrid() {
   console.log('[renderProjectsGrid] Rendering', projects.length, 'projects');
   
   // Separate open and closed projects
-  const TERMINAL_STATUSES = ['hired', 'canceled', 'declined'];
+  const TERMINAL_STATUSES = ['hired', 'canceled'];
   const openProjects = projects.filter(p => !TERMINAL_STATUSES.includes(p.project_status));
   const closedProjects = projects.filter(p => TERMINAL_STATUSES.includes(p.project_status));
 
@@ -409,7 +476,7 @@ function renderProjectsGrid() {
  * @returns {HTMLElement} - DOM element for the project card
  */
 function createProjectCard(project) {
-  const TERMINAL_STATUSES = ['hired', 'canceled', 'declined'];
+  const TERMINAL_STATUSES = ['hired', 'canceled'];
   
   const createdDate = new Date(project.created_at).toLocaleDateString('en-US', {
     year: 'numeric',
@@ -427,15 +494,17 @@ function createProjectCard(project) {
     .filter(Boolean);
 
   // Determine display status
+  // CRITICAL: Check terminal statuses FIRST, before checking for active matches
+  // A hired/canceled project should show that status, NOT "In Progress"
   let displayStatus = project.project_status || 'Pending';
-  if (matchedRecords.length > 0 && !TERMINAL_STATUSES.includes(project.project_status)) {
-    displayStatus = 'Active';
-  } else if (project.project_status === 'hired') {
+  
+  if (project.project_status === 'hired') {
     displayStatus = 'Hired';
   } else if (project.project_status === 'canceled') {
     displayStatus = 'Canceled';
-  } else if (project.project_status === 'declined') {
-    displayStatus = 'Declined';
+  } else if (matchedRecords.length > 0) {
+    // Only show "In Progress" if project is NOT in a terminal state AND has matches
+    displayStatus = 'In Progress';
   } else {
     displayStatus = 'Pending';
   }
@@ -1146,6 +1215,8 @@ function browseForProject(projectId) {
 
 /**
  * Submit close project form
+ * When project is canceled: sets project_status='canceled' AND cascades to set all matches to 'not-hired'
+ * When project is hired: sets project_status='hired' and hired_practitioner_serial (matches handled by My Matches page)
  */
 async function submitCloseProject(e) {
   e.preventDefault();
@@ -1168,7 +1239,7 @@ async function submitCloseProject(e) {
 
   try {
     // Determine project_status based on closure reason
-    // Valid statuses: 'pending', 'matched', 'hired', 'canceled'
+    // Valid statuses: 'pending', 'in-progress', 'hired', 'canceled'
     // When closing a project without hiring: use 'canceled'
     // When closing a project after hiring: use 'hired'
     let projectStatus = 'canceled';
@@ -1212,6 +1283,36 @@ async function submitCloseProject(e) {
     }
 
     console.log('[My Projects] Project closed successfully:', data);
+
+    // WORKFLOW: When client cancels project, set ALL associated matches to 'not-hired'
+    // This prevents orphaned matches and closes all connections when project is canceled
+    if (projectStatus === 'canceled') {
+      console.log('[My Projects] Project canceled - updating all matches to not-hired');
+      
+      // Get all matches for this project
+      const projectMatches = projectToClose.project_practitioner_matches || [];
+      console.log(`[My Projects] Found ${projectMatches.length} matches to update`);
+      
+      if (projectMatches.length > 0) {
+        // Update all matches to 'not-hired'
+        const matchIds = projectMatches.map(m => m.id);
+        console.log('[My Projects] Match IDs to update:', matchIds);
+        
+        const { data: matchUpdateData, error: matchError } = await supabaseClient
+          .from('project_practitioner_matches')
+          .update({ status: 'not-hired', updated_at: new Date().toISOString() })
+          .in('id', matchIds)
+          .select();
+        
+        if (matchError) {
+          console.error('[My Projects] Error updating matches:', matchError);
+          console.error('[My Projects] Error details:', matchError.message, matchError.details, matchError.hint);
+          // Don't block project closure if match update fails - project is already closed
+        } else {
+          console.log('[My Projects] Successfully updated all matches to not-hired:', matchUpdateData.length, 'matches');
+        }
+      }
+    }
 
     // Close modal
     const modal = document.getElementById('close-project-modal');

@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           }
           // If match went from pending/active to hired/not-hired
           else if ((oldStatus === 'pending' || oldStatus === 'active' || oldStatus === 'in-progress') && 
-                   (newStatus === 'hired' || newStatus === 'not-hired' || newStatus === 'completed')) {
+                   (newStatus === 'hired' || newStatus === 'not-hired')) {
             console.log('[My Matches] Match completed! Moving to completed section...');
             loadMatches(clientSerial).then(() => {
               renderMatches();
@@ -343,6 +343,7 @@ async function loadMatches(clientSerial) {
 
     // Fetch practitioner details for all matches (by serial number to avoid FK ambiguity)
     const practitionerSerials = [...new Set((matchesData || []).map(m => m.practitioner_serial))];
+    console.log('[My Matches] Fetching data for', practitionerSerials.length, 'unique practitioners');
     
     let practitionersMap = {};
     if (practitionerSerials.length > 0) {
@@ -353,8 +354,11 @@ async function loadMatches(clientSerial) {
         .in('serial_number', practitionerSerials);
       
       if (practitionersError) {
-        console.warn('Warning loading practitioner details:', practitionersError);
+        console.error('[My Matches] Error loading practitioner details:', practitionersError);
+      } else if (!practitionersData || practitionersData.length === 0) {
+        console.warn('[My Matches] No practitioner data returned for serials:', practitionerSerials);
       } else {
+        console.log('[My Matches] Loaded', practitionersData.length, 'practitioners from database');
         // Fetch practitioner profile data
         const { data: profilesData, error: profilesError } = await window.supabaseClient
           .from('practitioner_profiles')
@@ -362,7 +366,7 @@ async function loadMatches(clientSerial) {
           .in('practitioner_serial', practitionerSerials);
         
         if (profilesError) {
-          console.warn('Warning loading practitioner profiles:', profilesError);
+          console.warn('[My Matches] Warning loading practitioner profiles:', profilesError);
         }
         
         // Create map with merged data
@@ -563,9 +567,9 @@ async function loadMatches(clientSerial) {
  */
 async function updateBadgeCounts() {
   try {
-    // Count messages (pending/active/in-progress matches WITHOUT unread practitioner messages)
+    // Count messages (pending/in-progress matches WITHOUT unread practitioner messages)
     const messagesCount = allMatches.filter(m => {
-      const isOngoingMatch = m.status === 'pending' || m.status === 'active' || m.status === 'in-progress';
+      const isOngoingMatch = m.status === 'pending' || m.status === 'in-progress';
       if (!isOngoingMatch) return false;
       
       // Exclude if it has unread messages from practitioner
@@ -582,9 +586,9 @@ async function updateBadgeCounts() {
     const messagesBadge = document.getElementById('messages-badge');
     if (messagesBadge) messagesBadge.textContent = messagesCount;
 
-    // Count completed (hired/not-hired/declined/completed ONLY)
+    // Count completed (hired/not-hired/declined ONLY)
     const completedCount = allMatches.filter(m => 
-      m.status === 'hired' || m.status === 'not-hired' || m.status === 'declined' || m.status === 'completed'
+      m.status === 'hired' || m.status === 'not-hired' || m.status === 'declined'
     ).length;
     const completedBadge = document.getElementById('completed-badge');
     if (completedBadge) completedBadge.textContent = completedCount;
@@ -806,7 +810,18 @@ async function initializeReviewButtonText(btn) {
  */
 function createThreadItem(match) {
   const practitioner = match.practitioners;
-  if (!practitioner) return document.createElement('div');
+  
+  // Better error handling: if no practitioner data, create placeholder instead of empty div
+  if (!practitioner || (typeof practitioner === 'object' && Object.keys(practitioner).length === 0)) {
+    console.warn('[My Matches] Empty practitioner data for match:', match.id, match.practitioner_serial);
+    const item = document.createElement('button');
+    item.className = 'thread-item';
+    item.setAttribute('data-match-id', match.id);
+    item.setAttribute('data-practitioner-serial', match.practitioner_serial);
+    item.setAttribute('data-status', match.status);
+    item.innerHTML = `<p style="color: #999; padding: 1rem;">Practitioner information unavailable</p>`;
+    return item;
+  }
 
   const displayName = formatPractitionerName(practitioner.dba_name || practitioner.legal_name || 'Practitioner');
   const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase();
@@ -944,6 +959,7 @@ function initFilterHandlers() {
       
       const tabName = tab.getAttribute('data-tab');
       currentTab = tabName;
+      window.currentTab = tabName;  // Keep global in sync
       console.log('[My Matches] Switched to tab:', tabName);
       
       applyTabFilter(tabName);
@@ -1019,9 +1035,9 @@ function applyTabFilter(tabName) {
       });
       break;
     case 'completed':
-      // Show only completed/closed projects (hired, not-hired, declined, completed)
+      // Show only completed/closed matches (hired, not-hired, declined)
       filteredMatches = allMatches.filter(m => 
-        m.status === 'hired' || m.status === 'not-hired' || m.status === 'declined' || m.status === 'completed'
+        m.status === 'hired' || m.status === 'not-hired' || m.status === 'declined'
       );
       break;
     default:
@@ -1052,7 +1068,7 @@ async function updateMatchStatus(matchId, newStatus) {
     };
 
     // Track when practitioner first responds
-    if (newStatus === 'active' || newStatus === 'in-progress') {
+    if (newStatus === 'in-progress') {
       updateData.contacted_at = new Date().toISOString();
     }
     
@@ -1115,58 +1131,69 @@ async function updateMatchStatus(matchId, newStatus) {
     
     // Update project status ONLY when match is hired
     // CRITICAL: Project and Match statuses are independent!
-    // - Match status: pending/in-progress/active/hired/not-hired/declined (per individual match)
-    // - Project status: pending/active/in-progress/hired/not-hired (overall project state)
+    // - Match status: pending/in-progress/hired/not-hired/declined (per individual match)
+    // - Project status: pending/in-progress/hired/canceled (overall project state)
     // They only interact when match=hired, which also closes the project=hired
     if (selectedMatch) {
-      console.log('[My Matches] Project update check - newStatus:', newStatus, 'project_serial:', selectedMatch.project_serial, 'practitioner_serial:', selectedMatch.practitioner_serial);
+      console.log('[My Matches] Project update check - newStatus:', newStatus, 'project_serial:', selectedMatch.project_serial);
       
       // ONLY update project if match status changes to "hired"
       if (newStatus === 'hired') {
-        // Store practitioner serial (e.g., "P1", "P2") in hired_practitioner_serial
+        // Get the project UUID from selectedMatch.project.id
+        const projectUUID = selectedMatch.project?.id;
+        if (!projectUUID) {
+          console.error('[My Matches] Cannot close project - project UUID is missing!', 'Project:', selectedMatch.project);
+          return;
+        }
+        
         const projectUpdateData = {
           project_status: 'hired',
-          hired_practitioner_serial: selectedMatch.practitioner_serial,  // TEXT: "P1", "P2", etc.
+          hired_practitioner_serial: selectedMatch.practitioner_serial,
+          closed_date: new Date().toISOString().split('T')[0],  // Set closed_date to today
           updated_at: new Date().toISOString()
         };
         
-        // Try to update using project_serial first (preferred), fallback to id if missing
-        const useProjectSerial = !!selectedMatch.project_serial;
-        const lookupValue = useProjectSerial ? selectedMatch.project_serial : selectedMatch.id;
-        const lookupField = useProjectSerial ? 'project_serial' : 'id';
+        console.log('[My Matches] Match hired - CLOSING PROJECT with UUID:', projectUUID, 'Update data:', projectUpdateData);
         
-        console.log(`[My Matches] Match hired - CLOSING PROJECT. Using ${lookupField}=${lookupValue}`, 'Update data:', projectUpdateData);
-        console.log('[My Matches] Setting hired_practitioner_serial:', selectedMatch.practitioner_serial);
-        
-        const query = window.supabaseClient
+        // Update using project UUID (most reliable)
+        const { data: updateResult, error: projectError } = await window.supabaseClient
           .from('projects')
-          .update(projectUpdateData);
-        
-        if (useProjectSerial) {
-          query.eq('project_serial', lookupValue);
-        } else {
-          query.eq('id', lookupValue);
-        }
-        
-        const { data: updateResult, error: projectError } = await query.select();
+          .update(projectUpdateData)
+          .eq('id', projectUUID)
+          .select();
 
         if (projectError) {
           console.error('[My Matches] Error closing project:', projectError);
           console.error('[My Matches] Error details:', projectError.message, projectError.code);
         } else if (!updateResult || updateResult.length === 0) {
-          console.error('[My Matches] Project update returned no results! Check that lookupValue exists:', lookupValue);
+          console.error('[My Matches] Project update returned no results! Project UUID:', projectUUID);
         } else {
-          console.log('[My Matches] ✅ Project closed successfully. Result:', updateResult);
-          console.log('[My Matches] 🔔 Realtime UPDATE event should fire now for:', lookupValue);
-          // Trigger a realtime event update if my-wellness page is open
-          if (window.location.pathname.includes('my-wellness')) {
-            console.log('[My Matches] On my-wellness page - project update will be reflected via realtime');
+          console.log('[My Matches] ✅ Project closed successfully. Result:', updateResult[0]);
+          console.log('[My Matches] 🔔 Realtime UPDATE event should fire now');
+          
+          // Broadcast event to notify My Wellness page if it's open
+          if (window.supabaseClient) {
+            try {
+              const channel = window.supabaseClient.channel('project-status-updates');
+              channel.send('broadcast', {
+                event: 'project_status_changed',
+                payload: {
+                  project_id: projectUUID,
+                  project_serial: selectedMatch.project_serial,
+                  new_status: 'hired',
+                  hired_practitioner_serial: selectedMatch.practitioner_serial,
+                  timestamp: new Date().toISOString()
+                }
+              });
+              console.log('[My Matches] 📢 Broadcast sent to My Wellness page');
+            } catch (broadcastError) {
+              console.error('[My Matches] Error sending broadcast:', broadcastError);
+            }
           }
         }
       } else {
         // For all other match statuses (pending, in-progress, not-hired, declined)
         // The project status is NOT affected - it stays in its current state
-        // This allows the client to have multiple matches at different stages
         console.log('[My Matches] Match status:', newStatus, '- Project status unchanged (project still open for other matches)');
       }
     } else {
@@ -1297,8 +1324,29 @@ function closeMessagingThread() {
 function openMessagingThread(match) {
   console.log('[My Matches] openMessagingThread called with match:', match);
   
-  if (!match || !match.practitioners) {
-    console.error('[My Matches] Invalid match object or no practitioner data');
+  if (!match) {
+    console.error('[My Matches] Invalid match object');
+    return;
+  }
+  
+  // If practitioner data is missing, try to fetch it
+  if (!match.practitioners || Object.keys(match.practitioners).length === 0) {
+    console.warn('[My Matches] Missing practitioner data, attempting to fetch for serial:', match.practitioner_serial);
+    // Fetch just this practitioner's data
+    window.supabaseClient.from('practitioners')
+      .select('serial_number, id, legal_name, dba_name, phone, practice_city, practice_state, in_person_enabled, housecalls_enabled, virtual_enabled, timezone, email')
+      .eq('serial_number', match.practitioner_serial)
+      .then(({ data: practitionerData, error }) => {
+        if (!error && practitionerData && practitionerData.length > 0) {
+          // Update the match object with practitioners data
+          match.practitioners = practitionerData[0];
+          console.log('[My Matches] Successfully fetched practitioner data for:', match.practitioner_serial);
+          // Refresh the display
+          openMessagingThread(match);
+        } else {
+          console.error('[My Matches] Could not fetch practitioner data:', error);
+        }
+      });
     return;
   }
   
@@ -1392,9 +1440,9 @@ function openMessagingThread(match) {
   
   // Update practitioner meta info - show online/offline status
   if (threadMetaEl) {
-    const onlineStatus = 'Offline'; // Default to offline for now
+    const onlineStatus = 'Online'; // Practitioners are considered online by default
     threadMetaEl.innerHTML = `
-      <div id="thread-online-status" style="width: 8px; height: 8px; border-radius: 50%; background: #ccc;"></div>
+      <div id="thread-online-status" style="width: 8px; height: 8px; border-radius: 50%; background: #22c55e;"></div>
       <span id="thread-status-text" style="font-size: 13px; color: #666;">${onlineStatus}</span>
     `;
   }
@@ -1432,7 +1480,7 @@ function openMessagingThread(match) {
     const msgResponse = match.practitioner_response;
     const isLocked = match.status === 'pending' && !msgResponse;
     // Also lock if already completed (not-hired, hired, declined)
-    const isCompleted = match.status === 'not-hired' || match.status === 'hired' || match.status === 'declined' || match.status === 'completed';
+    const isCompleted = match.status === 'not-hired' || match.status === 'hired' || match.status === 'declined';
     updatedDropdownEl.disabled = isLocked || isCompleted;
     console.log('[My Matches] Dropdown locked:', isLocked || isCompleted, '(pending and no response:', isLocked, ', completed:', isCompleted, ')');
     
@@ -1746,7 +1794,7 @@ function openPractitionerModal(matchId) {
       <p>${displayName} declined your connection request${match.practitioner_response_reason ? ': ' + match.practitioner_response_reason : ''}.</p>
       <p>You can search for other practitioners on the Find Practitioners page.</p>
     `;
-  } else if ((msgStatus === 'active' || msgStatus === 'in-progress') && response === 'accepted') {
+  } else if (msgStatus === 'in-progress' && response === 'accepted') {
     // Active engagement
     statusMessageEl.style.display = 'block';
     statusContentEl.innerHTML = `
@@ -1760,7 +1808,7 @@ function openPractitionerModal(matchId) {
       <p><strong>✓ Engagement Active</strong></p>
       <p>${displayName} is engaged on your project. Continue communication on the <strong>My Team</strong> page.</p>
     `;
-  } else if (msgStatus === 'closed' || msgStatus === 'completed') {
+  } else if (msgStatus === 'hired' || msgStatus === 'not-hired' || msgStatus === 'declined') {
     // Engagement ended
     statusMessageEl.style.display = 'block';
     statusContentEl.innerHTML = `

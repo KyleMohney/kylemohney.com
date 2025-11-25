@@ -557,6 +557,7 @@
   <script src="../../../scripts/config.js"></script>
   <script src="../../../scripts/authManager.js"></script>
   <script src="../../../scripts/authHooks.js"></script>
+  <script src="../../../scripts/emailTemplates.js"></script>
   <script src="../../../scripts/notificationManager.js"></script>
   <script src="../../../scripts/proOpportunitiesManager.js"></script>
   <script src="../../../injections.js"></script>
@@ -945,54 +946,49 @@
           let currentMatchForDeclineMsg = null;
 
           card.querySelector('[data-action="accept"]').addEventListener('click', async () => {
-              const { error } = await window.supabaseClient
-                .from('project_practitioner_matches')
-                .update({
-                  status: 'in-progress',
-                  practitioner_response: 'accepted',
-                  practitioner_responded_at: new Date().toISOString(),
-                  updated_at: new Date().toISOString()
-                })
-                .eq('id', match.id);            if (!error) {
-              // Create initial message from client to practitioner
-              // This is the match notification message that appears in the inbox
-              const clientFullName = match.projects?.clients?.first_name && match.projects?.clients?.last_name 
-                ? `${match.projects.clients.first_name} ${match.projects.clients.last_name}`
-                : match.projects?.clients?.first_name || 'A client';
-              
-              const defaultMessage = `${clientFullName} has matched with you and is interested in your services for: ${match.projects?.category_name || 'wellness services'}.`;
-              
-              console.log('[Pro Clients] Creating initial message with data:', {
-                project_id: match.projects?.id,
-                practitioner_id: currentUser?.id,
-                client_id: match.projects?.clients?.id,
-                sender_id: match.projects?.clients?.id,
-                project_serial: match.project_serial,
-                practitioner_serial: practitionerSerial,
-                client_serial: match.client_serial,
-                message: defaultMessage
-              });
-              
-              // Get project and client IDs for the message
-              const projectId = match.projects?.id;
-              const clientId = match.projects?.clients?.id;
-              
-              console.log('[Pro Clients] Message insert data:', {
-                project_id: projectId,
-                practitioner_id: currentUser?.id,
-                client_id: clientId,
-                sender_id: currentUser?.id, // Practitioner is sending the initial message
-                project_serial: match.project_serial,
-                practitioner_serial: practitionerSerial,
-                client_serial: match.client_serial,
-                sender_type: 'practitioner', // Practitioner sending initial message
-                message: defaultMessage,
-                is_read: false
-              });
-              
-              const { data: msgData, error: msgError } = await window.supabaseClient
-                .from('project_messages')
-                .insert({
+              try {
+                  const { error } = await window.supabaseClient
+                    .from('project_practitioner_matches')
+                    .update({
+                      status: 'in-progress',
+                      practitioner_response: 'accepted',
+                      practitioner_responded_at: new Date().toISOString(),
+                      updated_at: new Date().toISOString()
+                    })
+                    .eq('id', match.id);
+                    
+                if (error) {
+                    console.error('[Pro Clients] Error updating match status:', error);
+                    alert('Error accepting match: ' + (error?.message || 'Unknown error'));
+                    return;
+                }
+                
+                console.log('[Pro Clients] Match status updated to in-progress');
+                
+                // Create initial message from client to practitioner
+                // This is the match notification message that appears in the inbox
+                const clientFullName = match.projects?.clients?.first_name && match.projects?.clients?.last_name 
+                  ? `${match.projects.clients.first_name} ${match.projects.clients.last_name}`
+                  : match.projects?.clients?.first_name || 'A client';
+                
+                const defaultMessage = `${clientFullName} has matched with you and is interested in your services for: ${match.projects?.category_name || 'wellness services'}.`;
+                
+                console.log('[Pro Clients] Creating initial message with data:', {
+                  project_id: match.projects?.id,
+                  practitioner_id: currentUser?.id,
+                  client_id: match.projects?.clients?.id,
+                  sender_id: match.projects?.clients?.id,
+                  project_serial: match.project_serial,
+                  practitioner_serial: practitionerSerial,
+                  client_serial: match.client_serial,
+                  message: defaultMessage
+                });
+                
+                // Get project and client IDs for the message
+                const projectId = match.projects?.id;
+                const clientId = match.projects?.clients?.id;
+                
+                console.log('[Pro Clients] Message insert data:', {
                   project_id: projectId,
                   practitioner_id: currentUser?.id,
                   client_id: clientId,
@@ -1004,33 +1000,53 @@
                   message: defaultMessage,
                   is_read: false
                 });
+                
+                const { data: msgData, error: msgError } = await window.supabaseClient
+                  .from('project_messages')
+                  .insert({
+                    project_id: projectId,
+                    practitioner_id: currentUser?.id,
+                    client_id: clientId,
+                    sender_id: currentUser?.id, // Practitioner is sending the initial message
+                    project_serial: match.project_serial,
+                    practitioner_serial: practitionerSerial,
+                    client_serial: match.client_serial,
+                    sender_type: 'practitioner', // Practitioner sending initial message
+                    message: defaultMessage,
+                    is_read: false
+                  });
 
-              if (msgError) {
-                console.error('[Pro Clients] Error creating initial message:', msgError);
-              } else {
-                console.log('[Pro Clients] Initial message created successfully:', msgData);
+                if (msgError) {
+                  console.error('[Pro Clients] Error creating initial message:', msgError);
+                } else {
+                  console.log('[Pro Clients] Initial message created successfully:', msgData);
+                }
+                
+                // Notify client of acceptance
+                if (window.notifyClientOfMatchResponse) {
+                  await notifyClientOfMatchResponse({
+                    clientSerial: match.client_serial,
+                    practitionerName: currentUser?.dba_name || currentUser?.legal_name || 'A practitioner',
+                    projectName: match.projectName || 'your project',
+                    action: 'accepted'
+                  });
+                }
+                
+                showToast('Client Accepted', `You accepted ${clientName}. Opening your inbox...`, 'success');
+                card.remove();
+                
+                console.log('[Pro Clients] Accept flow complete, redirecting to inbox with clientSerial:', match.client_serial);
+                
+                // Navigate to Inbox and auto-open the conversation
+                setTimeout(() => {
+                  console.log('[Pro Clients] Executing redirect to inbox');
+                  window.location.href = `/rooted-vitality/dashboard/pro/pages/inbox.html?clientSerial=${match.client_serial}&projectSerial=${match.project_serial}`;
+                }, 500);
+              } catch (acceptError) {
+                  console.error('[Pro Clients] Unexpected error in accept handler:', acceptError);
+                  console.error('[Pro Clients] Error stack:', acceptError?.stack);
+                  alert('Unexpected error: ' + (acceptError?.message || 'Please try again'));
               }
-              
-              // Notify client of acceptance
-              if (window.notifyClientOfMatchResponse) {
-                await notifyClientOfMatchResponse({
-                  clientSerial: match.client_serial,
-                  practitionerName: currentUser?.dba_name || currentUser?.legal_name || 'A practitioner',
-                  projectName: match.projectName || 'your project',
-                  action: 'accepted'
-                });
-              }
-              
-              showToast('Client Accepted', `You accepted ${clientName}. Opening your inbox...`, 'success');
-              card.remove();
-              
-              // Navigate to Inbox and auto-open the conversation
-              setTimeout(() => {
-                window.location.href = `/rooted-vitality/dashboard/pro/pages/inbox.html?clientSerial=${match.client_serial}`;
-              }, 500);
-            } else {
-              showToast('Error', 'Failed to accept client', 'error');
-            }
           });
 
           card.querySelector('[data-action="decline"]').addEventListener('click', async () => {

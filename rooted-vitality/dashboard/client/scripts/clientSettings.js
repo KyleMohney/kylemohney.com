@@ -61,6 +61,9 @@ async function initializeSettings() {
         setupSettingsListeners();
         setupModalHandlers();
         
+        // Setup real-time notification updates
+        subscribeToNotificationUpdates();
+        
         console.log('[Rooted Vitality] Settings initialized successfully');
     } catch (error) {
         console.error('[Rooted Vitality] Fatal error initializing settings:', error);
@@ -629,10 +632,9 @@ async function loadNotificationPreferences() {
             const notificationFields = [
                 'messages_in_app', 'messages_sms', 'messages_email',
                 'matches_in_app', 'matches_sms', 'matches_email',
-                'reviews_in_app', 'reviews_sms', 'reviews_email',
                 'promotions_in_app', 'promotions_sms', 'promotions_email',
                 'system_in_app', 'system_sms', 'system_email',
-                'account_in_app'
+                'account_in_app', 'account_email', 'account_sms'
             ];
             
             notificationFields.forEach(field => {
@@ -656,10 +658,9 @@ function defaultNotificationPreferences() {
     const notificationFields = [
         'messages_in_app', 'messages_sms', 'messages_email',
         'matches_in_app', 'matches_sms', 'matches_email',
-        'reviews_in_app', 'reviews_sms', 'reviews_email',
         'promotions_in_app', 'promotions_sms', 'promotions_email',
         'system_in_app', 'system_sms', 'system_email',
-        'account_in_app'
+        'account_in_app', 'account_email', 'account_sms'
     ];
     
     notificationFields.forEach(field => {
@@ -686,16 +687,13 @@ async function saveNotificationPreferences(e) {
         
         // Ensure all fields are present with correct names
         const fullPreferences = {
-            client_serial: currentUser.serial_number,
+            client_serial: userSettings.serial_number,
             messages_in_app: preferences['messages_in_app'] !== false,
             messages_sms: preferences['messages_sms'] !== false,
             messages_email: preferences['messages_email'] !== false,
             matches_in_app: preferences['matches_in_app'] !== false,
             matches_sms: preferences['matches_sms'] !== false,
             matches_email: preferences['matches_email'] !== false,
-            reviews_in_app: preferences['reviews_in_app'] !== false,
-            reviews_sms: preferences['reviews_sms'] !== false,
-            reviews_email: preferences['reviews_email'] !== false,
             promotions_in_app: preferences['promotions_in_app'] !== false,
             promotions_sms: preferences['promotions_sms'] !== false,
             promotions_email: preferences['promotions_email'] !== false,
@@ -703,6 +701,8 @@ async function saveNotificationPreferences(e) {
             system_sms: preferences['system_sms'] !== false,
             system_email: preferences['system_email'] !== false,
             account_in_app: preferences['account_in_app'] !== false,
+            account_email: preferences['account_email'] !== false,
+            account_sms: preferences['account_sms'] !== false,
             updated_at: new Date().toISOString()
         };
         
@@ -727,6 +727,126 @@ async function saveNotificationPreferences(e) {
 
 async function saveNotificationsToSupabase() {
     await saveNotificationPreferences();
+}
+
+/**
+ * Subscribe to real-time notification updates
+ * Listens for new notifications from promotions and other sources
+ */
+function subscribeToNotificationUpdates() {
+    if (!window.supabaseClient || !currentUser) {
+        console.warn('[Rooted Vitality] Cannot subscribe to notifications - not ready');
+        return;
+    }
+
+    console.log('[Rooted Vitality] Setting up real-time notification subscription for', currentUser.serial_number);
+
+    // Subscribe to new notifications for this client
+    const channel = window.supabaseClient.channel(
+        `client-notifications-${currentUser.serial_number}`,
+        {
+            config: {
+                broadcast: { self: true },
+                presence: { key: currentUser.serial_number }
+            }
+        }
+    );
+
+    channel
+        .on(
+            'postgres_changes',
+            {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'client_notifications',
+                filter: `client_serial=eq.${currentUser.serial_number}`
+            },
+            (payload) => {
+                console.log('[Rooted Vitality] New notification received:', payload.new);
+                
+                const notification = payload.new;
+                
+                // Check if this type of notification is enabled in preferences
+                if (shouldShowNotification(notification.type)) {
+                    // Show visual notification
+                    showInAppNotification(notification);
+                    
+                    // Update badge if available
+                    if (window.updateNotificationBadge) {
+                        window.updateNotificationBadge();
+                    }
+                }
+            }
+        )
+        .subscribe();
+
+    console.log('[Rooted Vitality] Real-time notification subscription active');
+}
+
+/**
+ * Check if a notification type should be shown based on preferences
+ * @param {string} notificationType - The type of notification (promotions, system, etc.)
+ * @returns {boolean} True if notification should be shown
+ */
+function shouldShowNotification(notificationType) {
+    const typeMap = {
+        'promotions': 'promotions_in_app',
+        'system': 'system_in_app',
+        'messages': 'messages_in_app',
+        'matches': 'matches_in_app',
+        'match_response': 'matches_in_app'
+    };
+
+    const prefField = typeMap[notificationType] || 'system_in_app';
+    const checkbox = document.querySelector(`[name="${prefField}"]`);
+    
+    return checkbox ? checkbox.checked : true;
+}
+
+/**
+ * Show an in-app notification (temporary alert)
+ * @param {Object} notification - Notification data
+ */
+function showInAppNotification(notification) {
+    // Create notification element
+    const notifEl = document.createElement('div');
+    notifEl.className = 'in-app-notification-toast';
+    notifEl.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #5c9a72;
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 10000;
+        max-width: 400px;
+        animation: slideIn 0.3s ease-out;
+    `;
+    
+    const title = notification.title || 'New Notification';
+    const message = notification.message || '';
+    
+    notifEl.innerHTML = `
+        <div style="font-weight: 600; margin-bottom: 0.5rem;">${title}</div>
+        <div style="font-size: 0.9rem; opacity: 0.95;">${message}</div>
+        <div style="margin-top: 1rem;">
+            <button onclick="this.closest('.in-app-notification-toast').remove()" 
+                    style="background: rgba(255,255,255,0.2); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-weight: 500;">
+                Dismiss
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(notifEl);
+    
+    // Auto-remove after 6 seconds
+    setTimeout(() => {
+        if (notifEl.parentElement) {
+            notifEl.remove();
+        }
+    }, 6000);
 }
 
 /* ========================================== */

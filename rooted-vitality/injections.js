@@ -20,23 +20,9 @@ console.log('[Rooted Vitality] injections.js loading...');
 // GLOBAL NAVIGATION FUNCTIONS
 // ======================================================
 window.navigateToPage = function(page) {
-  console.log('[Header] navigateToPage called with:', page);
-  console.log('[Header] Current pathname:', window.location.pathname);
-  
-  // Construct the correct path from current location
-  if (window.location.pathname.includes('/rooted-vitality/dashboard/pro/')) {
-    const url = './pages/' + page + '.html';
-    console.log('[Header] Navigating to relative URL:', url);
-    window.location.href = url;
-  } else if (window.location.pathname.includes('/rooted-vitality/dashboard/client/')) {
-    const url = './pages/' + page + '.html';
-    console.log('[Header] Navigating to relative URL:', url);
-    window.location.href = url;
-  } else {
-    const url = '/rooted-vitality/dashboard/pro/pages/' + page + '.html';
-    console.log('[Header] Navigating to absolute URL:', url);
-    window.location.href = url;
-  }
+  // Direct navigation: just use the page name
+  // Browser will resolve it relative to current directory
+  window.location.href = page + '.html';
 };
 
 window.logout = function() {
@@ -349,6 +335,12 @@ const RootedVitality = {
                         
                         // Subscribe to real-time notifications for new matches
                         this.subscribeToNewMatches();
+                        
+                        // Subscribe to real-time notification updates (badge, dropdown list)
+                        this.subscribeToNotificationUpdates();
+                        
+                        // Load initial notifications to populate badge on page load
+                        this.loadNotifications();
                         
                         // Update avatar initial with user's first name
                         let firstName = '';
@@ -1206,6 +1198,153 @@ const RootedVitality = {
 
         } catch (error) {
             console.error('[Rooted Vitality] Error setting up match listener:', error);
+        }
+    },
+
+    /**
+     * Subscribe to real-time notification updates
+     * Handles INSERT, UPDATE, DELETE on notifications table to keep badge and list in sync
+     * Runs on ALL pages for all users (client and practitioner)
+     */
+    subscribeToNotificationUpdates: async function() {
+        if (!window.supabaseClient) {
+            return;
+        }
+
+        try {
+            const { data: { user } } = await window.supabaseClient.auth.getUser();
+            if (!user) {
+                return;
+            }
+
+            const currentUser = window.authManager?.getCurrentUser?.();
+            const userRole = currentUser?.role || localStorage.getItem('rvUserRole') || 'practitioner';
+            
+            // Determine table and filter based on user role
+            let table, serial, roleLabel;
+            if (userRole === 'client') {
+                table = 'client_notifications';
+                
+                // Fetch client serial from clients table
+                const { data: clientData, error: clientError } = await window.supabaseClient
+                    .from('clients')
+                    .select('serial_number')
+                    .eq('id', user.id)
+                    .single();
+                
+                if (clientError || !clientData) {
+                    console.warn('[Rooted Vitality] Could not fetch client serial for notifications listener:', clientError);
+                    return;
+                }
+                
+                serial = clientData.serial_number;
+                roleLabel = 'client';
+            } else {
+                table = 'practitioner_notifications';
+                serial = user.user_metadata?.serial_number || currentUser?.serial_number;
+                roleLabel = 'practitioner';
+            }
+
+            if (!serial) {
+                return;
+            }
+
+            console.log(`[Rooted Vitality] Setting up real-time notification updates for ${roleLabel}:`, serial);
+
+            // Subscribe to ALL changes on the notifications table for this user
+            const channel = window.supabaseClient
+                .channel(`notif-updates:${roleLabel}:${serial}`)
+                .on(
+                    'postgres_changes',
+                    {
+                        event: '*',  // Listen for INSERT, UPDATE, DELETE
+                        schema: 'public',
+                        table: table,
+                        filter: userRole === 'client' 
+                            ? `client_serial=eq.${serial}`
+                            : `practitioner_serial=eq.${serial}`
+                    },
+                    async (payload) => {
+                        console.log(`[Rooted Vitality] Notification change (${payload.eventType}) for ${roleLabel}:`, payload);
+                        
+                        // For new notifications (INSERT), immediately update badge and dropdown
+                        if (payload.eventType === 'INSERT' && payload.new) {
+                            console.log('[Rooted Vitality] New notification received - updating UI immediately');
+                            
+                            // Update badge count immediately
+                            const badge = document.querySelector('.rv-notification-badge');
+                            if (badge) {
+                                const currentCount = parseInt(badge.textContent) || 0;
+                                const newCount = currentCount + 1;
+                                badge.textContent = newCount;
+                                badge.classList.add('active');
+                                badge.style.display = 'block';
+                                console.log('[Rooted Vitality] Badge updated to:', newCount);
+                            }
+
+                            // Update bell icon color to gold to indicate unread
+                            const bellIcon = document.querySelector('.rv-bell-icon');
+                            if (bellIcon) {
+                                bellIcon.style.color = '#d4c47c';
+                            }
+
+                            // If notification dropdown is open, add the notification to the list
+                            const notificationsList = document.querySelector('.rv-notifications-list');
+                            if (notificationsList && notificationsList.parentElement.classList.contains('show')) {
+                                const notifElement = document.createElement('a');
+                                notifElement.className = 'rv-notifications-item unread';
+                                notifElement.href = payload.new.link || '#';
+                                notifElement.dataset.notifId = payload.new.id;
+                                notifElement.innerHTML = `
+                                    <p class="rv-notifications-title">${payload.new.title}</p>
+                                    <p class="rv-notifications-message">${payload.new.message}</p>
+                                    <span class="rv-notifications-time">${new Date(payload.new.created_at).toLocaleDateString()}</span>
+                                `;
+                                notifElement.addEventListener('click', (e) => {
+                                    e.preventDefault();
+                                    const notifId = notifElement.dataset.notifId;
+                                    if (notifId && !notifElement.classList.contains('read')) {
+                                        this.markNotificationAsRead(notifId);
+                                        notifElement.classList.remove('unread');
+                                        notifElement.classList.add('read');
+                                    }
+                                });
+
+                                // Remove empty state message if it exists
+                                const emptyMessage = notificationsList.querySelector('.rv-notifications-empty');
+                                if (emptyMessage) {
+                                    emptyMessage.remove();
+                                }
+
+                                // Insert at the top of the list
+                                if (notificationsList.firstChild) {
+                                    notificationsList.insertBefore(notifElement, notificationsList.firstChild);
+                                } else {
+                                    notificationsList.appendChild(notifElement);
+                                }
+                                console.log('[Rooted Vitality] Notification added to dropdown list');
+                            }
+                        } 
+                        // For any other changes (UPDATE, DELETE), reload the full list
+                        else {
+                            console.log(`[Rooted Vitality] Notification ${payload.eventType} - reloading notifications`);
+                            this.loadNotifications();
+                        }
+                    }
+                )
+                .subscribe((status) => {
+                    console.log(`[Rooted Vitality] Notification updates subscription status:`, status);
+                    if (status === 'SUBSCRIBED') {
+                        console.log('[Rooted Vitality] ✅ Real-time notification updates SUBSCRIBED');
+                    }
+                });
+
+            // Store subscription for cleanup if needed
+            window.notificationSubscriptions = window.notificationSubscriptions || [];
+            window.notificationSubscriptions.push(channel);
+
+        } catch (error) {
+            console.error('[Rooted Vitality] Error setting up notification updates listener:', error);
         }
     },
 

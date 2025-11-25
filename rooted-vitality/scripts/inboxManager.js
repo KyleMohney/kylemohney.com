@@ -28,6 +28,8 @@ function closeBlockModal() {
 
 /**
  * Confirm block action from modal
+ * WORKFLOW: Practitioner blocks = match status = declined
+ * Find all matches between practitioner and client, set them to declined
  */
 async function confirmBlock() {
     if (!pendingBlockClient) return;
@@ -68,6 +70,43 @@ async function confirmBlock() {
         }
         
         console.log(`[Inbox] BLOCK SUCCESSFUL - Client: ${clientName}`);
+        
+        // WORKFLOW: Update all matches between this practitioner and client to 'declined'
+        console.log('[Inbox] Updating all matches to declined status...');
+        const { data: matchesToDecline, error: matchError } = await window.supabaseClient
+            .from('project_practitioner_matches')
+            .update({ status: 'declined', updated_at: new Date().toISOString() })
+            .eq('practitioner_serial', practitionerId)
+            .match('project_id', 'projects!inner(client_serial)')  // Find projects for this client
+            .select();
+        
+        // Alternative approach if the above doesn't work - find matches directly
+        if (matchError) {
+            console.warn('[Inbox] Direct match update failed, trying alternative approach:', matchError);
+            // Find all matches between this practitioner and client's projects
+            const { data: projectIds, error: projectError } = await window.supabaseClient
+                .from('projects')
+                .select('id')
+                .eq('client_serial', clientSerial);
+            
+            if (!projectError && projectIds && projectIds.length > 0) {
+                const projectIdList = projectIds.map(p => p.id);
+                
+                const { error: updateError } = await window.supabaseClient
+                    .from('project_practitioner_matches')
+                    .update({ status: 'declined', updated_at: new Date().toISOString() })
+                    .eq('practitioner_serial', practitionerId)
+                    .in('project_id', projectIdList);
+                
+                if (updateError) {
+                    console.error('[Inbox] Error updating match statuses:', updateError);
+                } else {
+                    console.log('[Inbox] Successfully updated all matches to declined status');
+                }
+            }
+        } else {
+            console.log('[Inbox] Successfully updated all matches to declined status');
+        }
         
         // Create notification for the client (show as "declined", not "blocked")
         const { error: notifError } = await window.supabaseClient
@@ -388,45 +427,96 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Check for auto-open parameter (e.g., from accept/decline match flow)
         const clientSerialToOpen = urlParams.get('clientSerial');
-        if (clientSerialToOpen) {
-            console.log('[Inbox] Auto-open requested for clientSerial:', clientSerialToOpen);
-            console.log('[Inbox] Available conversations:', conversations.map(c => c.clientSerial));
+        const projectSerialToOpen = urlParams.get('projectSerial');
+        
+        if (clientSerialToOpen || projectSerialToOpen) {
+            console.log('[Inbox] Auto-open requested for clientSerial:', clientSerialToOpen, 'projectSerial:', projectSerialToOpen);
+            console.log('[Inbox] Available conversations:', conversations.map(c => ({ 
+                clientSerial: c.clientSerial, 
+                projectSerial: c.projectSerial,
+                clientName: c.clientName 
+            })));
             
             // Try to find and open the conversation with retries
             let retryCount = 0;
-            const maxRetries = 5;
+            const maxRetries = 10;  // Increased from 5
             
-            const tryAutoOpen = () => {
-                const conversation = conversations.find(c => c.clientSerial === clientSerialToOpen);
+            const tryAutoOpen = async () => {
+                console.log(`[Inbox] Auto-open attempt ${retryCount + 1}/${maxRetries + 1}`);
+                
+                // Try to find conversation by clientSerial first, then by projectSerial
+                let conversation = conversations.find(c => c.clientSerial === clientSerialToOpen);
+                
+                if (!conversation && projectSerialToOpen) {
+                    conversation = conversations.find(c => c.projectSerial === projectSerialToOpen);
+                }
+                
                 if (conversation) {
-                    console.log('[Inbox] Found conversation for auto-open, opening now');
-                    const threadItem = document.querySelector(`.thread-item[data-client-serial="${clientSerialToOpen}"]`);
+                    console.log('[Inbox] Found conversation for auto-open:', conversation.clientName);
+                    
+                    // Try to find and click the thread item
+                    const threadItem = document.querySelector(`.thread-item[data-client-serial="${conversation.clientSerial}"], .thread-item[data-project-serial="${conversation.projectSerial}"]`);
+                    
                     if (threadItem) {
+                        console.log('[Inbox] Found thread DOM element, clicking to open...');
                         threadItem.click();
-                        console.log('[Inbox] Auto-opened conversation');
+                        console.log('[Inbox] Auto-opened conversation for:', conversation.clientName);
                     } else {
-                        console.log('[Inbox] Thread item found but DOM element not ready yet, retrying...');
+                        console.log('[Inbox] Thread item DOM element not found, searching by alternate selectors...');
+                        
+                        // Try alternative selectors if data attributes aren't set
+                        const allThreadItems = document.querySelectorAll('.thread-item');
+                        for (const item of allThreadItems) {
+                            const itemText = item.textContent || '';
+                            if (itemText.includes(conversation.clientName)) {
+                                console.log('[Inbox] Found thread by name match, clicking...');
+                                item.click();
+                                return;
+                            }
+                        }
+                        
+                        console.log('[Inbox] DOM elements not ready yet, retrying... Attempt', retryCount + 1);
                         if (retryCount < maxRetries) {
                             retryCount++;
-                            setTimeout(tryAutoOpen, 500);
+                            setTimeout(tryAutoOpen, 300);  // Reduced from 500ms for faster retry
+                        } else {
+                            console.warn('[Inbox] Max retries reached for DOM element. Attempting to open without clicking...');
+                            // As a last resort, open the first thread item
+                            const firstThread = document.querySelector('.thread-item');
+                            if (firstThread) {
+                                firstThread.click();
+                            }
                         }
                     }
                 } else {
-                    console.log('[Inbox] Conversation not found yet, retrying... Attempt', retryCount + 1);
+                    console.log('[Inbox] Conversation not found, reloading and retrying... Attempt', retryCount + 1);
                     if (retryCount < maxRetries) {
                         retryCount++;
                         // Reload conversations and try again
-                        loadConversations().then(() => {
-                            setTimeout(tryAutoOpen, 500);
-                        });
+                        try {
+                            await loadConversations();
+                            setTimeout(tryAutoOpen, 300);
+                        } catch (reloadError) {
+                            console.error('[Inbox] Error reloading conversations:', reloadError);
+                            if (retryCount < maxRetries) {
+                                setTimeout(tryAutoOpen, 300);
+                            }
+                        }
                     } else {
-                        console.log('[Inbox] Max retries reached, giving up on auto-open');
+                        console.warn('[Inbox] Max retries reached, could not find matching conversation');
+                        console.warn('[Inbox] Searched for clientSerial:', clientSerialToOpen, 'projectSerial:', projectSerialToOpen);
+                        console.warn('[Inbox] Available conversations:', conversations.map(c => ({
+                            clientSerial: c.clientSerial,
+                            projectSerial: c.projectSerial,
+                            clientName: c.clientName
+                        })));
                     }
                 }
             };
             
             // Start trying after a brief delay
-            setTimeout(tryAutoOpen, 500);
+            console.log('[Inbox] Scheduling auto-open attempt for 200ms...');
+            setTimeout(tryAutoOpen, 200);
         }
         
         // Set up real-time subscription for new accepted matches
@@ -446,7 +536,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         filter: `practitioner_serial=eq.${practitionerSerial}`,
                     }, (payload) => {
                         console.log('[Inbox] Match update received:', payload);
-                        if ((payload.new.status === 'in-progress' || payload.new.status === 'active') && payload.old.status === 'pending') {
+                        if (payload.new.status === 'in-progress' && payload.old.status === 'pending') {
                             console.log('[Inbox] New accepted match detected! Reloading conversations...');
                             loadConversations().then(() => {
                                 renderThreadsList();
@@ -456,6 +546,70 @@ document.addEventListener('DOMContentLoaded', async () => {
                     })
                     .subscribe((status) => {
                         console.log('[Inbox] Real-time subscription status:', status);
+                    });
+
+                // Set up real-time subscription for new messages from clients
+                console.log('[Inbox] Setting up real-time subscription for incoming messages from clients');
+                window.supabaseClient
+                    .channel(`practitioner-messages:${practitionerSerial}`)
+                    .on('postgres_changes', {
+                        event: 'INSERT',
+                        schema: 'public',
+                        table: 'project_messages',
+                        filter: `practitioner_serial=eq.${practitionerSerial}`,
+                    }, (payload) => {
+                        console.log('[Inbox] New message received via realtime:', payload.new);
+                        
+                        // Only care about messages from clients (not practitioner's own messages)
+                        if (payload.new.sender_type === 'client') {
+                            console.log('[Inbox] Message from client detected - updating unread counts...');
+                            
+                            // Find and update the conversation with new unread count
+                            const projectSerial = payload.new.project_serial;
+                            const conversation = conversations.find(c => c.projectSerial === projectSerial);
+                            
+                            if (conversation) {
+                                // Update conversation data
+                                conversation.unreadCount = (conversation.unreadCount || 0) + 1;
+                                conversation.isUnread = true;
+                                conversation.lastMessage = payload.new.message;
+                                conversation.lastMessageTime = new Date(payload.new.created_at);
+                                
+                                console.log('[Inbox] Updated conversation:', conversation.clientName, '- unread count:', conversation.unreadCount);
+                                
+                                // Re-render threads list to show updated unread indicator and move to unread tab if filtered
+                                renderThreadsList();
+                                updateBadges();
+                                
+                                // Also update the currently open conversation if it's this one
+                                if (selectedConversationId === conversation.id) {
+                                    conversation.messages = conversation.messages || [];
+                                    conversation.messages.push({
+                                        id: payload.new.id,
+                                        sender_type: payload.new.sender_type,
+                                        message: payload.new.message,
+                                        created_at: payload.new.created_at,
+                                        is_read: payload.new.is_read
+                                    });
+                                    renderMessages(conversation.messages);
+                                    
+                                    // Scroll to bottom to show new message
+                                    const messagesContainer = document.getElementById('messages-container');
+                                    if (messagesContainer) {
+                                        setTimeout(() => {
+                                            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                                        }, 50);
+                                    }
+                                }
+                            }
+                        }
+                    })
+                    .subscribe((status) => {
+                        if (status === 'SUBSCRIBED') {
+                            console.log('[Inbox] Real-time subscription active for incoming messages');
+                        } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
+                            console.warn('[Inbox] Real-time subscription error for messages, will rely on polling');
+                        }
                     });
             }
         }
@@ -602,6 +756,7 @@ function setupBackButtonListener() {
 async function loadConversations() {
     try {
         console.log('[Inbox] ===== LOAD CONVERSATIONS STARTED =====');
+        console.time('loadConversations-total');
         
         // Get practitioner ID and serial number
         const rvUserStr = localStorage.getItem('rvUser');
@@ -630,11 +785,24 @@ async function loadConversations() {
 
         conversations = [];
 
-        // ===== LOAD ALL MATCHES (Messages, New Leads, Archive) =====
-        // Query for ALL statuses including pending (new leads), active, in-progress, hired/not-hired (completed)
+        // ===== OPTIMIZED: LOAD ALL MATCHES WITH JOINED DATA =====
+        // Use a single query with joins instead of N+1 queries
         const { data: acceptedMatches, error: acceptedError } = await window.supabaseClient
             .from('project_practitioner_matches')
-            .select('id, project_serial, status, created_at')
+            .select(`
+                id,
+                project_serial,
+                status,
+                created_at,
+                projects:project_serial (
+                    id,
+                    description,
+                    category_name,
+                    client_serial,
+                    zipcode,
+                    travel_preference
+                )
+            `)
             .eq('practitioner_serial', practitionerSerial)
             .in('status', ['pending', 'active', 'in-progress', 'hired', 'not-hired']);
 
@@ -645,32 +813,61 @@ async function loadConversations() {
 
         console.log('[Inbox] Loaded accepted matches:', acceptedMatches?.length);
 
-        // Process accepted matches
+        // Get all unique client IDs and project serials from matches
+        const clientSerials = [...new Set(acceptedMatches?.map(m => m.projects?.client_serial).filter(Boolean) || [])];
+        const projectSerials = [...new Set(acceptedMatches?.map(m => m.project_serial) || [])];
+
+        // Batch fetch all clients
+        const { data: allClients } = await window.supabaseClient
+            .from('clients')
+            .select('id, first_name, last_name, profile_picture_url, serial_number')
+            .in('serial_number', clientSerials);
+
+        const clientsMap = new Map(allClients?.map(c => [c.serial_number, c]) || []);
+
+        // Batch fetch all messages for all projects
+        const { data: allMessages } = await window.supabaseClient
+            .from('project_messages')
+            .select('project_serial, practitioner_serial, id, message, sender_type, created_at, is_read')
+            .in('project_serial', projectSerials)
+            .eq('practitioner_serial', practitionerSerial)
+            .order('created_at', { ascending: false });
+
+        const messagesMap = new Map();
+        allMessages?.forEach(msg => {
+            const key = `${msg.project_serial}`;
+            if (!messagesMap.has(key)) {
+                messagesMap.set(key, []);
+            }
+            messagesMap.get(key).push(msg);
+        });
+
+        // Batch fetch all reviews
+        const { data: allReviews } = await window.supabaseClient
+            .from('reviews')
+            .select('practitioner_serial, project_serial')
+            .eq('practitioner_serial', practitionerSerial)
+            .in('project_serial', projectSerials);
+
+        const reviewsSet = new Set(allReviews?.map(r => `${r.practitioner_serial}:${r.project_serial}`) || []);
+
+        // Batch fetch all block records
+        const { data: allBlocks } = await window.supabaseClient
+            .from('practitioner_blocks')
+            .select('practitioner_serial, client_serial, is_blocked')
+            .eq('practitioner_serial', practitionerSerial)
+            .in('client_serial', clientSerials);
+
+        const blocksMap = new Map(allBlocks?.map(b => [`${b.practitioner_serial}:${b.client_serial}`, b]) || []);
+
+        // Process accepted matches with pre-fetched data
         for (const match of acceptedMatches || []) {
             try {
-                // Get project details
-                const { data: project, error: projectError } = await window.supabaseClient
-                    .from('projects')
-                    .select('id, description, category_name, client_serial, zipcode, travel_preference')
-                    .eq('project_serial', match.project_serial)
-                    .single();
+                const project = match.projects;
+                if (!project) continue;
 
-                if (projectError || !project) {
-                    console.warn('[Inbox] Could not load project:', match.project_serial);
-                    continue;
-                }
-
-                // Get client details
-                const { data: client, error: clientError } = await window.supabaseClient
-                    .from('clients')
-                    .select('id, first_name, last_name, profile_picture_url')
-                    .eq('serial_number', project.client_serial)
-                    .single();
-
-                if (clientError || !client) {
-                    console.warn('[Inbox] Could not load client for project:', match.project_serial);
-                    continue;
-                }
+                const client = clientsMap.get(project.client_serial);
+                if (!client) continue;
 
                 const clientName = `${client.first_name || 'Client'} ${client.last_name || ''}`;
                 const initials = `${client.first_name?.[0] || ''}${client.last_name?.[0] || ''}`.toUpperCase();
@@ -678,27 +875,13 @@ async function loadConversations() {
                     ? client.profile_picture_url 
                     : generateInitialsAvatar(clientName);
 
-                // Get latest messages (reversed because they come in descending order)
-                const { data: messages } = await window.supabaseClient
-                    .from('project_messages')
-                    .select('id, message, sender_type, created_at, is_read')
-                    .eq('project_serial', match.project_serial)
-                    .eq('practitioner_serial', practitionerSerial)
-                        .order('created_at', { ascending: false })
-                    .limit(50);
-
+                // Get messages for this project
+                const messages = messagesMap.get(`${match.project_serial}`) || [];
                 const lastMessage = messages?.[0];
                 const unreadCount = messages?.filter(m => !m.is_read && m.sender_type === 'client').length || 0;
 
-                // Check if client has reviewed this project
-                const { data: reviews } = await window.supabaseClient
-                    .from('reviews')
-                    .select('id')
-                    .eq('practitioner_serial', practitionerSerial)
-                    .eq('project_serial', match.project_serial)
-                    .limit(1);
-
-                const hasReview = reviews && reviews.length > 0;
+                // Check if client has reviewed
+                const hasReview = reviewsSet.has(`${practitionerSerial}:${match.project_serial}`);
 
                 // Determine category based on match status
                 let category = 'all';
@@ -714,16 +897,15 @@ async function loadConversations() {
                     category = 'archive';
                     isArchived = true;
                 }
-                // active and in-progress stay as category 'all'
 
                 conversations.push({
                     id: match.id,
                     matchId: match.id,
-                    projectId: project.id,  // Use project.id (UUID), not match.project_id
+                    projectId: project.id,
                     projectSerial: match.project_serial,
                     clientId: client.id,
                     clientSerial: project.client_serial,
-                    practitionerId: currentUser.id,  // Use actual practitioner UUID
+                    practitionerId: currentUser.id,
                     practitionerSerial: practitionerSerial,
                     clientName: clientName,
                     clientAvatar: clientAvatarUrl,
@@ -733,7 +915,7 @@ async function loadConversations() {
                     unreadCount: unreadCount,
                     status: 'online',
                     category: category,
-                    messages: messages ? [...messages].reverse() : [],  // Reverse to show oldest first
+                    messages: [...messages].reverse(),  // Reverse to show oldest first
                     isArchived: isArchived,
                     isPending: isPending,
                     isBlocked: false,
@@ -753,7 +935,20 @@ async function loadConversations() {
         // ===== LOAD DECLINED MATCHES (Archive Tab) =====
         const { data: declinedMatches, error: declinedError } = await window.supabaseClient
             .from('project_practitioner_matches')
-            .select('id, project_serial, status, created_at')
+            .select(`
+                id,
+                project_serial,
+                status,
+                created_at,
+                projects:project_serial (
+                    id,
+                    description,
+                    category_name,
+                    client_serial,
+                    zipcode,
+                    travel_preference
+                )
+            `)
             .eq('practitioner_serial', practitionerSerial)
             .eq('status', 'declined');
 
@@ -763,57 +958,30 @@ async function loadConversations() {
 
         console.log('[Inbox] Loaded declined matches:', declinedMatches?.length);
 
-        // Process declined matches
+        // Process declined matches (already have clients and blocks from batch fetches above)
         for (const match of declinedMatches || []) {
             try {
-                // Get project details
-                const { data: project, error: projectError } = await window.supabaseClient
-                    .from('projects')
-                    .select('id, description, category_name, client_serial, zipcode, travel_preference')
-                    .eq('project_serial', match.project_serial)
-                    .single();
+                const project = match.projects;
+                if (!project) continue;
 
-                if (projectError || !project) continue;
-
-                // Get client details
-                const { data: client, error: clientError } = await window.supabaseClient
-                    .from('clients')
-                    .select('id, first_name, last_name, profile_picture_url')
-                    .eq('serial_number', project.client_serial)
-                    .single();
-
-                if (clientError || !client) continue;
+                const client = clientsMap.get(project.client_serial);
+                if (!client) continue;
 
                 const clientName = `${client.first_name || 'Client'} ${client.last_name || ''}`;
                 const clientAvatarUrl = client.profile_picture_url 
                     ? client.profile_picture_url 
                     : generateInitialsAvatar(clientName);
 
-                // Check if this client is blocked
-                const { data: blockRecords, error: blockError } = await window.supabaseClient
-                    .from('practitioner_blocks')
-                    .select('id, is_blocked')
-                    .eq('practitioner_serial', practitionerSerial)
-                    .eq('client_serial', project.client_serial);
+                const blockKey = `${practitionerSerial}:${project.client_serial}`;
+                const isBlocked = blocksMap.has(blockKey) && blocksMap.get(blockKey).is_blocked === true;
+                console.log(`[Inbox] Processing declined match - Client: ${clientName}, isBlocked: ${isBlocked}`);
 
-                // A client is blocked if they have a block record with is_blocked = true
-                const isBlocked = blockRecords && blockRecords.length > 0 && blockRecords[0].is_blocked === true;
-                console.log(`[Inbox] Processing declined match - Client: ${clientName}, BlockRecords: ${blockRecords?.length}, isBlocked: ${isBlocked}`);
-
-                // Check if client has reviewed this project
-                const { data: reviews } = await window.supabaseClient
-                    .from('reviews')
-                    .select('id')
-                    .eq('practitioner_serial', practitionerSerial)
-                    .eq('project_serial', match.project_serial)
-                    .limit(1);
-
-                const hasReview = reviews && reviews.length > 0;
+                const hasReview = reviewsSet.has(`${practitionerSerial}:${match.project_serial}`);
 
                 conversations.push({
                     id: match.id,
                     matchId: match.id,
-                    projectId: match.project_id,
+                    projectId: project.id,
                     clientId: client.id,
                     clientSerial: project.client_serial,
                     practitionerId: practitionerSerial,
@@ -840,10 +1008,7 @@ async function loadConversations() {
             }
         }
 
-        // ===== LOAD BLOCKED MATCHES BY STATUS (Archive Tab) =====
-        // (No longer needed - blocked clients tracked via practitioner_blocks)
-        // Keeping this commented for reference, but we now detect blocks via practitioner_blocks table lookup above
-
+        console.timeEnd('loadConversations-total');
         console.log(`[Inbox] Loaded ${conversations.length} conversations (${conversations.filter(c => c.category === 'all').length} accepted, ${conversations.filter(c => c.category === 'archive' && !c.isBlocked).length} declined, ${conversations.filter(c => c.isBlocked).length} blocked)`);
         console.log('[Inbox] ===== LOAD CONVERSATIONS COMPLETED =====');
     } catch (error) {
@@ -912,6 +1077,7 @@ function createThreadElement(conversation) {
     const item = document.createElement('button');
     item.className = 'thread-item';
     item.setAttribute('data-client-serial', conversation.clientSerial);
+    item.setAttribute('data-project-serial', conversation.projectSerial);
     
     if (selectedConversationId === conversation.id) {
         item.classList.add('active');
@@ -1065,6 +1231,12 @@ function createThreadElement(conversation) {
  * Open and display a conversation thread
  */
 function openThreadView(conversation) {
+    _openThreadViewAsync(conversation).catch(error => {
+        console.error('[Inbox] Error in openThreadView:', error);
+    });
+}
+
+async function _openThreadViewAsync(conversation) {
     // Stop polling from previous conversation if one was open
     if (currentOpenConversation && currentOpenConversation._pollingInterval) {
         clearInterval(currentOpenConversation._pollingInterval);
@@ -1118,29 +1290,58 @@ function openThreadView(conversation) {
             .map(m => m.id);
         
         if (unreadClientMessageIds.length > 0) {
-            // Mark messages as read in database
-            window.supabaseClient
-                .from('project_messages')
-                .update({ is_read: true })
-                .in('id', unreadClientMessageIds)
-                .then(() => {
-                    console.log('[Inbox] Marked', unreadClientMessageIds.length, 'messages as read');
-                    
-                    // Update local conversation object
-                    conversation.messages.forEach(m => {
-                        if (unreadClientMessageIds.includes(m.id)) {
-                            m.is_read = true;
-                        }
-                    });
-                    
-                    // Recalculate unread count and update badges
-                    const updatedUnreadCount = conversation.messages.filter(m => !m.is_read && m.sender_type === 'client').length;
-                    conversation.isUnread = updatedUnreadCount > 0;
-                    conversation.unreadCount = updatedUnreadCount;
-                    updateBadges();
-                    renderThreadsList();
-                })
-                .catch(error => console.error('[Inbox] Error marking messages as read:', error));
+            try {
+                console.log('[Inbox] About to mark messages as read, IDs:', unreadClientMessageIds);
+                
+                // Mark messages as read in database
+                const { error: updateError, data: updateResponse } = await window.supabaseClient
+                    .from('project_messages')
+                    .update({ is_read: true })
+                    .in('id', unreadClientMessageIds);
+                
+                if (updateError) {
+                    console.error('[Inbox] Error updating messages as read:', updateError);
+                    return;
+                }
+                
+                console.log('[Inbox] Successfully marked', unreadClientMessageIds.length, 'messages as read, response:', updateResponse);
+                
+                // Verify the update by querying
+                const { data: verifyData, error: verifyError } = await window.supabaseClient
+                    .from('project_messages')
+                    .select('id, is_read')
+                    .in('id', unreadClientMessageIds);
+                
+                if (!verifyError) {
+                    console.log('[Inbox] Verified update - messages now have is_read status:', verifyData);
+                }
+                
+                // Update local conversation object
+                conversation.messages.forEach(m => {
+                    if (unreadClientMessageIds.includes(m.id)) {
+                        m.is_read = true;
+                    }
+                });
+                
+                // Recalculate unread count and update badges
+                const updatedUnreadCount = conversation.messages.filter(m => !m.is_read && m.sender_type === 'client').length;
+                conversation.isUnread = updatedUnreadCount > 0;
+                conversation.unreadCount = updatedUnreadCount;
+                
+                // Also update the conversation in the global conversations array to ensure sync
+                const globalConvIndex = conversations.findIndex(c => c.id === conversation.id);
+                if (globalConvIndex !== -1) {
+                    conversations[globalConvIndex].isUnread = conversation.isUnread;
+                    conversations[globalConvIndex].unreadCount = conversation.unreadCount;
+                    conversations[globalConvIndex].messages = conversation.messages;
+                    console.log('[Inbox] Updated conversation in global array, isUnread now:', conversation.isUnread);
+                }
+                
+                updateBadges();
+                renderThreadsList();
+            } catch (error) {
+                console.error('[Inbox] Error marking messages as read:', error);
+            }
         }
     }
     
@@ -1574,14 +1775,15 @@ async function archiveConversation(conversation) {
 }
 
 /**
- * Block a client conversation
+ * Block a client conversation (from thread menu)
+ * WORKFLOW: Practitioner blocks = match status = declined
  */
 async function blockConversation(conversation) {
     try {
-        // Update the match status to 'declined' and mark as blocked
+        // Update the match status to 'declined' (WORKFLOW requirement)
         const { error } = await window.supabaseClient
-            .from('matches')
-            .update({ status: 'declined', is_blocked: true })
+            .from('project_practitioner_matches')
+            .update({ status: 'declined', updated_at: new Date().toISOString() })
             .eq('id', conversation.matchId);
         
         if (error) {

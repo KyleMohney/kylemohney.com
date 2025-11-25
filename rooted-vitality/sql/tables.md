@@ -457,3 +457,14 @@ client_notification_settings
 | created_at        | timestamp with time zone |
 | updated_at        | timestamp with time zone |
 | client_serial     | text                     |
+
+
+Workflow =
+
+New Match is made = match AND project status = pending.
+Practitioner accepts = match AND project status = in-progress
+Practitioner declines = match status = declined
+Practitioner blocks = match status = declined
+client changes dropdown to hired = match AND project status change to Hired and CLOSE
+client changes dropdown to not hired = match status changes to not hired and match closes
+client cancels project itself = project status AND ALL match status change to not hired  and CLOSE

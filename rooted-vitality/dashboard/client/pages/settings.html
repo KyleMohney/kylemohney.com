@@ -166,37 +166,13 @@
           </div>
         </div>
 
-        <!-- Reviews Notifications -->
-        <div class="settings-card">
-          <div class="card-header">
-            <h3>Reviews</h3>
-          </div>
-          <div class="card-content">
-            <p class="setting-description">Notifications about reviews and ratings</p>
-            <div class="notification-channels">
-              <label class="notification-channel-toggle">
-                <input type="checkbox" name="reviews_in_app" checked class="notification-input">
-                <span class="toggle-label">In-App Notification</span>
-              </label>
-              <label class="notification-channel-toggle">
-                <input type="checkbox" name="reviews_email" checked class="notification-input">
-                <span class="toggle-label">Email</span>
-              </label>
-              <label class="notification-channel-toggle">
-                <input type="checkbox" name="reviews_sms" checked class="notification-input">
-                <span class="toggle-label">SMS</span>
-              </label>
-            </div>
-          </div>
-        </div>
-
         <!-- Promotions & News -->
         <div class="settings-card">
           <div class="card-header">
-            <h3>Promotions & News</h3>
+            <h3>Promotions</h3>
           </div>
           <div class="card-content">
-            <p class="setting-description">Updates about features, special offers, and wellness news</p>
+            <p class="setting-description">Receive notifications when we send out special offers and promotions</p>
             <div class="notification-channels">
               <label class="notification-channel-toggle">
                 <input type="checkbox" name="promotions_in_app" checked class="notification-input">
@@ -207,7 +183,7 @@
                 <span class="toggle-label">Email</span>
               </label>
               <label class="notification-channel-toggle">
-                <input type="checkbox" name="promotions_sms" checked class="notification-input">
+                <input type="checkbox" name="promotions_sms" class="notification-input">
                 <span class="toggle-label">SMS</span>
               </label>
             </div>
@@ -249,6 +225,14 @@
               <label class="notification-channel-toggle">
                 <input type="checkbox" name="account_in_app" checked class="notification-input">
                 <span class="toggle-label">In-App Notification</span>
+              </label>
+              <label class="notification-channel-toggle">
+                <input type="checkbox" name="account_email" checked class="notification-input">
+                <span class="toggle-label">Email</span>
+              </label>
+              <label class="notification-channel-toggle">
+                <input type="checkbox" name="account_sms" class="notification-input">
+                <span class="toggle-label">SMS</span>
               </label>
             </div>
           </div>
@@ -379,6 +363,8 @@
   <script src="../../../scripts/authModal.js"></script>
   <script src="../../../scripts/authHooks.js"></script>
   <script src="../../../scripts/clientHeaderAvatar.js"></script>
+  <script src="../../../scripts/emailTemplates.js"></script>
+  <script src="../../../scripts/notificationManager.js"></script>
   <script src="../../../injections.js"></script>
   <script src="../scripts/clientSettings.js"></script>
 </body>

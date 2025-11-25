@@ -127,49 +127,79 @@ async function notifyClientOfMatchResponse(options) {
  * @private
  */
 async function sendExternalNotifications(options) {
-  const { email, phone, emailEnabled, smsEnabled, title, message, action, practitionerName, projectName, reason } = options;
+  const { email, phone, emailEnabled, smsEnabled, title, message, action, practitionerName, projectName, reason, clientName, emailHtml } = options;
 
   try {
-    // This would typically call a backend webhook that handles actual email/SMS sending
-    // For now, log the notification that would be sent
-    
     if (emailEnabled && email) {
-      console.log('[Notifications] Email would be sent to:', email);
-      console.log('[Notifications] Subject:', title);
-      console.log('[Notifications] Body:', message);
+      console.log('[Notifications] Sending email notification to:', email);
       
-      // TODO: Implement webhook call to backend for email sending
-      // const emailResponse = await fetch('/api/send-notification', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     type: 'email',
-      //     email: email,
-      //     subject: title,
-      //     body: message,
-      //     notificationType: 'match_response'
-      //   })
-      // });
+      // Get HTML template based on action type
+      let finalEmailHtml;
+      let subject;
+      
+      if (emailHtml) {
+        // Use provided custom HTML (for practitioner new match)
+        finalEmailHtml = emailHtml;
+        subject = title;
+      } else if (action === 'accepted') {
+        subject = `✓ ${practitionerName} Accepted Your Match Request`;
+        finalEmailHtml = EmailTemplates.matchAccepted({
+          clientName: 'Valued Client',
+          practitionerName: practitionerName,
+          projectName: projectName
+        });
+      } else if (action === 'declined') {
+        subject = `Match Update: ${practitionerName} Declined Your Request`;
+        finalEmailHtml = EmailTemplates.matchDeclined({
+          clientName: 'Valued Client',
+          practitionerName: practitionerName,
+          projectName: projectName,
+          reason: reason || 'Not specified'
+        });
+      } else {
+        // Generic notification
+        subject = title;
+        finalEmailHtml = EmailTemplates.system({
+          title: title,
+          message: message
+        });
+      }
+
+      // Send email via Supabase Edge Function
+      const emailResponse = await fetch(
+        `${window.supabaseClient.supabaseUrl}/functions/v1/send-notification-email`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${(await window.supabaseClient.auth.getSession()).data.session?.access_token || ''}`
+          },
+          body: JSON.stringify({
+            to: email,
+            subject: subject,
+            html: finalEmailHtml,
+            type: 'notification'
+          })
+        }
+      );
+
+      if (emailResponse.ok) {
+        console.log('[Notifications] Email sent successfully to:', email);
+      } else {
+        const errorText = await emailResponse.text();
+        console.warn('[Notifications] Email API error:', emailResponse.status, errorText);
+        // Fallback: log that email would be sent
+        console.log('[Notifications] Fallback: Email would be sent to:', email);
+      }
     }
 
     if (smsEnabled && phone) {
       console.log('[Notifications] SMS would be sent to:', phone);
-      console.log('[Notifications] Body:', message.substring(0, 160));
-      
-      // TODO: Implement webhook call to backend for SMS sending
-      // const smsResponse = await fetch('/api/send-notification', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     type: 'sms',
-      //     phone: phone,
-      //     body: message.substring(0, 160), // SMS character limit
-      //     notificationType: 'match_response'
-      //   })
-      // });
+      // TODO: Implement SMS sending via Twilio or similar service
     }
+
   } catch (error) {
-    console.error('[Notifications] Error sending external notifications:', error);
+    console.error('[Notifications] Exception sending external notifications:', error);
   }
 }
 
@@ -191,36 +221,45 @@ async function notifyPractitionerOfNewMatch(options) {
       return;
     }
 
-    const title = 'New Match Request';
-    const message = `${clientName} has requested to connect with you for "${projectName}" (${matchScore}% match)`;
-
-    // Create in-app notification
-    const notification = {
-      practitioner_serial: practitionerSerial,
-      type: 'new_match',
-      title: title,
-      message: message,
-      is_read: false,
-      created_at: new Date().toISOString()
-    };
-
-    const { error } = await window.supabaseClient
-      .from('notifications')
-      .insert([notification]);
-
-    if (error) {
-      console.error('[Notifications] Failed to create practitioner notification:', error);
-    } else {
-      console.log('[Notifications] Practitioner notification created for', practitionerSerial);
-    }
-
-    // Check practitioner preferences and send email/SMS if enabled
+    // Check practitioner preferences first
     const { data: preferences, error: prefError } = await window.supabaseClient
       .from('practitioner_notification_settings')
-      .select('matches_email, matches_sms')
+      .select('matches_in_app, matches_email, matches_sms')
       .eq('practitioner_serial', practitionerSerial)
       .single();
 
+    if (prefError) {
+      console.log('[Notifications] No preferences found, using defaults (all enabled)');
+    }
+
+    // Create in-app notification only if matches_in_app is enabled
+    if (!prefError && preferences && !preferences.matches_in_app) {
+      console.log('[Notifications] In-app notifications disabled for practitioner', practitionerSerial);
+    } else {
+      const title = 'New Match Request';
+      const message = `${clientName} has requested to connect with you for "${projectName}" (${matchScore}% match)`;
+
+      const notification = {
+        practitioner_serial: practitionerSerial,
+        type: 'new_match',
+        title: title,
+        message: message,
+        is_read: false,
+        created_at: new Date().toISOString()
+      };
+
+      const { error } = await window.supabaseClient
+        .from('notifications')
+        .insert([notification]);
+
+      if (error) {
+        console.error('[Notifications] Failed to create practitioner notification:', error);
+      } else {
+        console.log('[Notifications] Practitioner in-app notification created for', practitionerSerial);
+      }
+    }
+
+    // Send email if enabled
     if (!prefError && preferences && (preferences.matches_email || preferences.matches_sms)) {
       const { data: practitioner, error: proError } = await window.supabaseClient
         .from('practitioners')
@@ -229,16 +268,25 @@ async function notifyPractitionerOfNewMatch(options) {
         .single();
 
       if (practitioner) {
+        // Use practitioner-specific email template
+        const emailHtml = EmailTemplates.practitionerNewMatch({
+          practitionerName: 'Valued Practitioner',
+          clientName: clientName,
+          projectName: projectName,
+          matchScore: matchScore || 'N/A'
+        });
+
         await sendExternalNotifications({
           email: practitioner.email,
           phone: practitioner.phone,
           emailEnabled: preferences.matches_email,
           smsEnabled: preferences.matches_sms,
-          title: title,
-          message: message,
+          title: `New Match Request from ${clientName}`,
+          message: `${clientName} has requested to work with you on "${projectName}"`,
           action: 'new_match',
           clientName: clientName,
-          projectName: projectName
+          projectName: projectName,
+          emailHtml: emailHtml
         });
       }
     }
@@ -273,6 +321,131 @@ async function markNotificationAsRead(notificationId, userType) {
     }
   } catch (error) {
     console.error('[Notifications] Exception marking notification as read:', error);
+  }
+}
+
+/**
+ * Send promotions notification to all clients who have it enabled
+ * @param {Object} options - Promotion notification options
+ * @param {string} options.title - Promotion title
+ * @param {string} options.message - Promotion message
+ * @param {string} options.promotionType - Type of promotion (discount, announcement, etc.)
+ * @param {string} options.buttonUrl - Optional button URL
+ * @param {string} options.buttonText - Optional button text
+ * @returns {Promise<void>}
+ */
+async function sendPromotionNotification(options) {
+  const { title, message, promotionType = 'promotion', buttonUrl, buttonText = 'Learn More' } = options;
+
+  try {
+    if (!window.supabaseClient) {
+      console.error('[Notifications] Supabase client not initialized');
+      return;
+    }
+
+    console.log('[Notifications] Sending promotion notification:', title);
+
+    // Get all clients who have promotions_in_app enabled AND get their email preferences + email
+    const { data: settings, error: settingsError } = await window.supabaseClient
+      .from('client_notification_settings')
+      .select('client_serial, promotions_in_app, promotions_email')
+      .eq('promotions_in_app', true);
+
+    if (settingsError) {
+      console.error('[Notifications] Error fetching client settings:', settingsError);
+      return;
+    }
+
+    if (!settings || settings.length === 0) {
+      console.log('[Notifications] No clients have promotions enabled');
+      return;
+    }
+
+    console.log('[Notifications] Sending promotion to', settings.length, 'clients');
+
+    // Create notifications for each client
+    const notifications = settings.map(setting => ({
+      client_serial: setting.client_serial,
+      type: 'promotions',
+      action: promotionType,
+      title: title,
+      message: message,
+      is_read: false,
+      created_at: new Date().toISOString()
+    }));
+
+    // Insert all notifications at once
+    const { data: insertedNotifs, error: insertError } = await window.supabaseClient
+      .from('client_notifications')
+      .insert(notifications)
+      .select();
+
+    if (insertError) {
+      console.error('[Notifications] Failed to create promotions notifications:', insertError);
+      return;
+    }
+
+    console.log('[Notifications] Successfully created notifications for', insertedNotifs?.length || notifications.length, 'clients');
+
+    // Now send emails to clients who have promotions_email enabled
+    const clientSerials = settings
+      .filter(s => s.promotions_email)
+      .map(s => s.client_serial);
+
+    if (clientSerials.length > 0) {
+      console.log('[Notifications] Sending promotion emails to', clientSerials.length, 'clients');
+      
+      // Fetch client emails
+      const { data: clients, error: clientsError } = await window.supabaseClient
+        .from('clients')
+        .select('serial_number, email')
+        .in('serial_number', clientSerials);
+
+      if (clientsError) {
+        console.warn('[Notifications] Error fetching client emails:', clientsError);
+        return;
+      }
+
+      // Send emails
+      for (const client of (clients || [])) {
+        try {
+          const emailHtml = EmailTemplates.promotion({
+            title: title,
+            message: message,
+            buttonUrl: buttonUrl,
+            buttonText: buttonText
+          });
+
+          const emailResponse = await fetch(
+            `${window.supabaseClient.supabaseUrl}/functions/v1/send-notification-email`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${(await window.supabaseClient.auth.getSession()).data.session?.access_token || ''}`
+              },
+              body: JSON.stringify({
+                to: client.email,
+                subject: `✨ ${title}`,
+                html: emailHtml,
+                type: 'promotion'
+              })
+            }
+          );
+
+          if (emailResponse.ok) {
+            console.log('[Notifications] Promotion email sent to:', client.email);
+          } else {
+            console.warn('[Notifications] Failed to send email to:', client.email);
+          }
+        } catch (emailError) {
+          console.error('[Notifications] Error sending promotion email to', client.email, ':', emailError);
+        }
+      }
+    }
+
+  } catch (error) {
+    console.error('[Notifications] Exception in sendPromotionNotification:', error);
   }
 }
 

@@ -906,6 +906,16 @@ label {
     outline-offset: 4px;
 }
 
+/* Desktop button - visible by default */
+.rv-header-client .rv-practitioner-btn-desktop {
+    display: block;
+}
+
+/* Mobile button - hidden by default */
+.rv-header-client .rv-practitioner-btn-mobile {
+    display: none;
+}
+
 /* Sign Out Button - Remove default button border */
 .rv-header-client .rv-sign-out-btn {
     background: none;
@@ -1585,6 +1595,21 @@ label {
         width: 100%;
         text-align: center;
         padding: 0.6rem 1rem;
+    }
+    
+    /* Hide desktop button on mobile */
+    .rv-header-client .rv-practitioner-btn-desktop {
+        display: none;
+    }
+    
+    /* Show mobile button in hamburger menu */
+    .rv-header-client .rv-practitioner-btn-mobile {
+        display: block;
+        width: 100%;
+        text-align: center;
+        padding: 0.6rem 1rem;
+        border-top: 1px solid rgba(92, 154, 114, 0.2);
+        margin-top: 0.4rem;
     }
     
     .rv-footer-inner {

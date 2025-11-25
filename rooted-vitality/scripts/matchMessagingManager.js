@@ -20,6 +20,7 @@ let selectedMatchStatus;  // Track match status for UI updates
 let selectedMatchResponse;  // Track practitioner response (accepted/declined/null)
 let messageRealtimeSubscription;  // Real-time subscription for messages
 let loadedMessageIds = new Set();  // Track which messages have been rendered to avoid re-rendering
+let isLoadingMessages = false;  // Debounce flag to prevent concurrent loads
 
 /**
  * Initialize messaging for a specific project + practitioner
@@ -151,6 +152,14 @@ async function loadMessages() {
     return;
   }
 
+  // Prevent concurrent loads (debounce)
+  if (isLoadingMessages) {
+    console.log('[Messaging] loadMessages already in progress - skipping duplicate call');
+    return;
+  }
+
+  isLoadingMessages = true;
+
   try {
     console.log('[Messaging] Loading messages for project UUID:', selectedProjectUUID, 'practitioner UUID:', selectedPractitionerUUID);
     const { data, error } = await supabaseClient
@@ -173,6 +182,8 @@ async function loadMessages() {
 
   } catch (error) {
     console.error('[Messaging] Exception loading messages:', error);
+  } finally {
+    isLoadingMessages = false;
   }
 }
 
@@ -210,7 +221,7 @@ async function displayMessages(messages) {
             <p style="margin: 0.5rem 0;">This practitioner has declined your request.</p>
           </div>
         `;
-      } else if (selectedMatchResponse === 'accepted' && (selectedMatchStatus === 'active' || selectedMatchStatus === 'in-progress')) {
+      } else if (selectedMatchResponse === 'accepted' && selectedMatchStatus === 'in-progress') {
         emptyMessageHTML = `
           <div style="padding: 2rem; text-align: center; color: #666; line-height: 1.6;">
             <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem; color: #52a35e;">Connection Active</p>
@@ -440,8 +451,8 @@ async function sendMessage() {
     // Track message send time to debounce polling
     lastMessageSentTime = Date.now();
 
-    // Reload messages immediately
-    await loadMessages();
+    // NOTE: Do NOT call loadMessages() here - the realtime subscription will handle it
+    // Calling it twice causes duplicate rendering
 
   } catch (error) {
     console.error('[Messaging] Exception sending message:', error);
