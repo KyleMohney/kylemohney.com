@@ -171,7 +171,7 @@ TABLE OF CONTENTS
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    #fbf7ec-space: nowrap;
+    white-space: nowrap;
 }
 
 .tier-badge.free {

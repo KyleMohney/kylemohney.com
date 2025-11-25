@@ -1050,7 +1050,7 @@ body.pro-dashboard main {
 .client-service {
     margin: 0.25rem 0 0;
     font-size: 0.9rem;
-    color: #666;
+    color: var(--rooted-dark);
     font-style: italic;
 }
 

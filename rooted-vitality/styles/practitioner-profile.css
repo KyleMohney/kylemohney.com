@@ -167,7 +167,7 @@
     border-radius: 20px;
     font-size: 0.9rem;
     font-weight: 600;
-    #fbf7ec-space: nowrap;
+    white-space: nowrap;
 }
 
 .badge-credentials {
@@ -307,7 +307,7 @@
     color: var(--color-text);
     font-family: var(--font-serif);
     margin: 0;
-    #fbf7ec-space: pre-wrap;
+    white-space: pre-wrap;
 }
 
 /* Video Section */
@@ -720,7 +720,7 @@
     color: var(--color-primary);
     border-radius: 20px;
     font-size: 0.85rem;
-    #fbf7ec-space: nowrap;
+    white-space: nowrap;
 }
 
 /* ============================================

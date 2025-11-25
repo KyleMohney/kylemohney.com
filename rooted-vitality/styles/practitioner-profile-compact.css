@@ -103,7 +103,7 @@ body { font-family: var(--font-sans); color: var(--color-text); background: #fbf
    ============================================ */
 
 .profile-hero {
-    background: linear-gradient(135deg, #77883e 0%, #4a7d5d 50%, #3d6a50 100%);
+    background: linear-gradient(135deg, #77883e 0%, #77883e 50%, #5a6830 100%);
     border-bottom: 3px solid var(--color-secondary);
     padding: var(--spacing-lg);
     position: relative;
@@ -728,7 +728,7 @@ body { font-family: var(--font-sans); color: var(--color-text); background: #fbf
     border-radius: 20px;
     font-size: 0.9rem;
     font-weight: 500;
-    #fbf7ec-space: nowrap;
+    white-space: nowrap;
 }
 
 .tag-compact {
@@ -995,7 +995,7 @@ body { font-family: var(--font-sans); color: var(--color-text); background: #fbf
     justify-content: center;
     width: 50px;
     height: 50px;
-    background: linear-gradient(135deg, var(--color-primary), #4a8661);
+    background: linear-gradient(135deg, #77883e, #6b7632);
     color: #fbf7ec;
     border-radius: 50%;
     font-size: 1.3rem;
@@ -1163,7 +1163,7 @@ body { font-family: var(--font-sans); color: var(--color-text); background: #fbf
 }
 
 .modal__header {
-    background: linear-gradient(135deg, #77883e 0%, #4a8b62 100%);
+    background: linear-gradient(135deg, #77883e 0%, #6b7632 100%);
     color: #fbf7ec;
     padding: 25px;
     border-radius: 12px 12px 0 0;
@@ -1240,7 +1240,7 @@ body { font-family: var(--font-sans); color: var(--color-text); background: #fbf
 }
 
 .btn--primary {
-    background: linear-gradient(135deg, #77883e 0%, #4a8b62 100%);
+    background: linear-gradient(135deg, #77883e 0%, #6b7632 100%);
     color: #fbf7ec;
 }
 

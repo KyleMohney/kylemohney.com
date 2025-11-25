@@ -1030,7 +1030,7 @@ TABLE OF CONTENTS
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--rooted-primary), #4a8a63);
+  background: #77883e;
 }
 
 .practitioner-badge__info {
@@ -1206,7 +1206,7 @@ TABLE OF CONTENTS
   text-align: center;
   padding: 2.5rem 2rem 1.5rem 2rem;
   gap: 1rem;
-  background: linear-gradient(135deg, #77883e 0%, #4a7a5a 100%);
+  background: #77883e;
 }
 
 .modal__header--success .modal__subtitle {
@@ -1221,7 +1221,7 @@ TABLE OF CONTENTS
 .modal__icon {
   width: 56px;
   height: 56px;
-  background: linear-gradient(135deg, #77883e 0%, #4a7a5a 100%);
+  background: #77883e;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -1583,18 +1583,20 @@ TABLE OF CONTENTS
 }
 
 #create-project-form .action-card--primary {
-  background: var(--rooted-primary);
-  border-color: var(--rooted-primary);
+  background: var(--rooted-primary) !important;
+  border-color: var(--rooted-primary) !important;
+  color: #fbf7ec !important;
 }
 
 #create-project-form .action-card--primary:hover {
-  background: #5f7030;
-  border-color: #5f7030;
-  box-shadow: 0 6px 16px rgba(92, 154, 114, 0.2);
+  background: var(--rooted-primary) !important;
+  border-color: var(--rooted-primary) !important;
+  opacity: 0.9;
+  box-shadow: 0 6px 16px rgba(92, 154, 114, 0.3);
 }
 
 #create-project-form .action-card--primary h4 {
-  color: #fbf7ec;
+  color: #fbf7ec !important;
 }
 
 /* ========================================== */
@@ -1914,17 +1916,20 @@ TABLE OF CONTENTS
 }
 
 .action-card--primary {
-  background: linear-gradient(135deg, rgba(92, 154, 114, 0.1) 0%, rgba(212, 196, 124, 0.05) 100%);
-  border-color: var(--rooted-primary);
+  background: var(--rooted-primary) !important;
+  border-color: var(--rooted-primary) !important;
+  color: #fbf7ec !important;
 }
 
 .action-card--primary:hover {
-  background: linear-gradient(135deg, rgba(92, 154, 114, 0.15) 0%, rgba(212, 196, 124, 0.1) 100%);
-  border-color: var(--rooted-accent);
+  background: var(--rooted-primary) !important;
+  border-color: var(--rooted-primary) !important;
+  opacity: 0.9;
+  color: #fbf7ec !important;
 }
 
 .action-card--primary h4 {
-  color: var(--rooted-primary);
+  color: #fbf7ec !important;
 }
 
 /* Descriptor text above action card */
@@ -1944,12 +1949,13 @@ TABLE OF CONTENTS
   margin: 2.5rem 0 0 0;
 }
 
-.action-cards--single .action-card {
+.action-cards--single .action-card,
+.action-cards--single .action-card--primary {
   width: 100%;
   flex-direction: column;
   justify-content: center;
   padding: 1.75rem 2rem;
-  background: linear-gradient(135deg, var(--rooted-primary) 0%, rgba(92, 154, 114, 0.9) 100%);
+  background: var(--rooted-primary) !important;
   border: 2px solid var(--rooted-primary);
   color: #fbf7ec;
   box-shadow: 0 8px 24px rgba(92, 154, 114, 0.25);
@@ -1968,10 +1974,11 @@ TABLE OF CONTENTS
 }
 
 .action-cards--single .action-card:hover {
-  background: linear-gradient(135deg, var(--rooted-accent) 0%, rgba(92, 154, 114, 0.85) 100%);
-  border-color: var(--rooted-accent);
+  background: var(--rooted-primary);
+  border-color: var(--rooted-primary);
   box-shadow: 0 12px 32px rgba(92, 154, 114, 0.35);
   transform: translateY(-4px);
+  opacity: 0.9;
 }
 
 @keyframes fadeIn {

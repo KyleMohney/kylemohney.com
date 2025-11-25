@@ -358,7 +358,7 @@
 .profile-name-input {
     font-size: 1.5rem;
     font-weight: 600;
-    color: var(--#fbf7ec);
+    color: #fbf7ec;
     border: none;
     border-bottom: 2px solid transparent;
     padding: 0.5rem 0;
@@ -391,7 +391,7 @@
     border-radius: 6px;
     font-size: 0.9rem;
     font-weight: 600;
-    #fbf7ec-space: nowrap;
+    white-space: nowrap;
     transition: all 0.3s ease;
     border: 2px solid;
 }
@@ -550,7 +550,7 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: var(--placeholder);
+    color: #fbf7ec;
 }
 
 .meta-field input {
@@ -562,7 +562,7 @@
     border: 1px solid rgba(251, 247, 236, 0.3);
     border-radius: 6px;
     background: rgba(251, 247, 236, 0.1);
-    color: var(--#fbf7ec);
+    color: #fbf7ec;
     box-sizing: border-box;
 }
 
@@ -570,7 +570,7 @@
     height: 36px;
     padding: 0 1rem;
     background: rgba(251, 247, 236, 0.2);
-    color: var(--#fbf7ec);
+    color: #fbf7ec;
     border: 1px solid rgba(251, 247, 236, 0.3);
     border-radius: 6px;
     font-weight: 600;
@@ -580,7 +580,7 @@
     backdrop-filter: blur(4px);
     display: flex;
     align-items: center;
-    #fbf7ec-space: nowrap;
+    white-space: nowrap;
 }
 
 .btn-header-save:hover {
@@ -799,7 +799,7 @@
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s ease;
-    #fbf7ec-space: nowrap;
+    white-space: nowrap;
 }
 
 .section-save-btn {
@@ -873,7 +873,7 @@
     font-size: 1rem;
     color: var(--dark-text);
     line-height: 1.6;
-    #fbf7ec-space: pre-wrap;
+    white-space: pre-wrap;
     word-break: break-word;
     border: 1px solid var(--border);
     border-radius: 8px;
@@ -1492,7 +1492,7 @@
 }
 
 #start-background-check {
-    #fbf7ec-space: nowrap;
+    white-space: nowrap;
 }
 
 /* ========================================== */
@@ -1706,7 +1706,7 @@
     cursor: pointer;
     transition: all 0.2s ease;
     font-family: inherit;
-    #fbf7ec-space: nowrap;
+    white-space: nowrap;
     margin-top: 1.5rem;
 }
 
@@ -1775,7 +1775,7 @@
     color: #fbf7ec;
     border-radius: 4px;
     font-size: 0.85rem;
-    #fbf7ec-space: nowrap;
+    white-space: nowrap;
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.3s ease;
@@ -3612,7 +3612,7 @@
     color: var(--primary);
     font-weight: 600;
     font-size: 0.9rem;
-    #fbf7ec-space: nowrap;
+    white-space: nowrap;
     box-shadow: 0 2px 4px rgba(92, 154, 114, 0.1);
     transition: all 0.2s ease;
 }
@@ -3911,7 +3911,7 @@
     font-size: 0.9rem;
     font-weight: 600;
     color: var(--primary);
-    #fbf7ec-space: nowrap;
+    white-space: nowrap;
 }
 
 .practice-display .section-edit-btn {
@@ -4652,7 +4652,7 @@
     font-size: 0.95rem;
     font-weight: 600;
     color: #2e2b28;
-    #fbf7ec-space: nowrap;
+    white-space: nowrap;
 }
 
 .filter-select {
@@ -4772,7 +4772,7 @@
 .review-date {
     font-size: 0.85rem;
     color: #999;
-    #fbf7ec-space: nowrap;
+    white-space: nowrap;
 }
 
 .review-text {

@@ -29,7 +29,7 @@
 /* Main Container - 3 Column Layout */
 .inbox-container {
     display: grid;
-    grid-template-columns: 280px minmax(0, 0.8fr) 1fr;
+    grid-template-columns: 280px 1fr 1fr;
     gap: 2rem;
     max-width: 1600px;
     margin: 0 auto;
@@ -298,6 +298,9 @@
     overflow-y: auto;
     overflow-x: hidden;
     min-width: 0;
+    padding: 0;
+    margin: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .thread-item {
@@ -399,7 +402,7 @@
     font-size: 0.85rem;
     color: var(--text-tertiary);
     margin: 0 0 0.75rem 0;
-    #fbf7ec-space: nowrap;
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     font-family: 'Inter', sans-serif;
@@ -476,6 +479,8 @@
     border: 1px solid var(--border-light);
     border-radius: 12px;
     overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    min-width: 0;
 }
 
 /* Empty State */

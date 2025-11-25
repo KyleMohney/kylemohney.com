@@ -28,7 +28,7 @@
   <meta name="robots" content="index,follow">
   <title>Rooted Vitality | Find Holistic Practitioners Near You</title>
   <link rel="stylesheet" href="./styles/styles.css">
-  <link rel="stylesheet" href="./styles/landing-page-v3.css">
+  <link rel="stylesheet" href="./styles/landing-page.css">
   <link rel="stylesheet" href="./styles/report-concern-widget.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -346,11 +346,6 @@
   </main>
 
   <!-- ========================================== -->
-  <!-- FOOTER INJECTION -->
-  <!-- ========================================== -->
-  <footer id="footer-inject"></footer>
-
-  <!-- ========================================== -->
   <!-- SCRIPTS -->
   <!-- ========================================== -->
   <!-- Supabase JS Client Library -->
@@ -362,9 +357,39 @@
   <script src="./scripts/authModal.js"></script>
   <script src="./scripts/authHooks.js"></script>
   <script src="./injections.js"></script>
+  <script src="./scripts/guidedOnboarding.js"></script>
   
   <!-- Landing Page Specific -->
   <script src="./scripts/landing-page.js"></script>
+
+  <!-- First-time User Onboarding -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Show onboarding modal for first-time users not signed in
+      setTimeout(async () => {
+        try {
+          if (!window.supabaseClient) {
+            console.log('[Landing] Supabase client not ready yet');
+            return;
+          }
+
+          const { data: { session } } = await window.supabaseClient.auth.getSession();
+
+          // Only show for users NOT signed in (first-time visitors)
+          if (!session) {
+            console.log('[Landing] First-time user detected, showing onboarding modal');
+            if (typeof showOnboardingModal === 'function') {
+              showOnboardingModal();
+            } else {
+              console.warn('[Landing] showOnboardingModal function not found');
+            }
+          }
+        } catch (error) {
+          console.error('[Landing] Error checking if first-time user:', error);
+        }
+      }, 1000); // Give time for auth to initialize
+    });
+  </script>
 
   <!-- Hero CTA Handler -->
   <script>
@@ -380,20 +405,22 @@
         const { data: { session } } = await window.supabaseClient.auth.getSession();
 
         if (session) {
-          // A: User is signed in - redirect to wellness with new project modal
-          console.log('[Landing] A/B Test: Route A - User signed in, redirecting to wellness with new modal');
-          window.location.href = '/rooted-vitality/dashboard/client/pages/my-wellness.html?action=new';
-        } else {
-          // B: User not signed in - show login modal, then redirect to wellness after successful login
-          console.log('[Landing] A/B Test: Route B - User not signed in, showing auth modal');
-          
-          // Set flag to redirect to new wellness after login
-          sessionStorage.setItem('redirectAfterAuth', '/rooted-vitality/dashboard/client/pages/my-wellness.html?action=new');
-          
-          if (typeof openLoginModal === 'function') {
-            openLoginModal();
+          // A: User is signed in - show onboarding choice modal on landing page
+          console.log('[Landing] User signed in, showing onboarding choice modal');
+          if (typeof showOnboardingChoice === 'function') {
+            showOnboardingChoice();
           } else {
-            alert('Please sign in or create an account to get started.');
+            console.warn('[Landing] showOnboardingChoice not available');
+            alert('Onboarding experience not available. Please try again.');
+          }
+        } else {
+          // B: User not signed in - show onboarding modal (which includes signup/signin)
+          console.log('[Landing] User not signed in, showing onboarding choice modal');
+          if (typeof showOnboardingChoice === 'function') {
+            showOnboardingChoice();
+          } else {
+            console.warn('[Landing] showOnboardingChoice not available');
+            alert('Onboarding experience not available. Please try again.');
           }
         }
       } catch (error) {

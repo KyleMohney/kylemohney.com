@@ -352,7 +352,26 @@
   <script src="../../../scripts/authManager.js"></script>
   <script src="../../../scripts/authHooks.js"></script>
   <script src="../../../injections.js"></script>
+  <script src="../../../scripts/guidedOnboarding.js"></script>
   <script src="../../../scripts/my-projects.js"></script>
+  
+  <script>
+    // Trigger onboarding modal if user clicked "Get Started" button
+    document.addEventListener('DOMContentLoaded', function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('action') === 'new') {
+        console.log('[My Wellness] action=new detected, opening onboarding modal');
+        // Give the page a moment to fully load before opening modal
+        setTimeout(() => {
+          if (typeof showOnboardingModal === 'function') {
+            showOnboardingModal();
+          } else {
+            console.warn('[My Wellness] showOnboardingModal function not found');
+          }
+        }, 500);
+      }
+    });
+  </script>
 </body>
 </html>
 

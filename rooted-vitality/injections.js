@@ -1779,15 +1779,6 @@ const RootedVitality = {
                     <div class="rv-footer-branding">
                         <h3 class="rv-footer-title">Rooted<br>Vitality</h3>
                     </div>
-                    <div class="rv-footer-contact">
-                        <p class="rv-footer-phone">435.637.7625</p>
-                        <p class="rv-footer-email">vitalityiswithin@gmail.com</p>
-                        <div class="rv-footer-socials">
-                            <a href="#" aria-label="Facebook" class="rv-social-link">f</a>
-                            <a href="#" aria-label="Instagram" class="rv-social-link">📷</a>
-                            <a href="#" aria-label="Twitter" class="rv-social-link">𝕏</a>
-                        </div>
-                    </div>
                 </div>
                 
                 <!-- Center Section: Links -->
@@ -1801,12 +1792,23 @@ const RootedVitality = {
                 
                 <!-- Right Section: Core Services -->
                 <div class="rv-footer-section">
-                    <h4 class="rv-footer-heading">Core Services</h4>
-                    <nav class="rv-footer-nav">
-                        <a href="#">Holistic Wellness Consultations</a>
-                        <a href="#">Nutritional & Lifestyle Guidance</a>
-                        <a href="#">Herbal Remedies & Tinctures</a>
-                        <a href="#">Practitioner Network</a>
+                    <h4 class="rv-footer-heading">Follow Us</h4>
+                    <nav class="rv-footer-socials-nav">
+                        <a href="#" aria-label="Facebook" class="rv-footer-social-btn">
+                            <img src="${pathPrefix}assets/facebook.png" alt="Facebook" class="rv-footer-social-icon">
+                        </a>
+                        <a href="#" aria-label="LinkedIn" class="rv-footer-social-btn">
+                            <img src="${pathPrefix}assets/in.png" alt="LinkedIn" class="rv-footer-social-icon">
+                        </a>
+                        <a href="#" aria-label="Instagram" class="rv-footer-social-btn">
+                            <img src="${pathPrefix}assets/instagram.logo.png" alt="Instagram" class="rv-footer-social-icon">
+                        </a>
+                        <a href="#" aria-label="X" class="rv-footer-social-btn">
+                            <img src="${pathPrefix}assets/x.png" alt="X" class="rv-footer-social-icon">
+                        </a>
+                        <a href="#" aria-label="TikTok" class="rv-footer-social-btn">
+                            <img src="${pathPrefix}assets/tiktok.logo.png" alt="TikTok" class="rv-footer-social-icon">
+                        </a>
                     </nav>
                 </div>
             </div>

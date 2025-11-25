@@ -67,7 +67,7 @@ TABLE OF CONTENTS
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    #fbf7ec-space: nowrap;
+    white-space: nowrap;
 }
 
 /* ========================================== */
@@ -160,7 +160,7 @@ TABLE OF CONTENTS
     font-size: 0.95rem;
     font-weight: 600;
     color: #2e2b28;
-    #fbf7ec-space: nowrap;
+    white-space: nowrap;
 }
 
 .filter-select {
@@ -279,7 +279,7 @@ TABLE OF CONTENTS
 .review-date {
     font-size: 0.85rem;
     color: #999;
-    #fbf7ec-space: nowrap;
+    white-space: nowrap;
 }
 
 .review-text {

@@ -365,7 +365,7 @@ select {
     border-radius: var(--radius-sm);
     font-size: 0.85rem;
     font-weight: 400;
-    #fbf7ec-space: nowrap;
+    white-space: nowrap;
     z-index: 10;
     transition: all 0.3s ease;
 }
