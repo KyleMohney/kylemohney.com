@@ -2579,7 +2579,7 @@ function setupOnboardingListeners() {
 
                 console.log('[Onboarding] User signed up:', authData.user.email);
 
-                // Create client profile
+                // Create client profile with only valid fields
                 const { error: clientError } = await window.supabaseClient
                     .from('clients')
                     .insert({
@@ -2589,9 +2589,16 @@ function setupOnboardingListeners() {
                         last_name: onboardingData.lastName,
                         phone: onboardingData.phone,
                         zipcode: onboardingData.zipcode,
-                        date_of_birth: onboardingData.dob,
                         sex: onboardingData.sex,
-                        created_at: new Date().toISOString()
+                        age: onboardingData.age,
+                        account_status: 'active',
+                        open_to_contact: true,
+                        open_to_match: true,
+                        two_factor_enabled: false,
+                        membership_level: 'free',
+                        membership_started_at: new Date().toISOString(),
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString()
                     });
 
                 if (clientError) {

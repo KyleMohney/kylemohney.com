@@ -135,9 +135,9 @@ window.addEventListener('DOMContentLoaded', async () => {
 
       // ============ 5. Create Client Record ============
       // Create a new client record with signup data
-      // Capture ALL client table fields with appropriate defaults
+      // Only include fields that exist in the clients table schema
       const clientData = {
-        id: authData.user.id,  // Use 'id' not 'user_id' - id is the auth.users link
+        id: authData.user.id,  // UUID primary key linked to auth.users
         email: email,
         first_name: firstName,
         last_name: lastName,
@@ -146,8 +146,8 @@ window.addEventListener('DOMContentLoaded', async () => {
         age,
         sex,
         account_status: 'active',
-        account_standing: 'good',
         open_to_contact: true,
+        open_to_match: true,
         two_factor_enabled: false,
         two_factor_method: null,
         profile_picture_url: null,
@@ -157,8 +157,12 @@ window.addEventListener('DOMContentLoaded', async () => {
         last_login: new Date().toISOString(),
         settings_updated_at: new Date().toISOString(),
         created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-        // Note: notification_settings will use database default
+        updated_at: new Date().toISOString(),
+        notification_settings: {
+          email_notifications: true,
+          sms_notifications: false,
+          push_notifications: true
+        }
       };
       
       console.log('📝 [Signup] Creating client record:', clientData);
