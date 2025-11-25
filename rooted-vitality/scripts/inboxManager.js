@@ -855,7 +855,7 @@ async function loadConversations() {
         const { data: allMessages } = await window.supabaseClient
             .from('project_messages')
             .select('project_serial, practitioner_serial, id, message, sender_type, created_at, is_read')
-            .in('project_serial', projectSerials)
+            .in('project_serial', allProjectSerials)
             .eq('practitioner_serial', practitionerSerial)
             .order('created_at', { ascending: false });
 
@@ -873,7 +873,7 @@ async function loadConversations() {
             .from('reviews')
             .select('practitioner_serial, project_serial')
             .eq('practitioner_serial', practitionerSerial)
-            .in('project_serial', projectSerials);
+            .in('project_serial', allProjectSerials);
 
         const reviewsSet = new Set(allReviews?.map(r => `${r.practitioner_serial}:${r.project_serial}`) || []);
 
