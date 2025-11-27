@@ -237,7 +237,7 @@ BEGIN
     )
     AND (
       (v_travel_preference = 'in-person' AND p.in_person_enabled = true)
-      OR (v_travel_preference = 'housecalls' AND p.housecalls_enabled = true)
+      OR (v_travel_preference = 'house-call' AND p.housecalls_enabled = true)
       OR (v_travel_preference = 'virtual' AND p.virtual_enabled = true)
       OR (v_travel_preference = 'flexible' AND (p.in_person_enabled = true OR p.housecalls_enabled = true OR p.virtual_enabled = true))
     )
@@ -247,7 +247,7 @@ BEGIN
         OR v_client_zipcode = ANY(COALESCE(p.in_person_zipcodes, ARRAY[]::TEXT[]))
       ))
       OR
-      (v_travel_preference = 'housecalls' AND (
+      (v_travel_preference = 'house-call' AND (
         v_client_zipcode = p.housecalls_base_zipcode
         OR v_client_zipcode = ANY(COALESCE(p.housecalls_zipcodes, ARRAY[]::TEXT[]))
       ))

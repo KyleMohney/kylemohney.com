@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Profile | Rooted Vitality</title>
+    <link rel="stylesheet" href="../../../styles/base.css">
+    <link rel="stylesheet" href="../../../styles/layout.css">
+    <link rel="stylesheet" href="../../../styles/components.css">
+    <link rel="stylesheet" href="../../../styles/pages.css">
+    <link rel="stylesheet" href="../styles/public-profile.css">
+</head>
+<body>
+    <!-- Header (injected by injections.js) -->
+    <div id="rvHeaderContainer"></div>
+
+    <!-- Main Profile Container -->
+    <main class="public-profile-wrapper">
+        <div class="container-narrow">
+            
+            <!-- Profile Header -->
+            <section class="profile-header-section">
+                <div class="profile-avatar-large">
+                    <div id="clientAvatarDisplay" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #77883e 0%, #5f7030 100%); font-size: 64px; color: #fbf7ec; font-weight: bold; width: 100%; height: 100%; border-radius: 12px;"></div>
+                </div>
+                <div class="profile-header-info">
+                    <h1 id="clientName">Loading...</h1>
+                    <p id="clientLocation" class="profile-location"></p>
+                    <p id="clientAge" class="profile-age"></p>
+                </div>
+            </section>
+
+            <!-- Basic Information -->
+            <section class="profile-section">
+                <div class="section-header">
+                    <h2>Basic Information</h2>
+                </div>
+                <div class="profile-grid">
+                    <div class="profile-item">
+                        <label>Age</label>
+                        <p id="displayAge">—</p>
+                    </div>
+                    <div class="profile-item">
+                        <label>Sex</label>
+                        <p id="displaySex">—</p>
+                    </div>
+                    <div class="profile-item">
+                        <label>Location</label>
+                        <p id="displayLocation">—</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Wellness Profile -->
+            <section class="profile-section">
+                <div class="section-header">
+                    <h2>Wellness Profile</h2>
+                </div>
+
+                <!-- Q1: Main Wellness Goal -->
+                <div class="wellness-item">
+                    <h3>What's their main wellness goal right now?</h3>
+                    <p id="displayMainWellnessGoal" class="wellness-answer">—</p>
+                </div>
+
+                <!-- Q2: Duration of Issue -->
+                <div class="wellness-item">
+                    <h3>How long have they been dealing with this?</h3>
+                    <p id="displayDurationOfIssue" class="wellness-answer">—</p>
+                </div>
+
+                <!-- Q3: What Tried Before -->
+                <div class="wellness-item">
+                    <h3>Approaches that have resonated with them</h3>
+                    <p id="displayWhatTriedBefore" class="wellness-answer">—</p>
+                </div>
+
+                <!-- Q4: Allergies & Sensitivities -->
+                <div class="wellness-item">
+                    <h3>Sensitivities or things to be mindful of</h3>
+                    <p id="displayAllergiesSensitivities" class="wellness-answer">—</p>
+                </div>
+
+                <!-- Q5: Current Medications & Supplements -->
+                <div class="wellness-item">
+                    <h3>Current medications or supplements?</h3>
+                    <p id="displayCurrentMedicationsSupplements" class="wellness-answer">—</p>
+                </div>
+
+                <!-- Q6: Typical Day Description -->
+                <div class="wellness-item">
+                    <h3>What does a typical day look like for them?</h3>
+                    <p id="displayTypicalDayDescription" class="wellness-answer">—</p>
+                </div>
+
+                <!-- Q7: Communication Preference -->
+                <div class="wellness-item">
+                    <h3>Communication Preference</h3>
+                    <p id="displayCommunicationPreference" class="wellness-answer">—</p>
+                </div>
+
+                <!-- Q8: Biggest Barrier to Healing -->
+                <div class="wellness-item">
+                    <h3>Potential challenges to moving forward</h3>
+                    <p id="displayBiggestBarrierToHealing" class="wellness-answer">—</p>
+                </div>
+
+                <!-- Q9: Prior Practitioner Experience -->
+                <div class="wellness-item">
+                    <h3>Prior experience with holistic practitioners?</h3>
+                    <p id="displayPriorPractitionerExperience" class="wellness-answer">—</p>
+                </div>
+
+                <!-- Q10: Desired Success Outcome -->
+                <div class="wellness-item">
+                    <h3>What would success look like for them?</h3>
+                    <p id="displayDesiredSuccessOutcome" class="wellness-answer">—</p>
+                </div>
+
+                <!-- Disclaimer -->
+                <div style="background: #fbf7ec; border: 1px solid #d4c47c; border-radius: 6px; padding: 1rem; margin-top: 2rem;">
+                    <p style="margin: 0; color: #2c3e50; font-size: 0.9rem; line-height: 1.5;">
+                        <strong>Note:</strong> This wellness information was voluntarily provided by the client to help you better understand their background and context. This information is <strong>not used for practitioner matching</strong>—matches are made based on category, subcategory, location, and availability alone. This additional context is provided solely to assist you in delivering personalized care.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Spacing before footer -->
+            <div style="height: 3rem;"></div>
+        </div>
+    </main>
+
+    <!-- Footer (injected by injections.js) -->
+    <div id="rvFooterContainer"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../../scripts/config.js"></script>
+    <script src="../../../scripts/authManager.js"></script>
+    <script src="../../../scripts/authModal.js"></script>
+    <script src="../../../scripts/authHooks.js"></script>
+    <script src="../../../injections.js"></script>
+    <script src="../scripts/public-profile.js"></script>
+</body>
+</html>

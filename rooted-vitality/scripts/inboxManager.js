@@ -1153,6 +1153,9 @@ function createThreadElement(conversation) {
                     <span class="detail-label">Project Description</span>
                     <span class="detail-value" id="thread-description-${conversation.clientSerial}">-</span>
                 </div>
+                <div class="project-detail-item" style="margin-top: 8px;">
+                    ${(['declined', 'blocked'].includes(conversation.matchStatus)) ? '' : `<a href="/rooted-vitality/dashboard/client/pages/public-profile.html?client_id=${conversation.clientId}" target="_blank" style="color: #5c9a72; text-decoration: none; font-size: 0.9rem; font-weight: 500; cursor: pointer;">View client profile →</a>`}
+                </div>
             </div>
         </div>
     `;

@@ -1794,20 +1794,11 @@ const RootedVitality = {
                 <div class="rv-footer-section">
                     <h4 class="rv-footer-heading">Follow Us</h4>
                     <nav class="rv-footer-socials-nav">
-                        <a href="#" aria-label="Facebook" class="rv-footer-social-btn">
+                        <a href="https://www.facebook.com/profile.php?id=61583674127724&sk=about" target="_blank" rel="noopener noreferrer" aria-label="Facebook" class="rv-footer-social-btn">
                             <img src="${pathPrefix}assets/facebook.png" alt="Facebook" class="rv-footer-social-icon">
                         </a>
-                        <a href="#" aria-label="LinkedIn" class="rv-footer-social-btn">
-                            <img src="${pathPrefix}assets/in.png" alt="LinkedIn" class="rv-footer-social-icon">
-                        </a>
-                        <a href="#" aria-label="Instagram" class="rv-footer-social-btn">
+                        <a href="https://www.instagram.com/rootedvitality.health/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="rv-footer-social-btn">
                             <img src="${pathPrefix}assets/instagram.logo.png" alt="Instagram" class="rv-footer-social-icon">
-                        </a>
-                        <a href="#" aria-label="X" class="rv-footer-social-btn">
-                            <img src="${pathPrefix}assets/x.png" alt="X" class="rv-footer-social-icon">
-                        </a>
-                        <a href="#" aria-label="TikTok" class="rv-footer-social-btn">
-                            <img src="${pathPrefix}assets/tiktok.logo.png" alt="TikTok" class="rv-footer-social-icon">
                         </a>
                     </nav>
                 </div>

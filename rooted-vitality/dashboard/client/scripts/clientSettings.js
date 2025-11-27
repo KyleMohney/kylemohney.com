@@ -164,6 +164,15 @@ function populateSettingsUI() {
     // Populate phone
     document.getElementById('display-phone').textContent = userSettings.phone || 'Not provided';
     
+    // Populate address
+    document.getElementById('display-address').textContent = userSettings.address || 'Not provided';
+    
+    // Populate city
+    document.getElementById('display-city').textContent = userSettings.city || 'Not provided';
+    
+    // Populate state
+    document.getElementById('display-state').textContent = userSettings.state || 'Not provided';
+    
     // Populate zipcode
     document.getElementById('display-zipcode').textContent = userSettings.zipcode || 'Not provided';
     
@@ -238,6 +247,30 @@ function setupButtonActions() {
     if (editPhoneBtn) {
         editPhoneBtn.addEventListener('click', () => {
             handleEditField('phone', 'Phone Number');
+        });
+    }
+    
+    // Edit Address
+    const editAddressBtn = document.querySelector('[data-setting="address"]');
+    if (editAddressBtn) {
+        editAddressBtn.addEventListener('click', () => {
+            handleEditField('address', 'Street Address');
+        });
+    }
+    
+    // Edit City
+    const editCityBtn = document.querySelector('[data-setting="city"]');
+    if (editCityBtn) {
+        editCityBtn.addEventListener('click', () => {
+            handleEditField('city', 'City');
+        });
+    }
+    
+    // Edit State
+    const editStateBtn = document.querySelector('[data-setting="state"]');
+    if (editStateBtn) {
+        editStateBtn.addEventListener('click', () => {
+            handleEditField('state', 'State');
         });
     }
     
@@ -378,6 +411,11 @@ function handleEditField(fieldName, fieldLabel) {
                 alert('Please enter a valid phone number');
                 return;
             }
+        } else if (fieldName === 'state') {
+            if (newValue.length > 2) {
+                alert('State must be a 2-letter abbreviation (e.g., CA, NY, OH)');
+                return;
+            }
         } else if (fieldName === 'zipcode') {
             const zipcodeRegex = /^[\d\-\s]+$/;
             if (!zipcodeRegex.test(newValue)) {
@@ -405,7 +443,7 @@ function handleEditField(fieldName, fieldLabel) {
 }
 
 function setupEditListeners() {
-    const editButtons = document.querySelectorAll('[data-setting="email"], [data-setting="phone"], [data-setting="zipcode"]');
+    const editButtons = document.querySelectorAll('[data-setting="email"], [data-setting="phone"], [data-setting="address"], [data-setting="city"], [data-setting="state"], [data-setting="zipcode"]');
     editButtons.forEach(btn => {
         // Remove existing listeners by cloning and replacing
         const newBtn = btn.cloneNode(true);
@@ -416,6 +454,9 @@ function setupEditListeners() {
         let label = 'Value';
         if (setting === 'email') label = 'Email Address';
         else if (setting === 'phone') label = 'Phone Number';
+        else if (setting === 'address') label = 'Street Address';
+        else if (setting === 'city') label = 'City';
+        else if (setting === 'state') label = 'State';
         else if (setting === 'zipcode') label = 'Zip Code';
         
         newBtn.addEventListener('click', () => {

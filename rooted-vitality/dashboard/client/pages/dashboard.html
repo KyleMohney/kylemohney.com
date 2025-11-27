@@ -23,6 +23,9 @@
                     <h1>Your Wellness Journey</h1>
                     <p class="subtitle">Manage your account, preferences, and wellness goals</p>
                 </div>
+                <a href="./my-wellness.html" class="back-to-inbox-link" style="display: flex; align-items: center; gap: 0.5rem; color: #5c9a72; text-decoration: none; font-weight: 500; font-size: 0.95rem; transition: all 0.2s ease;" onmouseover="this.style.color='#2c3e50'" onmouseout="this.style.color='#5c9a72'">
+                    <span>← Back to Wellness</span>
+                </a>
             </div>
 
             <!-- ============================================
@@ -90,8 +93,102 @@
                 </form>
             </section>
 
+            <!-- ========================================== -->
+            <!-- 2. WELLNESS QUESTIONNAIRE SECTION
+                 ========================================== -->
+            <section class="dashboard-section">
+                <div class="section-header">
+                    <h2>Your Wellness Profile</h2>
+                    <span class="section-note">(Optional - helps practitioners understand you better)</span>
+                </div>
+
+                <div style="background: #f0fdf4; border-left: 4px solid #77883e; padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem;">
+                    <p style="margin: 0; color: #2c3e50; font-size: 0.95rem;">
+                        <strong>Privacy:</strong> This information is only visible to practitioners you have matched with and who have already accepted your match.
+                    </p>
+                </div>
+
+                <form id="wellnessForm" class="form-grid">
+                    <!-- Q1: Main Wellness Goal -->
+                    <div class="form-group full-width">
+                        <label for="mainWellnessGoal">What's your main wellness goal right now?</label>
+                        <textarea id="mainWellnessGoal" name="mainWellnessGoal" placeholder="e.g., Better sleep, manage pain, reduce anxiety..." rows="3"></textarea>
+                    </div>
+
+                    <!-- Q2: Duration of Issue -->
+                    <div class="form-group full-width">
+                        <label for="durationOfIssue">How long have you been dealing with this?</label>
+                        <input type="text" id="durationOfIssue" name="durationOfIssue" placeholder="e.g., 3 months, 2 years...">
+                    </div>
+
+                    <!-- Q3: What Tried Before -->
+                    <div class="form-group full-width">
+                        <label for="whatTriedBefore">What approaches have resonated with you in the past?</label>
+                        <textarea id="whatTriedBefore" name="whatTriedBefore" placeholder="Practices, modalities, or approaches that have been helpful..." rows="3"></textarea>
+                    </div>
+
+                    <!-- Q4: Allergies & Sensitivities -->
+                    <div class="form-group full-width">
+                        <label for="allergiesSensitivities">Are there any sensitivities or things we should be mindful of?</label>
+                        <textarea id="allergiesSensitivities" name="allergiesSensitivities" placeholder="Any sensitivities or considerations..." rows="3"></textarea>
+                    </div>
+
+                    <!-- Q5: Current Medications & Supplements -->
+                    <div class="form-group full-width">
+                        <label for="currentMedicationsSupplements">Are you currently taking any medications or supplements?</label>
+                        <textarea id="currentMedicationsSupplements" name="currentMedicationsSupplements" placeholder="List medications and supplements..." rows="3"></textarea>
+                    </div>
+
+                    <!-- Q6: Typical Day Description -->
+                    <div class="form-group full-width">
+                        <label for="typicalDayDescription">What does a typical day look like for you?</label>
+                        <textarea id="typicalDayDescription" name="typicalDayDescription" placeholder="Your daily routine, work, lifestyle..." rows="3"></textarea>
+                    </div>
+
+                    <!-- Q7: Communication Preference -->
+                    <div class="form-group full-width">
+                        <label for="communicationPreference">How do you prefer to communicate? *</label>
+                        <select id="communicationPreference" name="communicationPreference" required>
+                            <option value="">Select your preference...</option>
+                            <option value="email">Email</option>
+                            <option value="phone">Phone</option>
+                            <option value="text">Text/SMS</option>
+                            <option value="video">Video Call</option>
+                            <option value="in-person">In-person</option>
+                        </select>
+                    </div>
+
+                    <!-- Q8: Biggest Barrier to Healing -->
+                    <div class="form-group full-width">
+                        <label for="biggestBarrierToHealing">What might make it challenging to move forward?</label>
+                        <textarea id="biggestBarrierToHealing" name="biggestBarrierToHealing" placeholder="Any challenges or considerations..." rows="3"></textarea>
+                    </div>
+
+                    <!-- Q9: Prior Practitioner Experience -->
+                    <div class="form-group full-width">
+                        <label for="priorPractitionerExperience">Have you worked with holistic practitioners before? *</label>
+                        <select id="priorPractitionerExperience" name="priorPractitionerExperience" required>
+                            <option value="">Select...</option>
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                            <option value="a_little">A little</option>
+                        </select>
+                    </div>
+
+                    <!-- Q10: Desired Success Outcome -->
+                    <div class="form-group full-width">
+                        <label for="desiredSuccessOutcome">What would success look like for you?</label>
+                        <textarea id="desiredSuccessOutcome" name="desiredSuccessOutcome" placeholder="Paint a picture of what you hope to achieve..." rows="3"></textarea>
+                    </div>
+
+                    <div class="form-actions full-width">
+                        <button type="submit" class="btn btn-primary">Save Wellness Profile</button>
+                    </div>
+                </form>
+            </section>
+
             <!-- ============================================
-                 2. CONNECTION PREFERENCES SECTION
+                 3. CONNECTION PREFERENCES SECTION
                  ============================================ -->
 
             <!-- Spacing before footer -->

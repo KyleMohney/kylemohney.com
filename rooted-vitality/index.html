@@ -35,6 +35,71 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital@0;1&display=swap" rel="stylesheet">
 </head>
 <body class="landing-page">
+
+  <!-- ========================================== -->
+  <!-- PRACTITIONER VIEW REDIRECT (Only when in practitioner mode) -->
+  <!-- ========================================== -->
+  <script>
+    (async function() {
+      try {
+        // Use setTimeout to allow Supabase client to initialize
+        setTimeout(async () => {
+          if (window.supabaseClient) {
+            const { data: { user } } = await window.supabaseClient.auth.getUser();
+            
+            if (user) {
+              // Check localStorage for current view preference
+              const rvUserData = localStorage.getItem('rvUser');
+              if (rvUserData) {
+                const userData = JSON.parse(rvUserData);
+                
+                // Check if there's an explicit view/mode preference
+                const viewPreference = localStorage.getItem('rvViewMode');
+                
+                // If they explicitly chose client mode, don't redirect
+                if (viewPreference === 'client') {
+                  console.log('[Rooted Vitality] User in client view mode, allowing access to index');
+                  return;
+                }
+                
+                // If they explicitly chose practitioner mode, redirect
+                if (viewPreference === 'practitioner') {
+                  console.log('[Rooted Vitality] User in practitioner view mode, redirecting');
+                  window.location.href = '/rooted-vitality/dashboard/pro/pages/index.html';
+                  return;
+                }
+              }
+              
+              // Fallback: If no view preference set, check if they're ONLY a practitioner (not dual-role)
+              const { data: practitioner } = await window.supabaseClient
+                .from('practitioners')
+                .select('id')
+                .eq('id', user.id)
+                .single();
+              
+              const { data: client } = await window.supabaseClient
+                .from('clients')
+                .select('id')
+                .eq('id', user.id)
+                .single();
+              
+              // If they're a practitioner but NOT a client, redirect them
+              if (practitioner && !client) {
+                console.log('[Rooted Vitality] Practitioner-only user detected, redirecting to dashboard');
+                window.location.href = '/rooted-vitality/dashboard/pro/pages/index.html';
+              } else if (practitioner && client) {
+                // Dual-role user - allow them to stay on landing page (client view is default)
+                console.log('[Rooted Vitality] Dual-role user on index, allowing client view');
+              }
+            }
+          }
+        }, 500);
+      } catch (error) {
+        console.warn('[Rooted Vitality] Could not check view mode:', error);
+      }
+    })();
+  </script>
+
   <!-- ========================================== -->
   <!-- MAIN CONTENT (Header injected by injections.js) -->
   <!-- ========================================== -->
@@ -371,7 +436,7 @@
       try {
         // Check if user is signed in
         if (!window.supabaseClient) {
-          console.error('Supabase client not initialized');
+          console.error('[Landing] Supabase client not initialized');
           alert('System not ready. Please refresh the page.');
           return;
         }
@@ -379,22 +444,24 @@
         const { data: { session } } = await window.supabaseClient.auth.getSession();
 
         if (session) {
-          // A: User is signed in - show onboarding choice modal on landing page
-          console.log('[Landing] User signed in, showing onboarding choice modal');
-          if (typeof showOnboardingChoice === 'function') {
-            showOnboardingChoice();
+          // RULE 3: Returning member, signed in = skip choice and signup
+          // Go straight to project creation for returning member
+          console.log('[Landing] Rule 3: Signed-in user detected. Starting onboarding for returning user...');
+          if (typeof window.initializeGuidedOnboarding === 'function') {
+            window.initializeGuidedOnboarding(true);
           } else {
-            console.warn('[Landing] showOnboardingChoice not available');
-            alert('Onboarding experience not available. Please try again.');
+            console.error('[Landing] initializeGuidedOnboarding not available. Functions available:', Object.keys(window).filter(k => k.includes('onboard') || k.includes('Guided')));
+            alert('Onboarding experience not available. Please refresh and try again.');
           }
         } else {
-          // B: User not signed in - show onboarding modal (which includes signup/signin)
-          console.log('[Landing] User not signed in, showing onboarding choice modal');
-          if (typeof showOnboardingChoice === 'function') {
-            showOnboardingChoice();
+          // RULE 1 or 2: User not signed in - show choice modal
+          // Let user choose: are they new (Rule 1) or returning (Rule 2)?
+          console.log('[Landing] Rule 1/2: No session detected. Showing new/returning choice modal...');
+          if (typeof window.initializeGuidedOnboarding === 'function') {
+            window.initializeGuidedOnboarding(false, false); // skipAuth=false, isReturningUser=false - shows Step 0
           } else {
-            console.warn('[Landing] showOnboardingChoice not available');
-            alert('Onboarding experience not available. Please try again.');
+            console.error('[Landing] initializeGuidedOnboarding not available. Functions available:', Object.keys(window).filter(k => k.includes('onboard') || k.includes('Guided')));
+            alert('Onboarding experience not available. Please refresh and try again.');
           }
         }
       } catch (error) {

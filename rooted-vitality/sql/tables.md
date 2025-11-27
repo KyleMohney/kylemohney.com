@@ -392,6 +392,9 @@ clients
 | last_name                | character varying           |
 | email                    | character varying           |
 | phone                    | character varying           |
+| address                  | text                        |
+| city                     | text                        |
+| state                    | text                        |
 | zipcode                  | character varying           |
 | account_status           | character varying           |
 | account_standing         | character varying           |
@@ -412,6 +415,33 @@ clients
 | open_to_contact          | boolean                     |
 | open_to_match            | boolean                     |
 | open_to_match_updated_at | timestamp with time zone    |
+| date_of_birth            | date                        |
+| address                  | text                        |
+| city                     | text                        |
+| state                    | text                        |
+
+
+====================================
+client_profiles
+====================================
+
+| column_name                     | data_type                |
+| ------------------------------- | ------------------------ |
+| id                              | uuid                     |
+| user_id                         | uuid                     |
+| serial_number                   | text                     |
+| main_wellness_goal              | text                     |
+| duration_of_issue               | text                     |
+| what_tried_before               | text                     |
+| allergies_sensitivities         | text                     |
+| current_medications_supplements | text                     |
+| typical_day_description         | text                     |
+| communication_preference        | text                     |
+| biggest_barrier_to_healing      | text                     |
+| prior_practitioner_experience   | text                     |
+| desired_success_outcome         | text                     |
+| created_at                      | timestamp with time zone |
+| updated_at                      | timestamp with time zone |
 
 
 ====================================

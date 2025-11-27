@@ -2,354 +2,1798 @@
  * ============================================
  * GUIDED ONBOARDING MODAL
  * ============================================
- * Feminine energy, hand-held onboarding experience
- * 4-step process for new user signup + project creation
+ * Unified modal for new/returning users
+ * Uses: global taxonomyData if available, otherwise loads from database
+ * 
+ * ARCHITECTURE:
+ * - Reuses global taxonomyData from my-projects.js if available
+ * - Falls back to loading from database if needed (e.g., on landing page)
+ * - All styling is in onboarding-modal.css (injected at runtime)
+ * - This file contains modal logic, event handlers, and database operations
  */
 
+// Reference to global taxonomyData (from my-projects.js) or local cache
+let onboardingTaxonomyCache = null;
+let taxonomyLoadPromise = null;
+
 /**
- * Wellness categories with keywords for auto-detection
+ * Initialize the onboarding modal
+ * Entry point - routes based on user state
  */
-const WELLNESS_CATEGORIES = [
-    {
-        id: 'acupuncture',
-        name: 'Acupuncture & Traditional Chinese Medicine',
-        keywords: ['acupuncture', 'needles', 'qi', 'chi', 'meridians', 'energy flow', 'tcm', 'chinese medicine', 'pain relief'],
-        subcategories: ['Pain Management', 'Energy Balance', 'Stress Relief', 'Women\'s Health', 'Fertility']
-    },
-    {
-        id: 'nutrition',
-        name: 'Nutrition & Functional Medicine',
-        keywords: ['nutrition', 'diet', 'eating', 'food', 'digestive', 'gut health', 'supplements', 'functional medicine', 'nutrient'],
-        subcategories: ['Nutrition Counseling', 'Digestive Health', 'Functional Medicine', 'Detox Support', 'Supplements']
-    },
-    {
-        id: 'yoga_movement',
-        name: 'Yoga & Movement',
-        keywords: ['yoga', 'pilates', 'exercise', 'movement', 'flexibility', 'strength', 'mobility', 'stretching', 'alignment'],
-        subcategories: ['Hatha Yoga', 'Vinyasa Yoga', 'Yin Yoga', 'Pilates', 'Dance Movement']
-    },
-    {
-        id: 'energy_healing',
-        name: 'Energy Healing & Reiki',
-        keywords: ['reiki', 'energy', 'chakra', 'aura', 'vibration', 'frequency', 'healing', 'spiritual'],
-        subcategories: ['Reiki', 'Chakra Balancing', 'Crystal Healing', 'Sound Therapy', 'Energy Work']
-    },
-    {
-        id: 'herbal',
-        name: 'Herbal & Botanical Medicine',
-        keywords: ['herbal', 'herbs', 'botanical', 'plants', 'remedies', 'tinctures', 'tea', 'adaptogenic'],
-        subcategories: ['Western Herbalism', 'Chinese Herbal Medicine', 'Ayurvedic Herbs', 'Adaptogenic Support']
-    },
-    {
-        id: 'mental_wellness',
-        name: 'Mental Wellness & Coaching',
-        keywords: ['anxiety', 'stress', 'depression', 'mental health', 'emotional', 'counseling', 'coaching', 'mindfulness', 'meditation'],
-        subcategories: ['Life Coaching', 'Meditation', 'Mindfulness', 'Emotional Support', 'Stress Management']
-    },
-    {
-        id: 'massage_bodywork',
-        name: 'Massage & Bodywork',
-        keywords: ['massage', 'massage therapy', 'bodywork', 'soft tissue', 'therapeutic touch', 'swedish massage', 'deep tissue', 'myofascial'],
-        subcategories: ['Swedish Massage', 'Deep Tissue', 'Thai Massage', 'Shiatsu', 'Myofascial Release']
-    },
-    {
-        id: 'naturopath',
-        name: 'Naturopathic Medicine',
-        keywords: ['naturopath', 'naturopathic', 'natural remedy', 'holistic', 'whole body', 'preventative care'],
-        subcategories: ['Naturopathic Consultation', 'Preventative Care', 'Natural Remedies', 'Lifestyle Coaching']
+async function initializeOnboarding() {
+    // Check if user is authenticated
+    if (!window.supabaseClient) {
+        console.error('[Onboarding] Supabase client not available');
+        return;
     }
-];
 
-/**
- * Detect category and subcategory from user symptoms
- */
-function detectCategoryFromSymptoms(symptoms) {
-    const symptomsLower = symptoms.toLowerCase();
-    let bestMatch = null;
-    let highestScore = 0;
+    // Load or use cached taxonomy data
+    await ensureTaxonomyLoaded();
 
-    WELLNESS_CATEGORIES.forEach(category => {
-        let score = 0;
-        category.keywords.forEach(keyword => {
-            if (symptomsLower.includes(keyword)) {
-                score += 10;
-            }
-        });
+    const { data: { session } } = await window.supabaseClient.auth.getSession();
 
-        if (score > highestScore) {
-            highestScore = score;
-            bestMatch = category;
-        }
-    });
-
-    return bestMatch || WELLNESS_CATEGORIES[0]; // Default to first if no match
+    if (session) {
+        // Returning user - skip to step 1 (knows what they want?)
+        initializeGuidedOnboarding(true); // true = returning user
+    } else {
+        // New user - show guided onboarding modal
+        initializeGuidedOnboarding(false, false); // skipAuth=false, isReturningUser=false
+    }
 }
 
 /**
- * Show initial choice modal - are they new or returning?
+ * Ensure taxonomy data is available
+ * First tries to use global taxonomyData from my-projects.js
+ * Falls back to loading from database if not available
  */
-function showOnboardingChoice() {
+async function ensureTaxonomyLoaded() {
+    // If global taxonomyData exists and has data, use it
+    if (typeof taxonomyData !== 'undefined' && Object.keys(taxonomyData).length > 0) {
+        console.log('[Onboarding] Using global taxonomyData from my-projects.js, count:', Object.keys(taxonomyData).length);
+        onboardingTaxonomyCache = taxonomyData;
+        return;
+    }
+
+    console.log('[Onboarding] Global taxonomyData not available, checking cache...');
+
+    // If already loading, wait for it
+    if (taxonomyLoadPromise) {
+        console.log('[Onboarding] Waiting for existing taxonomy load promise...');
+        return taxonomyLoadPromise;
+    }
+
+    // If already cached locally, use it
+    if (onboardingTaxonomyCache && Object.keys(onboardingTaxonomyCache).length > 0) {
+        console.log('[Onboarding] Using cached taxonomy data, count:', Object.keys(onboardingTaxonomyCache).length);
+        return;
+    }
+
+    console.log('[Onboarding] Loading taxonomy from database...');
+    // Load from database and cache
+    taxonomyLoadPromise = loadTaxonomyForOnboarding();
+    await taxonomyLoadPromise;
+    taxonomyLoadPromise = null;
+    console.log('[Onboarding] Taxonomy load complete, cache has', Object.keys(onboardingTaxonomyCache).length, 'categories');
+}
+
+/**
+ * Load taxonomy from database (fallback if not available globally)
+ */
+async function loadTaxonomyForOnboarding() {
+    try {
+        const { data, error } = await window.supabaseClient
+            .from('holistic_health_taxonomy')
+            .select(`
+                id,
+                category_id,
+                name,
+                taxonomy_subcategories(id, name)
+            `)
+            .eq('is_active', true)
+            .order('display_order', { ascending: true });
+
+        if (error) {
+            console.error('[Onboarding] Database error loading taxonomy:', error);
+            throw error;
+        }
+
+        if (!data || data.length === 0) {
+            console.warn('[Onboarding] No taxonomy data returned from database');
+            return;
+        }
+
+        console.log('[Onboarding] Raw taxonomy data from DB:', data);
+
+        // Build taxonomy object indexed by ID with subcategories as array of names
+        onboardingTaxonomyCache = {};
+        data.forEach(category => {
+            // Extract subcategory names from the nested response
+            const subcategoryNames = (category.taxonomy_subcategories || []).map(sub => sub.name);
+            console.log(`[Onboarding] Category "${category.id}" has ${subcategoryNames.length} subcategories:`, subcategoryNames);
+            onboardingTaxonomyCache[category.id] = {
+                id: category.id,
+                category_id: category.category_id,
+                name: category.name,
+                subcategories: subcategoryNames
+            };
+        });
+
+        console.log('[Onboarding] Taxonomy loaded from database, categories:', Object.keys(onboardingTaxonomyCache).length);
+
+    } catch (error) {
+        console.error('[Onboarding] Error loading taxonomy:', error);
+    }
+}
+
+/**
+ * Initialize the unified guided onboarding modal
+ * skipAuth: if true, user is already logged in - skip steps 0, 0a and go straight to step 1
+ * isReturningUser: if true, user chose "returning" but not yet logged in - show step 0, 0a then skip 3, 4
+ */
+async function initializeGuidedOnboarding(skipAuth = false, isReturningUser = false) {
+    // CRITICAL: Ensure taxonomy is loaded before creating modal
+    await ensureTaxonomyLoaded();
+    
     const modal = document.createElement('div');
-    modal.id = 'onboarding-choice-modal';
+    modal.id = 'guided-onboarding-modal';
+
+    // Build HTML with all steps
     modal.innerHTML = `
         <div class="onboarding-overlay"></div>
-        <div class="onboarding-choice-content">
-            <button class="onboarding-close-btn" aria-label="Close" title="Close">
+        <div class="onboarding-modal">
+            <button class="onboarding-close-btn" aria-label="Close onboarding" title="Close onboarding">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
             </button>
 
-            <div class="choice-content">
-                <div class="choice-logo">
-                    <img src="/rooted-vitality/assets/logo_trimmed.png" alt="Rooted Vitality" class="logo-image">
+            <div class="onboarding-progress">
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
                 </div>
-                <h1>Welcome to Rooted Vitality</h1>
-                <p>Every journey starts somewhere. Let's find yours.</p>
+            </div>
 
-                <div class="choice-buttons">
-                    <button class="choice-btn new-user-btn" id="new-user-choice">
-                        <span class="choice-title">First time here?</span>
-                        <span class="choice-desc">Let's help you start your wellness journey</span>
-                    </button>
-                    <button class="choice-btn returning-user-btn" id="returning-user-choice">
-                        <span class="choice-title">Welcome back!</span>
-                        <span class="choice-desc">Sign in to your account</span>
-                    </button>
+            <!-- STEP 0: New or returning user? -->
+            <div class="onboarding-step ${!skipAuth ? 'active' : ''}" data-step="0">
+                <div class="step-content">
+                    <div class="step-logo">
+                        <img src="/rooted-vitality/assets/logo_trimmed.png" alt="Rooted Vitality" class="logo-image">
+                    </div>
+                    <div class="step-opening">
+                        <h2>Welcome to Rooted Vitality</h2>
+                        <p class="step-subtitle">Every journey starts somewhere. Let's find yours.</p>
+                    </div>
+
+                    <div class="step-choice-cards">
+                        <button type="button" class="choice-card" id="new-user-btn">
+                            <span class="choice-title">First time here?</span>
+                            <span class="choice-desc">Create an account and start your journey</span>
+                        </button>
+                        <button type="button" class="choice-card" id="returning-user-btn">
+                            <span class="choice-title">Welcome back!</span>
+                            <span class="choice-desc">Sign in to your account</span>
+                        </button>
+                    </div>
+
+                    <p class="step-footer-text">You can switch between these anytime</p>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary onboarding-back" style="display: none;">Back</button>
+                    </div>
                 </div>
+            </div>
 
-                <p class="choice-hint">You can switch between these anytime</p>
+            <!-- STEP 0a: Sign in -->
+            <div class="onboarding-step ${isReturningUser && !skipAuth ? 'active' : ''}" data-step="0a">
+                <div class="step-content">
+                    <div class="step-logo">
+                        <img src="/rooted-vitality/assets/logo_trimmed.png" alt="Rooted Vitality" class="logo-image">
+                    </div>
+                    <div class="step-opening">
+                        <h2>Welcome back to Rooted Vitality</h2>
+                        <p class="step-subtitle">Sign in to your account and continue your healing journey</p>
+                    </div>
+
+                    <form id="step-login-form" class="onboarding-form">
+                        <div class="form-group">
+                            <label for="step-login-email">Your email *</label>
+                            <input type="email" id="step-login-email" name="email" placeholder="you@email.com" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="step-login-password">Your password *</label>
+                            <input type="password" id="step-login-password" name="password" placeholder="Enter your password" required>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-secondary onboarding-back">Back</button>
+                            <button type="submit" class="btn-primary">Sign in</button>
+                        </div>
+
+                        <p class="login-help">
+                            New here? <a href="#" class="login-switch-link">Create an account instead</a>
+                        </p>
+                    </form>
+                </div>
+            </div>
+
+            <!-- STEP 1: Know what you need? -->
+            <div class="onboarding-step ${skipAuth ? 'active' : ''}" data-step="1">
+                <div class="step-content">
+                    <div class="step-logo">
+                        <img src="/rooted-vitality/assets/logo_trimmed.png" alt="Rooted Vitality" class="logo-image">
+                    </div>
+                    <div class="step-opening">
+                        <h2>Welcome to Rooted Vitality</h2>
+                        <p class="step-subtitle">We're so glad you're here. How would you like to get started?</p>
+                    </div>
+
+                    <div class="step-path-choice">
+                        <button type="button" class="path-btn" id="path-direct">I know what I need</button>
+                        <button type="button" class="path-btn" id="path-guided">I'm not sure what I need</button>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary onboarding-back" style="display: none;">Back</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 1A: Direct path - Choose category -->
+            <div class="onboarding-step" data-step="1a">
+                <div class="step-content">
+                    <div class="step-logo">
+                        <img src="/rooted-vitality/assets/logo_trimmed.png" alt="Rooted Vitality" class="logo-image">
+                    </div>
+                    <div class="step-opening">
+                        <h2>What are you looking for?</h2>
+                        <p class="step-subtitle">Tell us about your wellness needs so we can find the right practitioner for you.</p>
+                    </div>
+
+                    <form id="step-1a-form" class="onboarding-form">
+                        <!-- CATEGORY -->
+                        <div class="form-group">
+                            <label for="onboarding-category-direct">Wellness Category *</label>
+                            <select id="onboarding-category-direct" name="category" required>
+                                <option value="">Choose a category...</option>
+                            </select>
+                        </div>
+
+                        <!-- SUBCATEGORY -->
+                        <div class="form-group">
+                            <label for="onboarding-subcategory-direct">Specific Concerns *</label>
+                            <select id="onboarding-subcategory-direct" name="subcategory" required>
+                                <option value="">Choose a specialty...</option>
+                            </select>
+                        </div>
+
+                        <!-- DESCRIPTION -->
+                        <div class="form-group">
+                            <label for="onboarding-description-direct">Description / Notes *</label>
+                            <textarea id="onboarding-description-direct" name="description" placeholder="Share what's going on..." rows="4" maxlength="1000" required></textarea>
+                            <span class="form-hint"><span id="onboarding-char-count">0</span> / 1000 characters</span>
+                        </div>
+
+                        <!-- URGENCY -->
+                        <div class="form-group">
+                            <label>How Urgent? *</label>
+                            <div class="options-grid">
+                                <label class="option-card">
+                                    <input type="radio" name="urgency" value="browsing" required>
+                                    <div class="option-content">
+                                        <span class="option-title">Just Browsing</span>
+                                        <span class="option-desc">Exploring options, no rush</span>
+                                    </div>
+                                </label>
+                                <label class="option-card">
+                                    <input type="radio" name="urgency" value="interested" required>
+                                    <div class="option-content">
+                                        <span class="option-title">Interested</span>
+                                        <span class="option-desc">Moderate priority</span>
+                                    </div>
+                                </label>
+                                <label class="option-card">
+                                    <input type="radio" name="urgency" value="urgent" required>
+                                    <div class="option-content">
+                                        <span class="option-title">Urgent</span>
+                                        <span class="option-desc">Need help soon</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- SESSION TYPE PREFERENCE -->
+                        <div class="form-group">
+                            <label>Session Type Preference *</label>
+                            <div class="options-grid">
+                                <label class="option-card">
+                                    <input type="radio" name="travel_preference" value="in-person" required>
+                                    <div class="option-content">
+                                        <span class="option-title">In-Person</span>
+                                        <span class="option-desc">Visit practitioner's office</span>
+                                    </div>
+                                </label>
+                                <label class="option-card">
+                                    <input type="radio" name="travel_preference" value="house-call" required>
+                                    <div class="option-content">
+                                        <span class="option-title">House Calls</span>
+                                        <span class="option-desc">Practitioner comes to me</span>
+                                    </div>
+                                </label>
+                                <label class="option-card">
+                                    <input type="radio" name="travel_preference" value="virtual" required>
+                                    <div class="option-content">
+                                        <span class="option-title">Virtual</span>
+                                        <span class="option-desc">Online session</span>
+                                    </div>
+                                </label>
+                                <label class="option-card">
+                                    <input type="radio" name="travel_preference" value="flexible" required>
+                                    <div class="option-content">
+                                        <span class="option-title">Flexible</span>
+                                        <span class="option-desc">Open to any option</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- LOCATION -->
+                        <fieldset class="form-fieldset">
+                            <legend>Location</legend>
+                            
+                            <div class="form-group">
+                                <label for="onboarding-street">Street Address</label>
+                                <input type="text" id="onboarding-street" name="street">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="onboarding-city">City *</label>
+                                <input type="text" id="onboarding-city" name="city" required>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="onboarding-state">State *</label>
+                                    <input type="text" id="onboarding-state" name="state" maxlength="2" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="onboarding-zipcode-direct">Zip Code *</label>
+                                    <input type="text" id="onboarding-zipcode-direct" name="zipcode" maxlength="5" required>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-secondary onboarding-back">Back</button>
+                            <button type="submit" class="btn-primary">Continue</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- STEP 2B: Guided path - Tell us about it (questionnaire disguised) -->
+            <!-- STEP 1B: Guided path - Full taxonomy picker with search -->
+            <div class="onboarding-step" data-step="1b">
+                <div class="step-content">
+                    <div class="step-logo">
+                        <img src="/rooted-vitality/assets/logo_trimmed.png" alt="Rooted Vitality" class="logo-image">
+                    </div>
+                    <div class="step-opening">
+                        <h2>We're so excited you're here!</h2>
+                        <p class="step-subtitle">You've already taken the biggest, most beautiful step just by showing up. We're so proud of you. Now, let's find exactly what your precious body needs.</p>
+                    </div>
+
+                    <form id="step-1b-form" class="onboarding-form">
+                        <!-- SYMPTOMS/DESCRIPTION -->
+                        <div class="form-group">
+                            <label for="guided-symptoms">Tell us what's happening with you</label>
+                            <p class="form-helper">Don't worry about being perfect—just let it flow. This is a safe space, and everything you share will help your practitioner understand exactly how to support you.</p>
+                            <textarea id="guided-symptoms" name="symptoms" placeholder="Share what's going on..." rows="4" maxlength="1000" required></textarea>
+                            <span class="form-hint"><span id="guided-symptoms-count">0</span> / 1000 characters</span>
+                        </div>
+
+                        <!-- CATEGORY PICKER WITH SEARCH -->
+                        <div class="form-group">
+                            <label for="guided-category-search">What type of healing are you drawn to?</label>
+                            <p class="form-helper">Pick one main healing path below, then choose as many specific focuses as you want within it. There are no wrong answers—trust what feels right.</p>
+                            <div class="category-picker">
+                                <input type="text" id="guided-category-search" class="category-search" placeholder="Type to find your healing..." autocomplete="off">
+                                <div id="guided-categories-list" class="categories-list">
+                                    <!-- Categories injected by JS with descriptions -->
+                                </div>
+                                <input type="hidden" id="guided-category-selected" name="category" required>
+                            </div>
+                        </div>
+
+                        <!-- SUBCATEGORY PICKER (APPEARS AFTER CATEGORY SELECTED) -->
+                        <div class="form-group" id="guided-subcategories-group" style="display: none;">
+                            <label>Pick everything that speaks to your soul</label>
+                            <p class="form-helper">Check as many as you want. Your practitioner will see all of these and know exactly what you need.</p>
+                            <div id="guided-subcategories-list" class="subcategories-list">
+                                <!-- Subcategory checkboxes injected by JS -->
+                            </div>
+                        </div>
+
+                        <!-- URGENCY -->
+                        <div class="form-group">
+                            <label>What does your timeline feel like right now?</label>
+                            <p class="form-helper">There's no rush—we'll match you with someone amazing whenever you're ready.</p>
+                            <div class="options-grid">
+                                <label class="option-card">
+                                    <input type="radio" name="urgency" value="browsing" required>
+                                    <div class="option-content">
+                                        <span class="option-title">Just Exploring</span>
+                                        <span class="option-desc">I'm dreaming and discovering</span>
+                                    </div>
+                                </label>
+                                <label class="option-card">
+                                    <input type="radio" name="urgency" value="interested" required>
+                                    <div class="option-content">
+                                        <span class="option-title">I'm Ready</span>
+                                        <span class="option-desc">This really matters to me</span>
+                                    </div>
+                                </label>
+                                <label class="option-card">
+                                    <input type="radio" name="urgency" value="urgent" required>
+                                    <div class="option-content">
+                                        <span class="option-title">I Need This Now</span>
+                                        <span class="option-desc">My body's calling for help</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- SESSION TYPE PREFERENCE -->
+                        <div class="form-group">
+                            <label>How do you prefer to receive care?</label>
+                            <p class="form-helper">Pick whichever option makes you feel most comfortable and safe. Your space, their space, or yours on screen—it's all good.</p>
+                            <div class="options-grid">
+                                <label class="option-card">
+                                    <input type="radio" name="travel_preference" value="in-person" required>
+                                    <div class="option-content">
+                                        <span class="option-title">In Their Sacred Space</span>
+                                        <span class="option-desc">I'll travel to them</span>
+                                    </div>
+                                </label>
+                                <label class="option-card">
+                                    <input type="radio" name="travel_preference" value="house-call" required>
+                                    <div class="option-content">
+                                        <span class="option-title">In My Sanctuary</span>
+                                        <span class="option-desc">They come to my space</span>
+                                    </div>
+                                </label>
+                                <label class="option-card">
+                                    <input type="radio" name="travel_preference" value="virtual" required>
+                                    <div class="option-content">
+                                        <span class="option-title">Through the Screen</span>
+                                        <span class="option-desc">From my cozy home</span>
+                                    </div>
+                                </label>
+                                <label class="option-card">
+                                    <input type="radio" name="travel_preference" value="flexible" required>
+                                    <div class="option-content">
+                                        <span class="option-title">I'm Flexible</span>
+                                        <span class="option-desc">I'm open to any option</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-secondary onboarding-back">Back</button>
+                            <button type="submit" class="btn-primary">Continue</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- STEP 2: 10 Client Profile Questions -->
+            <div class="onboarding-step" data-step="2">
+                <div class="step-content">
+                    <div class="step-logo">
+                        <img src="/rooted-vitality/assets/logo_trimmed.png" alt="Rooted Vitality" class="logo-image">
+                    </div>
+                    <div class="step-opening">
+                        <h2>Tell us more about you</h2>
+                        <p class="step-subtitle">All fields are optional and can be edited anytime from your profile page.</p>
+                        <p class="privacy-disclaimer-top">Your information is private and will only be shared with practitioners you match with and accept.</p>
+                    </div>
+
+                    <form id="step-2-form" class="onboarding-form">
+                        <div class="form-group">
+                            <label for="wellness-goals">What are your main wellness goals?</label>
+                            <textarea id="wellness-goals" name="wellnessGoals" placeholder="Tell us what you want to achieve..." rows="2"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="duration">How long have you been dealing with this?</label>
+                            <input type="text" id="duration" name="duration" placeholder="e.g., 6 months, 2 years">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tried-before">What have you already tried?</label>
+                            <textarea id="tried-before" name="triedBefore" placeholder="Share what has or hasn't worked..." rows="2"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="allergies">Do you have any allergies we should know about?</label>
+                            <textarea id="allergies" name="allergies" placeholder="List any allergies..." rows="2"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="medications">Are you currently taking any medications?</label>
+                            <textarea id="medications" name="medications" placeholder="List current medications..." rows="2"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="daily-life">How does this affect your daily life?</label>
+                            <textarea id="daily-life" name="dailyLife" placeholder="Describe the impact..." rows="2"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="communication-pref">How do you prefer to communicate?</label>
+                            <select id="communication-pref" name="communicationPref">
+                                <option value="">-- Select preference --</option>
+                                <option value="email">Email</option>
+                                <option value="phone">Phone</option>
+                                <option value="text">Text/SMS</option>
+                                <option value="video">Video call</option>
+                                <option value="in-person">In-person</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="barriers">What barriers might you face in your wellness journey?</label>
+                            <textarea id="barriers" name="barriers" placeholder="Describe any challenges..." rows="2"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="practitioner-exp">Have you worked with practitioners like this before?</label>
+                            <select id="practitioner-exp" name="practitionerExp">
+                                <option value="">-- Select option --</option>
+                                <option value="yes">Yes, I have experience</option>
+                                <option value="no">No, this would be new</option>
+                                <option value="some">Yes, but limited experience</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="desired-outcomes">What would success look like for you?</label>
+                            <textarea id="desired-outcomes" name="desiredOutcomes" placeholder="Describe your ideal outcome..." rows="2"></textarea>
+                        </div>
+
+                        <p class="privacy-disclaimer-bottom">We use this information to share with your practitioners. As a third-party platform, we don't use this for matching or medical recommendations.</p>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-secondary onboarding-back">Back</button>
+                            <button type="submit" class="btn-primary">Continue</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- STEP 3: Signup form (creates client - SKIP for returning users) -->
+            <div class="onboarding-step" data-step="3">
+                <div class="step-content">
+                    <div class="step-logo">
+                        <img src="/rooted-vitality/assets/logo_trimmed.png" alt="Rooted Vitality" class="logo-image">
+                    </div>
+                    <div class="step-opening">
+                        <h2>You're almost there!</h2>
+                        <p class="step-subtitle">We're so impressed with you for taking this journey. Now let's create your account so we can match you with your perfect practitioner.</p>
+                        <p class="form-helper">It's completely free. Your information is protected and only shared with practitioners you match with and accept.</p>
+                    </div>
+
+                    <form id="step-3-form" class="onboarding-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="onboarding-firstName">First name *</label>
+                                <input type="text" id="onboarding-firstName" name="firstName" placeholder="First" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="onboarding-lastName">Last name *</label>
+                                <input type="text" id="onboarding-lastName" name="lastName" placeholder="Last" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="onboarding-dob-signup">Date of birth *</label>
+                                <input type="date" id="onboarding-dob-signup" name="dob" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="onboarding-sex">Sex *</label>
+                                <select id="onboarding-sex" name="sex" required>
+                                    <option value="">-- Choose --</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="onboarding-email">Email address *</label>
+                            <input type="email" id="onboarding-email" name="email" placeholder="you@email.com" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="onboarding-confirmEmail">Confirm email *</label>
+                            <input type="email" id="onboarding-confirmEmail" name="confirmEmail" placeholder="Confirm your email" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="onboarding-password">Create a password *</label>
+                            <div class="password-input-container">
+                                <input type="password" id="onboarding-password" name="password" placeholder="At least 6 characters" required>
+                                <button type="button" class="password-toggle" id="toggle-password-3" aria-label="Show/hide password">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </button>
+                            </div>
+                            <small class="form-hint">Minimum 6 characters required</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="onboarding-confirmPassword">Confirm password *</label>
+                            <div class="password-input-container">
+                                <input type="password" id="onboarding-confirmPassword" name="confirmPassword" placeholder="Confirm password" required>
+                                <button type="button" class="password-toggle" id="toggle-confirm-password-3" aria-label="Show/hide password">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="onboarding-phone-signup">Phone number *</label>
+                            <input type="tel" id="onboarding-phone-signup" name="phone" placeholder="(555) 123-4567" required>
+                        </div>
+
+                        <fieldset class="form-fieldset">
+                            <legend>Address</legend>
+                            
+                            <div class="form-group">
+                                <label for="onboarding-street-signup">Street Address</label>
+                                <input type="text" id="onboarding-street-signup" name="street">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="onboarding-city-signup">City *</label>
+                                <input type="text" id="onboarding-city-signup" name="city" required>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="onboarding-state-signup">State *</label>
+                                    <input type="text" id="onboarding-state-signup" name="state" maxlength="2" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="onboarding-zipcode-signup">Zip code *</label>
+                                    <input type="text" id="onboarding-zipcode-signup" name="zipcode" maxlength="5" required>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-secondary onboarding-back">Back</button>
+                            <button type="submit" class="btn-primary">Continue</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- STEP 4: Verification, Disclaimers, Agreements, Email Confirmation -->
+            <div class="onboarding-step" data-step="4">
+                <div class="step-content">
+                    <div class="step-logo">
+                        <img src="/rooted-vitality/assets/logo_trimmed.png" alt="Rooted Vitality" class="logo-image">
+                    </div>
+                    <div class="step-opening">
+                        <h2>Review Our Terms</h2>
+                        <p class="step-subtitle">Before we proceed, please review and accept our terms, privacy policy, and disclaimer.</p>
+                    </div>
+
+                    <div class="verification-section">
+                        <div class="terms-section">
+                            <h3>What you should know</h3>
+
+                            <div class="terms-scroll" id="terms-scroll-container">
+                                <div class="terms-content">
+                                    <h4>Important Disclaimer & Informed Consent</h4>
+                                    
+                                    <h5>We're not a medical service</h5>
+                                    <p>Rooted Vitality is a marketplace platform that connects clients with independent wellness practitioners. We are NOT a medical provider. The practitioners available through our platform offer holistic, complementary wellness services—not medical treatment or diagnosis.</p>
+                                    
+                                    <h5>Practitioners are independent professionals</h5>
+                                    <p>While we vet our practitioners, they are independent contractors. Rooted Vitality is not responsible for their specific practices, methodologies, credentials, or outcomes. You are responsible for evaluating whether a practitioner is right for you.</p>
+                                    
+                                    <h5>Not a replacement for medical care</h5>
+                                    <p>Wellness services are complementary to, not a replacement for, professional medical care. Always consult with a licensed medical doctor (MD) or appropriate healthcare provider before making any health decisions, especially if you have existing medical conditions or are taking medications.</p>
+                                    
+                                    <h5>Your informed consent</h5>
+                                    <p>By using Rooted Vitality, you acknowledge that: (1) you understand the services offered are wellness-based and not medical; (2) you assume full responsibility for health decisions made through practitioners connected via our platform; (3) you will seek professional medical advice when appropriate; and (4) you release Rooted Vitality from liability for practitioner recommendations or outcomes.</p>
+                                    
+                                    <h5>Your privacy is protected</h5>
+                                    <p>Your personal and health information is private and confidential. Rooted Vitality only shares your information with practitioners you match with and accept. We never sell your data to third parties.</p>
+
+                                    <h5>Terms of Use & Privacy Policy</h5>
+                                    <p>By proceeding, you agree to our complete <a href="/terms-of-use" target="_blank" rel="noopener">Terms of Use</a> and <a href="/privacy-policy" target="_blank" rel="noopener">Privacy Policy</a>. Please review these documents carefully.</p>
+
+                                    <h5>Next step: Account creation</h5>
+                                    <p>When you click Continue below, we will create your account, save your profile information, and send you a confirmation email to verify your email address. You'll be able to start connecting with practitioners right away.</p>
+                                </div>
+                            </div>
+
+                            <div class="terms-checkboxes">
+                                <label class="terms-checkbox">
+                                    <input type="checkbox" id="checkbox-disclaimer" name="disclaimer">
+                                    <span>I understand Rooted Vitality is a wellness marketplace, not a medical service</span>
+                                </label>
+                                <label class="terms-checkbox">
+                                    <input type="checkbox" id="checkbox-privacy" name="privacy">
+                                    <span>I have read and agree to the Privacy Policy</span>
+                                </label>
+                                <label class="terms-checkbox">
+                                    <input type="checkbox" id="checkbox-terms" name="terms">
+                                    <span>I have read and agree to the Terms of Use and assume full responsibility for my wellness decisions</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-secondary onboarding-back">Back</button>
+                            <button type="button" class="btn-primary onboarding-next" id="step-4-next">Create Account & Send Email</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 5: Confirm your project details -->
+            <div class="onboarding-step" data-step="5">
+                <div class="step-content">
+                    <div class="step-logo">
+                        <img src="/rooted-vitality/assets/logo_trimmed.png" alt="Rooted Vitality" class="logo-image">
+                    </div>
+                    <div class="step-opening">
+                        <h2>Confirm your care request</h2>
+                        <p class="step-subtitle">Let's make sure we have everything right before finding your matches.</p>
+                    </div>
+
+                    <div class="project-confirmation">
+                        <div class="project-details">
+                            <h3>Your wellness focus:</h3>
+                            <p><strong>Category:</strong> <span id="confirm-category">Not selected</span></p>
+                            <p><strong>Specialty:</strong> <span id="confirm-subcategory">(Not specified)</span></p>
+                            
+                            <h3 style="margin-top: 1.5rem;">Your location & preferences:</h3>
+                            <p><strong>Zipcode:</strong> <span id="confirm-zipcode">Not provided</span></p>
+                            <p><strong>Travel Type:</strong> <span id="confirm-travel">Not specified</span></p>
+                            <p><strong>Urgency:</strong> <span id="confirm-urgency">Not specified</span></p>
+
+                            <button type="button" class="btn-link" id="edit-project-btn" style="margin-top: 1.5rem;">Edit these details</button>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-secondary onboarding-back">Back</button>
+                            <button type="button" class="btn-primary" id="step-5-next">Find my matches</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 6: Here are your matches -->
+            <div class="onboarding-step" data-step="6">
+                <div class="step-content">
+                    <div class="step-logo">
+                        <img src="/rooted-vitality/assets/logo_trimmed.png" alt="Rooted Vitality" class="logo-image">
+                    </div>
+                    <div class="step-opening">
+                        <h2>Meet practitioners matched for you</h2>
+                        <p class="step-subtitle">We've found some excellent matches based on what you're looking for.</p>
+                    </div>
+
+                    <div id="matches-container" class="matches-container">
+                        <p class="loading">Finding your perfect matches...</p>
+                    </div>
+
+                    <div class="matches-actions">
+                        <p class="action-help">Feel drawn to someone? Connect to reach out. Want to explore more first? You can always come back later.</p>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn-secondary onboarding-action" id="save-for-later-btn">I'll choose later</button>
+                            <button type="button" class="btn-primary onboarding-action" id="continue-browsing-btn">Show me more</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     `;
 
-    if (document.getElementById('onboarding-choice-modal')) {
-        document.getElementById('onboarding-choice-modal').remove();
-    }
+    // Add to DOM
+    const existing = document.getElementById('guided-onboarding-modal');
+    if (existing) existing.remove();
     document.body.appendChild(modal);
 
-    // Inject choice modal styles
-    injectChoiceModalStyles();
+    // Debug: Check data availability
+    console.log('[Onboarding] Before populateCategoryDropdowns:');
+    console.log('[Onboarding] - typeof taxonomyData:', typeof taxonomyData);
+    console.log('[Onboarding] - taxonomyData keys:', typeof taxonomyData !== 'undefined' ? Object.keys(taxonomyData).length : 'undefined');
+    console.log('[Onboarding] - onboardingTaxonomyCache keys:', onboardingTaxonomyCache ? Object.keys(onboardingTaxonomyCache).length : 'null');
 
-    // Setup event listeners
-    const closeBtn = modal.querySelector('.onboarding-close-btn');
-    closeBtn.addEventListener('click', () => {
-        closeChoiceModal();
-    });
+    // IMMEDIATELY populate all category dropdowns from loaded taxonomy
+    populateCategoryDropdowns();
 
-    modal.querySelector('.onboarding-overlay').addEventListener('click', () => {
-        closeChoiceModal();
-    });
+    // Inject styles
+    injectOnboardingStyles();
 
-    document.getElementById('new-user-choice').addEventListener('click', () => {
-        closeChoiceModal();
-        // Show new user signup flow
-        initializeGuidedOnboarding();
-    });
-
-    document.getElementById('returning-user-choice').addEventListener('click', () => {
-        closeChoiceModal();
-        // Show returning user login in unified modal
-        initializeGuidedOnboarding(true); // true = show login first
-    });
+    // Setup all event listeners
+    setupOnboardingEventListeners(isReturningUser);
 }
 
 /**
- * Inject choice modal styles
+ * Populate category dropdowns from taxonomy data
+ * Uses global taxonomyData if available, otherwise uses cached data
  */
-function injectChoiceModalStyles() {
-    if (document.getElementById('choice-modal-styles')) {
+function populateCategoryDropdowns() {
+    // Use global if available, otherwise use cache
+    const data = (typeof taxonomyData !== 'undefined' && Object.keys(taxonomyData).length > 0) 
+        ? taxonomyData 
+        : onboardingTaxonomyCache;
+
+    console.log('[Onboarding] populateCategoryDropdowns called with data:', data ? Object.keys(data).length + ' categories' : 'NO DATA');
+
+    if (!data || Object.keys(data).length === 0) {
+        console.warn('[Onboarding] No taxonomy data available to populate dropdowns');
         return;
     }
 
-    const styles = document.createElement('style');
-    styles.id = 'choice-modal-styles';
-    styles.textContent = `
-        #onboarding-choice-modal {
-            position: fixed;
-            top: 0 !important;
-            left: 0 !important;
-            right: 0 !important;
-            bottom: 0 !important;
-            z-index: 9999;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            inset: 0;
-        }
+    // Step 1a direct form dropdown
+    const step1aSelect = document.getElementById('onboarding-category-direct');
+    if (step1aSelect) {
+        console.log('[Onboarding] Populating Step 1a dropdown...');
+        step1aSelect.innerHTML = '<option value="">Choose a category...</option>';
+        Object.entries(data).forEach(([id, category]) => {
+            const option = document.createElement('option');
+            option.value = id;
+            option.textContent = category.name;
+            step1aSelect.appendChild(option);
+        });
+        console.log('[Onboarding] Step 1a dropdown populated with', Object.keys(data).length, 'categories');
+    } else {
+        console.log('[Onboarding] Step 1a dropdown element not found');
+    }
 
-        .onboarding-choice-content {
-            position: relative;
-            background: #fbf7ec;
-            border-radius: 24px;
-            width: 90%;
-            max-width: 600px;
-            box-shadow: 0 40px 60px rgba(0, 0, 0, 0.2), 0 0 40px rgba(119, 136, 62, 0.1);
-            animation: slideIn 0.5s cubic-bezier(0.23, 1, 0.320, 1);
-            z-index: 10000;
-        }
-
-        .choice-content {
-            padding: 3rem 2rem;
-            text-align: center;
-        }
-
-        .choice-logo {
-            margin-bottom: 1.5rem;
-            display: flex;
-            justify-content: center;
-        }
-
-        .logo-image {
-            height: 60px;
-            width: auto;
-            object-fit: contain;
-        }
-
-        .choice-content h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #2c3e50;
-            margin: 0 0 0.75rem;
-            line-height: 1.2;
-        }
-
-        .choice-content > p:first-of-type {
-            font-size: 1rem;
-            color: #888;
-            margin: 0 0 2rem;
-            line-height: 1.5;
-        }
-
-        .choice-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        @media (max-width: 600px) {
-            .choice-buttons {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .choice-btn {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 1.5rem;
-            background: #fbf7ec;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: inherit;
-            font-size: 0.9rem;
-        }
-
-        .choice-btn:hover {
-            border-color: #77883e;
-            background: linear-gradient(135deg, rgba(119, 136, 62, 0.03) 0%, rgba(119, 136, 62, 0.01) 100%);
-            transform: translateY(-2px);
-        }
-
-        .choice-title {
-            font-weight: 600;
-            color: #2c3e50;
-            display: block;
-        }
-
-        .choice-desc {
-            font-size: 0.8rem;
-            color: #999;
-            display: block;
-            font-weight: 400;
-        }
-
-        .choice-hint {
-            font-size: 0.85rem;
-            color: #fbf7ec;
-            margin: 0;
-        }
-
-        @media (max-width: 600px) {
-            .onboarding-choice-content {
-                width: 95%;
-                border-radius: 16px;
-            }
-
-            .choice-content {
-                padding: 2rem 1.5rem;
-            }
-
-            .choice-content h1 {
-                font-size: 1.6rem;
-            }
-
-            .choice-emoji {
-                font-size: 2.5rem;
-            }
-        }
-
-        .onboarding-close-btn {
-            position: absolute;
-            top: 1.5rem;
-            right: 1.5rem;
-            background: transparent;
-            border: none;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 10001;
-            color: #77883e;
-            transition: color 0.2s, transform 0.2s;
-            padding: 0;
-        }
-
-        .onboarding-close-btn:hover {
-            color: #5e6e30;
-            transform: scale(1.1);
-        }
-
-        .onboarding-close-btn:active {
-            transform: scale(0.95);
-        }
-
-        .onboarding-close-btn svg {
-            width: 24px;
-            height: 24px;
-            stroke-width: 3;
-        }
-    `;
-
-    document.head.appendChild(styles);
-}
-
-/**
- * Close choice modal
- */
-function closeChoiceModal() {
-    const modal = document.getElementById('onboarding-choice-modal');
-    if (modal) {
-        modal.style.animation = 'slideOut 0.3s ease-out forwards';
-        setTimeout(() => {
-            modal.remove();
-        }, 300);
+    // Step 1b/returning form dropdown (if it exists)
+    const step1bSelect = document.getElementById('returning-category');
+    if (step1bSelect) {
+        console.log('[Onboarding] Populating Step 1b dropdown...');
+        step1bSelect.innerHTML = '<option value="">Choose a category...</option>';
+        Object.entries(data).forEach(([id, category]) => {
+            const option = document.createElement('option');
+            option.value = id;
+            option.textContent = category.name;
+            step1bSelect.appendChild(option);
+        });
+        console.log('[Onboarding] Step 1b dropdown populated');
     }
 }
 
 /**
- * Show login form for returning users
+ * Inject onboarding styles from external CSS file
  */
+function injectOnboardingStyles() {
+    if (document.getElementById('onboarding-modal-styles')) {
+        return; // Already injected
+    }
+
+    const link = document.createElement('link');
+    link.id = 'onboarding-modal-styles';
+    link.rel = 'stylesheet';
+    link.href = '/rooted-vitality/styles/onboarding-modal.css';
+    document.head.appendChild(link);
+}
+
 /**
- * Initialize returning member special project creation flow
+ * Setup all event listeners for the onboarding modal
+ * isReturningUser: if true, user is returning/logged in - skip steps 3 and 4
+ */
+function setupOnboardingEventListeners(isReturningUser = false) {
+    const modal = document.getElementById('guided-onboarding-modal');
+    
+    // Load existing data from localStorage or start fresh
+    let onboardingData = JSON.parse(localStorage.getItem('rooted-onboarding-data')) || { path: null };
+    
+    // Function to save data to localStorage after each step
+    const saveLocalData = () => {
+        localStorage.setItem('rooted-onboarding-data', JSON.stringify(onboardingData));
+    };
+
+    // ====== SETUP: Category Picker for Step 1b ======
+    setupCategoryPickerForStep1b();
+
+    // ====== SETUP: Character counters ======
+    const guidedSymptomsTextarea = document.getElementById('guided-symptoms');
+    if (guidedSymptomsTextarea) {
+        guidedSymptomsTextarea.addEventListener('input', (e) => {
+            const count = e.target.value.length;
+            const countDisplay = document.getElementById('guided-symptoms-count');
+            if (countDisplay) {
+                countDisplay.textContent = count;
+            }
+        });
+    }
+
+    const directDescriptionTextarea = document.getElementById('onboarding-description-direct');
+    if (directDescriptionTextarea) {
+        directDescriptionTextarea.addEventListener('input', (e) => {
+            const count = e.target.value.length;
+            const countDisplay = document.getElementById('onboarding-char-count');
+            if (countDisplay) {
+                countDisplay.textContent = count;
+            }
+        });
+    }
+
+    // ====== SETUP: Password reveal toggle buttons ======
+    const passwordToggles = modal.querySelectorAll('.password-toggle');
+    passwordToggles.forEach(toggle => {
+        toggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            const input = toggle.parentElement.querySelector('input[type="password"], input[type="text"]');
+            if (input) {
+                const isPassword = input.type === 'password';
+                input.type = isPassword ? 'text' : 'password';
+            }
+        });
+    });
+
+    // Close button
+    modal.querySelector('.onboarding-close-btn').addEventListener('click', () => {
+        closeOnboardingModal();
+    });
+
+    // Overlay does NOT close the modal - only X button or completing onboarding closes it
+
+    // ====== STEP 0: New or returning user choice ======
+    const returningUserBtn = document.getElementById('returning-user-btn');
+    const newUserBtn = document.getElementById('new-user-btn');
+    if (returningUserBtn) {
+        returningUserBtn.addEventListener('click', () => {
+            goToStep('0a');
+        });
+    }
+    if (newUserBtn) {
+        newUserBtn.addEventListener('click', () => {
+            goToStep(1);
+        });
+    }
+
+    // ====== STEP 0a: Login ======
+    const loginForm = document.getElementById('step-login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', handleLoginSubmit);
+        const switchLink = loginForm.querySelector('.login-switch-link');
+        if (switchLink) {
+            switchLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                goToStep(1);
+            });
+        }
+    }
+
+    // ====== STEP 1: Path choice (Know what you need or not?) ======
+    document.getElementById('path-direct').addEventListener('click', () => {
+        onboardingData.path = 'direct';
+        goToStep('1a');
+    });
+
+    document.getElementById('path-guided').addEventListener('click', () => {
+        onboardingData.path = 'guided';
+        goToStep('1b');
+    });
+
+    // ====== STEP 1A: Direct category selection ======
+    const categoryDirect = document.getElementById('onboarding-category-direct');
+    categoryDirect.addEventListener('change', (e) => {
+        const categoryId = e.target.value;
+        const subSelect = document.getElementById('onboarding-subcategory-direct');
+        
+        if (!subSelect) return;
+        
+        subSelect.innerHTML = '<option value="">Choose a specialty...</option>';
+        
+        if (categoryId) {
+            // Use global if available, otherwise use cache
+            const data = (typeof taxonomyData !== 'undefined' && Object.keys(taxonomyData).length > 0) 
+                ? taxonomyData 
+                : onboardingTaxonomyCache;
+            
+            const category = data ? data[categoryId] : null;
+            if (category && category.subcategories && category.subcategories.length > 0) {
+                category.subcategories.forEach(subName => {
+                    const option = document.createElement('option');
+                    option.value = subName;
+                    option.textContent = subName;
+                    subSelect.appendChild(option);
+                });
+            }
+        }
+    });
+
+    document.getElementById('step-1a-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const category = document.getElementById('onboarding-category-direct').value;
+        if (!category) {
+            window.showAlertModal('Please select a category');
+            return;
+        }
+        onboardingData.category = category;
+        onboardingData.subcategory = document.getElementById('onboarding-subcategory-direct').value || null;
+        onboardingData.travel_preference = document.querySelector('input[name="travel_preference"]:checked')?.value || null;
+        onboardingData.urgency = document.querySelector('input[name="urgency"]:checked')?.value || null;
+        onboardingData.currentPath = '1a';
+        saveLocalData();
+        goToStep(2);
+    });
+
+    // ====== STEP 1B: Guided path with category picker ======
+    document.getElementById('step-1b-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const symptoms = document.getElementById('guided-symptoms').value.trim();
+        const category = document.getElementById('guided-category-selected').value;
+        const urgency = document.querySelector('input[name="urgency"]:checked').value;
+        const travelPref = document.querySelector('input[name="travel_preference"]:checked').value;
+        const selectedSubcategories = Array.from(document.querySelectorAll('#guided-subcategories-list input[type="checkbox"]:checked')).map(cb => cb.value);
+
+        if (!symptoms || !category || selectedSubcategories.length === 0) {
+            window.showAlertModal('Please complete all required fields');
+            return;
+        }
+
+        // Store all guided path data
+        onboardingData.category = category;
+        onboardingData.description = symptoms;
+        onboardingData.subcategory = selectedSubcategories;
+        onboardingData.urgency = urgency;
+        onboardingData.travel_preference = travelPref;
+        onboardingData.currentPath = '1b';
+        saveLocalData();
+
+        // All users go to Step 2 (client profile questions)
+        goToStep(2);
+
+
+    });
+
+    // ====== STEP 2: Client profile questions ======
+    document.getElementById('step-2-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // Capture all client profile answers
+        onboardingData.clientProfile = {
+            wellnessGoals: document.getElementById('wellness-goals').value.trim(),
+            duration: document.getElementById('duration').value.trim(),
+            triedBefore: document.getElementById('tried-before').value.trim(),
+            allergies: document.getElementById('allergies').value.trim(),
+            medications: document.getElementById('medications').value.trim(),
+            dailyLife: document.getElementById('daily-life').value.trim(),
+            communicationPref: document.getElementById('communication-pref').value,
+            barriers: document.getElementById('barriers').value.trim(),
+            practitionerExp: document.getElementById('practitioner-exp').value,
+            desiredOutcomes: document.getElementById('desired-outcomes').value.trim()
+        };
+        saveLocalData();
+        
+        // Check if user is already authenticated - if so, skip Steps 3 & 4 and go to Step 5
+        const { data: { session } } = await window.supabaseClient.auth.getSession();
+        if (session) {
+            console.log('[Onboarding] Authenticated user detected at Step 2, skipping Steps 3 & 4 to Step 5');
+            onboardingData.userId = session.user.id;
+            // Fetch client info for authenticated user (serial, name)
+            const { data: clientData } = await window.supabaseClient
+                .from('clients')
+                .select('serial_number, first_name, last_name')
+                .eq('id', session.user.id)
+                .single();
+            onboardingData.clientSerial = clientData?.serial_number || null;
+            onboardingData.firstName = clientData?.first_name || null;
+            onboardingData.lastName = clientData?.last_name || null;
+            saveLocalData();
+            goToStep(5);
+            return;
+        }
+        
+        // ALL new users go to Step 3 (signup) after Step 2
+        // Authenticated users already skipped above and went to Step 5
+        goToStep(3);
+    });
+
+    // ====== STEP 3: Signup (name, email, password) ======
+    document.getElementById('step-3-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // Check if user is already authenticated - if so, skip signup and go to step 5
+        const { data: { session } } = await window.supabaseClient.auth.getSession();
+        if (session) {
+            console.log('[Onboarding] Authenticated user detected in Step 3, skipping to Step 5');
+            onboardingData.userId = session.user.id;
+            // Fetch client info for authenticated user (serial, name)
+            const { data: clientData } = await window.supabaseClient
+                .from('clients')
+                .select('serial_number, first_name, last_name')
+                .eq('id', session.user.id)
+                .single();
+            onboardingData.clientSerial = clientData?.serial_number || null;
+            onboardingData.firstName = clientData?.first_name || null;
+            onboardingData.lastName = clientData?.last_name || null;
+            goToStep(5);
+            return;
+        }
+        
+        const firstName = document.getElementById('onboarding-firstName').value.trim();
+        const lastName = document.getElementById('onboarding-lastName').value.trim();
+        const dob = document.getElementById('onboarding-dob-signup').value;
+        const sex = document.getElementById('onboarding-sex').value;
+        const email = document.getElementById('onboarding-email').value.trim();
+        const confirmEmail = document.getElementById('onboarding-confirmEmail').value.trim();
+        const password = document.getElementById('onboarding-password').value;
+        const confirmPassword = document.getElementById('onboarding-confirmPassword').value;
+        const phone = document.getElementById('onboarding-phone-signup').value.trim();
+        const street = document.getElementById('onboarding-street-signup').value.trim();
+        const city = document.getElementById('onboarding-city-signup').value.trim();
+        const state = document.getElementById('onboarding-state-signup').value.trim();
+        const zipcode = document.getElementById('onboarding-zipcode-signup').value.trim();
+
+        if (!firstName || !lastName) {
+            window.showAlertModal('Please enter your name');
+            return;
+        }
+        if (!dob) {
+            window.showAlertModal('Please enter your date of birth');
+            return;
+        }
+
+        // Calculate age from date of birth
+        const dobDate = new Date(dob);
+        const today = new Date();
+        let age = today.getFullYear() - dobDate.getFullYear();
+        const monthDiff = today.getMonth() - dobDate.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dobDate.getDate())) {
+            age--;
+        }
+
+        if (age < 18) {
+            window.showAlertModal('You must be at least 18 years old');
+            return;
+        }
+        if (!sex) {
+            window.showAlertModal('Please select your sex');
+            return;
+        }
+        if (!email || email !== confirmEmail) {
+            window.showAlertModal('Please enter matching email addresses');
+            return;
+        }
+        if (!password || !confirmPassword) {
+            window.showAlertModal('Please enter a password');
+            return;
+        }
+        if (password !== confirmPassword) {
+            window.showAlertModal('Passwords do not match');
+            return;
+        }
+        if (password.length < 6) {
+            window.showAlertModal('Password must be at least 6 characters');
+            return;
+        }
+        if (!phone) {
+            window.showAlertModal('Please enter your phone number');
+            return;
+        }
+        if (!city || !state || !zipcode) {
+            window.showAlertModal('Please fill in city, state, and zip code');
+            return;
+        }
+
+        onboardingData.firstName = firstName;
+        onboardingData.lastName = lastName;
+        onboardingData.dob = dob;
+        onboardingData.age = age;
+        onboardingData.sex = sex;
+        onboardingData.email = email;
+        onboardingData.password = password;
+        onboardingData.phone = phone;
+        onboardingData.street = street;
+        onboardingData.city = city;
+        onboardingData.state = state;
+        onboardingData.zipcode = zipcode;
+        saveLocalData();
+        goToStep(4);
+    });
+
+    // ====== STEP 4: Project confirmation (edit button) ======
+    const editProjectBtn = document.getElementById('edit-project-btn');
+    if (editProjectBtn) {
+        editProjectBtn.addEventListener('click', () => {
+            // Go back to path choice step to edit
+            goToStep(onboardingData.path === 'direct' ? '1a' : '1b');
+        });
+    }
+
+    // ====== STEP 4: Terms agreement verification ======
+    const disclaimerCheckbox = document.getElementById('checkbox-disclaimer');
+    const privacyCheckbox = document.getElementById('checkbox-privacy');
+    const termsCheckbox = document.getElementById('checkbox-terms');
+    const step4NextBtn = document.getElementById('step-4-next');
+    const termsScrollContainer = document.getElementById('terms-scroll-container');
+
+    if (disclaimerCheckbox && privacyCheckbox && termsCheckbox && step4NextBtn && termsScrollContainer) {
+        let hasScrolledToBottom = false;
+
+        // Detect scroll to bottom
+        termsScrollContainer.addEventListener('scroll', () => {
+            const scrollTop = termsScrollContainer.scrollTop;
+            const scrollHeight = termsScrollContainer.scrollHeight;
+            const clientHeight = termsScrollContainer.clientHeight;
+            
+            // Check if scrolled to bottom (within 10px tolerance)
+            if (scrollTop + clientHeight >= scrollHeight - 10) {
+                hasScrolledToBottom = true;
+            }
+        });
+
+        const updateStep4Button = () => {
+            const allChecked = disclaimerCheckbox.checked && privacyCheckbox.checked && termsCheckbox.checked;
+            // Button only enabled if scrolled to bottom AND all checkboxes checked
+            step4NextBtn.disabled = !allChecked || !hasScrolledToBottom;
+        };
+
+        disclaimerCheckbox.addEventListener('change', updateStep4Button);
+        privacyCheckbox.addEventListener('change', updateStep4Button);
+        termsCheckbox.addEventListener('change', updateStep4Button);
+        step4NextBtn.disabled = true;
+
+        step4NextBtn.addEventListener('click', async () => {
+            if (!disclaimerCheckbox.checked || !privacyCheckbox.checked || !termsCheckbox.checked) {
+                window.showAlertModal('Please review and accept all agreements to continue');
+                return;
+            }
+
+            try {
+                step4NextBtn.disabled = true;
+                step4NextBtn.textContent = 'Creating your account...';
+
+                // Check if user is already authenticated (returning user)
+                const { data: { session } } = await window.supabaseClient.auth.getSession();
+                let authData;
+                
+                if (session) {
+                    // User is already logged in - use existing auth
+                    console.log('[Onboarding] User already authenticated:', session.user.email);
+                    authData = { user: session.user };
+                } else {
+                    // New user - sign up
+                    const { data: signupData, error: authError } = await window.supabaseClient.auth.signUp({
+                        email: onboardingData.email,
+                        password: onboardingData.password,
+                        options: {
+                            emailRedirectTo: `${window.location.origin}/rooted-vitality/index.html`
+                        }
+                    });
+
+                    if (authError) throw authError;
+                    authData = signupData;
+                    console.log('[Onboarding] User signed up:', authData.user.email);
+                }
+
+                // Normalize phone
+                const phoneDigitsOnly = onboardingData.phone.replace(/\D/g, '');
+                const normalizedPhone = phoneDigitsOnly.slice(-10);
+
+                // Create client profile in clients table
+                const { error: clientError } = await window.supabaseClient
+                    .from('clients')
+                    .insert({
+                        id: authData.user.id,
+                        email: onboardingData.email,
+                        first_name: onboardingData.firstName,
+                        last_name: onboardingData.lastName,
+                        phone: normalizedPhone,
+                        address: onboardingData.street || null,
+                        city: onboardingData.city || null,
+                        state: onboardingData.state || null,
+                        zipcode: onboardingData.zipcode.trim().slice(0, 10),
+                        sex: onboardingData.sex,
+                        age: onboardingData.age,
+                        date_of_birth: onboardingData.dob || null,
+                        account_status: 'active',
+                        account_standing: 'good',
+                        two_factor_enabled: false,
+                        open_to_contact: true,
+                        open_to_match: true
+                    });
+
+                if (clientError) {
+                    console.warn('[Onboarding] Client profile warning:', clientError.message);
+                }
+
+                // Get the client_serial that was auto-generated
+                const { data: clientData, error: clientSerialError } = await window.supabaseClient
+                    .from('clients')
+                    .select('serial_number')
+                    .eq('id', authData.user.id)
+                    .single();
+
+                if (clientSerialError) {
+                    console.warn('[Onboarding] Could not retrieve client serial:', clientSerialError.message);
+                }
+
+                const clientSerial = clientData?.serial_number || null;
+                onboardingData.clientSerial = clientSerial;
+
+                // Client profile questionnaire will be saved to client_profiles table in Step 5
+                // This ensures all users (authenticated and new) have their profile data saved
+
+                onboardingData.userId = authData.user.id;
+                onboardingData.signupCompleted = true; // Mark that user completed signup (for back button logic)
+
+                // Continue to Step 5 (project confirmation)
+                goToStep(5);
+
+                step4NextBtn.disabled = false;
+                step4NextBtn.textContent = 'Create Account & Send Email';
+
+            } catch (error) {
+                console.error('[Onboarding] Signup error:', error);
+                window.showAlertModal('Signup failed: ' + error.message);
+                step4NextBtn.disabled = false;
+                step4NextBtn.textContent = 'Create Account & Send Email';
+            }
+        });
+    }
+
+    // ====== STEP 5: Project confirmation - load matches and go to Step 6 ======
+    const step5NextBtn = document.getElementById('step-5-next');
+    if (step5NextBtn) {
+        step5NextBtn.addEventListener('click', async () => {
+            try {
+                step5NextBtn.disabled = true;
+                step5NextBtn.textContent = 'Saving your profile...';
+
+                // VALIDATION: Check that travel_preference and urgency are selected
+                const travelPrefSelected = document.querySelector('input[name="travel_preference"]:checked');
+                const urgencySelected = document.querySelector('input[name="urgency"]:checked');
+                
+                if (!travelPrefSelected) {
+                    window.showAlertModal('Please select a travel preference (In-Person, House Calls, Virtual, or Flexible)');
+                    step5NextBtn.disabled = false;
+                    step5NextBtn.textContent = 'Find my matches';
+                    return;
+                }
+                
+                if (!urgencySelected) {
+                    window.showAlertModal('Please select your urgency level (Interested, Somewhat Urgent, Very Urgent, or Need Immediately)');
+                    step5NextBtn.disabled = false;
+                    step5NextBtn.textContent = 'Find my matches';
+                    return;
+                }
+
+                // ========== STEP 1: SAVE CLIENT PROFILE FIRST ==========
+                console.log('[Onboarding Step 5] STARTING - First, save client profile questionnaire');
+                
+                // First, try to restore from localStorage if not in memory
+                if (!onboardingData.clientProfile) {
+                    loadLocalData();
+                    console.log('[Onboarding] Restored clientProfile from localStorage:', onboardingData.clientProfile);
+                }
+                
+                let profileSaveSucceeded = false;
+                if (onboardingData.userId) {
+                    console.log('[Onboarding] Step 1: Attempting to save client profile for user:', onboardingData.userId);
+                    console.log('[Onboarding] clientProfile object:', onboardingData.clientProfile);
+                    
+                    // Only save if we have actual profile data
+                    if (onboardingData.clientProfile && Object.keys(onboardingData.clientProfile).length > 0) {
+                        // Build profile data - use what we have, or null if not provided
+                        const profileData = {
+                            user_id: onboardingData.userId,
+                            serial_number: onboardingData.clientSerial || null,
+                            main_wellness_goal: onboardingData.clientProfile?.wellnessGoals || null,
+                            duration_of_issue: onboardingData.clientProfile?.duration || null,
+                            what_tried_before: onboardingData.clientProfile?.triedBefore || null,
+                            allergies_sensitivities: onboardingData.clientProfile?.allergies || null,
+                            current_medications_supplements: onboardingData.clientProfile?.medications || null,
+                            typical_day_description: onboardingData.clientProfile?.dailyLife || null,
+                            communication_preference: onboardingData.clientProfile?.communicationPref || null,
+                            biggest_barrier_to_healing: onboardingData.clientProfile?.barriers || null,
+                            prior_practitioner_experience: onboardingData.clientProfile?.practitionerExp || null,
+                            desired_success_outcome: onboardingData.clientProfile?.desiredOutcomes || null,
+                            created_at: new Date().toISOString()
+                        };
+                        
+                        console.log('[Onboarding] Profile data to insert:', profileData);
+                        
+                        try {
+                            const { data: profileInsertData, error: profileError } = await window.supabaseClient
+                                .from('client_profiles')
+                                .insert(profileData)
+                                .select();
+
+                            if (profileError) {
+                                console.error('[Onboarding] Client profile insert error:', profileError);
+                                console.error('[Onboarding] Error code:', profileError.code);
+                                console.error('[Onboarding] Error message:', profileError.message);
+                                console.error('[Onboarding] Error details:', profileError.details);
+                                // CONTINUE ANYWAY - do not throw, we want to save project even if profile fails
+                            } else {
+                                console.log('[Onboarding] ✅ CLIENT PROFILE SAVED SUCCESSFULLY');
+                                console.log('[Onboarding] Profile ID:', profileInsertData[0]?.id);
+                                profileSaveSucceeded = true;
+                            }
+                        } catch (err) {
+                            console.error('[Onboarding] Exception during profile insert:', err);
+                            // CONTINUE ANYWAY
+                        }
+                    } else {
+                        console.warn('[Onboarding] No actual client profile data to save - all fields are empty');
+                    }
+                } else {
+                    console.warn('[Onboarding] No userId found in onboardingData');
+                }
+
+                // ========== STEP 2: NOW CREATE PROJECT ==========
+                console.log('[Onboarding Step 5] PROCEEDING - Now create project with full details');
+                step5NextBtn.textContent = 'Creating your project...';
+
+                // Get category name
+                let categoryName = '';
+                // Use global if available, otherwise use cache
+                const data = (typeof taxonomyData !== 'undefined' && Object.keys(taxonomyData).length > 0) 
+                    ? taxonomyData 
+                    : onboardingTaxonomyCache;
+                if (onboardingData.category) {
+                    const categoryObj = data ? data[onboardingData.category] : null;
+                    categoryName = categoryObj ? categoryObj.name : onboardingData.category;
+                }
+
+                // Format subcategory - can be array or string
+                let subcategoryStr = '';
+                if (onboardingData.subcategory) {
+                    if (Array.isArray(onboardingData.subcategory)) {
+                        subcategoryStr = onboardingData.subcategory.join(', ');
+                    } else {
+                        subcategoryStr = onboardingData.subcategory;
+                    }
+                }
+
+                // Get raw values from form (NO VALIDATION - just like my-projects.js does)
+                let travelPref = document.querySelector('input[name="travel_preference"]:checked')?.value || onboardingData.travel_preference;
+                let urgency = document.querySelector('input[name="urgency"]:checked')?.value || onboardingData.urgency;
+
+                // Validate travel_preference is one of the allowed values
+                const validTravelPrefs = ['in-person', 'house-call', 'virtual', 'flexible'];
+                if (travelPref && !validTravelPrefs.includes(travelPref)) {
+                    console.warn('[Onboarding] Invalid travel_preference:', travelPref, 'Valid options:', validTravelPrefs);
+                    travelPref = null;
+                }
+
+                // Validate urgency is one of the allowed values
+                const validUrgencies = ['interested', 'somewhat_urgent', 'very_urgent', 'need_immediately'];
+                if (urgency && !validUrgencies.includes(urgency)) {
+                    console.warn('[Onboarding] Invalid urgency:', urgency, 'Valid options:', validUrgencies);
+                    urgency = null;
+                }
+
+                console.log('[Onboarding] Raw form values - travelPref:', travelPref, 'urgency:', urgency);
+                console.log('[Onboarding] From onboardingData - travelPref:', onboardingData.travel_preference, 'urgency:', onboardingData.urgency);
+                
+                // Don't map - send raw values
+                const mappedTravelPref = travelPref;
+                const mappedUrgency = urgency;
+                
+                console.log('[Onboarding] Using unmapped - travelPref:', mappedTravelPref, 'urgency:', mappedUrgency);
+
+                // Build the project insert object
+                const projectInsertData = {
+                    client_id: onboardingData.userId,
+                    client_serial: onboardingData.clientSerial,
+                    category_id: (data && onboardingData.category) ? data[onboardingData.category]?.category_id : null,
+                    category_name: categoryName || null,
+                    subcategory_name: subcategoryStr || null,
+                    description: onboardingData.description || onboardingData.symptoms || '',
+                    zipcode: onboardingData.zipcode || null,
+                    city: onboardingData.city || null,
+                    state: onboardingData.state || null,
+                    street: onboardingData.street || null,
+                    travel_preference: mappedTravelPref || null,
+                    urgency: mappedUrgency,
+                    client_first_name: onboardingData.firstName || null,
+                    client_last_name: onboardingData.lastName || null
+                };
+
+                console.log('[Onboarding] FULL Project insert data:', projectInsertData);
+                console.log('[Onboarding] travel_preference type:', typeof projectInsertData.travel_preference, 'value:', JSON.stringify(projectInsertData.travel_preference));
+                console.log('[Onboarding] urgency type:', typeof projectInsertData.urgency, 'value:', JSON.stringify(projectInsertData.urgency));
+
+                // Create project with ALL required fields
+                const insertObject = {
+                    ...projectInsertData,
+                    project_status: 'pending',
+                    client_open_to_contact: true,
+                    start_date: new Date().toISOString().split('T')[0]
+                };
+                console.log('[Onboarding] EXACT insert object being sent:', JSON.stringify(insertObject, null, 2));
+
+                // Create project with ALL required fields - use array format like my-projects.js
+                const { data: projectData, error: projectError } = await window.supabaseClient
+                    .from('projects')
+                    .insert([insertObject])
+                    .select();
+
+                if (projectError) {
+                    console.error('[Onboarding] Project insert error:', projectError);
+                    console.error('[Onboarding] Error code:', projectError.code);
+                    console.error('[Onboarding] Error message:', projectError.message);
+                    console.error('[Onboarding] Error details:', projectError.details);
+                    throw projectError;
+                }
+
+                console.log('[Onboarding] ✅ PROJECT CREATED SUCCESSFULLY');
+                console.log('[Onboarding] Project created:', projectData[0].id);
+                onboardingData.projectId = projectData[0].id;
+
+                // ========== STEP 3: LOAD MATCHES ==========
+                console.log('[Onboarding Step 5] FINAL STEP - Load matches and advance to Step 6');
+                step5NextBtn.textContent = 'Finding matches...';
+
+                // Load and show matches before going to Step 6
+                await loadMatchesForOnboarding(onboardingData);
+                console.log('[Onboarding] ✅ MATCHES LOADED');
+                
+                // Log summary
+                console.log('[Onboarding] ========== COMPLETION SUMMARY ==========');
+                console.log('[Onboarding] ✅ Client Profile:', profileSaveSucceeded ? 'SAVED' : 'SKIPPED/FAILED (see logs)');
+                console.log('[Onboarding] ✅ Project: CREATED with ID', onboardingData.projectId);
+                console.log('[Onboarding] ✅ Matches: LOADED');
+                console.log('[Onboarding] =========================================');
+                
+                goToStep(6);
+                
+                step5NextBtn.disabled = false;
+                step5NextBtn.textContent = 'Find my matches';
+            } catch (error) {
+                console.error('[Onboarding] CRITICAL ERROR in Step 5:', error);
+                const msg = 'Error: ' + (error?.message || 'Unknown error');
+                if (typeof window.showAlertModal === 'function') {
+                    window.showAlertModal(msg);
+                } else {
+                    alert(msg);
+                }
+                step5NextBtn.disabled = false;
+                step5NextBtn.textContent = 'Find my matches';
+            }
+        });
+    }
+
+    // ====== STEP 6: Matches ======
+    document.getElementById('save-for-later-btn').addEventListener('click', () => {
+        closeOnboardingModal();
+        window.showAlertModal('Your project has been created. Explore practitioners anytime from your dashboard.');
+        setTimeout(() => {
+            window.location.href = '/rooted-vitality/dashboard/client/pages/dashboard.html';
+        }, 500);
+    });
+
+    document.getElementById('continue-browsing-btn').addEventListener('click', () => {
+        closeOnboardingModal();
+        window.location.href = `/rooted-vitality/dashboard/client/pages/find-practitioners.html?project=${onboardingData.projectId}`;
+    });
+
+    // Back buttons
+    modal.querySelectorAll('.onboarding-back').forEach(btn => {
+        btn.addEventListener('click', handleBackButton);
+    });
+
+    function goToStep(stepNumber) {
+        modal.querySelectorAll('.onboarding-step').forEach(step => {
+            step.classList.remove('active');
+        });
+        
+        const selector = typeof stepNumber === 'string' 
+            ? `[data-step="${stepNumber}"]` 
+            : `[data-step="${stepNumber}"]`;
+        modal.querySelector(selector).classList.add('active');
+
+        // Populate Step 5 project confirmation details
+        if (stepNumber === 5 || stepNumber === '5') {
+            const confirmCat = modal.querySelector('#confirm-category');
+            const confirmSubcat = modal.querySelector('#confirm-subcategory');
+            const confirmZipcode = modal.querySelector('#confirm-zipcode');
+            const confirmTravel = modal.querySelector('#confirm-travel');
+            const confirmUrgency = modal.querySelector('#confirm-urgency');
+
+            // Get category name from taxonomy data
+            let categoryName = 'Not selected';
+            // Use global if available, otherwise use cache
+            const data = (typeof taxonomyData !== 'undefined' && Object.keys(taxonomyData).length > 0) 
+                ? taxonomyData 
+                : onboardingTaxonomyCache;
+            if (onboardingData.category && data && data[onboardingData.category]) {
+                categoryName = data[onboardingData.category].name;
+            }
+
+            if (confirmCat) confirmCat.textContent = categoryName;
+            
+            // Subcategory handling - can be array or string
+            let subcategoryDisplay = '(Not specified)';
+            if (onboardingData.subcategory) {
+                if (Array.isArray(onboardingData.subcategory)) {
+                    subcategoryDisplay = onboardingData.subcategory.join(', ');
+                } else {
+                    subcategoryDisplay = onboardingData.subcategory;
+                }
+            }
+            if (confirmSubcat) confirmSubcat.textContent = subcategoryDisplay;
+            
+            // Location - try to get from signup (step 3) or step 1a
+            const zipcode = onboardingData.zipcode || 'Not provided';
+            if (confirmZipcode) confirmZipcode.textContent = zipcode;
+            
+            // Travel preference
+            const travelPref = onboardingData.travel_preference || 'Not specified';
+            const travelDisplay = travelPref.charAt(0).toUpperCase() + travelPref.slice(1).replace(/_/g, ' ');
+            if (confirmTravel) confirmTravel.textContent = travelDisplay;
+            
+            // Urgency
+            const urgency = onboardingData.urgency || 'Not specified';
+            const urgencyDisplay = urgency.charAt(0).toUpperCase() + urgency.slice(1);
+            if (confirmUrgency) confirmUrgency.textContent = urgencyDisplay;
+        }
+
+        // Update progress bar (Total numeric steps: 0, 0a, 1, 1a/1b, 2, 3, 4, 5, 6 = 7 main steps)
+        let progressPercent;
+        if (stepNumber === '0' || stepNumber === 0) {
+            progressPercent = (1 / 7) * 100;
+        } else if (stepNumber === '0a') {
+            progressPercent = (1 / 7) * 100; // Still at same level as Step 0
+        } else if (typeof stepNumber === 'string') {
+            progressPercent = (3 / 7) * 100; // 1a or 1b
+        } else {
+            progressPercent = ((stepNumber + 1) / 7) * 100;
+        }
+        modal.querySelector('.progress-fill').style.width = progressPercent + '%';
+
+        // Scroll to top
+        const stepContent = modal.querySelector('.onboarding-step.active .step-content');
+        if (stepContent) {
+            stepContent.scrollTop = 0;
+        }
+    }
+
+    function handleBackButton() {
+        const currentStep = modal.querySelector('.onboarding-step.active').dataset.step;
+        
+        if (currentStep === '0') {
+            closeOnboardingModal();
+        } else if (currentStep === '0a') {
+            goToStep(0);
+        } else if (currentStep === '1') {
+            const loginStep = modal.querySelector('[data-step="0"]');
+            if (loginStep) {
+                goToStep(0);
+            } else {
+                closeOnboardingModal();
+            }
+        } else if (currentStep === '1a' || currentStep === '1b') {
+            goToStep(1);
+        } else if (currentStep === '2') {
+            // Go back to whichever path user took (1a or 1b)
+            const previousPath = onboardingData.currentPath || '1a';
+            goToStep(previousPath);
+        } else if (currentStep === '3') {
+            goToStep(2);
+        } else if (currentStep === '4') {
+            // Check if this is an authenticated user - if so, they should have gone straight from 2 to 5, so this shouldn't happen
+            // But if they're here, go back to step 2
+            goToStep(2);
+        } else if (currentStep === '5') {
+            // Back from Step 5: 
+            // - If authenticated user (has userId but came from Step 2), go back to Step 2
+            // - If new user who went through Step 3-4, go back to Step 4
+            if (onboardingData.userId && !onboardingData.signupCompleted) {
+                // Authenticated user - skip back to step 2
+                goToStep(2);
+            } else {
+                // New user - go back to step 4
+                goToStep(4);
+            }
+        } else if (currentStep === '6') {
+            goToStep(5);
+        } else {
+            const stepNum = parseInt(currentStep);
+            if (stepNum > 1) {
+                goToStep(stepNum - 1);
+            }
+        }
+    }
+}
+
+/**
+ * Save onboarding data to database after verification step completed
+ * This creates the client account and saves their profile information
+ * Project details are saved later at Step 5 confirmation
+ */
+async function saveToDatabaseAfterVerification(onboardingData) {
+    try {
+        // TODO: Implement database save
+        // 1. Create entry in clients table with signup info (firstName, lastName, email, password, age, sex, address, city, state, zipcode, phone, dob)
+        // 2. Create entry in client_profiles table with profile questionnaire answers
+        // 3. Return clientId for use in project creation
+        console.log('Saving to database:', onboardingData);
+        
+        // For now, just store clientId in onboardingData
+        // onboardingData.clientId = response.clientId;
+        
+        // Clear localStorage after successful save
+        clearOnboardingLocalStorage();
+        
+    } catch (error) {
+        console.error('Error saving to database:', error);
+        window.showAlertModal('Error creating account. Please try again.');
+        throw error;
+    }
+}
+
+/**
+ * Handle login form submission
+ */
+async function handleLoginSubmit(e) {
+    e.preventDefault();
+    const email = document.getElementById('step-login-email').value.trim();
+    const password = document.getElementById('step-login-password').value;
+
+    if (!email || !password) {
+        window.showAlertModal('Please fill in all fields');
+        return;
+    }
+
+    try {
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Signing in...';
+
+        const { data: authData, error: authError } = await window.supabaseClient.auth.signInWithPassword({
+            email: email,
+            password: password
+        });
+
+        if (authError) throw authError;
+
+        console.log('[Onboarding] User signed in:', authData.user.email);
+
+        closeOnboardingModal();
+        await initializeReturningMemberFlow();
+
+    } catch (error) {
+        console.error('[Onboarding] Login error:', error);
+        window.showAlertModal('Login failed: ' + error.message);
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Sign in';
+    }
+}
+
+/**
+ * Initialize returning member flow (signed-in user)
  */
 async function initializeReturningMemberFlow() {
     try {
@@ -367,7 +1811,6 @@ async function initializeReturningMemberFlow() {
         modal.innerHTML = `
             <div class="onboarding-overlay"></div>
             <div class="onboarding-modal">
-                <!-- Close Button -->
                 <button class="onboarding-close-btn" aria-label="Close" title="Close">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -375,14 +1818,14 @@ async function initializeReturningMemberFlow() {
                     </svg>
                 </button>
 
-                <!-- Welcome Section -->
                 <div class="returning-welcome">
-                    <div class="welcome-heart">💚</div>
+                <div class="welcome-logo">
+                    <img src="./assets/logo_trimmed.png" alt="Rooted Vitality" class="welcome-logo-image">
+                </div>
                     <h1>Welcome back, ${firstName}</h1>
                     <p>You're here to start something new. Let's make it beautiful.</p>
                 </div>
 
-                <!-- Project Creation Form -->
                 <div class="step-content returning-member-content">
                     <form id="returning-project-form" class="onboarding-form">
                         <div class="form-section">
@@ -392,10 +1835,7 @@ async function initializeReturningMemberFlow() {
                             <div class="form-group">
                                 <label for="returning-category">What area of wellness speaks to you? *</label>
                                 <select id="returning-category" name="category" required>
-                                    <option value="">�� What are you feeling drawn to? ��</option>
-                                    ${WELLNESS_CATEGORIES.map(cat => `
-                                        <option value="${cat.id}">${cat.name}</option>
-                                    `).join('')}
+                                    <option value="">Choose a category...</option>
                                 </select>
                             </div>
 
@@ -408,7 +1848,7 @@ async function initializeReturningMemberFlow() {
                                     rows="5"
                                     required
                                 ></textarea>
-                                <p class="form-hint">💚 We're here to listen.</p>
+                                <p class="form-hint">We're here to listen.</p>
                             </div>
 
                             <div class="form-group">
@@ -445,412 +1885,86 @@ async function initializeReturningMemberFlow() {
 
                         <div class="form-actions">
                             <button type="button" class="btn-secondary returning-cancel">Close</button>
-                            <button type="submit" class="btn-primary">Begin this journey ��</button>
+                            <button type="submit" class="btn-primary">Begin this journey</button>
                         </div>
                     </form>
                 </div>
             </div>
         `;
 
-        if (document.getElementById('returning-member-modal')) {
-            document.getElementById('returning-member-modal').remove();
-        }
+        const existing = document.getElementById('returning-member-modal');
+        if (existing) existing.remove();
         document.body.appendChild(modal);
 
-        // Inject styles if not already there
         injectOnboardingStyles();
-        injectReturningMemberStyles();
 
-        // Setup event listeners for returning member flow
-        setupReturningMemberListeners(user.id, firstName);
+        // Event listeners
+        modal.querySelector('.onboarding-close-btn').addEventListener('click', closeReturningMemberModal);
+        modal.querySelector('.onboarding-overlay').addEventListener('click', closeReturningMemberModal);
+        modal.querySelector('.returning-cancel').addEventListener('click', closeReturningMemberModal);
+
+        document.getElementById('returning-project-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const category = document.getElementById('returning-category').value;
+            const symptoms = document.getElementById('returning-symptoms').value;
+            const goals = document.getElementById('returning-goals').value;
+            const autoMatch = document.getElementById('returning-auto-match').checked;
+
+            if (!category || !symptoms) {
+                window.showAlertModal('Please fill in required fields');
+                return;
+            }
+
+            try {
+                const submitBtn = e.target.querySelector('button[type="submit"]');
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Creating your journey...';
+
+                const { data: projectData, error: projectError } = await window.supabaseClient
+                    .from('projects')
+                    .insert({
+                        user_id: user.id,
+                        category_id: category,
+                        description: symptoms,
+                        goals: goals || null,
+                        status: 'active',
+                        created_at: new Date().toISOString()
+                    })
+                    .select();
+
+                if (projectError) throw projectError;
+
+                console.log('[Onboarding] Project created:', projectData[0].id);
+
+                closeReturningMemberModal();
+                window.showAlertModal(`Welcome back, ${firstName}!\n\nYour project has been created.`);
+
+                if (autoMatch) {
+                    setTimeout(() => {
+                        window.location.href = `/rooted-vitality/dashboard/client/pages/find-practitioners.html?project=${projectData[0].id}&auto=true`;
+                    }, 500);
+                } else {
+                    setTimeout(() => {
+                        window.location.href = `/rooted-vitality/dashboard/client/pages/find-practitioners.html?project=${projectData[0].id}`;
+                    }, 500);
+                }
+
+            } catch (error) {
+                console.error('[Onboarding] Error creating project:', error);
+                window.showAlertModal('Error: ' + error.message);
+                const submitBtn = e.target.querySelector('button[type="submit"]');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Begin this journey';
+            }
+        });
 
     } catch (error) {
         console.error('[Onboarding] Error initializing returning member flow:', error);
-        window.showAlertModal('Error loading welcome experience. Please try again.');
+        window.showAlertModal('Error loading welcome experience');
     }
 }
 
-/**
- * Inject additional styles for returning member flow
- */
-function injectReturningMemberStyles() {
-    if (document.getElementById('returning-member-styles')) {
-        return;
-    }
-
-    const styles = document.createElement('style');
-    styles.id = 'returning-member-styles';
-    styles.textContent = `
-        .returning-welcome {
-            text-align: center;
-            padding: 3rem 2rem 2rem;
-            background: linear-gradient(135deg, rgba(119, 136, 62, 0.05) 0%, rgba(196, 165, 123, 0.05) 100%);
-            border-bottom: 1px solid #fbf7ec;
-        }
-
-        .welcome-heart {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            animation: heartBeat 0.6s ease-out;
-        }
-
-        @keyframes heartBeat {
-            0% {
-                transform: scale(0.95);
-                opacity: 0;
-            }
-            50% {
-                transform: scale(1.1);
-            }
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-
-        .returning-welcome h1 {
-            font-size: 1.8rem;
-            color: #2c3e50;
-            margin: 0 0 0.5rem;
-            font-weight: 600;
-        }
-
-        .returning-welcome p {
-            color: #999;
-            font-size: 1rem;
-            margin: 0;
-        }
-
-        .returning-member-content {
-            padding: 2rem;
-            max-height: calc(90vh - 280px);
-            overflow-y: auto;
-        }
-
-        .form-section {
-            margin-bottom: 2.5rem;
-            padding-bottom: 2.5rem;
-            border-bottom: 1px solid #fbf7ec;
-        }
-
-        .form-section:last-child {
-            margin-bottom: 0;
-            padding-bottom: 0;
-            border-bottom: none;
-        }
-
-        .form-section h2 {
-            font-size: 1.4rem;
-            color: #2c3e50;
-            margin: 0 0 0.5rem;
-            font-weight: 600;
-        }
-
-        .form-section h3 {
-            font-size: 1.1rem;
-            color: #2c3e50;
-            margin: 0 0 0.5rem;
-            font-weight: 600;
-        }
-
-        .form-description {
-            color: #999;
-            font-size: 0.95rem;
-            margin: 0 0 1.5rem;
-            line-height: 1.5;
-        }
-
-        .checkbox-group {
-            margin-bottom: 1rem;
-        }
-
-        .checkbox-label {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            padding: 1rem;
-            background: #fbf7ec;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            user-select: none;
-        }
-
-        .checkbox-label:hover {
-            border-color: #77883e;
-            background: #fbf7ec;
-        }
-
-        .checkbox-label input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-            accent-color: #77883e;
-        }
-
-        .checkbox-label span {
-            font-weight: 500;
-            color: #2c3e50;
-            font-size: 0.95rem;
-        }
-
-        .checkbox-label small {
-            color: #999;
-            font-size: 0.85rem;
-            font-weight: 400;
-        }
-
-        .checkbox-label input[type="checkbox"]:checked {
-            accent-color: #77883e;
-        }
-
-        .returning-cancel {
-            width: auto;
-        }
-
-        @media (max-width: 600px) {
-            .returning-welcome {
-                padding: 2rem 1.5rem 1.5rem;
-            }
-
-            .returning-welcome h1 {
-                font-size: 1.5rem;
-            }
-
-            .welcome-heart {
-                font-size: 2.5rem;
-            }
-
-            .returning-member-content {
-                padding: 1.5rem;
-                max-height: calc(95vh - 280px);
-            }
-
-            .form-section {
-                margin-bottom: 1.5rem;
-                padding-bottom: 1.5rem;
-            }
-        }
-    `;
-
-    document.head.appendChild(styles);
-}
-
-/**
- * Setup event listeners for returning member flow
- */
-function setupReturningMemberListeners(userId, firstName) {
-    const modal = document.getElementById('returning-member-modal');
-
-    // Close button
-    modal.querySelector('.onboarding-close-btn').addEventListener('click', () => {
-        closeReturningMemberModal();
-    });
-
-    // Overlay click to close
-    modal.querySelector('.onboarding-overlay').addEventListener('click', () => {
-        closeReturningMemberModal();
-    });
-
-    // Cancel button
-    modal.querySelector('.returning-cancel').addEventListener('click', () => {
-        closeReturningMemberModal();
-    });
-
-    // Form submission
-    document.getElementById('returning-project-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const category = document.getElementById('returning-category').value;
-        const symptoms = document.getElementById('returning-symptoms').value;
-        const goals = document.getElementById('returning-goals').value;
-        const autoMatch = document.getElementById('returning-auto-match').checked;
-        const explore = document.getElementById('returning-explore').checked;
-
-        if (!category || !symptoms) {
-            window.showAlertModal('Please tell us about your wellness needs');
-            return;
-        }
-
-        try {
-            const submitBtn = modal.querySelector('button[type="submit"]');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Creating your journey...';
-
-            // Create project
-            const { data: projectData, error: projectError } = await window.supabaseClient
-                .from('projects')
-                .insert({
-                    user_id: userId,
-                    category_id: category,
-                    description: symptoms,
-                    goals: goals || null,
-                    status: 'active',
-                    created_at: new Date().toISOString()
-                })
-                .select();
-
-            if (projectError) throw projectError;
-
-            console.log('[Onboarding] Project created:', projectData[0].id);
-
-            // Show celebration
-            showReturningMemberCelebration(firstName, () => {
-                closeReturningMemberModal();
-
-                // Route based on preference
-                if (autoMatch) {
-                    // Load matches and show them
-                    window.location.href = `/rooted-vitality/dashboard/client/pages/find-practitioners.html?project=${projectData[0].id}&auto=true`;
-                } else {
-                    // Go to find practitioners to explore
-                    window.location.href = `/rooted-vitality/dashboard/client/pages/find-practitioners.html?project=${projectData[0].id}`;
-                }
-            });
-
-        } catch (error) {
-            console.error('[Onboarding] Error creating project:', error);
-            window.showAlertModal('Error creating project: ' + error.message);
-            const submitBtn = modal.querySelector('button[type="submit"]');
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Begin This Journey ��';
-        }
-    });
-}
-
-/**
- * Show celebration modal for returning member
- */
-function showReturningMemberCelebration(firstName, callback) {
-    const celebration = document.createElement('div');
-    celebration.id = 'returning-celebration';
-    celebration.innerHTML = `
-        <div class="onboarding-overlay"></div>
-        <div class="celebration-modal">
-            <div class="celebration-content">
-                <div class="celebration-emoji">��</div>
-                <h2>We're so glad you're back, ${firstName}!</h2>
-                <p>Your new wellness chapter is being created...</p>
-                <p class="celebration-subtext">Get ready to meet practitioners who understand your journey 💚</p>
-                <button class="btn-primary celebration-continue">Continue ��</button>
-            </div>
-        </div>
-    `;
-
-    document.body.appendChild(celebration);
-
-    // Inject celebration styles
-    injectCelebrationStyles();
-
-    celebration.querySelector('.celebration-continue').addEventListener('click', () => {
-        celebration.style.animation = 'slideOut 0.3s ease-out forwards';
-        setTimeout(() => {
-            celebration.remove();
-            callback();
-        }, 300);
-    });
-}
-
-/**
- * Inject celebration modal styles
- */
-function injectCelebrationStyles() {
-    if (document.getElementById('celebration-styles')) {
-        return;
-    }
-
-    const styles = document.createElement('style');
-    styles.id = 'celebration-styles';
-    styles.textContent = `
-        #returning-celebration {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 10000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .celebration-modal {
-            position: relative;
-            background: #fbf7ec;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
-            animation: slideIn 0.4s ease-out;
-        }
-
-        .celebration-content {
-            text-align: center;
-            padding: 3rem 2rem;
-        }
-
-        .celebration-emoji {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-20px);
-            }
-        }
-
-        .celebration-modal h2 {
-            font-size: 1.6rem;
-            color: #2c3e50;
-            margin: 0 0 0.75rem;
-            font-weight: 600;
-        }
-
-        .celebration-modal p {
-            font-size: 1rem;
-            color: #666;
-            margin: 0.5rem 0;
-            line-height: 1.5;
-        }
-
-        .celebration-subtext {
-            color: #999;
-            font-size: 0.95rem;
-            margin-top: 1rem !important;
-        }
-
-        .celebration-continue {
-            margin-top: 2rem;
-            min-width: 200px;
-        }
-
-        @media (max-width: 600px) {
-            .celebration-content {
-                padding: 2rem 1.5rem;
-            }
-
-            .celebration-emoji {
-                font-size: 3rem;
-            }
-
-            .celebration-modal h2 {
-                font-size: 1.4rem;
-            }
-        }
-    `;
-
-    document.head.appendChild(styles);
-}
-
-/**
- * Close returning member modal
- */
 function closeReturningMemberModal() {
     const modal = document.getElementById('returning-member-modal');
     if (modal) {
@@ -862,2222 +1976,543 @@ function closeReturningMemberModal() {
 }
 
 /**
- * Initialize guided onboarding modal
- * @param {boolean} showLoginFirst - If true, show login form first for returning users
- */
-function initializeGuidedOnboarding(showLoginFirst = false) {
-    const modal = document.createElement('div');
-    modal.id = 'guided-onboarding-modal';
-    modal.innerHTML = `
-        <div class="onboarding-overlay"></div>
-        <div class="onboarding-modal">
-            <!-- Close Button -->
-            <button class="onboarding-close-btn" aria-label="Close onboarding" title="Close onboarding">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-            </button>
-
-            <!-- Progress Bar (subtle) -->
-            <div class="onboarding-progress">
-                <div class="progress-bar">
-                    <div class="progress-fill"></div>
-                </div>
-            </div>
-
-            <!-- LOGIN STEP: Sign in (for returning users) -->
-            <div class="onboarding-step ${showLoginFirst ? 'active' : ''}" data-step="0">
-                <div class="step-content conversation-style">
-                    <div class="step-opening">
-                        <h2>Welcome back to Rooted Vitality</h2>
-                        <p class="step-subtitle">Sign in to your account and continue your healing journey</p>
-                    </div>
-
-                    <form id="step-login-form" class="onboarding-form">
-                        <div class="form-group">
-                            <label for="step-login-email">Your email *</label>
-                            <input type="email" id="step-login-email" name="email" placeholder="you@email.com" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="step-login-password">Your password *</label>
-                            <input type="password" id="step-login-password" name="password" placeholder="Enter your password" required>
-                        </div>
-
-                        <div class="form-actions">
-                            <button type="button" class="btn-secondary onboarding-back" style="display: none;">�� Back</button>
-                            <button type="submit" class="btn-primary">Sign in ��</button>
-                        </div>
-
-                        <p class="login-help">
-                            New here? <a href="#" class="login-switch-link">Create an account instead</a>
-                        </p>
-                    </form>
-                </div>
-            </div>
-
-            <!-- STEP 1: How do you want to get started? -->
-            <div class="onboarding-step active" data-step="1">
-                <div class="step-content conversation-style">
-                    <div class="step-opening">
-                        <h2>Welcome to Rooted Vitality</h2>
-                        <p class="step-subtitle">We're so glad you're here. How would you like to get started?</p>
-                    </div>
-
-                    <div class="step-path-choice">
-                        <button type="button" class="path-btn" id="path-direct">
-                            <span class="path-title">I know what I need</span>
-                            <span class="path-desc">I'm ready to choose my wellness category</span>
-                        </button>
-                        <button type="button" class="path-btn" id="path-guided">
-                            <span class="path-title">I'm not sure what I need</span>
-                            <span class="path-desc">Help me figure out what's right for me</span>
-                        </button>
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="button" class="btn-secondary onboarding-back" style="display: none;">�� Back</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- STEP 2A: Direct path - Choose category & subcategory -->
-            <div class="onboarding-step" data-step="2a">
-                <div class="step-content conversation-style">
-                    <div class="step-opening">
-                        <h2>What are you looking for?</h2>
-                        <p class="step-subtitle">Choose the wellness area that best matches your needs.</p>
-                    </div>
-
-                    <form id="step-2a-form" class="onboarding-form">
-                        <div class="form-group">
-                            <label for="onboarding-category-direct">Wellness Category *</label>
-                            <select id="onboarding-category-direct" name="category" required>
-                                <option value="">Choose a category...</option>
-                                ${WELLNESS_CATEGORIES.map(cat => `
-                                    <option value="${cat.id}">${cat.name}</option>
-                                `).join('')}
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="onboarding-subcategory-direct">Specialty (optional)</label>
-                            <select id="onboarding-subcategory-direct" name="subcategory">
-                                <option value="">Choose a specialty...</option>
-                            </select>
-                        </div>
-
-                        <div class="form-actions">
-                            <button type="button" class="btn-secondary onboarding-back">�� Back</button>
-                            <button type="submit" class="btn-primary onboarding-next">Continue ��</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- STEP 2B: Guided path - Tell us your symptoms -->
-            <div class="onboarding-step" data-step="2b">
-                <div class="step-content conversation-style">
-                    <div class="step-opening">
-                        <h2>Tell us what brought you here</h2>
-                        <p class="step-subtitle">Share what's really going on. We'll match you with the right wellness area.</p>
-                    </div>
-
-                    <form id="step-2b-form" class="onboarding-form">
-                        <div class="form-group">
-                            <label for="onboarding-symptoms">What's happening in your body, mind, or spirit? *</label>
-                            <textarea 
-                                id="onboarding-symptoms" 
-                                name="symptoms" 
-                                placeholder="Share what's on your mind..." 
-                                rows="6"
-                                required
-                            ></textarea>
-                            <p class="form-hint">There's no 'right' answer here. Just your truth.</p>
-                        </div>
-
-                        <div class="form-actions">
-                            <button type="button" class="btn-secondary onboarding-back">�� Back</button>
-                            <button type="submit" class="btn-primary onboarding-next">Let's find your match ��</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- STEP 3: Confirmation of auto-detected category (guided path only) -->
-            <div class="onboarding-step" data-step="3">
-                <div class="step-content conversation-style">
-                    <div class="step-opening">
-                        <h2>Here's what we found</h2>
-                        <p class="step-subtitle">Based on what you shared, we think this is the right fit for you.</p>
-                    </div>
-
-                    <div id="detected-match" class="detected-match-display">
-                        <div class="match-info">
-                            <p class="match-category"><strong>Category:</strong> <span id="detected-category"></span></p>
-                            <p class="match-subcategory"><strong>Specialty:</strong> <span id="detected-subcategory"></span></p>
-                        </div>
-                    </div>
-
-                    <div class="confirmation-actions">
-                        <button type="button" class="btn-secondary" id="change-match-btn">That's not quite right</button>
-                        <button type="button" class="btn-primary" id="confirm-match-btn">Yes, that's it ��</button>
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="button" class="btn-secondary onboarding-back">�� Back</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- STEP 5: Who are you? (name) -->
-            <div class="onboarding-step" data-step="5">
-                <div class="step-content conversation-style">
-                    <div class="step-opening">
-                        <h2>What's your name?</h2>
-                        <p class="step-subtitle">So we know how to welcome you properly.</p>
-                    </div>
-
-                    <form id="step-5-form" class="onboarding-form">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="onboarding-firstName">First name *</label>
-                                <input type="text" id="onboarding-firstName" name="firstName" placeholder="First" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="onboarding-lastName">Last name *</label>
-                                <input type="text" id="onboarding-lastName" name="lastName" placeholder="Last" required>
-                            </div>
-                        </div>
-
-                        <div class="form-actions">
-                            <button type="button" class="btn-secondary onboarding-back">�� Back</button>
-                            <button type="submit" class="btn-primary onboarding-next">Let's continue ��</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- STEP 6: Your email -->
-            <div class="onboarding-step" data-step="6">
-                <div class="step-content conversation-style">
-                    <div class="step-opening">
-                        <h2>Your email address</h2>
-                        <p class="step-subtitle">We'll use this to create your account and send you important updates.</p>
-                    </div>
-
-                    <form id="step-6-form" class="onboarding-form">
-                        <div class="form-group">
-                            <label for="onboarding-email">Your email *</label>
-                            <input type="email" id="onboarding-email" name="email" placeholder="you@email.com" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="onboarding-confirmEmail">Confirm it *</label>
-                            <input type="email" id="onboarding-confirmEmail" name="confirmEmail" placeholder="Confirm your email" required>
-                        </div>
-
-                        <div class="form-actions">
-                            <button type="button" class="btn-secondary onboarding-back">�� Back</button>
-                            <button type="submit" class="btn-primary onboarding-next">Next ��</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- STEP 7: More details -->
-            <div class="onboarding-step" data-step="7">
-                <div class="step-content conversation-style">
-                    <div class="step-opening">
-                        <h2>A few more things</h2>
-                        <p class="step-subtitle">So we can create your safe space and find the right fit for you.</p>
-                    </div>
-
-                    <form id="step-7-form" class="onboarding-form">
-                        <div class="form-group">
-                            <label for="onboarding-phone">Your phone number *</label>
-                            <input type="tel" id="onboarding-phone" name="phone" placeholder="(555) 123-4567" required>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="onboarding-zipcode">Zip code *</label>
-                                <input type="text" id="onboarding-zipcode" name="zipcode" placeholder="12345" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="onboarding-dob">Birthday *</label>
-                                <input type="date" id="onboarding-dob" name="dob" required>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="onboarding-sex">How do you identify? *</label>
-                            <select id="onboarding-sex" name="sex" required>
-                                <option value="">-- Choose --</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                                <option value="Non-binary">Non-binary</option>
-                                <option value="Prefer not to say">Prefer not to say</option>
-                            </select>
-                        </div>
-
-                        <div class="form-actions">
-                            <button type="button" class="btn-secondary onboarding-back">�� Back</button>
-                            <button type="submit" class="btn-primary onboarding-next">Create account ��</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- STEP 8: Create password -->
-            <div class="onboarding-step" data-step="8">
-                <div class="step-content conversation-style">
-                    <div class="step-opening">
-                        <h2>Your password</h2>
-                        <p class="step-subtitle">Keep your space secure. Make it something strong and memorable.</p>
-                    </div>
-
-                    <form id="step-8-form" class="onboarding-form">
-                        <div class="form-group">
-                            <label for="onboarding-password">Create a password *</label>
-                            <input type="password" id="onboarding-password" name="password" placeholder="At least 6 characters" required>
-                            <small class="form-helper">Minimum 6 characters required</small>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="onboarding-confirmPassword">Confirm it *</label>
-                            <input type="password" id="onboarding-confirmPassword" name="confirmPassword" placeholder="Confirm password" required>
-                        </div>
-
-                        <div class="form-actions">
-                            <button type="button" class="btn-secondary onboarding-back">�� Back</button>
-                            <button type="submit" class="btn-primary onboarding-next">Let's go ��</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- STEP 9: Terms & Conditions -->
-            <div class="onboarding-step" data-step="9">
-                <div class="step-content conversation-style">
-                    <div class="step-opening">
-                        <h2>Before we connect you</h2>
-                        <p class="step-subtitle">Here are a few important things to know about our community and how we work.</p>
-                    </div>
-
-                    <div class="verification-container">
-                        <div class="terms-section">
-                            <h3>What you should know</h3>
-
-                            <div class="terms-scroll" id="terms-scroll-container">
-                                <div class="terms-content">
-                                    <h4>Our commitment to you</h4>
-                                    
-                                    <h5>We're not doctors</h5>
-                                    <p>The practitioners in our community are talented holistic healers, but they're not medical doctors (unless their profile says so). Their work is valuable AND it's not a replacement for medical care.</p>
-                                    
-                                    <h5>Your healing journey is yours</h5>
-                                    <p>You are the expert of your own body. Practitioners make suggestions; you decide what feels right. Please always consult with an MD before making significant health changes.</p>
-                                    
-                                    <h5>We're here to connect you</h5>
-                                    <p>We work hard to vet every practitioner, but Rooted Vitality isn't responsible for their outcomes or practices. You're choosing who to work with, giving you full agency.</p>
-                                    
-                                    <h5>Everyone's healing path is unique</h5>
-                                    <p>Results vary. What works for one person may not work the same for another. We encourage you to approach your wellness journey with openness and intentionality.</p>
-                                    
-                                    <h5>Your privacy and safety matter</h5>
-                                    <p>Your information is HIPAA-protected and stays private. We don't sell your data. Period.</p>
-                                </div>
-                            </div>
-
-                            <label class="terms-checkbox">
-                                <input type="checkbox" id="terms-agreement" name="terms">
-                                <span>I understand and I'm ready to begin.</span>
-                            </label>
-                        </div>
-
-                        <div class="form-actions">
-                            <button type="button" class="btn-secondary onboarding-back">�� Back</button>
-                            <button type="button" class="btn-primary onboarding-next" id="step-9-next">Create account & continue ��</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- STEP 10: Your matches -->
-            <div class="onboarding-step" data-step="10">
-                <div class="step-content">
-                    <div class="step-opening">
-                        <h2>Meet practitioners matched for you</h2>
-                        <p class="step-subtitle">We've found some excellent matches based on what you're looking for. Take your time exploring and trust your instincts.</p>
-                    </div>
-
-                    <div id="matches-container" class="matches-container">
-                        <p class="loading">Finding the right matches for you...</p>
-                    </div>
-
-                    <div class="matches-actions">
-                        <p class="action-help">Feel drawn to someone? Click "connect" to reach out. Want to explore more first? You can always come back later.</p>
-                        
-                        <div class="form-actions">
-                            <button type="button" class="btn-secondary onboarding-action" id="save-for-later-btn">
-                                I'll choose later
-                            </button>
-                            <button type="button" class="btn-primary onboarding-action" id="continue-browsing-btn">
-                                Show me more
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-
-    // Add modal to DOM
-    if (document.getElementById('guided-onboarding-modal')) {
-        document.getElementById('guided-onboarding-modal').remove();
-    }
-    document.body.appendChild(modal);
-
-    // Initialize styles
-    injectOnboardingStyles();
-
-    // Setup event listeners
-    setupOnboardingListeners();
-}
-
-/**
- * Inject onboarding styles
- */
-function injectOnboardingStyles() {
-    if (document.getElementById('guided-onboarding-styles')) {
-        return; // Already injected
-    }
-
-    const styles = document.createElement('style');
-    styles.id = 'guided-onboarding-styles';
-    styles.textContent = `
-        /* Onboarding Modal Styles */
-        #guided-onboarding-modal,
-        #returning-member-modal,
-        #returning-celebration {
-            position: fixed;
-            top: 0 !important;
-            left: 0 !important;
-            right: 0 !important;
-            bottom: 0 !important;
-            z-index: 9999;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            inset: 0;
-        }
-
-        .onboarding-overlay {
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            right: 0 !important;
-            bottom: 0 !important;
-            background: rgba(0, 0, 0, 0.55);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-        }
-
-        .onboarding-modal {
-            position: relative;
-            background: #fbf7ec;
-            border-radius: 24px;
-            width: 90%;
-            max-width: 720px;
-            max-height: 90vh;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 40px 60px rgba(0, 0, 0, 0.2), 0 0 40px rgba(119, 136, 62, 0.1);
-            overflow: hidden;
-            animation: slideIn 0.5s cubic-bezier(0.23, 1, 0.320, 1);
-            z-index: 10000;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(40px) scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        @keyframes slideOut {
-            from {
-                opacity: 1;
-                transform: translateY(0);
-            }
-            to {
-                opacity: 0;
-                transform: translateY(40px);
-            }
-        }
-
-        /* Step opening styling - more warmth */
-        .step-opening {
-            text-align: center;
-            margin-bottom: 2rem;
-            padding: 1rem 0;
-        }
-
-        .step-content h2 {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #2c3e50;
-            margin: 0 0 0.75rem;
-            line-height: 1.2;
-        }
-
-        /* Path choice buttons */
-        .step-path-choice {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            margin: 2rem 0;
-        }
-
-        .path-btn {
-            padding: 1.5rem;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            background: #fbf7ec;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: left;
-        }
-
-        .path-btn:hover {
-            border-color: #77883e;
-            background: #f9fbfa;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(119, 136, 62, 0.1);
-        }
-
-        .path-title {
-            display: block;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 0.5rem;
-        }
-
-        .path-desc {
-            display: block;
-            font-size: 0.95rem;
-            color: #888;
-        }
-
-        /* Detected match display */
-        .detected-match-display {
-            background: linear-gradient(135deg, rgba(119, 136, 62, 0.05) 0%, rgba(196, 165, 123, 0.05) 100%);
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            padding: 2rem;
-            margin: 2rem 0;
-        }
-
-        .match-info {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .match-category,
-        .match-subcategory {
-            margin: 0;
-            font-size: 1.1rem;
-            color: #2c3e50;
-        }
-
-        .match-category strong,
-        .match-subcategory strong {
-            color: #77883e;
-            font-weight: 600;
-        }
-
-        /* Confirmation actions */
-        .confirmation-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            margin: 1.5rem 0;
-        }
-
-        .confirmation-actions button {
-            padding: 0.875rem 1.5rem;
-            border-radius: 8px;
-            border: none;
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .confirmation-actions .btn-primary {
-            background: linear-gradient(135deg, #77883e 0%, #5e6e30 100%);
-            color: #fbf7ec;
-        }
-
-        .confirmation-actions .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(119, 136, 62, 0.3);
-        }
-
-        .confirmation-actions .btn-secondary {
-            background: #fbf7ec;
-            border: 2px solid #e0e0e0;
-            color: #2c3e50;
-        }
-
-        .confirmation-actions .btn-secondary:hover {
-            border-color: #77883e;
-            color: #77883e;
-        }
-
-        /* Subdued labels - less "SaaS" */
-        .form-group label {
-            font-weight: 400 !important;
-            color: #5c5c5c;
-            font-size: 1.05rem;
-            letter-spacing: -0.3px;
-        }
-
-        /* Softer form hints */
-        .form-hint {
-            font-size: 0.9rem !important;
-            color: #a8a8a8;
-            font-style: italic;
-            margin-top: 0.75rem;
-        }
-
-        .section-description {
-            color: #a8a8a8;
-            font-size: 1rem;
-            margin: 0 0 1rem;
-        }
-
-        /* Terms section styling */
-        .terms-section {
-            background: linear-gradient(135deg, rgba(119, 136, 62, 0.03) 0%, rgba(196, 165, 123, 0.03) 100%);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-        }
-
-        .terms-section h3 {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #2c3e50;
-            margin: 0 0 0.5rem;
-        }
-
-        /* Softer terms container */
-        .terms-container {
-            margin-top: 1rem;
-        }
-
-        .terms-scroll {
-            border: 1px solid #fbf7ec !important;
-            background: #fafbfa;
-            font-size: 0.95rem !important;
-            line-height: 1.7;
-        }
-
-        .terms-content h4 {
-            color: #77883e !important;
-            font-size: 1.1rem;
-            margin: 0 0 1rem;
-            font-weight: 600;
-        }
-
-        .terms-content h5 {
-            color: #2c3e50 !important;
-            font-weight: 600;
-            font-size: 1rem;
-            margin: 1.5rem 0 0.75rem;
-        }
-
-        .terms-content p {
-            color: #666;
-            margin: 0.75rem 0;
-        }
-
-        .terms-content ul {
-            color: #666;
-        }
-
-        .terms-checkbox {
-            margin-top: 1.5rem;
-            padding: 1rem;
-            background: #fbf7ec;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            user-select: none;
-        }
-
-        .terms-checkbox:hover {
-            border-color: #77883e;
-        }
-
-        .terms-checkbox span {
-            color: #2c3e50;
-            font-weight: 400;
-        }
-
-        /* Match cards - make them feel personal */
-        .match-card {
-            border: 2px solid #fbf7ec !important;
-            background: linear-gradient(135deg, #fafbfa 0%, #fbf7ec 100%);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .match-card:hover {
-            border-color: #77883e !important;
-            transform: translateY(-2px);
-            box-shadow: 0 12px 24px rgba(119, 136, 62, 0.15) !important;
-        }
-
-        .match-avatar {
-            background: linear-gradient(135deg, #77883e 0%, #5e6e30 100%) !important;
-        }
-
-        .match-specialty {
-            color: #77883e;
-            font-weight: 500;
-        }
-
-        .match-description {
-            color: #5c5c5c;
-            line-height: 1.6;
-        }
-
-        /* Buttons - softer, warmer */
-        .btn-primary {
-            background: linear-gradient(135deg, #77883e 0%, #5e6e30 100%) !important;
-            color: #fbf7ec !important;
-            letter-spacing: -0.3px;
-            font-weight: 500;
-            box-shadow: 0 6px 20px rgba(119, 136, 62, 0.25) !important;
-            border: none;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-1px) !important;
-            box-shadow: 0 8px 28px rgba(119, 136, 62, 0.35) !important;
-        }
-
-        .btn-secondary {
-            background: #fbf7ec !important;
-            border: 2px solid #fbf7ec !important;
-            color: #5c5c5c;
-            letter-spacing: -0.3px;
-            font-weight: 500;
-        }
-
-        .btn-secondary:hover {
-            border-color: #77883e !important;
-            color: #77883e;
-            background: #fafbfa !important;
-        }
-
-        /* Action help text */
-        .action-help {
-            color: #888;
-            font-style: italic;
-            font-size: 0.95rem;
-            margin-top: 1.5rem;
-            text-align: center;
-        }
-
-        .login-help {
-            color: #888;
-            font-size: 0.9rem;
-            text-align: center;
-            margin-top: 1.5rem;
-        }
-
-        .login-switch-link {
-            color: #77883e;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.2s;
-        }
-
-        .login-switch-link:hover {
-            color: #5e6e30;
-        }
-
-        .onboarding-close-btn {
-            position: absolute;
-            top: 1.5rem;
-            right: 1.5rem;
-            background: transparent;
-            border: none;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 1000;
-            color: #77883e;
-            transition: color 0.2s, transform 0.2s;
-            padding: 0;
-        }
-
-        .onboarding-close-btn:hover {
-            color: #5e6e30;
-            transform: scale(1.1);
-        }
-
-        .onboarding-close-btn:active {
-            transform: scale(0.95);
-        }
-
-        .onboarding-close-btn svg {
-            width: 24px;
-            height: 24px;
-            stroke-width: 3;
-        }
-
-        /* Progress Indicator */
-        .onboarding-progress {
-            padding: 2rem 2rem 1rem;
-            border-bottom: 1px solid #fbf7ec;
-        }
-
-        .progress-steps {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-        }
-
-        .progress-step {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.5rem;
-            color: #fbf7ec;
-            transition: color 0.3s;
-        }
-
-        .progress-step.active,
-        .progress-step.completed {
-            color: #77883e;
-        }
-
-        .step-number {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: #fbf7ec;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.3s;
-        }
-
-        .progress-step.active .step-number {
-            background: #77883e;
-            color: #fbf7ec;
-        }
-
-        .progress-step.completed .step-number {
-            background: #77883e;
-            color: #fbf7ec;
-        }
-
-        .step-label {
-            font-size: 0.75rem;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .progress-bar {
-            height: 4px;
-            background: #fbf7ec;
-            border-radius: 2px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: #77883e;
-            width: 25%;
-            transition: width 0.4s ease;
-        }
-
-        /* Step Content */
-        .onboarding-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 2rem;
-        }
-
-        .onboarding-step {
-            display: none;
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        .onboarding-step.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        .step-content {
-            padding: 2rem;
-            overflow-y: auto;
-            max-height: calc(90vh - 180px);
-        }
-
-        .step-content h2 {
-            font-size: 1.8rem;
-            color: #2c3e50;
-            margin: 0 0 0.5rem;
-            font-weight: 600;
-        }
-
-        .step-subtitle {
-            font-size: 1rem;
-            color: #999;
-            margin: 0 0 2rem;
-            line-height: 1.5;
-        }
-
-        /* Form Styles */
-        .onboarding-form {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        @media (max-width: 600px) {
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .form-group label {
-            font-weight: 500;
-            color: #2c3e50;
-            font-size: 0.95rem;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            padding: 0.75rem;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-family: inherit;
-            transition: border-color 0.2s;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #77883e;
-            box-shadow: 0 0 0 3px rgba(119, 136, 62, 0.1);
-        }
-
-        .form-hint {
-            font-size: 0.85rem;
-            color: #999;
-            margin-top: 0.5rem;
-        }
-
-        /* Button Styles */
-        .btn-primary,
-        .btn-secondary {
-            padding: 0.875rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #77883e 0%, #5e6e30 100%);
-            color: #fbf7ec;
-            box-shadow: 0 4px 12px rgba(119, 136, 62, 0.3);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(119, 136, 62, 0.4);
-        }
-
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-
-        .btn-secondary {
-            background: #fbf7ec;
-            border: 2px solid #e0e0e0;
-            color: #2c3e50;
-        }
-
-        .btn-secondary:hover {
-            background: #fbf7ec;
-            border-color: #77883e;
-            color: #77883e;
-        }
-
-        .form-actions {
-            display: flex;
-            gap: 1rem;
-            margin-top: 2rem;
-            justify-content: space-between;
-        }
-
-        .form-actions .btn-primary,
-        .form-actions .btn-secondary {
-            flex: 1;
-        }
-
-        /* Verification Container */
-        .verification-container {
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-
-        .verification-card {
-            background: #fbf7ec;
-            padding: 1.5rem;
-            border-radius: 12px;
-            border-left: 4px solid #77883e;
-        }
-
-        .verification-card h3 {
-            margin: 0 0 0.75rem;
-            color: #2c3e50;
-            font-size: 1.1rem;
-        }
-
-        .verification-card p {
-            margin: 0.5rem 0;
-            color: #666;
-            font-size: 0.95rem;
-        }
-
-        .verification-status {
-            font-weight: 500;
-            color: #77883e;
-            margin-top: 1rem !important;
-        }
-
-        .verification-resend {
-            margin-top: 1rem;
-        }
-
-        /* Terms Container */
-        .terms-container {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .terms-scroll {
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            height: 250px;
-            overflow-y: scroll;
-            padding: 1.5rem;
-            background: #fbf7ec;
-            font-size: 0.9rem;
-            line-height: 1.6;
-            color: #666;
-        }
-
-        .terms-content h4 {
-            margin: 0 0 1rem;
-            color: #2c3e50;
-            font-size: 1rem;
-        }
-
-        .terms-content h5 {
-            margin: 1.5rem 0 0.75rem;
-            color: #2c3e50;
-            font-size: 0.95rem;
-        }
-
-        .terms-content p {
-            margin: 0.75rem 0;
-        }
-
-        .terms-content ul {
-            margin: 0.75rem 0;
-            padding-left: 1.5rem;
-        }
-
-        .terms-checkbox {
-            display: flex;
-            align-items: flex-start;
-            gap: 0.75rem;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .terms-checkbox input {
-            width: 20px;
-            height: 20px;
-            margin-top: 2px;
-            cursor: pointer;
-        }
-
-        .terms-checkbox span {
-            color: #666;
-            font-size: 0.95rem;
-            line-height: 1.4;
-        }
-
-        /* Matches Container */
-        .matches-container {
-            display: grid;
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-
-        .match-card {
-            background: #fbf7ec;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            padding: 1.5rem;
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-
-        .match-card:hover {
-            border-color: #77883e;
-            box-shadow: 0 8px 16px rgba(119, 136, 62, 0.15);
-        }
-
-        .match-header {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
-            align-items: flex-start;
-        }
-
-        .match-info {
-            flex: 1;
-        }
-
-        .match-score {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #77883e;
-            background: rgba(119, 136, 62, 0.08);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            #fbf7ec-space: nowrap;
-            text-align: right;
-            min-width: 80px;
-        }
-
-        .match-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #77883e 0%, #5e6e30 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fbf7ec;
-            font-weight: 600;
-            font-size: 1.5rem;
-            flex-shrink: 0;
-        }
-
-        .match-info h3 {
-            margin: 0 0 0.25rem;
-            color: #2c3e50;
-            font-size: 1.1rem;
-        }
-
-        .match-specialty {
-            color: #77883e;
-            font-weight: 500;
-            font-size: 0.9rem;
-            margin: 0;
-        }
-
-        .match-description {
-            color: #666;
-            font-size: 0.95rem;
-            line-height: 1.5;
-            margin: 1rem 0;
-        }
-
-        .match-actions {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .match-actions button {
-            flex: 1;
-            padding: 0.75rem;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .match-actions .btn-primary {
-            background: linear-gradient(135deg, #77883e 0%, #5e6e30 100%);
-            color: #fbf7ec;
-        }
-
-        .match-actions .btn-secondary {
-            background: #fbf7ec;
-            border: 2px solid #e0e0e0;
-            color: #2c3e50;
-        }
-
-        .matches-actions {
-            margin-top: 2rem;
-            padding-top: 2rem;
-            border-top: 1px solid #fbf7ec;
-        }
-
-        .action-help {
-            color: #999;
-            font-size: 0.95rem;
-            margin-bottom: 1.5rem;
-            text-align: center;
-        }
-
-        .onboarding-action {
-            width: 100%;
-        }
-
-        .matches-actions .form-actions {
-            margin: 0;
-        }
-
-        .matches-actions .btn-primary,
-        .matches-actions .btn-secondary {
-            flex: 1;
-        }
-
-        /* Loading State */
-        .loading {
-            text-align: center;
-            color: #999;
-            padding: 2rem;
-            font-style: italic;
-        }
-
-        /* Conversation Style - Single question focus */
-        .conversation-style {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            min-height: 400px;
-        }
-
-        .conversation-style .step-opening {
-            margin-bottom: 2.5rem;
-            animation: slideDown 0.4s ease-out;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-
-
-        .conversation-style h2 {
-            font-size: 1.9rem;
-            font-weight: 700;
-            line-height: 1.1;
-            color: #2c3e50;
-        }
-
-        .conversation-style .step-subtitle {
-            font-size: 1.05rem;
-            color: #888;
-            font-weight: 400;
-            line-height: 1.5;
-            margin-top: 0.75rem;
-        }
-
-        .conversation-style .onboarding-form {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .conversation-style .form-group {
-            margin: 1rem 0;
-        }
-
-        .conversation-style .form-group label {
-            font-size: 1.05rem;
-            font-weight: 400;
-            color: #5c5c5c;
-            margin-bottom: 0.75rem;
-        }
-
-        .conversation-style input,
-        .conversation-style select,
-        .conversation-style textarea {
-            font-size: 1rem;
-            padding: 0.875rem;
-            border-radius: 8px;
-        }
-
-        .conversation-style textarea {
-            resize: vertical;
-            min-height: 120px;
-            font-family: inherit;
-        }
-
-        .conversation-style .form-hint {
-            font-size: 0.9rem;
-            color: #a8a8a8;
-            margin-top: 0.5rem;
-        }
-
-        .conversation-style .form-actions {
-            margin-top: 2rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid #fbf7ec;
-            gap: 1rem;
-        }
-
-        @media (max-width: 600px) {
-            .onboarding-modal {
-                width: 95%;
-                max-height: 95vh;
-                border-radius: 16px;
-            }
-
-            .step-content {
-                padding: 1.5rem;
-                max-height: calc(95vh - 180px);
-            }
-
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-
-            .form-actions {
-                flex-direction: column;
-            }
-
-            .form-actions .btn-primary,
-            .form-actions .btn-secondary {
-                width: 100%;
-            }
-
-            .conversation-style h2 {
-                font-size: 1.6rem;
-            }
-
-            /* Login form styling */
-            #step-login-form {
-                display: flex;
-                flex-direction: column;
-                gap: 1.5rem;
-            }
-
-            #step-login-form .form-group {
-                display: flex;
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-
-            #step-login-form label {
-                font-weight: 500;
-                color: #2c3e50;
-                font-size: 0.95rem;
-            }
-
-            #step-login-form input[type="email"],
-            #step-login-form input[type="password"] {
-                padding: 0.85rem;
-                border: 1px solid #e0e0e0;
-                border-radius: 8px;
-                font-size: 1rem;
-                font-family: inherit;
-                transition: all 0.2s;
-            }
-
-            #step-login-form input[type="email"]:focus,
-            #step-login-form input[type="password"]:focus {
-                outline: none;
-                border-color: #77883e;
-                box-shadow: 0 0 0 3px rgba(119, 136, 62, 0.1);
-            }
-
-            .login-help {
-                text-align: center;
-                color: #999;
-                font-size: 0.9rem;
-                margin: 0.5rem 0 0;
-            }
-
-            .login-switch-link {
-                color: #77883e;
-                text-decoration: none;
-                font-weight: 500;
-                cursor: pointer;
-                transition: color 0.2s;
-            }
-
-            .login-switch-link:hover {
-                color: #4a7d5c;
-                text-decoration: underline;
-            }
-        }
-    `;
-
-    document.head.appendChild(styles);
-}
-
-/**
- * Setup onboarding event listeners
- */
-function setupOnboardingListeners() {
-    const modal = document.getElementById('guided-onboarding-modal');
-    const onboardingData = { path: null };
-
-    // Close button
-    modal.querySelector('.onboarding-close-btn').addEventListener('click', () => {
-        closeOnboardingModal();
-    });
-
-    // Overlay click to close
-    modal.querySelector('.onboarding-overlay').addEventListener('click', () => {
-        closeOnboardingModal();
-    });
-
-    // LOGIN STEP (Step 0): Handle returning user login
-    const loginForm = document.getElementById('step-login-form');
-    if (loginForm) {
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const email = document.getElementById('step-login-email').value.trim();
-            const password = document.getElementById('step-login-password').value;
-
-            if (!email || !password) {
-                window.showAlertModal('Please fill in all fields');
-                return;
-            }
-
-            try {
-                const submitBtn = loginForm.querySelector('button[type="submit"]');
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Signing in...';
-
-                const { data: authData, error: authError } = await window.supabaseClient.auth.signInWithPassword({
-                    email: email,
-                    password: password
-                });
-
-                if (authError) {
-                    throw authError;
-                }
-
-                console.log('[Onboarding] User signed in:', authData.user.email);
-
-                // After successful login, show the returning member flow
-                closeOnboardingModal();
-                await initializeReturningMemberFlow();
-
-            } catch (error) {
-                console.error('[Onboarding] Login error:', error);
-                window.showAlertModal('Login failed: ' + error.message);
-                const submitBtn = loginForm.querySelector('button[type="submit"]');
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Sign in ��';
-            }
-        });
-
-        // Switch to signup link
-        const switchLink = loginForm.querySelector('.login-switch-link');
-        if (switchLink) {
-            switchLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                goToStep('1');
-            });
-        }
-    }
-
-    // STEP 1: Path choice - "I know what I need" vs "I'm not sure what I need"
-    document.getElementById('path-direct').addEventListener('click', () => {
-        onboardingData.path = 'direct';
-        goToStep('2a');
-    });
-
-    document.getElementById('path-guided').addEventListener('click', () => {
-        onboardingData.path = 'guided';
-        goToStep('2b');
-    });
-
-    // STEP 2A: Direct path - Choose category & subcategory
-    const categorySelectDirect = document.getElementById('onboarding-category-direct');
-    if (categorySelectDirect) {
-        categorySelectDirect.addEventListener('change', (e) => {
-            const categoryId = e.target.value;
-            const subcategorySelect = document.getElementById('onboarding-subcategory-direct');
-            subcategorySelect.innerHTML = '<option value="">Choose a specialty...</option>';
-            
-            if (categoryId) {
-                const category = WELLNESS_CATEGORIES.find(c => c.id === categoryId);
-                if (category && category.subcategories) {
-                    category.subcategories.forEach(sub => {
-                        const option = document.createElement('option');
-                        option.value = sub.id;
-                        option.textContent = sub.name;
-                        subcategorySelect.appendChild(option);
-                    });
-                }
-            }
-        });
-    }
-
-    document.getElementById('step-2a-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const category = document.getElementById('onboarding-category-direct').value;
-        const subcategory = document.getElementById('onboarding-subcategory-direct').value;
-        
-        if (!category) {
-            window.showAlertModal('Please select a category');
-            return;
-        }
-
-        onboardingData.category = category;
-        onboardingData.subcategory = subcategory || null;
-        goToStep(5); // Skip to name (direct path skips guided confirmation)
-    });
-
-    // STEP 2B: Guided path - Ask for symptoms
-    document.getElementById('step-2b-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const symptoms = document.getElementById('onboarding-symptoms').value.trim();
-        if (!symptoms) {
-            window.showAlertModal('Please tell us what\'s happening');
-            return;
-        }
-        
-        onboardingData.symptoms = symptoms;
-        
-        // Auto-detect category and subcategory
-        const detected = detectCategoryAndSubcategory(symptoms);
-        onboardingData.category = detected.categoryId;
-        onboardingData.subcategory = detected.subcategoryId;
-        onboardingData.detectedCategoryName = detected.categoryName;
-        onboardingData.detectedSubcategoryName = detected.subcategoryName;
-        
-        // Show confirmation
-        document.getElementById('detected-category').textContent = detected.categoryName;
-        document.getElementById('detected-subcategory').textContent = detected.subcategoryName || '(Not specified)';
-        goToStep(3);
-    });
-
-    // STEP 3: Confirmation of auto-detected category (guided path only)
-    document.getElementById('confirm-match-btn').addEventListener('click', () => {
-        goToStep(5); // Proceed to name
-    });
-
-    document.getElementById('change-match-btn').addEventListener('click', () => {
-        onboardingData.path = 'direct';
-        goToStep('2a'); // Go back to direct choice
-    });
-
-    // STEP 5: First name
-    document.getElementById('step-5-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const firstName = document.getElementById('onboarding-firstName').value.trim();
-        const lastName = document.getElementById('onboarding-lastName').value.trim();
-        if (!firstName || !lastName) {
-            window.showAlertModal('Please enter your first and last name');
-            return;
-        }
-        onboardingData.firstName = firstName;
-        onboardingData.lastName = lastName;
-        goToStep(6);
-    });
-
-    // STEP 6: Email
-    document.getElementById('step-6-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const email = document.getElementById('onboarding-email').value.trim();
-        const confirmEmail = document.getElementById('onboarding-confirmEmail').value.trim();
-        if (!email || !confirmEmail) {
-            window.showAlertModal('Please enter your email');
-            return;
-        }
-        if (email !== confirmEmail) {
-            window.showAlertModal('Email addresses do not match');
-            return;
-        }
-        onboardingData.email = email;
-        goToStep(7);
-    });
-
-    // STEP 7: Additional details (phone, zipcode, birthday, identity)
-    document.getElementById('step-7-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const phone = document.getElementById('onboarding-phone').value.trim();
-        const zipcode = document.getElementById('onboarding-zipcode').value.trim();
-        const dob = document.getElementById('onboarding-dob').value;
-        const sex = document.getElementById('onboarding-sex').value;
-        
-        if (!phone || !zipcode || !dob || !sex) {
-            window.showAlertModal('Please fill in all fields');
-            return;
-        }
-
-        // Check age
-        const dobDate = new Date(dob);
-        const today = new Date();
-        let age = today.getFullYear() - dobDate.getFullYear();
-        const monthDiff = today.getMonth() - dobDate.getMonth();
-        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dobDate.getDate())) {
-            age--;
-        }
-
-        if (age < 18) {
-            window.showAlertModal('You must be at least 18 years old');
-            return;
-        }
-
-        onboardingData.phone = phone;
-        onboardingData.zipcode = zipcode;
-        onboardingData.dob = dob;
-        onboardingData.sex = sex;
-        goToStep(8);
-    });
-
-    // STEP 8: Password
-    document.getElementById('step-8-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const password = document.getElementById('onboarding-password').value;
-        const confirmPassword = document.getElementById('onboarding-confirmPassword').value;
-        
-        if (!password || !confirmPassword) {
-            window.showAlertModal('Please enter a password');
-            return;
-        }
-
-        if (password !== confirmPassword) {
-            window.showAlertModal('Passwords do not match');
-            return;
-        }
-
-        if (password.length < 6) {
-            window.showAlertModal('Password must be at least 6 characters');
-            return;
-        }
-
-        onboardingData.password = password;
-        goToStep(9);
-    });
-
-    // STEP 9: Terms agreement and account creation
-    const termsCheckbox = document.getElementById('terms-agreement');
-    const step9NextBtn = document.getElementById('step-9-next');
-
-    if (termsCheckbox) {
-        termsCheckbox.addEventListener('change', () => {
-            if (step9NextBtn) step9NextBtn.disabled = !termsCheckbox.checked;
-        });
-        if (step9NextBtn) step9NextBtn.disabled = true;
-    }
-
-    if (step9NextBtn) {
-        step9NextBtn.addEventListener('click', async () => {
-            if (!termsCheckbox.checked) {
-                window.showAlertModal('Please review and agree to continue');
-                return;
-            }
-
-            try {
-                step9NextBtn.disabled = true;
-                step9NextBtn.textContent = 'Creating your account...';
-
-                // Sign up user
-                const { data: authData, error: authError } = await window.supabaseClient.auth.signUp({
-                    email: onboardingData.email,
-                    password: onboardingData.password,
-                    options: {
-                        emailRedirectTo: `${window.location.origin}/rooted-vitality/index.html`
-                    }
-                });
-
-                if (authError) {
-                    console.error('[Onboarding] Auth signup error details:', authError);
-                    console.error('[Onboarding] Auth error message:', authError.message);
-                    console.error('[Onboarding] Auth error status:', authError.status);
-                    console.error('[Onboarding] Auth error code:', authError.code);
-                    
-                    let friendlyMessage = 'Signup failed. Please try again.';
-                    if (authError.message.includes('already registered')) {
-                        friendlyMessage = 'This email is already registered. Please log in instead.';
-                    } else if (authError.message.includes('invalid email')) {
-                        friendlyMessage = 'Please enter a valid email address.';
-                    } else if (authError.message.includes('password')) {
-                        friendlyMessage = 'Password is too weak. Use at least 6 characters.';
-                    } else {
-                        friendlyMessage = authError.message;
-                    }
-                    throw new Error(friendlyMessage);
-                }
-
-                console.log('[Onboarding] User signed up:', authData.user.email);
-
-                // Create client profile with only valid fields
-                const { error: clientError } = await window.supabaseClient
-                    .from('clients')
-                    .insert({
-                        id: authData.user.id,
-                        email: onboardingData.email,
-                        first_name: onboardingData.firstName,
-                        last_name: onboardingData.lastName,
-                        phone: onboardingData.phone,
-                        zipcode: onboardingData.zipcode,
-                        sex: onboardingData.sex,
-                        age: onboardingData.age,
-                        account_status: 'active',
-                        open_to_contact: true,
-                        open_to_match: true,
-                        two_factor_enabled: false,
-                        membership_level: 'free',
-                        membership_started_at: new Date().toISOString(),
-                        created_at: new Date().toISOString(),
-                        updated_at: new Date().toISOString()
-                    });
-
-                if (clientError) {
-                    console.error('[Onboarding] Client profile error details:', clientError);
-                    console.error('[Onboarding] Error code:', clientError.code);
-                    console.error('[Onboarding] Error message:', clientError.message);
-                    console.error('[Onboarding] Error hint:', clientError.hint);
-                    console.error('[Onboarding] Full error object:', JSON.stringify(clientError, null, 2));
-                    
-                    // Provide detailed error info even if we continue
-                    let errorMsg = 'Note: Profile creation had an issue: ' + clientError.message;
-                    console.warn('[Onboarding]', errorMsg);
-                }
-
-                onboardingData.userId = authData.user.id;
-
-                // Create the project
-                const { data: projectData, error: projectError } = await window.supabaseClient
-                    .from('projects')
-                    .insert({
-                        user_id: authData.user.id,
-                        category_id: onboardingData.category,
-                        subcategory_id: onboardingData.subcategory,
-                        description: onboardingData.symptoms || '',
-                        status: 'active',
-                        created_at: new Date().toISOString()
-                    })
-                    .select();
-
-                if (projectError) {
-                    throw projectError;
-                }
-
-                console.log('[Onboarding] Project created:', projectData[0].id);
-                onboardingData.projectId = projectData[0].id;
-
-                // Load and display matches for this project
-                await loadMatchesForOnboarding(onboardingData);
-                goToStep(10);
-
-                step9NextBtn.disabled = false;
-                step9NextBtn.textContent = 'Continue ��';
-
-            } catch (error) {
-                console.error('[Onboarding] Signup error:', error);
-                window.showAlertModal('Something went wrong. Please try again: ' + error.message);
-                step9NextBtn.disabled = false;
-                step9NextBtn.textContent = 'Create account & continue ��';
-            }
-        });
-    }
-
-    // STEP 10: Save for later
-    document.getElementById('save-for-later-btn').addEventListener('click', async () => {
-        try {
-            closeOnboardingModal();
-            window.showAlertModal('Welcome to Rooted Vitality\n\nYour project has been created. You can explore practitioners anytime from your dashboard.');
-            setTimeout(() => {
-                window.location.href = '/rooted-vitality/dashboard/client/pages/dashboard.html';
-            }, 500);
-        } catch (error) {
-            console.error('[Onboarding] Error:', error);
-            window.showAlertModal('Something went wrong. Please try again: ' + error.message);
-        }
-    });
-
-    // STEP 10: View all practitioners
-    document.getElementById('continue-browsing-btn').addEventListener('click', () => {
-        closeOnboardingModal();
-        const projectId = onboardingData.projectId;
-        window.location.href = `/rooted-vitality/dashboard/client/pages/find-practitioners.html?project=${projectId}`;
-    });
-
-    // Back buttons for all steps
-    modal.querySelectorAll('.onboarding-back').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const currentStep = modal.querySelector('.onboarding-step.active').dataset.step;
-            
-            // Handle back navigation for different paths
-            if (currentStep === '1') {
-                // Back from path choice goes to login if it exists
-                const loginStep = modal.querySelector('[data-step="0"]');
-                if (loginStep) {
-                    goToStep(0);
-                } else {
-                    closeOnboardingModal();
-                }
-            } else if (currentStep === '2a' || currentStep === '2b') {
-                goToStep(1);
-            } else if (currentStep === '3') {
-                goToStep('2b'); // Back from confirmation goes to symptoms
-            } else if (currentStep === '5') {
-                if (onboardingData.path === 'direct') {
-                    goToStep('2a');
-                } else {
-                    goToStep(3); // Guided path goes back to confirmation
-                }
-            } else {
-                // Standard back navigation
-                const stepNum = parseInt(currentStep);
-                if (stepNum > 1) {
-                    goToStep(stepNum - 1);
-                }
-            }
-        });
-    });
-
-    // Helper function to navigate steps
-    function goToStep(stepNumber) {
-        // Update active step
-        modal.querySelectorAll('.onboarding-step').forEach(step => {
-            step.classList.remove('active');
-        });
-        
-        const selector = typeof stepNumber === 'string' 
-            ? `[data-step="${stepNumber}"]` 
-            : `[data-step="${stepNumber}"]`;
-        modal.querySelector(selector).classList.add('active');
-
-        // Update progress bar (11 total steps with login: 0, 1, 2a/2b, 3, 5-10)
-        let progressPercent;
-        if (stepNumber === '0' || stepNumber === 0) {
-            progressPercent = (1 / 11) * 100; // Login step
-        } else if (typeof stepNumber === 'string') {
-            progressPercent = (3 / 11) * 100; // Path choice steps are ~27%
-        } else {
-            // For numeric steps, add 1 to account for step 0
-            progressPercent = ((stepNumber + 1) / 11) * 100;
-        }
-        modal.querySelector('.progress-fill').style.width = progressPercent + '%';
-
-        // Scroll to top
-        const stepContent = modal.querySelector('.onboarding-step.active .step-content');
-        if (stepContent) {
-            stepContent.scrollTop = 0;
-        }
-    }
-}
-
-/**
- * Detect category and subcategory from symptoms text
- */
-function detectCategoryAndSubcategory(symptomsText) {
-    let highestScore = 0;
-    let detectedCategory = null;
-    let detectedSubcategory = null;
-    const symptomsLower = symptomsText.toLowerCase();
-
-    // Score each category
-    for (const category of WELLNESS_CATEGORIES) {
-        let categoryScore = 0;
-        let subcategoryScore = 0;
-        let bestSubcategory = null;
-
-        // Score keywords in category
-        if (category.keywords) {
-            for (const keyword of category.keywords) {
-                if (symptomsLower.includes(keyword.toLowerCase())) {
-                    categoryScore += 10;
-                }
-            }
-        }
-
-        // Score subcategories if they exist
-        if (category.subcategories) {
-            for (const subcategory of category.subcategories) {
-                let subScore = 0;
-                if (subcategory.keywords) {
-                    for (const keyword of subcategory.keywords) {
-                        if (symptomsLower.includes(keyword.toLowerCase())) {
-                            subScore += 15; // Subcategories weighted higher
-                        }
-                    }
-                }
-                if (subScore > subcategoryScore) {
-                    subcategoryScore = subScore;
-                    bestSubcategory = subcategory;
-                }
-            }
-        }
-
-        const totalScore = categoryScore + subcategoryScore;
-        if (totalScore > highestScore) {
-            highestScore = totalScore;
-            detectedCategory = category;
-            detectedSubcategory = bestSubcategory;
-        }
-    }
-
-    return {
-        categoryId: detectedCategory ? detectedCategory.id : null,
-        categoryName: detectedCategory ? detectedCategory.name : 'General Wellness',
-        subcategoryId: detectedSubcategory ? detectedSubcategory.id : null,
-        subcategoryName: detectedSubcategory ? detectedSubcategory.name : null
-    };
-}
-
-/**
- * Load matches for onboarding
+ * Load matches for new user
  */
 async function loadMatchesForOnboarding(onboardingData) {
-    try {
-        const container = document.getElementById('matches-container');
-        container.innerHTML = '<p class="loading">Finding your perfect matches...</p>';
+  try {
+    const container = document.getElementById('matches-container');
+    if (!container) return;
 
-        // Simulated top 3 matches (in production, query practitioners matching the category with score)
-        const matches = [
-            {
-                id: '1',
-                name: 'Dr. Sarah Chen',
-                specialty: 'Acupuncture & TCM',
-                description: 'Specializing in chronic pain management and energy balance with 12+ years of experience',
-                score: 95
-            },
-            {
-                id: '2',
-                name: 'Emma Wellness',
-                specialty: 'Holistic Nutrition',
-                description: 'Functional medicine nutritionist helping you align your diet with your wellness goals',
-                score: 88
-            },
-            {
-                id: '3',
-                name: 'Marcus Healing',
-                specialty: 'Energy & Reiki',
-                description: 'Certified reiki master helping clients find peace, clarity, and spiritual alignment',
-                score: 82
-            }
-        ];
-
-        container.innerHTML = matches.map((match, idx) => `
-            <div class="match-card">
-                <div class="match-header">
-                    <div class="match-avatar">${match.name.charAt(0)}</div>
-                    <div class="match-info">
-                        <h3>${match.name}</h3>
-                        <p class="match-specialty">${match.specialty}</p>
-                    </div>
-                    <div class="match-score">${match.score}% match</div>
-                </div>
-                <p class="match-description">${match.description}</p>
-                <div class="match-actions">
-                    <button class="btn-secondary match-view-profile" data-match-id="${match.id}">View Profile</button>
-                    <button class="btn-primary match-connect" data-match-id="${match.id}" data-match-name="${match.name}">
-                        Connect with ${match.name.split(' ')[0]}
-                    </button>
-                </div>
-            </div>
-        `).join('');
-
-        // Add event listeners to connect buttons
-        container.querySelectorAll('.match-connect').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                const matchId = btn.dataset.matchId;
-                const matchName = btn.dataset.matchName;
-                
-                try {
-                    btn.disabled = true;
-                    btn.textContent = 'Connecting...';
-
-                    // Create match record linking project to practitioner
-                    const { error: matchError } = await window.supabaseClient
-                        .from('matches')
-                        .insert({
-                            project_id: onboardingData.projectId,
-                            practitioner_id: matchId,
-                            status: 'pending',
-                            initiated_by: 'client',
-                            created_at: new Date().toISOString()
-                        });
-
-                    if (matchError) throw matchError;
-
-                    console.log('[Onboarding] Match created with practitioner:', matchId);
-
-                    // Redirect to my matches
-                    closeOnboardingModal();
-                    setTimeout(() => {
-                        window.location.href = '/rooted-vitality/dashboard/client/pages/my-matches.html';
-                    }, 300);
-                } catch (error) {
-                    console.error('[Onboarding] Error connecting:', error);
-                    window.showAlertModal('Error connecting. Please try again: ' + error.message);
-                    btn.disabled = false;
-                    btn.textContent = `Connect with ${matchName.split(' ')[0]}`;
-                }
-            });
-        });
-
-        // Add event listeners to view profile buttons
-        container.querySelectorAll('.match-view-profile').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                const matchId = btn.dataset.matchId;
-                // In production, this would open a profile modal or navigate to profile page
-                window.showAlertModal('Profile view coming soon!');
-            });
-        });
-
-    } catch (error) {
-        console.error('[Onboarding] Error loading matches:', error);
-        document.getElementById('matches-container').innerHTML = `
-            <p class="loading" style="color: #d32f2f;">Error loading matches. Please try again.</p>
-        `;
+    // Get current user for client serial
+    const currentUser = window.authManager?.getCurrentUser();
+    if (!currentUser) {
+      console.error('[Onboarding] Not authenticated');
+      container.innerHTML = '<p class="loading" style="color: #d32f2f;">Error: Not authenticated</p>';
+      return;
     }
+
+    // Get client serial
+    const { data: clientData, error: clientError } = await window.supabaseClient
+      .from('clients')
+      .select('serial_number, first_name')
+      .eq('id', currentUser.id)
+      .single();
+
+    if (clientError || !clientData) {
+      console.error('[Onboarding] Could not find client:', clientError);
+      container.innerHTML = '<p class="loading" style="color: #d32f2f;">Error loading client data</p>';
+      return;
+    }
+
+    // Call matching algorithm RPC with project ID
+    const { data: matchData, error: matchError } = await window.supabaseClient
+      .rpc('match_practitioners', { p_project_id: onboardingData.projectId });
+
+    if (matchError) {
+      console.error('[Onboarding] Matching error:', matchError);
+      container.innerHTML = '<p class="loading" style="color: #d32f2f;">Error loading matches</p>';
+      return;
+    }
+
+    console.log('[Onboarding] Raw matchData from RPC:', matchData);
+
+    // Get top 3 matches sorted by match_score (descending)
+    const topMatches = (matchData || [])
+      .sort((a, b) => (b.match_score || 0) - (a.match_score || 0))
+      .slice(0, 3);
+    
+    console.log('[Onboarding] Top matches after sort:', topMatches);
+
+    if (topMatches.length === 0) {
+      container.innerHTML = '<p class="loading">No matching practitioners found. You can browse all practitioners in the dashboard.</p>';
+      return;
+    }
+
+    // Fetch profile data for all matches (including logo and profile info)
+    const serialNumbers = topMatches.map(m => m.serial_number);
+    
+    const { data: practitionerData, error: practError } = await window.supabaseClient
+      .from('practitioners')
+      .select('id, serial_number, legal_business_name, dba_name')
+      .in('serial_number', serialNumbers);
+
+    if (practError) {
+      console.warn('[Onboarding] Error fetching practitioner data:', practError);
+    }
+
+    // Fetch practitioner profiles for logos
+    const { data: profileData, error: profileError } = await window.supabaseClient
+      .from('practitioner_profiles')
+      .select('practitioner_serial, practice_logo_url, modalities')
+      .in('practitioner_serial', serialNumbers);
+
+    if (profileError) {
+      console.warn('[Onboarding] Error fetching practitioner profiles:', profileError);
+      console.log('[Onboarding] Profile error details:', profileError.message);
+    }
+    
+    console.log('[Onboarding] Profile data fetched:', profileData);
+
+    // Fetch reviews for ratings
+    const { data: reviewsData, error: reviewError } = await window.supabaseClient
+      .from('reviews')
+      .select('practitioner_serial, rating')
+      .in('practitioner_serial', serialNumbers);
+
+    if (reviewError) {
+      console.warn('[Onboarding] Error fetching reviews:', reviewError);
+    }
+
+    // Create lookup maps
+    const practMap = {};
+    practitionerData?.forEach(p => {
+      practMap[p.serial_number] = p;
+    });
+
+    const profileMap = {};
+    profileData?.forEach(p => {
+      profileMap[p.practitioner_serial] = p;
+    });
+
+    const reviewMap = {};
+    reviewsData?.forEach(r => {
+      if (!reviewMap[r.practitioner_serial]) {
+        reviewMap[r.practitioner_serial] = { count: 0, totalRating: 0 };
+      }
+      reviewMap[r.practitioner_serial].count += 1;
+      reviewMap[r.practitioner_serial].totalRating += (r.rating || 0);
+    });
+
+    // Render matches with real data
+    container.innerHTML = topMatches.map(match => {
+      const practitioner = practMap[match.serial_number];
+      const profile = profileMap[match.serial_number];
+      // Use DBA name first, then legal name, then fallback
+      let displayName = practitioner?.dba_name || practitioner?.legal_business_name || 'Practitioner';
+      // Replace hyphens with spaces for display
+      displayName = displayName.replace(/-/g, ' ');
+      const logoUrl = profile?.practice_logo_url;
+      const specialty = (profile?.modalities || []).join(', ') || 'Wellness Services';
+      const reviews = reviewMap[match.serial_number];
+      const avgRating = reviews ? (reviews.totalRating / reviews.count).toFixed(1) : 0;
+      const reviewCount = reviews?.count || 0;
+      
+      console.log('[Onboarding] Rendering match card:', {
+        serial_number: match.serial_number,
+        match_score: match.match_score,
+        displayName: displayName,
+        logoUrl: logoUrl,
+        specialty: specialty
+      });
+      
+      // Create avatar: use logo if available, otherwise use initials
+      const avatarHtml = logoUrl 
+        ? `<img src="${logoUrl}" alt="${displayName}" class="match-avatar-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">`
+        : '';
+      const initialsHtml = logoUrl 
+        ? `<div class="match-avatar-initials" style="display:none;">${displayName.charAt(0)}</div>`
+        : `<div class="match-avatar-initials">${displayName.charAt(0)}</div>`;
+
+      return `
+        <div class="match-card" data-practitioner-serial="${match.serial_number}" data-practitioner-id="${practitioner?.id}">
+          <div class="match-header">
+            <div class="match-avatar">
+              ${avatarHtml}
+              ${initialsHtml}
+            </div>
+            <div class="match-info">
+              <h3>${displayName}</h3>
+              <p class="match-specialty">${specialty}</p>
+              <p class="match-rating">★${avgRating} (${reviewCount} reviews)</p>
+            </div>
+            <div class="match-score">${match.match_score}% match</div>
+          </div>
+          <div class="match-actions">
+            <button class="btn-secondary match-view-profile" data-practitioner-serial="${match.serial_number}" data-practitioner-id="${practitioner?.id}">View Profile</button>
+            <button class="btn-primary match-connect" data-practitioner-serial="${match.serial_number}" data-practitioner-id="${practitioner?.id}" data-match-score="${match.match_score}">Send Request</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // View Profile button - navigate to practitioner profile
+    container.querySelectorAll('.match-view-profile').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const practitionerId = btn.dataset.practitionerId;
+        const projectId = onboardingData.projectId;
+        if (practitionerId) {
+          window.location.href = `/rooted-vitality/dashboard/pro/pages/practitioner-profile.html?id=${practitionerId}&project_id=${projectId}`;
+        }
+      });
+    });
+
+    // Send Match Request button
+    container.querySelectorAll('.match-connect').forEach(btn => {
+      console.log('[Onboarding] Attaching match-connect listener - button dataset:', btn.dataset);
+      console.log('[Onboarding] practitionerSerial from dataset:', btn.dataset.practitionerSerial);
+      console.log('[Onboarding] Button HTML:', btn.outerHTML);
+      
+      btn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const practitionerSerial = btn.dataset.practitionerSerial; // Keep as text (P1, P2, etc)
+        const matchScore = parseInt(btn.dataset.matchScore);
+        const displayName = btn.closest('.match-card')?.querySelector('.match-info h3')?.textContent || 'Practitioner';
+        
+        console.log('[Onboarding] Match connect clicked - practitionerSerial:', practitionerSerial, 'type:', typeof practitionerSerial);
+        console.log('[Onboarding] Button dataset:', btn.dataset);
+        
+        try {
+          btn.disabled = true;
+          btn.textContent = 'Sending...';
+
+          // Get project data
+          const { data: projectData, error: projectError } = await window.supabaseClient
+            .from('projects')
+            .select('id, project_serial, client_serial')
+            .eq('id', onboardingData.projectId)
+            .single();
+
+          if (projectError || !projectData) {
+            throw new Error('Project not found');
+          }
+
+          console.log('[Onboarding] Creating match with:', { 
+            project_serial: projectData.project_serial, 
+            client_serial: projectData.client_serial, 
+            practitioner_serial: practitionerSerial,
+            match_score: matchScore
+          });
+
+          // Create match directly in table (same approach as "Save for Later")
+          const { data: matchResult, error: matchCreateError } = await window.supabaseClient
+            .from('project_practitioner_matches')
+            .insert({
+              project_serial: parseInt(projectData.project_serial),
+              client_serial: projectData.client_serial,
+              practitioner_serial: practitionerSerial,
+              match_score: matchScore,
+              status: 'pending',
+              client_initiated: true,
+              matched_at: new Date().toISOString()
+            })
+            .select();
+
+          if (matchCreateError) {
+            console.error('[Onboarding] Match creation error:', matchCreateError);
+            throw matchCreateError;
+          }
+
+          console.log('[Onboarding] ✅ Match created:', matchResult);
+
+          // Create notification for practitioner
+          const { data: practitionerInfo, error: practError } = await window.supabaseClient
+            .from('practitioners')
+            .select('id, serial_number, legal_name')
+            .eq('serial_number', practitionerSerial)
+            .single();
+
+          if (practitionerInfo && !practError) {
+            const clientName = onboardingData.firstName || 'New Client';
+            const { error: notifError } = await window.supabaseClient
+              .from('practitioner_notifications')
+              .insert({
+                practitioner_serial: practitionerInfo.serial_number,
+                type: 'match_new',
+                title: `New Match: ${clientName}`,
+                message: `${clientName} has matched with you!`,
+                is_read: false,
+                created_at: new Date().toISOString()
+              });
+
+            if (notifError) {
+              console.warn('[Onboarding] Notification creation warning:', notifError);
+            }
+          }
+
+          // Show pending modal
+          showPendingMatchModal(displayName);
+          
+          // Close onboarding after brief delay
+          setTimeout(() => {
+            closeOnboardingModal();
+            setTimeout(() => {
+              window.location.href = '/rooted-vitality/dashboard/client/pages/my-matches.html';
+            }, 300);
+          }, 1500);
+
+        } catch (error) {
+          console.error('[Onboarding] Error sending match request:', error);
+          window.showAlertModal('Error sending request: ' + (error?.message || 'Unknown error'));
+          btn.disabled = false;
+          btn.textContent = 'Send Request';
+        }
+      });
+    });
+
+  } catch (error) {
+    console.error('[Onboarding] Error loading matches:', error);
+    document.getElementById('matches-container').innerHTML = '<p class="loading" style="color: #d32f2f;">Error loading matches</p>';
+  }
 }
 
 /**
- * Create pending project (for save for later)
+ * Show modal explaining match request is pending practitioner acceptance
  */
-async function createPendingProject(data) {
-    const { data: projectData, error } = await window.supabaseClient
-        .from('projects')
-        .insert({
-            user_id: data.userId,
-            category_id: data.category,
-            description: data.symptoms,
-            status: 'pending',
-            created_at: new Date().toISOString()
-        });
-
-    if (error) throw error;
-    return projectData;
+function showPendingMatchModal(practitionerName) {
+  const modal = document.createElement('div');
+  modal.className = 'pending-match-modal';
+  modal.innerHTML = `
+    <div class="pending-match-overlay"></div>
+    <div class="pending-match-content">
+      <div class="pending-match-icon">
+        <img src="./assets/logo_trimmed.png" alt="Rooted Vitality" class="pending-match-logo">
+      </div>
+      <h2>Request Sent!</h2>
+      <p>Your connection request has been sent to <strong>${practitionerName}</strong>.</p>
+      <p style="font-size: 14px; color: #666; margin-top: 12px;">They'll review your profile and get back to you soon. You'll receive a notification when they respond.</p>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  
+  // Auto-remove after 2 seconds
+  setTimeout(() => {
+    modal.remove();
+  }, 2000);
 }
 
 /**
- * Create project with immediate match
+ * Setup category picker with search and subcategories for Step 1b
  */
-async function createProjectWithMatch(data, practitionerId, practitionerName) {
-    // Create project
-    const { data: projectData, error: projectError } = await window.supabaseClient
-        .from('projects')
-        .insert({
-            user_id: data.userId,
-            category_id: data.category,
-            description: data.symptoms,
-            status: 'active',
-            created_at: new Date().toISOString()
+function setupCategoryPickerForStep1b() {
+    const searchInput = document.getElementById('guided-category-search');
+    const categoriesList = document.getElementById('guided-categories-list');
+    const subcategoriesGroup = document.getElementById('guided-subcategories-group');
+    const subcategoriesList = document.getElementById('guided-subcategories-list');
+    const categorySelected = document.getElementById('guided-category-selected');
+    
+    if (!searchInput) return; // Step 1b not visible yet
+
+    // Soft spiritual descriptions for each category
+    const categoryDescriptions = {
+        'acupuncture': 'Let needles whisper to your energy',
+        'chiropractic': 'Align your spine, align your life',
+        'naturopathy': 'Ancient plant wisdom for modern souls',
+        'nutrition': 'Nourish the temple that holds you',
+        'wellness_coaching': 'Your partner in transformation',
+        'personal_training': 'Strengthen what\'s within and without',
+        'yoga': 'Find your breath, find your flow',
+        'meditation': 'Quiet the noise, hear yourself',
+        'mental_health': 'Heal what your heart has been carrying',
+        'energy_healing': 'Realign what feels scattered',
+        'herbalism': 'Nature\'s medicine for your body',
+        'ayurveda': 'Balance your unique constitution',
+        'homeopathy': 'Like heals like, always gently',
+        'functional_medicine': 'Find the root, heal the whole',
+        'physical_therapy': 'Restore movement, restore freedom',
+        'aromatherapy': 'Scent as medicine, feeling as healer',
+        'life_coaching': 'Rewrite your story, reclaim your power',
+        'hypnotherapy': 'Unlock what your subconscious knows',
+        'midwifery': 'Ancient wisdom meets modern care',
+        'reflexology': 'Every pressure point holds a story',
+        'osteopathy': 'The body knows how to heal',
+        'massage': 'Let your body release what it\'s holding'
+    };
+
+    // Render category cards with descriptions (uses taxonomy data)
+    function renderCategories(filter = '') {
+        // Use global if available, otherwise use cache
+        const data = (typeof taxonomyData !== 'undefined' && Object.keys(taxonomyData).length > 0) 
+            ? taxonomyData 
+            : onboardingTaxonomyCache;
+        
+        if (!data || Object.keys(data).length === 0) {
+            categoriesList.innerHTML = '<p>Loading categories...</p>';
+            return;
+        }
+        
+        const categories = Object.entries(data).map(([id, categoryData]) => ({
+            id,
+            name: categoryData.name,
+            subcategories: categoryData.subcategories || []
+        }));
+        
+        categoriesList.innerHTML = categories
+            .filter(cat => {
+                const matchesName = cat.name.toLowerCase().includes(filter.toLowerCase());
+                const matchesDesc = (categoryDescriptions[cat.id] || '').toLowerCase().includes(filter.toLowerCase());
+                return matchesName || matchesDesc;
+            })
+            .map(cat => {
+                const description = categoryDescriptions[cat.id] || 'A path to wellness';
+                return `
+                    <div class="category-card" data-category-id="${cat.id}" data-category-name="${cat.name}">
+                        <h4>${cat.name}</h4>
+                        <p>${description}</p>
+                    </div>
+                `;
+            }).join('');
+
+        // Add click handlers to category cards
+        document.querySelectorAll('.category-card').forEach(card => {
+            card.addEventListener('click', () => {
+                selectCategory(card.dataset.categoryId, card.dataset.categoryName);
+            });
         });
+    }
 
-    if (projectError) throw projectError;
-
-    // Create match
-    const { error: matchError } = await window.supabaseClient
-        .from('matches')
-        .insert({
-            project_id: projectData[0].id,
-            practitioner_id: practitionerId,
-            status: 'pending',
-            initiated_by: 'client',
-            created_at: new Date().toISOString()
+    // Select category and show subcategories
+    function selectCategory(catId, catName) {
+        categorySelected.value = catId;
+        
+        // Highlight selected category
+        document.querySelectorAll('.category-card').forEach(card => {
+            card.classList.remove('selected');
         });
+        document.querySelector(`[data-category-id="${catId}"]`).classList.add('selected');
 
-    if (matchError) throw matchError;
+        // Use global if available, otherwise use cache
+        const data = (typeof taxonomyData !== 'undefined' && Object.keys(taxonomyData).length > 0) 
+            ? taxonomyData 
+            : onboardingTaxonomyCache;
+        
+        // Find category object to get subcategories
+        const category = data ? data[catId] : null;
+        if (category && category.subcategories && category.subcategories.length > 0) {
+            renderSubcategories(category.subcategories);
+            subcategoriesGroup.style.display = 'block';
+        } else {
+            subcategoriesGroup.style.display = 'none';
+        }
+    }
 
-    return projectData[0];
+    // Render subcategories as checkboxes
+    function renderSubcategories(subcategories) {
+        subcategoriesList.innerHTML = subcategories
+            .map((subName, idx) => `
+                <label class="checkbox-label">
+                    <input type="checkbox" value="${subName}" name="subcategory" data-index="${idx}">
+                    <span class="checkbox-text">${subName}</span>
+                </label>
+            `).join('');
+    }
+
+    // Search handler
+    searchInput.addEventListener('input', (e) => {
+        renderCategories(e.target.value);
+    });
+
+    // Initial render
+    renderCategories();
 }
 
-/**
- * Close onboarding modal
- */
 function closeOnboardingModal() {
     const modal = document.getElementById('guided-onboarding-modal');
     if (modal) {
         modal.style.animation = 'slideOut 0.3s ease-out forwards';
         setTimeout(() => {
             modal.remove();
+            // NOTE: Do NOT clear localStorage here - user might close by accident
+            // localStorage is cleared only after successful account creation
         }, 300);
     }
 }
 
 /**
- * Open onboarding modal - shows choice first, then routes appropriately
+ * Restore form values from localStorage
+ * Called when a user navigates back or reopens the modal
  */
-function openGuidedOnboarding() {
-    // Always show the choice modal first
-    showOnboardingChoice();
+function restoreFormValuesFromLocalStorage() {
+    const data = JSON.parse(localStorage.getItem('rooted-onboarding-data'));
+    if (!data) return;
+
+    // Restore Step 1a fields if they exist
+    if (data.category) {
+        const categorySelect = document.getElementById('onboarding-category-direct');
+        if (categorySelect) categorySelect.value = data.category;
+    }
+
+    // Restore Step 1b fields if they exist
+    if (data.description) {
+        const descInput = document.getElementById('guided-symptoms');
+        if (descInput) descInput.value = data.description;
+    }
+
+    // Restore Step 2 fields if they exist
+    if (data.clientProfile) {
+        if (data.clientProfile.wellnessGoals) {
+            const field = document.getElementById('wellness-goals');
+            if (field) field.value = data.clientProfile.wellnessGoals;
+        }
+        if (data.clientProfile.duration) {
+            const field = document.getElementById('duration');
+            if (field) field.value = data.clientProfile.duration;
+        }
+        // ... etc for other client profile fields
+    }
+
+    // Restore Step 3 fields if they exist
+    if (data.firstName) {
+        const field = document.getElementById('onboarding-firstName');
+        if (field) field.value = data.firstName;
+    }
+    if (data.lastName) {
+        const field = document.getElementById('onboarding-lastName');
+        if (field) field.value = data.lastName;
+    }
+    if (data.dob) {
+        const field = document.getElementById('onboarding-dob-signup');
+        if (field) field.value = data.dob;
+    }
+    if (data.sex) {
+        const field = document.getElementById('onboarding-sex');
+        if (field) field.value = data.sex;
+    }
+    if (data.email) {
+        const field = document.getElementById('onboarding-email');
+        if (field) field.value = data.email;
+    }
+    if (data.street) {
+        const field = document.getElementById('onboarding-street-signup');
+        if (field) field.value = data.street;
+    }
+    if (data.city) {
+        const field = document.getElementById('onboarding-city-signup');
+        if (field) field.value = data.city;
+    }
+    if (data.state) {
+        const field = document.getElementById('onboarding-state-signup');
+        if (field) field.value = data.state;
+    }
+    if (data.zipcode) {
+        const field = document.getElementById('onboarding-zipcode-signup');
+        if (field) field.value = data.zipcode;
+    }
 }
 
 /**
- * Auto-open onboarding on first visit (if not authenticated and haven't seen modal before)
+ * Clear localStorage after successful account creation
+ * Call this after Step 4 verification is complete and account is created
  */
-function autoOpenOnboardingOnFirstVisit() {
-    // Check if user is already authenticated
+function clearOnboardingLocalStorage() {
+    localStorage.removeItem('rooted-onboarding-data');
+}
+
+// Export
+window.initializeOnboarding = initializeOnboarding;
+window.openGuidedOnboarding = () => initializeGuidedOnboarding();
+window.autoOpenOnboardingOnFirstVisit = () => {
     if (window.supabaseClient) {
         window.supabaseClient.auth.getSession().then(({ data: { session } }) => {
             if (!session) {
-                // No active session - check if they've already seen the modal
                 const hasSeenModal = sessionStorage.getItem('rooted-vitality-onboarding-shown');
-                
                 if (!hasSeenModal) {
-                    // First time visiting - auto-open after a brief delay
                     setTimeout(() => {
-                        openGuidedOnboarding();
+                        initializeOnboarding();
                         sessionStorage.setItem('rooted-vitality-onboarding-shown', 'true');
-                    }, 800); // Small delay to let page fully render
+                    }, 800);
                 }
             }
         });
     }
-}
-
-// Export for use
-window.openGuidedOnboarding = openGuidedOnboarding;
-window.autoOpenOnboardingOnFirstVisit = autoOpenOnboardingOnFirstVisit;
-window.closeOnboardingModal = closeOnboardingModal;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+};

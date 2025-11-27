@@ -77,10 +77,9 @@ async function initializeDashboard() {
             console.log('[Dashboard] User data loaded');
         }
 
-        // Load wellness profile from localStorage
-        const wellnessData = loadWellnessProfile();
-        if (wellnessData) {
-            populateWellnessForm(wellnessData);
+        // Load wellness profile from Supabase client_profiles table
+        if (userData?.id) {
+            await loadWellnessProfileFromSupabase(userData.id);
         }
 
         // Load preferences from localStorage
@@ -134,22 +133,44 @@ function populateDashboardForms(userData) {
 }
 
 /**
+ * Load wellness profile from Supabase client_profiles table
+ * @param {string} userId - User ID
+ */
+async function loadWellnessProfileFromSupabase(userId) {
+    try {
+        const { data: clientProfile, error } = await window.supabaseClient
+            .from('client_profiles')
+            .select('*')
+            .eq('user_id', userId)
+            .single();
+
+        if (clientProfile && !error) {
+            populateWellnessForm(clientProfile);
+            console.log('[Dashboard] Wellness profile loaded from Supabase:', clientProfile);
+        } else if (error && error.code !== 'PGRST116') {
+            console.warn('[Dashboard] Error fetching wellness profile:', error);
+        }
+    } catch (error) {
+        console.warn('[Dashboard] Could not load wellness profile:', error);
+    }
+}
+
+/**
  * Populate wellness form with stored data
- * @param {object} wellnessData - Wellness profile data
+ * @param {object} wellnessData - Wellness profile data from client_profiles table
  */
 function populateWellnessForm(wellnessData) {
     try {
-        document.getElementById('wellnessGoals').value = wellnessData.goals || '';
-        document.getElementById('healthFocus').value = wellnessData.healthFocus || '';
-        document.getElementById('locationPreference').value = wellnessData.locationPreference || '';
-
-        // Handle multi-select for healing modalities
-        if (wellnessData.modalities && Array.isArray(wellnessData.modalities)) {
-            const modalitiesSelect = document.getElementById('healingModalities');
-            for (let option of modalitiesSelect.options) {
-                option.selected = wellnessData.modalities.includes(option.value);
-            }
-        }
+        document.getElementById('mainWellnessGoal').value = wellnessData.main_wellness_goal || '';
+        document.getElementById('durationOfIssue').value = wellnessData.duration_of_issue || '';
+        document.getElementById('whatTriedBefore').value = wellnessData.what_tried_before || '';
+        document.getElementById('allergiesSensitivities').value = wellnessData.allergies_sensitivities || '';
+        document.getElementById('currentMedicationsSupplements').value = wellnessData.current_medications_supplements || '';
+        document.getElementById('typicalDayDescription').value = wellnessData.typical_day_description || '';
+        document.getElementById('communicationPreference').value = wellnessData.communication_preference || '';
+        document.getElementById('biggestBarrierToHealing').value = wellnessData.biggest_barrier_to_healing || '';
+        document.getElementById('priorPractitionerExperience').value = wellnessData.prior_practitioner_experience || '';
+        document.getElementById('desiredSuccessOutcome').value = wellnessData.desired_success_outcome || '';
     } catch (error) {
         console.error('[Dashboard] Error populating wellness form:', error);
     }
@@ -335,44 +356,73 @@ async function handleWellnessFormSubmit(e) {
     e.preventDefault();
 
     try {
-        const wellnessForm = document.getElementById('wellnessForm');
-        const formData = collectFormData(wellnessForm);
-        const modalities = collectMultiSelectData('healingModalities');
+        showToast('Saving wellness profile...', 'saving');
+        
+        const { data: { user } } = await window.supabaseClient.auth.getUser();
 
-        // For now, wellness data stored in localStorage as it's not in clients table
-        // TODO: Consider creating separate wellness_profiles table if needed
+        if (!user) {
+            showToast('You must be logged in to save your wellness profile', 'error');
+            return;
+        }
+
+        // Get current user data to find serial_number
+        const { data: clientData, error: clientError } = await window.supabaseClient
+            .from('clients')
+            .select('serial_number')
+            .eq('id', user.id)
+            .single();
+
+        if (clientError || !clientData) {
+            showToast('Error loading user information', 'error');
+            return;
+        }
+
         const wellnessData = {
-            goals: formData.wellnessGoals,
-            healthFocus: formData.healthFocus,
-            modalities: modalities,
-            locationPreference: formData.locationPreference,
-            updated_at: new Date().toISOString()
+            user_id: user.id,
+            serial_number: clientData.serial_number,
+            main_wellness_goal: document.getElementById('mainWellnessGoal').value,
+            duration_of_issue: document.getElementById('durationOfIssue').value,
+            what_tried_before: document.getElementById('whatTriedBefore').value,
+            allergies_sensitivities: document.getElementById('allergiesSensitivities').value,
+            current_medications_supplements: document.getElementById('currentMedicationsSupplements').value,
+            typical_day_description: document.getElementById('typicalDayDescription').value,
+            communication_preference: document.getElementById('communicationPreference').value,
+            biggest_barrier_to_healing: document.getElementById('biggestBarrierToHealing').value,
+            prior_practitioner_experience: document.getElementById('priorPractitionerExperience').value,
+            desired_success_outcome: document.getElementById('desiredSuccessOutcome').value
         };
 
-        localStorage.setItem('rvWellnessProfile', JSON.stringify(wellnessData));
-        
-        // Also update clients table settings_updated_at to track that user modified settings
-        const { data: { user } } = await window.supabaseClient.auth.getUser();
-        if (user) {
-            const { error } = await window.supabaseClient
-                .from('clients')
-                .update({
-                    settings_updated_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString()
-                })
-                .eq('id', user.id);
-            
-            if (error) {
-                console.warn('[Dashboard] Error updating settings_updated_at:', error);
-            }
+        // Try to update existing profile, or create if it doesn't exist
+        const { data: existingProfile } = await window.supabaseClient
+            .from('client_profiles')
+            .select('id')
+            .eq('user_id', user.id)
+            .single();
+
+        let result;
+        if (existingProfile) {
+            // Update existing profile
+            result = await window.supabaseClient
+                .from('client_profiles')
+                .update(wellnessData)
+                .eq('user_id', user.id);
+        } else {
+            // Create new profile
+            result = await window.supabaseClient
+                .from('client_profiles')
+                .insert([wellnessData]);
         }
-        
-        console.log('[Dashboard] Wellness profile saved');
+
+        if (result.error) {
+            throw result.error;
+        }
+
+        console.log('[Dashboard] Wellness profile saved successfully');
         showToast('Wellness profile updated successfully', 'success');
 
     } catch (error) {
         console.error('[Dashboard] Error saving wellness data:', error);
-        showToast('Error saving wellness profile', 'error');
+        showToast('Error saving wellness profile: ' + error.message, 'error');
     }
 }
 

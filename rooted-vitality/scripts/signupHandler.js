@@ -36,6 +36,9 @@ window.addEventListener('DOMContentLoaded', async () => {
     const email     = form.querySelector('#email').value.trim();
     const confirmEmail = form.querySelector('#confirmEmail').value.trim();
     const phone     = form.querySelector('#phone').value.trim();
+    const address   = form.querySelector('#address').value.trim();
+    const city      = form.querySelector('#city').value.trim();
+    const state     = form.querySelector('#state').value.trim().toUpperCase();
     const zipcode   = form.querySelector('#zipcode').value.trim();
     const dob       = form.querySelector('#dob').value;
     const sex       = form.querySelector('#sex').value || null;
@@ -44,7 +47,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     const termsAccepted = form.querySelector('#terms').checked;
 
     // ============ 2. Validate Required Fields ============
-    if (!firstName || !lastName || !email || !confirmEmail || !phone || !zipcode || !sex || !password || !dob) {
+    if (!firstName || !lastName || !email || !confirmEmail || !phone || !address || !city || !state || !zipcode || !sex || !password || !dob) {
       alert('Please complete all required fields (marked with *).');
       return;
     }
@@ -80,6 +83,13 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     if (!termsAccepted) {
       alert('You must accept the Terms of Service and Privacy Policy to continue.');
+      return;
+    }
+
+    // Validate phone has at least some digits
+    const phoneDigitsOnly = phone.replace(/\D/g, '');
+    if (phoneDigitsOnly.length === 0) {
+      alert('Please enter a valid phone number with at least one digit.');
       return;
     }
 
@@ -135,36 +145,36 @@ window.addEventListener('DOMContentLoaded', async () => {
 
       // ============ 5. Create Client Record ============
       // Create a new client record with signup data
-      // Only include fields that exist in the clients table schema
+      // Match schema in guidedOnboarding.js for consistency
+      
+      // Normalize phone to 10 digits only (remove formatting)
+      // phoneDigitsOnly was already validated above to have at least 1 digit
+      const normalizedPhone = phoneDigitsOnly.slice(-10); // Take last 10 digits in case of country codes
+      
       const clientData = {
-        id: authData.user.id,  // UUID primary key linked to auth.users
+        id: authData.user.id,
         email: email,
         first_name: firstName,
         last_name: lastName,
-        phone,
-        zipcode,
-        age,
-        sex,
-        account_status: 'active',
-        open_to_contact: true,
-        open_to_match: true,
-        two_factor_enabled: false,
-        two_factor_method: null,
-        profile_picture_url: null,
-        membership_level: 'free',
-        membership_started_at: new Date().toISOString(),
-        membership_expires_at: null,
-        last_login: new Date().toISOString(),
-        settings_updated_at: new Date().toISOString(),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        notification_settings: {
-          email_notifications: true,
-          sms_notifications: false,
-          push_notifications: true
-        }
+        phone: normalizedPhone,
+        address: address,
+        city: city,
+        state: state,
+        zipcode: zipcode.trim().slice(0, 10), // Ensure max 10 chars
+        sex: sex,
+        age: age,
+        date_of_birth: dob
       };
       
+      console.log('📝 [Signup] Field lengths:');
+      console.log('  - id length:', authData.user.id.length, 'value:', authData.user.id);
+      console.log('  - email length:', email.length, 'value:', email);
+      console.log('  - first_name length:', firstName.length, 'value:', firstName);
+      console.log('  - last_name length:', lastName.length, 'value:', lastName);
+      console.log('  - phone length:', normalizedPhone.length, 'original:', phone, 'normalized:', normalizedPhone);
+      console.log('  - zipcode length:', zipcode.length, 'original:', zipcode, 'normalized:', clientData.zipcode);
+      console.log('  - sex length:', sex ? sex.length : 0, 'value:', sex);
+      console.log('  - age type:', typeof age, 'value:', age);
       console.log('📝 [Signup] Creating client record:', clientData);
       
       const { error: clientError } = await window.supabaseClient
