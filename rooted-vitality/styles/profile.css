@@ -570,7 +570,7 @@
     height: 36px;
     padding: 0 1rem;
     background: rgba(251, 247, 236, 0.2);
-    color: #fbf7ec;
+    color: white;
     border: 1px solid rgba(251, 247, 236, 0.3);
     border-radius: 6px;
     font-weight: 600;
@@ -804,7 +804,7 @@
 
 .section-save-btn {
     background: var(--primary);
-    color: var(--#fbf7ec);
+    color: white;
 }
 
 .section-save-btn:hover {
@@ -1067,7 +1067,7 @@
     align-self: flex-start;
     padding: 0.85rem 1.5rem;
     background: var(--primary);
-    color: #fbf7ec;
+    color: white;
     border: none;
     border-radius: 8px;
     font-weight: 600;
@@ -1117,160 +1117,6 @@
 
 /* ========================================== */
 /* CONTINUING EDUCATION SECTION */
-/* ========================================== */
-
-.continuing-education-edit {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    animation: slideInUp 0.3s ease-out;
-}
-
-.continuing-education-edit::before {
-    content: 'Start adding professional development to showcase your commitment to growth.';
-    display: block;
-    font-size: 0.9rem;
-    color: var(--placeholder);
-    margin-bottom: 0.5rem;
-    font-style: italic;
-}
-
-.continuing-education-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.ce-item {
-    background: #fbf7ec;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.ce-item-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-}
-
-.ce-item-title {
-    font-weight: 600;
-    font-size: 1rem;
-    color: var(--dark-text);
-}
-
-.ce-item-close-btn {
-    background: transparent;
-    border: none;
-    color: #999;
-    font-size: 1.5rem;
-    cursor: pointer;
-    padding: 0;
-    line-height: 1;
-    transition: color 0.2s ease;
-}
-
-.ce-item-close-btn:hover {
-    color: var(--error);
-}
-
-.ce-form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.ce-form-group label {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--dark-text);
-}
-
-.ce-form-group input,
-.ce-form-group textarea {
-    padding: 0.75rem;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    font-family: inherit;
-    font-size: 0.95rem;
-    background: var(--#fbf7ec);
-    color: var(--dark-text);
-    transition: all 0.2s ease;
-}
-
-.ce-form-group input:focus,
-.ce-form-group textarea:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.1);
-}
-
-.ce-form-group textarea {
-    resize: vertical;
-    min-height: 60px;
-}
-
-.ce-form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-}
-
-.continuing-education-display {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.ce-display-item {
-    background: #fbf7ec;
-    border-left: 4px solid var(--primary);
-    border-radius: 4px;
-    padding: 1rem;
-}
-
-.ce-display-item-title {
-    font-weight: 600;
-    color: var(--dark-text);
-    margin-bottom: 0.5rem;
-}
-
-.ce-display-item-provider {
-    font-size: 0.9rem;
-    color: #666;
-    margin-bottom: 0.25rem;
-}
-
-.ce-display-item-hours {
-    font-size: 0.9rem;
-    color: #666;
-    margin-bottom: 0.25rem;
-    font-weight: 500;
-}
-
-.ce-display-item-date {
-    font-size: 0.85rem;
-    color: #999;
-}
-
-.ce-total-hours {
-    background: rgba(92, 154, 114, 0.1);
-    border: 1px solid rgba(92, 154, 114, 0.3);
-    border-radius: 8px;
-    padding: 1rem;
-    margin-top: 1rem;
-}
-
-.ce-total-hours-text {
-    font-weight: 600;
-    color: var(--primary);
-    font-size: 1.1rem;
-}
-
 /* ========================================== */
 /* SOCIAL MEDIA INPUTS */
 /* ========================================== */
@@ -1576,7 +1422,7 @@
 
 .verification-form-actions .btn-accent {
     background: var(--primary);
-    color: var(--#fbf7ec);
+    color: white;
 }
 
 .verification-form-actions .btn-accent:hover {
@@ -1712,7 +1558,7 @@
 
 .btn-accent {
     background: var(--primary);
-    color: var(--#fbf7ec);
+    color: white;
 }
 
 .btn-accent:hover {
@@ -3232,7 +3078,7 @@
 
 .btn-primary {
     background: var(--primary);
-    color: #fbf7ec;
+    color: white;
 }
 
 .btn-primary:hover:not(:disabled) {

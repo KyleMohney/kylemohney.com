@@ -13,11 +13,10 @@
   <header id="header-inject"></header>
   
   <main class="find-practitioners-container">
-    <!-- Hero Section -->
-    <section class="directory-hero">
-      <div class="directory-hero__content">
-        <h1 class="directory-hero__title">Find Practitioners</h1>
-        
+    <!-- Main Content Grid -->
+    <div class="directory-grid">
+      <!-- Left Sidebar: Filters & Project Info -->
+      <aside class="directory-sidebar">
         <!-- Project Information Card -->
         <div class="project-info-card">
           <div class="project-info-header">
@@ -44,14 +43,8 @@
             </div>
           </div>
         </div>
-      </div>
-    </section>
 
-    <!-- Main Content Grid -->
-    <div class="directory-grid">
-      <!-- Left Sidebar: Filters -->
-      <aside class="directory-sidebar">
-        <!-- Back Button -->
+        <!-- Navigation Buttons -->
         <button id="back-to-projects" class="btn btn--secondary" style="width: 100%; margin-bottom: 0.5rem; cursor: pointer;" onclick="window.location.href='my-wellness.html';">← Back to Wellness</button>
         <button id="refresh-search" class="btn btn--secondary" style="width: 100%; margin-bottom: 1rem; cursor: pointer;" onclick="refreshSearch();">Refresh Search</button>
 

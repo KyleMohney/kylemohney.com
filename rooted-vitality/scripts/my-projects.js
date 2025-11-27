@@ -438,29 +438,29 @@ function renderProjectsGrid() {
 
   let html = '';
 
-  // Render open projects section
+  // Render open projects section (always shown, even if empty)
+  html += '<div class="projects-section">';
+  html += '<h2 class="projects-section__title">Active Care Requests</h2>';
+  html += '<div class="projects-list">';
   if (openProjects.length > 0) {
-    html += '<div class="projects-section">';
-    html += '<h2 class="projects-section__title">Active Journeys</h2>';
-    html += '<div class="projects-list">';
     openProjects.forEach(project => {
       const card = createProjectCard(project);
       html += card.outerHTML;
     });
-    html += '</div></div>';
   }
+  html += '</div></div>';
 
-  // Render closed projects section
+  // Render closed projects section (always shown, even if empty)
+  html += '<div class="projects-section projects-section--closed">';
+  html += '<h2 class="projects-section__title">Closed Care Requests</h2>';
+  html += '<div class="projects-list projects-list--closed">';
   if (closedProjects.length > 0) {
-    html += '<div class="projects-section projects-section--closed">';
-    html += '<h2 class="projects-section__title">Completed Journeys</h2>';
-    html += '<div class="projects-list projects-list--closed">';
     closedProjects.forEach(project => {
       const card = createProjectCard(project);
       html += card.outerHTML;
     });
-    html += '</div></div>';
   }
+  html += '</div></div>';
 
   container.innerHTML = html;
   console.log('[renderProjectsGrid] Done. Rendered', openProjects.length, 'open and', closedProjects.length, 'closed projects');
@@ -790,6 +790,10 @@ async function submitCreateProject(e) {
     const createdProject = projectData[0];
     console.log('[submitCreateProject] Project created:', createdProject);
 
+    // ========== STEP 1: CREATE/UPDATE WELLNESS PROFILE ==========
+    // Ensure a client_profiles entry exists with data from this project
+    await ensureWellnessProfileFromProject(currentUser.id, currentClientProfile.serial_number, formData);
+
     // Now find matching practitioners using matching algorithm
     const matchRecords = await findMatchingPractitioners(createdProject);
     console.log('[submitCreateProject] Found', matchRecords.length, 'matching practitioners');
@@ -885,6 +889,10 @@ async function submitCreateProjectAndFindMatches(e) {
 
     const createdProject = projectData[0];
     console.log('[submitCreateProjectAndFindMatches] Project created:', createdProject);
+
+    // ========== STEP 1: CREATE/UPDATE WELLNESS PROFILE ==========
+    // Ensure a client_profiles entry exists with data from this project
+    await ensureWellnessProfileFromProject(currentUser.id, currentClientProfile.serial_number, formData);
 
     // Now find matching practitioners using matching algorithm
     const matchRecords = await findMatchingPractitioners(createdProject);
@@ -999,6 +1007,83 @@ async function findMatchingPractitioners(project) {
     console.error('[findMatchingPractitioners] Caught error:', error.message);
     console.error('[findMatchingPractitioners] Full error:', JSON.stringify(error, null, 2));
     return [];
+  }
+}
+
+// ======================================================
+// WELLNESS PROFILE CREATION
+// ======================================================
+
+/**
+ * Ensure a wellness profile exists in client_profiles table
+ * Creates or updates based on project information from Step 5
+ * Maps project form data to wellness profile fields
+ */
+async function ensureWellnessProfileFromProject(userId, clientSerial, projectFormData) {
+  try {
+    console.log('[ensureWellnessProfileFromProject] Creating/updating wellness profile for user:', userId);
+    console.log('[ensureWellnessProfileFromProject] Project form data:', projectFormData);
+
+    // Check if wellness profile already exists
+    const { data: existingProfile, error: checkError } = await supabaseClient
+      .from('client_profiles')
+      .select('id')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (checkError) {
+      console.warn('[ensureWellnessProfileFromProject] Error checking for existing profile:', checkError);
+      return false;
+    }
+
+    // Map project form fields to wellness profile fields
+    // Using project data to populate main_wellness_goal, duration_of_issue, etc.
+    const wellnessData = {
+      user_id: userId,
+      serial_number: clientSerial,
+      main_wellness_goal: projectFormData.description || '',  // Description becomes the main goal
+      duration_of_issue: projectFormData.urgency || 'interested',  // Urgency maps to duration
+      updated_at: new Date().toISOString()
+      // Other fields remain empty/null unless filled on My Wellness page
+    };
+
+    if (existingProfile) {
+      // Update existing profile
+      console.log('[ensureWellnessProfileFromProject] Updating existing wellness profile');
+      const { data: updateResult, error: updateError } = await supabaseClient
+        .from('client_profiles')
+        .update(wellnessData)
+        .eq('user_id', userId)
+        .select();
+
+      if (updateError) {
+        console.error('[ensureWellnessProfileFromProject] Error updating wellness profile:', updateError);
+        return false;
+      }
+
+      console.log('[ensureWellnessProfileFromProject] ✓ Wellness profile updated successfully');
+      return true;
+    } else {
+      // Create new profile
+      console.log('[ensureWellnessProfileFromProject] Creating new wellness profile');
+      const { data: insertResult, error: insertError } = await supabaseClient
+        .from('client_profiles')
+        .insert([wellnessData])
+        .select();
+
+      if (insertError) {
+        console.error('[ensureWellnessProfileFromProject] Error creating wellness profile:', insertError);
+        // Don't throw - let project creation continue even if wellness profile fails
+        return false;
+      }
+
+      console.log('[ensureWellnessProfileFromProject] ✓ Wellness profile created successfully');
+      return true;
+    }
+  } catch (error) {
+    console.error('[ensureWellnessProfileFromProject] Exception:', error);
+    // Don't throw - let project creation continue
+    return false;
   }
 }
 

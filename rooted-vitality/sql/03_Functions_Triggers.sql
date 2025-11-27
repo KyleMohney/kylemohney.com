@@ -189,7 +189,7 @@ BEGIN
   SELECT 
     proj.id,
     proj.category_name,
-    string_to_array(COALESCE(proj.subcategory_name, ''), ','),
+    array_remove(array(SELECT trim(x) FROM unnest(string_to_array(TRIM(COALESCE(proj.subcategory_name, '')), ',')) as x), ''),
     proj.travel_preference,
     proj.zipcode,
     proj.state,
@@ -209,6 +209,9 @@ BEGIN
     RETURN;
   END IF;
 
+  RAISE NOTICE 'match_practitioners DEBUG: category=%, subcats=%, travel=%, zip=%, state=%', 
+    v_category_name, v_subcategory_name, v_travel_preference, v_client_zipcode, v_client_state;
+
   RETURN QUERY
   SELECT 
     p.id,
@@ -226,7 +229,23 @@ BEGIN
     p.deleted_at IS NULL
     AND COALESCE(p.matching_enabled, true) = true
     AND COALESCE(p.matching_paused, false) = false
-    AND v_category_name = ANY(p.service_category_names)
+    -- Check for active membership
+    AND EXISTS (
+      SELECT 1 FROM memberships m
+      WHERE m.practitioner_id = p.id
+      AND m.status = 'active'
+    )
+    -- Check if practitioner has selected this category (either via service_category_names array OR via practitioner_selected_services table)
+    AND (
+      v_category_name = ANY(p.service_category_names)
+      OR EXISTS (
+        SELECT 1 FROM practitioner_selected_services pss
+        INNER JOIN holistic_health_taxonomy hht ON hht.id = pss.taxonomy_id
+        WHERE pss.practitioner_serial = p.serial_number
+        AND pss.is_active = true
+        AND hht.name = v_category_name
+      )
+    )
     AND (
       v_subcategory_name IS NULL 
       OR array_length(v_subcategory_name, 1) IS NULL
@@ -234,10 +253,19 @@ BEGIN
         SELECT 1 FROM unnest(v_subcategory_name) AS sub 
         WHERE sub = ANY(p.service_subcategory_names)
       )
+      OR EXISTS (
+        SELECT 1 FROM practitioner_selected_services pss
+        INNER JOIN holistic_health_taxonomy hht ON hht.id = pss.taxonomy_id
+        INNER JOIN taxonomy_subcategories ts ON ts.id = pss.subcategory_id
+        WHERE pss.practitioner_serial = p.serial_number
+        AND pss.is_active = true
+        AND hht.name = v_category_name
+        AND ts.name = ANY(v_subcategory_name)
+      )
     )
     AND (
       (v_travel_preference = 'in-person' AND p.in_person_enabled = true)
-      OR (v_travel_preference = 'house-call' AND p.housecalls_enabled = true)
+      OR (v_travel_preference = 'housecalls' AND p.housecalls_enabled = true)
       OR (v_travel_preference = 'virtual' AND p.virtual_enabled = true)
       OR (v_travel_preference = 'flexible' AND (p.in_person_enabled = true OR p.housecalls_enabled = true OR p.virtual_enabled = true))
     )
@@ -247,7 +275,7 @@ BEGIN
         OR v_client_zipcode = ANY(COALESCE(p.in_person_zipcodes, ARRAY[]::TEXT[]))
       ))
       OR
-      (v_travel_preference = 'house-call' AND (
+      (v_travel_preference = 'housecalls' AND (
         v_client_zipcode = p.housecalls_base_zipcode
         OR v_client_zipcode = ANY(COALESCE(p.housecalls_zipcodes, ARRAY[]::TEXT[]))
       ))
@@ -434,5 +462,308 @@ BEGIN
     p_message,
     false
   );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- ============================================================================
+-- UPDATE PRACTITIONER DENORMALIZED ARRAYS WHEN SERVICES CHANGE
+-- ============================================================================
+
+CREATE OR REPLACE FUNCTION update_practitioner_service_arrays()
+RETURNS TRIGGER AS $$
+DECLARE
+  v_practitioner_serial TEXT;
+  v_subcategory_names TEXT[];
+  v_category_names TEXT[];
+BEGIN
+  -- Get the practitioner serial (works for INSERT, UPDATE, DELETE)
+  v_practitioner_serial := COALESCE(NEW.practitioner_serial, OLD.practitioner_serial);
+  
+  -- Build subcategory names array
+  SELECT array_agg(DISTINCT ts.name ORDER BY ts.name)
+  INTO v_subcategory_names
+  FROM practitioner_selected_services pss
+  INNER JOIN taxonomy_subcategories ts ON ts.id = pss.subcategory_id
+  WHERE pss.practitioner_serial = v_practitioner_serial
+  AND pss.is_active = true;
+  
+  -- Build category names array
+  SELECT array_agg(DISTINCT hht.name ORDER BY hht.name)
+  INTO v_category_names
+  FROM practitioner_selected_services pss
+  INNER JOIN holistic_health_taxonomy hht ON hht.id = pss.taxonomy_id
+  WHERE pss.practitioner_serial = v_practitioner_serial
+  AND pss.is_active = true;
+  
+  -- Update practitioners table with explicit debug logging
+  UPDATE practitioners
+  SET 
+    service_subcategory_names = COALESCE(v_subcategory_names, ARRAY[]::TEXT[]),
+    service_category_names = COALESCE(v_category_names, ARRAY[]::TEXT[]),
+    updated_at = NOW()
+  WHERE serial_number = v_practitioner_serial;
+  
+  -- Log the update for debugging
+  RAISE NOTICE 'Trigger: Updated practitioner % with % categories and % subcategories', 
+    v_practitioner_serial, 
+    array_length(v_category_names, 1), 
+    array_length(v_subcategory_names, 1);
+  
+  RETURN COALESCE(NEW, OLD);
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS update_practitioner_arrays_on_service_change ON practitioner_selected_services;
+CREATE TRIGGER update_practitioner_arrays_on_service_change
+AFTER INSERT OR UPDATE OR DELETE ON practitioner_selected_services
+FOR EACH ROW
+EXECUTE FUNCTION update_practitioner_service_arrays();
+
+-- ============================================================================
+-- RPC FUNCTION TO MANUALLY UPDATE PRACTITIONER SERVICE ARRAYS
+-- ============================================================================
+
+CREATE OR REPLACE FUNCTION sync_practitioner_service_arrays(p_practitioner_serial TEXT)
+RETURNS BOOLEAN AS $$
+DECLARE
+  v_subcategory_names TEXT[];
+  v_category_names TEXT[];
+  v_rows_updated INT;
+BEGIN
+  -- Build subcategory names array
+  SELECT array_agg(DISTINCT ts.name ORDER BY ts.name)
+  INTO v_subcategory_names
+  FROM practitioner_selected_services pss
+  INNER JOIN taxonomy_subcategories ts ON ts.id = pss.subcategory_id
+  WHERE pss.practitioner_serial = p_practitioner_serial
+  AND pss.is_active = true;
+  
+  -- Build category names array
+  SELECT array_agg(DISTINCT hht.name ORDER BY hht.name)
+  INTO v_category_names
+  FROM practitioner_selected_services pss
+  INNER JOIN holistic_health_taxonomy hht ON hht.id = pss.taxonomy_id
+  WHERE pss.practitioner_serial = p_practitioner_serial
+  AND pss.is_active = true;
+  
+  -- Update practitioners table
+  UPDATE practitioners
+  SET 
+    service_subcategory_names = COALESCE(v_subcategory_names, ARRAY[]::TEXT[]),
+    service_category_names = COALESCE(v_category_names, ARRAY[]::TEXT[]),
+    updated_at = NOW()
+  WHERE serial_number = p_practitioner_serial;
+  
+  GET DIAGNOSTICS v_rows_updated = ROW_COUNT;
+  
+  RAISE NOTICE 'sync_practitioner_service_arrays: Updated % rows for practitioner %. Categories: %, Subcategories: %', 
+    v_rows_updated,
+    p_practitioner_serial, 
+    array_length(v_category_names, 1), 
+    array_length(v_subcategory_names, 1);
+  
+  RETURN v_rows_updated > 0;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- ============================================================================
+-- SIGNUP HELPER FUNCTIONS (SECURITY DEFINER - BYPASSES RLS)
+-- ============================================================================
+
+/**
+ * Create practitioner profile during signup
+ * SECURITY DEFINER bypasses RLS policies
+ * Returns the profile ID or throws error if it fails
+ */
+CREATE OR REPLACE FUNCTION create_practitioner_profile_signup(
+  p_practitioner_serial TEXT,
+  p_practitioner_id UUID
+)
+RETURNS UUID AS $$
+DECLARE
+  v_profile_id UUID;
+BEGIN
+  -- First check if it already exists
+  SELECT id INTO v_profile_id FROM practitioner_profiles WHERE id = p_practitioner_id LIMIT 1;
+  
+  IF v_profile_id IS NOT NULL THEN
+    RAISE NOTICE 'Profile already exists: %', v_profile_id;
+    RETURN v_profile_id;
+  END IF;
+  
+  -- Insert new profile
+  INSERT INTO practitioner_profiles (
+    id,
+    practitioner_serial,
+    languages,
+    modalities,
+    conditions_treated,
+    profile_completeness_percent,
+    created_at,
+    updated_at
+  )
+  VALUES (
+    p_practitioner_id,
+    p_practitioner_serial,
+    ARRAY[]::TEXT[],
+    ARRAY[]::TEXT[],
+    ARRAY[]::TEXT[],
+    10,
+    NOW(),
+    NOW()
+  )
+  RETURNING id INTO v_profile_id;
+  
+  IF v_profile_id IS NULL THEN
+    RAISE EXCEPTION 'Failed to create practitioner profile for %', p_practitioner_serial;
+  END IF;
+  
+  RAISE NOTICE 'Created practitioner profile: %', v_profile_id;
+  RETURN v_profile_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+/**
+ * Create practitioner notification settings during signup
+ * SECURITY DEFINER bypasses RLS policies
+ * Returns the settings ID or throws error if it fails
+ */
+CREATE OR REPLACE FUNCTION create_practitioner_notification_settings_signup(
+  p_practitioner_serial TEXT
+)
+RETURNS UUID AS $$
+DECLARE
+  v_settings_id UUID;
+BEGIN
+  -- First check if it already exists
+  SELECT id INTO v_settings_id FROM practitioner_notification_settings 
+  WHERE practitioner_serial = p_practitioner_serial LIMIT 1;
+  
+  IF v_settings_id IS NOT NULL THEN
+    RAISE NOTICE 'Notification settings already exist: %', v_settings_id;
+    RETURN v_settings_id;
+  END IF;
+  
+  -- Insert new settings
+  INSERT INTO practitioner_notification_settings (
+    practitioner_serial,
+    messages_in_app, messages_sms, messages_email,
+    matches_in_app, matches_sms, matches_email,
+    reviews_in_app, reviews_sms, reviews_email,
+    promotions_in_app, promotions_sms, promotions_email,
+    system_in_app, system_sms, system_email,
+    account_in_app,
+    created_at,
+    updated_at
+  )
+  VALUES (
+    p_practitioner_serial,
+    true, true, true,
+    true, true, true,
+    true, true, true,
+    false, false, false,
+    true, true, true,
+    true,
+    NOW(),
+    NOW()
+  )
+  RETURNING id INTO v_settings_id;
+  
+  IF v_settings_id IS NULL THEN
+    RAISE EXCEPTION 'Failed to create notification settings for %', p_practitioner_serial;
+  END IF;
+  
+  RAISE NOTICE 'Created practitioner notification settings: %', v_settings_id;
+  RETURN v_settings_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+/**
+ * Create practitioner membership during signup
+ * SECURITY DEFINER bypasses RLS policies
+ * Returns the membership ID or throws error if it fails
+ */
+CREATE OR REPLACE FUNCTION create_practitioner_membership_signup(
+  p_practitioner_id UUID,
+  p_practitioner_serial TEXT
+)
+RETURNS UUID AS $$
+DECLARE
+  v_membership_id UUID;
+BEGIN
+  -- First check if it already exists
+  SELECT id INTO v_membership_id FROM memberships 
+  WHERE practitioner_id = p_practitioner_id LIMIT 1;
+  
+  IF v_membership_id IS NOT NULL THEN
+    RAISE NOTICE 'Membership already exists: %', v_membership_id;
+    RETURN v_membership_id;
+  END IF;
+  
+  -- Insert new membership
+  INSERT INTO memberships (
+    practitioner_id,
+    practitioner_serial,
+    status,
+    started_at,
+    created_at,
+    updated_at
+  )
+  VALUES (
+    p_practitioner_id,
+    p_practitioner_serial,
+    'inactive',
+    NULL,
+    NOW(),
+    NOW()
+  )
+  RETURNING id INTO v_membership_id;
+  
+  IF v_membership_id IS NULL THEN
+    RAISE EXCEPTION 'Failed to create membership for %', p_practitioner_serial;
+  END IF;
+  
+  RAISE NOTICE 'Created practitioner membership: %', v_membership_id;
+  RETURN v_membership_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+/**
+ * Create welcome notification for new practitioner
+ * SECURITY DEFINER bypasses RLS policies
+ * Returns the notification ID or throws error if it fails
+ */
+CREATE OR REPLACE FUNCTION create_welcome_notification_signup(
+  p_practitioner_serial TEXT
+)
+RETURNS UUID AS $$
+DECLARE
+  v_notification_id UUID;
+BEGIN
+  -- Insert welcome notification
+  INSERT INTO practitioner_notifications (
+    practitioner_serial,
+    type,
+    title,
+    message,
+    is_read,
+    created_at
+  )
+  VALUES (
+    p_practitioner_serial,
+    'system',
+    'Welcome to Rooted Vitality',
+    'Your practitioner account has been created successfully. Complete your profile to start connecting with clients.',
+    false,
+    NOW()
+  )
+  RETURNING id INTO v_notification_id;
+  
+  IF v_notification_id IS NULL THEN
+    RAISE EXCEPTION 'Failed to create welcome notification for %', p_practitioner_serial;
+  END IF;
+  
+  RAISE NOTICE 'Created welcome notification: %', v_notification_id;
+  RETURN v_notification_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

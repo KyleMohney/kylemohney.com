@@ -89,6 +89,7 @@ DESIGN SYSTEM
                         <div class="hero-actions">
                             <button id="btn-contact" class="btn btn-secondary btn-lg">Contact</button>
                             <button id="btn-back-to-profile" class="btn btn-secondary btn-lg" style="display: none;">Back to Profile</button>
+                            <a id="btn-back-to-search" href="#" class="back-to-search-link">← Back to search</a>
                         </div>
                     </div>
                     <div class="hero-info">
@@ -185,7 +186,7 @@ DESIGN SYSTEM
             </section>
 
             <!-- ========================================== -->
-            <!-- 3.2b MY APPROACH SECTION -->
+            <!-- 3.2b MY APPROACH CARD -->
             <!-- ========================================== -->
             <section id="approach-section" class="profile-section profile-card" style="display: none;">
                 <div class="section-container">
@@ -197,6 +198,25 @@ DESIGN SYSTEM
                             <p id="profile-approach" class="section-text"></p>
                         </div>
                     </div>
+                </div>
+            </section>
+
+            <!-- ========================================== -->
+            <!-- 3.2c PAYMENTS SECTION -->
+            <!-- ========================================== -->
+            <section id="payments-section" class="profile-section" style="display: none;">
+                <h2 class="section-title">Payment & Insurance</h2>
+                
+                <!-- Payment Methods -->
+                <div id="payments-row" style="display: none; margin-bottom: 1.5rem;">
+                    <div class="label">Payment Methods Accepted</div>
+                    <div id="payment-methods-list" class="tag-list"></div>
+                </div>
+
+                <!-- Insurance -->
+                <div id="insurance-row" style="display: none;">
+                    <div class="label">Insurance Accepted</div>
+                    <div id="insurance-list" class="tag-list"></div>
                 </div>
             </section>
 
@@ -223,18 +243,6 @@ DESIGN SYSTEM
                                 <div class="card-col full-width">
                                     <div class="label">Modalities</div>
                                     <div id="card-modalities" class="tag-list"></div>
-                                </div>
-                            </div>
-
-                            <!-- Payment & Insurance -->
-                            <div class="card-row" id="card-payment-insurance-row">
-                                <div class="card-col">
-                                    <div class="label">Payment Methods</div>
-                                    <div id="card-payment" class="tag-list-compact"></div>
-                                </div>
-                                <div class="card-col" id="card-insurance-col">
-                                    <div class="label">Insurance</div>
-                                    <div id="card-insurance" class="tag-list-compact"></div>
                                 </div>
                             </div>
 
@@ -277,12 +285,6 @@ DESIGN SYSTEM
                     <div id="card-credentials-row" class="credentials-group" style="display: none;">
                         <h3 class="credentials-group-title" style="display: none;">Credentials</h3>
                         <div id="card-credentials-list" class="credentials-compact"></div>
-                    </div>
-
-                    <!-- Continuing Education -->
-                    <div id="card-continuing-ed-row" class="credentials-group" style="display: none;">
-                        <h3 class="credentials-group-title">Continuing Education</h3>
-                        <div id="card-continuing-ed" class="credentials-compact"></div>
                     </div>
                 </div>
             </section>

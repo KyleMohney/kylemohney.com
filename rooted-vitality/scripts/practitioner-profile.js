@@ -282,6 +282,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Setup Back to Profile button
         await setupBackToProfileButton();
         
+        // Setup Back to Search link
+        setupBackToSearchLink();
+        
         // Setup Connection Request Modal handlers
         const connectionModal = document.getElementById('connection-request-modal');
         if (connectionModal) {
@@ -732,6 +735,54 @@ async function setupBackToProfileButton() {
 }
 
 /**
+ * Setup back-to-search link for clients viewing practitioner profiles
+ */
+function setupBackToSearchLink() {
+    console.log('[Practitioner Profile] setupBackToSearchLink() called');
+    const backLink = document.getElementById('btn-back-to-search');
+    if (!backLink) {
+        console.log('[Practitioner Profile] Back link element not found');
+        return;
+    }
+    
+    try {
+        // Check if we came from find-practitioners page (has project_id in URL)
+        const urlParams = new URLSearchParams(window.location.search);
+        const projectIdFromUrl = urlParams.get('project_id');
+        
+        console.log('[Practitioner Profile] projectIdFromUrl:', projectIdFromUrl);
+        
+        if (!projectIdFromUrl) {
+            console.log('[Practitioner Profile] No project_id in URL - hiding back-to-search link');
+            return;
+        }
+        
+        // Check if current user is a client (has rvUser in localStorage and role is client)
+        const rvUserStr = localStorage.getItem('rvUser');
+        const userRole = rvUserStr ? JSON.parse(rvUserStr).role : null;
+        
+        console.log('[Practitioner Profile] userRole:', userRole);
+        
+        if (userRole === 'client') {
+            // Client viewing practitioner from find-practitioners flow - show link
+            console.log('[Practitioner Profile] Client viewing practitioner - showing back-to-search link');
+            backLink.style.display = 'block';
+            
+            // Set up click handler to go back to find-practitioners page
+            backLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log('[Practitioner Profile] Back to search clicked, project_id:', projectIdFromUrl);
+                window.location.href = `./find-practitioners.html?project_id=${projectIdFromUrl}`;
+            });
+        } else {
+            console.log('[Practitioner Profile] Not a client - hiding back-to-search link');
+        }
+    } catch (error) {
+        console.error('[Practitioner Profile] Error setting up back-to-search link:', error);
+    }
+}
+
+/**
  * Open connection request modal (client action)
  */
 async function openConnectionRequest(practitionerId) {
@@ -1055,6 +1106,7 @@ function renderProfile() {
     renderHero();
     renderVideo();
     renderAbout();
+    renderPaymentsSection();
     renderServicesCard();
     renderCredentialsCard();
     renderContactCard();
@@ -1221,7 +1273,17 @@ function renderHero() {
     
     // Years in practice
     if (practitioner.year_established) {
-        const yearsInPractice = new Date().getFullYear() - practitioner.year_established;
+        let yearsInPractice;
+        const value = parseInt(practitioner.year_established);
+        
+        // If value is < 100, treat it as years directly
+        // If value is >= 1900, treat it as a year and calculate
+        if (value < 100) {
+            yearsInPractice = value;
+        } else {
+            yearsInPractice = new Date().getFullYear() - value;
+        }
+        
         document.getElementById('stat-years').textContent = yearsInPractice + ' yrs';
     }
     
@@ -1270,71 +1332,11 @@ function renderVideo() {
 }
 
 /**
- * Render Services & Coverage Card - compact, information-dense
+ * Render Payments & Insurance Section
  */
-async function renderServicesCard() {
+function renderPaymentsSection() {
     try {
         let hasContent = false;
-        
-        // ===== SERVICE CATEGORIES (from DB) =====
-        try {
-            console.log('[Services Card] Loading services for practitioner:', practitioner.id);
-            
-            // Query with proper relation joins
-            const { data: services, error } = await window.supabaseClient
-                .from('practitioner_selected_services')
-                .select(`
-                    id,
-                    is_active,
-                    taxonomy_subcategories (
-                        id,
-                        name
-                    )
-                `)
-                .eq('practitioner_serial', practitioner.serial_number)
-                .eq('is_active', true);
-            
-            console.log('[Services Card] Query result:', { services, error });
-            
-            if (error) {
-                console.warn('[Services Card] Query error:', error);
-            } else if (services && services.length > 0) {
-                console.log('[Services Card] Found', services.length, 'services');
-                hasContent = true;
-                
-                const serviceNames = services
-                    .filter(s => {
-                        console.log('[Services Card] Service item:', s);
-                        return s.taxonomy_subcategories && s.taxonomy_subcategories.name;
-                    })
-                    .map(s => `<span class="tag">${escapeHtml(s.taxonomy_subcategories.name)}</span>`)
-                    .slice(0, 8);
-                
-                console.log('[Services Card] Service tags created:', serviceNames);
-                if (serviceNames.length > 0) {
-                    document.getElementById('card-services').innerHTML = serviceNames.join('');
-                    document.getElementById('card-services-row').style.display = 'block';
-                    console.log('[Services Card] Services displayed successfully');
-                } else {
-                    console.log('[Services Card] No valid service names found after filtering');
-                }
-            } else {
-                console.log('[Services Card] No services found - empty result');
-            }
-        } catch (e) {
-            console.error('[Services Card] Exception loading services:', e);
-        }
-        
-        // ===== MODALITIES =====
-        if (practitioner.modalities && practitioner.modalities.length > 0) {
-            hasContent = true;
-            const tags = practitioner.modalities
-                .slice(0, 6)
-                .map(m => `<span class="tag">${escapeHtml(m)}</span>`)
-                .join('');
-            document.getElementById('card-modalities').innerHTML = tags;
-            document.getElementById('card-modalities-row').style.display = 'block';
-        }
         
         // ===== PAYMENT METHODS =====
         if (practitioner.payment_methods) {
@@ -1357,72 +1359,77 @@ async function renderServicesCard() {
             }
             
             if (methods.length > 0) {
-                console.log('[Services Card] Payment methods:', methods);
+                hasContent = true;
                 const paymentHtml = methods
-                    .slice(0, 4)
-                    .map(m => `<span class="tag-compact">${escapeHtml(m)}</span>`)
+                    .map(m => `<span class="tag">${escapeHtml(m)}</span>`)
                     .join('');
-                document.getElementById('card-payment').innerHTML = paymentHtml;
-            } else {
-                document.getElementById('card-payment').innerHTML = '';
+                document.getElementById('payment-methods-list').innerHTML = paymentHtml;
+                document.getElementById('payments-row').style.display = 'block';
             }
-        } else {
-            document.getElementById('card-payment').innerHTML = '';
         }
         
-        // ===== INSURANCE - HIDE IF NO DATA =====
-        const insuranceCol = document.getElementById('card-insurance-col');
+        // ===== INSURANCE =====
         if (practitioner.accepts_insurance || (practitioner.insurance_providers && practitioner.insurance_providers.length > 0)) {
             const providers = practitioner.insurance_providers || [];
-            let label = '';
             if (providers.length > 0) {
-                label = providers.slice(0, 2).join(', ');
+                hasContent = true;
+                const insuranceHtml = providers
+                    .map(p => `<span class="tag">${escapeHtml(p)}</span>`)
+                    .join('');
+                document.getElementById('insurance-list').innerHTML = insuranceHtml;
+                document.getElementById('insurance-row').style.display = 'block';
             } else if (practitioner.accepts_insurance) {
-                label = 'Yes';
+                hasContent = true;
+                document.getElementById('insurance-list').innerHTML = '<span class="tag">Yes</span>';
+                document.getElementById('insurance-row').style.display = 'block';
             }
-            
-            if (label) {
-                console.log('[Services Card] Insurance:', label);
-                document.getElementById('card-insurance').innerHTML = `<span class="tag-compact">${escapeHtml(label)}</span>`;
-                insuranceCol.style.display = 'block';
-            } else {
-                insuranceCol.style.display = 'none';
-                document.getElementById('card-insurance').innerHTML = '';
-            }
-        } else {
-            console.log('[Services Card] No insurance data - hiding field completely');
-            insuranceCol.style.display = 'none';
-            document.getElementById('card-insurance').innerHTML = '';
+        }
+        
+        // Show payments section if has any content
+        if (hasContent) {
+            document.getElementById('payments-section').style.display = 'block';
+        }
+    } catch (error) {
+        console.error('[Practitioner Profile] Error rendering payments section:', error);
+    }
+}
+
+/**
+ * Render Services & Coverage Card - compact, information-dense
+ */
+async function renderServicesCard() {
+    try {
+        let hasContent = false;
+        
+        // ===== SERVICE CATEGORIES (HIDDEN - for matching only, not public display) =====
+        // Hide the services row entirely since services are not shown on public profile
+        const servicesRow = document.getElementById('card-services-row');
+        if (servicesRow) {
+            servicesRow.style.display = 'none';
+        }
+        
+        // ===== MODALITIES =====
+        if (practitioner.modalities && practitioner.modalities.length > 0) {
+            hasContent = true;
+            // Display as comma-separated formatted text instead of pills
+            const text = practitioner.modalities
+                .slice(0, 6)
+                .map(m => escapeHtml(m))
+                .join(', ');
+            document.getElementById('card-modalities').innerHTML = text;
+            document.getElementById('card-modalities-row').style.display = 'block';
         }
         
         // ===== LANGUAGES =====
         if (practitioner.languages && practitioner.languages.length > 0) {
             document.getElementById('card-languages').innerHTML = practitioner.languages
                 .slice(0, 4)
-                .map(l => `<span class="tag">${escapeHtml(l)}</span>`)
-                .join('');
+                .map(l => escapeHtml(l))
+                .join(', ');
             document.getElementById('card-languages-row').style.display = 'block';
         }
         
-        // ===== SPECIALIZATIONS (moved from credentials card) =====
-        // Combine conditions_treated and categories from match settings
-        const allSpecializations = [];
-        if (practitioner.conditions_treated && practitioner.conditions_treated.length > 0) {
-            allSpecializations.push(...practitioner.conditions_treated);
-        }
-        if (practitioner.service_categories && practitioner.service_categories.length > 0) {
-            allSpecializations.push(...practitioner.service_categories);
-        }
-        const uniqueSpecializations = [...new Set(allSpecializations)];
-        
-        if (uniqueSpecializations.length > 0) {
-            hasContent = true;
-            document.getElementById('card-specializations').innerHTML = uniqueSpecializations
-                .slice(0, 15)
-                .map(spec => `<span class="tag">${escapeHtml(spec)}</span>`)
-                .join('');
-            document.getElementById('card-specializations-row').style.display = 'block';
-        }
+        // ===== SPECIALIZATIONS - HIDDEN (already covered by match settings) =====
         
         // Show card if has any content
         if (hasContent) {
@@ -1447,51 +1454,67 @@ function renderCredentialsCard() {
     console.log('[renderCredentialsCard] practitioner.badge_certified:', practitioner.badge_certified);
     console.log('[renderCredentialsCard] practitioner.badge_licensed:', practitioner.badge_licensed);
     console.log('[renderCredentialsCard] practitioner.background_check_status:', practitioner.background_check_status);
-    console.log('[renderCredentialsCard] practitioner.continuing_education:', practitioner.continuing_education);
     
-    // Build array from explicit credentials + badge pseudo-credentials
+    // Prevent duplicate rendering - ensure credentials loaded once
+    if (!practitioner.credentials) {
+        practitioner.credentials = [];
+        console.log('[renderCredentialsCard] ⚠ Credentials not initialized, defaulting to empty array');
+    }
+    
+    // Ensure credentials is an array (defense against malformed data)
+    if (!Array.isArray(practitioner.credentials)) {
+        console.warn('[renderCredentialsCard] ⚠ Credentials is not an array, converting...');
+        practitioner.credentials = Object.values(practitioner.credentials || {});
+    }
+    
+    // Build array with DEDUPLICATION: track unique credentials
     let allCredentials = [];
+    let credentialIds = new Set(); // Track credential IDs to prevent duplicates
     
-    // Add explicit credentials if they exist and are an array
+    // Add explicit credentials if they exist and are an array - ONLY ONCE
+    // Note: Badges (Licensed, Certified) are already displayed in hero section, so we skip those
     if (Array.isArray(practitioner.credentials) && practitioner.credentials.length > 0) {
-        allCredentials = [...practitioner.credentials];
-        console.log('[renderCredentialsCard] Added', practitioner.credentials.length, 'explicit credentials');
-    }
-    
-    // Add badges as pseudo-credentials so they appear in the card
-    if (practitioner.badge_certified) {
-        allCredentials.push({
-            credential_type: 'Certification',
-            title: 'Certified Practitioner',
-            issuer: 'Rooted Vitality'
+        practitioner.credentials.forEach(cred => {
+            // Create unique key based on type and title to prevent duplicates
+            const credKey = `${cred.credential_type}:${cred.title}:${cred.issuer || ''}`;
+            
+            // Skip badge pseudo-credentials - they're already in the hero section
+            if (cred.credential_type === 'Certification' && cred.title === 'Certified Practitioner') {
+                console.log('[renderCredentialsCard] ℹ Skipped Certified Practitioner badge (shown in hero)');
+                return;
+            }
+            if (cred.credential_type === 'License' && cred.title === 'Licensed Practitioner') {
+                console.log('[renderCredentialsCard] ℹ Skipped Licensed Practitioner badge (shown in hero)');
+                return;
+            }
+            
+            if (!credentialIds.has(credKey)) {
+                allCredentials.push(cred);
+                credentialIds.add(credKey);
+            }
         });
-        console.log('[renderCredentialsCard] Added badge_certified as pseudo-credential');
-    }
-    
-    if (practitioner.badge_licensed) {
-        allCredentials.push({
-            credential_type: 'License',
-            title: 'Licensed Practitioner',
-            issuer: 'Professional Board'
-        });
-        console.log('[renderCredentialsCard] Added badge_licensed as pseudo-credential');
-    }
-    
-    if (practitioner.background_check_status === 'passed') {
-        allCredentials.push({
-            credential_type: 'Verification',
-            title: 'Background Check Passed',
-            issuer: 'Rooted Vitality'
-        });
-        console.log('[renderCredentialsCard] Added background_check as pseudo-credential');
+        console.log('[renderCredentialsCard] ✓ Loaded', allCredentials.length, 'unique credentials (excluding hero badges) from', practitioner.credentials.length, 'total');
     }
     
     // ===== RENDER CREDENTIALS =====
     if (allCredentials.length > 0) {
-        console.log('[renderCredentialsCard] Found', allCredentials.length, 'total credentials to display');
+        console.log('[renderCredentialsCard] Found', allCredentials.length, 'total unique credentials to display');
         hasContent = true;
-        const credentialsHtml = allCredentials
-            .slice(0, 5)
+        
+        // Separate by type and limit to ensure variety
+        const degreesCerts = allCredentials.filter(c => c.credential_type === 'Degree');
+        const licenses = allCredentials.filter(c => c.credential_type === 'License');
+        const certs = allCredentials.filter(c => c.credential_type === 'Certification');
+        const other = allCredentials.filter(c => !['Degree', 'License', 'Certification'].includes(c.credential_type));
+        
+        // Prioritize showing at least one of each type if available, up to 5 total
+        const toDisplay = [];
+        if (degreesCerts.length > 0) toDisplay.push(degreesCerts[0]);
+        if (licenses.length > 0) toDisplay.push(licenses[0]);
+        if (certs.length > 0 && toDisplay.length < 5) toDisplay.push(certs[0]);
+        if (toDisplay.length < 5) toDisplay.push(...other.slice(0, 5 - toDisplay.length));
+        
+        const credentialsHtml = toDisplay
             .map(cred => `
                 <div class="credential-item-compact">
                     <span class="credential-type">${escapeHtml(cred.credential_type || 'Credential')}</span>
@@ -1502,44 +1525,20 @@ function renderCredentialsCard() {
             `)
             .join('');
         
-        console.log('[renderCredentialsCard] Rendering credentials HTML...');
+        console.log('[renderCredentialsCard] ✓ Rendering', toDisplay.length, 'credentials (', degreesCerts.length, 'degrees,', licenses.length, 'licenses,', certs.length, 'certs )');
         document.getElementById('card-credentials-list').innerHTML = credentialsHtml;
         document.getElementById('card-credentials-row').style.display = 'block';
-        console.log('[renderCredentialsCard] Credentials displayed');
+        console.log('[renderCredentialsCard] ✓ Credentials displayed');
     } else {
-        console.log('[renderCredentialsCard] No credentials to display');
-    }
-    
-    // ===== CONTINUING EDUCATION =====
-    if (practitioner.continuing_education && practitioner.continuing_education.length > 0) {
-        console.log('[renderCredentialsCard] Found', practitioner.continuing_education.length, 'continuing education items');
-        hasContent = true;
-        const ceHtml = practitioner.continuing_education
-            .slice(0, 5)
-            .map(ce => `
-                <div class="credential-item-compact">
-                    <span class="credential-type">${escapeHtml(ce.type || 'Course')}</span>
-                    <span class="credential-divider">·</span>
-                    <span class="credential-title">${escapeHtml(ce.title || '')}</span>
-                    ${ce.provider ? `<span class="credential-issuer">${escapeHtml(ce.provider)}</span>` : ''}
-                    ${ce.year ? `<span class="credential-year">${ce.year}</span>` : ''}
-                </div>
-            `)
-            .join('');
-        
-        console.log('[renderCredentialsCard] Rendering continuing education HTML...');
-        document.getElementById('card-continuing-ed').innerHTML = ceHtml;
-        document.getElementById('card-continuing-ed-row').style.display = 'block';
-        console.log('[renderCredentialsCard] Continuing education displayed');
-    } else {
-        console.log('[renderCredentialsCard] No continuing education to display');
+        console.log('[renderCredentialsCard] ℹ No credentials to display');
     }
     
     if (hasContent) {
-        console.log('[renderCredentialsCard] Has content - showing credentials-card-section');
+        console.log('[renderCredentialsCard] ✓ Has content - showing credentials-card-section');
         document.getElementById('credentials-card-section').style.display = 'block';
     } else {
-        console.log('[renderCredentialsCard] No credentials or continuing education content - hiding credentials-card-section');
+        console.log('[renderCredentialsCard] ℹ No credentials content - hiding credentials-card-section');
+        document.getElementById('credentials-card-section').style.display = 'none';
     }
 }
 

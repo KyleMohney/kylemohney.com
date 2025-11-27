@@ -19,65 +19,190 @@ let hasUnsavedChanges = false; // Track if page has unsaved changes
 window.educationCredentials = [];
 window.licenseCredentials = [];
 window.certificationCredentials = [];
-window.continuingEducationCredentials = [];
 
 /**
- * Safe update/insert for practitioners table
- * Tries UPDATE first, then INSERT if record doesn't exist
+ * Profile-specific fields that belong in practitioner_profiles table
  */
-async function safePractitionerUpdate(updateData) {
+const PROFILE_TABLE_FIELDS = [
+    // About & Specializations
+    'bio', 'ethos_statement', 'languages', 'modalities',
+    // Photos & Video
+    'gallery_photos', 'intro_video_url', 'practice_logo_url',
+    // Additional Details
+    'faq', 'social_media', 'practice_type', 'year_established',
+    // Profile management
+    'profile_completeness_percent'
+];
+
+/**
+ * Credential-specific fields that belong in practitioner_credentials table
+ */
+const CREDENTIALS_TABLE_FIELDS = [
+    'credentials', 'badge_certified', 'badge_licensed', 'badge_background_check_verified',
+    'background_check_status', 'background_check_date', 'background_check_provider',
+    'background_check_notes', 'verification_updated_at', 'verification_updated_by',
+    'verification_audit_trail', 'approved_by', 'badge_verified', 'credentials_verified'
+];
+
+/**
+ * Route update data to the correct table based on field type
+ * Separates fields for practitioners, practitioner_profiles, and practitioner_credentials
+ * Returns merged data for window.practitionerData
+ */
+async function routeUpdateData(updateData) {
     if (!currentUser) {
         throw new Error('No current user');
     }
     
     try {
-        console.log('[DB] ====== safePractitionerUpdate CALLED ======');
-        console.log('[DB] Updating id:', currentUser.id);
-        console.log('[DB] Update data keys:', Object.keys(updateData));
-        console.log('[DB] languages in updateData:', updateData.languages);
-        console.log('[DB] faq in updateData:', updateData.faq);
-        console.log('[DB] Full update data:', JSON.stringify(updateData, null, 2));
+        const practitionersData = {};
+        const profileData = {};
+        const credentialsData = {};
+        const mergedResult = {};
         
-        // Try UPDATE first
-        const { data: updated, error: updateError } = await window.supabaseClient
-            .from('practitioners')
-            .update(updateData)
-            .eq('id', currentUser.id)
-            .select('*')
-            .single();
+        // Separate fields by table
+        Object.keys(updateData).forEach(key => {
+            if (PROFILE_TABLE_FIELDS.includes(key)) {
+                profileData[key] = updateData[key];
+            } else if (CREDENTIALS_TABLE_FIELDS.includes(key)) {
+                credentialsData[key] = updateData[key];
+            } else {
+                practitionersData[key] = updateData[key];
+            }
+        });
         
-        console.log('[DB] Update response - data:', updated, 'error:', updateError);
+        console.log('[DB] ====== routeUpdateData CALLED ======');
+        console.log('[DB] Practitioners fields:', Object.keys(practitionersData));
+        console.log('[DB] Profile fields:', Object.keys(profileData));
+        console.log('[DB] Credentials fields:', Object.keys(credentialsData));
         
-        if (updateError && updateError.code === 'PGRST116') {
-            // Record doesn't exist, INSERT it
-            const insertData = {
-                id: currentUser.id,
-                email: currentUser.email || '',
-                status: 'draft',
-                created_at: new Date().toISOString(),
-                ...updateData
-            };
-            
-            const { data: inserted, error: insertError } = await window.supabaseClient
+        // Update practitioners table if there are fields for it
+        if (Object.keys(practitionersData).length > 0) {
+            const { data: updated, error: updateError } = await window.supabaseClient
                 .from('practitioners')
-                .insert([insertData])
+                .update(practitionersData)
+                .eq('id', currentUser.id)
                 .select('*')
                 .single();
             
-            if (insertError) {
-                throw insertError;
+            if (updateError) {
+                console.error('[DB] Error updating practitioners:', updateError);
+                throw updateError;
             }
-            
-            return inserted;
-        } else if (updateError) {
-            throw updateError;
+            console.log('[DB] ✓ Practitioners table updated');
+            Object.assign(mergedResult, updated);
         }
         
-        return updated;
+        // Update practitioner_profiles table if there are fields for it
+        if (Object.keys(profileData).length > 0) {
+            // Add updated_at if not present
+            if (!profileData.updated_at) {
+                profileData.updated_at = new Date().toISOString();
+            }
+            
+            const { data: profileUpdated, error: profileError } = await window.supabaseClient
+                .from('practitioner_profiles')
+                .update(profileData)
+                .eq('id', currentUser.id)
+                .select('*')
+                .single();
+            
+            if (profileError) {
+                // If record doesn't exist, try to insert it
+                if (profileError.code === 'PGRST116') {
+                    const insertData = {
+                        id: currentUser.id,
+                        practitioner_serial: window.practitionerData?.serial_number,
+                        ...profileData
+                    };
+                    
+                    const { data: inserted, error: insertError } = await window.supabaseClient
+                        .from('practitioner_profiles')
+                        .insert([insertData])
+                        .select('*')
+                        .single();
+                    
+                    if (insertError) {
+                        console.error('[DB] Error inserting into practitioner_profiles:', insertError);
+                        throw insertError;
+                    }
+                    console.log('[DB] ✓ Practitioner profile created');
+                    Object.assign(mergedResult, inserted);
+                } else {
+                    console.error('[DB] Error updating practitioner_profiles:', profileError);
+                    throw profileError;
+                }
+            } else {
+                console.log('[DB] ✓ Practitioner profile updated');
+                Object.assign(mergedResult, profileUpdated);
+            }
+        }
+        
+        // Update practitioner_credentials table if there are fields for it
+        if (Object.keys(credentialsData).length > 0) {
+            if (!credentialsData.updated_at) {
+                credentialsData.updated_at = new Date().toISOString();
+            }
+            
+            const { data: credUpdated, error: credError } = await window.supabaseClient
+                .from('practitioner_credentials')
+                .update(credentialsData)
+                .eq('id', currentUser.id)
+                .select('*')
+                .single();
+            
+            if (credError) {
+                if (credError.code === 'PGRST116') {
+                    const insertData = {
+                        id: currentUser.id,
+                        practitioner_serial: window.practitionerData?.serial_number,
+                        ...credentialsData
+                    };
+                    
+                    const { data: inserted, error: insertError } = await window.supabaseClient
+                        .from('practitioner_credentials')
+                        .insert([insertData])
+                        .select('*')
+                        .single();
+                    
+                    if (insertError) {
+                        console.error('[DB] Error inserting into practitioner_credentials:', insertError);
+                        throw insertError;
+                    }
+                    console.log('[DB] ✓ Practitioner credentials created');
+                    Object.assign(mergedResult, inserted);
+                } else {
+                    console.error('[DB] Error updating practitioner_credentials:', credError);
+                    throw credError;
+                }
+            } else {
+                console.log('[DB] ✓ Practitioner credentials updated');
+                Object.assign(mergedResult, credUpdated);
+            }
+        }
+        
+        // Return merged data with existing window.practitionerData
+        const finalMerged = {
+            ...window.practitionerData,
+            ...mergedResult
+        };
+        
+        console.log('[DB] ✓ routeUpdateData complete, returning merged data');
+        return finalMerged;
+        
     } catch (error) {
-        console.error('[Rooted Vitality] Error in safePractitionerUpdate:', error);
+        console.error('[DB] Error in routeUpdateData:', error);
         throw error;
     }
+}
+
+/**
+ * Safe update/insert for practitioners table (legacy - kept for compatibility)
+ * Tries UPDATE first, then INSERT if record doesn't exist
+ */
+async function safePractitionerUpdate(updateData) {
+    // Use the new routing function which handles all tables
+    return routeUpdateData(updateData);
 }
 
 /**
@@ -176,10 +301,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         currentUser = user;
         console.log(`[Rooted Vitality] Loaded profile for user: ${user.id}`);
         
-        // Initialize conditions manager with Supabase client
-        console.log('[Rooted Vitality] Initializing conditions manager...');
-        await window.conditionsManager.init(window.supabaseClient);
-        
         // Load profile data from Supabase
         await loadProfile(user.id);
         
@@ -190,24 +311,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Setup change tracking for unsaved changes warning
     setupUnsavedChangesTracking();
     
-    // Listen for conditions changes and mark as unsaved
-    window.addEventListener('conditionsUpdated', (e) => {
-        console.log('[Rooted Vitality] Conditions updated event fired:', e.detail.conditions);
-        window.markAsChanged();
-        // Also update the conditions data
-        window.conditionsData = e.detail.conditions;
-    });
     
     // Setup event listeners for all input fields
     setupInputListeners();
-    setupConditionsListeners();
     setupLanguageListeners();
     setupInsuranceListeners();
     setupFAQListeners();
     setupPricingListeners();
     setupPracticeListeners();
     setupVideoListeners();
-    setupContinuingEducationListeners();
     setupAvatarUpload();
     setupBackgroundCheckButton();
     setupBusinessVerification();
@@ -268,12 +380,15 @@ async function loadProfile(userId) {
             const { data: credentials, error: credError } = await window.supabaseClient
                 .from('practitioner_credentials')
                 .select('*')
-                .eq('practitioner_serial', practitioner.serial_number)
+                .eq('id', practitioner.id)
                 .single();
             
             if (!credError && credentials) {
                 credentialsData = credentials;
-                console.log('[Rooted Vitality] Credentials loaded from practitioner_credentials');
+                console.log('[Rooted Vitality] Credentials loaded from practitioner_credentials:', credentialsData);
+                console.log('[Rooted Vitality] Credentials array:', credentialsData.credentials, 'Type:', typeof credentialsData.credentials, 'IsArray:', Array.isArray(credentialsData.credentials));
+            } else if (credError && credError.code !== 'PGRST116') {
+                console.warn('[Rooted Vitality] Warning loading credentials (may not exist yet):', credError);
             }
         }
         
@@ -290,11 +405,7 @@ async function loadProfile(userId) {
             console.log('[Rooted Vitality] ✓ Practitioner data stored in window.practitionerData');
         }
         
-        // Render dynamic conditions checkboxes from taxonomy FIRST (before loading conditions data)
-        console.log('[Rooted Vitality] Rendering conditions checkboxes before loading profile...');
-        window.conditionsManager.render();
-        
-        // Then populate profile fields (which will set selected conditions)
+        // Then populate profile fields
         if (practitioner) {
             console.log('[Rooted Vitality] Practitioner profile found, populating fields...');
             await populateProfileFields(window.practitionerData);
@@ -463,7 +574,6 @@ async function populateProfileFields(data) {
         window.educationCredentials = [];
         window.licenseCredentials = [];
         window.certificationCredentials = [];
-        window.continuingEducationCredentials = [];
         
         // Separate credentials by type
         data.credentials.forEach(cred => {
@@ -473,16 +583,13 @@ async function populateProfileFields(data) {
                 window.licenseCredentials.push(cred);
             } else if (cred.credential_type === 'certification') {
                 window.certificationCredentials.push(cred);
-            } else if (cred.credential_type === 'continuing_education') {
-                window.continuingEducationCredentials.push(cred);
             }
         });
         
         console.log('[Rooted Vitality] ✓ Credentials separated by type:', {
             degrees: window.educationCredentials.length,
             licenses: window.licenseCredentials.length,
-            certifications: window.certificationCredentials.length,
-            continuingEducation: window.continuingEducationCredentials.length
+            certifications: window.certificationCredentials.length
         });
     } else {
         // Fallback to legacy field names for backward compatibility
@@ -505,12 +612,6 @@ async function populateProfileFields(data) {
             console.log('[Rooted Vitality] ✓ Loaded certification_credentials:', window.certificationCredentials.length, window.certificationCredentials);
         } else {
             window.certificationCredentials = [];
-        }
-        
-        if (data.continuing_education && Array.isArray(data.continuing_education)) {
-            window.continuingEducationCredentials = data.continuing_education;
-        } else {
-            window.continuingEducationCredentials = [];
         }
     }
     
@@ -656,12 +757,6 @@ async function populateProfileFields(data) {
         console.log('[Rooted Vitality] ✓ Loaded practice type:', data.practice_type);
     }
     
-    // Load conditions treated
-    if (data.conditions_treated) {
-        loadConditions(data.conditions_treated);
-        console.log('[Rooted Vitality] ✓ Loaded conditions treated:', data.conditions_treated);
-    }
-    
     // Load video introduction
     console.log('[Rooted Vitality] Video URL from database:', data.intro_video_url);
     if (data.intro_video_url) {
@@ -670,11 +765,6 @@ async function populateProfileFields(data) {
     } else {
         console.log('[Rooted Vitality] No video URL found in database');
     }
-    
-    // Continuing education credentials are loaded above from data.credentials array
-    // (filtered by credential_type === 'continuing_education')
-    // No need to load from a separate field
-    console.log('[Rooted Vitality] ✓ Continuing education already loaded from credentials array:', window.continuingEducationCredentials.length, 'items');
     
     // Load languages from database
     // Languages are stored as text[] array in database
@@ -766,26 +856,6 @@ function initializeCredentialSections() {
         console.log(`[Rooted Vitality] 🔧 Credential array length: ${credentialArray.length}`);
     });
     
-    // Initialize continuing education section
-    console.log(`[Rooted Vitality] 🔧 Processing section: continuing-education`);
-    const ceEditDiv = document.getElementById('continuing-education-edit');
-    const ceDisplayDiv = document.getElementById('continuing-education-display');
-    
-    if (ceEditDiv) {
-        ceEditDiv.style.display = 'flex';
-        console.log(`[Rooted Vitality] 🔧 Set continuing-education-edit display = flex`);
-    }
-    
-    if (ceDisplayDiv) {
-        ceDisplayDiv.style.display = 'none';
-        console.log(`[Rooted Vitality] 🔧 Set continuing-education-display display = none`);
-    }
-    
-    // Render any existing continuing education credentials
-    console.log(`[Rooted Vitality] 🔧 Rendering continuing education list`);
-    renderContinuingEducationList();
-    
-    console.log(`[Rooted Vitality] 🔧 Credential array length: ${(window.continuingEducationCredentials || []).length}`);
     console.log('[Rooted Vitality] 🔧 initializeCredentialSections completed');
 }
 
@@ -835,67 +905,170 @@ function updateProfileCompleteness() {
         }
         
         const p = window.practitionerData;
-        let points = 0;
-        const totalPoints = 18;
+        const sections = {
+            about: { required: [], completed: 0 },
+            specializations: { required: [], completed: 0 },
+            credentials: { required: [], completed: 0 },
+            photos: { required: [], completed: 0 },
+            reviews: { required: [], completed: 0 },
+            additional: { required: [], completed: 0 }
+        };
         
-        // 1. bio - About You
-        if (p.bio?.trim()) points += 1;
+        // ═══════════════════════════════════════════════════════════════════════════
+        // SECTION 1: ABOUT & SPECIALIZATIONS
+        // Requires: Bio, Ethos Statement, At least 1 condition treated, At least 1 language
+        // ═══════════════════════════════════════════════════════════════════════════
         
-        // 2. ethos_statement - Your Approach & Philosophy
-        if (p.ethos_statement?.trim()) points += 1;
+        // About You - Bio (needs at least 1 character)
+        sections.about.required.push('bio');
+        const hasBio = p.bio?.trim()?.length > 0;
+        console.log('[Profile] Bio present:', hasBio);
+        if (hasBio) sections.about.completed++;
         
-        // 3. conditions_treated - Conditions & Specializations
-        if (Array.isArray(p.conditions_treated) && p.conditions_treated.length > 0) points += 1;
+        // Your Approach & Philosophy - Ethos Statement (needs at least 1 character)
+        sections.about.required.push('ethos_statement');
+        const hasEthos = p.ethos_statement?.trim()?.length > 0;
+        console.log('[Profile] Ethos Statement present:', hasEthos);
+        if (hasEthos) sections.about.completed++;
         
-        // 4. credentials (degree) - Degrees & Education
-        if (Array.isArray(p.credentials) && p.credentials.some(c => c.credential_type === 'degree')) points += 1;
+        // Languages (needs at least 1)
+        sections.about.required.push('languages');
+        const hasLanguages = Array.isArray(p.languages) && p.languages.length > 0;
+        console.log('[Profile] Languages present (at least 1):', hasLanguages);
+        if (hasLanguages) sections.about.completed++;
         
-        // 5. credentials (license) - Licenses
-        if (Array.isArray(p.credentials) && p.credentials.some(c => c.credential_type === 'license')) points += 1;
+        // ═══════════════════════════════════════════════════════════════════════════
+        // SECTION 2: CREDENTIALS
+        // Requires: At least 1 degree, 1 license, 1 certification, AND background check passed
+        // ═══════════════════════════════════════════════════════════════════════════
         
-        // 6. credentials (certification) - Certifications
-        if (Array.isArray(p.credentials) && p.credentials.some(c => c.credential_type === 'certification')) points += 1;
+        console.log('[Profile] Credentials array:', p.credentials, 'Type:', typeof p.credentials, 'IsArray:', Array.isArray(p.credentials));
+        if (Array.isArray(p.credentials)) {
+            console.log('[Profile] Credentials array length:', p.credentials.length);
+            console.log('[Profile] Credentials content:', JSON.stringify(p.credentials));
+        }
         
-        // 7. credentials (continuing_education) - Ongoing Education
-        if (Array.isArray(p.credentials) && p.credentials.some(c => c.credential_type === 'continuing_education')) points += 1;
+        // At least one degree/education
+        sections.credentials.required.push('degree');
+        const hasDegree = Array.isArray(p.credentials) && p.credentials.some(c => c.credential_type === 'degree');
+        console.log('[Profile] Has at least 1 degree:', hasDegree);
+        if (hasDegree) sections.credentials.completed++;
         
-        // 8. background_check_status === 'passed' - Background Check Badge
-        if (p.background_check_status === 'passed') points += 1;
+        // At least one license
+        sections.credentials.required.push('license');
+        const hasLicense = Array.isArray(p.credentials) && p.credentials.some(c => c.credential_type === 'license');
+        console.log('[Profile] Has at least 1 license:', hasLicense);
+        if (hasLicense) sections.credentials.completed++;
         
-        // 9. badge_verified - Verified Badge
-        if (p.badge_verified === true) points += 1;
+        // At least one certification
+        sections.credentials.required.push('certification');
+        const hasCertification = Array.isArray(p.credentials) && p.credentials.some(c => c.credential_type === 'certification');
+        console.log('[Profile] Has at least 1 certification:', hasCertification);
+        if (hasCertification) sections.credentials.completed++;
         
-        // 10. gallery_photos - Professional Photos
-        if (Array.isArray(p.gallery_photos) && p.gallery_photos.length > 0) points += 1;
+        // Background check passed
+        sections.credentials.required.push('background_check');
+        const bgCheckPassed = p.background_check_status === 'passed';
+        console.log('[Profile] Background check passed:', bgCheckPassed, 'Status:', p.background_check_status);
+        if (bgCheckPassed) sections.credentials.completed++;
         
-        // 11. intro_video_url - Professional Introduction Video
-        if (p.intro_video_url?.trim()) points += 1;
+        // ═══════════════════════════════════════════════════════════════════════════
+        // SECTION 3: PHOTOS & VIDEO (Business Logo, Professional Photos, Intro Video)
+        // ═══════════════════════════════════════════════════════════════════════════
         
-        // 12. reviews (from data, not DOM) - Reviews
-        if (window.allReviews && window.allReviews.length > 0) points += 1;
+        // Business Logo / Practice Logo
+        sections.photos.required.push('practice_logo_url');
+        const hasLogo = p.practice_logo_url?.trim()?.length > 0;
+        console.log('[Profile] Has practice logo:', hasLogo);
+        if (hasLogo) sections.photos.completed++;
         
-        // 13. languages - Languages
-        if (Array.isArray(p.languages) && p.languages.length > 0) points += 1;
+        // Professional photos/gallery
+        sections.photos.required.push('gallery_photos');
+        const hasGalleryPhotos = Array.isArray(p.gallery_photos) && p.gallery_photos.length > 0;
+        console.log('[Profile] Has gallery photos (at least 1):', hasGalleryPhotos);
+        if (hasGalleryPhotos) {
+            sections.photos.completed++;
+        }
         
-        // 14. faq - Frequently Asked Questions
-        if (p.faq && Object.keys(p.faq).length > 0) points += 1;
+        // Intro video
+        sections.photos.required.push('intro_video_url');
+        const hasVideo = p.intro_video_url?.trim()?.length > 0;
+        console.log('[Profile] Has intro video:', hasVideo);
+        if (hasVideo) sections.photos.completed++;
         
-        // 15. social_media - Social Media & Connect
-        if (p.social_media && Object.keys(p.social_media).length > 0) points += 1;
+        // ═══════════════════════════════════════════════════════════════════════════
+        // SECTION 4: REVIEWS
+        // Requires: At least 1 review (optional section - having reviews counts as complete)
+        // ═══════════════════════════════════════════════════════════════════════════
         
-        // 16. practice_type - Practice Type & Setting
-        if (p.practice_type && ['private', 'clinic', 'hospital'].includes(p.practice_type)) points += 1;
+        sections.reviews.required.push('reviews');
+        const hasReviews = window.allReviews && window.allReviews.length > 0;
+        console.log('[Profile] Has reviews (at least 1):', hasReviews);
+        if (hasReviews) {
+            sections.reviews.completed++;
+        }
         
-        // 17. accepts_insurance OR insurance_providers - Payments & Insurance
-        if (p.accepts_insurance === true || (Array.isArray(p.insurance_providers) && p.insurance_providers.length > 0) || p.custom_insurance_providers?.trim()) points += 1;
+        // ═══════════════════════════════════════════════════════════════════════════
+        // SECTION 5: ADDITIONAL DETAILS (FAQ, Social Media, Practice Type, Insurance)
+        // Requires: At least 1 FAQ, At least 1 social media, Practice type selected, AND insurance/payments configured
+        // ═══════════════════════════════════════════════════════════════════════════
         
-        // 18. payment_methods - Payment Methods Accepted
-        if (p.payment_methods?.trim() || p.custom_payment_methods?.trim()) points += 1;
+        // FAQ - at least 1 FAQ entry
+        sections.additional.required.push('faq');
+        const hasFAQ = p.faq && Object.keys(p.faq).length > 0;
+        console.log('[Profile] Has FAQ (at least 1):', hasFAQ);
+        if (hasFAQ) sections.additional.completed++;
         
-        // Calculate percentage (18 points = 100%)
-        const percentage = Math.round((points / totalPoints) * 100);
+        // Social Media - at least 1 social media link
+        sections.additional.required.push('social_media');
+        const hasSocialMedia = p.social_media && Object.keys(p.social_media).length > 0;
+        console.log('[Profile] Has social media (at least 1):', hasSocialMedia);
+        if (hasSocialMedia) sections.additional.completed++;
         
-        console.log(`[Rooted Vitality] Profile completeness: ${points}/${totalPoints} points = ${percentage}%`);
+        // Practice Type - must be selected (private, clinic, or hospital)
+        sections.additional.required.push('practice_type');
+        const hasPracticeType = p.practice_type && ['private', 'clinic', 'hospital'].includes(p.practice_type);
+        console.log('[Profile] Has practice type selected:', hasPracticeType);
+        if (hasPracticeType) {
+            sections.additional.completed++;
+        }
+        
+        // Insurance/Payments - at least 1 payment method configured
+        sections.additional.required.push('insurance_payments');
+        const hasInsurancePayments = p.accepts_insurance === true || (Array.isArray(p.insurance_providers) && p.insurance_providers.length > 0) || p.custom_insurance_providers?.trim() || p.payment_methods?.trim() || p.custom_payment_methods?.trim();
+        console.log('[Profile] Has insurance/payments configured:', hasInsurancePayments);
+        if (hasInsurancePayments) {
+            sections.additional.completed++;
+        }
+        
+        // ═══════════════════════════════════════════════════════════════════════════
+        // CALCULATE OVERALL COMPLETION
+        // Rule: Each section requires AT LEAST 1 of each required field (100% field completion per section)
+        // Formula: (sections_complete / 6) × 100%  [All 6 sections required including reviews]
+        // ═══════════════════════════════════════════════════════════════════════════
+        
+        let sectionsComplete = 0;
+        const totalSections = 6; // All sections required: about, credentials, photos, reviews, additional details, and at least 1 review
+        
+        Object.keys(sections).forEach(section => {
+            const sectionData = sections[section];
+            const required = sectionData.required.length;
+            const completed = sectionData.completed;
+            const percentComplete = (completed / required) * 100;
+            const isComplete = completed === required; // ALL fields required
+            
+            console.log(`[Profile] Section "${section}": ${completed}/${required} fields (${percentComplete.toFixed(0)}%) ${isComplete ? '✓' : '✗'}`);
+            
+            // Include all sections in completion count (reviews now required)
+            if (isComplete) {
+                sectionsComplete++;
+            }
+        });
+        
+        // Calculate percentage based on complete sections
+        const percentage = Math.round((sectionsComplete / totalSections) * 100);
+        
+        console.log(`[Rooted Vitality] Profile completeness: ${sectionsComplete}/${totalSections} sections = ${percentage}%`);
         
         // Update UI
         const progressEl = document.getElementById('completeness-progress');
@@ -913,15 +1086,13 @@ function updateProfileCompleteness() {
                 labelEl.textContent = '✓ Profile complete!';
                 labelEl.style.color = '#77883e';
             } else {
-                const remaining = totalPoints - points;
-                labelEl.textContent = `${remaining} section${remaining !== 1 ? 's' : ''} to go`;
+                const incomplete = totalSections - sectionsComplete;
+                labelEl.textContent = `${incomplete} section${incomplete !== 1 ? 's' : ''} to go`;
                 labelEl.style.color = 'var(--placeholder)';
             }
         }
         
-        console.log(`[Rooted Vitality] Profile completeness: ${points}/${totalPoints} (${percentage}%)`);
-        
-        // Save to database (practitioner_profiles table where profile_completeness_percent now lives)
+        // Save to database
         if (window.practitionerData?.id) {
             window.supabaseClient
                 .from('practitioner_profiles')
@@ -1428,7 +1599,7 @@ async function saveSectionData(sectionId) {
             // About & Specializations section saves: About You + Your Approach & Philosophy + Conditions & Specializations
             await saveAboutSection();
         } else if (sectionId === 'credentials') {
-            // Credentials section saves: Degrees + Licenses + Certifications + Background Check + Continuing Education
+            // Credentials section saves: Degrees + Licenses + Certifications + Background Check
             await saveCredentialsSection('all');
         } else if (sectionId === 'photos') {
             // Photos & Video section saves: Professional Photos + Professional Video Introduction
@@ -1477,22 +1648,17 @@ async function saveSectionData(sectionId) {
  */
 async function saveAboutSection() {
     try {
-        const conditionsData = saveConditionsData();
-        
         const updateData = {
             bio: document.getElementById('about-content')?.value || '',
             ethos_statement: document.getElementById('approach-content')?.value || '',
-            conditions_treated: Array.isArray(conditionsData) ? conditionsData : [],
             updated_at: new Date().toISOString()
         };
         
         console.log('[SAVE] About section data:', updateData);
-        console.log('[SAVE] Conditions type:', typeof updateData.conditions_treated, 'value:', updateData.conditions_treated);
         
         const result = await safePractitionerUpdate(updateData);
         
         console.log('[SAVE] ✓ About section saved successfully');
-        console.log('[SAVE] Result conditions:', result?.conditions_treated);
         window.practitionerData = result;
         showAutoSaveIndicator('success');
         lockSectionEdit('about');
@@ -1506,7 +1672,7 @@ async function saveAboutSection() {
 }
 
 /**
- * Save Credentials section (Degrees + Licenses + Certifications + Background Check + Continuing Education)
+ * Save Credentials section (Degrees + Licenses + Certifications + Background Check)
  */
 async function saveCredentialsSection(type = 'all') {
     try {
@@ -1543,16 +1709,6 @@ async function saveCredentialsSection(type = 'all') {
             });
         }
         
-        // Add continuing education
-        if (window.continuingEducationCredentials && window.continuingEducationCredentials.length > 0) {
-            window.continuingEducationCredentials.forEach(cred => {
-                allCredentials.push({
-                    ...cred,
-                    credential_type: 'continuing_education'
-                });
-            });
-        }
-        
         console.log('[SAVE] All credentials to save:', allCredentials);
         
         // Remove the old save to practitioners.credentials (that column no longer exists)
@@ -1569,7 +1725,7 @@ async function saveCredentialsSection(type = 'all') {
                 badge_certified: document.getElementById('badge-certified')?.checked || false,
                 badge_licensed: document.getElementById('badge-licensed')?.checked || false,
                 badge_background_check_verified: document.getElementById('badge-background-check')?.checked || false,
-                background_check_status: window.practitionerData?.background_check_status || 'pending',
+                background_check_status: window.practitionerData?.background_check_status || null,
                 background_check_date: window.practitionerData?.background_check_date || null,
                 background_check_provider: window.practitionerData?.background_check_provider || '',
                 background_check_notes: window.practitionerData?.background_check_notes || '',
@@ -1609,12 +1765,19 @@ async function saveCredentialsSection(type = 'all') {
                 console.error('[SAVE] Error saving to practitioner_credentials:', credError);
             } else {
                 console.log('[SAVE] ✓ Credentials saved to practitioner_credentials table');
+                // Update window.practitionerData with credentials so completeness calculation sees them
+                window.practitionerData.credentials = allCredentials;
+                console.log('[SAVE] Updated window.practitionerData.credentials with', allCredentials.length, 'credentials');
+                console.log('[SAVE] Credentials data:', allCredentials);
             }
         }
         
         console.log('[SAVE] ✓ Credentials saved successfully');
         showAutoSaveIndicator('success');
         lockSectionEdit('credentials');
+        
+        // Verify credentials are in window.practitionerData before calculating completeness
+        console.log('[SAVE] Before updateProfileCompleteness - window.practitionerData.credentials:', window.practitionerData?.credentials);
         updateProfileCompleteness();
         updateCredentialsBadge();
         window.clearUnsavedChanges();
@@ -1643,7 +1806,13 @@ async function savePhotosAndVideoSection() {
         const result = await safePractitionerUpdate(updateData);
         
         console.log('[SAVE] ✓ Photos & Video section saved successfully');
-        window.practitionerData = result;
+        if (result) {
+            window.practitionerData = {
+                ...window.practitionerData,
+                ...result
+            };
+            console.log('[SAVE] Updated window.practitionerData with photos/video data');
+        }
         showAutoSaveIndicator('success');
         lockSectionEdit('photos');
         updateProfileCompleteness();
@@ -1889,14 +2058,6 @@ function enableSectionEdit(sectionId) {
         
         if (editDiv) editDiv.style.display = 'block';
         if (displayDiv) displayDiv.style.display = 'none';
-    } else if (sectionId === 'continuing-education') {
-        // Handle continuing education section
-        const editDiv = document.getElementById('continuing-education-edit');
-        const displayDiv = document.getElementById('continuing-education-display');
-        
-        if (editDiv) editDiv.style.display = 'flex';
-        if (displayDiv) displayDiv.style.display = 'none';
-        renderContinuingEducationList();
     } else if (sectionId === 'photos') {
         // Handle photo gallery section
         const editDiv = document.getElementById('photos-edit');
@@ -1990,16 +2151,6 @@ function lockSectionEdit(sectionId) {
             displayDiv.style.display = 'block';
             renderPracticeDisplay();
         }
-    } else if (sectionId === 'conditions') {
-        // Handle conditions section
-        const editDiv = document.getElementById('conditions-edit');
-        const displayDiv = document.getElementById('conditions-display');
-        
-        if (editDiv) editDiv.style.display = 'none';
-        if (displayDiv) {
-            displayDiv.style.display = 'block';
-            renderConditionsDisplay();
-        }
     } else if (sectionId === 'video') {
         // Handle video section
         const editDiv = document.getElementById('video-edit');
@@ -2007,16 +2158,6 @@ function lockSectionEdit(sectionId) {
         
         if (editDiv) editDiv.style.display = 'none';
         if (displayDiv) displayDiv.style.display = 'block';
-    } else if (sectionId === 'continuing-education') {
-        // Handle continuing education section
-        const editDiv = document.getElementById('continuing-education-edit');
-        const displayDiv = document.getElementById('continuing-education-display');
-        
-        if (editDiv) editDiv.style.display = 'none';
-        if (displayDiv) {
-            displayDiv.style.display = 'block';
-            renderContinuingEducationDisplay();
-        }
     } else if (sectionId === 'photos') {
         // Handle photo gallery section - keep in edit mode for profile page
         const editDiv = document.getElementById('photos-edit');
@@ -2246,20 +2387,28 @@ async function uploadAvatar(file) {
         const avatarUrl = data.publicUrl;
         console.log('[Rooted Vitality] Avatar uploaded to storage:', avatarUrl);
         
-        // Update practitioner_profiles table with new practice logo URL
+        // Get practitioner serial to update practitioner_profiles table
+        const practitionerSerial = window.practitionerData?.serial_number;
+        if (!practitionerSerial) {
+            console.error('[Rooted Vitality] Could not get practitioner serial number');
+            throw new Error('Practitioner serial number not found');
+        }
+        console.log('[Rooted Vitality] Using practitioner serial for profile update:', practitionerSerial);
+        
+        // Update practitioner_profiles table with new practice logo URL using practitioner_serial
         try {
             const { data: profileUpdateData, error: profileError } = await window.supabaseClient
                 .from('practitioner_profiles')
                 .update({ 
                     practice_logo_url: avatarUrl
                 })
-                .eq('id', authUserId);
+                .eq('practitioner_serial', practitionerSerial);
             
             if (profileError) {
                 console.error('[Rooted Vitality] Profile table update error:', profileError);
                 throw profileError;
             } else {
-                console.log('[Rooted Vitality] Successfully updated practitioner_profiles table:', profileUpdateData);
+                console.log('[Rooted Vitality] ✓ Successfully updated practitioner_profiles table with logo');
             }
         } catch (profileTableError) {
             console.error('[Rooted Vitality] Error updating practitioner_profiles table:', profileTableError);
@@ -2269,6 +2418,7 @@ async function uploadAvatar(file) {
         // Update local practitionerData object so it persists
         if (window.practitionerData) {
             window.practitionerData.practice_logo_url = avatarUrl;
+            console.log('[Rooted Vitality] Updated window.practitionerData.practice_logo_url with logo URL');
         }
         
         // Update preview in avatar div
@@ -2276,24 +2426,32 @@ async function uploadAvatar(file) {
         avatarDiv.innerHTML = `<img src="${avatarUrl}" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;">`;
         console.log('[Rooted Vitality] Updated profile avatar image after upload');
         
-    // Update header with avatar using the universal avatar system
-    const activeView = localStorage.getItem('active_view') || 'client';
-    const userRole = currentUser?.role || 'practitioner';
-    
-    if (userRole === 'practitioner' && activeView === 'practitioner') {
-        // Update as business logo using RootedVitality
-        if (typeof RootedVitality !== 'undefined') {
-            console.log('[Rooted Vitality] Updating logo via RootedVitality');
-            RootedVitality.updateHeaderLogo(avatarUrl, 'practitioner', 'practitioner');
-            // Clear the logo cache so other pages reload it when visited
-            RootedVitality.clearLogoCacheForUser();
+        // Recalculate profile completeness since logo was updated
+        if (typeof updateProfileCompleteness === 'function') {
+            updateProfileCompleteness();
+            console.log('[Rooted Vitality] Recalculated profile completeness after logo upload');
         }
-    } else {
-        // Update as avatar
-        if (typeof RootedVitality !== 'undefined') {
-            RootedVitality.updateHeaderAvatar(avatarUrl);
+        
+        // Update header with avatar using the universal avatar system
+        const activeView = localStorage.getItem('active_view') || 'client';
+        const userRole = currentUser?.role || 'practitioner';
+        
+        if (userRole === 'practitioner' && activeView === 'practitioner') {
+            // Update as business logo using RootedVitality
+            if (typeof RootedVitality !== 'undefined') {
+                console.log('[Rooted Vitality] Updating logo via RootedVitality');
+                RootedVitality.updateHeaderLogo(avatarUrl, 'practitioner', 'practitioner');
+                // Clear the logo cache so other pages reload it when visited
+                RootedVitality.clearLogoCacheForUser();
+            }
+        } else {
+            // Update as avatar
+            if (typeof RootedVitality !== 'undefined') {
+                RootedVitality.updateHeaderAvatar(avatarUrl);
+            }
         }
-    }        // Trigger auto-save to ensure everything is synchronized
+        
+        // Trigger auto-save to ensure everything is synchronized
         if (typeof debounceAutoSave === 'function') {
             debounceAutoSave();
         }
@@ -2751,7 +2909,6 @@ function updateBackgroundCheckStatus(status) {
     } else if (status === 'pending') {
         statusContainer.innerHTML = `
             <div class="background-check-status pending">
-                <span class="status-icon">⏳</span>
                 <div>
                     <p>Background Check Pending</p>
                     <p class="status-date">Your background check is being reviewed</p>
@@ -3396,6 +3553,7 @@ function closeProfilePictureModal() {
     document.getElementById('upload-dropzone').style.display = 'block';
     document.getElementById('upload-progress-section').style.display = 'none';
     document.getElementById('confirm-upload-btn').style.display = 'none';
+    document.getElementById('confirm-upload-btn').disabled = false;  // Re-enable button for next upload
 }
 
 function handleProfilePictureSelect(e) {
@@ -3785,31 +3943,6 @@ function removeVideo() {
  */
 window.conditionsData = [];
 
-function setupConditionsListeners() {
-    try {
-        const checkboxes = document.querySelectorAll('input[name="condition"]');
-        checkboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', (e) => {
-                updateConditionsData();
-                window.markAsChanged(); // Mark page as unsaved when condition changes
-            });
-        });
-        console.log('[Rooted Vitality] ✓ Conditions listeners attached');
-    } catch (error) {
-        console.error('[Rooted Vitality] Error setting up conditions listeners:', error);
-    }
-}
-
-function updateConditionsData() {
-    try {
-        // Get selected conditions from the conditions manager
-        window.conditionsData = window.conditionsManager.getSelected();
-        console.log('[Rooted Vitality] Updated conditions data:', window.conditionsData);
-    } catch (error) {
-        console.error('[Rooted Vitality] Error updating conditions data:', error);
-    }
-}
-
 function saveConditionsData() {
     try {
         updateConditionsData();
@@ -3825,203 +3958,13 @@ function saveConditionsData() {
     }
 }
 
-function loadConditions(conditionsArray) {
+function saveConditionsData() {
     try {
-        if (!Array.isArray(conditionsArray)) {
-            console.warn('[Rooted Vitality] Conditions not an array:', conditionsArray, typeof conditionsArray);
-            // Try to parse if it's a stringified array
-            if (typeof conditionsArray === 'string') {
-                try {
-                    conditionsArray = JSON.parse(conditionsArray);
-                    console.log('[Rooted Vitality] Parsed conditions from string:', conditionsArray);
-                } catch (e) {
-                    console.error('[Rooted Vitality] Failed to parse conditions string:', e);
-                    return;
-                }
-            } else {
-                return;
-            }
-        }
-        
-        console.log('[Rooted Vitality] Loading conditions into UI:', conditionsArray, 'length:', conditionsArray.length);
-        
-        // Use conditions manager to set selected conditions
-        // This handles the dynamic taxonomy checkboxes
-        window.conditionsData = conditionsArray;
-        if (window.conditionsManager && window.conditionsManager.setSelected) {
-            window.conditionsManager.setSelected(conditionsArray);
-            console.log('[Rooted Vitality] ✓ Called conditionsManager.setSelected()');
-        } else {
-            console.warn('[Rooted Vitality] ⚠ conditionsManager not ready or setSelected not available');
-        }
-        
-        // Render display
-        renderConditionsDisplay();
-        console.log('[Rooted Vitality] ✓ Conditions loaded:', conditionsArray);
+        return [];
     } catch (error) {
-        console.error('[Rooted Vitality] Error loading conditions:', error);
+        console.error('[Rooted Vitality] Error saving conditions:', error);
+        return [];
     }
-}
-
-function renderConditionsDisplay() {
-    // Pills display removed - conditions are shown only as checkboxes
-    return;
-}
-
-/**
- * Continuing Education Functions
- */
-function setupContinuingEducationListeners() {
-    const addCEBtn = document.getElementById('add-ce-btn');
-    if (addCEBtn) {
-        addCEBtn.addEventListener('click', addCourseEntry);
-    }
-    console.log('[Rooted Vitality] Continuing education listeners setup');
-}
-
-function addCourseEntry() {
-    const entryId = Date.now().toString();
-    
-    const entry = {
-        id: entryId,
-        courseName: '',
-        provider: '',
-        hours: '',
-        completedDate: '',
-        notes: ''
-    };
-    
-    window.continuingEducationCredentials.push(entry);
-    renderContinuingEducationList();
-    console.log('[Rooted Vitality] New CE course entry added');
-}
-
-function removeCourseEntry(entryId) {
-    window.continuingEducationCredentials = window.continuingEducationCredentials.filter(entry => entry.id !== entryId);
-    renderContinuingEducationList();
-    console.log('[Rooted Vitality] CE course entry removed:', entryId);
-}
-
-function updateCourseEntry(entryId, field, value) {
-    const entry = window.continuingEducationCredentials.find(e => e.id === entryId);
-    if (entry) {
-        entry[field] = value;
-        console.log('[Rooted Vitality] CE entry updated:', { entryId, field, value });
-    }
-}
-
-function renderContinuingEducationList() {
-    const listDiv = document.getElementById('continuing-education-list');
-    if (!listDiv) return;
-    
-    if (!window.continuingEducationCredentials || window.continuingEducationCredentials.length === 0) {
-        listDiv.innerHTML = '<p class="placeholder-text">No courses added yet. Click "Add Course" to get started.</p>';
-        return;
-    }
-    
-    let html = '';
-    window.continuingEducationCredentials.forEach(entry => {
-        html += `
-            <div class="ce-item" data-ce-id="${entry.id}">
-                <div class="ce-item-header">
-                    <span class="ce-item-title">${entry.courseName || 'New Course'}</span>
-                    <button class="ce-item-close-btn" onclick="removeCourseEntry('${entry.id}')">×</button>
-                </div>
-                
-                <div class="ce-form-group">
-                    <label>Course Name</label>
-                    <input 
-                        type="text" 
-                        value="${entry.courseName || ''}" 
-                        placeholder="e.g., Advanced Herbal Medicine"
-                        onchange="updateCourseEntry('${entry.id}', 'courseName', this.value)"
-                    >
-                </div>
-                
-                <div class="ce-form-row">
-                    <div class="ce-form-group">
-                        <label>Provider</label>
-                        <input 
-                            type="text" 
-                            value="${entry.provider || ''}" 
-                            placeholder="e.g., National Institute of Health"
-                            onchange="updateCourseEntry('${entry.id}', 'provider', this.value)"
-                        >
-                    </div>
-                    <div class="ce-form-group">
-                        <label>Hours</label>
-                        <input 
-                            type="number" 
-                            value="${entry.hours || ''}" 
-                            placeholder="e.g., 20"
-                            onchange="updateCourseEntry('${entry.id}', 'hours', this.value)"
-                            min="0"
-                        >
-                    </div>
-                </div>
-                
-                <div class="ce-form-group">
-                    <label>Completion Date</label>
-                    <input 
-                        type="date" 
-                        value="${entry.completedDate || ''}" 
-                        onchange="updateCourseEntry('${entry.id}', 'completedDate', this.value)"
-                    >
-                </div>
-                
-                <div class="ce-form-group">
-                    <label>Notes</label>
-                    <textarea 
-                        placeholder="Optional notes about the course"
-                        onchange="updateCourseEntry('${entry.id}', 'notes', this.value)"
-                    >${entry.notes || ''}</textarea>
-                </div>
-            </div>
-        `;
-    });
-    
-    listDiv.innerHTML = html;
-    console.log('[Rooted Vitality] ✓ CE list rendered');
-}
-
-function renderContinuingEducationDisplay() {
-    const displayDiv = document.getElementById('continuing-education-display');
-    if (!displayDiv) return;
-    
-    if (!window.continuingEducationCredentials || window.continuingEducationCredentials.length === 0) {
-        displayDiv.innerHTML = '<p class="placeholder-text">No continuing education added yet.</p>';
-        return;
-    }
-    
-    let totalHours = 0;
-    let html = '';
-    
-    window.continuingEducationCredentials.forEach(entry => {
-        const hours = parseInt(entry.hours) || 0;
-        totalHours += hours;
-        
-        const dateStr = entry.completedDate ? new Date(entry.completedDate).toLocaleDateString() : 'Date not specified';
-        
-        html += `
-            <div class="ce-display-item">
-                <div class="ce-display-item-title">${entry.courseName}</div>
-                <div class="ce-display-item-provider">Provider: ${entry.provider}</div>
-                <div class="ce-display-item-hours">Hours: ${hours}${hours !== 1 ? ' hrs' : ' hr'}</div>
-                <div class="ce-display-item-date">Completed: ${dateStr}</div>
-                ${entry.notes ? `<div class="ce-display-item-notes">Notes: ${entry.notes}</div>` : ''}
-            </div>
-        `;
-    });
-    
-    // Add total hours summary
-    html += `
-        <div class="ce-total-hours">
-            <div class="ce-total-hours-text">Total Continuing Education: ${totalHours} hours</div>
-        </div>
-    `;
-    
-    displayDiv.innerHTML = html;
-    console.log('[Rooted Vitality] ✓ CE display rendered - Total hours: ' + totalHours);
 }
 
 /**

@@ -1271,6 +1271,128 @@
     }
 }
 
+/* ========================================== */
+/* 11. MEMBERSHIP CARD STYLES */
+/* ========================================== */
+
+.membership-status-card {
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #fbf7ec 0%, #f5f1e8 100%);
+    border: 1px solid #e0d4b8;
+    border-radius: 8px;
+}
+
+.membership-status-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(119, 136, 62, 0.2);
+}
+
+.membership-status-header h4 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.status-badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-badge.badge-active {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.status-badge.badge-canceled {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.membership-details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.detail-item {
+    padding: 1rem;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #e0d4b8;
+}
+
+.detail-item label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+}
+
+.detail-item p {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.membership-actions {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.membership-actions button {
+    flex: 1;
+    max-width: 200px;
+}
+
+.membership-note {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 0;
+    padding: 1rem;
+    background: #fffbf3;
+    border-left: 3px solid #77883e;
+    border-radius: 4px;
+    line-height: 1.5;
+}
+
+/* Responsive adjustments for membership card */
+@media (max-width: 768px) {
+    .membership-details-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .membership-status-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .membership-actions {
+        flex-direction: column;
+    }
+    
+    .membership-actions button {
+        max-width: 100%;
+    }
+}
+
 
 
 

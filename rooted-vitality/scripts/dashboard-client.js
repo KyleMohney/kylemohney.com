@@ -138,20 +138,30 @@ function populateDashboardForms(userData) {
  */
 async function loadWellnessProfileFromSupabase(userId) {
     try {
+        console.log('[Dashboard] Attempting to load wellness profile for user:', userId);
+        
         const { data: clientProfile, error } = await window.supabaseClient
             .from('client_profiles')
-            .select('*')
+            .select('id, user_id, serial_number, main_wellness_goal, duration_of_issue, what_tried_before, allergies_sensitivities, current_medications_supplements, typical_day_description, communication_preference, biggest_barrier_to_healing, prior_practitioner_experience, desired_success_outcome')
             .eq('user_id', userId)
             .single();
 
-        if (clientProfile && !error) {
+        if (error) {
+            if (error.code === 'PGRST116') {
+                // No rows found, which is expected for new profiles
+                console.log('[Dashboard] No existing wellness profile found (first time)');
+            } else {
+                console.error('[Dashboard] Error fetching wellness profile:', error);
+            }
+            return;
+        }
+        
+        if (clientProfile) {
             populateWellnessForm(clientProfile);
             console.log('[Dashboard] Wellness profile loaded from Supabase:', clientProfile);
-        } else if (error && error.code !== 'PGRST116') {
-            console.warn('[Dashboard] Error fetching wellness profile:', error);
         }
     } catch (error) {
-        console.warn('[Dashboard] Could not load wellness profile:', error);
+        console.error('[Dashboard] Exception loading wellness profile:', error);
     }
 }
 
@@ -393,21 +403,23 @@ async function handleWellnessFormSubmit(e) {
         };
 
         // Try to update existing profile, or create if it doesn't exist
-        const { data: existingProfile } = await window.supabaseClient
+        const { data: existingProfile, error: checkError } = await window.supabaseClient
             .from('client_profiles')
             .select('id')
             .eq('user_id', user.id)
-            .single();
+            .maybeSingle();
 
         let result;
         if (existingProfile) {
             // Update existing profile
+            console.log('[Dashboard] Updating existing wellness profile');
             result = await window.supabaseClient
                 .from('client_profiles')
                 .update(wellnessData)
                 .eq('user_id', user.id);
         } else {
             // Create new profile
+            console.log('[Dashboard] Creating new wellness profile');
             result = await window.supabaseClient
                 .from('client_profiles')
                 .insert([wellnessData]);

@@ -1480,7 +1480,7 @@ function setupOnboardingEventListeners(isReturningUser = false) {
                 let urgency = document.querySelector('input[name="urgency"]:checked')?.value || onboardingData.urgency;
 
                 // Validate travel_preference is one of the allowed values
-                const validTravelPrefs = ['in-person', 'house-call', 'virtual', 'flexible'];
+                const validTravelPrefs = ['in-person', 'housecalls', 'virtual', 'flexible'];
                 if (travelPref && !validTravelPrefs.includes(travelPref)) {
                     console.warn('[Onboarding] Invalid travel_preference:', travelPref, 'Valid options:', validTravelPrefs);
                     travelPref = null;

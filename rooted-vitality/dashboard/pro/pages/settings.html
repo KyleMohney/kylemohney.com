@@ -316,11 +316,42 @@
         <!-- Active Memberships -->
         <div class="settings-card">
           <div class="card-header">
-            <h3>Active Memberships</h3>
+            <h3>Professional Membership</h3>
           </div>
           <div class="card-content">
             <div id="active-memberships-list" class="memberships-list">
-              <p class="setting-description">Loading your memberships...</p>
+              <div class="membership-status-card">
+                <div class="membership-status-header">
+                  <h4 id="membership-status-title">Loading...</h4>
+                  <span id="membership-status-badge" class="status-badge">—</span>
+                </div>
+                
+                <div class="membership-details-grid">
+                  <div class="detail-item">
+                    <label>Status</label>
+                    <p id="membership-status-display">—</p>
+                  </div>
+                  <div class="detail-item">
+                    <label>Started</label>
+                    <p id="membership-started-date">—</p>
+                  </div>
+                  <div class="detail-item">
+                    <label>Monthly Cost</label>
+                    <p id="membership-cost">$222/month</p>
+                  </div>
+                  <div class="detail-item">
+                    <label>Renewal Date</label>
+                    <p id="membership-renewal-date">—</p>
+                  </div>
+                </div>
+                
+                <div class="membership-actions">
+                  <button class="btn-secondary" id="cancel-membership-btn" style="display: none;">Cancel Membership</button>
+                  <button class="btn-secondary" id="reactivate-membership-btn" style="display: none;">Reactivate Membership</button>
+                </div>
+                
+                <p class="membership-note">You can cancel your membership anytime. If canceled, you'll retain access through the end of the current billing period.</p>
+              </div>
             </div>
           </div>
         </div>

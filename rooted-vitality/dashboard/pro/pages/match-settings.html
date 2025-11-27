@@ -641,7 +641,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 1.5rem;
+      padding: 0.5rem 1.5rem;
       border-bottom: 1px solid #e0dcd5;
     }
     
@@ -672,7 +672,7 @@
     }
     
     .modal-body {
-      padding: 1.5rem;
+      padding: 0.75rem 1.5rem;
     }
     
     .modal-body h3 {
@@ -720,7 +720,7 @@
     .modal-footer {
       display: flex;
       gap: 1rem;
-      padding: 1.5rem;
+      padding: 0.75rem 1.5rem;
       border-top: 1px solid #e0dcd5;
       background: #fbf7ec;
     }
@@ -738,13 +738,16 @@
     
     .btn-modal-primary {
       background: #77883e;
-      color: #fbf7ec;
+      color: #fbf7ec !important;
+      text-decoration: none !important;
     }
     
     .btn-modal-primary:hover {
       background: #5f7030;
+      color: #fbf7ec !important;
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(92, 154, 114, 0.3);
+      text-decoration: none !important;
     }
     
     .btn-modal-secondary {
@@ -754,9 +757,64 @@
     }
     
     .btn-modal-secondary:hover {
-      background: #fbf7ec;
+      background: #e8e4dd;
       border-color: #77883e;
+      color: #2e2b28;
+    }
+
+    /* ========================================== */
+    /* MEMBERSHIP REQUIRED MODAL */
+    /* ========================================== */
+
+    .modal-body h3 {
+      text-align: center;
+      font-size: 1.2rem;
+      color: #2e2b28;
+      margin: 1rem 0;
+    }
+
+    .membership-required-text {
+      text-align: center;
+      color: #6b6b6b;
+      line-height: 1.6;
+      margin: 1rem 0 1.5rem 0;
+    }
+
+    .membership-required-benefits {
+      background: #fbf7ec;
+      border: 1px solid #e0dcd5;
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .membership-benefits-title {
+      font-weight: 600;
+      color: #2e2b28;
+      margin: 0 0 0.75rem 0;
+      font-size: 0.95rem;
+    }
+
+    .membership-benefits-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .membership-benefits-list li {
+      padding: 0.5rem 0 0.5rem 1.5rem;
+      position: relative;
+      color: #6b6b6b;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .membership-benefits-list li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
       color: #77883e;
+      font-weight: bold;
     }
 
     /* ========================================== */
@@ -2970,6 +3028,7 @@
                     <div style="flex: 1;">
                       <div style="font-weight: 600; color: #2e2b28; margin-bottom: 0.25rem;">Option A: Radius-Based Coverage</div>
                       <div style="font-size: 0.9rem; color: #6b6b6b; line-height: 1.4;">Enter your practice ZIP code and set how far clients can travel to you from. Your coverage area updates in real-time on the map.</div>
+                      <div style="font-size: 0.85rem; color: #c41e3a; margin-top: 0.5rem; font-style: italic;">Note: New York is excluded from coverage.</div>
                     </div>
                   </label>
 
@@ -3015,6 +3074,7 @@
                     <div style="flex: 1;">
                       <div style="font-weight: 600; color: #2e2b28; margin-bottom: 0.25rem;">Option B: Specific ZIP Codes</div>
                       <div style="font-size: 0.9rem; color: #6b6b6b; line-height: 1.4;">Select only the specific ZIP codes where you'll serve clients. Best for targeting specific neighborhoods or service areas.</div>
+                      <div style="font-size: 0.85rem; color: #c41e3a; margin-top: 0.5rem; font-style: italic;">Note: New York is excluded from coverage.</div>
                     </div>
                   </label>
 
@@ -3067,6 +3127,7 @@
                     <div style="flex: 1;">
                       <div style="font-weight: 600; color: #2e2b28; margin-bottom: 0.25rem;">Option A: Travel Radius Based Coverage</div>
                       <div style="font-size: 0.9rem; color: #6b6b6b; line-height: 1.4;">Enter your practice ZIP code and set the maximum distance you're willing to travel to serve clients at their location. Your service area updates in real-time on the map.</div>
+                      <div style="font-size: 0.85rem; color: #c41e3a; margin-top: 0.5rem; font-style: italic;">Note: New York is excluded from coverage.</div>
                     </div>
                   </label>
 
@@ -3112,6 +3173,7 @@
                     <div style="flex: 1;">
                       <div style="font-weight: 600; color: #2e2b28; margin-bottom: 0.25rem;">Option B: Specific Service Areas</div>
                       <div style="font-size: 0.9rem; color: #6b6b6b; line-height: 1.4;">Select only the specific ZIP codes where you'll service clients at their locations. Best for targeting specific neighborhoods or service areas.</div>
+                      <div style="font-size: 0.85rem; color: #c41e3a; margin-top: 0.5rem; font-style: italic;">Note: New York is excluded from coverage.</div>
                     </div>
                   </label>
 
@@ -3164,6 +3226,7 @@
                     <div style="flex: 1;">
                       <div style="font-weight: 600; color: #2e2b28; margin-bottom: 0.25rem;">Option A: Nationwide Service</div>
                       <div style="font-size: 0.9rem; color: #6b6b6b; line-height: 1.4;">Offer remote services to clients across all 50 US states. Your services are available nationwide.</div>
+                      <div style="font-size: 0.85rem; color: #c41e3a; margin-top: 0.5rem; font-style: italic;">Note: New York is excluded from coverage.</div>
                     </div>
                   </label>
                 </div>
@@ -3180,6 +3243,7 @@
                     <div style="flex: 1;">
                       <div style="font-weight: 600; color: #2e2b28; margin-bottom: 0.25rem;">Option B: Select Specific States</div>
                       <div style="font-size: 0.9rem; color: #6b6b6b; line-height: 1.4;">Choose which states you offer remote services in. Your services are available only to clients in those states.</div>
+                      <div style="font-size: 0.85rem; color: #c41e3a; margin-top: 0.5rem; font-style: italic;">Note: New York is excluded from coverage.</div>
                     </div>
                   </label>
 
@@ -3557,6 +3621,41 @@
 
   <!-- ========================================== -->
   <!-- MODAL: BROWSE ALL CATEGORIES -->
+  <!-- ========================================== -->
+  <!-- MEMBERSHIP REQUIRED MODAL -->
+  <!-- ========================================== -->
+  <div id="membership-required-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Membership Required</h2>
+        <button class="modal-close-btn" onclick="closeMembershipRequiredModal()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <h3>Activate Your Membership to Enable Matching</h3>
+        <p class="membership-required-text">
+          Client matching is exclusively available for active members. Your membership gives you access to our client network and allows you to start receiving qualified leads.
+        </p>
+        <div class="membership-required-benefits">
+          <p class="membership-benefits-title">With an active membership, you get:</p>
+          <ul class="membership-benefits-list">
+            <li>Access to client leads in your specializations</li>
+            <li>Real-time match notifications</li>
+            <li>Direct messaging with clients</li>
+            <li>Profile visibility to thousands of potential clients</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-modal btn-modal-secondary" onclick="closeMembershipRequiredModal()">Cancel</button>
+        <a href="../pages/settings.html#memberships" class="btn-modal btn-modal-primary">Go to Membership Settings</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- BROWSE CATEGORIES MODAL -->
   <!-- ========================================== -->
   <div id="browse-categories-modal" class="modal-overlay">
     <div class="modal-content modal-large">
@@ -4563,11 +4662,35 @@
           try {
             const { data: { user } } = await window.supabaseClient.auth.getUser();
             if (user) {
+              // Extract active category names from activeCategories array
+              const activeCategoryNames = activeCategories
+                .filter(cat => cat.active !== false)
+                .map(cat => cat.name)
+                .filter(name => name);
+              
+              console.log('[Rooted Vitality] Active categories to sync:', activeCategoryNames);
+              
+              // Update practitioners table with both pricing AND service_category_names
+              const { error: updateError } = await window.supabaseClient
+                .from('practitioners')
+                .update({
+                  service_category_names: activeCategoryNames,
+                  updated_at: new Date().toISOString()
+                })
+                .eq('id', user.id);
+
+              if (updateError) {
+                console.error('[Rooted Vitality] Error updating service_category_names:', updateError);
+              } else {
+                console.log('[Rooted Vitality] ✓ Service category names synced to practitioners table:', activeCategoryNames);
+              }
+              
+              // Also sync pricing
               await matchSettingsManager.syncServicePricingToPractitioner(user.id);
               console.log('[Rooted Vitality] ✓ All pricing synced to practitioners table');
             }
           } catch (syncError) {
-            console.error('[Rooted Vitality] Error syncing pricing to practitioners:', syncError);
+            console.error('[Rooted Vitality] Error syncing to practitioners:', syncError);
           }
         } else if (successCount > 0) {
           showToast(`Saved ${successCount} service(s), but ${errorCount} had errors`, 'warning');
@@ -4576,6 +4699,24 @@
           try {
             const { data: { user } } = await window.supabaseClient.auth.getUser();
             if (user) {
+              // Extract active category names from activeCategories array
+              const activeCategoryNames = activeCategories
+                .filter(cat => cat.active !== false)
+                .map(cat => cat.name)
+                .filter(name => name);
+              
+              const { error: updateError } = await window.supabaseClient
+                .from('practitioners')
+                .update({
+                  service_category_names: activeCategoryNames,
+                  updated_at: new Date().toISOString()
+                })
+                .eq('id', user.id);
+
+              if (!updateError) {
+                console.log('[Rooted Vitality] ✓ Service category names synced despite errors:', activeCategoryNames);
+              }
+              
               await matchSettingsManager.syncServicePricingToPractitioner(user.id);
             }
           } catch (syncError) {
@@ -5121,6 +5262,26 @@
             } catch (syncError) {
               console.error('[Rooted Vitality] Error syncing pricing to practitioners:', syncError);
             }
+            
+            // CRITICAL: Sync denormalized service arrays after all services are saved
+            try {
+              const { data: { user } } = await window.supabaseClient.auth.getUser();
+              if (user && matchSettingsManager?.practitionerSerial) {
+                console.log('[Rooted Vitality] Calling sync_practitioner_service_arrays for:', matchSettingsManager.practitionerSerial);
+                const { data: syncResult, error: syncError } = await window.supabaseClient
+                  .rpc('sync_practitioner_service_arrays', {
+                    p_practitioner_serial: matchSettingsManager.practitionerSerial
+                  });
+                
+                if (syncError) {
+                  console.error('[Rooted Vitality] Error syncing service arrays:', syncError);
+                } else {
+                  console.log('[Rooted Vitality] ✓ Service arrays synced successfully:', syncResult);
+                }
+              }
+            } catch (arraySyncError) {
+              console.error('[Rooted Vitality] Exception syncing service arrays:', arraySyncError);
+            }
           } else {
             showToast('Services saved successfully.', 'success');
           }
@@ -5139,30 +5300,169 @@
     // 8. MATCHING ACTIVATION & PAUSE
     // ======================================================
 
-    function loadMatchingStatus() {
-      const saved = localStorage.getItem('matchingActive');
-      const pauseUntil = localStorage.getItem('matchingPauseUntil');
-      
-      if (pauseUntil) {
-        const pauseTime = new Date(pauseUntil);
-        const now = new Date();
-        
-        if (now < pauseTime) {
-          // Still paused
-          updateMatchingUI(true, true, pauseTime);
-          checkPauseExpiration(pauseTime);
-          return;
-        } else {
-          // Pause time has passed, resume automatically
-          localStorage.removeItem('matchingPauseUntil');
-          localStorage.setItem('matchingActive', 'true');
-          updateMatchingUI(true, false);
+    async function loadMatchingStatus() {
+      try {
+        const { data: { user }, error: userError } = await window.supabaseClient.auth.getUser();
+        if (userError || !user) {
+          console.error('[Match Settings] Failed to get current user');
+          updateMatchingUI(false, false);
           return;
         }
+
+        // Step 1: Check membership status
+        let membershipData = null;
+        let membershipError = null;
+        
+        // Debug: Check Supabase auth state
+        const { data: { session }, error: sessionError } = await window.supabaseClient.auth.getSession();
+        console.log('[Match Settings] Current Supabase session:', {
+          hasSession: !!session,
+          sessionError,
+          sessionUser: session?.user?.id,
+          sessionEmail: session?.user?.email
+        });
+        
+        console.log('[Match Settings] Attempting to query memberships for user:', user.id, typeof user.id);
+        
+        // Try query with select * - order by created_at to get the LATEST membership
+        const result1 = await window.supabaseClient
+          .from('memberships')
+          .select('*')
+          .eq('practitioner_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1);
+        
+        membershipData = result1.data;
+        membershipError = result1.error;
+        
+        console.log('[Match Settings] Query result 1 (with order):', {
+          data: membershipData,
+          error: membershipError,
+          userId: user.id,
+          userIdType: typeof user.id,
+          membershipStatus: membershipData?.[0]?.status,
+          membershipRecordFull: membershipData?.[0]
+        });
+        
+        // Fallback: if no results, try without order clause
+        if (!membershipData || membershipData.length === 0) {
+          console.log('[Match Settings] No membership found with order clause, trying without...');
+          const result2 = await window.supabaseClient
+            .from('memberships')
+            .select('*')
+            .eq('practitioner_id', user.id);
+          
+          membershipData = result2.data;
+          membershipError = result2.error;
+          
+          console.log('[Match Settings] Query result 2 (without order):', {
+            data: membershipData,
+            error: membershipError,
+            recordCount: membershipData?.length,
+            membershipStatus: membershipData?.[0]?.status,
+            membershipRecordFull: membershipData?.[0]
+          });
+        }
+        
+        // Third fallback: try querying all memberships (for debugging)
+        if (!membershipData || membershipData.length === 0) {
+          console.log('[Match Settings] Still no results, querying all memberships for debugging...');
+          const result3 = await window.supabaseClient
+            .from('memberships')
+            .select('*');
+          
+          console.log('[Match Settings] Query result 3 (all memberships - DEBUGGING):', {
+            allData: result3.data,
+            error: result3.error,
+            totalCount: result3.data?.length,
+            userIdToMatch: user.id,
+            allRecords: result3.data?.map(r => ({
+              id: r.id,
+              practitioner_id: r.practitioner_id,
+              practitioner_serial: r.practitioner_serial,
+              status: r.status,
+              created_at: r.created_at
+            }))
+          });
+        }
+        
+        if (membershipError) {
+          console.error('[Match Settings] Error checking membership:', membershipError);
+          updateMatchingUI(false, false);
+          return;
+        }
+
+        // Check LATEST membership status - use most recent record
+        const latestMembership = membershipData && membershipData.length > 0 ? membershipData[0] : null;
+        const hasActiveMembership = latestMembership && latestMembership.status === 'active';
+        
+        console.log('[Match Settings] Membership status check:', {
+          hasActiveMembership,
+          fullMembershipRecord: latestMembership,
+          membershipStatus: latestMembership?.status,
+          userId: user.id,
+          recordCount: membershipData?.length || 0
+        });
+
+        // Step 2: Load matching status from database
+        const { data: practitionerData, error: practError } = await window.supabaseClient
+          .from('practitioners')
+          .select('matching_enabled, matching_paused')
+          .eq('id', user.id)
+          .single();
+        
+        if (practError) {
+          console.error('[Match Settings] Error loading practitioner data:', practError);
+          updateMatchingUI(false, false);
+          return;
+        }
+
+        let isActive = practitionerData?.matching_enabled || false;
+        let isPaused = practitionerData?.matching_paused || false;
+
+        // ENFORCEMENT: If membership is inactive, FORCE matching OFF
+        if (!hasActiveMembership && isActive) {
+          console.warn('[Match Settings] ENFORCEMENT: Membership inactive, forcing matching OFF');
+          isActive = false;
+          
+          // Update database to turn matching off
+          await window.supabaseClient
+            .from('practitioners')
+            .update({
+              matching_enabled: false,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', user.id);
+        }
+
+        // Step 3: Check for pause status
+        const pauseUntil = localStorage.getItem('matchingPauseUntil');
+        
+        if (pauseUntil && isActive) {
+          const pauseTime = new Date(pauseUntil);
+          const now = new Date();
+          
+          if (now < pauseTime) {
+            // Still paused
+            console.log('[Match Settings] Matching is paused until:', pauseTime);
+            updateMatchingUI(true, true, pauseTime);
+            checkPauseExpiration(pauseTime);
+            return;
+          } else {
+            // Pause time has passed, resume
+            console.log('[Match Settings] Pause expired, resuming');
+            localStorage.removeItem('matchingPauseUntil');
+            isPaused = false;
+          }
+        }
+
+        console.log('[Match Settings] ✓ Loaded matching status:', { isActive, isPaused, hasActiveMembership });
+        updateMatchingUI(isActive, isPaused);
+        
+      } catch (error) {
+        console.error('[Match Settings] Exception loading matching status:', error);
+        updateMatchingUI(false, false);
       }
-      
-      const isActive = saved === 'true';
-      updateMatchingUI(isActive, false);
     }
 
     function updateMatchingUI(isActive, isPaused, pauseUntilTime = null) {
@@ -5216,13 +5516,80 @@
 
     /**
      * Save matching_enabled status to practitioners table
+     * First checks if practitioner has active membership
+     * Returns true if save succeeded, false if rejected
      */
     async function saveMatchingEnabledToDatabase(isEnabled) {
       try {
         const { data: { user }, error: userError } = await window.supabaseClient.auth.getUser();
         if (userError || !user) {
           console.error('[Match Settings] Failed to get current user');
-          return;
+          showToast('Failed to verify user account.', 'error');
+          return false;
+        }
+
+        // If enabling matching, check for active membership
+        if (isEnabled) {
+          console.log('[Match Settings] Checking for active membership before toggle...');
+          
+          let membershipData = null;
+          let membershipError = null;
+          
+          // Query with cache busting - get fresh data from database
+          const result = await window.supabaseClient
+            .from('memberships')
+            .select('*')
+            .eq('practitioner_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(1);
+          
+          membershipData = result.data;
+          membershipError = result.error;
+          
+          console.log('[Match Settings] Fresh membership query on toggle:', {
+            data: membershipData,
+            error: membershipError,
+            userId: user.id
+          });
+          
+          if (membershipError) {
+            console.error('[Match Settings] Error checking membership:', membershipError);
+            showToast('Unable to verify membership status. Please refresh the page and try again.', 'error');
+            return false;
+          }
+          
+          // Get the most recent (latest) membership record
+          const latestMembership = membershipData && membershipData.length > 0 ? membershipData[0] : null;
+          const hasActiveMembership = latestMembership && latestMembership.status === 'active';
+          
+          console.log('[Match Settings] Toggle membership check result:', {
+            hasActiveMembership,
+            fullMembershipRecord: latestMembership,
+            membershipStatus: latestMembership?.status,
+            recordCount: membershipData?.length || 0,
+            latestRecordId: latestMembership?.id,
+            latestCreatedAt: latestMembership?.created_at
+          });
+          
+          if (!hasActiveMembership) {
+            console.warn('[Match Settings] BLOCKED: Cannot enable matching - no active membership');
+            console.warn('[Match Settings] Membership details:', {
+              recordFound: !!latestMembership,
+              currentStatus: latestMembership?.status
+            });
+            
+            // Force toggle OFF immediately
+            const matchingToggle = document.getElementById('matching-activation-toggle');
+            if (matchingToggle) {
+              matchingToggle.checked = false;
+            }
+            
+            // Show custom modal
+            showMembershipRequiredModal();
+            return false;
+          }
+          
+          console.log('[Match Settings] ✓ Active membership verified, allowing toggle');
         }
 
         const { error } = await window.supabaseClient
@@ -5236,13 +5603,73 @@
         if (error) {
           console.error('[Match Settings] Error saving matching_enabled:', error);
           showToast('Failed to save matching status to database.', 'error');
-          return;
+          // Force toggle back to previous state
+          const matchingToggle = document.getElementById('matching-activation-toggle');
+          if (matchingToggle) {
+            matchingToggle.checked = !isEnabled;
+          }
+          return false;
+        }
+
+        // Also update practitioner_match_settings table
+        try {
+          // Get practitioner serial number to update match settings
+          const { data: practitionerData } = await window.supabaseClient
+            .from('practitioners')
+            .select('serial_number')
+            .eq('id', user.id)
+            .single();
+
+          if (practitionerData?.serial_number) {
+            const { error: matchSettingsError } = await window.supabaseClient
+              .from('practitioner_match_settings')
+              .update({
+                matching_enabled: isEnabled,
+                updated_at: new Date().toISOString()
+              })
+              .eq('practitioner_serial', practitionerData.serial_number);
+
+            if (matchSettingsError) {
+              console.warn('[Match Settings] Warning: Could not update practitioner_match_settings:', matchSettingsError);
+            } else {
+              console.log('[Match Settings] ✓ Also updated practitioner_match_settings');
+            }
+          }
+        } catch (matchSettingsErr) {
+          console.warn('[Match Settings] Warning updating match settings:', matchSettingsErr);
         }
 
         console.log('[Match Settings] ✓ Saved matching_enabled:', isEnabled);
+        return true;
       } catch (error) {
         console.error('[Match Settings] Exception saving matching_enabled:', error);
         showToast('An error occurred while saving.', 'error');
+        // Force toggle back to previous state
+        const matchingToggle = document.getElementById('matching-activation-toggle');
+        if (matchingToggle) {
+          matchingToggle.checked = !isEnabled;
+        }
+        return false;
+      }
+    }
+
+    /**
+     * Show membership required modal
+     */
+    function showMembershipRequiredModal() {
+      const modal = document.getElementById('membership-required-modal');
+      if (modal) {
+        modal.classList.add('active');
+      }
+    }
+
+    /**
+     * Close membership required modal
+     */
+    function closeMembershipRequiredModal() {
+      const modal = document.getElementById('membership-required-modal');
+      if (modal) {
+        modal.classList.remove('active');
       }
     }
 
@@ -5299,18 +5726,22 @@
         return;
       }
       
-      localStorage.setItem('matchingActive', isNowActive ? 'true' : 'false');
-      localStorage.removeItem('matchingPauseUntil');
-      
-      // Save to database
-      saveMatchingEnabledToDatabase(isNowActive);
-      
-      updateMatchingUI(isNowActive, false);
-      
-      const status = isNowActive ? 'activated' : 'deactivated';
-      showToast(`Matching ${status}.`, 'success');
-      
-      console.log('[Rooted Vitality] Matching activation toggled:', isNowActive);
+      // Save to database (this will handle membership check and force OFF if needed)
+      saveMatchingEnabledToDatabase(isNowActive).then(success => {
+        if (success) {
+          // Only update UI if database save succeeded
+          localStorage.setItem('matchingActive', isNowActive ? 'true' : 'false');
+          localStorage.removeItem('matchingPauseUntil');
+          updateMatchingUI(isNowActive, false);
+          
+          const status = isNowActive ? 'activated' : 'deactivated';
+          showToast(`Matching ${status}.`, 'success');
+          console.log('[Rooted Vitality] Matching activation toggled:', isNowActive);
+        } else {
+          // Database save failed or membership check failed, toggle was already forced OFF by saveMatchingEnabledToDatabase
+          console.log('[Match Settings] Toggle update rejected due to membership check');
+        }
+      });
     }
 
     function togglePauseForm() {
@@ -6673,15 +7104,19 @@
           return;
         }
 
-        // Load from database
+        // The practitioners.id IS the auth user ID, so we can use it directly
+        const practitionerId = user.id;
+        console.log('[Coverage Settings] Using practitioner ID:', practitionerId);
+
+        // Load from practitioners table (where coverage settings are stored)
         const { data: practitioner, error } = await supabaseClient
           .from('practitioners')
           .select('in_person_enabled, in_person_option, in_person_base_zipcode, in_person_radius_miles, in_person_zipcodes, housecalls_enabled, housecalls_option, housecalls_base_zipcode, housecalls_radius_miles, housecalls_zipcodes, virtual_enabled, virtual_option, virtual_states')
-          .eq('id', user.id)
+          .eq('id', practitionerId)
           .single();
 
         if (error || !practitioner) {
-          console.log('[Coverage Settings] No practitioner data found');
+          console.log('[Coverage Settings] No coverage data found in practitioners table:', error);
           return;
         }
 
@@ -6833,26 +7268,15 @@
 
         console.log('[Coverage Settings] Saving coverage data:', coverageData);
 
-        // Get the practitioner profile to find the practitioner ID (not auth user ID)
-        const { data: practitionerData, error: practitionerError } = await supabaseClient
-          .from('practitioners')
-          .select('id')
-          .eq('auth_user_id', user.id)
-          .single();
+        // The practitioners.id IS the auth user ID, so we can use it directly
+        const practitionerId = user.id;
+        console.log('[Coverage Settings] Using practitioner ID:', practitionerId);
 
-        if (practitionerError || !practitionerData) {
-          console.error('[Coverage Settings] Could not find practitioner record:', practitionerError);
-          showToast('Could not find your practitioner profile. Please contact support.', 'error');
-          return;
-        }
-
-        console.log('[Coverage Settings] Found practitioner record:', practitionerData.id);
-
-        // Update practitioners table using practitioner's actual database ID
+        // Update practitioners table with coverage data
         const { data, error } = await supabaseClient
           .from('practitioners')
           .update(coverageData)
-          .eq('id', practitionerData.id);
+          .eq('id', practitionerId);
 
         if (error) {
           console.error('[Coverage Settings] Save error:', error);

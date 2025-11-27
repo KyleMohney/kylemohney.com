@@ -170,7 +170,7 @@
         
         <!-- Side Navigation -->
         <nav class="profile-nav">
-          <button class="profile-nav-item active" onclick="switchProfilePanel('bio', this)">About & Specializations</button>
+          <button class="profile-nav-item active" onclick="switchProfilePanel('bio', this)">About</button>
           <button class="profile-nav-item" onclick="switchProfilePanel('credentials', this)">Credentials</button>
           <button class="profile-nav-item" onclick="switchProfilePanel('photos-video', this)">Photos & Video</button>
           <button class="profile-nav-item" onclick="switchProfilePanel('reviews', this)">Reviews</button>
@@ -183,7 +183,7 @@
         <!-- About Section -->
         <section class="profile-panel active" data-panel="bio">
           <div class="section-header">
-            <h2>About & Specializations</h2>
+            <h2>About</h2>
             <button class="section-edit-btn" data-section="about" style="display: none;">Edit</button>
           </div>
           
@@ -213,27 +213,10 @@
             </div>
           </div>
 
-          <!-- Conditions & Specializations Subsection -->
-          <div class="bio-subsection">
-            <button class="subsection-toggle" onclick="toggleSubsection(this)" aria-expanded="true">
-              <h3>Conditions & Specializations</h3>
-              <span class="toggle-icon">▼</span>
-            </button>
-            <div class="subsection-content">
-              <div class="section-instruction">Select the conditions and specializations you focus on.</div>
-              <div class="section-tooltip">Help clients find you by specifying conditions you treat and your specializations. This improves discoverability and sets expectations. These are loaded from your service offerings in Match Settings.</div>
-              <div class="conditions-checkbox-container">
-                <div class="condition-checkbox-grid" id="conditions-checkboxes-container">
-                  <!-- Dynamically loaded from database taxonomy by conditions-manager.js -->
-                  <p style="color: #666; font-style: italic;">Loading conditions from database...</p>
-                </div>
-              </div>
-            </div>
-          </div>
           
           <!-- Section Save Button -->
           <div class="section-footer">
-            <button class="section-save-btn" data-section="about">Save About & Specializations</button>
+            <button class="section-save-btn" data-section="about">Save About</button>
           </div>
         </section>
 
@@ -291,27 +274,6 @@
                 <button class="btn-add-credential" id="add-certification-btn" data-credential-type="certification">+ Add Certification</button>
               </div>
               <div class="credentials-section-display" id="certifications-display"></div>
-            </div>
-          </div>
-
-          <!-- Continuing Education Subsection -->
-          <div class="credentials-subsection">
-            <button class="subsection-toggle" onclick="toggleSubsection(this)" aria-expanded="true">
-              <h3>Continuing Education</h3>
-              <span class="toggle-icon">▼</span>
-            </button>
-            <div class="subsection-content">
-              <div class="section-instruction">Show clients your commitment to staying current in your field.</div>
-              <div class="section-tooltip">Add professional development courses, workshops, and training programs completed in the last 2 years. This demonstrates your dedication to continuous learning and best practices.</div>
-              
-              <!-- Edit Mode (start open) -->
-              <div id="continuing-education-edit" class="continuing-education-edit" style="display: flex;">
-                <div id="continuing-education-list" class="continuing-education-list"></div>
-                <button class="btn-add-credential" id="add-ce-btn" data-ce-type="course">+ Add Course</button>
-              </div>
-              
-              <!-- Display Mode -->
-              <div id="continuing-education-display" class="continuing-education-display"></div>
             </div>
           </div>
 
@@ -993,7 +955,6 @@
   <script src="../../../scripts/authModal.js"></script>
   <script src="../../../scripts/authHooks.js"></script>
   <script src="../../../injections.js"></script>
-  <script src="../../../scripts/conditions-manager.js"></script>
   <script src="../../../scripts/proDashboard.js"></script>
   <script src="../../../scripts/proProfile.js"></script>
 

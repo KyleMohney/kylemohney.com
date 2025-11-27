@@ -1713,15 +1713,160 @@ function setupSettingsListeners() {
 /* 7. MEMBERSHIPS */
 /* ========================================== */
 
-function loadActiveMemberships() {
+async function loadActiveMemberships() {
     try {
         const membershipsList = document.getElementById('active-memberships-list');
-        if (membershipsList) {
-            // TODO: Load from database when membership system is implemented
-            membershipsList.innerHTML = '<p class="setting-description">You currently have no active memberships. <a href="#" style="color: var(--primary); font-weight: 600;">View available plans</a></p>';
+        if (!membershipsList) return;
+        
+        console.log('[Rooted Vitality] Loading memberships for practitioner:', currentUser.id);
+        
+        // Fetch membership record from database
+        const { data: membershipData, error: membershipError } = await window.supabaseClient
+            .from('memberships')
+            .select('*')
+            .eq('practitioner_id', currentUser.id)
+            .order('created_at', { ascending: false })
+            .limit(1);
+        
+        if (membershipError) {
+            console.error('[Rooted Vitality] Error fetching membership:', membershipError);
+            membershipsList.innerHTML = '<p class="setting-description">Unable to load membership information. Please try again later.</p>';
+            return;
         }
+        
+        if (!membershipData || membershipData.length === 0) {
+            console.log('[Rooted Vitality] No membership record found');
+            membershipsList.innerHTML = '<p class="setting-description">No active membership found. <a href="../../dashboard/practitioner-signup.html" style="color: var(--primary); font-weight: 600;">Set up membership</a></p>';
+            return;
+        }
+        
+        const membership = membershipData[0];
+        console.log('[Rooted Vitality] Membership loaded:', membership);
+        
+        // Format dates
+        const startDate = new Date(membership.started_at);
+        const startDateFormatted = startDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        
+        // Calculate renewal date (first month free, so renewal is started_at + 30 days)
+        const renewalDate = new Date(membership.started_at);
+        renewalDate.setDate(renewalDate.getDate() + 30);
+        const renewalDateFormatted = renewalDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        
+        // Determine status display
+        const isActive = membership.status === 'active';
+        const statusBadgeClass = isActive ? 'badge-active' : 'badge-canceled';
+        const statusText = isActive ? 'Active' : 'Canceled';
+        const canceledText = membership.canceled_at ? ` on ${new Date(membership.canceled_at).toLocaleDateString()}` : '';
+        
+        // Update DOM elements
+        document.getElementById('membership-status-title').textContent = isActive ? 'Professional Membership' : 'Membership Canceled';
+        document.getElementById('membership-status-badge').className = `status-badge ${statusBadgeClass}`;
+        document.getElementById('membership-status-badge').textContent = statusText;
+        document.getElementById('membership-status-display').textContent = isActive ? 'Active' : `Canceled${canceledText}`;
+        document.getElementById('membership-started-date').textContent = startDateFormatted;
+        document.getElementById('membership-renewal-date').textContent = renewalDateFormatted;
+        
+        // Show/hide action buttons
+        const cancelBtn = document.getElementById('cancel-membership-btn');
+        const reactivateBtn = document.getElementById('reactivate-membership-btn');
+        
+        if (isActive) {
+            cancelBtn.style.display = 'inline-block';
+            reactivateBtn.style.display = 'none';
+            
+            // Add cancel event listener
+            cancelBtn.onclick = () => handleCancelMembership(membership.id);
+        } else {
+            cancelBtn.style.display = 'none';
+            reactivateBtn.style.display = 'inline-block';
+            
+            // Add reactivate event listener
+            reactivateBtn.onclick = () => handleReactivateMembership(membership.id);
+        }
+        
+        console.log('[Rooted Vitality] Membership UI updated');
     } catch (error) {
-        console.error('[Rooted Vitality] Error loading memberships:', error);
+        console.error('[Rooted Vitality] Exception in loadActiveMemberships:', error);
+        const membershipsList = document.getElementById('active-memberships-list');
+        if (membershipsList) {
+            membershipsList.innerHTML = '<p class="setting-description">Error loading membership information.</p>';
+        }
+    }
+}
+
+async function handleCancelMembership(membershipId) {
+    try {
+        const confirmCancel = confirm('Are you sure you want to cancel your membership?\n\nYou will retain access through the end of your current billing period.\n\nYou can reactivate your membership anytime from settings.');
+        
+        if (!confirmCancel) {
+            console.log('[Rooted Vitality] Membership cancellation canceled by user');
+            return;
+        }
+        
+        console.log('[Rooted Vitality] Canceling membership:', membershipId);
+        
+        // Update membership record
+        const { error: updateError } = await window.supabaseClient
+            .from('memberships')
+            .update({
+                status: 'canceled',
+                canceled_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', membershipId);
+        
+        if (updateError) {
+            console.error('[Rooted Vitality] Error canceling membership:', updateError);
+            alert('Error canceling membership. Please try again.');
+            return;
+        }
+        
+        console.log('[Rooted Vitality] Membership canceled successfully');
+        alert('Your membership has been canceled. You\'ll retain access through the end of your current billing period.');
+        
+        // Reload membership display
+        await loadActiveMemberships();
+    } catch (error) {
+        console.error('[Rooted Vitality] Exception in handleCancelMembership:', error);
+        alert('Error canceling membership.');
+    }
+}
+
+async function handleReactivateMembership(membershipId) {
+    try {
+        const confirmReactivate = confirm('Reactivate your membership?\n\nYour membership will be active immediately.');
+        
+        if (!confirmReactivate) {
+            console.log('[Rooted Vitality] Membership reactivation canceled by user');
+            return;
+        }
+        
+        console.log('[Rooted Vitality] Reactivating membership:', membershipId);
+        
+        // Update membership record
+        const { error: updateError } = await window.supabaseClient
+            .from('memberships')
+            .update({
+                status: 'active',
+                re_enrolled_on: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', membershipId);
+        
+        if (updateError) {
+            console.error('[Rooted Vitality] Error reactivating membership:', updateError);
+            alert('Error reactivating membership. Please try again.');
+            return;
+        }
+        
+        console.log('[Rooted Vitality] Membership reactivated successfully');
+        alert('Your membership is now active!');
+        
+        // Reload membership display
+        await loadActiveMemberships();
+    } catch (error) {
+        console.error('[Rooted Vitality] Exception in handleReactivateMembership:', error);
+        alert('Error reactivating membership.');
     }
 }
 

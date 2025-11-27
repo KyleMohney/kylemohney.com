@@ -602,11 +602,21 @@ class MatchSettingsManager {
         price_per_service: service.price_per_service || null
       }));
 
-      // Save to practitioners table as JSONB in pricing column
+      // Extract unique category names for service_category_names array
+      const categoryNamesSet = new Set(this.selectedServices.map(s => s.category_name));
+      const serviceCategoryNames = Array.from(categoryNamesSet).filter(name => name); // Remove falsy values
+
+      // Extract unique subcategory names for service_subcategory_names array
+      const subcategoryNamesSet = new Set(this.selectedServices.map(s => s.subcategory_name));
+      const serviceSubcategoryNames = Array.from(subcategoryNamesSet).filter(name => name); // Remove falsy values
+
+      // Save to practitioners table
       const { error } = await this.supabase
         .from('practitioners')
         .update({
           pricing: servicePricingArray,
+          service_category_names: serviceCategoryNames,
+          service_subcategory_names: serviceSubcategoryNames,
           updated_at: new Date().toISOString()
         })
         .eq('id', practitionerId);
@@ -614,6 +624,8 @@ class MatchSettingsManager {
       if (error) throw error;
 
       console.log('[MatchSettingsManager] ✓ Service pricing synced to practitioners.pricing:', servicePricingArray);
+      console.log('[MatchSettingsManager] ✓ Service categories synced to practitioners.service_category_names:', serviceCategoryNames);
+      console.log('[MatchSettingsManager] ✓ Service subcategories synced to practitioners.service_subcategory_names:', serviceSubcategoryNames);
       return true;
     } catch (error) {
       console.error('[MatchSettingsManager] Error syncing service pricing:', error);

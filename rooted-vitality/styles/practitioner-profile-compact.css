@@ -155,8 +155,27 @@ body { font-family: var(--font-sans); color: var(--color-text); background: #fbf
 .hero-actions {
     width: 100%;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
     margin-top: 1rem;
+}
+
+.back-to-search-link {
+    display: none;
+    text-decoration: none;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    margin-top: 0;
+    white-space: nowrap;
+}
+
+.back-to-search-link:hover {
+    color: var(--rooted-accent);
+    text-decoration: underline;
 }
 
 .hero-info {
@@ -168,7 +187,7 @@ body { font-family: var(--font-sans); color: var(--color-text); background: #fbf
 .hero-title-group {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-sm);
+    gap: 1rem;
 }
 
 .hero-title {
@@ -181,7 +200,7 @@ body { font-family: var(--font-sans); color: var(--color-text); background: #fbf
 
 .hero-badges {
     display: flex;
-    gap: 0.75rem;
+    gap: 1rem;
     flex-wrap: wrap;
 }
 
@@ -193,7 +212,7 @@ body { font-family: var(--font-sans); color: var(--color-text); background: #fbf
     background: transparent !important;
     color: #fbf7ec !important;
     border: 2px solid #fbf7ec !important;
-    border-radius: 20px;
+    border-radius: 0;
     font-size: 0.9rem;
     font-weight: 500;
 }
@@ -238,9 +257,9 @@ body { font-family: var(--font-sans); color: var(--color-text); background: #fbf
 }
 
 .hero-quick-info {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
     padding: var(--spacing-sm) 0;
     border-top: 1px solid rgba(251, 247, 236, 0.2);
     border-bottom: 1px solid rgba(251, 247, 236, 0.2);
@@ -359,7 +378,7 @@ body { font-family: var(--font-sans); color: var(--color-text); background: #fbf
 
 .section-title {
     display: inline-block;
-    margin: 0;
+    margin: 0 0 var(--spacing-md) 0;
     font-size: 1.2rem;
     font-weight: 600;
     color: var(--color-dark);
@@ -367,6 +386,12 @@ body { font-family: var(--font-sans); color: var(--color-text); background: #fbf
     padding-bottom: var(--spacing-sm);
     border-bottom: 3px solid var(--color-secondary);
     width: auto;
+}
+
+#payments-section {
+    padding: var(--spacing-lg);
+    background: #fbf7ec;
+    border-bottom: 1px solid var(--color-border);
 }
 
 .section-title-centered {

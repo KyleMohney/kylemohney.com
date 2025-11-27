@@ -278,6 +278,35 @@
       margin: 0;
     }
 
+    .empty-state.membership-required {
+      background: #fff9e6;
+      border: 2px solid #ffd700;
+    }
+
+    .empty-state.membership-required h3 {
+      color: #77883e;
+    }
+
+    .empty-state.membership-required p {
+      color: #666;
+    }
+
+    .empty-state.membership-required .btn-primary {
+      display: inline-block;
+      background: #77883e;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .empty-state.membership-required .btn-primary:hover {
+      background: #5d6830;
+      box-shadow: 0 4px 12px rgba(119, 136, 62, 0.3);
+    }
+
     /* Toast Notification Styles */
     .toast-container {
       position: fixed;
@@ -819,6 +848,34 @@
         const rvUser = JSON.parse(rvUserStr);
         const practitionerId = rvUser.id;
         console.log('[Pro Clients] Loading data for practitioner:', practitionerId);
+
+        // CHECK MEMBERSHIP STATUS BEFORE LOADING CLIENTS/OPPORTUNITIES
+        const { data: membershipData, error: membershipError } = await window.supabaseClient
+          .from('memberships')
+          .select('status')
+          .eq('practitioner_id', practitionerId)
+          .order('created_at', { ascending: false })
+          .limit(1);
+
+        const hasActiveMembership = membershipData && membershipData[0]?.status === 'active';
+        
+        if (!hasActiveMembership) {
+          console.log('[Pro Clients] Practitioner does not have active membership');
+          const newClientsContainer = document.getElementById('new-clients');
+          const opportunitiesContainer = document.getElementById('opportunities');
+          
+          const membershipRequiredHTML = `
+            <div class="empty-state membership-required">
+              <h3>Membership Required</h3>
+              <p>Access to new clients and opportunities requires an active membership.</p>
+              <a href="./settings.html" class="btn btn-primary" style="margin-top: 15px;">View Membership Options</a>
+            </div>
+          `;
+          
+          newClientsContainer.innerHTML = membershipRequiredHTML;
+          opportunitiesContainer.innerHTML = membershipRequiredHTML;
+          return;
+        }
 
         // Get practitioner serial number
         const { data: practitioner, error: practitionerError } = await window.supabaseClient

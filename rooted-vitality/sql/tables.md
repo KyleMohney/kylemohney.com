@@ -94,6 +94,23 @@ practitioners
 
 
 ====================================
+memberships
+====================================
+
+| column_name         | data_type                   |
+| ------------------- | --------------------------- |
+| id                  | uuid                        |
+| status              | text                        |
+| started_at          | timestamp without time zone |
+| created_at          | timestamp without time zone |
+| updated_at          | timestamp without time zone |
+| practitioner_serial | text                        |
+| canceled_at         | timestamp with time zone    |
+| re-enrolled_on      | timestamp with time zone    |
+| practitioner_id     | uuid                        |
+
+
+====================================
 practitioner_profiles
 ====================================
 

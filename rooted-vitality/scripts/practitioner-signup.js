@@ -18,7 +18,7 @@ window.onerror = (msg, src, line, col, err) => {
 
 const state = {
     currentStep: 1,
-    totalSteps: 2,
+    totalSteps: 3,
     session: null,
     formData: {
         legal_name: '',
@@ -66,16 +66,40 @@ async function initializeAuth() {
         // Store the authenticated user info
         state.session = user;
         
-        // Populate the email field with the current user's email
+        // Get email from clients table (the primary source)
+        let userEmail = '';
+        
+        try {
+            const { data: clientData, error: clientError } = await window.supabaseClient
+                .from('clients')
+                .select('email')
+                .eq('id', user.id)
+                .single();
+            
+            if (clientData && clientData.email) {
+                userEmail = clientData.email;
+                console.log('[Signup] Email retrieved from clients table:', userEmail);
+            } else if (clientError) {
+                console.warn('[Signup] Error fetching from clients table:', clientError);
+            }
+        } catch (e) {
+            console.error('[Signup] Exception querying clients table:', e);
+        }
+        
+        console.log('[Signup] Final email to use:', userEmail);
+        
+        // Populate the email field with the user's email
         const emailElement = document.getElementById('email');
+        console.log('[Signup] Email element found:', !!emailElement, 'Value before:', emailElement?.value);
+        
         if (emailElement) {
-            emailElement.value = user.email || '';
-            console.log('[Signup] Email field populated with:', user.email);
+            emailElement.value = userEmail;
+            console.log('[Signup] Email field populated with:', userEmail, 'Value after:', emailElement.value);
         } else {
             console.error('[Signup] Email element not found');
         }
         
-        state.formData.email = user.email || '';
+        state.formData.email = userEmail;
         
         loadDraft();
         return true;
@@ -155,6 +179,9 @@ function validateStep(stepNum) {
     let isValid = true;
     
     inputs.forEach(input => {
+        // Skip readonly fields (like email) in validation
+        if (input.readOnly) return;
+        
         if (!input.value.trim()) {
             isValid = false;
             input.classList.add('error');
@@ -179,26 +206,29 @@ function updateProgress() {
     });
     const step1Complete = step1Filled === step1Fields.length;
     
-    // Step 2: Legal agreement checkboxes (required for submission)
+    // Step 2: Legal agreement checkboxes
     const agreeTerms = document.getElementById('agreeTerms');
     const confirmAccuracy = document.getElementById('confirmAccuracy');
     const step2CheckboxesFilled = (agreeTerms && agreeTerms.checked ? 1 : 0) + (confirmAccuracy && confirmAccuracy.checked ? 1 : 0);
     const step2CheckboxesTotal = 2;
     const step2Complete = agreeTerms && agreeTerms.checked && confirmAccuracy && confirmAccuracy.checked;
     
+    // Step 3: Membership checkbox
+    const agreeMembership = document.getElementById('agreeMembership');
+    const step3CheckboxesFilled = agreeMembership && agreeMembership.checked ? 1 : 0;
+    const step3CheckboxesTotal = 1;
+    const step3Complete = agreeMembership && agreeMembership.checked;
+    
     // Calculate overall progress percentage
-    // Total: 7 (step 1 fields) + 2 (step 2 checkboxes) = 9
-    const totalRequiredFields = step1Fields.length + step2CheckboxesTotal;
-    const totalFilledFields = step1Filled + step2CheckboxesFilled;
+    // Total: 8 (step 1 fields) + 2 (step 2 checkboxes) + 1 (step 3 checkbox) = 11
+    const totalRequiredFields = step1Fields.length + step2CheckboxesTotal + step3CheckboxesTotal;
+    const totalFilledFields = step1Filled + step2CheckboxesFilled + step3CheckboxesFilled;
     const percent = totalRequiredFields > 0 ? (totalFilledFields / totalRequiredFields) * 100 : 0;
     
     const bar = document.getElementById('progressBar');
     if (bar) {
         bar.style.width = percent + '%';
     }
-    
-    const pct = document.getElementById('progressPercentage');
-    if (pct) pct.textContent = Math.round(percent) + '%';
     
     // Update step indicator styles
     document.querySelectorAll('.step').forEach(step => {
@@ -215,6 +245,12 @@ function updateProgress() {
             if (step2Complete) {
                 step.classList.add('completed');
             } else if (step1Complete) {
+                step.classList.add('active');
+            }
+        } else if (stepNum === 3) {
+            if (step3Complete) {
+                step.classList.add('completed');
+            } else if (step2Complete) {
                 step.classList.add('active');
             }
         }
@@ -259,7 +295,273 @@ function prevStep() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 6. FORM SUBMISSION (AUTO-REGISTERED)
+// 6. SKIP MEMBERSHIP (Without Activation)
+// ═══════════════════════════════════════════════════════════════════════════
+
+async function skipMembership(event) {
+    event.preventDefault();
+    
+    try {
+        const skipBtn = document.getElementById('skipMembershipBtn');
+        skipBtn.disabled = true;
+        skipBtn.textContent = 'Finishing setup...';
+        
+        console.log('[Signup] Skipping membership setup...');
+        
+        // Validate all steps first
+        if (!validateStep(1) || !validateStep(2)) {
+            alert('Please complete all required fields on previous steps.');
+            skipBtn.disabled = false;
+            skipBtn.textContent = 'Skip for Now';
+            return;
+        }
+        
+        updateFormData();
+        
+        // Check required fields
+        if (!state.formData.legal_name || !state.formData.legal_business_name || !state.formData.dba_name || 
+            !state.formData.business_size || !state.formData.phone || !state.formData.physical_address || 
+            !state.formData.practice_city || !state.formData.practice_state || !state.formData.zipcode) {
+            alert('Please complete all required fields.');
+            skipBtn.disabled = false;
+            skipBtn.textContent = 'Skip for Now';
+            return;
+        }
+        
+        // Check legal agreement checkboxes
+        if (!document.getElementById('agreeTerms').checked || 
+            !document.getElementById('confirmAccuracy').checked) {
+            alert('Please agree to the terms to continue.');
+            skipBtn.disabled = false;
+            skipBtn.textContent = 'Skip for Now';
+            return;
+        }
+        
+        // Save practitioner to database (without membership)
+        const payload = {
+            id: state.session.id,
+            email: state.formData.email || state.session.email,
+            legal_name: state.formData.legal_name,
+            legal_business_name: state.formData.legal_business_name,
+            dba_name: state.formData.dba_name,
+            phone: state.formData.phone,
+            physical_address: state.formData.physical_address,
+            practice_city: state.formData.practice_city,
+            practice_state: state.formData.practice_state,
+            zipcode: state.formData.zipcode,
+            business_size: state.formData.business_size,
+            status: 'registered',
+            submitted_at: new Date().toISOString(),
+            // Default values for availability
+            in_person_enabled: false,
+            virtual_enabled: false,
+            housecalls_enabled: false,
+            timezone: 'America/Denver',
+            // Default settings
+            accepts_insurance: false,
+            matching_enabled: true,
+            matching_paused: false,
+            notification_preferences: JSON.stringify({
+                email_matches: true,
+                email_messages: true,
+                email_reviews: true
+            }),
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        };
+        
+        // First check if practitioner already exists
+        const { data: existingPractitioner, error: checkError } = await window.supabaseClient
+            .from('practitioners')
+            .select('id')
+            .eq('id', state.session.id)
+            .single();
+        
+        let error;
+        if (checkError && checkError.code !== 'PGRST116') {
+            // PGRST116 means no rows found, which is expected for new practitioners
+            throw new Error('Error checking for existing practitioner: ' + checkError.message);
+        }
+        
+        if (existingPractitioner) {
+            // Practitioner exists - UPDATE instead of INSERT
+            console.log('[Signup] Practitioner exists, updating...');
+            const { error: updateError } = await window.supabaseClient
+                .from('practitioners')
+                .update({
+                    email: payload.email,
+                    legal_name: payload.legal_name,
+                    legal_business_name: payload.legal_business_name,
+                    dba_name: payload.dba_name,
+                    phone: payload.phone,
+                    physical_address: payload.physical_address,
+                    practice_city: payload.practice_city,
+                    practice_state: payload.practice_state,
+                    zipcode: payload.zipcode,
+                    business_size: payload.business_size,
+                    status: payload.status,
+                    submitted_at: payload.submitted_at,
+                    in_person_enabled: payload.in_person_enabled,
+                    virtual_enabled: payload.virtual_enabled,
+                    housecalls_enabled: payload.housecalls_enabled,
+                    timezone: payload.timezone,
+                    accepts_insurance: payload.accepts_insurance,
+                    matching_enabled: payload.matching_enabled,
+                    matching_paused: payload.matching_paused,
+                    notification_preferences: payload.notification_preferences,
+                    updated_at: payload.updated_at
+                })
+                .eq('id', state.session.id);
+            
+            error = updateError;
+        } else {
+            // New practitioner - INSERT
+            console.log('[Signup] New practitioner, inserting...');
+            const { error: insertError } = await window.supabaseClient
+                .from('practitioners')
+                .insert([payload])
+                .select()
+                .single();
+            
+            error = insertError;
+        }
+        
+        if (error) {
+            console.error('[Signup] Save error details:', error);
+            console.error('[Signup] Error code:', error.code);
+            console.error('[Signup] Error message:', error.message);
+            console.error('[Signup] Error details:', error.details);
+            throw new Error(error.message);
+        }
+        
+        console.log('[Signup] Practitioner registered successfully (skip membership)');
+        
+        // Fetch the practitioner serial number and id
+        const { data: practitionerData, error: fetchError } = await window.supabaseClient
+            .from('practitioners')
+            .select('id, serial_number')
+            .eq('id', state.session.id)
+            .single();
+        
+        if (fetchError) {
+            console.error('[Signup] ERROR: Could not fetch practitioner data:', fetchError);
+            console.error('[Signup] Practitioner fetch error code:', fetchError.code);
+            console.error('[Signup] Practitioner fetch error message:', fetchError.message);
+            // Continue anyway - related tables will be created later if needed
+        } else if (!practitionerData) {
+            console.error('[Signup] ERROR: No practitioner data returned after insert/update');
+            // Continue anyway
+        } else {
+            const practitionerSerial = practitionerData.serial_number;
+            const practitionerId = practitionerData.id;
+            console.log('[Signup] ✓ Practitioner ID:', practitionerId);
+            console.log('[Signup] ✓ Practitioner serial number:', practitionerSerial);
+            
+            // Create practitioner profile record via RPC (SECURITY DEFINER bypasses RLS)
+            console.log('[Signup] Creating profile for:', { practitionerSerial, practitionerId });
+            const { data: profileData, error: profileError } = await window.supabaseClient
+                .rpc('create_practitioner_profile_signup', {
+                    p_practitioner_serial: practitionerSerial,
+                    p_practitioner_id: practitionerId
+                });
+            
+            if (profileError) {
+                console.error('[Signup] ❌ ERROR creating profile record:', profileError);
+                throw new Error(`Profile creation failed: ${profileError.message}`);
+            }
+            
+            if (!profileData) {
+                console.error('[Signup] ❌ Profile RPC returned NULL (no UUID)');
+                throw new Error('Profile creation returned no ID');
+            }
+            
+            console.log('[Signup] ✓ Practitioner profile created with ID:', profileData);
+
+            // Create notification settings record via RPC (SECURITY DEFINER bypasses RLS)
+            console.log('[Signup] Creating notification settings for:', practitionerSerial);
+            const { data: notifSettingsData, error: notifSettingsError } = await window.supabaseClient
+                .rpc('create_practitioner_notification_settings_signup', {
+                    p_practitioner_serial: practitionerSerial
+                });
+            
+            if (notifSettingsError) {
+                console.error('[Signup] ❌ ERROR creating notification settings:', notifSettingsError);
+                throw new Error(`Notification settings creation failed: ${notifSettingsError.message}`);
+            }
+            
+            if (!notifSettingsData) {
+                console.error('[Signup] ❌ Notification settings RPC returned NULL (no UUID)');
+                throw new Error('Notification settings creation returned no ID');
+            }
+            
+            console.log('[Signup] ✓ Notification settings created with ID:', notifSettingsData);
+
+            // Create welcome notification for practitioner via RPC (SECURITY DEFINER bypasses RLS)
+            console.log('[Signup] Creating welcome notification for:', practitionerSerial);
+            const { data: notifData, error: notifError } = await window.supabaseClient
+                .rpc('create_welcome_notification_signup', {
+                    p_practitioner_serial: practitionerSerial
+                });
+            
+            if (notifError) {
+                console.error('[Signup] ❌ ERROR creating welcome notification:', notifError);
+                throw new Error(`Welcome notification creation failed: ${notifError.message}`);
+            }
+            
+            if (!notifData) {
+                console.error('[Signup] ❌ Welcome notification RPC returned NULL (no UUID)');
+                throw new Error('Welcome notification creation returned no ID');
+            }
+            
+            console.log('[Signup] ✓ Welcome notification created with ID:', notifData);
+
+            // Create membership record via RPC (SECURITY DEFINER bypasses RLS)
+            console.log('[Signup] Creating membership for:', { practitionerId, practitionerSerial });
+            const { data: membershipData, error: membershipError } = await window.supabaseClient
+                .rpc('create_practitioner_membership_signup', {
+                    p_practitioner_id: practitionerId,
+                    p_practitioner_serial: practitionerSerial
+                });
+
+            if (membershipError) {
+                console.error('[Signup] ❌ ERROR creating membership record:', membershipError);
+                throw new Error(`Membership creation failed: ${membershipError.message}`);
+            }
+            
+            if (!membershipData) {
+                console.error('[Signup] ❌ Membership RPC returned NULL (no UUID)');
+                throw new Error('Membership creation returned no ID');
+            }
+            
+            console.log('[Signup] ✓ Membership record created (inactive) with ID:', membershipData);
+        }
+        
+        // Update user role in localStorage
+        const currentUser = window.authManager.getCurrentUser();
+        if (currentUser) {
+            currentUser.role = 'practitioner';
+            localStorage.setItem('rvUser', JSON.stringify(currentUser));
+            console.log('[Signup] Updated user role to practitioner in localStorage');
+        }
+        
+        // Clear draft
+        clearDraft();
+        
+        // Complete the registration flow
+        completeRegistrationFlow(false);
+        
+    } catch (error) {
+        console.error('[Signup] Error skipping membership:', error);
+        alert('Error: ' + error.message);
+        
+        const skipBtn = document.getElementById('skipMembershipBtn');
+        skipBtn.disabled = false;
+        skipBtn.textContent = 'Skip for Now';
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 7. FORM SUBMISSION (AUTO-REGISTERED)
 // ═══════════════════════════════════════════════════════════════════════════
 
 async function registerPractitioner(event) {
@@ -288,81 +590,45 @@ async function registerPractitioner(event) {
         return;
     }
     
+    // Check membership agreement
+    if (!document.getElementById('agreeMembership').checked) {
+        alert('Please agree to activate your membership.');
+        return;
+    }
+    
     try {
         const submitBtn = document.getElementById('submitBtn');
         submitBtn.disabled = true;
         submitBtn.textContent = 'Registering...';
         
         const payload = {
-            id: state.session.id,  // Use 'id' not 'user_id' - id is the auth.users link
-            email: state.session.email,
+            id: state.session.id,
+            email: state.formData.email || state.session.email,
             legal_name: state.formData.legal_name,
             legal_business_name: state.formData.legal_business_name,
             dba_name: state.formData.dba_name,
-            year_established: parseInt(state.formData.year_established),
-            business_size: state.formData.business_size,
             phone: state.formData.phone,
             physical_address: state.formData.physical_address,
             practice_city: state.formData.practice_city,
             practice_state: state.formData.practice_state,
             zipcode: state.formData.zipcode,
+            business_size: state.formData.business_size,
             status: 'registered',
             submitted_at: new Date().toISOString(),
-            // Capture all practitioner table fields with proper types
-            bio: null,
-            ethos_statement: null,
-            modalities: [], // TEXT[] array
-            conditions_treated: [], // TEXT[] array
-            languages: ['English'], // TEXT[] array
-            credentials: JSON.stringify([]), // JSONB
-            credentials_verified: false,
-            badge_verified: false,
-            badge_certified: false,
-            badge_licensed: false,
-            badge_background_check: null,  // TEXT: null | 'pending' | 'passed' | 'failed'
+            // Default values for availability
+            in_person_enabled: false,
+            virtual_enabled: false,
+            housecalls_enabled: false,
+            timezone: 'America/Denver',
+            // Default settings
             accepts_insurance: false,
-            insurance_accepted: [], // TEXT[] array
-            insurance_providers: [], // TEXT[] array
-            custom_insurance_providers: [], // TEXT[] array
-            payment_methods: [], // TEXT[] array
-            custom_payment_methods: [], // TEXT[] array
-            pricing: null,
-            practice_type: null,
-            practice_logo_url: null,
-            intro_video_url: null,
-            gallery_photos: JSON.stringify([]), // JSONB
-            service_category_ids: [], // TEXT[] array
-            service_category_names: [], // TEXT[] array
-            service_subcategory_ids: [], // TEXT[] array
-            service_subcategory_names: [], // TEXT[] array
-            social_media: JSON.stringify({}), // JSONB
+            matching_enabled: true,
+            matching_paused: false,
             notification_preferences: JSON.stringify({
                 email_matches: true,
                 email_messages: true,
                 email_reviews: true
-            }), // JSONB
-            // Availability defaults
-            in_person_enabled: false,
-            in_person_option: null,
-            in_person_base_zipcode: null,
-            in_person_radius_miles: null,
-            in_person_zipcodes: [], // TEXT[] array
-            housecalls_enabled: false,
-            housecalls_option: null,
-            housecalls_base_zipcode: null,
-            housecalls_radius_miles: null,
-            housecalls_zipcodes: [], // TEXT[] array
-            virtual_enabled: false,
-            virtual_option: null,
-            virtual_states: [], // TEXT[] array
-            timezone: 'America/Denver',
-            availability_schedule: JSON.stringify({}), // JSONB
-            availability_last_updated: null,
-            // Matching settings
-            matching_enabled: true,
-            matching_paused: false,
-            profile_completion_percent: 10,
-            faq: null,
+            }),
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
         };
@@ -374,6 +640,10 @@ async function registerPractitioner(event) {
             .single();
         
         if (error) {
+            console.error('[Signup] Upsert error details:', error);
+            console.error('[Signup] Error code:', error.code);
+            console.error('[Signup] Error message:', error.message);
+            console.error('[Signup] Error details:', error.details);
             throw new Error(error.message);
         }
         
@@ -393,9 +663,100 @@ async function registerPractitioner(event) {
             console.log('[Signup] Practitioner record updated');
         }
 
+        // Fetch the practitioner serial number for membership creation
+        const { data: practitionerData, error: fetchError } = await window.supabaseClient
+            .from('practitioners')
+            .select('serial_number')
+            .eq('id', state.session.id)
+            .single();
+        
+        const practitionerSerial = practitionerData?.serial_number || null;
+        
+        if (fetchError) {
+            console.error('[Signup] Warning: Could not fetch practitioner serial:', fetchError);
+        } else if (practitionerSerial) {
+            console.log('[Signup] Fetched practitioner serial:', practitionerSerial);
+        }
+
+        // Create membership record
+        if (practitionerSerial) {
+            const membershipRecord = {
+                practitioner_id: state.session.id,
+                practitioner_serial: practitionerSerial,
+                status: 'active',
+                started_at: new Date().toISOString(),
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            };
+            
+            const { error: membershipError } = await window.supabaseClient
+                .from('memberships')
+                .insert([membershipRecord]);
+            
+            if (membershipError) {
+                console.error('[Signup] Warning: Could not create membership record:', membershipError);
+            } else {
+                console.log('[Signup] Membership record created for:', practitionerSerial);
+            }
+
+            // Create practitioner profile record
+            const profileRecord = {
+                practitioner_serial: practitionerSerial,
+                profile_completeness_percent: 10,
+                languages: ['English'],
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            };
+            
+            const { error: profileError } = await window.supabaseClient
+                .from('practitioner_profiles')
+                .insert([profileRecord]);
+            
+            if (profileError) {
+                console.warn('[Signup] Warning: Could not create practitioner profile record:', profileError);
+            } else {
+                console.log('[Signup] Practitioner profile record created for:', practitionerSerial);
+            }
+
+            // Create notification settings record
+            // Note: matches_in_app and matches_email default to OFF
+            // Practitioners must have an active membership to enable matches
+            const notifSettingsRecord = {
+                practitioner_serial: practitionerSerial,
+                messages_in_app: true,
+                messages_email: true,
+                messages_sms: false,
+                matches_in_app: false,
+                matches_email: false,
+                matches_sms: false,
+                reviews_in_app: true,
+                reviews_email: true,
+                reviews_sms: false,
+                promotions_in_app: true,
+                promotions_email: false,
+                promotions_sms: false,
+                system_in_app: true,
+                system_sms: false,
+                system_email: true,
+                account_in_app: true,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            };
+            
+            const { error: notifSettingsError } = await window.supabaseClient
+                .from('practitioner_notification_settings')
+                .insert([notifSettingsRecord]);
+            
+            if (notifSettingsError) {
+                console.warn('[Signup] Warning: Could not create notification settings record:', notifSettingsError);
+            } else {
+                console.log('[Signup] Notification settings record created for:', practitionerSerial);
+            }
+        }
+
         // Create welcome notification for practitioner
         const welcomeNotification = {
-            practitioner_serial: state.practitionerSerial,
+            practitioner_serial: practitionerSerial,
             type: 'welcome',
             title: 'Welcome to Rooted Vitality!',
             message: 'Thank you for signing up to help others on their wellness journey! Complete your profile and set your match preferences to start connecting with clients who need your expertise.',
@@ -429,12 +790,8 @@ async function registerPractitioner(event) {
         // Clear draft
         clearDraft();
         
-        // Redirect to dashboard after 3 seconds
-        setTimeout(() => {
-            const baseUrl = (typeof RootedVitality !== 'undefined' && RootedVitality.config.siteUrl) ? RootedVitality.config.siteUrl : '/rooted-vitality/';
-            window.location.href = baseUrl + 'dashboard/pro/';
-        }, 3000);
-        
+        // Complete the registration flow
+        completeRegistrationFlow(true);
         
     } catch (error) {
         console.error('[Signup] Error:', error);
@@ -442,7 +799,27 @@ async function registerPractitioner(event) {
         
         const submitBtn = document.getElementById('submitBtn');
         submitBtn.disabled = false;
-        submitBtn.textContent = 'Submit Registration';
+        submitBtn.textContent = 'Activate Membership';
+    }
+}
+
+/**
+ * Complete the registration flow and redirect to dashboard
+ * @param {boolean} withMembership - Whether membership was activated
+ */
+function completeRegistrationFlow(withMembership) {
+    try {
+        // Hide form and show success modal
+        document.getElementById('practitionerForm').style.display = 'none';
+        const modal = document.getElementById('successModal');
+        modal.classList.remove('hidden');
+        
+        // Redirect to practitioner profile page after 3 seconds
+        setTimeout(() => {
+            window.location.href = '/rooted-vitality/dashboard/pro/pages/profile.html';
+        }, 3000);
+    } catch (error) {
+        console.error('[Signup] Error in completeRegistrationFlow:', error);
     }
 }
 
@@ -472,6 +849,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     document.getElementById('step1Next').addEventListener('click', nextStep);
     document.getElementById('step2Prev').addEventListener('click', prevStep);
+    document.getElementById('step2Next').addEventListener('click', nextStep);
+    document.getElementById('step3Prev').addEventListener('click', prevStep);
+    document.getElementById('skipMembershipBtn').addEventListener('click', skipMembership);
     
     showStep(1);
     updateProgress(); // Initialize progress on page load
