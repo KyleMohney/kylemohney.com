@@ -565,8 +565,16 @@ let reviewsManager = {
         }
       }
 
-      alert('Thank you! Your review has been posted.');
-      this.closeReviewModal();
+      // Show custom branded modal instead of alert
+      if (window.showSuccessModal) {
+        window.showSuccessModal('Thank you! Your review has been posted.', () => {
+          this.closeReviewModal();
+        });
+      } else {
+        // Fallback to alert if modal manager isn't loaded
+        alert('Thank you! Your review has been posted.');
+        this.closeReviewModal();
+      }
 
     } catch (error) {
       console.error('[Reviews] Submission failed:', error.message);

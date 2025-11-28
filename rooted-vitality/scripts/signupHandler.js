@@ -226,7 +226,9 @@ window.addEventListener('DOMContentLoaded', async () => {
       console.log('[Signup] Welcome notification created');
 
       // ============ 7. Success: Show Message & Redirect ============
-      alert('Account created! Welcome to Rooted Vitality. Redirecting...');
+      // Show warm welcome modal
+      const clientFirstName = form.querySelector('#first-name')?.value.trim() || '';
+      const welcomeName = clientFirstName ? clientFirstName : 'Friend';
       
       // Disable form and show loading state
       submitBtn.disabled = true;
@@ -266,34 +268,68 @@ window.addEventListener('DOMContentLoaded', async () => {
         }
       };
       
-      // Try redirect with exponential backoff
-      let attempt = 0;
-      const maxAttempts = 5;
-      const tryRedirect = async () => {
-        attempt++;
-        console.log(`[Signup] Redirect attempt ${attempt}/${maxAttempts}`);
+      // Show custom welcome modal and trigger redirect on close
+      if (window.showWelcomeModal) {
+        window.showWelcomeModal(welcomeName, () => {
+          console.log('[Signup] Welcome modal closed, starting redirect sequence...');
+          
+          // Try redirect with exponential backoff
+          let attempt = 0;
+          const maxAttempts = 5;
+          const tryRedirect = async () => {
+            attempt++;
+            console.log(`[Signup] Redirect attempt ${attempt}/${maxAttempts}`);
+            
+            const success = await attemptRedirect();
+            if (!success && attempt < maxAttempts) {
+              const nextDelay = 500 * attempt;
+              console.log(`[Signup] Will retry in ${nextDelay}ms`);
+              setTimeout(tryRedirect, nextDelay); // Exponential backoff
+            } else if (attempt >= maxAttempts && !success) {
+              // Fallback: Just go to index anyway
+              console.warn('[Signup] Max attempts reached, forcing redirect');
+              if (redirectUrl) {
+                sessionStorage.removeItem('redirectAfterAuth');
+                window.location.href = redirectUrl;
+              } else {
+                window.location.href = '/rooted-vitality/index.html';
+              }
+            }
+          };
+          
+          tryRedirect();
+        });
+      } else {
+        // Fallback: Show alert and proceed with redirect if modal manager isn't loaded
+        alert('Account created! Welcome to Rooted Vitality. Redirecting...');
         
-        const success = await attemptRedirect();
-        if (!success && attempt < maxAttempts) {
-          const nextDelay = 500 * attempt;
-          console.log(`[Signup] Will retry in ${nextDelay}ms`);
-          setTimeout(tryRedirect, nextDelay); // Exponential backoff
-        } else if (attempt >= maxAttempts && !success) {
-          // Fallback: Just go to index anyway
-          console.warn('[Signup] Max attempts reached, forcing redirect');
-          if (redirectUrl) {
-            sessionStorage.removeItem('redirectAfterAuth');
-            window.location.href = redirectUrl;
-          } else {
-            window.location.href = '/rooted-vitality/index.html';
+        // Try redirect with exponential backoff
+        let attempt = 0;
+        const maxAttempts = 5;
+        const tryRedirect = async () => {
+          attempt++;
+          console.log(`[Signup] Redirect attempt ${attempt}/${maxAttempts}`);
+          
+          const success = await attemptRedirect();
+          if (!success && attempt < maxAttempts) {
+            const nextDelay = 500 * attempt;
+            console.log(`[Signup] Will retry in ${nextDelay}ms`);
+            setTimeout(tryRedirect, nextDelay); // Exponential backoff
+          } else if (attempt >= maxAttempts && !success) {
+            // Fallback: Just go to index anyway
+            console.warn('[Signup] Max attempts reached, forcing redirect');
+            if (redirectUrl) {
+              sessionStorage.removeItem('redirectAfterAuth');
+              window.location.href = redirectUrl;
+            } else {
+              window.location.href = '/rooted-vitality/index.html';
+            }
           }
-        }
-      };
+        };
+        
+        tryRedirect();
+      }
       
-      // Start redirect process after initial delay
-      console.log('[Signup] Starting redirect process...');
-      setTimeout(tryRedirect, 500);
-
     } catch (error) {
       console.error('Signup error:', error);
       alert(`Signup failed: ${error.message}`);

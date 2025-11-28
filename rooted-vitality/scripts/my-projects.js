@@ -1423,8 +1423,16 @@ async function submitCloseProject(e) {
       await loadProjects();
     }
 
-    // Show success message
-    showNotification(`Project ${closureReason === 'hired' ? 'marked as hired' : 'closed'} successfully!`, 'success');
+    // Show success message with custom modal
+    const hiredMessage = closureReason === 'hired' 
+      ? 'Congratulations! You\'ve successfully hired this practitioner.' 
+      : 'Your wellness journey has been closed.';
+    
+    if (window.showSuccessModal) {
+      window.showSuccessModal(hiredMessage);
+    } else {
+      showNotification(hiredMessage, 'success');
+    }
 
   } catch (error) {
     console.error('[My Projects] Unexpected error closing project:', error);

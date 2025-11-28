@@ -3,7 +3,7 @@
   ROOTED VITALITY, INC.
   File: scripts/modalManager.js
   Purpose: Global Modal Management System - Single Source of Truth
-  Holistic Wellness � Modern Connection Platform
+  Holistic Wellness � Modern Connection Platform
   rootedvitality.com | 2025
   =====================================================================
 
@@ -39,6 +39,8 @@ const ModalManager = {
     window.showSuccessModal = this.showSuccessModal.bind(this);
     window.showErrorModal = this.showErrorModal.bind(this);
     window.showWarningModal = this.showWarningModal.bind(this);
+    window.showStatusModal = this.showStatusModal.bind(this);
+    window.showWelcomeModal = this.showWelcomeModal.bind(this);
     window.showToast = this.showToast.bind(this);
   },
 
@@ -556,6 +558,245 @@ const ModalManager = {
   },
 
   /**
+   * Show custom status update modal for match status changes
+   * @param {string} status - The new status ('hired', 'not-hired', 'in-progress', 'declined')
+   * @param {function} onClose - Callback when closed
+   */
+  showStatusModal(status, onClose) {
+    const modalId = 'status-modal-' + Date.now();
+    
+    const statusConfig = {
+      'hired': {
+        icon: '✓',
+        title: 'Match Hired',
+        message: 'Great! You\'ve successfully hired this practitioner.',
+        color: '#77883e',
+        bgColor: '#e8f0d9'
+      },
+      'not-hired': {
+        icon: '✗',
+        title: 'Match Not Hired',
+        message: 'You\'ve decided not to hire this practitioner.',
+        color: '#d64545',
+        bgColor: '#fde8e8'
+      },
+      'in-progress': {
+        icon: '→',
+        title: 'In Progress',
+        message: 'You\'re now communicating with this practitioner.',
+        color: '#77883e',
+        bgColor: '#e8f0d9'
+      },
+      'declined': {
+        icon: '✗',
+        title: 'Match Declined',
+        message: 'This match has been declined.',
+        color: '#d64545',
+        bgColor: '#fde8e8'
+      }
+    };
+    
+    const config = statusConfig[status] || statusConfig['in-progress'];
+    
+    const modalHTML = `
+      <div class="modal-overlay" id="${modalId}-overlay" style="
+        position: fixed; 
+        top: 0; 
+        left: 0; 
+        right: 0; 
+        bottom: 0; 
+        background: rgba(0,0,0,0.5); 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        z-index: 3000;
+        animation: fadeIn 0.2s ease-out;
+      ">
+        <div class="modal-content" style="
+          background: #fbf7ec; 
+          border-radius: 12px; 
+          padding: 40px; 
+          max-width: 440px; 
+          width: 90%; 
+          box-shadow: 0 10px 40px rgba(0,0,0,0.15); 
+          text-align: center;
+          animation: slideUp 0.3s ease-out;
+          border-left: 5px solid ${config.color};
+        ">
+          <div style="
+            font-size: 56px; 
+            margin-bottom: 20px;
+            color: ${config.color};
+          ">${config.icon}</div>
+          <h2 style="
+            font-size: 20px; 
+            color: ${config.color}; 
+            margin-bottom: 12px; 
+            font-weight: 700;
+            letter-spacing: 0.5px;
+          ">${config.title}</h2>
+          <p style="
+            font-size: 14px; 
+            color: #666; 
+            line-height: 1.6; 
+            margin-bottom: 28px;
+            word-break: break-word;
+          ">${this.escapeHtml(config.message)}</p>
+          <button id="${modalId}-btn" style="
+            width: 100%; 
+            padding: 14px; 
+            background: ${config.color}; 
+            color: #fbf7ec; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 14px; 
+            font-weight: 600; 
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          " onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">Dismiss</button>
+        </div>
+      </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    this.activeModals.add(modalId);
+    
+    const modalOverlay = document.getElementById(modalId + '-overlay');
+    const closeBtn = document.getElementById(modalId + '-btn');
+    
+    const closeModal = () => {
+      if (modalOverlay && modalOverlay.parentNode) {
+        modalOverlay.remove();
+      }
+      this.activeModals.delete(modalId);
+      if (onClose) onClose();
+    };
+    
+    closeBtn.addEventListener('click', closeModal);
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) closeModal();
+    });
+    
+    // Allow Escape key to close
+    const escapeHandler = (e) => {
+      if (e.key === 'Escape' && modalOverlay && modalOverlay.parentNode) {
+        document.removeEventListener('keydown', escapeHandler);
+        closeModal();
+      }
+    };
+    document.addEventListener('keydown', escapeHandler);
+  },
+
+  /**
+   * Show warm welcome modal for new client signups
+   * @param {string} clientName - The client's name to personalize welcome
+   * @param {function} onClose - Callback when closed (typically triggers redirect)
+   */
+  showWelcomeModal(clientName = '', onClose) {
+    const modalId = 'welcome-modal-' + Date.now();
+    
+    const greeting = clientName ? `Welcome, ${clientName}!` : 'Welcome to Rooted Vitality!';
+    
+    const modalHTML = `
+      <div class="modal-overlay" id="${modalId}-overlay" style="
+        position: fixed; 
+        top: 0; 
+        left: 0; 
+        right: 0; 
+        bottom: 0; 
+        background: rgba(0,0,0,0.5); 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        z-index: 3000;
+        animation: fadeIn 0.2s ease-out;
+      ">
+        <div class="modal-content" style="
+          background: linear-gradient(135deg, #fbf7ec 0%, #f5f0e6 100%); 
+          border-radius: 12px; 
+          padding: 50px 40px; 
+          max-width: 480px; 
+          width: 90%; 
+          box-shadow: 0 15px 50px rgba(0,0,0,0.2); 
+          text-align: center;
+          animation: slideUp 0.4s ease-out;
+          border-top: 4px solid #77883e;
+        ">
+          <div style="
+            font-size: 64px; 
+            margin-bottom: 24px;
+            animation: bounce 0.6s ease-out;
+          ">🌱</div>
+          <h2 style="
+            font-size: 24px; 
+            color: #77883e; 
+            margin-bottom: 16px; 
+            font-weight: 700;
+            letter-spacing: 0.5px;
+          ">${this.escapeHtml(greeting)}</h2>
+          <p style="
+            font-size: 15px; 
+            color: #555; 
+            line-height: 1.8; 
+            margin-bottom: 12px;
+          ">You're now part of a community dedicated to holistic wellness and meaningful connections.</p>
+          <p style="
+            font-size: 14px; 
+            color: #888; 
+            line-height: 1.6; 
+            margin-bottom: 32px;
+            font-style: italic;
+          ">Let's find the perfect practitioners for your wellness journey.</p>
+          <button id="${modalId}-btn" style="
+            width: 100%; 
+            padding: 16px; 
+            background: #77883e; 
+            color: #fbf7ec; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 15px; 
+            font-weight: 700; 
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+          " onmouseover="this.style.background='#5e6e30'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(119,136,62,0.3)'" onmouseout="this.style.background='#77883e'; this.style.transform='translateY(0)'; this.style.boxShadow='none'">Get Started</button>
+        </div>
+      </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    this.activeModals.add(modalId);
+    
+    const modalOverlay = document.getElementById(modalId + '-overlay');
+    const closeBtn = document.getElementById(modalId + '-btn');
+    
+    const closeModal = () => {
+      if (modalOverlay && modalOverlay.parentNode) {
+        // Add fade out animation before removing
+        modalOverlay.style.animation = 'fadeOut 0.3s ease-out';
+        setTimeout(() => {
+          if (modalOverlay && modalOverlay.parentNode) {
+            modalOverlay.remove();
+          }
+          this.activeModals.delete(modalId);
+          if (onClose) onClose();
+        }, 300);
+      } else {
+        this.activeModals.delete(modalId);
+        if (onClose) onClose();
+      }
+    };
+    
+    closeBtn.addEventListener('click', closeModal);
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) closeModal();
+    });
+  },
+
+  /**
    * Escape HTML to prevent XSS
    * @param {string} text - Text to escape
    * @returns {string} - Escaped text
@@ -589,6 +830,11 @@ if (!document.getElementById('modal-manager-styles')) {
       to { opacity: 1; }
     }
     
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+    
     @keyframes slideUp {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
@@ -602,6 +848,11 @@ if (!document.getElementById('modal-manager-styles')) {
     @keyframes slideOutRight {
       from { opacity: 1; transform: translateX(0); }
       to { opacity: 0; transform: translateX(20px); }
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
     }
   `;
   document.head.appendChild(style);

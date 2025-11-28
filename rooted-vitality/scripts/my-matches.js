@@ -1251,8 +1251,15 @@ async function updateMatchStatus(matchId, newStatus) {
       'declined': 'Declined'
     };
     const label = statusLabels[newStatus] || newStatus;
-    console.log('[My Matches] Status updated successfully - showing alert for:', label);
-    alert(`Status changed to "${label}"`);
+    console.log('[My Matches] Status updated successfully - showing modal for:', label);
+    
+    // Show custom branded modal instead of alert
+    if (window.showStatusModal) {
+      window.showStatusModal(newStatus);
+    } else {
+      // Fallback to alert if modal manager isn't loaded
+      alert(`Status changed to "${label}"`);
+    }
     
   } catch (error) {
     console.error('[My Matches] Exception updating match status:', error);

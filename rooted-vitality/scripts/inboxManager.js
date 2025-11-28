@@ -842,7 +842,7 @@ async function loadConversations() {
         if (clientSerials.length > 0) {
             const { data: allClients } = await window.supabaseClient
                 .from('clients')
-                .select('id, first_name, last_name, profile_picture_url, serial_number')
+                .select('id, first_name, last_name, profile_picture_url, serial_number, phone')
                 .in('serial_number', clientSerials);
 
             clientsMap = new Map(allClients?.map(c => [c.serial_number, c]) || []);
@@ -901,6 +901,8 @@ async function loadConversations() {
                     ? client.profile_picture_url 
                     : generateInitialsAvatar(clientName);
 
+                console.log(`[Inbox] Client data for ${clientName}:`, { phone: client.phone, keys: Object.keys(client), full_client: client });
+
                 // Get messages for this project
                 const messages = messagesMap.get(`${match.project_serial}`) || [];
                 const lastMessage = messages?.[0];
@@ -935,6 +937,7 @@ async function loadConversations() {
                     practitionerSerial: practitionerSerial,
                     clientName: clientName,
                     clientAvatar: clientAvatarUrl,
+                    clientPhone: client.phone || '',
                     lastMessage: lastMessage?.message || 'No messages yet',
                     lastMessageTime: lastMessage?.created_at ? new Date(lastMessage.created_at) : new Date(match.created_at),
                     isUnread: unreadCount > 0,
@@ -1113,13 +1116,23 @@ function createThreadElement(conversation) {
     if (conversation.hasReview) {
         reviewLabel = '<span style="padding: 2px 8px; background: #ffd700; color: #996600; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">Reviewed</span>';
     }
+
+    // Show phone number if match is accepted (any status except pending/declined/not-hired, and in the Messages or Hired tabs)
+    const isAccepted = conversation.matchStatus && !['pending', 'declined', 'not-hired'].includes(conversation.matchStatus);
+    const showPhoneNumber = isAccepted && conversation.clientPhone;
+    const phoneDisplay = showPhoneNumber ? `<div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 2px;">📞 ${conversation.clientPhone}</div>` : '';
+    
+    console.log(`[Inbox] Thread ${conversation.clientName} - matchStatus: ${conversation.matchStatus}, category: ${conversation.category}, phone: ${conversation.clientPhone}, showPhone: ${showPhoneNumber}`);
     
     item.innerHTML = `
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; width: 100%;">
             <div class="thread-avatar-small">
                 <img src="${conversation.clientAvatar}" alt="${conversation.clientName}">
             </div>
-            <p class="thread-name">${conversation.clientName}</p>
+            <div style="flex: 1;">
+                <p class="thread-name" style="margin: 0; margin-bottom: 2px;">${conversation.clientName}</p>
+                ${phoneDisplay}
+            </div>
             <div class="thread-status-badge ${conversation.status === 'online' ? 'online' : conversation.status === 'away' ? 'away' : ''}"></div>
             <span class="thread-time" style="margin-left: auto;">${formatTime(conversation.lastMessageTime)}</span>
             ${reviewLabel}
