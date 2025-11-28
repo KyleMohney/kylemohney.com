@@ -5528,55 +5528,57 @@
           return false;
         }
 
-        // If enabling matching, check for active membership
+        // If enabling matching, check active membership via RPC function
         if (isEnabled) {
-          console.log('[Match Settings] Checking for active membership before toggle...');
+          console.log('[Match Settings] Checking membership status via RPC for practitioner serial...');
           
-          let membershipData = null;
-          let membershipError = null;
+          // Get practitioner serial from stored data or query it
+          let practitionerSerial = localStorage.getItem('practitionerSerial');
           
-          // Query with cache busting - get fresh data from database
-          const result = await window.supabaseClient
-            .from('memberships')
-            .select('*')
-            .eq('practitioner_id', user.id)
-            .order('created_at', { ascending: false })
-            .limit(1);
+          if (!practitionerSerial) {
+            // Query for serial number
+            const { data: practData, error: practError } = await window.supabaseClient
+              .from('practitioners')
+              .select('serial_number')
+              .eq('id', user.id)
+              .single();
+            
+            if (practError || !practData) {
+              console.error('[Match Settings] Cannot get practitioner serial:', practError);
+              showToast('Unable to verify your account. Please refresh and try again.', 'error');
+              return false;
+            }
+            
+            practitionerSerial = practData.serial_number;
+          }
           
-          membershipData = result.data;
-          membershipError = result.error;
+          // Call RPC function to check membership and enable matching
+          console.log('[Match Settings] Calling enable_matching RPC for:', practitionerSerial);
           
-          console.log('[Match Settings] Fresh membership query on toggle:', {
-            data: membershipData,
-            error: membershipError,
-            userId: user.id
+          const { data: canEnable, error: rpcError } = await window.supabaseClient.rpc('enable_matching', {
+            p_practitioner_serial: practitionerSerial
           });
           
-          if (membershipError) {
-            console.error('[Match Settings] Error checking membership:', membershipError);
-            showToast('Unable to verify membership status. Please refresh the page and try again.', 'error');
+          console.log('[Match Settings] RPC enable_matching result:', {
+            canEnable,
+            error: rpcError,
+            serial: practitionerSerial
+          });
+          
+          if (rpcError) {
+            console.error('[Match Settings] RPC error:', rpcError);
+            showToast('Unable to verify membership. Please try again.', 'error');
+            
+            // Force toggle OFF
+            const matchingToggle = document.getElementById('matching-activation-toggle');
+            if (matchingToggle) {
+              matchingToggle.checked = false;
+            }
             return false;
           }
           
-          // Get the most recent (latest) membership record
-          const latestMembership = membershipData && membershipData.length > 0 ? membershipData[0] : null;
-          const hasActiveMembership = latestMembership && latestMembership.status === 'active';
-          
-          console.log('[Match Settings] Toggle membership check result:', {
-            hasActiveMembership,
-            fullMembershipRecord: latestMembership,
-            membershipStatus: latestMembership?.status,
-            recordCount: membershipData?.length || 0,
-            latestRecordId: latestMembership?.id,
-            latestCreatedAt: latestMembership?.created_at
-          });
-          
-          if (!hasActiveMembership) {
-            console.warn('[Match Settings] BLOCKED: Cannot enable matching - no active membership');
-            console.warn('[Match Settings] Membership details:', {
-              recordFound: !!latestMembership,
-              currentStatus: latestMembership?.status
-            });
+          if (!canEnable) {
+            console.warn('[Match Settings] BLOCKED: No active membership');
             
             // Force toggle OFF immediately
             const matchingToggle = document.getElementById('matching-activation-toggle');
@@ -5589,9 +5591,38 @@
             return false;
           }
           
-          console.log('[Match Settings] ✓ Active membership verified, allowing toggle');
+          console.log('[Match Settings] ✓ Active membership verified, matching enabled via RPC');
+          return true;
         }
 
+        
+        // Call disable_matching RPC if disabling
+        if (!isEnabled) {
+          let practitionerSerial = localStorage.getItem('practitionerSerial');
+          
+          if (!practitionerSerial) {
+            const { data: practData } = await window.supabaseClient
+              .from('practitioners')
+              .select('serial_number')
+              .eq('id', user.id)
+              .single();
+            practitionerSerial = practData?.serial_number;
+          }
+          
+          if (practitionerSerial) {
+            console.log('[Match Settings] Calling disable_matching RPC for:', practitionerSerial);
+            const { data: disabledSuccess, error: disableError } = await window.supabaseClient.rpc('disable_matching', {
+              p_practitioner_serial: practitionerSerial
+            });
+            
+            if (disableError) {
+              console.warn('[Match Settings] RPC disable_matching warning:', disableError);
+            } else {
+              console.log('[Match Settings] ✓ Disabled via RPC:', disabledSuccess);
+            }
+          }
+        }
+        
         const { error } = await window.supabaseClient
           .from('practitioners')
           .update({
@@ -5921,8 +5952,22 @@
         // Remove from database if manager is initialized
         if (matchSettingsManager) {
           const categoryItem = activeCategories.find(ac => ac.id === categoryId);
-          if (categoryItem && categoryItem.databaseId) {
-            await matchSettingsManager.removeServiceCategory(categoryItem.databaseId);
+          if (categoryItem && categoryItem.serviceIds && categoryItem.serviceIds.length > 0) {
+            console.log('[Rooted Vitality] Removing category from database:', {
+              categoryId,
+              serviceIds: categoryItem.serviceIds,
+              serviceCount: categoryItem.serviceIds.length
+            });
+            
+            // Delete all services for this category
+            for (const serviceId of categoryItem.serviceIds) {
+              console.log('[Rooted Vitality] Deleting service:', serviceId);
+              await matchSettingsManager.removeServiceCategory(serviceId);
+            }
+            
+            console.log('[Rooted Vitality] ✓ All services for category removed and arrays synced');
+          } else {
+            console.warn('[Rooted Vitality] No serviceIds found for category:', categoryId);
           }
         }
 
@@ -5930,7 +5975,7 @@
         activeCategories = activeCategories.filter(ac => ac.id !== categoryId);
         renderActiveCategories();
         showToast(`${category.name} removed.`, 'success');
-        console.log('[Rooted Vitality] Category removed:', categoryId);
+        console.log('[Rooted Vitality] Category removed from UI:', categoryId);
         closeConfirmModal();
       } catch (error) {
         console.error('[Rooted Vitality] Error removing category:', error);

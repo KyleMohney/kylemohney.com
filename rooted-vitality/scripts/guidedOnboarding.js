@@ -315,7 +315,7 @@ async function initializeGuidedOnboarding(skipAuth = false, isReturningUser = fa
                                     </div>
                                 </label>
                                 <label class="option-card">
-                                    <input type="radio" name="travel_preference" value="house-call" required>
+                                    <input type="radio" name="travel_preference" value="housecalls" required>
                                     <div class="option-content">
                                         <span class="option-title">House Calls</span>
                                         <span class="option-desc">Practitioner comes to me</span>
@@ -458,7 +458,7 @@ async function initializeGuidedOnboarding(skipAuth = false, isReturningUser = fa
                                     </div>
                                 </label>
                                 <label class="option-card">
-                                    <input type="radio" name="travel_preference" value="house-call" required>
+                                    <input type="radio" name="travel_preference" value="housecalls" required>
                                     <div class="option-content">
                                         <span class="option-title">In My Sanctuary</span>
                                         <span class="option-desc">They come to my space</span>
@@ -1036,6 +1036,7 @@ function setupOnboardingEventListeners(isReturningUser = false) {
             return;
         }
         onboardingData.category = category;
+        onboardingData.description = document.getElementById('onboarding-description-direct').value.trim() || '';
         onboardingData.subcategory = document.getElementById('onboarding-subcategory-direct').value || null;
         onboardingData.travel_preference = document.querySelector('input[name="travel_preference"]:checked')?.value || null;
         onboardingData.urgency = document.querySelector('input[name="urgency"]:checked')?.value || null;

@@ -638,15 +638,31 @@ class MatchSettingsManager {
    */
   async removeServiceCategory(serviceId) {
     try {
-      const { error } = await this.supabase
-        .from('practitioner_selected_services')
-        .delete()
-        .eq('id', serviceId);
+      console.log('[MatchSettingsManager] removeServiceCategory called with:', {
+        serviceId,
+        practitionerSerial: this.practitionerSerial,
+        practitionerId: this.practitionerId
+      });
 
-      if (error) throw error;
+      // Use RPC function to delete service (bypasses RLS)
+      console.log('[MatchSettingsManager] Calling delete_practitioner_service RPC for:', serviceId);
 
+      const { data: deleteResult, error: deleteError } = await this.supabase.rpc(
+        'delete_practitioner_service',
+        { p_service_id: serviceId }
+      );
+
+      if (deleteError) {
+        console.error('[MatchSettingsManager] RPC DELETE error:', deleteError);
+        throw deleteError;
+      }
+
+      console.log('[MatchSettingsManager] ✓ Service deleted via RPC:', deleteResult);
+
+      // Remove from local array
       this.selectedServices = this.selectedServices.filter(s => s.id !== serviceId);
-      console.log('[MatchSettingsManager] Service category removed:', serviceId);
+      console.log('[MatchSettingsManager] Removed from local array, now have:', this.selectedServices.length, 'services');
+
       return true;
     } catch (error) {
       console.error('[MatchSettingsManager] Error removing service category:', error);

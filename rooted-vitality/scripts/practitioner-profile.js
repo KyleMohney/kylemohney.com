@@ -772,7 +772,7 @@ function setupBackToSearchLink() {
             backLink.addEventListener('click', (e) => {
                 e.preventDefault();
                 console.log('[Practitioner Profile] Back to search clicked, project_id:', projectIdFromUrl);
-                window.location.href = `./find-practitioners.html?project_id=${projectIdFromUrl}`;
+                window.location.href = `/rooted-vitality/dashboard/client/pages/find-practitioners.html?project_id=${projectIdFromUrl}`;
             });
         } else {
             console.log('[Practitioner Profile] Not a client - hiding back-to-search link');

@@ -364,23 +364,43 @@ DROP POLICY IF EXISTS "Practitioners delete own selected services" ON practition
 -- SELECT: Practitioners can read their own selected services
 CREATE POLICY "Practitioners read own selected services" ON practitioner_selected_services
 FOR SELECT
-USING (practitioner_serial = auth.uid());
+USING (
+  practitioner_serial IN (
+    SELECT serial_number FROM practitioners WHERE id = auth.uid()
+  )
+);
 
 -- INSERT: Practitioners can add their own selected services
 CREATE POLICY "Practitioners insert own selected services" ON practitioner_selected_services
 FOR INSERT
-WITH CHECK (practitioner_serial = auth.uid());
+WITH CHECK (
+  practitioner_serial IN (
+    SELECT serial_number FROM practitioners WHERE id = auth.uid()
+  )
+);
 
 -- UPDATE: Practitioners can update their own selected services (pricing, active status)
 CREATE POLICY "Practitioners update own selected services" ON practitioner_selected_services
 FOR UPDATE
-USING (practitioner_serial = auth.uid())
-WITH CHECK (practitioner_serial = auth.uid());
+USING (
+  practitioner_serial IN (
+    SELECT serial_number FROM practitioners WHERE id = auth.uid()
+  )
+)
+WITH CHECK (
+  practitioner_serial IN (
+    SELECT serial_number FROM practitioners WHERE id = auth.uid()
+  )
+);
 
 -- DELETE: Practitioners can remove their own selected services
 CREATE POLICY "Practitioners delete own selected services" ON practitioner_selected_services
 FOR DELETE
-USING (practitioner_serial = auth.uid());
+USING (
+  practitioner_serial IN (
+    SELECT serial_number FROM practitioners WHERE id = auth.uid()
+  )
+);
 
 -- ============================================================================
 -- SECTION 10: CLIENT_NOTIFICATIONS TABLE

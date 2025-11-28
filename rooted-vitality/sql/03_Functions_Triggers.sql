@@ -179,7 +179,8 @@ RETURNS TABLE (
 ) AS $$
 DECLARE
   v_project_id UUID;
-  v_category_name TEXT;
+  v_category_id TEXT;
+  v_category_uuid UUID;
   v_subcategory_name TEXT[];
   v_travel_preference TEXT;
   v_client_zipcode TEXT;
@@ -188,7 +189,7 @@ DECLARE
 BEGIN
   SELECT 
     proj.id,
-    proj.category_name,
+    proj.category_id,
     array_remove(array(SELECT trim(x) FROM unnest(string_to_array(TRIM(COALESCE(proj.subcategory_name, '')), ',')) as x), ''),
     proj.travel_preference,
     proj.zipcode,
@@ -196,7 +197,7 @@ BEGIN
     proj.project_serial
   INTO 
     v_project_id,
-    v_category_name,
+    v_category_id,
     v_subcategory_name,
     v_travel_preference,
     v_client_zipcode,
@@ -206,11 +207,31 @@ BEGIN
   WHERE proj.id = p_project_id;
 
   IF v_project_id IS NULL THEN
+    RAISE NOTICE 'match_practitioners: Project not found for ID %', p_project_id;
     RETURN;
   END IF;
 
-  RAISE NOTICE 'match_practitioners DEBUG: category=%, subcats=%, travel=%, zip=%, state=%', 
-    v_category_name, v_subcategory_name, v_travel_preference, v_client_zipcode, v_client_state;
+  -- Default to 'flexible' if travel_preference is not specified (matches practitioners with any delivery method)
+  IF v_travel_preference IS NULL THEN
+    v_travel_preference := 'flexible';
+  END IF;
+
+  -- Map category_id TEXT slug to UUID
+  v_category_uuid := CASE v_category_id
+    WHEN 'midwifery' THEN '900f680e-15e1-4ce1-95df-6c5e2cd10d6a'::UUID
+    WHEN 'acupuncture' THEN '17d4d957-905e-411a-9b4d-1165a9940b4f'::UUID
+    WHEN 'chiropractic' THEN '88e8ef68-ea5c-4ef5-af89-53f08502845a'::UUID
+    ELSE (SELECT hht.id FROM holistic_health_taxonomy AS hht WHERE hht.name ILIKE '%' || v_category_id || '%' LIMIT 1)
+  END;
+
+  RAISE NOTICE '=== MATCH_PRACTITIONERS DEBUG ===';
+  RAISE NOTICE 'Project ID: %', p_project_id;
+  RAISE NOTICE 'Category ID: %', v_category_id;
+  RAISE NOTICE 'Category UUID: %', v_category_uuid;
+  RAISE NOTICE 'Subcategories: %', v_subcategory_name;
+  RAISE NOTICE 'Travel Preference: %', v_travel_preference;
+  RAISE NOTICE 'Client Zipcode: %', v_client_zipcode;
+  RAISE NOTICE 'Client State: %', v_client_state;
 
   RETURN QUERY
   SELECT 
@@ -223,44 +244,24 @@ BEGIN
     p.email,
     p.phone,
     LEAST(100, GREATEST(2, 1 + COALESCE(pp.profile_completeness_percent, 1)))::INTEGER AS match_score
-  FROM practitioners p
-  LEFT JOIN practitioner_profiles pp ON p.id = pp.id
+  FROM practitioners AS p
+  LEFT JOIN practitioner_profiles AS pp ON pp.practitioner_serial = p.serial_number
   WHERE 
     p.deleted_at IS NULL
     AND COALESCE(p.matching_enabled, true) = true
     AND COALESCE(p.matching_paused, false) = false
-    -- Check for active membership
     AND EXISTS (
       SELECT 1 FROM memberships m
       WHERE m.practitioner_id = p.id
       AND m.status = 'active'
     )
-    -- Check if practitioner has selected this category (either via service_category_names array OR via practitioner_selected_services table)
-    AND (
-      v_category_name = ANY(p.service_category_names)
-      OR EXISTS (
-        SELECT 1 FROM practitioner_selected_services pss
-        INNER JOIN holistic_health_taxonomy hht ON hht.id = pss.taxonomy_id
-        WHERE pss.practitioner_serial = p.serial_number
-        AND pss.is_active = true
-        AND hht.name = v_category_name
-      )
-    )
+    AND v_category_uuid = ANY(p.service_category_ids)
     AND (
       v_subcategory_name IS NULL 
       OR array_length(v_subcategory_name, 1) IS NULL
       OR EXISTS (
         SELECT 1 FROM unnest(v_subcategory_name) AS sub 
         WHERE sub = ANY(p.service_subcategory_names)
-      )
-      OR EXISTS (
-        SELECT 1 FROM practitioner_selected_services pss
-        INNER JOIN holistic_health_taxonomy hht ON hht.id = pss.taxonomy_id
-        INNER JOIN taxonomy_subcategories ts ON ts.id = pss.subcategory_id
-        WHERE pss.practitioner_serial = p.serial_number
-        AND pss.is_active = true
-        AND hht.name = v_category_name
-        AND ts.name = ANY(v_subcategory_name)
       )
     )
     AND (
@@ -303,7 +304,7 @@ BEGIN
   ORDER BY match_score DESC;
   
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- ============================================================================
 -- SECTION 4: MATCH STATUS COLUMNS & CONSTRAINTS
@@ -479,15 +480,15 @@ BEGIN
   -- Get the practitioner serial (works for INSERT, UPDATE, DELETE)
   v_practitioner_serial := COALESCE(NEW.practitioner_serial, OLD.practitioner_serial);
   
-  -- Build subcategory names array
-  SELECT array_agg(DISTINCT ts.name ORDER BY ts.name)
-  INTO v_subcategory_names
+  -- Build service_category_ids array from selected services (what the matching algo needs)
+  SELECT array_agg(DISTINCT hht.id ORDER BY hht.id)
+  INTO v_category_ids
   FROM practitioner_selected_services pss
-  INNER JOIN taxonomy_subcategories ts ON ts.id = pss.subcategory_id
+  INNER JOIN holistic_health_taxonomy hht ON hht.id = pss.taxonomy_id
   WHERE pss.practitioner_serial = v_practitioner_serial
   AND pss.is_active = true;
   
-  -- Build category names array
+  -- Build category names array from selected services
   SELECT array_agg(DISTINCT hht.name ORDER BY hht.name)
   INTO v_category_names
   FROM practitioner_selected_services pss
@@ -495,19 +496,39 @@ BEGIN
   WHERE pss.practitioner_serial = v_practitioner_serial
   AND pss.is_active = true;
   
-  -- Update practitioners table with explicit debug logging
+  -- Build service_subcategory_ids array from selected services
+  SELECT array_agg(DISTINCT ts.id ORDER BY ts.id)
+  INTO v_subcategory_ids
+  FROM practitioner_selected_services pss
+  INNER JOIN taxonomy_subcategories ts ON ts.id = pss.subcategory_id
+  WHERE pss.practitioner_serial = v_practitioner_serial
+  AND pss.is_active = true;
+  
+  -- Build subcategory names array from selected services
+  SELECT array_agg(DISTINCT ts.name ORDER BY ts.name)
+  INTO v_subcategory_names
+  FROM practitioner_selected_services pss
+  INNER JOIN taxonomy_subcategories ts ON ts.id = pss.subcategory_id
+  WHERE pss.practitioner_serial = v_practitioner_serial
+  AND pss.is_active = true;
+  
+  -- Update practitioners table with all four arrays
   UPDATE practitioners
   SET 
-    service_subcategory_names = COALESCE(v_subcategory_names, ARRAY[]::TEXT[]),
+    service_category_ids = COALESCE(v_category_ids, ARRAY[]::UUID[]),
     service_category_names = COALESCE(v_category_names, ARRAY[]::TEXT[]),
+    service_subcategory_ids = COALESCE(v_subcategory_ids, ARRAY[]::UUID[]),
+    service_subcategory_names = COALESCE(v_subcategory_names, ARRAY[]::TEXT[]),
     updated_at = NOW()
   WHERE serial_number = v_practitioner_serial;
   
   -- Log the update for debugging
-  RAISE NOTICE 'Trigger: Updated practitioner % with % categories and % subcategories', 
+  RAISE NOTICE 'Trigger: Updated practitioner % with % categories, % category IDs, % subcategories, % subcategory IDs', 
     v_practitioner_serial, 
-    array_length(v_category_names, 1), 
-    array_length(v_subcategory_names, 1);
+    array_length(v_category_names, 1),
+    array_length(v_category_ids, 1),
+    array_length(v_subcategory_names, 1),
+    array_length(v_subcategory_ids, 1);
   
   RETURN COALESCE(NEW, OLD);
 END;
@@ -526,15 +547,17 @@ EXECUTE FUNCTION update_practitioner_service_arrays();
 CREATE OR REPLACE FUNCTION sync_practitioner_service_arrays(p_practitioner_serial TEXT)
 RETURNS BOOLEAN AS $$
 DECLARE
-  v_subcategory_names TEXT[];
+  v_category_ids TEXT[];
   v_category_names TEXT[];
+  v_subcategory_ids TEXT[];
+  v_subcategory_names TEXT[];
   v_rows_updated INT;
 BEGIN
-  -- Build subcategory names array
-  SELECT array_agg(DISTINCT ts.name ORDER BY ts.name)
-  INTO v_subcategory_names
+  -- Build service_category_ids array from selected services
+  SELECT array_agg(DISTINCT hht.id ORDER BY hht.id)
+  INTO v_category_ids
   FROM practitioner_selected_services pss
-  INNER JOIN taxonomy_subcategories ts ON ts.id = pss.subcategory_id
+  INNER JOIN holistic_health_taxonomy hht ON hht.id = pss.taxonomy_id
   WHERE pss.practitioner_serial = p_practitioner_serial
   AND pss.is_active = true;
   
@@ -546,29 +569,100 @@ BEGIN
   WHERE pss.practitioner_serial = p_practitioner_serial
   AND pss.is_active = true;
   
-  -- Update practitioners table
+  -- Build service_subcategory_ids array
+  SELECT array_agg(DISTINCT ts.id ORDER BY ts.id)
+  INTO v_subcategory_ids
+  FROM practitioner_selected_services pss
+  INNER JOIN taxonomy_subcategories ts ON ts.id = pss.subcategory_id
+  WHERE pss.practitioner_serial = p_practitioner_serial
+  AND pss.is_active = true;
+  
+  -- Build subcategory names array
+  SELECT array_agg(DISTINCT ts.name ORDER BY ts.name)
+  INTO v_subcategory_names
+  FROM practitioner_selected_services pss
+  INNER JOIN taxonomy_subcategories ts ON ts.id = pss.subcategory_id
+  WHERE pss.practitioner_serial = p_practitioner_serial
+  AND pss.is_active = true;
+  
+  -- Update practitioners table with all arrays
   UPDATE practitioners
   SET 
-    service_subcategory_names = COALESCE(v_subcategory_names, ARRAY[]::TEXT[]),
+    service_category_ids = COALESCE(v_category_ids, ARRAY[]::UUID[]),
     service_category_names = COALESCE(v_category_names, ARRAY[]::TEXT[]),
+    service_subcategory_ids = COALESCE(v_subcategory_ids, ARRAY[]::UUID[]),
+    service_subcategory_names = COALESCE(v_subcategory_names, ARRAY[]::TEXT[]),
     updated_at = NOW()
   WHERE serial_number = p_practitioner_serial;
   
   GET DIAGNOSTICS v_rows_updated = ROW_COUNT;
   
-  RAISE NOTICE 'sync_practitioner_service_arrays: Updated % rows for practitioner %. Categories: %, Subcategories: %', 
+  RAISE NOTICE 'sync_practitioner_service_arrays: Updated % rows for practitioner %. Cat IDs: %, Cat Names: %, SubCat IDs: %, SubCat Names: %', 
     v_rows_updated,
     p_practitioner_serial, 
-    array_length(v_category_names, 1), 
+    array_length(v_category_ids, 1),
+    array_length(v_category_names, 1),
+    array_length(v_subcategory_ids, 1),
     array_length(v_subcategory_names, 1);
   
-  RETURN v_rows_updated > 0;
+  RETURN TRUE;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- ============================================================================
+-- SERVICE MANAGEMENT FUNCTIONS (SECURITY DEFINER - BYPASSES RLS)
+-- ============================================================================
+
+/**
+ * Delete a practitioner service and sync arrays
+ * SECURITY DEFINER bypasses RLS policies
+ * Returns true if deletion was successful
+ */
+CREATE OR REPLACE FUNCTION delete_practitioner_service(
+  p_service_id UUID
+)
+RETURNS BOOLEAN AS $$
+DECLARE
+  v_practitioner_serial TEXT;
+  v_rows_deleted INT;
+BEGIN
+  -- Get the practitioner_serial for this service
+  SELECT practitioner_serial INTO v_practitioner_serial
+  FROM practitioner_selected_services
+  WHERE id = p_service_id
+  LIMIT 1;
+
+  IF v_practitioner_serial IS NULL THEN
+    RAISE EXCEPTION 'Service not found: %', p_service_id;
+  END IF;
+
+  RAISE NOTICE 'Deleting service % for practitioner %', p_service_id, v_practitioner_serial;
+
+  -- Delete the service
+  DELETE FROM practitioner_selected_services
+  WHERE id = p_service_id;
+
+  GET DIAGNOSTICS v_rows_deleted = ROW_COUNT;
+
+  IF v_rows_deleted = 0 THEN
+    RAISE EXCEPTION 'Failed to delete service: %', p_service_id;
+  END IF;
+
+  RAISE NOTICE 'Service deleted, rows affected: %', v_rows_deleted;
+
+  -- Sync the practitioner's service arrays
+  PERFORM sync_practitioner_service_arrays(v_practitioner_serial);
+
+  RAISE NOTICE 'Service arrays synced for %', v_practitioner_serial;
+
+  RETURN TRUE;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- ============================================================================
 -- SIGNUP HELPER FUNCTIONS (SECURITY DEFINER - BYPASSES RLS)
 -- ============================================================================
+
 
 /**
  * Create practitioner profile during signup
@@ -765,5 +859,73 @@ BEGIN
   
   RAISE NOTICE 'Created welcome notification: %', v_notification_id;
   RETURN v_notification_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- ============================================================================
+-- MATCHING CONTROL FUNCTIONS (SECURITY DEFINER - BYPASSES RLS)
+-- ============================================================================
+
+/**
+ * Enable matching for a practitioner after verifying active membership
+ * SECURITY DEFINER bypasses RLS policies
+ * Returns true if matching was successfully enabled
+ */
+CREATE OR REPLACE FUNCTION enable_matching(
+  p_practitioner_serial TEXT
+)
+RETURNS BOOLEAN AS $$
+DECLARE
+  v_practitioner_id UUID;
+  v_has_active_membership BOOLEAN;
+BEGIN
+  -- Get practitioner ID from serial number
+  SELECT id INTO v_practitioner_id
+  FROM practitioners
+  WHERE serial_number = p_practitioner_serial
+  LIMIT 1;
+  
+  IF v_practitioner_id IS NULL THEN
+    RAISE EXCEPTION 'Practitioner not found: %', p_practitioner_serial;
+  END IF;
+  
+  -- Check for active membership
+  SELECT EXISTS (
+    SELECT 1 FROM memberships
+    WHERE practitioner_id = v_practitioner_id
+    AND status = 'active'
+  ) INTO v_has_active_membership;
+  
+  IF NOT v_has_active_membership THEN
+    RAISE NOTICE 'No active membership for %', p_practitioner_serial;
+    RETURN FALSE;
+  END IF;
+  
+  -- Update matching_enabled flag
+  UPDATE practitioners
+  SET matching_enabled = true, matching_paused = false
+  WHERE serial_number = p_practitioner_serial;
+  
+  RAISE NOTICE 'Matching enabled for %', p_practitioner_serial;
+  RETURN TRUE;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+/**
+ * Disable matching for a practitioner
+ * SECURITY DEFINER bypasses RLS policies
+ * Returns true if matching was successfully disabled
+ */
+CREATE OR REPLACE FUNCTION disable_matching(
+  p_practitioner_serial TEXT
+)
+RETURNS BOOLEAN AS $$
+BEGIN
+  UPDATE practitioners
+  SET matching_enabled = false, matching_paused = true
+  WHERE serial_number = p_practitioner_serial;
+  
+  RAISE NOTICE 'Matching disabled for %', p_practitioner_serial;
+  RETURN TRUE;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
