@@ -46,6 +46,11 @@ ARCHITECTURE:
   display: flex !important;
 }
 
+/* Backwards compatibility for modal--hidden class */
+.modal.modal--hidden {
+  display: none !important;
+}
+
 .modal-overlay {
   position: fixed;
   top: 0;

@@ -1380,6 +1380,7 @@ function handleCategoryChange(e) {
 function openModal(modalId) {
   const modal = document.getElementById(modalId);
   if (modal) {
+    modal.classList.add('active');
     modal.classList.remove('modal--hidden');
     
     // Populate categories if this is the create project modal
@@ -1424,6 +1425,7 @@ function resetCreateProjectForm() {
 function closeModal(modalId) {
   const modal = document.getElementById(modalId);
   if (modal) {
+    modal.classList.remove('active');
     modal.classList.add('modal--hidden');
   }
 }
