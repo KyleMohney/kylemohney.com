@@ -273,31 +273,20 @@ async function loadAvailabilityIntoUI() {
  * Both versions can coexist - the modals.js version has better duration control
  * Keeping this simple version here for initialization-time calls before modals.js loads
  */
+/**
+ * Show toast notification (wrapper for modalManager)
+ * Uses the unified toast system from modalManager.js
+ * @param {string} message - Message to display
+ * @param {string} type - Type: 'success', 'error', 'warning', 'info'
+ */
 function showToast(message, type = 'success') {
-  // Try the modals.js version first (better)
-  if (typeof window.showToastFromModals === 'function') {
-    return window.showToastFromModals(message, type);
+  // Use modalManager's showToast if available
+  if (typeof window.ModalManager !== 'undefined' && window.ModalManager.showToast) {
+    window.ModalManager.showToast(message, type, 3000);
+  } else if (typeof window.ModalManagerInstance !== 'undefined' && window.ModalManagerInstance.showToast) {
+    window.ModalManagerInstance.showToast(message, type, 3000);
   }
-  
-  // Fallback to simple version
-  const toast = document.getElementById('toast');
-  if (!toast) {
-    console.warn('[Toast] Toast element not found');
-    return;
-  }
-  
-  toast.textContent = message;
-  
-  // Set correct CSS class names - use hyphenated format
-  toast.className = `toast toast-${type} show`;
-  
-  // Remove after 3 seconds
-  setTimeout(() => {
-    toast.classList.add('toast-exit');
-    setTimeout(() => {
-      toast.className = 'toast';  // Reset to initial state
-    }, 300);
-  }, 3000);
+  // If modalManager not loaded, silently fail (user should load it first)
 }
 
 /**
@@ -423,6 +412,7 @@ async function loadTaxonomy() {
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
     allCategories = data.categories || [];
+    window.allCategories = allCategories;
     if (allCategories.length === 0) {
       console.warn('[Match Settings] No categories loaded from taxonomy');
     }

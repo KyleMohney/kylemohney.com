@@ -118,6 +118,138 @@ function setupManualSaveButtons() {
     }
 }
 
+/**
+ * SECTION SAVE ROUTER
+ * Routes section saves to appropriate handlers
+ * @param {string} section - Section name ('header', 'credentials', etc.)
+ * @param {boolean} isAutoSave - Whether this is auto-save or manual save
+ */
+async function executeSave(section, isAutoSave = false) {
+    try {
+        switch(section) {
+            case 'header':
+                // Collect header data - only fields that exist in schema
+                // Note: years_in_service field doesn't exist in current schema
+                const headerData = {
+                    updated_at: new Date().toISOString()
+                };
+                // Only save if there's actual data
+                if (Object.keys(headerData).length > 1) {
+                    await routeUpdateData(headerData);
+                }
+                break;
+                
+            case 'about':
+                // About section save
+                if (typeof saveSectionAbout === 'function') {
+                    await saveSectionAbout();
+                }
+                break;
+                
+            case 'credentials':
+                // Credentials section save
+                if (typeof saveSectionCredentials === 'function') {
+                    await saveSectionCredentials();
+                }
+                break;
+                
+            case 'photos':
+            case 'video':
+            case 'media':
+                // Photos/video section save
+                if (typeof saveSectionPhotosVideo === 'function') {
+                    await saveSectionPhotosVideo();
+                }
+                break;
+                
+            case 'more-details':
+                // More details section save
+                if (typeof saveSectionMoreDetails === 'function') {
+                    await saveSectionMoreDetails();
+                }
+                break;
+                
+            default:
+                console.warn('[Profile] Unknown section:', section);
+        }
+        
+        // SAVE SUCCESSFUL - clear unsaved changes flag
+        ProfileState.hasUnsavedChanges = false;
+        
+        // Show success status only for manual saves (not auto-save)
+        if (!isAutoSave && typeof showToast === 'function') {
+            showToast('Saved successfully!', 'success', 2000);
+        }
+        
+        // Update profile completeness
+        if (typeof updateProfileCompleteness === 'function') {
+            updateProfileCompleteness();
+        }
+        
+    } catch (error) {
+        console.error('[Profile] Save error:', section, error);
+        // Show error toast for both manual and auto-save so user knows something went wrong
+        if (typeof showToast === 'function') {
+            showToast('Save failed: ' + (error.message || 'Unknown error'), 'error', 3000);
+        }
+    }
+}
+
+/**
+ * DEBOUNCED AUTO-SAVE FUNCTION
+ * 
+     * Triggers auto-save after user stops typing/editing for 1.5 seconds
+     * Prevents excessive database writes by debouncing rapid changes
+     * 
+     * @param {string} section - Section identifier ('more-details', etc.)
+     */
+let autoSaveTimeouts = {};
+
+function debounceAutoSave(section = 'more-details') {
+    // Clear existing timeout for this section
+    if (autoSaveTimeouts[section]) {
+        clearTimeout(autoSaveTimeouts[section]);
+    }
+    
+    // Set new timeout - save after 1.5 seconds of inactivity
+    autoSaveTimeouts[section] = setTimeout(() => {
+        executeSave(section, true); // true = isAutoSave
+    }, 1500);
+}
+
+/**
+ * Save a specific section of the profile
+ * @param {string} section - Section identifier
+ */
+async function saveProfileSection(section) {
+    try {
+        // Show saving status
+        showSaveStatus('Saving...', 'saving');
+        
+        // Collect form data for this section
+        const formData = {};
+        
+        if (section === 'more-details') {
+            // Collect More Details section data
+            formData.bio = document.getElementById('bio')?.value || null;
+            formData.years_experience = document.getElementById('years-experience')?.value || null;
+            formData.specializations = document.getElementById('specializations')?.value || null;
+            formData.approach_philosophy = document.getElementById('approach-philosophy')?.value || null;
+        }
+        
+        // Update ProfileState
+        Object.assign(ProfileState.practitionerData, formData);
+        
+        // Save to database via ProfileState
+        await ProfileState.save();
+        
+        showSaveStatus('Saved', 'success');
+    } catch (error) {
+        console.error('[Profile] Error auto-saving section:', section, error);
+        showSaveStatus('Save failed', 'error');
+    }
+}
+
 function loadLanguages() {
 
     if (!ProfileState.currentLanguages || ProfileState.currentLanguages.length === 0) {
@@ -1101,33 +1233,34 @@ function attachReviewEventListeners() {
 
 async function initializeProfilePage() {
     try {
-        // Populate form fields from loaded data
+        // STEP 1: Populate form fields from loaded data BEFORE attaching listeners
         if (ProfileState.practitionerData) {
             await populateProfileFields(ProfileState.practitionerData);
         }
         
-        // Render credentials into form (degrees, licenses, certifications)
+        // STEP 2: Render credentials into form (degrees, licenses, certifications)
         renderCredentials('degree');
         renderCredentials('license');
         renderCredentials('certification');
         
-        // Load saved languages, FAQ, and practice type
+        // STEP 3: Load saved languages, FAQ, and practice type
         loadLanguages();
         loadFAQ();
         if (ProfileState.practitionerData?.practice_type) {
             loadPractice(ProfileState.practitionerData.practice_type);
         }
         
-        // Load reviews
+        // STEP 4: Load reviews
         await loadReviews();
         
-        // Update completeness
+        // STEP 5: Update completeness with current data
         updateProfileCompleteness();
         
-        // Setup unsaved changes tracking
+        // STEP 6: NOW setup unsaved changes tracking and event listeners
+        // This MUST happen AFTER all form fields are populated
         setupUnsavedChangesTracking();
         
-        // Setup all event listeners for form inputs
+        // STEP 7: Setup all event listeners for form inputs
         setupInputListeners();
         setupLanguageListeners();
         setupInsuranceListeners();
@@ -1136,17 +1269,21 @@ async function initializeProfilePage() {
         setupAvatarUpload();
         setupManualSaveButtons();
         
-        // Setup media handlers
+        // STEP 8: Setup media handlers
         setupVideoListeners();
         setupAlbumButton();
         setupVideoButton();
         setupPaymentInsuranceSection();
         
-        // Setup public profile link
+        // STEP 9: Setup public profile link
         setupPublicProfileLink();
         
-        // Setup review event listeners
+        // STEP 10: Setup review event listeners
         attachReviewEventListeners();
+        
+        // STEP 11: Mark initialization as complete - NOW allow auto-save
+        ProfileState.isInitializing = false;
+        console.log('[Profile] Initialization complete - auto-save now enabled');
         
     } catch (error) {
         console.error('[Rooted Vitality] Error initializing profile page:', error);

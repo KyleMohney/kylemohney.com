@@ -25,7 +25,7 @@ TABLE OF CONTENTS
 const CRM_PROVIDERS = {
   highlevel: {
     name: 'HighLevel',
-    icon: '🚀',
+    icon: null,  // Logo to be added
     description: 'All-in-one CRM & sales platform',
     authType: 'oauth', // OAuth flow required
     features: ['contacts', 'deals', 'pipelines', 'messages'],
@@ -33,7 +33,7 @@ const CRM_PROVIDERS = {
   },
   servicetitan: {
     name: 'ServiceTitan',
-    icon: '🔧',
+    icon: null,  // Logo to be added
     description: 'Service-based business CRM',
     authType: 'oauth',
     features: ['contacts', 'jobs', 'pipelines'],
@@ -41,7 +41,7 @@ const CRM_PROVIDERS = {
   },
   mhelpdesk: {
     name: 'mHelpDesk',
-    icon: '📞',
+    icon: null,  // Logo to be added
     description: 'Help desk & ticketing system',
     authType: 'apikey',
     features: ['tickets', 'contacts', 'messages'],
@@ -49,7 +49,7 @@ const CRM_PROVIDERS = {
   },
   hubspot: {
     name: 'HubSpot',
-    icon: '🐝',
+    icon: null,  // Logo to be added
     description: 'Marketing, sales & service platform',
     authType: 'oauth',
     features: ['contacts', 'deals', 'pipelines'],
@@ -57,7 +57,7 @@ const CRM_PROVIDERS = {
   },
   pipedrive: {
     name: 'Pipedrive',
-    icon: '📊',
+    icon: null,  // Logo to be added
     description: 'Sales CRM for teams',
     authType: 'oauth',
     features: ['contacts', 'deals', 'pipelines'],
@@ -65,7 +65,7 @@ const CRM_PROVIDERS = {
   },
   salesforce: {
     name: 'Salesforce',
-    icon: '☁️',
+    icon: null,  // Logo to be added
     description: 'Enterprise CRM platform',
     authType: 'oauth',
     features: ['contacts', 'opportunities', 'accounts'],
@@ -73,7 +73,7 @@ const CRM_PROVIDERS = {
   },
   zoho: {
     name: 'Zoho CRM',
-    icon: '⚙️',
+    icon: null,  // Logo to be added
     description: 'Zoho CRM platform',
     authType: 'oauth',
     features: ['contacts', 'deals', 'pipelines'],
@@ -191,7 +191,12 @@ function renderConnectedCRMs(integrations) {
   if (integrations.length === 0) {
     container.innerHTML = `
       <div class="crm-empty-state">
-        <div class="crm-empty-state-icon">🔗</div>
+        <div class="crm-empty-state-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+          </svg>
+        </div>
         <p>No CRM integrations connected yet. Connect your first CRM below.</p>
       </div>
     `;
@@ -208,7 +213,7 @@ function renderConnectedCRMs(integrations) {
       <div class="crm-connection-item" data-provider="${integration.provider}">
         <div class="crm-connection-info">
           <div class="crm-connection-name">
-            ${provider?.icon || '🔗'} ${provider?.name || integration.provider}
+            ${provider?.name || integration.provider}
           </div>
           <div class="crm-connection-details">
             Last synced: ${lastSync}
@@ -262,10 +267,10 @@ function renderCRMProviders() {
 
   const html = providers.map(([key, provider]) => `
     <div class="crm-provider-card" data-provider="${key}" onclick="openCRMConnectModal('${key}')">
-      <div class="crm-provider-icon">${provider.icon}</div>
+      <div class="crm-provider-icon">${provider.icon ? `<img src="${provider.icon}" alt="${provider.name}" />` : '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>'}</div>
       <div class="crm-provider-name">${provider.name}</div>
       <div class="crm-provider-status">
-        ${provider.popular ? '⭐ Popular' : 'Available'}
+        ${provider.popular ? 'Popular' : 'Available'}
       </div>
       <button class="btn-primary" style="padding: 6px 12px; font-size: 12px;">
         Connect
@@ -378,20 +383,20 @@ function openCRMConnectModal(provider) {
       <div class="crm-modal-content">
         <div class="crm-modal-header">
           <h2 class="crm-modal-title">
-            ${providerConfig.icon} Connect ${providerConfig.name}
+            Connect ${providerConfig.name}
           </h2>
           <button class="crm-modal-close" onclick="closeCRMModal('${provider}')">✕</button>
         </div>
         
         <div class="crm-modal-body">
-          <p style="margin-bottom: 1rem; color: #666;">
+          <p style="margin-bottom: 1rem; color: var(--rooted-text-secondary);">
             ${providerConfig.description}
           </p>
 
           ${providerConfig.authType === 'oauth' ? `
             <div style="margin-bottom: 1rem;">
               <p style="font-weight: 600; margin-bottom: 0.5rem;">How it works:</p>
-              <ol style="margin-left: 1.5rem; color: #666; font-size: 14px;">
+              <ol style="margin-left: 1.5rem; color: var(--rooted-text-secondary); font-size: 14px;">
                 <li>Click "Authorize" to connect with ${providerConfig.name}</li>
                 <li>Log in to your ${providerConfig.name} account</li>
                 <li>Grant Rooted Vitality access permissions</li>
@@ -410,14 +415,14 @@ function openCRMConnectModal(provider) {
                 placeholder="Enter your ${providerConfig.name} API key"
                 style="width: 100%;"
               >
-              <p style="font-size: 12px; color: #999; margin-top: 0.5rem;">
+              <p style="font-size: 12px; color: var(--rooted-text-muted); margin-top: 0.5rem;">
                 Find your API key in your ${providerConfig.name} settings
               </p>
             </div>
           `}
 
-          <div style="background: #f5f5f5; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
-            <p style="font-size: 12px; color: #666; margin: 0;">
+          <div style="background: var(--rooted-bg-light); padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
+            <p style="font-size: 12px; color: var(--rooted-text-secondary); margin: 0;">
               <strong>🔒 Security:</strong> Your API credentials are encrypted and never stored in plain text.
             </p>
           </div>

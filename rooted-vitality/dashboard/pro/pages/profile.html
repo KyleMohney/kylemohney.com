@@ -1032,6 +1032,7 @@
   <script src="../../../scripts/authModal.js"></script>
   <script src="../../../scripts/authHooks.js"></script>
   <script src="../../../scripts/utilities.js"></script>
+  <script src="../../../scripts/modalManager.js"></script>
   <script src="../../../injections.js"></script>
   <script src="../scripts/profileCompleteness.js"></script>
 
@@ -1059,9 +1060,10 @@
   <!-- ========================================== -->
   
   <!-- Profile module scripts (in dependency order) -->
+  <!-- ProfileState MUST load first since other modules depend on it -->
+  <script src="../scripts/practitioner-profile-utility.js"></script>
   <script src="../scripts/practitioner-profile-media.js"></script>
   <script src="../scripts/practitioner-profile-credentials.js"></script>
-  <script src="../scripts/practitioner-profile-utility.js"></script>
   <script src="../scripts/practitioner-profile.js"></script>
 
   <!-- Page-specific inline scripts -->

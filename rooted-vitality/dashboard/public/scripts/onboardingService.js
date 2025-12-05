@@ -565,7 +565,7 @@ async function loadMatchesForOnboarding(onboardingData) {
           // Get project data
           const { data: projectData, error: projectError } = await window.supabaseClient
             .from('projects')
-            .select('id, project_serial, client_serial')
+            .select('id, project_serial, client_serial, custom_name, category_name')
             .eq('id', onboardingData.projectId)
             .single();
 
@@ -573,28 +573,77 @@ async function loadMatchesForOnboarding(onboardingData) {
             throw new Error('Project not found');
           }
 
-          // Create match directly in table
-          const { data: matchResult, error: matchCreateError } = await window.supabaseClient
-            .from('project_practitioner_matches')
-            .insert({
-              project_serial: parseInt(projectData.project_serial),
-              client_serial: projectData.client_serial,
-              practitioner_serial: practitionerSerial,
-              match_score: matchScore,
-              status: 'pending',
-              client_initiated: true,
-              matched_at: new Date().toISOString()
-            })
-            .select();
+          // Get current user (client) ID for messages
+          const { data: { user: currentUser } } = await window.supabaseClient.auth.getUser();
+          if (!currentUser) {
+            throw new Error('Not authenticated');
+          }
+
+          // Use RPC function to create match (same as find-practitioners.js)
+          const { data: matchData, error: matchCreateError } = await window.supabaseClient
+            .rpc('create_practitioner_match', {
+              p_project_serial: parseInt(projectData.project_serial),
+              p_client_serial: projectData.client_serial,
+              p_practitioner_serial: practitionerSerial,
+              p_match_score: matchScore
+            });
 
           if (matchCreateError) {
             console.error('[Onboarding] Match creation error:', matchCreateError);
             throw matchCreateError;
           }
 
+          // Update matched_practitioners array in projects table (same as find-practitioners.js)
+          const currentMatched = projectData.matched_practitioners || [];
+          const practitionerId = btn.dataset.practitionerId;
+          if (practitionerId && !currentMatched.includes(practitionerId)) {
+            const { error: projectUpdateError } = await window.supabaseClient
+              .from('projects')
+              .update({
+                matched_practitioners: [...currentMatched, practitionerId],
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', projectData.id);
+
+            if (projectUpdateError) {
+              console.error('[Onboarding] Error updating matched practitioners:', projectUpdateError);
+            }
+          }
+
+          // Create auto-message via RPC (same as find-practitioners.js)
+          const clientName = onboardingData.firstName || 'Client';
+          const messageText = `${clientName} wants connect about their wellness project!`;
+
+          const { error: messageError } = await window.supabaseClient
+            .rpc('create_project_message', {
+              p_project_id: projectData.id,
+              p_practitioner_id: btn.dataset.practitionerId,
+              p_client_id: currentUser.id,
+              p_sender_id: currentUser.id,
+              p_sender_type: 'client',
+              p_message: messageText
+            });
+
+          if (messageError) {
+            console.error('[Onboarding] Error creating auto-message:', messageError);
+          } else {
+            // Update contacted_at in the match
+            const { error: updateContactedError } = await window.supabaseClient
+              .from('project_practitioner_matches')
+              .update({
+                contacted_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+              })
+              .eq('project_serial', parseInt(projectData.project_serial))
+              .eq('practitioner_serial', practitionerSerial);
+
+            if (updateContactedError) {
+              console.error('[Onboarding] Error updating contacted_at:', updateContactedError);
+            }
+          }
+
           // Notify practitioner of new match using reliability manager
-          const clientName = onboardingData.firstName || 'New Client';
-          const projectName = onboardingData.projectCategory || 'wellness project';
+          const projectName = projectData.custom_name || projectData.category_name || 'wellness project';
           
           if (window.notifyPractitionerOfNewMatch && typeof window.notifyPractitionerOfNewMatch === 'function') {
             try {

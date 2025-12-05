@@ -82,8 +82,8 @@ function addCredential(type) {
     // Attach listeners to newly rendered inputs
     setupCredentialInputListeners();
     // Trigger auto-save after credential addition
-    if (typeof executeSave === 'function') {
-        executeSave('credentials', true);
+    if (typeof saveSectionCredentials === 'function') {
+        saveSectionCredentials();
     }
 }
 
@@ -96,8 +96,8 @@ function removeCredential(type, id) {
         updateProfileCompleteness();
         updateCredentialsBadge();
         // Trigger auto-save after credential removal
-        if (typeof executeSave === 'function') {
-            executeSave('credentials', true);
+        if (typeof saveSectionCredentials === 'function') {
+            saveSectionCredentials();
         }
     }
 }
@@ -541,3 +541,109 @@ function handleCredentialInputChange() {
         }
     }, ProfileState.AUTO_SAVE_DELAY || 1500);
 }
+
+// ======================================================
+// SAVE CREDENTIALS TO DATABASE
+// ======================================================
+
+/**
+ * Save all credentials (education, licenses, certifications) to database
+ * Persists ProfileState credential arrays to practitioner_credentials table
+ * All credentials are combined into a single JSONB 'credentials' array with type field
+ */
+async function saveSectionCredentials() {
+    try {
+        // Get current practitioner ID and serial number
+        const userId = window.currentPractitionerId || ProfileState.practitionerData?.id;
+        const serialNumber = ProfileState.practitionerData?.serial_number;
+        
+        if (!userId) {
+            console.error('[Credentials] Cannot save: no user ID');
+            return;
+        }
+        
+        // Combine all credential types into a single array with type field
+        const allCredentials = [
+            ...(ProfileState.educationCredentials || []).map(c => ({ 
+                ...c, 
+                credential_type: 'degree',
+                id: c.id || Date.now()
+            })),
+            ...(ProfileState.licenseCredentials || []).map(c => ({ 
+                ...c, 
+                credential_type: 'license',
+                id: c.id || Date.now()
+            })),
+            ...(ProfileState.certificationCredentials || []).map(c => ({ 
+                ...c, 
+                credential_type: 'certification',
+                id: c.id || Date.now()
+            }))
+        ];
+        
+        // Build credentials object for practitioner_credentials table
+        const credentialsToSave = {
+            credentials: allCredentials,
+            updated_at: new Date().toISOString()
+        };
+        
+        // AUTOMATICALLY set badges based on credentials saved
+        // Pro accepts all responsibility for accurate information
+        if ((ProfileState.educationCredentials || []).length > 0) {
+            credentialsToSave.badge_certified = true; // Has education/degrees
+        }
+        if ((ProfileState.licenseCredentials || []).length > 0) {
+            credentialsToSave.badge_licensed = true; // Has licenses
+        }
+        if ((ProfileState.certificationCredentials || []).length > 0) {
+            credentialsToSave.badge_certified = true; // Has certifications
+        }
+        
+        // Add practitioner_serial if available (helps with lookups and RLS)
+        if (serialNumber) {
+            credentialsToSave.practitioner_serial = serialNumber;
+        }
+        
+        // Update or insert into practitioner_credentials table
+        // Using upsert with onConflict on 'id' column
+        const { error } = await window.supabaseClient
+            .from('practitioner_credentials')
+            .upsert({
+                id: userId,
+                ...credentialsToSave
+            }, {
+                onConflict: 'id'
+            });
+        
+        if (error) {
+            console.error('[Credentials] Save failed:', error);
+            throw error;
+        }
+        
+        console.log('[Credentials] Saved successfully:', allCredentials.length, 'credentials');
+        console.log('[Credentials] Auto-set badges - Licensed:', !!credentialsToSave.badge_licensed, 'Certified:', !!credentialsToSave.badge_certified);
+        
+        // Update ProfileState with new badge values so completeness calculation sees them
+        if (credentialsToSave.badge_certified !== undefined) {
+            ProfileState.practitionerData.badge_certified = credentialsToSave.badge_certified;
+        }
+        if (credentialsToSave.badge_licensed !== undefined) {
+            ProfileState.practitionerData.badge_licensed = credentialsToSave.badge_licensed;
+        }
+        
+        // Update completeness after successful save
+        if (typeof updateProfileCompleteness === 'function') {
+            updateProfileCompleteness();
+        }
+        
+        return true;
+        
+    } catch (error) {
+        console.error('[Credentials] Error saving credentials:', error);
+        throw error;
+    }
+}
+
+// Make function globally available
+window.saveSectionCredentials = saveSectionCredentials;
+

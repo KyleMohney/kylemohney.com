@@ -46,6 +46,9 @@ const ProfileState = {
     // Profile Data
     practitionerData: null,
     
+    // Initialization flag - prevents auto-save during initial data load
+    isInitializing: true,
+    
     // Auto-save Management
     autoSaveTimeout: null,
     hasUnsavedChanges: false,
@@ -79,7 +82,35 @@ const ProfileState = {
     // Reviews
     allReviews: [],
     filteredReviews: [],
-    profileLoadComplete: false
+    profileLoadComplete: false,
+    
+    /**
+     * Generic save method - routes to appropriate save function
+     * Persists all unsaved data in ProfileState to database
+     */
+    async save() {
+        try {
+            // Save credentials if changed
+            if (this.educationCredentials.length > 0 || this.licenseCredentials.length > 0 || this.certificationCredentials.length > 0) {
+                await saveSectionCredentials();
+            }
+            
+            // Save photos and video together
+            if ((this.currentPhotos && this.currentPhotos.length > 0) || (this.videoData && (this.videoData.url || this.videoData.fileName))) {
+                await saveSectionPhotosVideo();
+            }
+            
+            // Save years_in_service if in practitioner data
+            if (this.practitionerData && this.practitionerData.years_in_service !== undefined) {
+                await routeUpdateData({ years_in_service: this.practitionerData.years_in_service });
+            }
+            
+            console.log('[ProfileState] Save complete');
+        } catch (error) {
+            console.error('[ProfileState] Save failed:', error);
+            throw error;
+        }
+    }
 };
 
 // Make ProfileState globally available for other modules
@@ -181,7 +212,9 @@ const PROFILE_TABLE_FIELDS = [
     // Photos & Video
     'gallery_photos', 'intro_video_url', 'practice_logo_url',
     // Additional Details
-    'faq', 'social_media', 'practice_type', 'year_established',
+    'faq', 'social_media', 'practice_type', 'year_established', 'years_in_service',
+    // Insurance & Payment
+    'insurance_providers', 'payment_methods', 'custom_insurance_providers', 'custom_payment_methods',
     // Profile management
     'profile_completeness_percent'
 ];
@@ -353,7 +386,7 @@ async function safePractitionerUpdate(updateData) {
 
 // Warn user if they try to leave page with unsaved changes
 window.addEventListener('beforeunload', (event) => {
-    if (hasUnsavedChanges) {
+    if (ProfileState.hasUnsavedChanges) {
         // Standard beforeunload message (browsers show their own warning)
         event.preventDefault();
         event.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
@@ -622,42 +655,29 @@ async function populateProfileFields(data) {
         }
     }
     
-    // Credentials - now stored in practitioners.credentials JSONB array
+    // Credentials - stored in practitioner_credentials.credentials JSONB array
+    // Clear all credential arrays first
+    ProfileState.educationCredentials = [];
+    ProfileState.licenseCredentials = [];
+    ProfileState.certificationCredentials = [];
+    
+    // Parse credentials from JSONB column (all types combined in single array)
     if (data.credentials && Array.isArray(data.credentials)) {
-        // Clear all credential arrays first
-        ProfileState.educationCredentials = [];
-        ProfileState.licenseCredentials = [];
-        ProfileState.certificationCredentials = [];
-        
-        // Separate credentials by type
+        // Separate credentials by type from combined array
         data.credentials.forEach(cred => {
+            const credWithId = {
+                ...cred,
+                id: cred.id || Date.now()
+            };
+            
             if (cred.credential_type === 'degree') {
-                ProfileState.educationCredentials.push(cred);
+                ProfileState.educationCredentials.push(credWithId);
             } else if (cred.credential_type === 'license') {
-                ProfileState.licenseCredentials.push(cred);
+                ProfileState.licenseCredentials.push(credWithId);
             } else if (cred.credential_type === 'certification') {
-                ProfileState.certificationCredentials.push(cred);
+                ProfileState.certificationCredentials.push(credWithId);
             }
         });
-    } else {
-        // Fallback to legacy field names for backward compatibility
-        if (data.education_credentials && Array.isArray(data.education_credentials)) {
-            ProfileState.educationCredentials = data.education_credentials;
-        } else {
-            ProfileState.educationCredentials = [];
-        }
-        
-        if (data.license_credentials && Array.isArray(data.license_credentials)) {
-            ProfileState.licenseCredentials = data.license_credentials;
-        } else {
-            ProfileState.licenseCredentials = [];
-        }
-        
-        if (data.certification_credentials && Array.isArray(data.certification_credentials)) {
-            ProfileState.certificationCredentials = data.certification_credentials;
-        } else {
-            ProfileState.certificationCredentials = [];
-        }
     }
     
     // Social media fields
@@ -907,7 +927,7 @@ function updateProfileCompleteness() {
         if (itemStatus['10. Reviews']) completedItems++;
         
         // 11. At least 1 FAQ
-        itemStatus['11. FAQ'] = p.faq && (Array.isArray(p.faq) && p.faq.length > 0 || typeof p.faq === 'object' && Object.keys(p.faq).length > 0);
+        itemStatus['11. FAQ'] = p.faq && ((Array.isArray(p.faq) && p.faq.length > 0) || (typeof p.faq === 'object' && Object.keys(p.faq).length > 0));
         if (itemStatus['11. FAQ']) completedItems++;
         
         // 12. At least 1 social media or website link
@@ -927,11 +947,19 @@ function updateProfileCompleteness() {
         if (itemStatus['13. Practice Type']) completedItems++;
         
         // 14. At least 1 insurance provider checkbox selected
-        itemStatus['14. Insurance'] = (Array.isArray(p.insurance_providers) && p.insurance_providers.length > 0) || p.custom_insurance_providers?.trim()?.length > 0;
+        // Check both ProfileState arrays and database columns
+        const hasInsurance = (Array.isArray(p.insurance_providers) && p.insurance_providers.length > 0) || 
+                           (Array.isArray(ProfileState.selectedInsurance) && ProfileState.selectedInsurance.length > 0) ||
+                           p.custom_insurance_providers?.trim()?.length > 0;
+        itemStatus['14. Insurance'] = hasInsurance;
         if (itemStatus['14. Insurance']) completedItems++;
         
         // 15. At least 1 payment method checkbox selected
-        itemStatus['15. Payment Methods'] = (Array.isArray(p.payment_methods) && p.payment_methods.length > 0) || p.custom_payment_methods?.trim()?.length > 0;
+        // Check both ProfileState arrays and database columns
+        const hasPayment = (Array.isArray(p.payment_methods) && p.payment_methods.length > 0) ||
+                          (Array.isArray(ProfileState.selectedPaymentMethods) && ProfileState.selectedPaymentMethods.length > 0) ||
+                          p.custom_payment_methods?.trim()?.length > 0;
+        itemStatus['15. Payment Methods'] = hasPayment;
         if (itemStatus['15. Payment Methods']) completedItems++;
         
         const percentage = Math.round(completedItems * itemsPercentage);
@@ -1108,18 +1136,30 @@ function setupUnsavedChangesTracking() {
     
     // Monitor all form inputs for changes - triggers auto-save
     document.addEventListener('input', (e) => {
+        // SKIP if still initializing (prevents auto-save on initial data load)
+        if (ProfileState.isInitializing) return;
+        
         const target = e.target;
         if (target.matches('input[type="text"], input[type="email"], input[type="url"], input[type="number"], textarea, select')) {
             window.markAsChanged();
-            executeSave(null, true); // Auto-save with debounce
+            // Only call debounceAutoSave if available (credentials/media modules define it)
+            if (typeof debounceAutoSave === 'function') {
+                debounceAutoSave('credentials'); // Default to credentials, module can override
+            }
         }
     }, true);
     
     document.addEventListener('change', (e) => {
+        // SKIP if still initializing (prevents auto-save on initial data load)
+        if (ProfileState.isInitializing) return;
+        
         const target = e.target;
         if (target.matches('input[type="checkbox"], input[type="radio"], select')) {
             window.markAsChanged();
-            executeSave(null, true); // Auto-save with debounce
+            // Only call debounceAutoSave if available (credentials/media modules define it)
+            if (typeof debounceAutoSave === 'function') {
+                debounceAutoSave('credentials'); // Default to credentials, module can override
+            }
         }
     }, true);
 }
@@ -1317,12 +1357,16 @@ async function saveSectionMoreDetails() {
             website: document.getElementById('social-website')?.value || ''
         },
         practice_type: document.querySelector('input[name="practice-setting"]:checked')?.value || null,
+        
+        // INSURANCE PROVIDERS - collect from ProfileState
+        insurance_providers: ProfileState.selectedInsurance || [],
+        
+        // PAYMENT METHODS - collect from ProfileState
+        payment_methods: ProfileState.selectedPaymentMethods || [],
+        
         updated_at: new Date().toISOString()
     };
     
-    // Insurance and payment info
-    const paymentData = getPaymentCheckboxValues();
-    moreDetailsData.accepts_insurance = paymentData.accepts_insurance || false;
-    
     await routeUpdateData(moreDetailsData);
 }
+

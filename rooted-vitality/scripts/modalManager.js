@@ -530,17 +530,17 @@ const ModalManager = {
     const toastId = 'toast-' + Date.now();
     
     let backgroundColor = '#77883e';
-    let icon = '??';
+    let icon = '?';
     
     if (type === 'success') {
       backgroundColor = '#77883e';
-      icon = '?';
+      icon = '✓'; // Checkmark for success
     } else if (type === 'error') {
       backgroundColor = '#d64545';
-      icon = '??';
+      icon = '✕'; // X mark for error
     } else if (type === 'warning') {
       backgroundColor = '#e8a517';
-      icon = '?';
+      icon = '!'; // Exclamation for warning
     }
     
     const toastHTML = `

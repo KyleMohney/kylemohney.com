@@ -687,22 +687,18 @@ async function registerPractitioner(event) {
             }
         }
 
-        // Create welcome notification for practitioner
-        const welcomeNotification = {
-            practitioner_serial: practitionerSerial,
-            type: 'welcome',
-            title: 'Welcome to Rooted Vitality!',
-            message: 'Thank you for signing up to help others on their wellness journey! Complete your profile and set your match preferences to start connecting with clients who need your expertise.',
-            is_read: false,
-            created_at: new Date().toISOString()
-        };
-
-        const { error: notifError } = await window.supabaseClient
-            .from('practitioner_notifications')
-            .insert([welcomeNotification]);
+        // Create welcome notification for practitioner via RPC (SECURITY DEFINER bypasses RLS)
+        const { data: notifData, error: notifError } = await window.supabaseClient
+            .rpc('create_welcome_notification_signup', {
+                p_practitioner_serial: practitionerSerial
+            });
         
         if (notifError) {
-            // Warning: Welcome notification insertion failed - continue anyway
+            throw new Error(`Welcome notification creation failed: ${notifError.message}`);
+        }
+        
+        if (!notifData) {
+            throw new Error('Welcome notification creation returned no ID');
         }
         
         // Hide form and show success modal

@@ -22,6 +22,28 @@ ARCHITECTURE NOTES:
 
 */
 
+// ======================================================
+// AUTO-SAVE WRAPPER (calls parent debounceAutoSave if available)
+// ======================================================
+
+/**
+ * Trigger auto-save - calls parent function or no-op
+ */
+function debounceAutoSave(section) {
+    // If parent has debounceAutoSave, use it
+    if (typeof window.debounceAutoSave === 'function') {
+        window.debounceAutoSave(section);
+    }
+    // Otherwise use saveProfileSection if available
+    else if (typeof saveProfileSection === 'function') {
+        saveProfileSection(section || 'media');
+    }
+    // If neither available, just log (graceful degradation)
+    else {
+        console.log('[Media] Auto-save requested (parent not ready)');
+    }
+}
+
 // Initialize video data when ProfileState is ready
 document.addEventListener('DOMContentLoaded', () => {
     if (typeof ProfileState !== 'undefined' && !ProfileState.videoData) {
@@ -429,7 +451,8 @@ function removeVideo() {
 function openProfilePictureModal() {
     const modal = document.getElementById('profile-picture-modal');
     if (modal) {
-        // Show modal container
+        // Show modal container using class toggle
+        modal.classList.add('active');
         modal.style.display = 'flex';
         
         // Activate overlay for backdrop
@@ -446,6 +469,7 @@ function openProfilePictureModal() {
 function closeProfilePictureModal() {
     const modal = document.getElementById('profile-picture-modal');
     if (modal) {
+        modal.classList.remove('active');
         modal.style.display = 'none';
         
         // Deactivate overlay

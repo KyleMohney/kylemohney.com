@@ -339,27 +339,21 @@ async function executeConfirmAction() {
  * @param {string} type - 'success', 'error', 'info'
  * @param {number} duration - Duration in milliseconds (default: 3000)
  */
+/**
+ * Show toast notification (wrapper for modalManager)
+ * Uses the unified toast system from modalManager.js
+ * @param {string} message - Message to display
+ * @param {string} type - Type: 'success', 'error', 'warning', 'info'
+ * @param {number} duration - Duration in milliseconds (default: 3000)
+ */
 function showToast(message, type = 'success', duration = 3000) {
-  // Create or get toast container
-  const container = document.getElementById('toast-container');
-  if (!container) {
-    const newContainer = document.createElement('div');
-    newContainer.id = 'toast-container';
-    newContainer.className = 'toast-container';
-    document.body.appendChild(newContainer);
+  // Use modalManager's showToast if available
+  if (typeof window.ModalManager !== 'undefined' && window.ModalManager.showToast) {
+    window.ModalManager.showToast(message, type, duration);
+  } else if (typeof window.ModalManagerInstance !== 'undefined' && window.ModalManagerInstance.showToast) {
+    window.ModalManagerInstance.showToast(message, type, duration);
   }
-
-  const toast = document.createElement('div');
-  toast.className = `toast toast-${type} show`;
-  toast.textContent = message;
-  document.getElementById('toast-container').appendChild(toast);
-
-  setTimeout(() => {
-    toast.classList.add('toast-exit');
-    setTimeout(() => {
-      toast.remove();
-    }, 300);
-  }, duration);
+  // If modalManager not loaded, silently fail (user should load it first)
 }
 
 

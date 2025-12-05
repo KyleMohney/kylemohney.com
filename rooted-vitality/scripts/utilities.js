@@ -172,38 +172,19 @@ function getTimeAgo(date) {
         return 'Just now';
     }
 }
-
 /**
- * Show toast notification
+ * Show toast notification (wrapper for modalManager)
+ * Uses the unified toast system from modalManager.js
  * @param {string} message - Message to display
  * @param {string} type - Type: 'info', 'success', 'error', 'warning'
  * @param {number} duration - Duration in milliseconds (default: 3000)
  */
 function showToast(message, type = 'info', duration = 3000) {
-    const toastContainer = document.getElementById('toast-container') || createToastContainer();
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    toast.textContent = message;
-    toastContainer.appendChild(toast);
-    
-    setTimeout(() => {
-        toast.classList.add('show');
-    }, 10);
-    
-    setTimeout(() => {
-        toast.classList.remove('show');
-        setTimeout(() => toast.remove(), 300);
-    }, duration);
-}
-
-/**
- * Create toast container if it doesn't exist
- * @returns {HTMLElement} Toast container element
- */
-function createToastContainer() {
-    const container = document.createElement('div');
-    container.id = 'toast-container';
-    container.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px;';
-    document.body.appendChild(container);
-    return container;
+    // Use modalManager's showToast if available, otherwise fallback
+    if (typeof window.ModalManager !== 'undefined' && window.ModalManager.showToast) {
+        window.ModalManager.showToast(message, type, duration);
+    } else if (typeof window.ModalManagerInstance !== 'undefined' && window.ModalManagerInstance.showToast) {
+        window.ModalManagerInstance.showToast(message, type, duration);
+    }
+    // If modalManager not loaded, silently fail (user should load it first)
 }

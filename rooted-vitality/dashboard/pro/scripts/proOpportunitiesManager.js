@@ -689,22 +689,20 @@ async function createClientNotification(clientSerial, notificationType, title, m
 /**
  * Show toast notification
  */
+/**
+ * Show toast notification (wrapper for modalManager)
+ * Uses the unified toast system from modalManager.js
+ * @param {string} message - Message to display
+ * @param {string} type - Type: 'success', 'error', 'info'
+ */
 function showToast(message, type = 'info') {
-  const container = document.getElementById('toast-container') || document.body;
-  const toast = document.createElement('div');
-  toast.className = `toast toast--${type}`;
-  toast.textContent = message;
-  toast.style.cssText = `
-    background: ${type === 'success' ? '#4caf50' : type === 'error' ? '#f44336' : '#2196f3'};
-    color: #fbf7ec;
-    padding: 1rem 1.5rem;
-    border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    margin-bottom: 0.5rem;
-  `;
-  
-  container.appendChild(toast);
-  setTimeout(() => toast.remove(), 4000);
+  // Use modalManager's showToast if available
+  if (typeof window.ModalManager !== 'undefined' && window.ModalManager.showToast) {
+    window.ModalManager.showToast(message, type, 3000);
+  } else if (typeof window.ModalManagerInstance !== 'undefined' && window.ModalManagerInstance.showToast) {
+    window.ModalManagerInstance.showToast(message, type, 3000);
+  }
+  // If modalManager not loaded, silently fail (user should load it first)
 }
 
 /**
