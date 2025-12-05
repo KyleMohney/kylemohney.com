@@ -336,28 +336,28 @@ project_messages
 opportunities
 ============================
 
-| column_name              | data_type                |
-| ------------------------ | ------------------------ |
-| id                       | uuid                     |
-| serial_number            | text                     |
-| client_id                | uuid                     |
-| practitioner_id          | uuid                     |
-| service_type             | text                     |
-| description              | text                     |
-| status                   | text                     |
-| created_at               | timestamp with time zone |
-| updated_at               | timestamp with time zone |
-| project_id               | uuid                     |
-| open_to_match            | boolean                  |
-| is_active                | boolean                  |
-| message_sent             | boolean                  |
-| message_count            | integer                  |
-| declined_by_practitioner | boolean                  |
-| declined_by_client       | boolean                  |
-| is_archived              | boolean                  |
-| practitioner_blocked     | boolean                  |
-| converted_to_match       | boolean                  |
-| match_id                 | uuid                     |
+| column_name              | data_type                | is_nullable | column_default     |
+| ------------------------ | ------------------------ | ----------- | ------------------ |
+| id                       | uuid                     | NO          | uuid_generate_v4() |
+| serial_number            | text                     | NO          | null               |
+| client_id                | uuid                     | YES         | null               |
+| practitioner_id          | uuid                     | YES         | null               |
+| service_type             | text                     | YES         | null               |
+| description              | text                     | YES         | null               |
+| status                   | text                     | YES         | 'new'::text        |
+| created_at               | timestamp with time zone | YES         | now()              |
+| updated_at               | timestamp with time zone | YES         | now()              |
+| project_id               | uuid                     | YES         | null               |
+| open_to_match            | boolean                  | YES         | false              |
+| is_active                | boolean                  | YES         | true               |
+| message_sent             | boolean                  | YES         | false              |
+| message_count            | integer                  | YES         | 0                  |
+| declined_by_practitioner | boolean                  | YES         | false              |
+| declined_by_client       | boolean                  | YES         | false              |
+| is_archived              | boolean                  | YES         | false              |
+| practitioner_blocked     | boolean                  | YES         | false              |
+| converted_to_match       | boolean                  | YES         | false              |
+| match_id                 | uuid                     | YES         | null               |
 
 
 ====================================

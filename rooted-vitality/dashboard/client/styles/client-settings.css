@@ -1,22 +1,40 @@
-/* =====================================================
-   ROOTED VITALITY, INC.
-   File: client-settings.css
-   Purpose: Client settings page styles (adapted from practitioner)
-   Holistic Wellness · Modern Connection Platform
-   rootedvitality.com | 2025
-   ===================================================== */
+/*
+╔═════════════════════════════════════════════════════════════════════════════╗
+║                    ROOTED VITALITY, INC.                                    ║
+║               CLIENT SETTINGS (STYLES)                                      ║
+║                                                                             ║
+║ File:        dashboard/client/styles/client-settings.css                    ║
+║ Purpose:     Client settings page styling and dashboard layout              ║
+║ Description: Sidebar navigation, settings forms, cards, responsive design,  ║
+║              animations, inline editing, notifications, badges              ║
+║ Last Update: November 2025                                                  ║
+║ Status:      Production-Ready | Build Standard v2.0 Compliant               ║
+║                                                                             ║
+║ QUICK REFERENCE:                                                            ║
+║ - Layout: Grid | Sidebar | Content Area | Responsive Design                 ║
+║ - Components: Cards | Forms | Buttons | Badges | Notifications | Animations ║                                                                             ║
+╚═════════════════════════════════════════════════════════════════════════════╝
+*/
 
-/* TABLE OF CONTENTS
-   1. LAYOUT & STRUCTURE
-   2. SIDEBAR NAVIGATION
-   3. SETTINGS CONTENT
-   4. SETTINGS CARDS
-   5. FORM ELEMENTS
-   6. NOTIFICATIONS
-   7. STATUS BADGES
-   8. BUTTONS
-   9. MOBILE RESPONSIVE
-   10. ANIMATIONS
+/* ========================================== */
+/* TABLE OF CONTENTS */
+/* ========================================== */
+
+/*
+  1. LAYOUT & STRUCTURE
+  2. SIDEBAR NAVIGATION
+  3. SETTINGS CONTENT
+  4. SETTINGS CARDS
+  5. FORM ELEMENTS
+  6. NOTIFICATIONS
+  7. STATUS BADGES
+  8. BUTTONS
+  9. TOGGLE SWITCH
+  10. MEMBERSHIPS & BILLING
+  11. MOBILE RESPONSIVE
+  12. ANIMATIONS
+  13. IN-APP NOTIFICATION TOAST
+  14. INLINE EDITING
 */
 
 /* ========================================== */
@@ -153,12 +171,13 @@
 /* ========================================== */
 
 .settings-card {
-    background: #fbf7ec;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
+    background: var(--rooted-light);
+    border: 1px solid var(--card-border-light);
+    border-radius: var(--radius-md);
     padding: 1.5rem;
     margin-bottom: 2rem;
-    transition: all 0.2s ease;
+    box-shadow: var(--card-shadow-subtle);
+    transition: all 0.3s ease;
 }
 
 .settings-card:last-of-type {
@@ -166,8 +185,8 @@
 }
 
 .settings-card:hover {
-    border-color: #d1d5db;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    border-color: var(--card-border-accent);
+    box-shadow: var(--card-shadow-hover);
 }
 
 .card-header {
@@ -176,7 +195,7 @@
     align-items: center;
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--card-border-light);
 }
 
 .card-header h3 {
@@ -294,11 +313,12 @@
 /* ========================================== */
 
 .notification-info-banner {
-    background: #fbf7ec;
-    border: 1px solid #d1e9e6;
-    border-radius: 8px;
+    background: var(--rooted-light);
+    border: 1px solid var(--card-border-light);
+    border-radius: var(--radius-md);
     padding: 1rem;
     margin-top: 1rem;
+    box-shadow: var(--card-shadow-subtle);
 }
 
 .notification-info-text {
@@ -401,12 +421,12 @@
 /* 8. BUTTONS */
 /* ========================================== */
 
+/* Use universal button styles from components.css */
 .btn-accent,
 .btn-edit-setting,
 .btn-setting-action,
 .btn-primary,
-.btn-secondary,
-.btn-danger {
+.btn-secondary {
     padding: 0.75rem 1.5rem;
     border: none;
     border-radius: 8px;
@@ -477,10 +497,12 @@
     background: rgba(92, 154, 114, 0.05);
     border-color: #5f7030;
     color: #5f7030;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(92, 154, 114, 0.15);
 }
 
 /* ========================================== */
-/* TOGGLE SWITCH */
+/* 9. TOGGLE SWITCH */
 /* ========================================== */
 
 .toggle-switch {
@@ -559,7 +581,7 @@
 }
 
 /* ========================================== */
-/* 8. MEMBERSHIPS & BILLING */
+/* 10. MEMBERSHIPS & BILLING */
 /* ========================================== */
 
 .subscription-info {
@@ -600,7 +622,7 @@
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: inline-block;
-    #fbf7ec-space: nowrap;
+    white-space: nowrap;
 }
 
 #upgrade-plan-btn:hover,
@@ -613,7 +635,7 @@
 }
 
 /* ========================================== */
-/* 9. MOBILE RESPONSIVE */
+/* 11. MOBILE RESPONSIVE */
 /* ========================================== */
 
 @media (max-width: 768px) {
@@ -642,7 +664,7 @@
     .settings-nav-link {
         padding: 0.5rem 1rem;
         font-size: 0.85rem;
-        #fbf7ec-space: nowrap;
+        white-space: nowrap;
     }
 
     .settings-content {
@@ -711,7 +733,7 @@
 }
 
 /* ========================================== */
-/* 10. ANIMATIONS */
+/* 12. ANIMATIONS */
 /* ========================================== */
 
 @keyframes fadeIn {
@@ -747,8 +769,9 @@
     }
 }
 
+
 /* ========================================== */
-/* 11. IN-APP NOTIFICATION TOAST */
+/* 13. IN-APP NOTIFICATION TOAST */
 /* ========================================== */
 
 .in-app-notification-toast {
@@ -756,7 +779,7 @@
 }
 
 /* ========================================== */
-/* 12. INLINE EDIT STYLES */
+/* 14. INLINE EDITING */
 /* ========================================== */
 
 .edit-inline-input {
@@ -811,61 +834,3 @@
 .btn-inline-cancel:hover {
     background-color: #e0e0e0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

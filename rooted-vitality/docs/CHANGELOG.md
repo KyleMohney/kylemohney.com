@@ -1,5 +1,30 @@
 # Changelog - Rooted Vitality
 
+## November 30, 2025 (v2.4.1)
+### Refactored - Client Dashboard Card Styling
+- **REFACTOR:** My Wellness page card styles now use universal card classes
+  - Added `.card-base` universal card component to `components.css`
+  - Added `.card-header`, `.card-body`, `.card-footer` universal card section styles
+  - Added `.card-base--collapsed` and `.card-base--inactive` modifiers
+  - Added `.card-divider-subtle` for universal border styling
+  - Updated `my-wellness-layout.css` to reference universal classes instead of duplicating styles
+  - All `.project-card` elements now align with universal `.card-base` patterns
+  - Added comments throughout `my-wellness-layout.css` explaining universal class alignment
+  - Maintains 100% backwards compatibility - no HTML changes required
+  - Follows System Prompt Commandment #6: Universal styles used on each page, no inline universals
+- **IMPROVED:** Code maintainability and scalability
+  - Reduced CSS duplication across dashboard pages
+  - Easier to apply consistent card styling to new pages/components
+  - Future dashboard pages can inherit card styles from `components.css`
+  - Simplified troubleshooting: single source of truth for card styling
+
+### Files Modified
+- `styles/components.css` - Added base card component section (~100 lines)
+- `dashboard/client/styles/my-wellness-layout.css` - Refactored to use universal classes with inline documentation
+- **NO** HTML changes required - purely CSS refactoring
+
+---
+
 ## November 8, 2025 (v2.3)
 ### Added - World-Class Landing Page
 - **NEW:** Conversion-optimized landing page (`/index.html`)
@@ -179,9 +204,9 @@
 ## October 30, 2025 (v2.0)
 ### Added - Practitioner Signup System
 - Comprehensive multi-step practitioner onboarding wizard (`/dashboard/practitioner-signup.html`)
-- Full JavaScript implementation with Supabase integration (`/scripts/practitioner-signup.js`)
+- Full JavaScript implementation with Supabase integration (`/dashboard/pro/scripts/practitioner-signup.js`)
 - **NEW:** Dedicated Supabase client module (`/scripts/supabaseClient.js`)
-- **NEW:** Practitioner helper functions module (`/scripts/practitionerHelpers.js`) with:
+- **NEW:** Practitioner helper functions module (`/dashboard/pro/scripts/practitionerHelpers.js`) with:
   - Profile CRUD operations
   - Credential management
   - File upload/download helpers
@@ -237,9 +262,9 @@
 ```
 ### Added - Practitioner Signup System
 - Comprehensive multi-step practitioner onboarding wizard (`/dashboard/practitioner-signup.html`)
-- Full JavaScript implementation with Supabase integration (`/scripts/practitioner-signup.js`)
+- Full JavaScript implementation with Supabase integration (`/dashboard/pro/scripts/practitioner-signup.js`)
 - **NEW:** Dedicated Supabase client module (`/scripts/supabaseClient.js`)
-- **NEW:** Practitioner helper functions module (`/scripts/practitionerHelpers.js`) with:
+- **NEW:** Practitioner helper functions module (`/dashboard/pro/scripts/practitionerHelpers.js`) with:
   - Profile CRUD operations
   - Credential management
   - File upload/download helpers

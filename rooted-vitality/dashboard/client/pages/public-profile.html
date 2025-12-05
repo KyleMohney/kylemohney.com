@@ -1,9 +1,71 @@
+<!--
+    ╔═════════════════════════════════════════════════════════════════════════════╗
+    ║                         ROOTED VITALITY DASHBOARD                           ║
+    ║              CLIENT PUBLIC PROFILE (HTML)                                   ║
+    ║                                                                             ║
+    ║ File:        public-profile.html                                            ║
+    ║ Purpose:     Public client profile view for practitioners                   ║
+    ║ Description: Client wellness information display, profile details,          ║
+    ║              wellness questionnaire responses, sensitivities, preferences   ║
+    ║ Last Update: November 2025                                                  ║
+    ║ Status:      Production-Ready | Build Standard v2.0 Compliant               ║
+    ║                                                                             ║
+    ║ QUICK REFERENCE:                                                            ║
+    ║ - Display: Profile Header | Basic Info | Wellness Questionnaire             ║
+    ║ - Design System: CSS Classes, Read-Only Display, Professional Layout        ║
+    ║ - Features: Avatar Display, Location, Age, Wellness Goals Visibility        ║
+    ║                                                                             ║
+    ╚═════════════════════════════════════════════════════════════════════════════╝
+    -->
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         TABLE OF CONTENTS
+         ═════════════════════════════════════════════════════════════════════════
+         
+         1. HEAD METADATA & SEO
+         2. STYLESHEETS
+         3. HEADER (INJECTED)
+         4. MAIN PROFILE CONTAINER
+         5. PROFILE HEADER SECTION
+         6. BASIC INFORMATION SECTION
+         7. WELLNESS PROFILE SECTION
+         8. DISCLAIMER BOX
+         9. SPACING & FOOTER (INJECTED)
+         10. SCRIPTS
+         
+         ═════════════════════════════════════════════════════════════════════════
+    -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         1. HEAD METADATA & SEO
+         ═════════════════════════════════════════════════════════════════════════ -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Client Profile | Rooted Vitality</title>
+    <meta name="description" content="View client wellness profile and preferences on Rooted Vitality. Practitioner-facing profile with wellness questionnaire responses, health goals, and important sensitivities.">
+    <meta name="keywords" content="client profile, wellness information, practitioner matching, health preferences, wellness goals">
+    <meta name="author" content="Rooted Vitality, Inc.">
+    <meta name="robots" content="noindex,nofollow">
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Client Wellness Profile · Rooted Vitality">
+    <meta property="og:description" content="View client wellness information to provide personalized practitioner care.">
+    <meta property="og:url" content="https://rootedvitality.com/dashboard/client/pages/public-profile.html">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Client Wellness Profile · Rooted Vitality">
+    <meta name="twitter:description" content="Client wellness information and preferences for practitioner care.">
+    
+    <title>Client Wellness Profile · Rooted Vitality</title>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         2. STYLESHEETS
+         ═════════════════════════════════════════════════════════════════════════ -->
     <link rel="stylesheet" href="../../../styles/base.css">
     <link rel="stylesheet" href="../../../styles/layout.css">
     <link rel="stylesheet" href="../../../styles/components.css">
@@ -11,17 +73,23 @@
     <link rel="stylesheet" href="../styles/public-profile.css">
 </head>
 <body>
-    <!-- Header (injected by injections.js) -->
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         3. HEADER (INJECTED)
+         ═════════════════════════════════════════════════════════════════════════ -->
     <div id="rvHeaderContainer"></div>
 
-    <!-- Main Profile Container -->
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         4. MAIN PROFILE CONTAINER
+         ═════════════════════════════════════════════════════════════════════════ -->
     <main class="public-profile-wrapper">
         <div class="container-narrow">
             
-            <!-- Profile Header -->
+            <!-- ═══════════════════════════════════════════════════════════════════════════
+                 5. PROFILE HEADER SECTION
+                 ═════════════════════════════════════════════════════════════════════════ -->
             <section class="profile-header-section">
                 <div class="profile-avatar-large">
-                    <div id="clientAvatarDisplay" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #77883e 0%, #5f7030 100%); font-size: 64px; color: #fbf7ec; font-weight: bold; width: 100%; height: 100%; border-radius: 12px;"></div>
+                    <div id="clientAvatarDisplay" class="client-avatar-display"></div>
                 </div>
                 <div class="profile-header-info">
                     <h1 id="clientName">Loading...</h1>
@@ -30,7 +98,9 @@
                 </div>
             </section>
 
-            <!-- Basic Information -->
+            <!-- ═══════════════════════════════════════════════════════════════════════════
+                 6. BASIC INFORMATION SECTION
+                 ═════════════════════════════════════════════════════════════════════════ -->
             <section class="profile-section">
                 <div class="section-header">
                     <h2>Basic Information</h2>
@@ -51,7 +121,9 @@
                 </div>
             </section>
 
-            <!-- Wellness Profile -->
+            <!-- ═══════════════════════════════════════════════════════════════════════════
+                 7. WELLNESS PROFILE SECTION
+                 ═════════════════════════════════════════════════════════════════════════ -->
             <section class="profile-section">
                 <div class="section-header">
                     <h2>Wellness Profile</h2>
@@ -117,23 +189,31 @@
                     <p id="displayDesiredSuccessOutcome" class="wellness-answer">—</p>
                 </div>
 
-                <!-- Disclaimer -->
-                <div style="background: #fbf7ec; border: 1px solid #d4c47c; border-radius: 6px; padding: 1rem; margin-top: 2rem;">
-                    <p style="margin: 0; color: #2c3e50; font-size: 0.9rem; line-height: 1.5;">
+                <!-- ═══════════════════════════════════════════════════════════════════════════
+                     8. DISCLAIMER BOX
+                     ═════════════════════════════════════════════════════════════════════════ -->
+                <div class="profile-disclaimer-box">
+                    <p class="profile-disclaimer-text">
                         <strong>Note:</strong> This wellness information was voluntarily provided by the client to help you better understand their background and context. This information is <strong>not used for practitioner matching</strong>—matches are made based on category, subcategory, location, and availability alone. This additional context is provided solely to assist you in delivering personalized care.
                     </p>
                 </div>
             </section>
 
-            <!-- Spacing before footer -->
-            <div style="height: 3rem;"></div>
+            <!-- ═══════════════════════════════════════════════════════════════════════════
+                 9. SPACING & FOOTER (INJECTED)
+                 ═════════════════════════════════════════════════════════════════════════ -->
+            <div class="spacing-xxl"></div>
         </div>
     </main>
 
-    <!-- Footer (injected by injections.js) -->
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         FOOTER
+         ═════════════════════════════════════════════════════════════════════════ -->
     <div id="rvFooterContainer"></div>
 
-    <!-- Scripts -->
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         10. SCRIPTS
+         ═════════════════════════════════════════════════════════════════════════ -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../../../scripts/config.js"></script>
     <script src="../../../scripts/authManager.js"></script>

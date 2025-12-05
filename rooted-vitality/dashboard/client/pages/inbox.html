@@ -1,0 +1,422 @@
+<!--
+  ╔═════════════════════════════════════════════════════════════════════════════╗
+  ║                         ROOTED VITALITY DASHBOARD                           ║
+  ║                    CLIENT INBOX (HTML)                                      ║
+  ║                                                                             ║
+  ║ File:        inbox.html                                                     ║
+  ║ Purpose:     Client inbox - view connections and message practitioners      ║
+  ║ Description: 3-Column layout with message threads, practitioner list,       ║
+  ║              tab navigation, filters, modals, and review management         ║
+  ║ Last Update: November 2025                                                  ║
+  ║ Status:      Production-Ready | Build Standard v2.0 Compliant               ║
+  ║                                                                             ║
+  ║ QUICK REFERENCE:                                                            ║
+  ║ - Layout: 3-Column | Sidebar | List | Message Thread                        ║
+  ║ - Design System: CSS Classes, Tabs, Filters, Modals                         ║
+  ║ - Features: Messaging, Reviews, Connection Management                       ║
+  ║                                                                             ║
+  ╚═════════════════════════════════════════════════════════════════════════════╝
+  -->
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       TABLE OF CONTENTS
+       ═════════════════════════════════════════════════════════════════════════
+       
+       1. HEAD METADATA & SEO
+       2. STYLESHEETS
+       3. HEADER (INJECTED)
+       4. MAIN CONTENT - 3-COLUMN LAYOUT
+       5. LEFT COLUMN - TAB NAVIGATION & FILTERS
+       6. MIDDLE COLUMN - PRACTITIONERS LIST
+       7. RIGHT COLUMN - MESSAGE THREAD
+       8. PRACTITIONER DETAILS MODAL
+       9. REVIEW MODAL
+       10. FOOTER (INJECTED)
+       11. SCRIPTS
+       
+       ═════════════════════════════════════════════════════════════════════════
+  -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       1. HEAD METADATA & SEO
+       ═════════════════════════════════════════════════════════════════════════ -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Message your wellness practitioners and manage connections on Rooted Vitality. View active matches, unread messages, and completed sessions. Leave reviews and provide feedback.">
+  <meta name="keywords" content="wellness matches, practitioner messages, wellness connections, communication, reviews, appointments">
+  <meta name="author" content="Rooted Vitality, Inc.">
+  <meta name="robots" content="noindex,nofollow">
+  
+  <!-- Open Graph / Social Media -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="My Matches · Rooted Vitality">
+  <meta property="og:description" content="Message and manage your wellness practitioner connections. View appointments, communicate, and share feedback.">
+  <meta property="og:url" content="https://rootedvitality.com/dashboard/client/pages/inbox.html">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="My Matches · Rooted Vitality">
+  <meta name="twitter:description" content="Manage wellness practitioner connections and messages.">
+  
+  <title>My Matches · Rooted Vitality</title>
+  
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       2. STYLESHEETS
+       ═════════════════════════════════════════════════════════════════════════ -->
+  <link rel="stylesheet" href="../../../styles/base.css">
+  <link rel="stylesheet" href="../../../styles/layout.css">
+  <link rel="stylesheet" href="../../../styles/components.css">
+  <link rel="stylesheet" href="../../../styles/styles.css">
+  <link rel="stylesheet" href="../styles/inbox-layout.css">
+  <link rel="stylesheet" href="../styles/inbox-interactive.css">
+</head>
+<body>
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       3. HEADER (INJECTED)
+       ═════════════════════════════════════════════════════════════════════════ -->
+  <header id="header-inject"></header>
+  
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       4. MAIN CONTENT - 3-COLUMN LAYOUT
+       ═════════════════════════════════════════════════════════════════════════ -->
+  <main class="my-matches-container">
+    <div class="matches-grid-3col">
+      <!-- ═══════════════════════════════════════════════════════════════════════════
+           5. LEFT COLUMN - TAB NAVIGATION & FILTERS
+           ═════════════════════════════════════════════════════════════════════════ -->
+      <aside class="matches-sidebar">
+        <div class="sidebar-tab active" data-tab="messages">
+          <h3 class="sidebar-tab__title">Messages</h3>
+          <div class="sidebar-tab__badge" id="messages-badge">0</div>
+        </div>
+        
+        <div class="sidebar-tab" data-tab="opportunities">
+          <h3 class="sidebar-tab__title">Opportunities</h3>
+          <div class="sidebar-tab__badge" id="opportunities-badge">0</div>
+        </div>
+        
+        <div class="sidebar-tab" data-tab="unread">
+          <h3 class="sidebar-tab__title">Unread</h3>
+          <div class="sidebar-tab__badge" id="unread-badge">0</div>
+        </div>
+
+        <div class="sidebar-tab" data-tab="completed">
+          <h3 class="sidebar-tab__title">Completed</h3>
+          <div class="sidebar-tab__badge" id="completed-badge">0</div>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="sidebar-section">
+          <h4 class="sidebar-section__title">Filter</h4>
+          <div class="sidebar-filters">
+            <div class="filter-group">
+              <label class="filter-label">Category</label>
+              <select id="filter-category" class="filter-select">
+                <option value="">All Categories</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label class="filter-label">Service Type</label>
+              <select id="filter-service" class="filter-select">
+                <option value="">All Types</option>
+                <option value="in-person">In-Person</option>
+                <option value="virtual">Virtual</option>
+                <option value="housecalls">House Calls</option>
+              </select>
+            </div>
+            <button id="btn-clear-filters" class="btn-clear-filters">Clear Filters</button>
+          </div>
+        </div>
+
+        <!-- Tips Section -->
+        <div class="article-card tips-section">
+          <div class="tips-section__header">
+            <span class="tips-icon">ℹ</span>
+            <h4 class="tips-section__title">TIPS</h4>
+          </div>
+          <ul class="tips-list">
+            <li>Click on any practitioner to message and connect with them</li>
+            <li>Update your care request status in the chat window to track if you hired or declined a practitioner</li>
+            <li>Messages are disabled until the practitioner accepts your connection request</li>
+            <li>Close a care request once you've found the right practitioner for that need</li>
+          </ul>
+        </div>
+      </aside>
+
+      <!-- ═══════════════════════════════════════════════════════════════════════════
+           6. MIDDLE COLUMN - PRACTITIONERS LIST
+           ═════════════════════════════════════════════════════════════════════════ -->
+      <section class="inbox-list" id="messages-content">
+        <!-- Search Box -->
+        <div class="inbox-search">
+          <input 
+            type="text" 
+            id="search-conversations" 
+            class="search-input" 
+            placeholder="Search practitioners..."
+          >
+        </div>
+
+        <!-- Practitioners Thread List -->
+        <div class="inbox-threads-list" id="threads-list">
+          <!-- Practitioner thread items rendered here -->
+        </div>
+      </section>
+
+      <!-- OPPORTUNITIES SECTION -->
+      <section class="inbox-list hidden" id="opportunities-content">
+        <!-- Search Box -->
+        <div class="inbox-search">
+          <input 
+            type="text" 
+            id="search-opportunities" 
+            class="search-input" 
+            placeholder="Search opportunities..."
+          >
+        </div>
+
+        <!-- Opportunities List -->
+        <div class="inbox-threads-list" id="opportunities-list">
+          <!-- Opportunity items rendered here -->
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════════════════════════════
+           7. RIGHT COLUMN - MESSAGE THREAD
+           ═════════════════════════════════════════════════════════════════════════ -->
+      <section class="message-thread-column">
+        <div class="message-thread-panel" id="message-thread-panel">
+          <!-- Header with Practitioner Avatar, Name, Status, and Actions -->
+          <div class="thread-header">
+            <div class="thread-header__content">
+              <div class="thread-header-flex">
+                <div class="thread-avatar-medium" id="thread-avatar">
+                  <img id="thread-avatar-img" src="" alt="Practitioner" class="thread-avatar-img">
+                  <span id="thread-avatar-initials" class="thread-avatar-initials">S</span>
+                </div>
+                <div class="thread-header-info">
+                  <h3 id="thread-practitioner-name" class="thread-header__title">Select a practitioner</h3>
+                  <div id="thread-practitioner-meta" class="thread-header-meta">
+                    <div id="thread-online-status" class="status-indicator"></div>
+                    <span id="thread-status-text">Offline</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Status Dropdown and Close Button -->
+            <div class="thread-header__actions">
+              <select id="status-dropdown" class="status-dropdown hidden">
+                <option value="pending">Pending</option>
+                <option value="in-progress">In-Progress</option>
+                <option value="hired">Complete: Hired</option>
+                <option value="not-hired">Complete: Not Hired</option>
+              </select>
+              <button id="close-thread-btn" class="thread-close-btn hidden" title="Close thread">×</button>
+            </div>
+          </div>
+          
+          <!-- Messages Area -->
+          <div id="message-thread" class="message-thread">
+            <div class="empty-state">
+              <p>Select a practitioner to view message history</p>
+            </div>
+          </div>
+
+          <!-- Message Input -->
+          <div class="message-input-area">
+            <input 
+              type="text" 
+              id="message-input" 
+              class="message-input" 
+              placeholder="Type your message..." 
+              disabled
+            />
+            <button id="send-message-btn" class="btn btn-primary message-send-btn" disabled>Send</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       8. PRACTITIONER DETAILS MODAL
+       ═════════════════════════════════════════════════════════════════════════ -->
+  <div id="practitioner-modal" class="modal modal--hidden">
+    <div class="modal__overlay"></div>
+    <div class="modal__content">
+      <button class="modal__close" aria-label="Close modal">&times;</button>
+      
+      <div class="modal__header">
+        <div class="practitioner-header">
+          <div class="practitioner-avatar" id="modal-avatar"></div>
+          <div class="practitioner-info">
+            <h2 class="modal__title" id="modal-name">Practitioner Name</h2>
+            <p class="modal__subtitle" id="modal-specialty">Specialty</p>
+            <div class="rating-badge" id="modal-rating"></div>
+            <div class="connection-status-badge" id="modal-status"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal__body">
+        <div class="practitioner-details">
+          <!-- Status Message -->
+          <section class="modal-section info-box hidden" id="modal-status-message">
+            <div id="status-message-content"></div>
+          </section>
+
+          <!-- Bio -->
+          <section class="modal-section">
+            <h3 class="modal-section__title">About</h3>
+            <p id="modal-bio">—</p>
+          </section>
+
+          <!-- Services -->
+          <section class="modal-section">
+            <h3 class="modal-section__title">Services Offered</h3>
+            <div id="modal-services">—</div>
+          </section>
+
+          <!-- Availability -->
+          <section class="modal-section">
+            <h3 class="modal-section__title">Availability & Location</h3>
+            <div id="modal-availability">—</div>
+          </section>
+
+          <!-- Contact -->
+          <section class="modal-section">
+            <h3 class="modal-section__title">Contact Information</h3>
+            <div id="modal-contact">—</div>
+          </section>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary modal-cancel">Close</button>
+        <button type="button" class="btn btn-primary" id="btn-message">Send Message</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       9. REVIEW MODAL
+       ═════════════════════════════════════════════════════════════════════════ -->
+  <div id="review-modal" class="modal modal--hidden">
+    <div class="modal__overlay"></div>
+    <div class="modal__content modal__content--review">
+      <button class="modal__close" aria-label="Close modal">&times;</button>
+      
+      <div class="modal__header">
+        <h2 class="modal__title">Leave a Review</h2>
+        <p class="modal__subtitle" id="review-practitioner-name">Practitioner Name</p>
+      </div>
+
+      <form id="review-form" class="review-form">
+        <!-- Star Rating -->
+        <div class="review-form__section">
+          <label class="review-form__label">Rating <span class="required">*</span></label>
+          <div class="star-rating" id="star-rating">
+            <button type="button" class="star-btn" data-rating="1" title="Poor">★</button>
+            <button type="button" class="star-btn" data-rating="2" title="Fair">★</button>
+            <button type="button" class="star-btn" data-rating="3" title="Good">★</button>
+            <button type="button" class="star-btn" data-rating="4" title="Very Good">★</button>
+            <button type="button" class="star-btn" data-rating="5" title="Excellent">★</button>
+          </div>
+          <input type="hidden" id="review-rating" name="rating" required>
+        </div>
+
+        <!-- Review Text -->
+        <div class="review-form__section">
+          <label class="review-form__label">Comments <span class="required">*</span></label>
+          <textarea 
+            id="review-text" 
+            name="review_text" 
+            class="review-form__textarea" 
+            placeholder="Share your experience with this practitioner..." 
+            rows="6"
+            required
+            minlength="10"
+            maxlength="1000"
+          ></textarea>
+          <div class="review-form__hint" id="char-count">0 / 1000</div>
+        </div>
+
+        <!-- Photo Upload -->
+        <div class="review-form__section">
+          <label class="review-form__label">Photos (Optional)</label>
+          <div class="photo-upload">
+            <input 
+              type="file" 
+              id="review-photos" 
+              name="photos" 
+              class="photo-upload__input" 
+              accept="image/*" 
+              multiple
+            >
+            <label for="review-photos" class="photo-upload__label">
+              <span class="photo-upload__icon">📸</span>
+              <span class="photo-upload__text">Click to add photos or drag and drop</span>
+              <span class="photo-upload__hint">Max 3 photos, 5MB each</span>
+            </label>
+            <div class="photo-preview" id="photo-preview"></div>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary modal-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit-review">Submit Review</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       10. FOOTER (INJECTED)
+       ═════════════════════════════════════════════════════════════════════════ -->
+  <footer id="footer-inject"></footer>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       11. SCRIPTS
+       ═════════════════════════════════════════════════════════════════════════ -->
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Rooted Vitality Scripts (in order) -->
+  <script src="../../../scripts/config.js"></script>
+  <script src="../../../scripts/authManager.js"></script>
+  <script src="../../../scripts/authHooks.js"></script>
+  <script src="../../../injections.js"></script>
+  <script src="../../../scripts/emailTemplates.js"></script>
+  <script src="../../../scripts/utilities.js"></script>
+  <script src="../../../scripts/modalManager.js"></script>
+  <script src="../../../scripts/notificationManager.js"></script>
+  <script src="../../../scripts/unifiedMessagingSystem.js"></script>
+  <script src="../../../scripts/matchMessagingManager.js"></script>
+  <script src="../../../scripts/reviewsManager.js"></script>
+  <script src="../scripts/my-wellness-manager.js"></script>
+  <script src="../scripts/my-wellness-ui.js"></script>
+  <script src="../scripts/inbox-manager.js"></script>
+  <script src="../scripts/inbox-ui.js"></script>
+  <script src="../scripts/clientOpportunitiesManager.js"></script>
+  
+  <!-- Initialize Reviews Manager and Opportunities Manager -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.supabaseClient && window.authManager) {
+        reviewsManager.init(window.supabaseClient, window.authManager);
+        
+        // Initialize opportunities manager
+        if (window.initializeClientOpportunitiesManager) {
+          window.initializeClientOpportunitiesManager();
+        }
+      }
+    });
+  </script>
+</body>
+</html>

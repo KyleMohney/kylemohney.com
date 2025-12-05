@@ -1,38 +1,29 @@
-/*
+﻿/*
 ╔════════════════════════════════════════════════════════════════════╗
 ║  ROOTED VITALITY, INC.                                             ║
-║  File: scripts/config.js                                           ║
-║  Purpose: Supabase Authentication Configuration                    ║
+║  File: config.js                                                   ║
+║  Purpose: Global email and Supabase configuration settings          ║
 ║  Holistic Wellness · Modern Connection Platform                    ║
 ║  rootedvitality.com | 2025                                         ║
 ╚════════════════════════════════════════════════════════════════════╝
 
-TABLE OF CONTENTS
-  1. EMAIL CONFIGURATION (TEMPORARY GMAIL SMTP)
-  2. SUPABASE CLIENT INITIALIZATION
-  3. ENVIRONMENT SETUP INSTRUCTIONS
-  4. API KEY MANAGEMENT
+ TABLE OF CONTENTS
+   1. EMAIL CONFIGURATION (SUPPORT@ROOTEDVITALITY.HEALTH)
+   2. SUPABASE CLIENT INITIALIZATION
+   3. ENVIRONMENT SETUP INSTRUCTIONS
+   4. API KEY MANAGEMENT
 */
 
-console.log('[Rooted Vitality] config.js loading...');
-
 // ======================================================
-// 1. EMAIL CONFIGURATION (TEMPORARY GMAIL SMTP)
+// 1. EMAIL CONFIGURATION (SUPPORT@ROOTEDVITALITY.HEALTH)
 // ======================================================
 
 /**
- * TEMPORARY EMAIL SENDER CONFIGURATION
+ * EMAIL SENDER CONFIGURATION
  * 
- * Current Status: Personal Gmail SMTP (temporary)
- * Sender Email: kylejmohney@gmail.com
- * Future: Support@rooted-vitality.com (Google Workspace)
- * 
- * SUPABASE EMAIL SMTP SETTINGS:
- * 
- * To configure email verification in Supabase Dashboard:
- * 
- * 1. Go to: Authentication → Settings → SMTP Configuration
- * 
+ * Current Status: Production configuration (ACTIVE)
+ * Sender Email: support@rootedvitality.health
+ * Service: Google Workspace SMTP + Resend API for Edge Functions
  * 2. Enter these values:
  *    SMTP Host: smtp.gmail.com
  *    SMTP Port: 587
@@ -77,7 +68,7 @@ console.log('[Rooted Vitality] config.js loading...');
  *   For users who click "Forgot password?" in login modal
  * 
  * To update email templates in Supabase:
- * 1. Authentication → Templates
+ * 1. Authentication â†’ Templates
  * 2. Select template to edit
  * 3. Paste HTML from /docs/EMAIL_VERIFICATION_TEMPLATE.html
  * 4. Click Save
@@ -92,7 +83,7 @@ console.log('[Rooted Vitality] config.js loading...');
  * 
  * To get your credentials:
  * 1. Go to supabase.com and create a new project (or use existing)
- * 2. Navigate to Project Settings → API
+ * 2. Navigate to Project Settings â†’ API
  * 3. Copy the Project URL and Public Anon Key
  * 4. Paste them below in the respective placeholders
  * 
@@ -106,10 +97,9 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 // ======================================================
 // Initialize Supabase Client
 // ======================================================
-console.log('🔄 [Rooted Vitality] config.js loading Supabase...');
 
 if (!window.supabase) {
-    console.error('❌ [Rooted Vitality] supabase.js library not loaded. Make sure to include Supabase JS library before config.js');
+    console.error('âŒ [Rooted Vitality] supabase.js library not loaded. Make sure to include Supabase JS library before config.js');
     throw new Error('Supabase JS library required');
 }
 
@@ -121,9 +111,6 @@ window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON
     detectSessionInUrl: true
   }
 });
-
-console.log('✅ [Rooted Vitality] Supabase client initialized with localStorage persistence');
-console.log('📍 [Rooted Vitality] Supabase URL:', SUPABASE_URL);
 
 // ======================================================
 // Connection Test & Diagnostics
@@ -230,63 +217,4 @@ if (typeof module !== 'undefined' && module.exports) {
         SUPABASE_ANON_KEY
     };
 }
-
-console.log('[Rooted Vitality] config.js ready');
-
-// End of config.js — Rooted Vitality Supabase Configuration
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

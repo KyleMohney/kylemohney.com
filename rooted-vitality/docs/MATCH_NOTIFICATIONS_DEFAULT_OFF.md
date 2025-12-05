@@ -13,7 +13,7 @@ Both signup paths (with and without membership) now initialize notification sett
 - `matches_email`: `false` (default OFF)
 - `matches_sms`: `false` (unchanged)
 
-**Location**: `/rooted-vitality/scripts/practitioner-signup.js`
+**Location**: `/rooted-vitality/dashboard/pro/scripts/practitioner-signup.js`
 - Line ~423-444 (skipMembership function)
 - Line ~660-681 (registerPractitioner function)
 
@@ -132,4 +132,4 @@ SET
 WHERE matches_in_app = false AND matches_email = false;
 ```
 
-Then update both functions in `practitioner-signup.js` to set `matches_in_app: true` and `matches_email: true`.
+Then update both functions in `dashboard/pro/scripts/practitioner-signup.js` to set `matches_in_app: true` and `matches_email: true`.

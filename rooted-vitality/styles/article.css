@@ -1,24 +1,26 @@
-/* ========================================== */
-/* ROOTED VITALITY, INC.                      */
-/* Article Styles - Blog Posts & Stories      */
-/* Holistic Wellness · Modern Connection      */
-/* rootedvitality.com | 2025                  */
-/* ========================================== */
+/*
+╔════════════════════════════════════════════════════════════════════╗
+║  ROOTED VITALITY, INC.                                             ║
+║  File: styles/article.css                                          ║
+║  Purpose: Article page styling and layout                          ║
+║  Holistic Wellness · Modern Connection Platform                    ║
+║  rootedvitality.com | 2025                                         ║
+╚════════════════════════════════════════════════════════════════════╝
 
-/* TABLE OF CONTENTS
-  1. Header Styles
-  2. Article Meta
-  3. Featured Image
-  4. Body Content
-  5. Article Sections & Elements
-  6. Checklist & Related Content
-  7. Footer & CTA
-  8. Animations
-  9. Responsive Design
+TABLE OF CONTENTS
+  1. ARTICLE CONTAINER & HEADER STYLES
+  2. ARTICLE META & TYPOGRAPHY
+  3. FEATURED IMAGE & MEDIA
+  4. BODY CONTENT & TEXT FORMATTING
+  5. ARTICLE SECTIONS & ELEMENTS
+  6. CHECKLIST & RELATED CONTENT
+  7. FOOTER & CTA
+  8. ANIMATIONS
+  9. RESPONSIVE DESIGN
 */
 
 /* ========================================== */
-/* 1. HEADER STYLES                           */
+/* 1. ARTICLE CONTAINER & HEADER STYLES       */
 /* ========================================== */
 
 :root {
@@ -41,7 +43,7 @@
 }
 
 /* ========================================== */
-/* 2. HEADER STYLES                           */
+/* 2. ARTICLE META & TYPOGRAPHY               */
 /* ========================================== */
 
 .article__header {
@@ -265,6 +267,7 @@
 }
 
 /* ========================================== */
+/* ========================================== */
 /* 7. FOOTER & CTA                            */
 /* ========================================== */
 
@@ -359,6 +362,7 @@
   }
 }
 
+/* ========================================== */
 /* ========================================== */
 /* 9. RESPONSIVE DESIGN                       */
 /* ========================================== */
@@ -493,60 +497,3 @@
     padding: 1rem 1rem 1rem 1rem;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

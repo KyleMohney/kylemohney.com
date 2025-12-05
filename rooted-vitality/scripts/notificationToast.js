@@ -1,18 +1,29 @@
-/*
-+--------------------------------------------------------------------+
-│  ROOTED VITALITY, INC.                                             │
-│  File: scripts/notificationToast.js                                │
-│  Purpose: Toast notifications for real-time events                 │
-│  Holistic Wellness – Modern Connection Platform                    │
-│  rootedvitality.com | 2025                                         │
-+--------------------------------------------------------------------+
+﻿/*
+╔════════════════════════════════════════════════════════════════════╗
+║  ROOTED VITALITY, INC.                                             ║
+║  File: notificationToast.js                                        ║
+║  Purpose: Toast notifications for real-time events                 ║
+║  Holistic Wellness · Modern Connection Platform                    ║
+║  rootedvitality.com | 2025                                         ║
+╚════════════════════════════════════════════════════════════════════╝
 
-ARCHITECTURE:
-- Displays toast notifications for real-time events (reviews, messages, etc.)
-- Auto-dismisses after 6 seconds or on user interaction
-- Stacks multiple notifications
-- Integrates with reviewNotificationManager
+ TABLE OF CONTENTS
+   1. INITIALIZATION & QUEUE MANAGEMENT
+   2. TOAST CREATION & DISPLAY
+   3. AUTO-DISMISS & STACKING
+   4. EVENT LISTENERS & INTERACTIONS
+   5. STYLING & ANIMATIONS
+
+ ARCHITECTURE:
+   - Displays toast notifications for real-time events (reviews, messages, etc.)
+   - Auto-dismisses after 6 seconds or on user interaction
+   - Stacks multiple notifications
+   - Integrates with reviewNotificationManager
 */
+
+// ======================================================
+// 1. INITIALIZATION & QUEUE MANAGEMENT
+// ======================================================
 
 let notificationToast = {
   queue: [],
@@ -37,8 +48,6 @@ let notificationToast = {
     window.addEventListener('reviewNotification', (e) => {
       this.show(e.detail);
     });
-    
-    console.log('[Notification Toast] Initialized');
   },
 
   show(notification) {
@@ -72,7 +81,7 @@ let notificationToast = {
     `;
 
     // Build content
-    const starsHtml = '⭐'.repeat(notification.rating);
+    const starsHtml = 'â­'.repeat(notification.rating);
     
     toast.innerHTML = `
       <div style="display: flex; gap: 12px; align-items: flex-start;">
@@ -105,7 +114,7 @@ let notificationToast = {
           justify-content: center;
           transition: color 0.2s;
         " onclick="this.closest('.notification-toast').remove()">
-          ×
+          Ã—
         </button>
       </div>
     `;
@@ -185,6 +194,8 @@ window.showNotificationToast = (notification) => notificationToast.show(notifica
 document.addEventListener('DOMContentLoaded', () => {
   notificationToast.init();
 });
+
+
 
 
 

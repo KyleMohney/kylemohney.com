@@ -9,13 +9,13 @@ The Rooted Vitality signup system manages two distinct user types with different
 ## System Architecture
 
 ```
-signup.html (Single Page Form)
+client-signup.html (Client Signup Form)
     ↓
 Client/Practitioner Tab Selection
     ↓
 Form Data Collection + Validation
     ↓
-scripts/signupHandler.js (Client) OR scripts/practitionerHelpers.js (Practitioner)
+dashboard/client/scripts/client-signup.js (Client) OR dashboard/pro/scripts/practitionerHelpers.js (Practitioner)
     ↓
 Supabase Auth (Email + Password)
     ↓
@@ -31,9 +31,9 @@ Serial Number Auto-Generated (C1, P1, etc.)
 ## Client Signup Flow
 
 ### Frontend
-- **Entry Point**: `signup.html` - Client tab
+- **Entry Point**: `client-signup.html` - Client signup
 - **Tab Controller**: `scripts/tabController.js` - Manages client/practitioner tab switching
-- **Validation Script**: `scripts/signupHandler.js`
+- **Validation Script**: `dashboard/client/scripts/client-signup.js`
 
 ### Form Fields (All Required)
 | Field | Type | Validation |
@@ -50,7 +50,7 @@ Serial Number Auto-Generated (C1, P1, etc.)
 | Confirm Password | password | Must match password |
 | Terms Acceptance | checkbox | Must be checked |
 
-### Data Collection & Validation (signupHandler.js)
+### Data Collection & Validation (client-signup.js)
 1. **Collect** all form inputs
 2. **Validate**:
    - All required fields are filled
@@ -89,11 +89,11 @@ Serial Number Auto-Generated (C1, P1, etc.)
 
 ---
 
-## Practitioner Signup Flow
+### Practitioner Signup Flow
 
 ### Frontend
-- **Entry Point**: `signup.html` - Practitioner tab
-- **Validation Script**: `scripts/practitionerHelpers.js`
+- **Entry Point**: `practitioner-signup.html` - Practitioner onboarding
+- **Validation Script**: `dashboard/pro/scripts/practitionerHelpers.js`
 
 ### Form Fields (All Required)
 | Field | Type | Purpose |
@@ -109,7 +109,7 @@ Serial Number Auto-Generated (C1, P1, etc.)
 | practice_state | text | State |
 | zipcode | text | Zip code |
 
-### Data Collection & Validation (practitionerHelpers.js)
+### Data Collection & Validation (dashboard/pro/scripts/practitionerHelpers.js)
 1. **Collect** all form inputs
 2. **Validate** (Frontend):
    - All required fields present and non-empty
@@ -204,13 +204,13 @@ Enforces NOT NULL constraints on 10 critical practitioner fields:
 
 ### Frontend
 ```
-signup.html                           # Main signup page (client + practitioner tabs)
-scripts/signupHandler.js              # Client signup validation & submission
-scripts/practitionerHelpers.js        # Practitioner signup validation & submission
-scripts/tabController.js              # Tab switching (client ↔ practitioner)
-scripts/authManager.js                # Supabase auth management
-scripts/authModal.js                  # Auth modal UI
-scripts/authHooks.js                  # Auth lifecycle hooks
+client-signup.html                                 # Client signup page
+dashboard/client/scripts/client-signup.js          # Client signup validation & submission
+dashboard/pro/scripts/practitionerHelpers.js       # Practitioner signup validation & submission
+scripts/tabController.js                           # Tab switching (client ↔ practitioner)
+scripts/authManager.js                             # Supabase auth management
+scripts/authModal.js                               # Auth modal UI
+scripts/authHooks.js                               # Auth lifecycle hooks
 ```
 
 ### Backend (SQL)
@@ -259,7 +259,7 @@ SELECT id, user_id, serial_number FROM practitioners ORDER BY created_at DESC;
 ```
 
 ### Testing Signup Flow (Development)
-1. Open `signup.html`
+1. Open `client-signup.html`
 2. Switch to desired tab (Client or Practitioner)
 3. Fill in all required fields
 4. Submit and check:

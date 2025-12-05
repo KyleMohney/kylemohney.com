@@ -1,0 +1,204 @@
+# CRM Integration - Environment Configuration
+
+This file documents all environment variables required for CRM OAuth integrations.
+
+## Supabase Configuration
+
+Add these to your Supabase project settings:
+
+```
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+SUPABASE_ANON_KEY=your-anon-key
+```
+
+## HighLevel OAuth
+
+**Get credentials at:** https://developer.gohighlevel.com/
+
+```
+HIGHLEVEL_CLIENT_ID=your_client_id
+HIGHLEVEL_CLIENT_SECRET=your_client_secret
+```
+
+**Required Scopes:**
+- contacts.read
+- contacts.write
+- deals.read
+- deals.write
+- pipelines.read
+
+**Redirect URI:** `https://yourdomain.com/functions/v1/crm-oauth-callback`
+
+## ServiceTitan OAuth
+
+**Get credentials at:** https://developer.servicetitan.com/
+
+```
+SERVICETITAN_CLIENT_ID=your_client_id
+SERVICETITAN_CLIENT_SECRET=your_client_secret
+```
+
+**Required Scopes:**
+- Crm:Read
+- Crm:Write
+- Jobs:Read
+
+**Redirect URI:** `https://yourdomain.com/functions/v1/crm-oauth-callback`
+
+## mHelpDesk API Key
+
+**Get API Key at:** https://api.mhelpdesk.com/docs/
+
+No environment variables needed - practitioners enter their API key directly in settings.
+
+**Test Endpoint:** `GET https://api.mhelpdesk.com/api/users`
+
+## HubSpot OAuth
+
+**Get credentials at:** https://developers.hubspot.com/
+
+```
+HUBSPOT_CLIENT_ID=your_client_id
+HUBSPOT_CLIENT_SECRET=your_client_secret
+```
+
+**Required Scopes:**
+- crm.objects.contacts.read
+- crm.objects.contacts.write
+- crm.objects.deals.read
+- crm.objects.deals.write
+
+**Redirect URI:** `https://yourdomain.com/functions/v1/crm-oauth-callback`
+
+## Pipedrive OAuth
+
+**Get credentials at:** https://developers.pipedrive.com/
+
+```
+PIPEDRIVE_CLIENT_ID=your_client_id
+PIPEDRIVE_CLIENT_SECRET=your_client_secret
+```
+
+**Required Scopes:** (Pipedrive uses implicit scopes - full API access)
+
+**Redirect URI:** `https://yourdomain.com/functions/v1/crm-oauth-callback`
+
+## Salesforce OAuth
+
+**Get credentials at:** https://developer.salesforce.com/
+
+```
+SALESFORCE_CLIENT_ID=your_client_id
+SALESFORCE_CLIENT_SECRET=your_client_secret
+```
+
+**Required Scopes:**
+- api
+- id
+- full
+
+**Redirect URI:** `https://yourdomain.com/functions/v1/crm-oauth-callback`
+
+## Zoho CRM OAuth
+
+**Get credentials at:** https://www.zoho.com/crm/developer/
+
+```
+ZOHO_CLIENT_ID=your_client_id
+ZOHO_CLIENT_SECRET=your_client_secret
+```
+
+**Required Scopes:**
+- ZohoCRM.modules.contacts.ALL
+- ZohoCRM.modules.deals.ALL
+
+**Redirect URI:** `https://yourdomain.com/functions/v1/crm-oauth-callback`
+
+## General Configuration
+
+```
+APP_URL=https://yourdomain.com
+ENCRYPTION_KEY=your_encryption_key_for_api_credentials
+```
+
+## Setup Instructions
+
+1. **For Each CRM Provider:**
+   - Go to their developer portal
+   - Create an OAuth application
+   - Add redirect URI: `https://yourdomain.com/functions/v1/crm-oauth-callback`
+   - Copy Client ID and Client Secret
+
+2. **Add to Supabase:**
+   - Go to Project Settings → Edge Functions
+   - Click on each function (crm-oauth-init, crm-oauth-callback, etc.)
+   - Add the environment variables in the "Environment Variables" section
+
+3. **Test Each Integration:**
+   - Go to Settings → Integrations in practitioner dashboard
+   - Click "Connect" on each provider
+   - Verify OAuth flow completes successfully
+
+## Database Tables Required
+
+All tables already exist in schema:
+- `crm_integrations` - Stores connection credentials and settings
+- `crm_sync_logs` - Logs all sync operations
+- `crm_field_mappings` - Maps Rooted Vitality fields to CRM fields
+- `crm_sync_queue` - Queues sync operations for background processing
+
+## Testing OAuth Flows
+
+### HighLevel
+```bash
+curl -X POST http://localhost:3000/functions/v1/crm-oauth-init \
+  -H "Content-Type: application/json" \
+  -d '{
+    "provider": "highlevel",
+    "practitioner_serial": "P1"
+  }'
+```
+
+### mHelpDesk (API Key)
+```bash
+curl -X POST http://localhost:3000/functions/v1/crm-save-credentials \
+  -H "Content-Type: application/json" \
+  -d '{
+    "provider": "mhelpdesk",
+    "practitioner_serial": "P1",
+    "api_key": "your_api_key"
+  }'
+```
+
+### Disconnect
+```bash
+curl -X POST http://localhost:3000/functions/v1/crm-disconnect \
+  -H "Content-Type: application/json" \
+  -d '{
+    "provider": "highlevel",
+    "practitioner_serial": "P1"
+  }'
+```
+
+## Troubleshooting
+
+**"Invalid state token"**
+- Likely expired cache
+- State tokens expire after 10 minutes
+- Try reconnecting
+
+**"Invalid API credentials"**
+- Check that credentials are correct
+- Verify scopes are included
+- Test with provider's API documentation
+
+**"Redirect URI mismatch"**
+- Ensure redirect URI exactly matches in provider settings
+- Must be: `https://yourdomain.com/functions/v1/crm-oauth-callback`
+- No trailing slash
+
+**Tokens not saving**
+- Check Supabase credentials are correct
+- Verify SUPABASE_SERVICE_ROLE_KEY is set
+- Check Row Level Security policies on crm_integrations table

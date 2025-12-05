@@ -1,12 +1,27 @@
-/* =====================================================
-   ROOTED VITALITY, INC.
-   File: settings.css
-   Purpose: Practitioner settings page styles
-   Holistic Wellness · Modern Connection Platform
-   rootedvitality.com | 2025
-   ===================================================== */
+/*
+╔═════════════════════════════════════════════════════════════════════════════╗
+║                         ROOTED VITALITY DASHBOARD                           ║
+║              PRACTITIONER SETTINGS STYLESHEET (CSS)                         ║
+║                                                                             ║
+║ File:        settings.css                                                   ║
+║ Purpose:     Practitioner settings page styles                              ║
+║ Description: Layout & structure, sidebar navigation, settings content,      ║
+║              settings cards, forms, notifications, status badges, responsive║
+║ Last Update: November 2025                                                  ║
+║ Status:      Production-Ready | Build Standard v2.0 Compliant               ║
+║                                                                             ║
+║ QUICK REFERENCE:                                                            ║
+║ - Layout: 2-Column Sidebar | Content                                        ║
+║ - Design System: CSS Variables, Settings Cards, Status Badges               ║
+║ - Features: Notifications, Danger Zone, Mobile Responsive                   ║
+║                                                                             ║
+╚═════════════════════════════════════════════════════════════════════════════╝
+*/
 
-/* TABLE OF CONTENTS
+/* ═══════════════════════════════════════════════════════════════════════════
+   TABLE OF CONTENTS
+   ═════════════════════════════════════════════════════════════════════════
+   
    1. LAYOUT & STRUCTURE
    2. SIDEBAR NAVIGATION
    3. SETTINGS CONTENT
@@ -14,9 +29,10 @@
    5. FORM ELEMENTS
    6. NOTIFICATIONS
    7. STATUS BADGES
-   8. DANGER ZONE
-   9. MOBILE RESPONSIVE
-   10. ANIMATIONS
+   8. BUTTONS
+   9. PLAN & BILLING INFO
+   
+   ═══════════════════════════════════════════════════════════════════════════
 */
 
 /* ========================================== */
@@ -85,20 +101,20 @@
     font-size: 0.95rem;
     transition: all 0.2s ease;
     border: 1px solid #e0dcd5;
-    background: #fbf7ec;
+    background: var(--rooted-neutral);
     text-align: left;
 }
 
 .settings-nav-link:hover {
     background: #f5f5f3;
-    color: #2e2b28;
+    color: var(--rooted-dark);
     border-color: #d0ccc5;
 }
 
 .settings-nav-link.active {
-    background: #77883e;
-    color: #fbf7ec;
-    border-color: #77883e;
+    background: var(--rooted-primary);
+    color: var(--rooted-neutral);
+    border-color: var(--rooted-primary);
     font-weight: 500;
     box-shadow: 0 2px 8px rgba(92, 154, 114, 0.2);
 }
@@ -108,10 +124,10 @@
 /* ========================================== */
 
 .settings-content {
-    background: #fbf7ec;
+    background: var(--rooted-neutral);
     border-radius: 12px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-    border: 1px solid #fbf7ec;
+    border: 1px solid var(--rooted-neutral);
     overflow: hidden;
 }
 
@@ -153,7 +169,7 @@
 /* ========================================== */
 
 .settings-card {
-    background: #fbf7ec;
+    background: var(--rooted-neutral);
     border: 1px solid #e5e7eb;
     border-radius: 8px;
     padding: 1.5rem;
@@ -171,7 +187,7 @@
 }
 
 .settings-card.danger-zone {
-    background: #fbf7ec;
+    background: var(--rooted-neutral);
     border-color: #fecaca;
 }
 
@@ -196,8 +212,8 @@
     visibility: visible;
     padding: 0.5rem 1rem;
     font-size: 0.85rem;
-    background: #77883e;
-    color: #fbf7ec;
+    background: var(--rooted-primary);
+    color: var(--rooted-neutral);
     border: none;
     border-radius: 6px;
     font-weight: 600;
@@ -206,7 +222,7 @@
 }
 
 .card-content {
-    color: #2e2b28;
+    color: var(--rooted-dark);
 }
 
 .card-content .setting-description {
@@ -279,7 +295,7 @@
     font-family: inherit;
     font-size: 0.95rem;
     color: var(--dark-text);
-    background: #fbf7ec;
+    background: var(--rooted-neutral);
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -299,7 +315,7 @@
 /* ========================================== */
 
 .notification-info-banner {
-    background: #fbf7ec;
+    background: var(--rooted-neutral);
     border: 1px solid #d1e9e6;
     border-radius: 8px;
     padding: 1rem;
@@ -333,7 +349,7 @@
 
 .notification-item {
     padding-bottom: 1.5rem;
-    border-bottom: 1px solid #fbf7ec;
+    border-bottom: 1px solid var(--rooted-neutral);
 }
 
 .notification-item:last-child {
@@ -353,11 +369,11 @@
     width: 18px;
     height: 18px;
     cursor: pointer;
-    accent-color: #77883e;
+    accent-color: var(--rooted-primary);
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
-    background: #fbf7ec;
+    background: var(--rooted-neutral);
     border: 2px solid #d1d5db;
     border-radius: 4px;
     outline: none;
@@ -365,13 +381,13 @@
 }
 
 .notification-toggle input[type="checkbox"]:hover {
-    border-color: #77883e;
+    border-color: var(--rooted-primary);
 }
 
 .notification-toggle input[type="checkbox"]:checked {
-    background: #77883e;
-    border-color: #77883e;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='#fbf7ec' d='M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 11.94l6.72-6.72a.75.75 0 011.06 0z'/%3E%3C/svg%3E");
+    background: var(--rooted-primary);
+    border-color: var(--rooted-primary);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='var(--rooted-neutral)' d='M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 11.94l6.72-6.72a.75.75 0 011.06 0z'/%3E%3C/svg%3E");
     background-size: 100% 100%;
     background-position: center;
     background-repeat: no-repeat;
@@ -407,12 +423,12 @@
     width: 18px;
     height: 18px;
     cursor: pointer;
-    accent-color: #77883e;
+    accent-color: var(--rooted-primary);
     flex-shrink: 0;
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
-    background: #fbf7ec;
+    background: var(--rooted-neutral);
     border: 2px solid #d1d5db;
     border-radius: 4px;
     outline: none;
@@ -420,13 +436,13 @@
 }
 
 .notification-channel-toggle input[type="checkbox"]:hover {
-    border-color: #77883e;
+    border-color: var(--rooted-primary);
 }
 
 .notification-channel-toggle input[type="checkbox"]:checked {
-    background: #77883e;
-    border-color: #77883e;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='#fbf7ec' d='M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 11.94l6.72-6.72a.75.75 0 011.06 0z'/%3E%3C/svg%3E");
+    background: var(--rooted-primary);
+    border-color: var(--rooted-primary);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='var(--rooted-neutral)' d='M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 11.94l6.72-6.72a.75.75 0 011.06 0z'/%3E%3C/svg%3E");
     background-size: 100% 100%;
     background-position: center;
     background-repeat: no-repeat;
@@ -461,7 +477,7 @@
 }
 
 .status-badge.inactive {
-    background: #fbf7ec;
+    background: var(--rooted-neutral);
     color: #991b1b;
 }
 
@@ -492,8 +508,8 @@
 .btn-edit-setting,
 .btn-setting-action,
 .btn-primary {
-    background: #77883e;
-    color: #fbf7ec;
+    background: var(--rooted-primary);
+    color: var(--rooted-neutral);
 }
 
 .btn-accent:hover,
@@ -501,7 +517,7 @@
 .btn-setting-action:hover,
 .btn-primary:hover,
 .card-header .btn-edit-setting:hover {
-    background: #5f7030;
+    background: var(--rooted-primary-dark);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(92, 154, 114, 0.25);
 }
@@ -516,37 +532,28 @@
 
 /* Explicit styling for button in cards */
 .card-content .btn-setting-action {
-    background: #77883e;
-    color: #fbf7ec !important;
-    display: inline-block !important;
-    visibility: visible !important;
+    background: var(--rooted-primary);
+    color: var(--rooted-neutral);
+    display: inline-block;
+    visibility: visible;
 }
 
+/* Button styling handled by base .btn-accent class */
 #change-password-btn {
-    background: #77883e !important;
-    color: #fbf7ec !important;
-    padding: 0.75rem 1.5rem !important;
-    border: none !important;
-    border-radius: 8px !important;
-    font-weight: 600 !important;
-    font-size: 0.9rem !important;
-    cursor: pointer !important;
-    display: inline-block !important;
-    margin-top: 0.5rem !important;
-    visibility: visible !important;
-    opacity: 1 !important;
+    visibility: visible;
+    opacity: 1;
 }
 
 .btn-secondary {
     background: transparent;
-    color: var(--primary);
-    border: 2px solid var(--primary);
+    color: var(--rooted-primary);
+    border: 2px solid var(--rooted-primary);
 }
 
 .btn-secondary:hover {
     background: rgba(92, 154, 114, 0.05);
-    border-color: #5f7030;
-    color: #5f7030;
+    border-color: var(--rooted-primary-dark);
+    color: var(--rooted-primary-dark);
 }
 
 .btn-secondary:active {
@@ -554,18 +561,20 @@
 }
 
 .btn-danger-secondary {
-    background: #fecaca;
-    color: #991b1b;
-    border: 1px solid #fca5a5;
+    background: var(--rooted-danger);
+    color: var(--rooted-neutral);
+    border: 1px solid var(--rooted-danger);
+    opacity: 0.7;
 }
 
 .btn-danger-secondary:hover {
-    background: #fca5a5;
+    background: var(--rooted-danger);
+    opacity: 1;
 }
 
 .btn-danger {
-    background: #dc2626;
-    color: #fbf7ec;
+    background: var(--rooted-danger);
+    color: var(--rooted-neutral);
 }
 
 .btn-danger:hover {
@@ -648,12 +657,12 @@
 }
 
 .support-info {
-    background: #fbf7ec;
+    background: var(--rooted-neutral);
     padding: 1rem;
     border-radius: 8px;
     margin-top: 1rem;
     font-size: 0.9rem;
-    color: #2e2b28;
+    color: var(--rooted-dark);
 }
 
 .support-info p {
@@ -718,7 +727,7 @@
 
 .settings-modal .modal-content {
     position: relative;
-    background: #fbf7ec;
+    background: var(--rooted-neutral);
     border-radius: 12px;
     max-width: 500px;
     width: 90%;
@@ -757,7 +766,7 @@
 }
 
 .settings-modal .modal-close-btn:hover {
-    color: #2e2b28;
+    color: var(--rooted-dark);
 }
 
 .modal-form {
@@ -793,7 +802,7 @@
 
 .form-input:focus {
     outline: none;
-    border-color: #77883e;
+    border-color: var(--rooted-primary);
     box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.1);
 }
 
@@ -822,20 +831,11 @@
     border-top: 1px solid #e5e7eb;
 }
 
-.settings-modal .modal-footer button {
-    padding: 0.65rem 1.25rem;
-    border-radius: 6px;
-    font-weight: 600;
-    transition: all 0.2s ease;
-    border: none;
-    cursor: pointer;
-    font-size: 0.95rem;
-}
-
+/* Modal buttons inherit base button styles, only override context-specific properties */
 .settings-modal .modal-footer .btn-secondary {
     background: transparent;
     border: 1px solid #d1d5db;
-    color: #2e2b28;
+    color: var(--rooted-dark);
 }
 
 .settings-modal .modal-footer .btn-secondary:hover {
@@ -844,12 +844,12 @@
 }
 
 .settings-modal .modal-footer .btn-accent {
-    background: #77883e;
-    color: #fbf7ec;
+    background: var(--rooted-primary);
+    color: var(--rooted-neutral);
 }
 
 .settings-modal .modal-footer .btn-accent:hover {
-    background: #5f7030;
+    background: var(--rooted-primary-dark);
 }
 
 /* ========================================== */
@@ -882,7 +882,7 @@
     .settings-nav-link {
         padding: 0.5rem 1rem;
         font-size: 0.85rem;
-        #fbf7ec-space: nowrap;
+        white-space: nowrap;
     }
 
     .settings-content {
@@ -993,7 +993,7 @@
 }
 
 .password-reset-modal {
-    background: #fbf7ec;
+    background: var(--rooted-neutral);
     border-radius: 12px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
     max-width: 500px;
@@ -1046,7 +1046,7 @@
 }
 
 .modal-close-btn:hover {
-    background: #fbf7ec;
+    background: var(--rooted-neutral);
     color: var(--dark-text);
 }
 
@@ -1115,14 +1115,14 @@
 .password-strength {
     margin-top: 0.5rem;
     padding: 0.75rem;
-    background: #fbf7ec;
+    background: var(--rooted-neutral);
     border-radius: 6px;
     font-size: 0.85rem;
     color: #666;
 }
 
 .password-requirements {
-    background: #fbf7ec;
+    background: var(--rooted-neutral);
     border: 1px solid #e5e7eb;
     border-radius: 8px;
     padding: 1rem;
@@ -1174,76 +1174,31 @@
     gap: 1rem;
     padding: 1.5rem 2rem;
     border-top: 1px solid #e5e7eb;
-    background: #fbf7ec;
+    background: var(--rooted-neutral);
 }
 
+/* Modal footer buttons - inherit base btn-* classes */
 .modal-footer .btn-secondary,
 .modal-footer .btn-accent {
     flex: 1;
     margin: 0;
 }
 
-.modal-footer .btn-secondary {
-    background: #fbf7ec !important;
-    color: var(--dark-text) !important;
-    border: 1px solid #e5e7eb !important;
-}
-
-.modal-footer .btn-secondary:hover {
-    background: #e5e7eb !important;
-}
-
-.modal-footer .btn-accent {
-    background: #77883e !important;
-    color: #fbf7ec !important;
-}
-
-.modal-footer .btn-accent:hover {
-    background: #5f7030 !important;
-    box-shadow: 0 4px 12px rgba(92, 154, 114, 0.25) !important;
-}
-
 #submit-password-btn {
-    background: #77883e !important;
-    color: #fbf7ec !important;
-    padding: 0.75rem 1.5rem !important;
-    border: none !important;
-    border-radius: 8px !important;
-    font-weight: 600 !important;
-    font-size: 0.9rem !important;
-    cursor: pointer !important;
-    display: inline-block !important;
-    flex: 1 !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-}
-
-#submit-password-btn:hover {
-    background: #5f7030 !important;
+    flex: 1;
+    visibility: visible;
+    opacity: 1;
 }
 
 #submit-password-btn:disabled {
-    background: #a0b5a0 !important;
-    cursor: not-allowed !important;
+    background: #a0b5a0;
+    cursor: not-allowed;
 }
 
 #cancel-password-btn {
-    background: #fbf7ec !important;
-    color: var(--dark-text) !important;
-    border: 1px solid #e5e7eb !important;
-    padding: 0.75rem 1.5rem !important;
-    border-radius: 8px !important;
-    font-weight: 600 !important;
-    font-size: 0.9rem !important;
-    cursor: pointer !important;
-    display: inline-block !important;
-    flex: 1 !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-}
-
-#cancel-password-btn:hover {
-    background: #e5e7eb !important;
+    flex: 1;
+    visibility: visible;
+    opacity: 1;
 }
 
 @media (max-width: 640px) {
@@ -1272,12 +1227,122 @@
 }
 
 /* ========================================== */
-/* 11. MEMBERSHIP CARD STYLES */
+/* 11. INLINE FORM STATES */
+/* ========================================== */
+
+.inline-edit-form {
+    display: none;
+}
+
+.inline-edit-form.visible {
+    display: block;
+}
+
+/* ========================================== */
+/* 12. FORM UTILITIES */
+/* ========================================== */
+
+.modal-footer {
+    margin-top: 1.5rem;
+}
+
+.hidden {
+    display: none;
+}
+
+.visible {
+    display: block;
+}
+
+.visible-flex {
+    display: flex;
+}
+
+.visible-inline {
+    display: inline-block;
+}
+
+/* ========================================== */
+/* 13. 2FA SETUP FORM */
+/* ========================================== */
+
+#qr-code-container {
+    text-align: center;
+    padding: 1.5rem;
+    background: var(--rooted-neutral);
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+#qr-code-container p {
+    color: #999;
+    margin: 0;
+}
+
+#manual-entry-code {
+    background: var(--rooted-neutral);
+    padding: 1rem;
+    border-radius: 8px;
+    word-break: break-all;
+    font-family: monospace;
+    font-size: 0.9rem;
+    margin: 0.5rem 0;
+}
+
+#2fa-verify-code {
+    font-size: 1.5rem;
+    text-align: center;
+    letter-spacing: 0.5rem;
+}
+
+#backup-codes-display {
+    font-family: monospace;
+    line-height: 1.8;
+    font-size: 0.9rem;
+}
+
+.backup-codes-container {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+#copy-backup-codes-btn {
+    margin-top: 0.5rem;
+    width: 100%;
+}
+
+#2fa-enabled-view {
+    display: none;
+}
+
+#2fa-enabled-view.visible {
+    display: block;
+}
+
+#2fa-enabled-view .setting-description {
+    color: var(--rooted-primary);
+    font-weight: 600;
+}
+
+/* Hidden button visibility states */
+.hidden-btn {
+    display: none;
+}
+
+.hidden-btn.visible {
+    display: inline-block;
+}
+
+/* ========================================== */
+/* 14. MEMBERSHIP CARD STYLES */
 /* ========================================== */
 
 .membership-status-card {
     padding: 1.5rem;
-    background: linear-gradient(135deg, #fbf7ec 0%, #f5f1e8 100%);
+    background: linear-gradient(135deg, var(--rooted-neutral) 0%, #f5f1e8 100%);
     border: 1px solid #e0d4b8;
     border-radius: 8px;
 }
@@ -1367,7 +1432,7 @@
     margin: 0;
     padding: 1rem;
     background: #fffbf3;
-    border-left: 3px solid #77883e;
+    border-left: 3px solid var(--rooted-primary);
     border-radius: 4px;
     line-height: 1.5;
 }
@@ -1393,60 +1458,338 @@
     }
 }
 
+/* ========================================== */
+/* 11. UTILITY CLASSES FOR JS-GENERATED HTML */
+/* ========================================== */
 
+/* Opacity utilities */
+.opacity-faded {
+    opacity: 0.7;
+}
 
+.opacity-full {
+    opacity: 1;
+}
 
+/* Center alignment */
+.text-center {
+    text-align: center;
+}
 
+.center-content {
+    text-align: center;
+    padding: 20px 0;
+}
 
+/* Font sizes for modal content */
+.modal-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
 
+.modal-title {
+    font-size: 16px;
+    color: var(--rooted-dark);
+    margin-bottom: 12px;
+    font-weight: 500;
+}
 
+.modal-description {
+    font-size: 14px;
+    color: #888;
+    line-height: 1.6;
+}
 
+.modal-helper-text {
+    font-size: 13px;
+    color: #aaa;
+    margin-top: 16px;
+}
 
+/* Full width button */
+.btn-full-width {
+    width: 100%;
+}
 
+/* QR code styling */
+.qr-code-image {
+    max-width: 250px;
+}
 
+/* Link with primary color */
+.link-primary {
+    color: var(--primary);
+    font-weight: 600;
+}
 
+/* ========================================== */
+/* 10. CRM INTEGRATIONS SECTION */
+/* ========================================== */
 
+.crm-providers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
 
+.crm-provider-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-light);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
 
+.crm-provider-card:hover {
+    border-color: var(--primary);
+    background: #f8faf3;
+    box-shadow: 0 2px 8px rgba(119, 136, 62, 0.1);
+}
 
+.crm-provider-card.connected {
+    border-color: var(--success);
+    background: #f0fef1;
+}
 
+.crm-provider-icon {
+    font-size: 32px;
+    margin-bottom: 0.5rem;
+}
 
+.crm-provider-name {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: var(--text-primary);
+}
 
+.crm-provider-status {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+}
 
+.crm-provider-card.connected .crm-provider-status {
+    color: var(--success);
+    font-weight: 600;
+}
 
+.crm-connection-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-light);
+    border-radius: 6px;
+    margin-bottom: 0.75rem;
+}
 
+.crm-connection-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
 
+.crm-connection-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
 
+.crm-connection-name {
+    font-weight: 600;
+    color: var(--text-primary);
+}
 
+.crm-connection-details {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
 
+.crm-connection-actions {
+    display: flex;
+    gap: 0.5rem;
+}
 
+.btn-crm-action {
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
 
+.btn-crm-sync {
+    background: var(--primary);
+    color: white;
+}
 
+.btn-crm-sync:hover {
+    background: #6a7834;
+}
 
+.btn-crm-settings {
+    background: var(--bg);
+    color: var(--primary);
+    border: 1px solid var(--primary);
+}
 
+.btn-crm-settings:hover {
+    background: var(--bg-light);
+}
 
+.btn-crm-disconnect {
+    background: #ffe5e5;
+    color: #d32f2f;
+}
 
+.btn-crm-disconnect:hover {
+    background: #ffcccc;
+}
 
+.crm-loading {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--text-secondary);
+}
 
+.crm-empty-state {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--text-secondary);
+}
 
+.crm-empty-state-icon {
+    font-size: 48px;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
 
+.crm-sync-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+}
 
+.crm-sync-status.idle {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
 
+.crm-sync-status.syncing {
+    background: #fff3e0;
+    color: #f57c00;
+}
 
+.crm-sync-status.error {
+    background: #ffebee;
+    color: #c62828;
+}
 
+/* ========================================== */
+/* CRM MODAL STYLES */
+/* ========================================== */
 
+.crm-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+}
 
+.crm-modal.active {
+    display: flex;
+}
 
+.crm-modal-content {
+    background: white;
+    border-radius: 12px;
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
 
+.crm-modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
+.crm-modal-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
 
+.crm-modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
+.crm-modal-close:hover {
+    color: var(--text-primary);
+}
 
+.crm-modal-body {
+    padding: 1.5rem;
+}
 
+.crm-modal-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
 
+/* ========================================== */
+/* RESPONSIVE */
+/* ========================================== */
 
+@media (max-width: 768px) {
+    .crm-providers-grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    }
 
+    .crm-connection-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
 
-
-
-
+    .crm-connection-actions {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+}

@@ -77,7 +77,7 @@ Each match card displays:
 **Option A: Connect immediately**
 - Creates project in `projects` table (active status)
 - Creates match in `matches` table (pending status)
-- Redirects to my-matches page
+- Redirects to inbox page
 - User immediately in normal matching workflow
 
 **Option B: Save for later**
@@ -135,7 +135,7 @@ Symptoms input analyzed against 8 categories with keywords:
 ## Files Created/Modified
 
 ### Created:
-- `rooted-vitality/scripts/guidedOnboarding.js` (1,000+ lines)
+- `rooted-vitality/public/scripts/guidedOnboarding.js` (1,000+ lines)
   - Main orchestration script
   - All modal HTML generation
   - CSS injection
@@ -226,7 +226,7 @@ New user clicks "Get Started on Your Wellness Journey"
         │ - Show top 3 matched practitioners      │
         │ - Option 1: Connect now                 │
         │   [Create project + match → go to       │
-        │    my-matches]                          │
+        │    inbox]                              │
         │ - Option 2: Save for later              │
         │   [Create project (pending) →           │
         │    go to dashboard]                     │

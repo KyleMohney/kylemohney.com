@@ -1,24 +1,22 @@
-/*
+﻿/*
 ╔════════════════════════════════════════════════════════════════════╗
 ║  ROOTED VITALITY, INC.                                             ║
-║  File: scripts/authModal.js                                        ║
-║  Purpose: Login/Registration Modal UI & Form Handling              ║
+║  File: authModal.js                                                ║
+║  Purpose: Pure UI layer for auth modal (login/signup)              ║
 ║  Holistic Wellness · Modern Connection Platform                    ║
 ║  rootedvitality.com | 2025                                         ║
 ╚════════════════════════════════════════════════════════════════════╝
 
-TABLE OF CONTENTS
-  1. MODAL INITIALIZATION
-  2. OPEN / CLOSE FUNCTIONS
-  3. FORM EVENT HANDLERS
-  4. TAB SWITCHING
-  5. UTILITY FUNCTIONS
+ TABLE OF CONTENTS
+   1. MODAL INITIALIZATION (LAZY - ON DEMAND ONLY)
+   2. OPEN / CLOSE FUNCTIONS
+   3. FORM EVENT HANDLERS
+   4. TAB SWITCHING
+   5. UTILITY FUNCTIONS
 
-PURPOSE: Pure UI layer for auth modal. All business logic delegated to authManager.js.
-No login/logout logic here — only DOM manipulation and user input collection.
+ PURPOSE: Pure UI layer for auth modal. All business logic delegated to authManager.js.
+ No login/logout logic here - only DOM manipulation and user input collection.
 */
-
-console.log('[Rooted Vitality] authModal.js loading...');
 
 // ======================================================
 // 1. MODAL INITIALIZATION (LAZY - ON DEMAND ONLY)
@@ -32,11 +30,9 @@ let modalInitialized = false;
  */
 window.initAuthModal = () => {
     if (modalInitialized) {
-        console.log('[Rooted Vitality] Auth modal already initialized');
         return;
     }
-
-    console.log('[Rooted Vitality] Initializing auth modal...');
+    modalInitialized = true;
     
     // Detect if we're in a subdirectory
     const currentPath = window.location.pathname;
@@ -62,7 +58,7 @@ window.initAuthModal = () => {
                 <button type="submit" class="rv-auth-submit">Sign In</button>
             </form>
             <div class="rv-auth-footer">
-                <p id="rvToggleLogin">Don't have an account? <a href="${pathPrefix}dashboard/signup.html" id="rvRegisterLink">Sign up</a></p>
+                <p id="rvToggleLogin">Don't have an account? <a href="${pathPrefix}dashboard/client/pages/client-signup.html" id="rvRegisterLink">Sign up</a></p>
             </div>
         </div>
     </div>
@@ -87,7 +83,6 @@ window.initAuthModal = () => {
      * Close login modal
      */
     window.closeLoginModal = () => {
-        console.log('[Rooted Vitality] Closing login modal');
         const overlay = document.getElementById('rvAuthOverlay');
         if (!overlay) return;
         
@@ -127,7 +122,7 @@ window.initAuthModal = () => {
     // Redirect to signup page
     registerLink.addEventListener('click', (e) => {
         e.preventDefault();
-        const signupPath = isSubdirectory ? '../dashboard/signup.html' : './dashboard/signup.html';
+        const signupPath = isSubdirectory ? '../dashboard/client/pages/client-signup.html' : './dashboard/client/pages/client-signup.html';
         window.location.href = signupPath;
     });
 
@@ -140,7 +135,6 @@ window.initAuthModal = () => {
             return;
         }
 
-        console.log('[Rooted Vitality] Password reset requested for:', email);
         if (typeof authManager !== 'undefined' && authManager.resetPassword) {
             authManager.resetPassword(email);
         } else {
@@ -148,14 +142,13 @@ window.initAuthModal = () => {
         }
     });
 
-    // Form submission — delegates to authManager
+    // Form submission â€” delegates to authManager
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const mode = form.dataset.mode || 'login';
         const email = document.getElementById('rvAuthEmail').value.trim();
         const password = document.getElementById('rvAuthPassword').value.trim();
 
-        console.log('[Rooted Vitality] Form submitted - mode:', mode);
 
         if (typeof authManager === 'undefined') {
             alert('Authentication system not ready. Please refresh the page.');
@@ -183,7 +176,6 @@ window.initAuthModal = () => {
     });
 
     modalInitialized = true;
-    console.log('[Rooted Vitality] Auth modal initialized successfully');
 };
 
 /**
@@ -191,7 +183,6 @@ window.initAuthModal = () => {
  * @param {string} role - 'client' or 'practitioner'
  */
 window.openLoginModal = (role = 'client') => {
-    console.log('[Rooted Vitality] openLoginModal called for role:', role);
     
     // Initialize modal if not already done
     if (!modalInitialized) {
@@ -204,7 +195,6 @@ window.openLoginModal = (role = 'client') => {
         return;
     }
     
-    console.log('[Rooted Vitality] Opening modal...');
     overlay.classList.add('active');
     overlay.removeAttribute('inert');
     overlay.setAttribute('aria-hidden', 'false');
@@ -222,7 +212,6 @@ window.openLoginModal = (role = 'client') => {
     if (rememberMe && savedEmail) {
         document.getElementById('rvAuthEmail').value = savedEmail;
         document.getElementById('rvRememberMe').checked = true;
-        console.log('[Rooted Vitality] Credentials prefilled from localStorage');
     } else {
         document.getElementById('rvAuthEmail').value = '';
         document.getElementById('rvRememberMe').checked = false;
@@ -235,61 +224,4 @@ window.openLoginModal = (role = 'client') => {
 };
 
 // DO NOT auto-initialize - modal should only be created when login button is clicked
-
-console.log('[Rooted Vitality] authModal.js loaded');
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

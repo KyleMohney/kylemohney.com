@@ -1,3 +1,22 @@
+<!--
+  ========================================== 
+  FILE: header_public.html
+  PROJECT: Rooted Vitality Platform
+  PURPOSE: Public (Not Logged-in) Navigation Header Component
+  BRANDING: Official Rooted Vitality Colors & Styling
+  ========================================== 
+
+  TABLE OF CONTENTS:
+  1. Header Container & Logo
+  2. Public Navigation Links (Sign Up / Log In)
+  3. Mobile Menu Toggle
+
+  ========================================== 
+-->
+
+<!-- ========================================== -->
+<!-- 1. HEADER CONTAINER & LOGO               -->
+<!-- ========================================== -->
 <header id="rvHeader" class="rv-header rv-header-public">
   <div class="rv-header-inner container-wide">
     <a href="/rooted-vitality/index.html" class="rv-logo rv-logo-public" aria-label="Rooted Vitality Home">
@@ -7,10 +26,18 @@
         <span class="rv-brand-name">Vitality</span>
       </span>
     </a>
+    
+    <!-- ========================================== -->
+    <!-- 2. PUBLIC NAVIGATION LINKS                -->
+    <!-- ========================================== -->
     <nav class="rv-nav" aria-label="Primary Navigation">
-      <a href="/rooted-vitality/dashboard/signup.html" class="rv-nav-link rv-btn-accent">Sign Up</a>
-      <button class="rv-nav-link rv-nav-login" onclick="window.openLoginModal('client')">Log In</button>
+      <a href="/rooted-vitality/dashboard/client/pages/client-signup.html" class="rv-nav-link rv-btn-accent">Sign Up</a>
+      <button class="rv-nav-link rv-nav-login" id="loginBtn">Log In</button>
     </nav>
+    
+    <!-- ========================================== -->
+    <!-- 3. MOBILE MENU TOGGLE                    -->
+    <!-- ========================================== -->
     <button class="rv-menu-toggle" aria-label="Toggle Menu" aria-expanded="false">☰</button>
   </div>
 </header>

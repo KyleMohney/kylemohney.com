@@ -60,7 +60,7 @@ A complete client notification system that alerts clients when practitioners acc
 
 **Changes:**
 - Added script include: `<script src="../../../scripts/notificationManager.js"></script>` (line 299)
-- Loaded before my-matches.js so notifications are available
+- Loaded before my-wellness.js (wellness script) so notifications are available
 - Enables notification badge updates on client pages
 
 ## Database Integration
@@ -228,7 +228,7 @@ rooted-vitality/
 │   │   └── index.html (pro accept/decline handlers)
 │   └── client/
 │       └── pages/
-│           └── my-matches.html (script include)
+│           └── inbox.html (script include: dashboard/client/scripts/my-wellness.js)
 ```
 
 ## Configuration

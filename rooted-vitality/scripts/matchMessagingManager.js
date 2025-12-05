@@ -1,12 +1,28 @@
-/*
+﻿/*
 ╔════════════════════════════════════════════════════════════════════╗
 ║  ROOTED VITALITY, INC.                                             ║
-║  File: scripts/matchMessagingManager.js                            ║
-║  Purpose: Project-specific messaging between client and pro        ║
+║  File: matchMessagingManager.js                                    ║
+║  Purpose: Real-time messaging between matched clients/practitioners ║
 ║  Holistic Wellness · Modern Connection Platform                    ║
 ║  rootedvitality.com | 2025                                         ║
 ╚════════════════════════════════════════════════════════════════════╝
+
+ TABLE OF CONTENTS
+   1. INITIALIZATION & VARIABLES
+   2. MESSAGE LOADING & REAL-TIME SUBSCRIPTIONS
+   3. MESSAGE SENDING & HANDLING
+   4. EVENT LISTENERS & UI UPDATE
+   5. POLLING & CLEANUP
 */
+
+// ======================================================
+// 1. INITIALIZATION & VARIABLES
+// ======================================================
+
+// Import shared utilities
+const utilsScript = document.createElement('script');
+utilsScript.src = '/rooted-vitality/scripts/utilities.js';
+document.head.appendChild(utilsScript);
 
 let supabaseClient;
 let currentUser;
@@ -77,7 +93,7 @@ async function initializeProjectMessaging(projectData, practitionerData, matchDa
     selectedMatchStatus = matchData?.status;  // Use status column
     selectedMatchResponse = matchData?.practitioner_response;  // Track practitioner response
 
-    console.log('[Messaging] Initialized for project:', projectSerial, '(', projectId, ') practitioner:', practitionerSerial, '(', practitionerId, ') status:', selectedMatchStatus, 'response:', selectedMatchResponse);
+    
 
     // Load and display existing messages
     await loadMessages();
@@ -129,14 +145,14 @@ function setupRealtimeSubscription(projectId, practitionerId) {
         filter: `project_id=eq.${projectId}`
       },
       (payload) => {
-        console.log('[Messaging] Real-time message received:', payload);
+
         // Reload messages when a new message is inserted
         loadMessages();
       }
     )
     .subscribe((status) => {
       if (status === 'SUBSCRIBED') {
-        console.log('[Messaging] Real-time subscription active for project:', projectId);
+
       } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
         console.warn('[Messaging] Real-time subscription error, will rely on polling');
       }
@@ -148,20 +164,20 @@ function setupRealtimeSubscription(projectId, practitionerId) {
  */
 async function loadMessages() {
   if (!selectedProjectUUID || !selectedPractitionerUUID) {
-    console.log('[Messaging] loadMessages skipped - missing UUIDs:', { selectedProjectUUID, selectedPractitionerUUID });
+
     return;
   }
 
   // Prevent concurrent loads (debounce)
   if (isLoadingMessages) {
-    console.log('[Messaging] loadMessages already in progress - skipping duplicate call');
+
     return;
   }
 
   isLoadingMessages = true;
 
   try {
-    console.log('[Messaging] Loading messages for project UUID:', selectedProjectUUID, 'practitioner UUID:', selectedPractitionerUUID);
+
     const { data, error } = await supabaseClient
       .from('project_messages')
       .select('*')
@@ -177,7 +193,6 @@ async function loadMessages() {
       return;
     }
 
-    console.log('[Messaging] Loaded', data?.length || 0, 'messages');
     displayMessages(data || []);
 
   } catch (error) {
@@ -205,32 +220,35 @@ async function displayMessages(messages) {
     // Only update if we haven't already shown messages
     if (loadedMessageIds.size === 0) {
       let emptyMessageHTML = '<p>No messages yet. Start the conversation!</p>';
+      let backgroundColor = '#f5f7f0';
+      let textColor = '#2e2b28';
+      let headingColor = '#77883e';
       
       if (selectedMatchStatus === 'pending' && !selectedMatchResponse) {
         emptyMessageHTML = `
-          <div style="padding: 2rem; text-align: center; color: #666; line-height: 1.6;">
-            <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem; color: #4a90e2;">Awaiting Practitioner Response</p>
-            <p style="margin: 0.5rem 0;">You've sent a connection request with an automatic introduction message.</p>
-            <p style="margin: 0.5rem 0;">Once they accept, you'll be able to message them here.</p>
-          </div>
+          <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem; color: #77883e;">Awaiting Practitioner Response</p>
+          <p style="margin: 0.5rem 0;">You've sent a connection request with an automatic introduction message.</p>
+          <p style="margin: 0.5rem 0;">Once they accept, you'll be able to message them here.</p>
         `;
+        backgroundColor = '#f5f7f0';
+        textColor = '#2e2b28';
       } else if (selectedMatchResponse === 'declined') {
         emptyMessageHTML = `
-          <div style="padding: 2rem; text-align: center; color: #999; line-height: 1.6;">
-            <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem;">Connection Declined</p>
-            <p style="margin: 0.5rem 0;">This practitioner has declined your request.</p>
-          </div>
+          <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem; color: #999;">Connection Declined</p>
+          <p style="margin: 0.5rem 0;">This practitioner has declined your request.</p>
         `;
+        backgroundColor = '#f5f7f0';
+        textColor = '#666';
       } else if (selectedMatchResponse === 'accepted' && selectedMatchStatus === 'in-progress') {
         emptyMessageHTML = `
-          <div style="padding: 2rem; text-align: center; color: #666; line-height: 1.6;">
-            <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem; color: #52a35e;">Connection Active</p>
-            <p style="margin: 0.5rem 0;">Start your conversation with this practitioner here.</p>
-          </div>
+          <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem; color: #77883e;">Connection Active</p>
+          <p style="margin: 0.5rem 0;">Start your conversation with this practitioner here.</p>
         `;
+        backgroundColor = '#f5f7f0';
+        textColor = '#2e2b28';
       }
       
-      messageThread.innerHTML = `<div class="message-empty" style="display: flex; align-items: center; justify-content: center; height: 100%; min-height: 300px; background-color: #fafafa; border-radius: 8px;">${emptyMessageHTML}</div>`;
+      messageThread.innerHTML = `<div class="message-empty" style="display: flex; align-items: center; justify-content: center; height: 100%; min-height: 300px; background-color: ${backgroundColor}; border-radius: 8px; padding: 2rem; text-align: center; color: ${textColor}; line-height: 1.6;">${emptyMessageHTML}</div>`;
     }
     return;
   }
@@ -241,13 +259,13 @@ async function displayMessages(messages) {
   // If all messages have already been loaded, don't re-render
   if (currentMessageIds.size === loadedMessageIds.size && 
       [...currentMessageIds].every(id => loadedMessageIds.has(id))) {
-    console.log('[Messaging] No new messages - skipping re-render');
+
     return;
   }
 
   // If this is the first load, render all messages
   if (loadedMessageIds.size === 0) {
-    console.log('[Messaging] First load - rendering all messages');
+
     renderUnifiedMessages(
       messages,
       'message-thread',
@@ -269,11 +287,10 @@ async function displayMessages(messages) {
   const newMessages = messages.filter(msg => !loadedMessageIds.has(msg.id));
   
   if (newMessages.length === 0) {
-    console.log('[Messaging] No new messages to display');
+
     return;
   }
 
-  console.log('[Messaging] Found', newMessages.length, 'new messages - re-rendering');
   
   // Re-render with all messages when new ones arrive
   renderUnifiedMessages(
@@ -394,16 +411,6 @@ async function sendMessage() {
       selectedProjectUUID = projectData.id;
     }
 
-    console.log('[Messaging] Sending message as:', senderType, 'with data:', {
-      project_id: selectedProjectUUID,
-      practitioner_id: selectedPractitionerUUID,
-      client_id: clientId,
-      sender_id: senderId,
-      sender_type: senderType,
-      project_serial: selectedProjectId,
-      practitioner_serial: selectedPractitionerId,
-      client_serial: clientSerialId
-    });
 
     // Insert message with all required UUID fields
     const { error: insertError } = await supabaseClient
@@ -428,7 +435,6 @@ async function sendMessage() {
       return;
     }
 
-    console.log('[Messaging] Message sent successfully');
 
     // Update match's contacted_at timestamp on first message
     const { error: matchUpdateError } = await supabaseClient
@@ -477,7 +483,7 @@ async function markMessagesAsRead() {
     if (error) {
       console.error('[Messaging] Error marking as read:', error);
     } else {
-      console.log('[Messaging] Marked practitioner messages as read');
+
       
       // Update local project_messages data for the selected match
       if (window.allMatches) {
@@ -492,7 +498,7 @@ async function markMessagesAsRead() {
           
           // Re-apply tab filter to move match to appropriate tab
           if (window.applyTabFilter) {
-            console.log('[Messaging] Re-applying tab filter after marking messages as read');
+
             window.applyTabFilter(window.currentTab || 'messages');
           }
         }
@@ -506,32 +512,9 @@ async function markMessagesAsRead() {
 /**
  * Format timestamp for display
  */
-function formatTime(timestamp) {
-  if (!timestamp) return '';
-  const date = new Date(timestamp);
-  const now = new Date();
-  const sameDay = date.toDateString() === now.toDateString();
-
-  if (sameDay) {
-    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-  } else {
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  }
-}
-
 /**
- * Escape HTML to prevent XSS
+ * Utilities: formatTime() and escapeHtml() are imported from utilities.js
  */
-function escapeHtml(text) {
-  const map = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#039;'
-  };
-  return text.replace(/[&<>"']/g, m => map[m]);
-}
 
 /**
  * Close messaging thread
@@ -543,7 +526,7 @@ function closeMessageThread() {
   if (messageRealtimeSubscription && supabaseClient) {
     supabaseClient.removeChannel(messageRealtimeSubscription);
     messageRealtimeSubscription = null;
-    console.log('[Messaging] Real-time subscription closed');
+
   }
   
   selectedProjectId = null;
@@ -568,7 +551,7 @@ window.declineOpportunityMessage = declineOpportunityMessage;
  */
 async function acceptOpportunityMessage(opportunityId, projectId, practitionerId) {
   try {
-    console.log('[Messaging] Accepting opportunity message:', { opportunityId, projectId, practitionerId });
+
 
     if (!supabaseClient) {
       supabaseClient = window.supabaseClient;
@@ -594,7 +577,7 @@ async function acceptOpportunityMessage(opportunityId, projectId, practitionerId
         project_serial: opp.project_serial,
         practitioner_serial: opp.practitioner_serial,
         client_serial: opp.client_serial,
-        status: 'in-progress',  // ✅ Automatically set to in-progress
+        status: 'in-progress',  // âœ… Automatically set to in-progress
         match_score: 85, // Default score for opportunity matches
         client_initiated: false,
         contacted_at: new Date().toISOString(),
@@ -618,7 +601,21 @@ async function acceptOpportunityMessage(opportunityId, projectId, practitionerId
 
     if (oppUpdateError) throw oppUpdateError;
 
-    console.log('[Messaging] Opportunity accepted and converted to match:', newMatch.id);
+    // Notify practitioner of new match from opportunity acceptance
+    if (window.notifyPractitionerOfNewMatch && typeof window.notifyPractitionerOfNewMatch === 'function') {
+      try {
+        const projectName = opp.project_category || 'wellness project';
+        const clientName = opp.client_name || 'A client';
+        await window.notifyPractitionerOfNewMatch({
+          practitionerSerial: opp.practitioner_serial,
+          clientName: clientName,
+          projectName: projectName,
+          matchScore: 85
+        });
+      } catch (notifyError) {
+        console.warn('[Messaging] Non-blocking error notifying practitioner:', notifyError);
+      }
+    }
     
     // Reload the matches to show the new status
     if (window.loadMatches) {
@@ -645,7 +642,7 @@ async function acceptOpportunityMessage(opportunityId, projectId, practitionerId
  */
 async function declineOpportunityMessage(opportunityId) {
   try {
-    console.log('[Messaging] Declining opportunity message:', opportunityId);
+
 
     if (!supabaseClient) {
       supabaseClient = window.supabaseClient;
@@ -662,7 +659,6 @@ async function declineOpportunityMessage(opportunityId) {
 
     if (oppUpdateError) throw oppUpdateError;
 
-    console.log('[Messaging] Opportunity declined and archived');
 
     // Show notification
     if (window.showNotification) {
@@ -678,6 +674,9 @@ async function declineOpportunityMessage(opportunityId) {
     }
   }
 }
+
+
+
 
 
 

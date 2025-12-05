@@ -1,27 +1,38 @@
-/*
-  =====================================================================
-  ROOTED VITALITY, INC.
-  File: scripts/modalManager.js
-  Purpose: Global Modal Management System - Single Source of Truth
-  Holistic Wellness � Modern Connection Platform
-  rootedvitality.com | 2025
-  =====================================================================
+﻿/*
+╔════════════════════════════════════════════════════════════════════╗
+║  ROOTED VITALITY, INC.                                             ║
+║  File: modalManager.js                                             ║
+║  Purpose: Global Modal Management System - Centralized UI dialogs   ║
+║  Holistic Wellness · Modern Connection Platform                    ║
+║  rootedvitality.com | 2025                                         ║
+╚════════════════════════════════════════════════════════════════════╝
 
-  ARCHITECTURE:
-    - Centralized modal management replacing 233+ inline alert/confirm calls
-    - Brand-aligned styling with cream backgrounds, green accents
-    - Callback-based architecture for async handling
-    - Global window.showAlertModal() and window.showConfirmModal()
-    - Toast notifications for non-blocking messages
-    - Success/Error/Warning modal types with icons
-  
-  USAGE:
-    window.showAlertModal('Your message', () => { console.log('closed'); });
-    window.showConfirmModal('Continue?', () => { // yes }, () => { // no });
-    window.showSuccessModal('Success!');
-    window.showErrorModal('Error: Something failed');
-    window.showToast('Quick message');
+ TABLE OF CONTENTS
+   1. MODAL MANAGER INITIALIZATION
+   2. ALERT & CONFIRM MODALS
+   3. STATUS MODALS (SUCCESS/ERROR/WARNING)
+   4. SPECIAL MODALS (WELCOME, STATUS)
+   5. TOAST NOTIFICATIONS
+   6. UTILITY FUNCTIONS
+
+ ARCHITECTURE:
+   - Centralized modal management replacing 233+ inline alert/confirm calls
+   - Brand-aligned styling with cream backgrounds, green accents
+   - Callback-based architecture for async handling
+   - Global window.showAlertModal() and window.showConfirmModal()
+   - Toast notifications for non-blocking messages
+
+ USAGE:
+   window.showAlertModal('Your message', () => {  });
+   window.showConfirmModal('Continue?', () => { }, () => { });
+   window.showSuccessModal('Success!');
+   window.showErrorModal('Error: Something failed');
+   window.showToast('Quick message');
 */
+
+// ======================================================
+// 1. MODAL MANAGER INITIALIZATION
+// ======================================================
 
 // Prevent duplicate declaration if script loads multiple times
 if (typeof ModalManager !== 'undefined') {
@@ -32,7 +43,7 @@ const ModalManager = {
   activeModals: new Set(),
   
   init() {
-    console.log('[Modal Manager] Initialized - Global modal system ready');
+
     // Ensure functions are available globally
     window.showAlertModal = this.showAlertModal.bind(this);
     window.showConfirmModal = this.showConfirmModal.bind(this);
@@ -42,6 +53,13 @@ const ModalManager = {
     window.showStatusModal = this.showStatusModal.bind(this);
     window.showWelcomeModal = this.showWelcomeModal.bind(this);
     window.showToast = this.showToast.bind(this);
+  },
+
+  /**
+   * Auto-scroll page to top when modal opens
+   */
+  scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   },
 
   /**
@@ -107,6 +125,7 @@ const ModalManager = {
     
     document.body.insertAdjacentHTML('beforeend', modalHTML);
     this.activeModals.add(modalId);
+    this.scrollToTop();
     
     const modalOverlay = document.getElementById(modalId + '-overlay');
     const closeBtn = document.getElementById(modalId + '-btn');
@@ -210,10 +229,11 @@ const ModalManager = {
     
     document.body.insertAdjacentHTML('beforeend', modalHTML);
     this.activeModals.add(modalId);
+    this.scrollToTop();
     
     const modalOverlay = document.getElementById(modalId + '-overlay');
-    const confirmBtn = document.getElementById(modalId + '-confirm');
-    const cancelBtn = document.getElementById(modalId + '-cancel');
+    const confirmBtn = document.getElementById(modalId + '-yes-btn');
+    const cancelBtn = document.getElementById(modalId + '-no-btn');
     
     const closeModal = () => {
       if (modalOverlay) modalOverlay.remove();
@@ -315,6 +335,7 @@ const ModalManager = {
     
     document.body.insertAdjacentHTML('beforeend', modalHTML);
     this.activeModals.add(modalId);
+    this.scrollToTop();
     
     const modalOverlay = document.getElementById(modalId + '-overlay');
     const closeBtn = document.getElementById(modalId + '-btn');
@@ -398,6 +419,7 @@ const ModalManager = {
     
     document.body.insertAdjacentHTML('beforeend', modalHTML);
     this.activeModals.add(modalId);
+    this.scrollToTop();
     
     const modalOverlay = document.getElementById(modalId + '-overlay');
     const closeBtn = document.getElementById(modalId + '-btn');
@@ -481,6 +503,7 @@ const ModalManager = {
     
     document.body.insertAdjacentHTML('beforeend', modalHTML);
     this.activeModals.add(modalId);
+    this.scrollToTop();
     
     const modalOverlay = document.getElementById(modalId + '-overlay');
     const closeBtn = document.getElementById(modalId + '-btn');
@@ -567,28 +590,28 @@ const ModalManager = {
     
     const statusConfig = {
       'hired': {
-        icon: '✓',
+        icon: 'âœ“',
         title: 'Match Hired',
         message: 'Great! You\'ve successfully hired this practitioner.',
         color: '#77883e',
         bgColor: '#e8f0d9'
       },
       'not-hired': {
-        icon: '✗',
+        icon: 'âœ—',
         title: 'Match Not Hired',
         message: 'You\'ve decided not to hire this practitioner.',
         color: '#d64545',
         bgColor: '#fde8e8'
       },
       'in-progress': {
-        icon: '→',
+        icon: 'â†’',
         title: 'In Progress',
         message: 'You\'re now communicating with this practitioner.',
         color: '#77883e',
         bgColor: '#e8f0d9'
       },
       'declined': {
-        icon: '✗',
+        icon: 'âœ—',
         title: 'Match Declined',
         message: 'This match has been declined.',
         color: '#d64545',
@@ -662,6 +685,7 @@ const ModalManager = {
     
     document.body.insertAdjacentHTML('beforeend', modalHTML);
     this.activeModals.add(modalId);
+    this.scrollToTop();
     
     const modalOverlay = document.getElementById(modalId + '-overlay');
     const closeBtn = document.getElementById(modalId + '-btn');
@@ -728,7 +752,7 @@ const ModalManager = {
             font-size: 64px; 
             margin-bottom: 24px;
             animation: bounce 0.6s ease-out;
-          ">🌱</div>
+          ">ðŸŒ±</div>
           <h2 style="
             font-size: 24px; 
             color: #77883e; 
@@ -769,6 +793,7 @@ const ModalManager = {
     
     document.body.insertAdjacentHTML('beforeend', modalHTML);
     this.activeModals.add(modalId);
+    this.scrollToTop();
     
     const modalOverlay = document.getElementById(modalId + '-overlay');
     const closeBtn = document.getElementById(modalId + '-btn');
@@ -864,6 +889,9 @@ if (typeof module !== 'undefined' && module.exports) {
 }
 
 } // End of duplicate prevention guard
+
+
+
 
 
 

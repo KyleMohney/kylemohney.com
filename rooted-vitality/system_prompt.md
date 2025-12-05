@@ -91,15 +91,22 @@ NAMING CONVENTIONS:
 🎨 BRAND & DESIGN SYSTEM
 ═══════════════════════════════════════════════════════════════════
 
-COLOR PALETTE:
+COLOR PALETTE (Updated 2025):
 
---rooted-primary: #5c9a72;   /* Botanical green */
---rooted-accent:  #d4c47c;   /* Herbal gold */
---rooted-green:   #ebf6e8;   /* Light sage */
---rooted-cream:   #fbf7ec;   /* Warm cream */
---rooted-peach:   #fae2ca;   /* Soft peach */
---rooted-dark:    #2e2b28;   /* Earth brown */
---rooted-light:   #ffffff;   /* Clean white */
+PRIMARY COLORS (from official Rooted Vitality logo):
+--rooted-primary:      #77883e;   /* Sage green - primary button/accent color */
+--rooted-accent:       #d4c47c;   /* Herbal gold - secondary accent */
+--rooted-cream:        #f8f5e2;   /* Warm cream - backgrounds */
+--rooted-dark:         #6b5b47;   /* Earth brown - dark text/accents */
+
+SECONDARY ACCENT COLORS (from logo palette):
+--rooted-bright-green: #6b9820;   /* Bright accent green */
+--rooted-olive:        #5c5438;   /* Dark olive - alternative dark */
+--rooted-light:        #ffffff;   /* Clean white - contrast */
+
+LEGACY COLORS (maintained for compatibility):
+--rooted-green:        #ebf6e8;   /* Light sage - backgrounds */
+--rooted-peach:        #fae2ca;   /* Soft peach - if needed */
 
 TYPOGRAPHY:
 

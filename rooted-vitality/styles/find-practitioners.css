@@ -1,15 +1,21 @@
 /* 
 ╔════════════════════════════════════════════════════════════════════╗
 ║  ROOTED VITALITY, INC.                                             ║
-║  File: find-practitioners.css                                      ║
-║  Purpose: Find Practitioners page styling                          ║
+║  File: styles/find-practitioners.css                               ║
+║  Purpose: Find Practitioners page styling and modals               ║
 ║  Holistic Wellness · Modern Connection Platform                    ║
 ║  rootedvitality.com | 2025                                         ║
 ╚════════════════════════════════════════════════════════════════════╝
+
+TABLE OF CONTENTS
+  1. CONNECTION REQUEST MODAL STYLING
+  2. MODAL OVERLAY & CONTENT
+  3. FORM ELEMENTS & INPUTS
+  4. RESPONSIVE DESIGN
 */
 
 /* ============================================================
-   CONNECTION REQUEST MODAL STYLING
+   1. CONNECTION REQUEST MODAL STYLING
    ============================================================ */
 
 /* Hide modal by default */
@@ -159,61 +165,3 @@
     opacity: 0.6;
     cursor: not-allowed;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

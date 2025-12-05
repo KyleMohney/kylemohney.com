@@ -1,20 +1,32 @@
-/*
-+--------------------------------------------------------------------+
-�  ROOTED VITALITY, INC.                                             �
-�  File: scripts/reviewsManager.js                                   �
-�  Purpose: Review submission modal & database integration           �
-�  Holistic Wellness � Modern Connection Platform                    �
-�  rootedvitality.com | 2025                                         �
-+--------------------------------------------------------------------+
+﻿/*
+╔════════════════════════════════════════════════════════════════════╗
+║  ROOTED VITALITY, INC.                                             ║
+║  File: reviewsManager.js                                           ║
+║  Purpose: User review submission and management system             ║
+║  Holistic Wellness · Modern Connection Platform                    ║
+║  rootedvitality.com | 2025                                         ║
+╚════════════════════════════════════════════════════════════════════╝
 
-ARCHITECTURE:
-- reviews table has: id (UUID), rating, review_text, created_at, updated_at, 
-  is_approved, is_visible, client_name, practitioner_name
-- Modal shows practitioner name for context only
-- Submission stores: rating, review text, timestamp, status, names for support
-- Serial numbers: METADATA ONLY, never used in database operations
-- UUIDs: Every table has id (UUID) at column 1 - this is the system foundation
+ TABLE OF CONTENTS
+   1. INITIALIZATION & STATE MANAGEMENT
+   2. EVENT LISTENERS & FORM HANDLERS
+   3. STAR RATING & INPUT VALIDATION
+   4. PHOTO UPLOAD & MANAGEMENT
+   5. REVIEW SUBMISSION & STORAGE
+   6. MODAL LIFECYCLE & CLEANUP
+
+ ARCHITECTURE:
+   - reviews table has: id (UUID), rating, review_text, created_at, updated_at, 
+     is_approved, is_visible, client_name, practitioner_name
+   - Modal shows practitioner name for context only
+   - Submission stores: rating, review text, timestamp, status, names for support
+   - Serial numbers: METADATA ONLY, never used in database operations
+   - UUIDs: Every table has id (UUID) at column 1 - this is the system foundation
 */
+
+// ======================================================
+// 1. INITIALIZATION & STATE MANAGEMENT
+// ======================================================
 
 // Helper function to escape HTML
 function escapeHtmlReview(text) {
@@ -43,7 +55,7 @@ let reviewsManager = {
     this.supabaseClient = supabaseClient;
     this.authManager = authManager;
     this.initEventListeners();
-    console.log('[Reviews] Manager initialized');
+
   },
 
   initEventListeners() {
@@ -90,7 +102,7 @@ let reviewsManager = {
       overlay.addEventListener('click', () => this.closeReviewModal());
     }
 
-    console.log('[Reviews] Event listeners attached');
+
   },
 
   // ======================================================
@@ -98,8 +110,8 @@ let reviewsManager = {
   // ======================================================
 
   openReviewModal(matchId, practitionerId, practitionerName, projectId, clientFirstName, clientLastName, clientId) {
-    console.log('[Reviews] Opening modal for:', practitionerName, 'UUID:', practitionerId);
-    console.log('[Reviews] Modal data:', { matchId, practitionerId, projectId, clientId });
+
+
 
     this.currentReview = {
       matchId,
@@ -121,18 +133,18 @@ let reviewsManager = {
     const nameEl = document.getElementById('review-practitioner-name');
     if (nameEl) {
       nameEl.textContent = this.currentReview.practitionerName;
-      console.log('[Reviews] Set practitioner name:', this.currentReview.practitionerName);
+
     } else {
       console.error('[Reviews] Name element not found');
     }
 
     const modal = document.getElementById('review-modal');
-    console.log('[Reviews] Modal element found:', !!modal);
+
     if (modal) {
-      console.log('[Reviews] Removing modal--hidden class');
+
       modal.classList.remove('modal--hidden');
       document.body.style.overflow = 'hidden';
-      console.log('[Reviews] Modal shown');
+
     } else {
       console.error('[Reviews] Modal element not found!');
     }
@@ -141,7 +153,7 @@ let reviewsManager = {
   // Check if review already exists for this match
   async checkForExistingReview(projectId, practitionerId, clientId) {
     if (!projectId || !practitionerId || !clientId) {
-      console.warn('[Reviews] Missing required IDs to check for existing review');
+
       return;
     }
 
@@ -155,7 +167,7 @@ let reviewsManager = {
         .single();
 
       if (existingReview) {
-        console.log('[Reviews] Existing review found:', existingReview);
+
         // Show message that review already exists
         const form = document.getElementById('review-form');
         const submitBtn = document.getElementById('btn-submit-review');
@@ -189,7 +201,7 @@ let reviewsManager = {
       return false; // No review found
     } catch (error) {
       if (error.code !== 'PGRST116') { // PGRST116 = no rows returned
-        console.warn('[Reviews] Error checking for existing review:', error);
+
       }
       return false;
     }
@@ -250,7 +262,7 @@ let reviewsManager = {
       }
     });
 
-    console.log('[Reviews] Rating set to:', rating);
+
   },
 
   // ======================================================
@@ -330,7 +342,7 @@ let reviewsManager = {
       div.className = 'photo-preview__item';
       div.innerHTML = `
         <img src="${photo.preview}" alt="Photo ${index + 1}">
-        <button type="button" class="photo-preview__remove" onclick="reviewsManager.removePhoto(${index})" title="Remove">�</button>
+        <button type="button" class="photo-preview__remove" onclick="reviewsManager.removePhoto(${index})" title="Remove">ï¿½</button>
       `;
       preview.appendChild(div);
     });
@@ -360,10 +372,10 @@ let reviewsManager = {
     }
 
     try {
-      console.log('[Reviews] Submitting review...');
+
 
       // Step 1: Read practitioner_serial and client_serial from project_practitioner_matches
-      console.log('[Reviews] Reading serial numbers from match ID:', this.currentReview.matchId);
+
       const { data: matchData, error: matchError } = await this.supabaseClient
         .from('project_practitioner_matches')
         .select('practitioner_serial, client_serial')
@@ -374,7 +386,7 @@ let reviewsManager = {
       let clientSerial = null;
 
       if (matchError || !matchData) {
-        console.warn('[Reviews] Match lookup failed, falling back to individual lookups:', matchError?.message);
+
         // Fallback: Get the practitioner's serial_number if match not found
         const { data: practitionerData, error: practitionerError } = await this.supabaseClient
           .from('practitioners')
@@ -402,7 +414,7 @@ let reviewsManager = {
         clientSerial = matchData.client_serial;
       }
 
-      console.log('[Reviews] Serial numbers retrieved - Practitioner:', practitionerSerial, 'Client:', clientSerial);
+
       const { data: { user } } = await this.supabaseClient.auth.getUser();
       const currentUser = window.authManager?.getCurrentUser();
       
@@ -424,7 +436,7 @@ let reviewsManager = {
       // Step 2: Upload photos to Supabase Storage if any
       let photoPaths = [];
       if (this.currentReview.photos && this.currentReview.photos.length > 0) {
-        console.log('[Reviews] Uploading photos...');
+
         for (const photo of this.currentReview.photos) {
           try {
             // Convert data URL to blob if needed
@@ -436,7 +448,7 @@ let reviewsManager = {
             }
             
             if (!fileToUpload) {
-              console.warn('[Reviews] Could not upload photo - no file data');
+
               continue;
             }
 
@@ -445,7 +457,7 @@ let reviewsManager = {
             const random = Math.random().toString(36).substring(7);
             const fileName = `review-photos/${this.currentReview.practitionerId}/${timestamp}-${random}-${fileToUpload.name || 'photo.jpg'}`;
 
-            console.log('[Reviews] Uploading photo to:', fileName);
+
 
             // Upload to Supabase Storage
             const { data: uploadData, error: uploadError } = await this.supabaseClient.storage
@@ -459,12 +471,12 @@ let reviewsManager = {
 
             // Store the path (not the full URL) for efficient storage
             photoPaths.push(fileName);
-            console.log('[Reviews] Photo uploaded successfully. Path stored:', fileName);
+
           } catch (photoError) {
             console.error('[Reviews] Error processing photo:', photoError);
           }
         }
-        console.log('[Reviews] Photos uploaded:', photoPaths.length);
+
       }
       
       // Get client record for client_serial
@@ -508,12 +520,12 @@ let reviewsManager = {
         moderation_notes: ''                        // Admin notes during moderation
       };
 
-      console.log('[Reviews] 📋 REVIEW DATA BEFORE INSERT:');
-      console.log('[Reviews]   - practitioner_serial:', reviewData.practitioner_serial);
-      console.log('[Reviews]   - practitioner_id:', reviewData.practitioner_id);
-      console.log('[Reviews]   - is_visible:', reviewData.is_visible);
-      console.log('[Reviews]   - rating:', reviewData.rating);
-      console.log('[Reviews] Full review data:', reviewData);
+
+
+
+
+
+
 
       // Insert into database
       const { data, error } = await this.supabaseClient
@@ -522,23 +534,23 @@ let reviewsManager = {
         .select();
 
       if (error) {
-        console.error('[Reviews] ❌ INSERT FAILED:', error);
+        console.error('[Reviews] âŒ INSERT FAILED:', error);
         console.error('[Reviews] Error code:', error.code);
         console.error('[Reviews] Error message:', error.message);
         throw error;
       }
 
-      console.log('[Reviews] ✅ Review inserted successfully!');
-      console.log('[Reviews] Inserted data:', data);
+
+
       
       if (data && data[0]) {
-        console.log('[Reviews] ✅ STORED practitioner_serial in DB:', data[0].practitioner_serial);
-        console.log('[Reviews] ✅ STORED is_visible in DB:', data[0].is_visible);
+
+
       }
 
       // Update projects table to set review_left = true
       if (this.currentReview.projectId) {
-        console.log('[Reviews] 📝 Updating projects table - setting review_left=true for project_serial:', this.currentReview.projectId);
+
         
         const { error: projectUpdateError } = await this.supabaseClient
           .from('projects')
@@ -549,9 +561,9 @@ let reviewsManager = {
           .eq('project_serial', this.currentReview.projectId);
         
         if (projectUpdateError) {
-          console.warn('[Reviews] ⚠️ Failed to update projects table:', projectUpdateError);
+
         } else {
-          console.log('[Reviews] ✅ Projects table updated - review_left set to true');
+
         }
       }
 
@@ -559,7 +571,7 @@ let reviewsManager = {
       if (window.reviewNotificationManager && data && data.length > 0) {
         try {
           window.reviewNotificationManager.handleNewReview(data[0]);
-          console.log('[Reviews] Real-time notification triggered for practitioner');
+
         } catch (notifError) {
           console.warn('[Reviews] Error triggering notification (non-blocking):', notifError);
         }
@@ -589,6 +601,8 @@ window.reviewsManager = reviewsManager;
 function openReviewModal(matchId, practitionerId, practitionerName) {
   reviewsManager.openReviewModal(matchId, practitionerId, practitionerName);
 }
+
+
 
 
 

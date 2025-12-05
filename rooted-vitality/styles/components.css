@@ -2,7 +2,7 @@
 ╔════════════════════════════════════════════════════════════════════╗
 ║  ROOTED VITALITY, INC.                                             ║
 ║  File: styles/components.css                                       ║
-║  Purpose: Reusable UI Components (Buttons, Cards, Forms, Modals)  ║
+║  Purpose: Reusable UI Components (Buttons, Cards, Forms, Modals)   ║
 ║  Holistic Wellness · Modern Connection Platform                    ║
 ║  rootedvitality.com | 2025                                         ║
 ╚════════════════════════════════════════════════════════════════════╝
@@ -123,40 +123,485 @@ Extracted from: styles_legacy.css
 }
 
 /* ========================================== */
+/* UNIVERSAL BUTTON VARIANTS */
+/* ========================================== */
+
+/* Primary Button - Green background with white text */
+.btn-success,
+.btn-primary {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    background: #77883e;
+    background-image: repeating-linear-gradient(135deg, rgba(152,229,142,0.04) 0px, rgba(152,229,142,0.04) 2px, transparent 2px, transparent 12px);
+    color: #fbf7ec;
+}
+
+.btn-success:hover,
+.btn-primary:hover {
+    background: #5f7030;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(92, 154, 114, 0.25);
+}
+
+.btn-success:active,
+.btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(92, 154, 114, 0.15);
+}
+
+.btn-success:focus-visible,
+.btn-primary:focus-visible {
+    outline: 2px solid #77883e;
+    outline-offset: 2px;
+}
+
+.btn-success:disabled,
+.btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Neutral Button - White background with green border and text */
+.btn-neutral {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    background: transparent;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+}
+
+.btn-neutral:hover {
+    background: rgba(92, 154, 114, 0.05);
+    border-color: #5f7030;
+    color: #5f7030;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(92, 154, 114, 0.15);
+}
+
+.btn-neutral:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(92, 154, 114, 0.1);
+}
+
+.btn-neutral:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.btn-neutral:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Danger Button - Red/Warning background */
+.btn-danger {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    background: #d32f2f;
+    color: #fbf7ec;
+}
+
+.btn-danger:hover {
+    background: #b71c1c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
+}
+
+.btn-danger:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(211, 47, 47, 0.15);
+}
+
+.btn-danger:focus-visible {
+    outline: 2px solid #d32f2f;
+    outline-offset: 2px;
+}
+
+.btn-danger:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Ghost Button - Transparent with border */
+.btn-ghost {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 0.9rem;
+    background: transparent;
+    border: 2px solid #d0ccc5;
+    color: #6b6b6b;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.btn-ghost:hover {
+    border-color: #b0aca5;
+    color: #2e2b28;
+    background: #fafaf9;
+}
+
+.btn-ghost:active {
+    transform: scale(0.98);
+}
+
+.btn-ghost:focus-visible {
+    outline: 2px solid #77883e;
+    outline-offset: 2px;
+}
+
+.btn-ghost:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ========================================== */
+
 /* 2. CARDS & CONTENT BOXES */
 /* ========================================== */
+
+/**
+ * UNIVERSAL CARD DESIGN
+ * Based on the timezone card design - simple, elegant, and professional
+ * Two-column layout: content (left) + action/input (right)
+ * Responsive: stacks to single column on mobile
+ */
+.universal-card {
+  background: linear-gradient(135deg, var(--primary-opacity-08) 0%, var(--primary-opacity-03) 100%);
+  border: 1px solid var(--primary-opacity-20);
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  transition: all 0.3s ease;
+}
+
+.universal-card:hover {
+  border-color: var(--primary-opacity-30);
+  box-shadow: 0 2px 8px rgba(92, 154, 114, 0.08);
+}
+
+.universal-card-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .universal-card-content {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+.universal-card h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--rooted-dark);
+}
+
+.universal-card p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--rooted-dark);
+  line-height: 1.5;
+}
+
+.universal-card-info {
+  flex: 1;
+}
+
+.universal-card-action {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/**
+ * BASE CARD COMPONENT (for dashboard pages)
+ * Provides universal card styling for collapsible cards, content cards, etc.
+ * Combines with page-specific classes for extended functionality
+ */
+.card-base {
+  background: var(--rooted-light);
+  border: 1px solid var(--card-border-light);
+  border-radius: var(--radius-md);
+  box-shadow: var(--card-shadow-subtle);
+  transition: all 0.3s ease;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-base:hover {
+  box-shadow: var(--card-shadow-hover);
+  border-color: var(--card-border-accent);
+}
+
+.card-base--collapsed {
+  box-shadow: none;
+  border: 1px solid var(--primary-opacity-15);
+  background: transparent;
+}
+
+.card-base--collapsed:hover {
+  box-shadow: none;
+  transform: none;
+  border-color: var(--rooted-primary);
+}
+
+.card-base--inactive {
+  opacity: 0.6;
+  background-color: var(--rooted-light);
+  border-color: var(--status-inactive);
+}
+
+.card-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--card-border-light);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s ease, border-bottom-color 0.2s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.card-header:hover {
+  background: var(--card-bg-gradient-light);
+}
+
+.card-base--collapsed .card-header {
+  border-bottom-color: transparent;
+}
+
+.card-body {
+  padding: 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  max-height: 500px;
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+  opacity: 1;
+}
+
+.card-base--collapsed .card-body {
+  max-height: 0;
+  padding: 0 1.5rem;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.card-footer {
+  padding: 1.25rem 1.5rem;
+  border-top: 1px solid rgba(92, 154, 114, 0.1);
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  max-height: 100px;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+}
+
+.card-base--collapsed .card-footer {
+  max-height: 0;
+  padding: 0 1.5rem;
+  border-top: none;
+}
+
+.card-divider-subtle {
+  height: 1px;
+  background: var(--card-border-light);
+  margin: 0;
+}
+
+/**
+ * UNIVERSAL TIPS SECTION
+ * Used across all dashboard pages (client, practitioner)
+ * Provides consistent styling for Tips sections with info icon
+ */
+.tips-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tips-section__header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  height: 28px;
+}
+
+.tips-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  background: var(--rooted-primary);
+  color: #ffffff;
+  border-radius: 50%;
+  font-size: 0.9rem;
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: none;
+  -webkit-text-fill-color: #ffffff;
+}
+
+.tips-section__title {
+  margin: 0;
+  line-height: 1;
+  color: var(--rooted-primary);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tips-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tips-list li {
+  font-size: 0.85rem;
+  color: var(--color-text);
+  line-height: 1.5;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding-left: 0.25rem;
+}
+
+.tips-list li::before {
+  content: "✓";
+  color: var(--rooted-primary);
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+/* Timezone select input styling */
+.timezone-select {
+  padding: 0.875rem 1rem;
+  border: 1.5px solid #d0ccc5;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: var(--rooted-dark);
+  background: var(--rooted-neutral);
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.timezone-select:hover {
+  border-color: var(--rooted-primary);
+  box-shadow: 0 2px 6px rgba(92, 154, 114, 0.1);
+}
+
+.timezone-select:focus {
+  outline: none;
+  border-color: var(--rooted-primary);
+  box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.15);
+}
+
+.timezone-current-time {
+  padding: 0.75rem 1rem;
+  background: var(--rooted-neutral);
+  border: 1px solid #e0dcd5;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  text-align: center;
+  color: var(--rooted-primary);
+  font-weight: 600;
+}
+
+/* ========================================== */
+
 .box-highlight,
 .highlight-box {
-    background: var(--glass-white);
+    background: linear-gradient(135deg, var(--card-bg-gradient-light) 0%, var(--card-bg-gradient-accent) 100%);
     backdrop-filter: blur(6px);
-    border-left: 4px solid var(--rooted-primary);
-    padding: 1rem 1.2rem;
-    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--card-border-primary);
+    border-left: 4px solid var(--card-accent-color);
+    padding: 1.25rem 1.5rem;
+    border-radius: 12px;
     margin: var(--spacing-md) 0;
     font-style: italic;
-    box-shadow: var(--shadow-minimal);
+    box-shadow: var(--card-shadow-subtle);
     animation: fadeUp 0.8s ease 0.2s both;
+    transition: all 0.3s ease;
+}
+
+.box-highlight:hover,
+.highlight-box:hover {
+    box-shadow: var(--card-shadow-hover);
+    border-color: var(--card-border-primary);
 }
 
 .box-plant,
 .plant-card,
 .season-card {
-    background: var(--glass-white);
+    background: linear-gradient(135deg, var(--card-bg-gradient-light) 0%, var(--card-bg-gradient-accent-soft) 100%);
     backdrop-filter: blur(6px);
-    border-left: 4px solid var(--rooted-accent);
-    padding: 1.2rem;
-    border-radius: var(--radius-md);
-    border: 1px solid rgba(92, 154, 114, 0.25);
+    border: 1.5px solid var(--card-border-primary);
+    border-left: 4px solid var(--card-accent-color);
+    padding: 1.5rem;
+    border-radius: 12px;
     margin: var(--spacing-md) 0;
-    box-shadow: var(--shadow-medium);
+    box-shadow: var(--card-shadow-subtle);
     animation: fadeUp 0.8s ease 0.2s both;
+    transition: all 0.3s ease;
+}
+
+.box-plant:hover,
+.plant-card:hover,
+.season-card:hover {
+    box-shadow: var(--card-shadow-hover);
+    border-color: var(--card-border-primary);
 }
 
 .box-plant h3,
 .plant-card h3,
 .season-card h3 {
     margin-top: 0;
-    color: var(--color-button);
+    color: var(--card-accent-color);
 }
 
 .checklist-box {
@@ -279,6 +724,8 @@ Extracted from: styles_legacy.css
 /* ========================================== */
 /* 4. FORMS & INPUTS */
 /* ========================================== */
+
+/* Unified form input styling - prevent browser dark mode interference */
 input,
 textarea,
 select {
@@ -287,20 +734,119 @@ select {
     padding: 0.75rem 1rem;
     border: 2px solid rgba(92, 154, 114, 0.25);
     border-radius: var(--radius-sm);
-    background: var(--glass-light);
+    background: var(--glass-light) !important;
     backdrop-filter: blur(4px);
-    color: var(--color-text);
+    color: var(--color-text) !important;
     transition: all 0.3s ease;
     width: 100%;
     box-sizing: border-box;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
 }
 
-input:focus,
+/* EXCEPTION: Checkboxes - use native appearance */
+input[type="checkbox"],
+input[type="radio"] {
+    width: auto;
+    padding: 0;
+    border: 2px solid #999;
+    border-radius: 4px;
+    background: white !important;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+/* Checkboxes - checked state with green fill and checkmark */
+input[type="checkbox"]:checked {
+    background-color: #77883e !important;
+    border-color: #77883e !important;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="white"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>') !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-size: 16px 16px !important;
+    background-attachment: fixed !important;
+}
+
+/* Checkboxes - hover state */
+input[type="checkbox"]:hover {
+    border-color: #77883e;
+    box-shadow: 0 0 0 2px rgba(119, 136, 62, 0.2);
+}
+
+/* Checkboxes - focus state */
+input[type="checkbox"]:focus,
+input[type="checkbox"]:focus-visible {
+    outline: 2px solid #77883e;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 2px rgba(119, 136, 62, 0.2);
+}
+
+/* Radio buttons */
+input[type="radio"] {
+    border-radius: 50%;
+}
+
+input[type="radio"]:checked {
+    background-color: #77883e !important;
+    border-color: #77883e !important;
+    box-shadow: inset 0 0 0 4px white !important;
+}
+
+/* Prevent browser autofill styling - BUT NOT FOR CHECKBOXES/RADIOS */
+input:not([type="checkbox"]):not([type="radio"]):-webkit-autofill,
+input:not([type="checkbox"]):not([type="radio"]):-webkit-autofill:hover,
+input:not([type="checkbox"]):not([type="radio"]):-webkit-autofill:focus,
+input:not([type="checkbox"]):not([type="radio"]):-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px var(--glass-light) inset !important;
+    -webkit-text-fill-color: var(--color-text) !important;
+    color: var(--color-text) !important;
+}
+
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+textarea:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px var(--glass-light) inset !important;
+    -webkit-text-fill-color: var(--color-text) !important;
+    color: var(--color-text) !important;
+}
+
+/* Ensure placeholder text is visible */
+input::placeholder,
+textarea::placeholder {
+    color: var(--text-muted-light);
+    opacity: 1;
+}
+
+input::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder {
+    color: var(--text-muted-light);
+    opacity: 1;
+}
+
+input::-moz-placeholder,
+textarea::-moz-placeholder {
+    color: var(--text-muted-light);
+    opacity: 1;
+}
+
+/* Focus state - EXCLUDING checkboxes/radios */
+input:not([type="checkbox"]):not([type="radio"]):focus,
 textarea:focus,
 select:focus {
     outline: none;
     border-color: var(--rooted-primary);
     box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.1);
+    background: var(--glass-light) !important;
+    color: var(--color-text) !important;
 }
 
 label {
@@ -508,21 +1054,58 @@ label {
     position: sticky;
     top: 0;
     width: 100%;
-    background: #faf7f2;
-    box-shadow: 0 2px 8px rgba(46, 43, 40, 0.08);
+    background: linear-gradient(
+        180deg,
+        rgba(249, 245, 232, 0.88) 0%,
+        rgba(251, 247, 236, 0.85) 50%,
+        rgba(248, 244, 231, 0.82) 100%
+    );
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    box-shadow: 
+        0 8px 24px rgba(46, 43, 40, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6),
+        0 0 50px rgba(92, 154, 114, 0.08);
     transition: all 0.3s ease;
     z-index: 1000;
     animation: headerFade 0.6s ease forwards;
+    border-bottom: 1px solid rgba(92, 154, 114, 0.1);
+    background-attachment: fixed;
 }
+
 
 @keyframes headerFade {
     from { opacity: 0; transform: translateY(-12px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes shimmer {
+    0% { 
+        background-position: -1000px 0;
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% { 
+        background-position: 1000px 0;
+        opacity: 0;
+    }
+}
+
 .rv-header-scrolled {
-    background: #fdf9f5;
-    box-shadow: 0 4px 12px rgba(46, 43, 40, 0.1);
+    background: linear-gradient(
+        180deg,
+        rgba(247, 242, 229, 0.86) 0%,
+        rgba(249, 245, 232, 0.83) 50%,
+        rgba(246, 241, 228, 0.80) 100%
+    );
+    backdrop-filter: blur(36px);
+    -webkit-backdrop-filter: blur(36px);
+    box-shadow: 
+        0 12px 32px rgba(46, 43, 40, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6),
+        0 0 60px rgba(92, 154, 114, 0.10);
 }
 
 .rv-header-inner {
@@ -734,9 +1317,18 @@ label {
    ====================================================== */
 
 .rv-header-public {
-    background: var(--neutral, #faf7f2);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-    box-shadow: none;
+    background: linear-gradient(
+        180deg,
+        rgba(249, 245, 232, 0.88) 0%,
+        rgba(251, 247, 236, 0.85) 50%,
+        rgba(248, 244, 231, 0.82) 100%
+    );
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border-bottom: 1px solid rgba(92, 154, 114, 0.1);
+    box-shadow: 
+        inset 0 1px 0 rgba(255, 255, 255, 0.6),
+        0 0 50px rgba(92, 154, 114, 0.08);
 }
 
 .rv-header-public .rv-nav-link {
@@ -832,9 +1424,18 @@ label {
    ====================================================== */
 
 .rv-header-client {
-    background: var(--neutral, #faf7f2);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-    box-shadow: none;
+    background: linear-gradient(
+        180deg,
+        rgba(249, 245, 232, 0.88) 0%,
+        rgba(251, 247, 236, 0.85) 50%,
+        rgba(248, 244, 231, 0.82) 100%
+    );
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border-bottom: 1px solid rgba(92, 154, 114, 0.1);
+    box-shadow: 
+        inset 0 1px 0 rgba(255, 255, 255, 0.6),
+        0 0 50px rgba(92, 154, 114, 0.08);
 }
 
 /* Client Header Logo Sizing */
@@ -1039,7 +1640,7 @@ label {
     color: #fbf7ec;
     font-weight: 700;
     font-size: 16px;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-sans);
     text-transform: uppercase;
 }
 
@@ -1214,9 +1815,18 @@ label {
    ====================================================== */
 
 .rv-header-practitioner {
-    background: var(--neutral, #faf7f2);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-    box-shadow: none;
+    background: linear-gradient(
+        180deg,
+        rgba(249, 245, 232, 0.88) 0%,
+        rgba(251, 247, 236, 0.85) 50%,
+        rgba(248, 244, 231, 0.82) 100%
+    );
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border-bottom: 1px solid rgba(92, 154, 114, 0.1);
+    box-shadow: 
+        inset 0 1px 0 rgba(255, 255, 255, 0.6),
+        0 0 50px rgba(92, 154, 114, 0.08);
 }
 
 /* Practitioner Header Logo Sizing */
@@ -1943,59 +2553,98 @@ label {
     color: var(--rooted-dark);
 }
 
+/* ========================================== */
+/* NOTIFICATION TOAST */
+/* ========================================== */
 
+.rv-notification-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: linear-gradient(135deg, #77883e 0%, #5e6e30 100%);
+    color: #fbf7ec;
+    padding: 16px 20px;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(119, 136, 62, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    max-width: 360px;
+    width: calc(100% - 48px);
+    z-index: 10000;
+    animation: toastSlideIn 0.3s ease-out;
+    opacity: 0;
+    transform: translateY(100px);
+    pointer-events: auto;
+}
 
+.rv-notification-toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
 
+.rv-notification-toast-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
 
+.rv-notification-toast-title {
+    margin: 0;
+    font-weight: 700;
+    font-size: 15px;
+    line-height: 1.3;
+    letter-spacing: 0.5px;
+}
 
+.rv-notification-toast-message {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.4;
+    opacity: 0.95;
+}
 
+.rv-notification-toast-close {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: #fbf7ec;
+    font-size: 20px;
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+    flex-shrink: 0;
+}
 
+.rv-notification-toast-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
 
+@keyframes toastSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+@media (max-width: 600px) {
+    .rv-notification-toast {
+        bottom: 16px;
+        right: 16px;
+        left: 16px;
+        max-width: none;
+        width: auto;
+    }
+}

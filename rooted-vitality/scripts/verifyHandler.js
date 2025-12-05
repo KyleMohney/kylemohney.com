@@ -1,5 +1,26 @@
+﻿/*
+╔════════════════════════════════════════════════════════════════════╗
+║  ROOTED VITALITY, INC.                                             ║
+║  File: verifyHandler.js                                            ║
+║  Purpose: Email verification and resend functionality              ║
+║  Holistic Wellness · Modern Connection Platform                    ║
+║  rootedvitality.com | 2025                                         ║
+╚════════════════════════════════════════════════════════════════════╝
+
+ TABLE OF CONTENTS
+   1. VERIFICATION BUTTON HANDLERS
+   2. EMAIL RESEND FUNCTIONALITY
+   3. VERIFICATION FROM URL FRAGMENT
+   4. REDIRECT & SUCCESS HANDLING
+   5. ERROR MANAGEMENT
+*/
+
 // ======================================================
-// EMAIL VERIFICATION HANDLER — Rooted Vitality
+// 1. VERIFICATION BUTTON HANDLERS
+// ======================================================
+
+// ======================================================
+// EMAIL VERIFICATION HANDLER – Rooted Vitality
 // ======================================================
 // Purpose: Handle email verification page interactions
 // Supports resending verification emails on verify.html
@@ -59,7 +80,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if (fragment.includes('type=signup')) {
       // Verification is being processed by Supabase auth state listener
       // Show a loading state briefly
-      console.log('Email verification in progress...');
+
       
       // Wait a moment for Supabase to process, then check auth state
       setTimeout(() => {
@@ -75,59 +96,3 @@ window.addEventListener('DOMContentLoaded', () => {
   
   handleFragmentAuth();
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,28 +1,60 @@
+/*
+╔═════════════════════════════════════════════════════════════════════════════╗
+║                    ROOTED VITALITY, INC.                                    ║
+║              CLIENT PUBLIC PROFILE (LOGIC)                                  ║
+║                                                                             ║
+║ File:        dashboard/client/scripts/public-profile.js                     ║
+║ Purpose:     Load and display client profile for matched practitioners      ║
+║ Description: Authorization verification, data loading, profile rendering    ║
+║ Last Update: November 2025                                                  ║
+║ Status:      Production-Ready | Build Standard v2.0 Compliant               ║
+║                                                                             ║
+║ QUICK REFERENCE:                                                            ║
+║ - Authorization | Data Loading | Profile Population | Error Handling        ║
+║ - Real-Time: Practitioner/Client Serial Verification, Match Status Check    ║
+║                                                                             ║
+╚═════════════════════════════════════════════════════════════════════════════╝
+*/
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TABLE OF CONTENTS
+// ═══════════════════════════════════════════════════════════════════════════
+//
+// 1. AUTHORIZATION & VALIDATION
+// 2. DATA LOADING
+// 3. PROFILE POPULATION
+// 4. DATA FORMATTING
+// 5. ERROR HANDLING
+// 6. INITIALIZATION
+//
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 1. AUTHORIZATION & VALIDATION
+// ═══════════════════════════════════════════════════════════════════════════
+
 /**
- * ============================================
- * PUBLIC CLIENT PROFILE SCRIPT
- * ============================================
- * Loads and displays client profile for practitioners
- * Accessed via URL parameter: ?client_id=<uuid>
+ * Extract client_id from URL query parameters
+ * @returns {string|null} The client UUID from ?client_id=<uuid> or null
  */
-
-console.log('[Public Profile] Loading...');
-
-// Get client_id from URL parameters
 function getClientIdFromUrl() {
     const params = new URLSearchParams(window.location.search);
     return params.get('client_id');
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// 2. DATA LOADING
+// ═══════════════════════════════════════════════════════════════════════════
+
 /**
- * Initialize public profile page
+ * Initialize and load public profile page
+ * Performs authorization checks, loads data, and populates UI
  */
 async function initializePublicProfile() {
     try {
         const clientId = getClientIdFromUrl();
         
         if (!clientId) {
-            console.error('[Public Profile] No client_id provided');
             showError('Invalid profile link. Please check the URL and try again.');
             return;
         }
@@ -31,7 +63,6 @@ async function initializePublicProfile() {
         const { data: { user: currentUser } } = await window.supabaseClient.auth.getUser();
         
         if (!currentUser) {
-            console.error('[Public Profile] User not authenticated');
             showError('You must be signed in to view client profiles.');
             return;
         }
@@ -45,7 +76,6 @@ async function initializePublicProfile() {
             .single();
 
         if (!practitionerData || practitionerError) {
-            console.error('[Public Profile] Could not find practitioner data:', practitionerError);
             showError('Could not verify your practitioner account.');
             return;
         }
@@ -58,12 +88,9 @@ async function initializePublicProfile() {
             .single();
 
         if (!clientData_serial || clientError_serial) {
-            console.error('[Public Profile] Could not find client data:', clientError_serial);
             showError('This client profile could not be found.');
             return;
         }
-
-        console.log('[Public Profile] Practitioner serial:', practitionerData.serial_number, 'Client serial:', clientData_serial.serial_number);
 
         // Now query matches using the serial numbers
         const { data: match, error: matchError } = await window.supabaseClient
@@ -72,22 +99,12 @@ async function initializePublicProfile() {
             .eq('practitioner_serial', practitionerData.serial_number)
             .eq('client_serial', clientData_serial.serial_number);
 
-        console.log('[Public Profile] Match query result:', match, 'Error:', matchError);
 
         // Check if match exists
         if (!match || match.length === 0) {
-            console.error('[Public Profile] No match found for this practitioner and client');
             showError('You do not have permission to view this profile. You must have an active connection with this client.');
             return;
         }
-
-        // Log match details for debugging
-        match.forEach((m, idx) => {
-            console.log(`[Public Profile] Match ${idx}:`, {
-                status: m.status,
-                match_status: m.match_status
-            });
-        });
 
         // Filter out only explicitly declined/blocked matches
         // Allow: pending, matched, hired, accepted, etc.
@@ -95,19 +112,13 @@ async function initializePublicProfile() {
         const activeMatch = match.find(m => {
             const isBlocked = blockedStatuses.includes(m.status?.toLowerCase()) || 
                              blockedStatuses.includes(m.match_status?.toLowerCase());
-            console.log(`[Public Profile] Checking match - status: ${m.status}, match_status: ${m.match_status}, isBlocked: ${isBlocked}`);
             return !isBlocked;
         });
 
         if (!activeMatch) {
-            console.error('[Public Profile] No active match found - all matches are archived or blocked');
             showError('This connection is no longer active. You cannot view archived client profiles.');
             return;
         }
-
-        console.log('[Public Profile] Active match found, proceeding...');
-
-        console.log('[Public Profile] Practitioner authorized. Loading profile for client:', clientId);
 
         // Fetch client data
         const { data: clientData, error: clientError } = await window.supabaseClient
@@ -117,7 +128,6 @@ async function initializePublicProfile() {
             .single();
 
         if (clientError || !clientData) {
-            console.error('[Public Profile] Error fetching client data:', clientError);
             showError('This client profile could not be found.');
             return;
         }
@@ -129,22 +139,22 @@ async function initializePublicProfile() {
             .eq('user_id', clientId)
             .single();
 
-        if (wellnessError && wellnessError.code !== 'PGRST116') {
-            console.warn('[Public Profile] Error fetching wellness profile:', wellnessError);
-        }
-
         // Populate page with data
         populateProfilePage(clientData, wellnessData);
-        console.log('[Public Profile] Profile loaded successfully');
-
     } catch (error) {
-        console.error('[Public Profile] Initialization error:', error);
         showError('An error occurred while loading the profile.');
+        console.error('[PUBLIC_PROFILE] Profile initialization error:', error);
     }
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// 3. PROFILE POPULATION
+// ═══════════════════════════════════════════════════════════════════════════
+
 /**
- * Populate all profile fields with data
+ * Populate all profile fields with client and wellness data
+ * @param {Object} clientData - Client basic information
+ * @param {Object} wellnessData - Client wellness profile responses
  */
 function populateProfilePage(clientData, wellnessData) {
     // Header information
@@ -157,7 +167,7 @@ function populateProfilePage(clientData, wellnessData) {
     // Avatar
     const avatarContainer = document.getElementById('clientAvatarDisplay');
     if (clientData.profile_picture_url) {
-        avatarContainer.innerHTML = `<img src="${clientData.profile_picture_url}" alt="${fullName}" style="width: 100%; height: 100%; object-fit: cover;">`;
+        avatarContainer.innerHTML = `<img src="${clientData.profile_picture_url}" alt="${fullName}" class="client-avatar-image">`;
     } else if (firstName) {
         avatarContainer.textContent = firstName.charAt(0).toUpperCase();
     }
@@ -188,8 +198,14 @@ function populateProfilePage(clientData, wellnessData) {
     }
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// 4. DATA FORMATTING
+// ═══════════════════════════════════════════════════════════════════════════
+
 /**
  * Format communication preference for display
+ * @param {string} value - Raw communication preference value from database
+ * @returns {string} Human-readable communication preference label
  */
 function formatCommunicationPreference(value) {
     if (!value) return '';
@@ -205,6 +221,8 @@ function formatCommunicationPreference(value) {
 
 /**
  * Format prior practitioner experience for display
+ * @param {string} value - Raw experience value from database
+ * @returns {string} Human-readable experience label
  */
 function formatPriorExperience(value) {
     if (!value) return '';
@@ -216,21 +234,31 @@ function formatPriorExperience(value) {
     return labels[value] || value;
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// 5. ERROR HANDLING
+// ═══════════════════════════════════════════════════════════════════════════
+
 /**
- * Show error message
+ * Display error message in user-friendly container
+ * Uses CSS classes from public-profile.css (no inline styles)
+ * @param {string} message - Error message to display to user
  */
 function showError(message) {
     const container = document.querySelector('.container-narrow');
     container.innerHTML = `
-        <div style="background: #f0fdf4; border: 2px solid #5c9a72; border-radius: 12px; padding: 2rem; text-align: center; margin-top: 3rem;">
-            <h2 style="color: #2e2b28; margin: 0 0 1rem 0;">Profile Not Found</h2>
-            <p style="color: #555; margin: 0;">${message}</p>
-            <a href="/rooted-vitality/dashboard/pro/pages/inbox.html" style="display: inline-block; margin-top: 1rem; padding: 0.75rem 1.5rem; background: #5c9a72; color: white; text-decoration: none; border-radius: 6px; font-weight: 500;">Back to Inbox</a>
+        <div class="error-container">
+            <h2 class="error-title">Profile Not Found</h2>
+            <p class="error-message">${message}</p>
+            <a href="/rooted-vitality/dashboard/pro/pages/inbox.html" class="error-link">Back to Inbox</a>
         </div>
     `;
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// 6. INITIALIZATION
+// ═══════════════════════════════════════════════════════════════════════════
+
 /**
- * On page load, initialize
+ * Initialize public profile on page load
  */
 document.addEventListener('DOMContentLoaded', initializePublicProfile);

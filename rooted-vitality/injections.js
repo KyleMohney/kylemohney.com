@@ -13,16 +13,13 @@ TABLE OF CONTENTS
   3. UTILITY FUNCTIONS
   4. INITIALIZATION
 */
-
-console.log('[Rooted Vitality] injections.js loading...');
-
 // ======================================================
 // GLOBAL NAVIGATION FUNCTIONS
 // ======================================================
 window.navigateToPage = function(page) {
-  // Direct navigation: just use the page name
-  // Browser will resolve it relative to current directory
-  window.location.href = page + '.html';
+  // Since we're always on pages within /dashboard/pro/ or /dashboard/client/
+  // and the header is injected, we can use a simple relative path
+  window.location.href = './' + page + '.html';
 };
 
 window.logout = function() {
@@ -110,7 +107,6 @@ const RootedVitality = {
      */
     trackPageView: function() {
         const pagePath = window.location.pathname;
-        console.log('[Analytics] Page viewed:', pagePath);
         // Hook for future analytics integration
     },
     
@@ -144,7 +140,6 @@ const RootedVitality = {
      */
     log: function(message, type = 'info') {
         const style = 'color: #77883e; font-weight: bold;';
-        console.log(`%c[${this.config.siteName}] ${message}`, style);
     },
     
     // ======================================================
@@ -160,7 +155,6 @@ const RootedVitality = {
     renderHeader: async function(role = 'public', view = null) {
         // Prevent concurrent renders
         if (this._headerRendering) {
-            console.log('[Rooted Vitality] Header render already in progress, skipping');
             return;
         }
         
@@ -172,16 +166,15 @@ const RootedVitality = {
             
             // If header exists with SAME role and view, skip render
             if (headerRole === role && headerView === (view || 'client')) {
-                console.log(`[Rooted Vitality] Header already rendered with same role/view (${role}/${view}), skipping`);
+                
                 // But still load logo if practitioner view
                 if (role === 'practitioner' && view === 'practitioner') {
-                    console.log('[Rooted Vitality] Still loading logo for practitioner view...');
                     this.loadPractitionerLogo();
                 }
                 return;
             } else {
                 // Different role or view - allow re-render
-                console.log(`[Rooted Vitality] Header role/view mismatch (existing: ${headerRole}/${headerView}, requested: ${role}/${view}) - re-rendering`);
+                
             }
         }
         
@@ -193,7 +186,7 @@ const RootedVitality = {
                 view = localStorage.getItem('active_view') || 'client';
             }
             
-            console.log(`[Rooted Vitality] renderHeader(${role}, view=${view}) called`);
+            
         
             // Check if a correct header already exists
             const existingHeader = document.getElementById('rvHeader');
@@ -202,12 +195,9 @@ const RootedVitality = {
                 const headerView = existingHeader.dataset.view || 'client';
                 
                 if (headerRole === role && headerView === (view || 'client')) {
-                    console.log('[Rooted Vitality] Correct header already exists, skipping render');
                     this._headerRendering = false;
                     return;
                 }
-                
-                console.log('[Rooted Vitality] Header exists but wrong type, removing for replacement');
                 existingHeader.remove();
             }
             
@@ -259,9 +249,6 @@ const RootedVitality = {
             }
             
             const headerPath = pathPrefix + 'components/' + headerFile;
-            
-            console.log(`[Rooted Vitality] Fetching header from: ${headerPath}`);
-            
             // Fetch the header component
             const response = await fetch(headerPath);
             if (!response.ok) {
@@ -288,8 +275,6 @@ const RootedVitality = {
                 headerHTML = headerHTML
                     .replace(/href="\/(?!rooted-vitality)([^"]+)"/g, `href="${replacementPrefix}$1"`)
                     .replace(/src="\/(?!rooted-vitality)([^"]+)"/g, `src="${replacementPrefix}$1"`);
-                
-                console.log(`[Rooted Vitality] Replaced paths with: ${replacementPrefix}`);
             }
             // In root: paths remain as-is (/)
             
@@ -303,16 +288,28 @@ const RootedVitality = {
                     injectedHeader.dataset.role = role;
                     injectedHeader.dataset.view = view || 'client';
                 }
-                
-                console.log(`[Rooted Vitality] ${role} header successfully injected`);
                 this.log(`${role.charAt(0).toUpperCase() + role.slice(1)} header loaded successfully`);
+                
+                // Initialize public header login button
+                if (role === 'public') {
+                    const loginBtn = document.getElementById('loginBtn');
+                    if (loginBtn) {
+                        loginBtn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            if (window.openLoginModal && typeof window.openLoginModal === 'function') {
+                                window.openLoginModal('client');
+                            } else {
+                                console.error('[Rooted Vitality] openLoginModal not available');
+                            }
+                        });
+                    }
+                }
                 
                 // Hide "Become a Practitioner" button if user is already a practitioner in client view
                 if (role === 'practitioner' && view === 'client') {
                     const becomePractitionerBtn = document.getElementById('becomePractitionerBtn');
                     if (becomePractitionerBtn) {
                         becomePractitionerBtn.style.display = 'none';
-                        console.log('[Rooted Vitality] Hidden "Become a Practitioner" button for practitioner in client view');
                     }
                 }
                 
@@ -325,7 +322,6 @@ const RootedVitality = {
                         
                         // Attach view switcher for practitioners (regardless of current view)
                         if (role === 'practitioner') {
-                            console.log('[Rooted Vitality] Attaching view switcher for practitioner user');
                             this.attachViewSwitcher();
                         }
                         
@@ -348,47 +344,37 @@ const RootedVitality = {
                         // Try multiple sources for firstName
                         try {
                             const userData = window.authManager?.getCurrentUser();
-                            console.log('[Rooted Vitality] getCurrentUser() returned:', userData);
+                            
                             
                             if (userData?.firstName) {
                                 firstName = userData.firstName;
-                                console.log('[Rooted Vitality] Avatar initial from getCurrentUser():', firstName);
+                                
                             } else {
                                 // Fallback: get from localStorage
                                 const storedUser = localStorage.getItem('rvUser');
-                                console.log('[Rooted Vitality] Raw localStorage rvUser:', storedUser);
-                                
                                 if (storedUser) {
                                     const user = JSON.parse(storedUser);
-                                    console.log('[Rooted Vitality] Parsed localStorage user:', user);
                                     firstName = user.firstName || '';
-                                    console.log('[Rooted Vitality] Avatar initial from localStorage:', firstName);
                                 }
                             }
                         } catch (e) {
-                            console.log('[Rooted Vitality] Could not get firstName:', e);
                         }
                         
                         if (firstName) {
-                            console.log('[Rooted Vitality] Calling updateAvatarInitial with:', firstName);
                             this.updateAvatarInitial(firstName);
                         } else {
-                            console.log('[Rooted Vitality] No firstName found, using default');
                             this.updateAvatarInitial('U');
                         }
                         
                         // Load appropriate avatar based on role and view
                         if (role === 'practitioner' && view === 'practitioner') {
                             // Practitioner in practitioner view - show business logo
-                            console.log('[Rooted Vitality] Scheduling loadPractitionerLogo with 300ms delay');
                             this.loadPractitionerLogo();
                         } else if (role === 'practitioner' && view === 'client') {
                             // Practitioner in client view - show client avatar (not business logo)
-                            console.log('[Rooted Vitality] Practitioner in client view - loading client avatar');
                             this.loadClientAvatar();
                         } else if (role === 'client') {
                             // Client - load client avatar
-                            console.log('[Rooted Vitality] Scheduling loadClientAvatar');
                             this.loadClientAvatar();
                         }
                         
@@ -402,12 +388,10 @@ const RootedVitality = {
                     }, 100);
                 }
             } else {
-                console.warn('[Rooted Vitality] Body not ready for header injection');
             }
         } catch (error) {
             console.error('[Rooted Vitality] Error rendering header:', error);
             // Fallback: inject basic public header
-            console.log('[Rooted Vitality] Falling back to inline public header');
             this._injectFallbackPublicHeader();
         } finally {
             this._headerRendering = false;
@@ -424,7 +408,6 @@ const RootedVitality = {
         const nav = document.querySelector('.rv-nav');
         
         if (!toggle || !nav) {
-            console.log('[Rooted Vitality] Menu toggle or nav not found, skipping mobile menu init');
             return;
         }
         
@@ -433,7 +416,6 @@ const RootedVitality = {
             nav.classList.toggle('open');
             const isOpen = nav.classList.contains('open');
             toggle.setAttribute('aria-expanded', isOpen);
-            console.log(`[Rooted Vitality] Mobile menu ${isOpen ? 'opened' : 'closed'}`);
         });
         
         // Close mobile menu when hamburger nav links are clicked
@@ -449,7 +431,6 @@ const RootedVitality = {
             if (e.key === 'Escape' && nav.classList.contains('open')) {
                 nav.classList.remove('open');
                 toggle.setAttribute('aria-expanded', 'false');
-                console.log('[Rooted Vitality] Mobile menu closed by Escape key');
             }
         });
         
@@ -460,8 +441,6 @@ const RootedVitality = {
                 toggle.setAttribute('aria-expanded', 'false');
             }
         });
-        
-        console.log('[Rooted Vitality] Mobile menu toggle initialized');
     },
     
     /**
@@ -472,7 +451,6 @@ const RootedVitality = {
     attachLogoBehavior: function(role, view) {
         const logo = document.querySelector('.rv-logo');
         if (!logo) {
-            console.warn('[Rooted Vitality] Logo element not found');
             return;
         }
         
@@ -482,7 +460,6 @@ const RootedVitality = {
         }
         
         logo.setAttribute('href', targetHref);
-        console.log(`[Rooted Vitality] Logo behavior attached - href set to: ${targetHref}`);
     },
     
     /**
@@ -490,46 +467,29 @@ const RootedVitality = {
      * Looks for buttons with data-switch-view attribute and adds click handlers
      */
     attachViewSwitcher: function() {
-        console.log('[Rooted Vitality] attachViewSwitcher called, searching for [data-switch-view] elements...');
         const elements = document.querySelectorAll('[data-switch-view]');
-        console.log(`[Rooted Vitality] Found ${elements.length} view switcher element(s)`, elements);
+        
         
         document.querySelectorAll('[data-switch-view]').forEach(btn => {
             const switchValue = btn.dataset.switchView;
-            console.log(`[Rooted Vitality] Attaching click handler to view switcher:`, btn, `data-switch-view="${switchValue}"`);
-            
             btn.addEventListener('click', (e) => {
-                console.log('[Rooted Vitality] View switcher clicked!', btn);
                 e.preventDefault();
                 
                 const newView = btn.dataset.switchView === 'practitioner' ? 'practitioner' : 'client';
-                console.log(`[Rooted Vitality] newView determined as: ${newView} (btn.dataset.switchView="${btn.dataset.switchView}")`);
-                
-                console.log(`[Rooted Vitality] View switch clicked: ${newView}`);
-                console.log(`[Rooted Vitality] Current pathname: ${window.location.pathname}`);
                 
                 // Persist active view
                 localStorage.setItem('active_view', newView);
-                console.log(`[Rooted Vitality] Saved active_view to localStorage: ${newView}`);
-                
                 // Navigate using absolute path from rooted-vitality root
                 const currentPath = window.location.pathname;
-                console.log('[Rooted Vitality] Current path:', currentPath);
-                
                 let targetUrl = '';
                 if (newView === 'practitioner') {
                     targetUrl = '/rooted-vitality/dashboard/pro/pages/index.html';
-                    console.log('[Rooted Vitality] Practitioner view selected, targetUrl set to:', targetUrl);
                 } else {
-                    targetUrl = '/rooted-vitality/dashboard/client/pages/dashboard.html';
-                    console.log('[Rooted Vitality] Client view selected, targetUrl set to:', targetUrl);
+                    targetUrl = '/rooted-vitality/dashboard/client/pages/client-profile.html';
                 }
-                
-                console.log(`[Rooted Vitality] About to redirect to: ${targetUrl}`);
                 window.location.href = targetUrl;
             });
         });
-        console.log('[Rooted Vitality] View switcher attached');
     },
     
     /**
@@ -553,7 +513,7 @@ const RootedVitality = {
               <span class="rv-brand-text">Rooted Vitality</span>
             </a>
             <nav class="rv-nav" aria-label="Primary Navigation">
-              <a href="${pathPrefix}dashboard/signup.html" class="rv-nav-link rv-btn-accent">Sign Up</a>
+              <a href="${pathPrefix}dashboard/client/pages/client-signup.html" class="rv-nav-link rv-btn-accent">Sign Up</a>
               <a href="${pathPrefix}login.html" class="rv-nav-link rv-nav-login">Log In</a>
             </nav>
           </div>
@@ -562,7 +522,6 @@ const RootedVitality = {
         
         if (document.body) {
             document.body.insertAdjacentHTML('afterbegin', fallbackHTML);
-            console.log('[Rooted Vitality] Fallback public header injected');
         }
     },
     
@@ -571,14 +530,11 @@ const RootedVitality = {
      * Handles click toggle, keyboard navigation, outside click close
      */
     initAvatarMenu: function() {
-        console.log('[Rooted Vitality] Initializing avatar menu...');
-        
         const avatarBtn = document.querySelector('.rv-avatar-btn');
         const avatarDropdown = document.querySelector('.rv-avatar-dropdown');
         const dropdownItems = document.querySelectorAll('.rv-avatar-dropdown .rv-dropdown-item');
         
         if (!avatarBtn || !avatarDropdown) {
-            console.log('[Rooted Vitality] Avatar menu not found, skipping initialization');
             return;
         }
         
@@ -649,43 +605,31 @@ const RootedVitality = {
         
         // Show "Practitioner View" link only if user is a practitioner AND currently in client view
         const switchToPractitionerBtn = document.getElementById('switchToPractitioner');
-        console.log('[Rooted Vitality] Checking practitioner view switcher button...');
-        console.log('[Rooted Vitality] Button element found:', !!switchToPractitionerBtn);
-        
         if (switchToPractitionerBtn) {
             try {
                 // Get user data - try authManager first, fallback to localStorage
                 let userData = null;
                 if (typeof window.authManager !== 'undefined' && window.authManager.getCurrentUser) {
                     userData = window.authManager.getCurrentUser();
-                    console.log('[Rooted Vitality] Got userData from authManager');
                 } else {
                     // Fallback: check localStorage for user_role
                     const storedRole = localStorage.getItem('user_role');
                     if (storedRole) {
                         userData = { role: storedRole };
-                        console.log('[Rooted Vitality] Got userData from localStorage - role:', storedRole);
                     }
                 }
                 
                 const activeView = localStorage.getItem('active_view') || 'client';
-                console.log('[Rooted Vitality] User role:', userData?.role, 'Active view:', activeView);
-                
                 // Show button if: user is practitioner AND they're viewing the client dashboard
                 if (userData?.role === 'practitioner' && activeView === 'client') {
                     switchToPractitionerBtn.style.display = 'block';
-                    console.log('[Rooted Vitality] ✓ Showing "Practitioner View" link for practitioner user in client view');
                 } else {
                     switchToPractitionerBtn.style.display = 'none';
-                    console.log('[Rooted Vitality] ✗ Hiding Practitioner View link - role:', userData?.role, 'view:', activeView);
                 }
             } catch (error) {
-                console.log('[Rooted Vitality] Could not check practitioner status:', error);
                 switchToPractitionerBtn.style.display = 'none';
             }
         }
-        
-        console.log('[Rooted Vitality] Avatar menu initialized');
     },
 
     /**
@@ -694,14 +638,10 @@ const RootedVitality = {
      */
     updateAvatarInitial: function(firstName = 'U') {
         const avatarInitial = document.getElementById('rvAvatarInitial');
-        console.log(`[Rooted Vitality] updateAvatarInitial called with: "${firstName}"`);
         if (avatarInitial) {
             const initial = (firstName && firstName.length > 0) ? firstName.charAt(0).toUpperCase() : 'U';
-            console.log(`[Rooted Vitality] Setting avatar initial to: "${initial}"`);
             avatarInitial.textContent = initial;
-            console.log(`[Rooted Vitality] Avatar initial updated to: ${initial}`);
         } else {
-            console.log('[Rooted Vitality] Avatar initial element not found - element ID: rvAvatarInitial');
         }
     },
 
@@ -712,9 +652,6 @@ const RootedVitality = {
      */
     updateHeaderAvatar: function(imageUrl) {
         if (!imageUrl) return;
-        
-        console.log('[Rooted Vitality] Updating header avatar with:', imageUrl);
-        
         // Try to find and update avatar in the header
         const avatarBtn = document.querySelector('.rv-avatar-btn');
         if (avatarBtn) {
@@ -739,10 +676,7 @@ const RootedVitality = {
             avatarImg.style.objectFit = 'cover';
             avatarImg.style.borderRadius = 'inherit';
             avatarBtn.appendChild(avatarImg);
-            
-            console.log('[Rooted Vitality] Header avatar image updated');
         } else {
-            console.warn('[Rooted Vitality] Avatar button not found in header');
         }
     },
 
@@ -755,9 +689,6 @@ const RootedVitality = {
      */
     updateHeaderLogo: function(logoUrl, role = 'practitioner', view = 'practitioner') {
         if (!logoUrl) return;
-        
-        console.log('[Rooted Vitality] Updating header logo/avatar with:', logoUrl);
-        
         // Only update logo for practitioner view with practitioners
         if (role === 'practitioner' && view === 'practitioner') {
             const avatarBtn = document.querySelector('.rv-avatar-btn');
@@ -785,17 +716,13 @@ const RootedVitality = {
                 
                 // Log when image loads or fails
                 logoImg.onload = () => {
-                    console.log('[Rooted Vitality] Logo image loaded successfully:', logoUrl);
                 };
                 logoImg.onerror = () => {
                     console.error('[Rooted Vitality] Logo image failed to load:', logoUrl);
                 };
                 
                 avatarBtn.appendChild(logoImg);
-                
-                console.log('[Rooted Vitality] Header logo image updated in avatar button');
             } else {
-                console.warn('[Rooted Vitality] Avatar button not found for logo update');
             }
         }
     },
@@ -809,7 +736,6 @@ const RootedVitality = {
             const { data: { user } } = await window.supabaseClient.auth.getUser();
             if (user && this._logoLoadedForUser[user.id]) {
                 delete this._logoLoadedForUser[user.id];
-                console.log('[Rooted Vitality] Logo cache cleared for user:', user.id);
             }
         } catch (error) {
             console.error('[Rooted Vitality] Error clearing logo cache:', error);
@@ -825,7 +751,6 @@ const RootedVitality = {
             const { data: { user } } = await window.supabaseClient.auth.getUser();
             if (user && this._clientAvatarLoadedForUser[user.id]) {
                 delete this._clientAvatarLoadedForUser[user.id];
-                console.log('[Rooted Vitality] Client avatar cache cleared for user:', user.id);
             }
         } catch (error) {
             console.error('[Rooted Vitality] Error clearing client avatar cache:', error);
@@ -839,97 +764,73 @@ const RootedVitality = {
      */
     loadPractitionerLogo: async function(retryCount = 0) {
         const maxRetries = 3;
-        console.log(`[Rooted Vitality] loadPractitionerLogo() called (attempt ${retryCount + 1}/${maxRetries + 1})`);
+        
         
         try {
             // Check if avatar button exists in DOM
             const avatarBtn = document.querySelector('.rv-avatar-btn');
             if (!avatarBtn) {
-                console.warn(`[Rooted Vitality] [Attempt ${retryCount + 1}] Avatar button (.rv-avatar-btn) not found in DOM`);
+                
                 
                 // Retry if we haven't exceeded max retries
                 if (retryCount < maxRetries) {
-                    console.log(`[Rooted Vitality] Retrying in 200ms (${maxRetries - retryCount} retries left)...`);
+                    
                     setTimeout(() => this.loadPractitionerLogo(retryCount + 1), 200);
                 } else {
                     console.error('[Rooted Vitality] Max retries exceeded, avatar button never found');
                 }
                 return;
             }
-            console.log(`[Rooted Vitality] [Attempt ${retryCount + 1}] Avatar button found in DOM`);
-            
             // Only attempt if Supabase client is available
             if (!window.supabaseClient) {
-                console.warn('[Rooted Vitality] Supabase client not available');
-                
                 if (retryCount < maxRetries) {
-                    console.log(`[Rooted Vitality] Retrying in 200ms...`);
                     setTimeout(() => this.loadPractitionerLogo(retryCount + 1), 200);
                 }
                 return;
             }
-            console.log('[Rooted Vitality] Supabase client available');
-            
             // Get current user
             const { data: { user } } = await window.supabaseClient.auth.getUser();
             if (!user) {
-                console.warn('[Rooted Vitality] No authenticated user');
                 return;
             }
-            console.log('[Rooted Vitality] Authenticated user:', user.id);
-            
             // Check if already loaded for this user
             if (this._logoLoadedForUser[user.id]) {
-                console.log('[Rooted Vitality] Logo already loaded for this user, skipping');
                 return;
             }
             
             // Fetch practitioner data
-            console.log('[Rooted Vitality] Querying practitioners table...');
             const { data: practitioner, error } = await window.supabaseClient
                 .from('practitioners')
-                .select('legal_business_name')
+                .select('legal_business_name, serial_number')
                 .eq('id', user.id)
                 .single();
             
             if (error) {
                 console.error('[Rooted Vitality] Database query failed:', error);
-                console.log('[Rooted Vitality] Error details - practitioners table may not be accessible or user has no record');
                 return;
             }
             
             if (!practitioner) {
-                console.warn('[Rooted Vitality] No practitioner record found');
                 return;
             }
             
-            // Fetch logo from practitioner_profiles table
-            console.log('[Rooted Vitality] Querying practitioner_profiles table for logo...');
+            // Fetch logo from practitioner_profiles table using serial_number
             const { data: profile, error: profileError } = await window.supabaseClient
                 .from('practitioner_profiles')
                 .select('practice_logo_url')
-                .eq('id', user.id)
+                .eq('practitioner_serial', practitioner.serial_number)
                 .single();
             
             let logoUrl = null;
             if (!profileError && profile) {
                 logoUrl = profile.practice_logo_url;
             }
-            
-            console.log('[Rooted Vitality] Logo URL determination:', {
-                practice_logo_url: logoUrl,
-                hasProfile: !!profile
-            });
-            
             if (logoUrl) {
-                console.log('[Rooted Vitality] Logo URL found:', logoUrl.substring(0, 80) + '...');
+                
                 this.updateHeaderLogo(logoUrl, 'practitioner', 'practitioner');
-                console.log('[Rooted Vitality] Logo loaded successfully');
             } else {
-                console.log('[Rooted Vitality] No logo URL in database, updating initial with business name');
                 // No logo - update initial with business name from database
                 if (practitioner.legal_business_name) {
-                    console.log('[Rooted Vitality] Updating avatar initial with business name:', practitioner.legal_business_name);
                     this.updateAvatarInitial(practitioner.legal_business_name);
                 }
             }
@@ -937,12 +838,10 @@ const RootedVitality = {
             // Mark logo as loaded regardless of whether we found one
             // This prevents repeated database queries on every page load
             this._logoLoadedForUser[user.id] = true;
-            console.log('[Rooted Vitality] Logo load completed for user:', user.id);
         } catch (error) {
             console.error('[Rooted Vitality] Exception in loadPractitionerLogo:', error.message);
             
             if (retryCount < maxRetries) {
-                console.log(`[Rooted Vitality] Retrying after error in 200ms...`);
                 setTimeout(() => this.loadPractitionerLogo(retryCount + 1), 200);
             }
         }
@@ -954,12 +853,11 @@ const RootedVitality = {
      */
     loadClientAvatar: async function(retryCount = 0) {
         const maxRetries = 3;
-        console.log(`[Rooted Vitality] loadClientAvatar() called (attempt ${retryCount + 1}/${maxRetries + 1})`);
+        
         
         try {
             const avatarBtn = document.querySelector('.rv-avatar-btn');
             if (!avatarBtn) {
-                console.warn(`[Rooted Vitality] Avatar button not found`);
                 if (retryCount < maxRetries) {
                     setTimeout(() => this.loadClientAvatar(retryCount + 1), 200);
                 }
@@ -977,7 +875,6 @@ const RootedVitality = {
             if (!user) return;
             
             if (this._clientAvatarLoadedForUser && this._clientAvatarLoadedForUser[user.id]) {
-                console.log('[Rooted Vitality] Client avatar already loaded');
                 return;
             }
             
@@ -991,7 +888,6 @@ const RootedVitality = {
             
             if (client.profile_picture_url) {
                 this.updateHeaderAvatar(client.profile_picture_url);
-                console.log('[Rooted Vitality] Client avatar loaded');
             }
             
             if (!this._clientAvatarLoadedForUser) {
@@ -1025,8 +921,6 @@ const RootedVitality = {
                 console.error('[Rooted Vitality] Error marking notification as read:', error);
                 return;
             }
-            
-            console.log('[Rooted Vitality] Notification marked as read:', notifId, 'in table:', table);
             this.loadNotifications(); // Refresh to update bell state
         } catch (error) {
             console.error('[Rooted Vitality] Exception marking notification as read:', error);
@@ -1064,7 +958,6 @@ const RootedVitality = {
                     .single();
                 
                 if (clientError || !clientData) {
-                    console.warn('[Rooted Vitality] Could not fetch client serial for marking as read:', clientError);
                     return;
                 }
                 
@@ -1081,7 +974,6 @@ const RootedVitality = {
                     .single();
                 
                 if (practError || !practData) {
-                    console.warn('[Rooted Vitality] Could not fetch practitioner serial for marking as read:', practError);
                     return;
                 }
                 
@@ -1103,8 +995,6 @@ const RootedVitality = {
                 console.error('[Rooted Vitality] Error marking all notifications as read:', error);
                 return;
             }
-
-            console.log('[Rooted Vitality] All notifications marked as read');
             // Reload to update UI
             this.loadNotifications();
         } catch (error) {
@@ -1139,9 +1029,6 @@ const RootedVitality = {
             if (!practitionerSerial) {
                 return;
             }
-
-            console.log('[Rooted Vitality] Setting up real-time match listener...');
-
             // Subscribe to changes in project_practitioner_matches table
             const subscription = window.supabaseClient
                 .channel(`matches:${practitionerSerial}`)
@@ -1154,8 +1041,6 @@ const RootedVitality = {
                         filter: `practitioner_serial=eq.${practitionerSerial}`
                     },
                     async (payload) => {
-                        console.log('[Rooted Vitality] New match detected:', payload);
-                        
                         // Get match details to create a notification
                         const { data: matchData } = await window.supabaseClient
                             .from('project_practitioner_matches')
@@ -1183,7 +1068,6 @@ const RootedVitality = {
                             if (error) {
                                 console.error('[Rooted Vitality] Error creating match notification:', error);
                             } else {
-                                console.log('[Rooted Vitality] Match notification created');
                                 // Update the notification bell immediately
                                 this.loadNotifications();
                             }
@@ -1233,7 +1117,6 @@ const RootedVitality = {
                     .single();
                 
                 if (clientError || !clientData) {
-                    console.warn('[Rooted Vitality] Could not fetch client serial for notifications listener:', clientError);
                     return;
                 }
                 
@@ -1248,9 +1131,6 @@ const RootedVitality = {
             if (!serial) {
                 return;
             }
-
-            console.log(`[Rooted Vitality] Setting up real-time notification updates for ${roleLabel}:`, serial);
-
             // Subscribe to ALL changes on the notifications table for this user
             const channel = window.supabaseClient
                 .channel(`notif-updates:${roleLabel}:${serial}`)
@@ -1265,12 +1145,10 @@ const RootedVitality = {
                             : `practitioner_serial=eq.${serial}`
                     },
                     async (payload) => {
-                        console.log(`[Rooted Vitality] Notification change (${payload.eventType}) for ${roleLabel}:`, payload);
+                        
                         
                         // For new notifications (INSERT), immediately update badge and dropdown
                         if (payload.eventType === 'INSERT' && payload.new) {
-                            console.log('[Rooted Vitality] New notification received - updating UI immediately');
-                            
                             // Update badge count immediately
                             const badge = document.querySelector('.rv-notification-badge');
                             if (badge) {
@@ -1279,7 +1157,6 @@ const RootedVitality = {
                                 badge.textContent = newCount;
                                 badge.classList.add('active');
                                 badge.style.display = 'block';
-                                console.log('[Rooted Vitality] Badge updated to:', newCount);
                             }
 
                             // Update bell icon color to gold to indicate unread
@@ -1322,20 +1199,16 @@ const RootedVitality = {
                                 } else {
                                     notificationsList.appendChild(notifElement);
                                 }
-                                console.log('[Rooted Vitality] Notification added to dropdown list');
                             }
                         } 
                         // For any other changes (UPDATE, DELETE), reload the full list
                         else {
-                            console.log(`[Rooted Vitality] Notification ${payload.eventType} - reloading notifications`);
                             this.loadNotifications();
                         }
                     }
                 )
                 .subscribe((status) => {
-                    console.log(`[Rooted Vitality] Notification updates subscription status:`, status);
                     if (status === 'SUBSCRIBED') {
-                        console.log('[Rooted Vitality] ✅ Real-time notification updates SUBSCRIBED');
                     }
                 });
 
@@ -1379,7 +1252,6 @@ const RootedVitality = {
                     .single();
                 
                 if (clientError || !clientData) {
-                    console.warn('[Rooted Vitality] Could not fetch client serial:', clientError);
                     return;
                 }
                 
@@ -1391,7 +1263,6 @@ const RootedVitality = {
             }
 
             if (!whereValue) {
-                console.warn('[Rooted Vitality] Could not determine serial number for notifications');
                 return;
             }
 
@@ -1402,7 +1273,6 @@ const RootedVitality = {
                 .order('created_at', { ascending: false });
 
             if (error) {
-                console.warn('[Rooted Vitality] Notification query error:', error);
                 return;
             }
 
@@ -1461,17 +1331,263 @@ const RootedVitality = {
     },
 
     /**
-     * Initialize notifications menu interactions
-     * Handles click toggle, outside click close
+     * Initialize real-time notification subscriptions
+     * Sets up Supabase realtime listeners for instant notification updates
      */
+    initializeRealtimeNotifications: async function() {
+        if (!window.supabaseClient) {
+            return;
+        }
+
+        try {
+            const { data: { user } } = await window.supabaseClient.auth.getUser();
+            if (!user) {
+                return;
+            }
+
+            const currentUser = window.authManager?.getCurrentUser?.();
+            const userRole = currentUser?.role || localStorage.getItem('rvUserRole') || 'practitioner';
+
+            let notificationTable, whereField, whereValue;
+
+            if (userRole === 'client') {
+                notificationTable = 'client_notifications';
+                whereField = 'client_serial';
+                
+                const { data: clientData } = await window.supabaseClient
+                    .from('clients')
+                    .select('serial_number')
+                    .eq('id', user.id)
+                    .single();
+                
+                if (clientData) {
+                    whereValue = clientData.serial_number;
+                }
+            } else {
+                notificationTable = 'practitioner_notifications';
+                whereField = 'practitioner_serial';
+                whereValue = user.user_metadata?.serial_number || currentUser?.serial_number;
+
+                // For practitioners, also get it from the practitioners table if needed
+                if (!whereValue) {
+                    const { data: practData } = await window.supabaseClient
+                        .from('practitioners')
+                        .select('serial_number')
+                        .eq('id', user.id)
+                        .single();
+                    
+                    if (practData) {
+                        whereValue = practData.serial_number;
+                    }
+                }
+            }
+
+            if (!whereValue) {
+                return;
+            }
+
+            // Create channel name with user role and serial for isolation
+            const channelName = `${notificationTable}:${whereValue}`;
+            
+            // Subscribe to table changes
+            const channel = window.supabaseClient
+                .channel(channelName, {
+                    config: {
+                        broadcast: { self: true },
+                        presence: { key: whereValue }
+                    }
+                })
+                .on('postgres_changes', 
+                    {
+                        event: '*', // Listen to all events (INSERT, UPDATE, DELETE)
+                        schema: 'public',
+                        table: notificationTable,
+                        filter: `${whereField}=eq.${whereValue}`
+                    },
+                    (payload) => {
+                        console.log(`[Realtime] ${notificationTable} change detected:`, payload);
+                        
+                        // Reload notifications to reflect changes in real-time
+                        this.loadNotifications();
+                        
+                        // Show toast notification for new unread notifications
+                        if (payload.eventType === 'INSERT' && payload.new && !payload.new.is_read) {
+                            this.showNotificationToast(payload.new);
+                        }
+                    }
+                )
+                .subscribe((status) => {
+                    if (status === 'SUBSCRIBED') {
+                        console.log(`[Realtime] Successfully subscribed to ${channelName}`);
+                    } else if (status === 'CLOSED') {
+                        console.warn(`[Realtime] Channel ${channelName} closed`);
+                    } else if (status === 'CHANNEL_ERROR') {
+                        console.error(`[Realtime] Channel ${channelName} error`);
+                    }
+                });
+
+            // Store channel reference for cleanup if needed
+            if (!window._rvNotificationChannels) {
+                window._rvNotificationChannels = [];
+            }
+            window._rvNotificationChannels.push(channel);
+
+        } catch (error) {
+            console.error('[Realtime] Error initializing real-time notifications:', error);
+        }
+    },
+
+    /**
+     * Show a toast notification for new notifications
+     */
+    showNotificationToast: function(notification) {
+        try {
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = 'rv-notification-toast';
+            toast.innerHTML = `
+                <div class="rv-notification-toast-content">
+                    <p class="rv-notification-toast-title">${notification.title || 'New Notification'}</p>
+                    <p class="rv-notification-toast-message">${notification.message || ''}</p>
+                </div>
+                <button class="rv-notification-toast-close">&times;</button>
+            `;
+
+            // Add toast to page
+            document.body.appendChild(toast);
+
+            // Animate in
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 10);
+
+            // Close button handler
+            toast.querySelector('.rv-notification-toast-close').addEventListener('click', () => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            });
+
+            // Auto-dismiss after 5 seconds
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 300);
+                }
+            }, 5000);
+
+        } catch (error) {
+            console.error('[Realtime] Error showing notification toast:', error);
+        }
+    },
+
+    /**
+     * Subscribe to new match notifications for practitioners
+     */
+    subscribeToNewMatches: async function() {
+        if (!window.supabaseClient) {
+            return;
+        }
+
+        try {
+            const { data: { user } } = await window.supabaseClient.auth.getUser();
+            if (!user) {
+                return;
+            }
+
+            const currentUser = window.authManager?.getCurrentUser?.();
+            const userRole = currentUser?.role || localStorage.getItem('rvUserRole') || 'practitioner';
+
+            // Only practitioners care about new matches
+            if (userRole !== 'practitioner') {
+                return;
+            }
+
+            let practitionerSerial = user.user_metadata?.serial_number || currentUser?.serial_number;
+            
+            if (!practitionerSerial) {
+                const { data: practData } = await window.supabaseClient
+                    .from('practitioners')
+                    .select('serial_number')
+                    .eq('id', user.id)
+                    .single();
+                
+                if (practData) {
+                    practitionerSerial = practData.serial_number;
+                }
+            }
+
+            if (!practitionerSerial) {
+                return;
+            }
+
+            // Subscribe to new matches
+            const matchChannel = window.supabaseClient
+                .channel(`matches:${practitionerSerial}`)
+                .on('postgres_changes',
+                    {
+                        event: 'INSERT',
+                        schema: 'public',
+                        table: 'project_practitioner_matches',
+                        filter: `practitioner_serial=eq.${practitionerSerial}`
+                    },
+                    (payload) => {
+                        console.log('[Realtime] New match received:', payload);
+                        
+                        // Create and show notification
+                        const notification = {
+                            title: 'New Client Match',
+                            message: 'A new wellness client request matches your services',
+                            is_read: false
+                        };
+                        
+                        this.showNotificationToast(notification);
+                        
+                        // Reload notifications
+                        this.loadNotifications();
+                        
+                        // Trigger any page-specific handlers
+                        if (window.onNewMatchReceived) {
+                            window.onNewMatchReceived(payload.new);
+                        }
+                    }
+                )
+                .subscribe((status) => {
+                    if (status === 'SUBSCRIBED') {
+                        console.log(`[Realtime] Subscribed to new matches for ${practitionerSerial}`);
+                    }
+                });
+
+            if (!window._rvNotificationChannels) {
+                window._rvNotificationChannels = [];
+            }
+            window._rvNotificationChannels.push(matchChannel);
+
+        } catch (error) {
+            console.error('[Realtime] Error subscribing to new matches:', error);
+        }
+    },
+
+    /**
+     * Subscribe to notification updates for real-time badge/list updates
+     */
+    subscribeToNotificationUpdates: async function() {
+        if (!window.supabaseClient) {
+            return;
+        }
+
+        try {
+            // Initialize the comprehensive real-time notification system
+            await this.initializeRealtimeNotifications();
+        } catch (error) {
+            console.error('[Realtime] Error subscribing to notification updates:', error);
+        }
+    },
+
     initNotificationsMenu: function() {
-        console.log('[Rooted Vitality] Initializing notifications menu...');
-        
         const notificationsBtn = document.querySelector('.rv-notifications-btn');
         const notificationsDropdown = document.querySelector('.rv-notifications-dropdown');
         
         if (!notificationsBtn || !notificationsDropdown) {
-            console.log('[Rooted Vitality] Notifications menu not found, skipping initialization');
             return;
         }
         
@@ -1483,8 +1599,6 @@ const RootedVitality = {
             
             // When opening, immediately clear the bell badge and mark all as read
             if (isOpen) {
-                console.log('[Rooted Vitality] Bell clicked, clearing badge and marking all as read...');
-                
                 // Immediately hide badge and reset bell color for instant feedback
                 const bellIcon = document.querySelector('.rv-bell-icon');
                 const badge = document.querySelector('.rv-notification-badge');
@@ -1518,8 +1632,6 @@ const RootedVitality = {
                 notificationsBtn.focus();
             }
         });
-        
-        console.log('[Rooted Vitality] Notifications menu initialized');
     },
 
     /**
@@ -1527,23 +1639,17 @@ const RootedVitality = {
      * Handles click event to call authManager.logout()
      */
     initLogoutButtons: function() {
-        console.log('[Rooted Vitality] Initializing logout handler...');
-        
         // Handle Logout link in avatar dropdown
         const logoutLink = document.querySelector('.rv-logout-item');
         if (logoutLink) {
             logoutLink.addEventListener('click', (e) => {
                 e.preventDefault();
-                console.log('[Rooted Vitality] Log out link clicked');
                 if (typeof window.authManager !== 'undefined') {
                     window.authManager.logout();
                 } else {
-                    console.warn('[Rooted Vitality] authManager not available for logout');
                 }
             });
         }
-        
-        console.log('[Rooted Vitality] Logout handler initialized');
     },
     
     // ======================================================
@@ -1555,22 +1661,17 @@ const RootedVitality = {
      * Usage: RootedVitality.injectHeader();
      */
     injectHeader: function() {
-        console.log('[Rooted Vitality] injectHeader() called');
+        
         
         // Prevent double injection
         if (document.getElementById('rvHeader')) {
-            console.log('[Rooted Vitality] Header already exists, skipping injection');
             return;
         }
         
         // Ensure we have a body to inject into
         if (!document.body) {
-            console.warn('[Rooted Vitality] Body not ready for header injection');
             return;
         }
-        
-        console.log('[Rooted Vitality] Injecting header into body...');
-        
         // Detect if we're in a subdirectory and adjust paths accordingly
         const currentPath = window.location.pathname;
         const isSubdirectory = currentPath.includes('/articles/') || currentPath.includes('/policies/') || currentPath.includes('/dashboard/') || currentPath.includes('/help-center/');
@@ -1635,8 +1736,6 @@ const RootedVitality = {
                 toggle.setAttribute('aria-expanded', 'false');
             }
         });
-        
-        console.log('[Rooted Vitality] Header successfully injected!');
         this.log('Rooted Vitality Header injected successfully');
         
         // Attach login modal trigger to Login button
@@ -1648,7 +1747,6 @@ const RootedVitality = {
                     openLoginModal('client');
                 }
             });
-            console.log('[Rooted Vitality] Login modal trigger attached to Login button');
         }
         
         // Check auth state and update header if user is logged in
@@ -1662,21 +1760,15 @@ const RootedVitality = {
     updatePublicHeaderForAuthState: function() {
         try {
             if (typeof window.authManager === 'undefined') {
-                console.log('[Rooted Vitality] authManager not ready, skipping header update');
                 return;
             }
             
             const userData = window.authManager.getCurrentUser();
             if (!userData || !userData.role) {
-                console.log('[Rooted Vitality] No authenticated user, keeping public header');
                 return;
             }
-            
-            console.log('[Rooted Vitality] User authenticated as:', userData.role, '- Updating header');
-            
             const loginBtn = document.getElementById('rvLoginBtn');
             if (!loginBtn) {
-                console.warn('[Rooted Vitality] Login button not found in header');
                 return;
             }
             
@@ -1686,7 +1778,7 @@ const RootedVitality = {
             const pathPrefix = isSubdirectory ? '../' : './';
             
             // Replace Login button with Dashboard link
-            let dashboardUrl = pathPrefix + 'dashboard/client/pages/dashboard.html';
+            let dashboardUrl = pathPrefix + 'dashboard/client/pages/client-profile.html';
             if (userData.role === 'practitioner') {
                 dashboardUrl = pathPrefix + 'dashboard/pro/pages/index.html';
             }
@@ -1701,8 +1793,6 @@ const RootedVitality = {
                 e.preventDefault();
                 window.location.href = dashboardUrl;
             };
-            
-            console.log('[Rooted Vitality] Header updated to show Dashboard button');
         } catch (error) {
             console.error('[Rooted Vitality] Error updating header for auth state:', error);
         }
@@ -1717,7 +1807,6 @@ const RootedVitality = {
      * This function kept for backward compatibility
      */
     injectLoginModal: function() {
-        console.log('[Rooted Vitality] Login modal managed by authModal.js');
         // Modal auto-initializes in authModal.js
     },
     
@@ -1730,16 +1819,14 @@ const RootedVitality = {
      * Usage: RootedVitality.injectFooter();
      */
     injectFooter: function() {
-        console.log('[Rooted Vitality] injectFooter() called');
+        
         
         // Prevent double injection
         if (document.getElementById('rvFooter')) {
-            console.log('[Rooted Vitality] Footer already exists, skipping injection');
             return;
         }
         
         if (!document.body) {
-            console.warn('[Rooted Vitality] Body not ready for footer injection');
             return;
         }
         
@@ -1763,9 +1850,6 @@ const RootedVitality = {
             // 1 level deep (e.g., /dashboard/index.html)
             pathPrefix = '../';
         }
-        
-        console.log('[Rooted Vitality] Footer path calculation:', {currentPath, pathAfterBase, slashCount, pathPrefix});
-        
         const logoPath = `${pathPrefix}assets/logo_trimmed.png`;
         
         const footerHTML = `
@@ -1834,8 +1918,6 @@ const RootedVitality = {
         
         // Inject footer at end of body
         document.body.insertAdjacentHTML('beforeend', footerHTML);
-        
-        console.log('[Rooted Vitality] Footer successfully injected!');
         this.log('Rooted Vitality Footer injected successfully');
     },
 
@@ -1846,16 +1928,14 @@ const RootedVitality = {
      * Usage: RootedVitality.injectReportConcern();
      */
     injectReportConcern: function() {
-        console.log('[Rooted Vitality] injectReportConcern() called');
+        
         
         // Prevent double injection
         if (document.getElementById('report-concern-footer')) {
-            console.log('[Rooted Vitality] Report concern widget already exists, skipping injection');
             return;
         }
         
         if (!document.body) {
-            console.warn('[Rooted Vitality] Body not ready for report concern injection');
             return;
         }
         
@@ -1869,14 +1949,15 @@ const RootedVitality = {
         </div>
 
         <!-- Report Concern Modal -->
-        <div id="report-concern-modal" class="modal" style="display: none;">
-            <div class="modal-content report-concern-modal-content">
+        <div id="report-concern-modal" class="modal-overlay">
+            <div class="modal-content">
                 <div class="modal-header">
                     <h2>Report a Concern</h2>
-                    <button class="close-btn" onclick="closeReportConcernModal()">&times;</button>
+                    <button class="modal-close-btn" id="report-concern-close-btn">×</button>
                 </div>
                 
-                <form id="report-concern-form" onsubmit="submitReportConcern(event)">
+                <div class="modal-body">
+                <form id="report-concern-form">
                     
                     <!-- Category Selection -->
                     <div class="form-group">
@@ -1971,19 +2052,29 @@ const RootedVitality = {
 
                     <!-- Form Actions -->
                     <div class="form-actions">
-                        <button type="button" class="btn-secondary" onclick="closeReportConcernModal()">Cancel</button>
-                        <button type="submit" class="btn-primary">Submit Report</button>
+                        <button type="button" class="btn-modal btn-modal-secondary" id="report-concern-cancel-btn">Cancel</button>
+                        <button type="submit" class="btn-modal btn-modal-primary" id="report-concern-submit-btn">Submit Report</button>
                     </div>
                 </form>
+                </div>
             </div>
         </div>
         `;
         
-        // Insert at end of body (after all content, before footer which comes after)
-        // This ensures it appears between main content and footer
-        document.body.insertAdjacentHTML('beforeend', reportConcernHTML);
-        
-        console.log('[Rooted Vitality] Report concern widget successfully injected!');
+        // Insert into report-concern-inject container (positioned before footer in HTML)
+        const reportContainer = document.getElementById('report-concern-inject');
+        if (reportContainer) {
+            reportContainer.innerHTML = reportConcernHTML;
+        } else {
+            // Fallback: insert before footer if container doesn't exist
+            const footer = document.getElementById('footer-inject');
+            if (footer) {
+                footer.insertAdjacentHTML('beforebegin', reportConcernHTML);
+            } else {
+                // Last resort: insert at end of body
+                document.body.insertAdjacentHTML('beforeend', reportConcernHTML);
+            }
+        }
         this.log('Report concern widget injected successfully');
         
         // Load and initialize the report concern system
@@ -1994,7 +2085,14 @@ const RootedVitality = {
      * Load report concern script and initialize system
      */
     initializeReportConcernSystem: function() {
-        console.log('[Rooted Vitality] Initializing report concern system...');
+        // Ensure modal-system.css is loaded (required for .modal-overlay and .modal-content classes)
+        const modalCssPath = '/rooted-vitality/styles/modal-system.css';
+        if (!document.querySelector(`link[href="${modalCssPath}"]`)) {
+            const modalLink = document.createElement('link');
+            modalLink.rel = 'stylesheet';
+            modalLink.href = modalCssPath;
+            document.head.appendChild(modalLink);
+        }
         
         // Ensure CSS is loaded (as fallback if not in HTML head)
         const cssPath = '/rooted-vitality/styles/report-concern-widget.css';
@@ -2003,12 +2101,10 @@ const RootedVitality = {
             link.rel = 'stylesheet';
             link.href = cssPath;
             document.head.appendChild(link);
-            console.log('[Rooted Vitality] Report concern CSS loaded');
         }
         
         // Check if script already loaded
         if (window.initializeReportConcernSystem) {
-            console.log('[Rooted Vitality] Report concern system already loaded, initializing...');
             window.initializeReportConcernSystem();
             return;
         }
@@ -2020,7 +2116,6 @@ const RootedVitality = {
         script.async = true;
         
         script.onload = () => {
-            console.log('[Rooted Vitality] Report concern script loaded successfully');
             // Initialize the system
             if (window.initializeReportConcernSystem) {
                 window.initializeReportConcernSystem();
@@ -2050,12 +2145,9 @@ const RootedVitality = {
             // Check if this is practitioner profile page with pre-detected role
             if (window.PRACTITIONER_PROFILE_PAGE && window.DETECTED_USER_ROLE) {
                 headerRole = window.DETECTED_USER_ROLE;
-                console.log('[Rooted Vitality] Using pre-detected role from practitioner profile:', headerRole);
-                
                 // For practitioners, load view from localStorage
                 if (headerRole === 'practitioner') {
                     headerView = localStorage.getItem('active_view') || 'client';
-                    console.log('[Rooted Vitality] Practitioner view:', headerView);
                 }
             } 
             // Check for authenticated user via authManager
@@ -2063,17 +2155,13 @@ const RootedVitality = {
                 const userData = window.authManager.getCurrentUser();
                 if (userData && userData.role) {
                     headerRole = userData.role;
-                    console.log('[Rooted Vitality] User authenticated as:', headerRole);
-                    
                     // For practitioners, load view from localStorage
                     if (headerRole === 'practitioner') {
                         headerView = localStorage.getItem('active_view') || 'client';
-                        console.log('[Rooted Vitality] Practitioner view:', headerView);
                     }
                 }
             }
         } catch (error) {
-            console.log('[Rooted Vitality] Auth check failed, defaulting to public header:', error);
         }
         
         // Render header with appropriate role and view
@@ -2091,17 +2179,12 @@ const RootedVitality = {
 };
 
 // Auto-initialize on script load if document is ready
-console.log('[Rooted Vitality] Document readyState:', document.readyState);
-
 if (document.readyState === 'loading') {
-    console.log('[Rooted Vitality] Waiting for DOMContentLoaded...');
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('[Rooted Vitality] DOMContentLoaded fired, initializing...');
         RootedVitality.init();
     });
 } else {
     // Document already loaded
-    console.log('[Rooted Vitality] Document already loaded, initializing immediately...');
     RootedVitality.init();
 }
 
@@ -2111,6 +2194,7 @@ if (typeof module !== 'undefined' && module.exports) {
 }
 
 // End of injections.js — Rooted Vitality Global Utilities
+
 
 
 

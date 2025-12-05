@@ -1,26 +1,80 @@
+  <!--
+  ╔════════════════════════════════════════════════════════════════════╗
+  ║  ROOTED VITALITY, INC.                                             ║
+  ║  File: dashboard/pro/pages/profile.html                            ║
+  ║  Purpose: Practitioner profile management dashboard                ║
+  ║  Holistic Wellness · Modern Connection Platform                    ║
+  ║  rootedvitality.com | 2025                                         ║
+  ╚════════════════════════════════════════════════════════════════════╝
+
+  TABLE OF CONTENTS:
+    1. Page Specific Inline Scripts
+    2. Head & Metadata
+    3. Profile Header Card
+    4. Profile Completeness Section
+    5. Profile Navigation
+    6. Profile Panels
+       6.1 About Section (Bio & Approach)
+       6.2 Credentials Section (Degrees, Licenses, Certs, Background Check, Verification)
+       6.3 Photos & Video Section
+       6.4 Additional Details Section (Languages, FAQ, Social, Practice Type, Insurance)
+       6.5 Reviews Section
+    7. Scripts
+  -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+  <!-- Basic Meta Tags -->
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>My Profile | Rooted Vitality</title>
-  <meta name="description" content="Your professional practitioner profile on Rooted Vitality.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
+  <!-- SEO & Metadata (Private Dashboard - No Indexing) -->
+  <meta name="description" content="Manage your professional practitioner profile, credentials, photos, and practice details on Rooted Vitality.">
+  <meta name="keywords" content="practitioner profile, professional dashboard, practice management, credentials, profile builder">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="author" content="Rooted Vitality, Inc.">
+  <meta name="theme-color" content="#77883e">
+  
+  <!-- Open Graph (Internal Sharing) -->
+  <meta property="og:title" content="My Profile - Rooted Vitality Practitioner Dashboard">
+  <meta property="og:description" content="Manage your professional profile, credentials, and practice information.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://kylemohney.com/rooted-vitality/dashboard/pro/pages/profile.html">
+  <meta property="og:site_name" content="Rooted Vitality">
+  
+  <!-- Mobile App Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Rooted Vitality">
+  
+  <!-- Page Title -->
+  <title>My Profile | Rooted Vitality Practitioner</title>
+  
+  <!-- Stylesheets -->
   <link rel="stylesheet" href="../../../styles/base.css">
   <link rel="stylesheet" href="../../../styles/layout.css">
   <link rel="stylesheet" href="../../../styles/components.css">
+  <link rel="stylesheet" href="../../../styles/modal-system.css">
   <link rel="stylesheet" href="../../../styles/styles.css">
-  <link rel="stylesheet" href="../../../styles/profile.css">
+  <link rel="stylesheet" href="../styles/profile-utility.css">
+  <link rel="stylesheet" href="../styles/profile-credentials.css">
+  <link rel="stylesheet" href="../styles/profile.css">
+  <link rel="stylesheet" href="../styles/profile-media.css">
   <link rel="stylesheet" href="../../../styles/report-concern-widget.css">
 </head>
 <body class="pro-dashboard">
+
+  <!-- ========================================== -->
+  <!-- 1. PAGE-SPECIFIC INLINE SCRIPTS          -->
+  <!-- ========================================== -->
   <script>
     localStorage.setItem('active_view', 'practitioner');
     
-    // Profile Panel Navigation Switcher - Define early for inline onclick handlers
+    // 1. PROFILE PANEL NAVIGATION
+    // Switches between About, Credentials, Photos, Reviews, Additional Details panels
     function switchProfilePanel(panelName, buttonElement) {
-      console.log('Switching to panel:', panelName);
-      
       // Hide all panels
       document.querySelectorAll('.profile-panel').forEach(panel => {
         panel.classList.remove('active');
@@ -35,14 +89,13 @@
       const panel = document.querySelector(`[data-panel="${panelName}"]`);
       if (panel) {
         panel.classList.add('active');
-        console.log('Panel activated:', panelName);
         
         // Initialize reviews if switching to reviews panel
         if (panelName === 'reviews' && typeof initializeReviews === 'function') {
           initializeReviews();
         }
       } else {
-        console.warn('Panel not found:', panelName);
+        // Panel not found, silently fail
       }
       
       // Activate the clicked button
@@ -51,7 +104,8 @@
       }
     }
 
-    // Subsection Collapse/Expand Toggle
+    // 2. SUBSECTION COLLAPSE/EXPAND TOGGLE
+    // Expands/collapses individual subsections within panels
     function toggleSubsection(button) {
       const subsection = button.closest('.bio-subsection, .credentials-subsection, .photos-subsection, .more-details-subsection');
       if (subsection) {
@@ -61,15 +115,22 @@
     }
   </script>
   
+  <!-- ========================================== -->
+  <!-- 2. HEAD & METADATA -->
+  <!-- ========================================== -->
+  
   <header id="header-inject"></header>
 
   <main id="profile-container" class="profile-main">
     <article class="profile-page">
       
+      <!-- ========================================== -->
+      <!-- 3. PROFILE HEADER CARD -->
+      <!-- ========================================== -->
       <!-- Profile Header Card -->
       <div class="profile-header-card">
         <div class="profile-avatar-container">
-          <div id="profile-avatar" class="profile-avatar" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #77883e 0%, #5f7030 100%); font-size: 48px; color: #fbf7ec; font-weight: bold;">U</div>
+          <div id="profile-avatar" class="profile-avatar" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #77883e 0%, #ebf6e8 100%); font-size: 48px; color: #fbf7ec; font-weight: bold;">U</div>
           <label class="avatar-upload-btn" title="Change profile photo">
             <input type="file" id="avatar-input" accept="image/*" style="display: none;">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -133,6 +194,9 @@
         </div>
       </div>
 
+      <!-- ========================================== -->
+      <!-- 4. PROFILE COMPLETENESS SECTION -->
+      <!-- ========================================== -->
       <!-- Profile Completeness Section -->
       <div class="profile-completeness-section">
         <!-- Profile Completeness Meter -->
@@ -165,6 +229,9 @@
         </div>
       </div>
 
+      <!-- ========================================== -->
+      <!-- 5. PROFILE NAVIGATION -->
+      <!-- ========================================== -->
       <!-- Profile Sections Container with Side Navigation -->
       <div class="profile-sections-wrapper">
         
@@ -180,6 +247,11 @@
         <!-- Content Panels Container -->
         <div class="profile-panels-container">
 
+        <!-- ========================================== -->
+        <!-- 6. PROFILE PANELS -->
+        <!-- ========================================== -->
+        
+        <!-- 6.1 ABOUT SECTION -->
         <!-- About Section -->
         <section class="profile-panel active" data-panel="bio">
           <div class="section-header">
@@ -220,6 +292,7 @@
           </div>
         </section>
 
+        <!-- 6.2 CREDENTIALS SECTION -->
         <!-- Credentials Section (Degrees, Licenses, Certifications combined) -->
         <section class="profile-panel" data-panel="credentials">
           <div class="section-header">
@@ -361,8 +434,7 @@
           </div>
         </section>
 
-        <!-- Presence & Photos Section -->
-        <!-- Photos & Video Section -->
+        <!-- 6.3 PHOTOS & VIDEO SECTION -->
         <section class="profile-panel" data-panel="photos-video">
           <div class="section-header">
             <h2>Professional Photos & Video</h2>
@@ -413,6 +485,7 @@
           </div>
         </section>
 
+        <!-- 6.4 ADDITIONAL DETAILS SECTION -->
         <!-- Languages Section -->
         <!-- Additional Details Section (Languages, FAQ, Practice, Payment combined) -->
         <section class="profile-panel" data-panel="more-details">
@@ -769,6 +842,7 @@
           </div>
         </section>
 
+        <!-- 6.5 REVIEWS SECTION -->
         <!-- Reviews Section -->
         <section class="profile-panel" data-panel="reviews">
           <div class="section-header">
@@ -912,7 +986,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h2>Share Review Link</h2>
-        <button class="modal-close" onclick="closeReviewLinkModal()">×</button>
+        <button class="modal-close-btn" onclick="closeReviewLinkModal()">×</button>
       </div>
       
       <div class="modal-body">
@@ -946,18 +1020,51 @@
 
   <footer id="footer-inject"></footer>
 
+  <!-- Report Concern Widget Container -->
+  <div id="report-concern-inject"></div>
+
   <!-- Supabase JS Client Library -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
-  <!-- Rooted Vitality Scripts -->
+  <!-- Global auth and utility scripts (core dependencies) -->
   <script src="../../../scripts/config.js"></script>
   <script src="../../../scripts/authManager.js"></script>
   <script src="../../../scripts/authModal.js"></script>
   <script src="../../../scripts/authHooks.js"></script>
+  <script src="../../../scripts/utilities.js"></script>
   <script src="../../../injections.js"></script>
-  <script src="../../../scripts/proDashboard.js"></script>
-  <script src="../../../scripts/proProfile.js"></script>
+  <script src="../scripts/profileCompleteness.js"></script>
 
+  <!-- Pre-initialize injections for practitioner profile page -->
+  <script>
+    // Mark this as practitioner profile page and trigger header/footer/report concern injection
+    (async function() {
+      if (typeof RootedVitality !== 'undefined' && typeof RootedVitality.renderHeader === 'function') {
+        localStorage.setItem('active_view', 'practitioner');
+        // Force render header for practitioner
+        await RootedVitality.renderHeader('practitioner', 'practitioner');
+        // Inject footer and report concern
+        if (typeof RootedVitality.injectFooter === 'function') {
+          RootedVitality.injectFooter();
+        }
+        if (typeof RootedVitality.injectReportConcern === 'function') {
+          RootedVitality.injectReportConcern();
+        }
+      }
+    })();
+  </script>
+
+  <!-- ========================================== -->
+  <!-- 7. SCRIPTS -->
+  <!-- ========================================== -->
+  
+  <!-- Profile module scripts (in dependency order) -->
+  <script src="../scripts/practitioner-profile-media.js"></script>
+  <script src="../scripts/practitioner-profile-credentials.js"></script>
+  <script src="../scripts/practitioner-profile-utility.js"></script>
+  <script src="../scripts/practitioner-profile.js"></script>
+
+  <!-- Page-specific inline scripts -->
   <script>
     // Mark Profile as active in the header navigation
     document.addEventListener('DOMContentLoaded', () => {
@@ -974,59 +1081,3 @@
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,21 +1,88 @@
+<!--
+  ╔═════════════════════════════════════════════════════════════════════════════╗
+  ║                         ROOTED VITALITY DASHBOARD                           ║
+  ║              FIND PRACTITIONERS (HTML)                                      ║
+  ║                                                                             ║
+  ║ File:        find-practitioners.html                                        ║
+  ║ Purpose:     Client practitioner directory - find and connect               ║
+  ║ Description: Practitioner search, filtering, sorting, connection            ║
+  ║              requests, practitioner detail modals, project-based matching   ║
+  ║ Last Update: November 2025                                                  ║
+  ║ Status:      Production-Ready | Build Standard v2.0 Compliant               ║
+  ║                                                                             ║
+  ║ QUICK REFERENCE:                                                            ║
+  ║ - Key Sections: Directory Grid | Sidebar | Filters | Detail Modal           ║
+  ║ - Design System: CSS Classes, Form Elements, Modal Dialogs                  ║
+  ║ - Features: Search, Sort, Filter, Connection Requests                       ║
+  ║                                                                             ║
+  ╚═════════════════════════════════════════════════════════════════════════════╝
+  -->
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       TABLE OF CONTENTS
+       ═════════════════════════════════════════════════════════════════════════
+       
+       1. HEAD METADATA & SEO
+       2. STYLESHEETS
+       3. HEADER (INJECTED)
+       4. MAIN CONTENT - DIRECTORY GRID
+       5. SIDEBAR - PROJECT INFO & FILTERS
+       6. CONTENT AREA - PRACTITIONER LIST
+       7. PRACTITIONER DETAIL MODAL
+       8. CONNECTION REQUEST MODAL
+       9. FOOTER (INJECTED)
+       10. SCRIPTS
+       
+       ═════════════════════════════════════════════════════════════════════════
+  -->
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       1. HEAD METADATA & SEO
+       ═════════════════════════════════════════════════════════════════════════ -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Find and connect with qualified wellness practitioners on Rooted Vitality. Browse our curated directory of therapists, coaches, and holistic health professionals. Filter by specialty, location, and availability.">
+  <meta name="keywords" content="wellness practitioners, therapists, holistic health, practitioners directory, wellness professionals, find practitioners">
+  <meta name="author" content="Rooted Vitality, Inc.">
   <meta name="robots" content="noindex,nofollow">
+  
+  <!-- Open Graph / Social Media -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Find Practitioners · Rooted Vitality">
+  <meta property="og:description" content="Browse and connect with qualified wellness practitioners. Personalized matching based on your wellness goals and preferences.">
+  <meta property="og:url" content="https://rootedvitality.com/dashboard/client/pages/find-practitioners.html">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Find Practitioners · Rooted Vitality">
+  <meta name="twitter:description" content="Browse and connect with qualified wellness practitioners personalized for your needs.">
+  
   <title>Find Practitioners · Rooted Vitality</title>
+  
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       2. STYLESHEETS
+       ═════════════════════════════════════════════════════════════════════════ -->
   <link rel="stylesheet" href="../../../styles/styles.css">
   <link rel="stylesheet" href="../styles/find-practitioners.css">
   <link rel="stylesheet" href="../../../styles/report-concern-widget.css">
 </head>
 <body>
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       3. HEADER (INJECTED)
+       ═════════════════════════════════════════════════════════════════════════ -->
   <header id="header-inject"></header>
   
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       4. MAIN CONTENT - DIRECTORY GRID
+       ═════════════════════════════════════════════════════════════════════════ -->
   <main class="find-practitioners-container">
-    <!-- Main Content Grid -->
     <div class="directory-grid">
-      <!-- Left Sidebar: Filters & Project Info -->
+      <!-- ═══════════════════════════════════════════════════════════════════════════
+           5. SIDEBAR - PROJECT INFO & FILTERS
+           ═════════════════════════════════════════════════════════════════════════ -->
       <aside class="directory-sidebar">
         <!-- Project Information Card -->
         <div class="project-info-card">
@@ -45,8 +112,8 @@
         </div>
 
         <!-- Navigation Buttons -->
-        <button id="back-to-projects" class="btn btn--secondary" style="width: 100%; margin-bottom: 0.5rem; cursor: pointer;" onclick="window.location.href='my-wellness.html';">← Back to Wellness</button>
-        <button id="refresh-search" class="btn btn--secondary" style="width: 100%; margin-bottom: 1rem; cursor: pointer;" onclick="refreshSearch();">Refresh Search</button>
+        <button id="back-to-projects" class="btn btn--secondary btn--full-width btn--mb-sm" data-action="navigate" data-target="my-wellness.html">← Back to Wellness</button>
+        <button id="refresh-search" class="btn btn--secondary btn--full-width btn--mb-lg" data-action="refresh-search">Refresh Search</button>
 
         <!-- Sorting -->
         <div class="directory-sidebar__card">
@@ -67,7 +134,9 @@
         </div>
       </aside>
 
-      <!-- Right Content: Practitioner List -->
+      <!-- ═══════════════════════════════════════════════════════════════════════════
+           6. CONTENT AREA - PRACTITIONER LIST
+           ═════════════════════════════════════════════════════════════════════════ -->
       <section class="directory-content">
         <!-- Controls Bar -->
         <div class="directory-controls">
@@ -75,7 +144,7 @@
             <span class="results-count">Showing <span id="showing-count">0</span> of <span id="total-count">0</span> practitioners</span>
           </div>
           <div class="controls-right">
-            <button id="clear-filters" class="btn btn--secondary" style="display:none;">Clear Filters</button>
+            <button id="clear-filters" class="btn btn--secondary hidden">Clear Filters</button>
           </div>
         </div>
 
@@ -85,7 +154,7 @@
         </div>
 
         <!-- Empty State -->
-        <div id="empty-state" class="empty-state" style="display:none;">
+        <div id="empty-state" class="empty-state hidden">
           <div class="empty-state__content">
             <h3 class="empty-state__title">No Matches Found</h3>
             <p class="empty-state__text">
@@ -96,7 +165,7 @@
         </div>
 
         <!-- Pagination -->
-        <div id="pagination" class="pagination" style="display:none;">
+        <div id="pagination" class="pagination hidden">
           <button id="prev-page" class="btn btn--secondary" disabled>← Previous</button>
           <span class="pagination__info">Page <span id="current-page">1</span> of <span id="total-pages">1</span></span>
           <button id="next-page" class="btn btn--secondary" disabled>Next →</button>
@@ -105,7 +174,9 @@
     </div>
   </main>
 
-  <!-- Practitioner Detail Modal -->
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       7. PRACTITIONER DETAIL MODAL
+       ═════════════════════════════════════════════════════════════════════════ -->
   <div id="practitioner-modal" class="modal">
     <div class="modal__overlay"></div>
     <div class="modal__content modal__content--large">
@@ -173,7 +244,9 @@
     </div>
   </div>
 
-  <!-- Connection Request Modal -->
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       8. CONNECTION REQUEST MODAL
+       ═════════════════════════════════════════════════════════════════════════ -->
   <div id="connection-request-modal" class="modal">
     <div class="modal__overlay"></div>
     <div class="modal__content">
@@ -197,8 +270,14 @@
     </div>
   </div>
 
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       9. FOOTER (INJECTED)
+       ═════════════════════════════════════════════════════════════════════════ -->
   <footer id="footer-inject"></footer>
 
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       10. SCRIPTS
+       ═════════════════════════════════════════════════════════════════════════ -->
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -207,62 +286,6 @@
   <script src="../../../scripts/authManager.js"></script>
   <script src="../../../scripts/authHooks.js"></script>
   <script src="../../../injections.js"></script>
-  <script src="../../../scripts/find-practitioners.js"></script>
+  <script src="../scripts/find-practitioners.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

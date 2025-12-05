@@ -143,11 +143,11 @@ serve(async (req) => {
           "Authorization": `Bearer ${RESEND_API_KEY}`,
         },
         body: JSON.stringify({
-          from: "error-reports@rooted-vitality.com",
+          from: "support@rootedvitality.health",
           to: "kylejmohney@gmail.com",
           subject: `USER ERROR REPORT [${ticketId}] - ${title}`,
           html: emailContent,
-          reply_to: email,
+          reply_to: "support@rootedvitality.health",
         }),
       });
 
@@ -157,11 +157,7 @@ serve(async (req) => {
         throw new Error("Failed to send email");
       }
     } else {
-      // Fallback: log to console (useful for development)
-      console.log(`Email would be sent to: kylejmohney@gmail.com`);
-      console.log(`Ticket: ${ticketId}`);
-      console.log(`Title: ${title}`);
-      console.log(`Reply-To: ${email}`);
+      console.warn("RESEND_API_KEY not set. Email not sent.");
     }
 
     // Log the report to Supabase for record keeping

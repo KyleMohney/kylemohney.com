@@ -120,7 +120,7 @@ FEATURES:
         // Getting Started (Patient)
         {
             keywords: ['get started', 'how to start', 'begin', 'first steps', 'new patient', 'patient guide', 'where do i start', 'getting started', 'how does this work', 'new here', 'start using'],
-            answer: "Start by exploring wellness resources and articles to learn about different modalities. When ready, browse practitioners by specialty and location, then book a consultation with someone who resonates with you.",
+            answer: "Start by exploring wellness resources and articles to learn about different wellness practices. When ready, browse practitioners by specialty and location, then book a consultation with someone who resonates with you.",
             articleLink: './articles/how-to-book-consultation.html',
             articleTitle: 'How to Book a Consultation'
         },
@@ -135,7 +135,7 @@ FEATURES:
         
         // Types of Practitioners
         {
-            keywords: ['types of practitioners', 'what practitioners', 'who can i find', 'modalities', 'specialties'],
+            keywords: ['types of practitioners', 'what practitioners', 'who can i find', 'specialties', 'wellness professionals'],
             answer: "You'll find herbalists, energy workers, nutritionists, wellness coaches, massage therapists, acupuncturists, and many other holistic wellness professionals. Browse by specialty to find exactly what you need.",
             articleLink: './articles/what-is-rooted-vitality.html',
             articleTitle: 'What is Rooted Vitality?'

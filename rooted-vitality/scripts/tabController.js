@@ -1,3 +1,22 @@
+﻿/*
+╔════════════════════════════════════════════════════════════════════╗
+║  ROOTED VITALITY, INC.                                             ║
+║  File: tabController.js                                            ║
+║  Purpose: Tab switching between Client and Practitioner views      ║
+║  Holistic Wellness · Modern Connection Platform                    ║
+║  rootedvitality.com | 2025                                         ║
+╚════════════════════════════════════════════════════════════════════╝
+
+ TABLE OF CONTENTS
+   1. SWITCH TAB HANDLER
+   2. INITIALIZE TAB LISTENERS
+   3. EXPORTS & GLOBALS
+*/
+
+// ======================================================
+// 1. SWITCH TAB HANDLER
+// ======================================================
+
 // ======================================================
 // tabController.js
 // ======================================================
@@ -58,6 +77,8 @@ window.tabController = {
   switchTab,
   initTabListeners
 };
+
+
 
 
 

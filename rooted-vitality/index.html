@@ -28,7 +28,7 @@
   <meta name="robots" content="index,follow">
   <title>Rooted Vitality | Find Holistic Practitioners Near You</title>
   <link rel="stylesheet" href="./styles/styles.css">
-  <link rel="stylesheet" href="./styles/landing-page.css">
+  <link rel="stylesheet" href="./dashboard/public/styles/landing-page.css">
   <link rel="stylesheet" href="./styles/report-concern-widget.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -71,25 +71,36 @@
               }
               
               // Fallback: If no view preference set, check if they're ONLY a practitioner (not dual-role)
-              const { data: practitioner } = await window.supabaseClient
-                .from('practitioners')
-                .select('id')
-                .eq('id', user.id)
-                .single();
-              
-              const { data: client } = await window.supabaseClient
-                .from('clients')
-                .select('id')
-                .eq('id', user.id)
-                .single();
-              
-              // If they're a practitioner but NOT a client, redirect them
-              if (practitioner && !client) {
-                console.log('[Rooted Vitality] Practitioner-only user detected, redirecting to dashboard');
-                window.location.href = '/rooted-vitality/dashboard/pro/pages/index.html';
-              } else if (practitioner && client) {
-                // Dual-role user - allow them to stay on landing page (client view is default)
-                console.log('[Rooted Vitality] Dual-role user on index, allowing client view');
+              try {
+                // First check if they exist in clients table - most common case
+                const { data: client, error: clientError } = await window.supabaseClient
+                  .from('clients')
+                  .select('id')
+                  .eq('id', user.id)
+                  .single();
+                
+                // If they're a client, they stay on landing page (default)
+                if (client) {
+                  console.log('[Rooted Vitality] Client user detected, staying on index');
+                  return;
+                }
+                
+                // Only if NOT a client, check if they're a practitioner
+                if (!client) {
+                  const { data: practitioner, error: practError } = await window.supabaseClient
+                    .from('practitioners')
+                    .select('id')
+                    .eq('id', user.id)
+                    .single();
+                  
+                  if (practitioner && !practError) {
+                    console.log('[Rooted Vitality] Practitioner-only user detected, redirecting to dashboard');
+                    window.location.href = '/rooted-vitality/dashboard/pro/pages/index.html';
+                  }
+                }
+              } catch (error) {
+                console.warn('[Rooted Vitality] Error checking user roles:', error);
+                // Continue anyway - user stays on landing page (safe default)
               }
             }
           }
@@ -422,10 +433,13 @@
   <script src="./scripts/authModal.js"></script>
   <script src="./scripts/authHooks.js"></script>
   <script src="./injections.js"></script>
-  <script src="./scripts/guidedOnboarding.js"></script>
+  <!-- Modular Onboarding System -->
+  <script src="./dashboard/public/scripts/onboardingCore.js"></script>
+  <script src="./dashboard/public/scripts/onboardingUI.js"></script>
+  <script src="./dashboard/public/scripts/onboardingService.js"></script>
   
   <!-- Landing Page Specific -->
-  <script src="./scripts/landing-page.js"></script>
+  <script src="./dashboard/public/scripts/landing-page.js"></script>
 
   <!-- First-time User Onboarding - DISABLED: Modal now only shows on user action -->
   <!-- Previously showed onboarding modal automatically for first-time users -->
@@ -434,6 +448,8 @@
   <script>
     async function handleHeroClick() {
       try {
+        console.log('[Landing] Hero button clicked!');
+        
         // Check if user is signed in
         if (!window.supabaseClient) {
           console.error('[Landing] Supabase client not initialized');
@@ -441,6 +457,7 @@
           return;
         }
 
+        console.log('[Landing] Supabase client available. Checking session...');
         const { data: { session } } = await window.supabaseClient.auth.getSession();
 
         if (session) {
@@ -448,6 +465,7 @@
           // Go straight to project creation for returning member
           console.log('[Landing] Rule 3: Signed-in user detected. Starting onboarding for returning user...');
           if (typeof window.initializeGuidedOnboarding === 'function') {
+            console.log('[Landing] Calling initializeGuidedOnboarding(true)...');
             window.initializeGuidedOnboarding(true);
           } else {
             console.error('[Landing] initializeGuidedOnboarding not available. Functions available:', Object.keys(window).filter(k => k.includes('onboard') || k.includes('Guided')));
@@ -458,6 +476,7 @@
           // Let user choose: are they new (Rule 1) or returning (Rule 2)?
           console.log('[Landing] Rule 1/2: No session detected. Showing new/returning choice modal...');
           if (typeof window.initializeGuidedOnboarding === 'function') {
+            console.log('[Landing] Calling initializeGuidedOnboarding(false, false)...');
             window.initializeGuidedOnboarding(false, false); // skipAuth=false, isReturningUser=false - shows Step 0
           } else {
             console.error('[Landing] initializeGuidedOnboarding not available. Functions available:', Object.keys(window).filter(k => k.includes('onboard') || k.includes('Guided')));
@@ -515,7 +534,7 @@
           if (typeof openLoginModal === 'function') {
             openLoginModal();
           } else {
-            window.location.href = '/rooted-vitality/dashboard/client/pages/signup.html';
+            window.location.href = '/rooted-vitality/dashboard/client/pages/client-signup.html';
           }
         }
       } catch (error) {

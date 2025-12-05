@@ -22,7 +22,7 @@
 | dashboard/pro/match-settings| Match Settings - Rooted Vitality     | Set your service categories and matching preferences| match, settings, service, category      | Yes            | WebPage           |
 | articles.html               | Articles - Holistic Health Insights  | Read expert articles on wellness and health         | articles, wellness, insights, health    | Yes            | Blog              |
 | help-center/index.html      | Help Center - Rooted Vitality        | Get support, FAQs, and guides for your journey      | help, support, FAQ, guide               | Yes            | FAQPage           |
-| signup.html                 | Sign Up - Rooted Vitality            | Create your account and start your wellness journey | signup, account, wellness, practitioner | Yes            | WebPage           |
+| client-signup.html          | Sign Up - Rooted Vitality            | Create your account and start your wellness journey | signup, account, wellness, practitioner | Yes            | WebPage           |
 | contact.html                | Contact Us - Rooted Vitality         | Reach out for support or partnership inquiries      | contact, support, partnership, wellness | Yes            | ContactPage       |
 | policies/*                  | Privacy Policy / Terms of Service    | Review our privacy and terms policies               | privacy, terms, policy, legal           | Yes            | WebPage           |
 

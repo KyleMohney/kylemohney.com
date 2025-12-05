@@ -1,25 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!--
+  ╔═════════════════════════════════════════════════════════════════════════════╗
+  ║                         ROOTED VITALITY DASHBOARD                           ║
+  ║                 CLIENT SETTINGS (HTML)                                      ║
+  ║                                                                             ║
+  ║ File:        settings.html                                                  ║
+  ║ Purpose:     Client account settings and preferences management             ║
+  ║ Description: Settings sidebar navigation, account info, notifications,      ║
+  ║              memberships, security, privacy preferences                     ║
+  ║ Last Update: November 2025                                                  ║
+  ║ Status:      Production-Ready | Build Standard v2.0 Compliant               ║
+  ║                                                                             ║
+  ║ QUICK REFERENCE:                                                            ║
+  ║ - Layout: Sidebar Navigation | Settings Content Area                        ║
+  ║ - Design System: CSS Classes, Settings Cards, Form Elements                 ║
+  ║ - Features: Account, Notifications, Memberships, Security Management        ║
+  ║                                                                             ║
+  ╚═════════════════════════════════════════════════════════════════════════════╝
+  -->
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       TABLE OF CONTENTS
+       ═════════════════════════════════════════════════════════════════════════
+       
+       1. HEAD METADATA & SEO
+       2. STYLESHEETS
+       3. HEADER (INJECTED)
+       4. MAIN CONTENT
+       5. SETTINGS SIDEBAR NAVIGATION
+       6. SETTINGS CONTENT AREA
+       7. ACCOUNT SETTINGS SECTION
+       8. NOTIFICATIONS SETTINGS SECTION
+       9. MEMBERSHIPS SETTINGS SECTION
+       10. SECURITY SETTINGS SECTION
+       11. FOOTER (INJECTED)
+       12. SCRIPTS
+       
+       ═════════════════════════════════════════════════════════════════════════
+  -->
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       1. HEAD METADATA & SEO
+       ═════════════════════════════════════════════════════════════════════════ -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Settings | Rooted Vitality Client</title>
+  <meta name="description" content="Manage your account settings on Rooted Vitality. Update profile information, notification preferences, memberships, and security settings.">
+  <meta name="keywords" content="account settings, notifications, memberships, privacy, security, client preferences">
+  <meta name="author" content="Rooted Vitality, Inc.">
+  <meta name="robots" content="noindex,nofollow">
+  
+  <!-- Open Graph / Social Media -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Account Settings · Rooted Vitality">
+  <meta property="og:description" content="Manage your Rooted Vitality account settings, preferences, and security.">
+  <meta property="og:url" content="https://rootedvitality.com/dashboard/client/pages/settings.html">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Account Settings · Rooted Vitality">
+  <meta name="twitter:description" content="Manage your account settings and preferences.">
+  
+  <title>Account Settings · Rooted Vitality</title>
+  
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       2. STYLESHEETS
+       ═════════════════════════════════════════════════════════════════════════ -->
   <link rel="stylesheet" href="../../../styles/styles.css">
   <link rel="stylesheet" href="../styles/client-settings.css">
 </head>
 <body class="rooted-body client-view">
   
-  <!-- ========================================== -->
-  <!-- HEADER (Injected via injections.js) -->
-  <!-- ========================================== -->
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       3. HEADER (INJECTED)
+       ═════════════════════════════════════════════════════════════════════════ -->
   <header id="rooted-header"></header>
 
-  <!-- ========================================== -->
-  <!-- MAIN CONTENT -->
-  <!-- ========================================== -->
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       4. MAIN CONTENT
+       ═════════════════════════════════════════════════════════════════════════ -->
   <main class="settings-main">
     
-    <!-- Settings Sidebar Navigation -->
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         5. SETTINGS SIDEBAR NAVIGATION
+         ═════════════════════════════════════════════════════════════════════════ -->
     <nav class="settings-sidebar">
       <div class="settings-sidebar-header">
         <h2>Settings</h2>
@@ -32,12 +97,14 @@
       </ul>
     </nav>
 
-    <!-- Settings Content Area -->
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         6. SETTINGS CONTENT AREA
+         ═════════════════════════════════════════════════════════════════════════ -->
     <div class="settings-content">
       
-      <!-- ========================================== -->
-      <!-- 1. ACCOUNT SETTINGS -->
-      <!-- ========================================== -->
+      <!-- ═══════════════════════════════════════════════════════════════════════════
+           7. ACCOUNT SETTINGS SECTION
+           ═════════════════════════════════════════════════════════════════════════ -->
       <section class="settings-section active" data-section="account" id="account">
         <div class="settings-section-header">
           <h1>Account Settings</h1>
@@ -122,17 +189,6 @@
           </div>
         </div>
 
-        <!-- Password Reset -->
-        <div class="settings-card">
-          <div class="card-header">
-            <h3>Password Reset</h3>
-          </div>
-          <div class="card-content">
-            <p class="setting-description">Update your password to keep your account secure</p>
-            <button class="btn-setting-action" id="change-password-btn">Change Password</button>
-          </div>
-        </div>
-
         <!-- Account Standing -->
         <div class="settings-card">
           <div class="card-header">
@@ -145,9 +201,9 @@
         </div>
       </section>
 
-      <!-- ========================================== -->
-      <!-- 2. NOTIFICATION SETTINGS -->
-      <!-- ========================================== -->
+      <!-- ═══════════════════════════════════════════════════════════════════════════
+           8. NOTIFICATIONS SETTINGS SECTION
+           ═════════════════════════════════════════════════════════════════════════ -->
       <section class="settings-section" data-section="notifications" id="notifications">
         <div class="settings-section-header">
           <h1>Notification Preferences</h1>
@@ -283,9 +339,9 @@
         </div>
       </section>
 
-      <!-- ========================================== -->
-      <!-- 3. MEMBERSHIPS & BILLING -->
-      <!-- ========================================== -->
+      <!-- ═══════════════════════════════════════════════════════════════════════════
+           9. MEMBERSHIPS SETTINGS SECTION
+           ═════════════════════════════════════════════════════════════════════════ -->
       <section class="settings-section" data-section="memberships" id="memberships">
         <div class="settings-section-header">
           <h1>Memberships & Billing</h1>
@@ -342,13 +398,24 @@
         </div>
       </section>
 
-      <!-- ========================================== -->
-      <!-- 4. SECURITY -->
-      <!-- ========================================== -->
+      <!-- ═══════════════════════════════════════════════════════════════════════════
+           10. SECURITY SETTINGS SECTION
+           ═════════════════════════════════════════════════════════════════════════ -->
       <section class="settings-section" data-section="security" id="security">
         <div class="settings-section-header">
           <h1>Security</h1>
           <p class="section-description">Manage your account security and data settings</p>
+        </div>
+
+        <!-- Password Reset -->
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>Password</h3>
+          </div>
+          <div class="card-content">
+            <p class="setting-description">Update your password to keep your account secure</p>
+            <button class="btn-setting-action" id="change-password-btn">Change Password</button>
+          </div>
         </div>
 
         <!-- Two-Factor Authentication -->
@@ -388,11 +455,14 @@
     </div>
   </main>
 
-  <!-- ========================================== -->
-  <!-- FOOTER (Injected via injections.js) -->
-  <!-- ========================================== -->
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       11. FOOTER (INJECTED)
+       ═════════════════════════════════════════════════════════════════════════ -->
   <footer id="rooted-footer"></footer>
 
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       12. SCRIPTS
+       ═════════════════════════════════════════════════════════════════════════ -->
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
@@ -401,66 +471,10 @@
   <script src="../../../scripts/authManager.js"></script>
   <script src="../../../scripts/authModal.js"></script>
   <script src="../../../scripts/authHooks.js"></script>
-  <script src="../../../scripts/clientHeaderAvatar.js"></script>
+  <script src="../scripts/clientHeaderAvatar.js"></script>
   <script src="../../../scripts/emailTemplates.js"></script>
   <script src="../../../scripts/notificationManager.js"></script>
   <script src="../../../injections.js"></script>
   <script src="../scripts/clientSettings.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

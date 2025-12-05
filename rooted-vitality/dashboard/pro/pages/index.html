@@ -1,9 +1,52 @@
+<!--
+╔════════════════════════════════════════════════════════════════════╗
+║  ROOTED VITALITY, INC.                                             ║
+║  Holistic Wellness · Modern Connection Platform                    ║
+║  rootedvitality.com | 2025                                         ║
+╚════════════════════════════════════════════════════════════════════╝
+
+FILE: index.html
+LOCATION: /rooted-vitality/dashboard/pro/pages/
+PURPOSE: Practitioner dashboard - Clients and matches overview
+STANDARDS: Rooted Vitality Build Standard v2.0
+
+TABLE OF CONTENTS:
+  1. HTML Structure & Meta Tags (lines 26-340)
+  2. CSS Styles (lines 44-455)
+  3. Main Container & Modals (lines 480-630)
+  4. Toast System & Initialization (lines 560-1505)
+  5. Tab Switching & Modal Handlers (lines 592-820)
+  6. Client Data Loading & Real-Time (lines 714-1090)
+  7. Notifications & Page Init (lines 1106-1505)
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Basic Meta Tags -->
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Clients | Rooted Vitality</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- SEO & Metadata -->
+  <title>Clients & Matches Dashboard | Rooted Vitality Practitioner</title>
+  <meta name="description" content="Manage your client relationships and match inquiries. View matched clients, pending requests, and track your holistic wellness practice on Rooted Vitality.">
+  <meta name="keywords" content="practitioner dashboard, client management, wellness matches, appointment requests, holistic health practice">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="author" content="Rooted Vitality, Inc.">
+  <meta name="theme-color" content="#77883e">
+  
+  <!-- Open Graph (Social Sharing) -->
+  <meta property="og:title" content="Clients & Matches Dashboard - Rooted Vitality Practitioner">
+  <meta property="og:description" content="Manage your client relationships and match inquiries on Rooted Vitality.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://kylemohney.com/rooted-vitality/dashboard/pro/pages/index.html">
+  
+  <!-- Mobile App Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Rooted Vitality">
+  
+  <!-- Stylesheets -->
   <link rel="stylesheet" href="../../../styles/base.css">
   <link rel="stylesheet" href="../../../styles/layout.css">
   <link rel="stylesheet" href="../../../styles/components.css">
@@ -15,6 +58,16 @@
     /* CLIENTS PAGE STYLES */
     /* ========================================== */
     
+    /* Modal Utilities */
+    .hidden { display: none !important; }
+    .flex-end { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem; }
+    .modal-gap { margin: 1rem 0; }
+    .btn-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--color-text); }
+    
+    /* Modal Structure */
+    .modal-body { margin: 1rem 0; }
+    .modal-footer { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem; }
+
     .clients-main {
       background: #fbf7ec;
       padding: 2rem 0;
@@ -44,10 +97,7 @@
       }
     }
     
-    .clients-header {
-      display: none;
-    }
-    
+    /* Alias for semantic clarity - uses .clients-container styles */
     .clients-grid-3col {
       max-width: 1600px;
       margin: 0 auto;
@@ -69,13 +119,6 @@
       .clients-grid-3col {
         grid-template-columns: 1fr;
       }
-    }
-    
-    .clients-header h1 {
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: #2d2d2d;
-      margin: 0;
     }
     
     /* Sidebar */
@@ -436,54 +479,18 @@
       color: #c2185b;
     }
 
-    /* Distance Badge */
-    .distance-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 4px 10px;
-      background: #e3f2fd;
-      border-radius: 16px;
-      font-size: 0.8rem;
-      color: #1976d2;
-      margin-left: 0.5rem;
-    }
-
-    /* Enhanced Card Styling */
-    .match-details {
-      padding: 0.75rem 1.5rem;
-      background: #fbf7ec;
-      border-bottom: 1px solid #e5e5e5;
-      font-size: 0.85rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      align-items: center;
-    }
-
-    .match-detail-item {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      color: #666;
-    }
-
-    .match-detail-label {
-      font-weight: 600;
-      color: #333;
-    }
+    /* Unused: distance-badge, match-details, match-detail-item, match-detail-label removed (never rendered) */
 
     /* Notification Badge on Sidebar */
     .sidebar-tab__badge {
-      display: inline-block;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       background: #f44336;
       color: #fbf7ec;
       border-radius: 50%;
       width: 24px;
       height: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       font-size: 0.75rem;
       font-weight: bold;
       margin-top: 0.5rem;
@@ -496,20 +503,17 @@
         right: 10px;
       }
     }
-
-    /* Modal Hidden State */
-    .modal--hidden {
-      display: none !important;
-    }
   </style>
 </head>
 <body class="pro-dashboard">
   <script>
     localStorage.setItem('active_view', 'practitioner');
-    console.log('[Rooted Vitality] Practitioner dashboard - active_view set to: practitioner');
   </script>
   <header id="header-inject"></header>
 
+  <!-- ========================================== -->
+  <!-- 3. MAIN CONTAINER & MODALS -->
+  <!-- ========================================== -->
   <main class="clients-main">
     <!-- Toast Container for Notifications -->
     <div id="toast-container" class="toast-container"></div>
@@ -531,12 +535,12 @@
       <!-- MIDDLE COLUMN: Clients List -->
       <section class="clients-main-content">
         <!-- New Clients Tab -->
-        <div id="new-clients" class="clients-list" style="display: flex;">
+        <div id="new-clients" class="clients-list">
           <!-- Client cards will be populated here by JavaScript -->
         </div>
         
         <!-- Opportunities Tab -->
-        <div id="opportunities" class="clients-list" style="display: none;">
+        <div id="opportunities" class="clients-list hidden">
           <!-- Opportunity cards will be populated here by JavaScript -->
         </div>
       </section>
@@ -544,41 +548,44 @@
   </main>
 
   <!-- Decline Confirmation Modal -->
-  <div id="decline-modal" class="modal-overlay" style="display: none;">
+  <div id="decline-modal" class="modal-overlay hidden">
     <div class="modal-content">
       <div class="modal-header">
         <h2>Decline Match?</h2>
-        <button class="modal-close" onclick="closeDeclineModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--color-text);">&times;</button>
+        <button class="modal-close btn-close close-decline-modal">&times;</button>
       </div>
-      <div class="modal-body" style="margin: 1rem 0;">
+      <div class="modal-body">
         <p>Are you sure you want to decline this client? They will be notified about your decision.</p>
       </div>
-      <div class="modal-footer" style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
-        <button class="btn btn--secondary" onclick="closeDeclineModal()">Cancel</button>
-        <button class="btn btn--danger" onclick="confirmDecline()">Decline</button>
+      <div class="modal-footer">
+        <button class="btn btn--secondary close-decline-modal">Cancel</button>
+        <button class="btn btn--danger confirm-decline-btn">Decline</button>
       </div>
     </div>
   </div>
 
   <!-- Block Confirmation Modal -->
-  <div id="block-modal" class="modal-overlay" style="display: none;">
+  <div id="block-modal" class="modal-overlay hidden">
     <div class="modal-content">
       <div class="modal-header">
         <h2>Block Client?</h2>
-        <button class="modal-close" onclick="closeBlockModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--color-text);">&times;</button>
+        <button class="modal-close btn-close close-block-modal">&times;</button>
       </div>
-      <div class="modal-body" style="margin: 1rem 0;">
+      <div class="modal-body">
         <p>Block this client? They won't be able to match with you again, and all pending matches will be declined.</p>
       </div>
-      <div class="modal-footer" style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
-        <button class="btn btn--secondary" onclick="closeBlockModal()">Cancel</button>
-        <button class="btn btn--danger" onclick="confirmBlock()">Block</button>
+      <div class="modal-footer">
+        <button class="btn btn--secondary close-block-modal">Cancel</button>
+        <button class="btn btn--danger confirm-block-btn">Block</button>
       </div>
     </div>
   </div>
 
   <footer id="footer-inject"></footer>
 
+  <!-- ========================================== -->
+  <!-- 4. TOAST SYSTEM & INITIALIZATION -->
+  <!-- ========================================== -->
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -588,12 +595,12 @@
   <script src="../../../scripts/authHooks.js"></script>
   <script src="../../../scripts/emailTemplates.js"></script>
   <script src="../../../scripts/notificationManager.js"></script>
-  <script src="../../../scripts/proOpportunitiesManager.js"></script>
+  <script src="../scripts/proOpportunitiesManager.js"></script>
   <script src="../../../injections.js"></script>
   
   <script>
     // ============================================================================
-    // TOAST NOTIFICATION SYSTEM
+    // 5. TAB SWITCHING & MODAL HANDLERS
     // ============================================================================
     function showToast(title, message, type = 'info', duration = 5000) {
       const container = document.getElementById('toast-container');
@@ -651,6 +658,22 @@
         document.getElementById(tabName).style.display = 'flex';
       });
     });
+
+    // ============================================================================
+    // UTILITY HELPERS
+    // ============================================================================
+    // Safe helper to get practitioner ID from localStorage
+    function getPractitionerId() {
+      const rvUserStr = localStorage.getItem('rvUser');
+      if (!rvUserStr) return null;
+      try {
+        const rvUser = JSON.parse(rvUserStr);
+        return rvUser.id || null;
+      } catch (e) {
+        console.error('[Utils] Failed to parse rvUser:', e);
+        return null;
+      }
+    }
 
     // ============================================================================
     // MODAL CONFIRMATION HELPERS
@@ -756,74 +779,85 @@
     }
 
     async function handleBlockConfirmed() {
-      if (!pendingBlockClientSerial) return;
+      try {
+        if (!pendingBlockClientSerial) return;
 
-      const clientSerial = pendingBlockClientSerial;
-      const currentUser = window.authManager.getCurrentUser();
-      const practitionerSerial = currentUser?.serial_number;
+        const clientSerial = pendingBlockClientSerial;
+        const currentUser = window.authManager.getCurrentUser();
+        const practitionerSerial = currentUser?.serial_number;
 
-      const { data: allMatches, error: fetchError } = await window.supabaseClient
-        .from('project_practitioner_matches')
-        .select('id')
-        .eq('practitioner_serial', practitionerSerial)
-        .eq('client_serial', clientSerial)
-        .eq('status', 'pending');
-
-      if (fetchError) {
-        showToast('Error', 'Failed to find all matches', 'error');
-        pendingBlockClientSerial = null;
-        document.getElementById('confirm-block-confirm').disabled = false;
-        return;
-      }
-
-      if (allMatches && allMatches.length > 0) {
-        const { error: updateError } = await window.supabaseClient
+        const { data: allMatches, error: fetchError } = await window.supabaseClient
           .from('project_practitioner_matches')
-          .update({
-            status: 'declined',
-            practitioner_response: 'declined',
-            practitioner_responded_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          })
-          .in('id', allMatches.map(m => m.id));
+          .select('id')
+          .eq('practitioner_serial', practitionerSerial)
+          .eq('client_serial', clientSerial)
+          .eq('status', 'pending');
 
-        if (!updateError) {
-          // Add to blocklist
-          const rvUser = JSON.parse(localStorage.getItem('rvUser') || '{}');
-          const practitionerId = rvUser.id;
-          
-          const { error: blockError } = await window.supabaseClient
-            .from('practitioner_blocks')
-            .upsert({
-              practitioner_id: practitionerId,
-              practitioner_serial: practitionerSerial,
-              client_serial: clientSerial,
-              is_blocked: true
-            }, {
-              onConflict: 'practitioner_id,client_serial'
-            });
+        if (fetchError) {
+          showToast('Error', 'Failed to find all matches', 'error');
+          pendingBlockClientSerial = null;
+          document.getElementById('confirm-block-confirm').disabled = false;
+          return;
+        }
 
-          if (!blockError) {
-            showToast('Blocked', 'Client blocked successfully', 'info');
-            // Remove all cards for this client
-            document.querySelectorAll(`.client-card`).forEach(card => {
-              const cardClientSerial = card.getAttribute('data-client-serial');
-              if (cardClientSerial === pendingBlockClientSerial) {
-                card.remove();
-              }
-            });
-          } else {
-            showToast('Error', 'Failed to block client', 'error');
+        if (allMatches && allMatches.length > 0) {
+          const { error: updateError } = await window.supabaseClient
+            .from('project_practitioner_matches')
+            .update({
+              status: 'declined',
+              practitioner_response: 'declined',
+              practitioner_responded_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            })
+            .in('id', allMatches.map(m => m.id));
+
+          if (!updateError) {
+            // Add to blocklist
+            const practitionerId = getPractitionerId();
+            if (!practitionerId) {
+              showToast('Error', 'Failed to get practitioner info', 'error');
+              pendingBlockClientSerial = null;
+              document.getElementById('confirm-block-confirm').disabled = false;
+              return;
+            }
+            
+            const { error: blockError } = await window.supabaseClient
+              .from('practitioner_blocks')
+              .upsert({
+                practitioner_id: practitionerId,
+                practitioner_serial: practitionerSerial,
+                client_serial: clientSerial,
+                is_blocked: true
+              }, {
+                onConflict: 'practitioner_id,client_serial'
+              });
+
+            if (!blockError) {
+              showToast('Blocked', 'Client blocked successfully', 'info');
+              // Remove all cards for this client
+              document.querySelectorAll(`.client-card`).forEach(card => {
+                const cardClientSerial = card.getAttribute('data-client-serial');
+                if (cardClientSerial === pendingBlockClientSerial) {
+                  card.remove();
+                }
+              });
+            } else {
+              showToast('Error', 'Failed to block client', 'error');
+            }
           }
         }
-      }
 
-      pendingBlockClientSerial = null;
-      document.getElementById('confirm-block-confirm').disabled = false;
+        pendingBlockClientSerial = null;
+        document.getElementById('confirm-block-confirm').disabled = false;
+      } catch (error) {
+        console.error('[Pro Clients] Error in handleBlockConfirmed:', error);
+        pendingBlockClientSerial = null;
+        document.getElementById('confirm-block-confirm').disabled = false;
+      }
     }
 
     // ============================================================================
-    // LOAD CLIENT DATA & REAL-TIME SUBSCRIPTIONS
+    // 6. CLIENT DATA LOADING & REAL-TIME EVENTS
     // ============================================================================
     async function loadClientsData() {
       try {
@@ -834,20 +868,14 @@
 
         const currentUser = window.authManager.getCurrentUser();
         if (!currentUser) {
-          console.log('[Pro Clients] User not authenticated');
           return;
         }
 
-        // Get practitioner ID
-        const rvUserStr = localStorage.getItem('rvUser');
-        if (!rvUserStr) {
-          console.error('[Pro Clients] No rvUser in localStorage');
+        const practitionerId = getPractitionerId();
+        if (!practitionerId) {
+          console.error('[Pro Clients] No practitioner ID available');
           return;
         }
-
-        const rvUser = JSON.parse(rvUserStr);
-        const practitionerId = rvUser.id;
-        console.log('[Pro Clients] Loading data for practitioner:', practitionerId);
 
         // CHECK MEMBERSHIP STATUS BEFORE LOADING CLIENTS/OPPORTUNITIES
         const { data: membershipData, error: membershipError } = await window.supabaseClient
@@ -860,7 +888,6 @@
         const hasActiveMembership = membershipData && membershipData[0]?.status === 'active';
         
         if (!hasActiveMembership) {
-          console.log('[Pro Clients] Practitioner does not have active membership');
           const newClientsContainer = document.getElementById('new-clients');
           const opportunitiesContainer = document.getElementById('opportunities');
           
@@ -868,7 +895,7 @@
             <div class="empty-state membership-required">
               <h3>Membership Required</h3>
               <p>Access to new clients and opportunities requires an active membership.</p>
-              <a href="./settings.html" class="btn btn-primary" style="margin-top: 15px;">View Membership Options</a>
+              <a href="./settings.html" class="btn btn-primary margin-top-link">View Membership Options</a>
             </div>
           `;
           
@@ -890,9 +917,9 @@
         }
 
         const practitionerSerial = practitioner.serial_number;
-        console.log('[Pro Clients] Practitioner serial:', practitionerSerial);
 
-        // Get new clients (pending matches waiting for practitioner response)
+        // Get new clients with project and client data using joins (optimized query)
+        // This prevents N+1 queries: instead of 1 + (2 * N) queries, we do 1 query total
         const { data: matches, error: matchError } = await window.supabaseClient
           .from('project_practitioner_matches')
           .select(`
@@ -913,31 +940,31 @@
           return;
         }
 
-        console.log('[Pro Clients] Loaded matches:', matches?.length);
-
-        // For each match, fetch the project and client data separately
-        for (let match of matches) {
-          // Get project details using project_serial
-          const { data: project } = await window.supabaseClient
+        // Fetch related data separately
+        if (matches && matches.length > 0) {
+          const projectSerials = [...new Set(matches.map(m => m.project_serial))];
+          const clientSerials = [...new Set(matches.map(m => m.client_serial))];
+          
+          // Get projects
+          const { data: projects } = await window.supabaseClient
             .from('projects')
             .select('id, project_serial, description, category_name, created_at, client_serial')
-            .eq('project_serial', match.project_serial)
-            .single();
-
-          if (project) {
-            // Get client details
-            const { data: client } = await window.supabaseClient
-              .from('clients')
-              .select('id, first_name, last_name, profile_picture_url')
-              .eq('serial_number', project.client_serial)
-              .single();
-
+            .in('project_serial', projectSerials);
+          
+          // Get clients
+          const { data: clients } = await window.supabaseClient
+            .from('clients')
+            .select('id, first_name, last_name, profile_picture_url')
+            .in('id', clientSerials);
+          
+          // Merge data with matches
+          matches.forEach(match => {
+            const project = projects?.find(p => p.project_serial === match.project_serial);
+            const client = clients?.find(c => c.id === match.client_serial);
             match.projects = project;
-            match.projects.clients = client;
-          }
+            match.clients = client;
+          });
         }
-
-        console.log('[Pro Clients] Enriched matches with project and client data');
 
         // Get first message from each match
         const newClientsContainer = document.getElementById('new-clients');
@@ -1020,8 +1047,6 @@
                     return;
                 }
                 
-                console.log('[Pro Clients] Match status updated to in-progress');
-                
                 // Create initial message from client to practitioner
                 // This is the match notification message that appears in the inbox
                 const clientFullName = match.projects?.clients?.first_name && match.projects?.clients?.last_name 
@@ -1030,33 +1055,9 @@
                 
                 const defaultMessage = `${clientFullName} has matched with you and is interested in your services for: ${match.projects?.category_name || 'wellness services'}.`;
                 
-                console.log('[Pro Clients] Creating initial message with data:', {
-                  project_id: match.projects?.id,
-                  practitioner_id: currentUser?.id,
-                  client_id: match.projects?.clients?.id,
-                  sender_id: match.projects?.clients?.id,
-                  project_serial: match.project_serial,
-                  practitioner_serial: practitionerSerial,
-                  client_serial: match.client_serial,
-                  message: defaultMessage
-                });
-                
                 // Get project and client IDs for the message
                 const projectId = match.projects?.id;
                 const clientId = match.projects?.clients?.id;
-                
-                console.log('[Pro Clients] Message insert data:', {
-                  project_id: projectId,
-                  practitioner_id: currentUser?.id,
-                  client_id: clientId,
-                  sender_id: currentUser?.id, // Practitioner is sending the initial message
-                  project_serial: match.project_serial,
-                  practitioner_serial: practitionerSerial,
-                  client_serial: match.client_serial,
-                  sender_type: 'practitioner', // Practitioner sending initial message
-                  message: defaultMessage,
-                  is_read: false
-                });
                 
                 const { data: msgData, error: msgError } = await window.supabaseClient
                   .from('project_messages')
@@ -1076,7 +1077,6 @@
                 if (msgError) {
                   console.error('[Pro Clients] Error creating initial message:', msgError);
                 } else {
-                  console.log('[Pro Clients] Initial message created successfully:', msgData);
                 }
                 
                 // Notify client of acceptance
@@ -1092,11 +1092,8 @@
                 showToast('Client Accepted', `You accepted ${clientName}. Opening your inbox...`, 'success');
                 card.remove();
                 
-                console.log('[Pro Clients] Accept flow complete, redirecting to inbox with clientSerial:', match.client_serial);
-                
                 // Navigate to Inbox and auto-open the conversation
                 setTimeout(() => {
-                  console.log('[Pro Clients] Executing redirect to inbox');
                   window.location.href = `/rooted-vitality/dashboard/pro/pages/inbox.html?clientSerial=${match.client_serial}&projectSerial=${match.project_serial}`;
                 }, 500);
               } catch (acceptError) {
@@ -1162,10 +1159,9 @@
             filter: `practitioner_serial=eq.${practitionerSerial}`
           },
           async (payload) => {
-            console.log('[Real-time] New match received:', payload);
             
-            // Fetch full match details
-            const { data: match, error } = await window.supabaseClient
+            // Fetch full match details separately (no joins needed)
+            const { data: matchResult, error } = await window.supabaseClient
               .from('project_practitioner_matches')
               .select(`
                 id,
@@ -1177,25 +1173,35 @@
               `)
               .eq('id', payload.new.id)
               .single();
+            
+            if (error || !matchResult) {
+              console.error('[Pro Clients] Error fetching new match:', error);
+              return;
+            }
+            
+            // Fetch related project and client data
+            const { data: projectData } = await window.supabaseClient
+              .from('projects')
+              .select('id, project_serial, description, category_name, created_at, client_serial')
+              .eq('project_serial', matchResult.project_serial)
+              .single();
+            
+            const { data: clientData } = await window.supabaseClient
+              .from('clients')
+              .select('id, first_name, last_name')
+              .eq('id', matchResult.client_serial)
+              .single();
+            
+            // Merge data
+            const match = {
+              ...matchResult,
+              projects: projectData,
+              clients: clientData
+            };
 
             if (match && match.status === 'active') {
-              // Get project details using project_serial
-              const { data: project } = await window.supabaseClient
-                .from('projects')
-                .select('id, project_serial, description, category_name, created_at, client_serial')
-                .eq('project_serial', match.project_serial)
-                .single();
-
-              // Get client details
-              let client = null;
-              if (project) {
-                const { data: clientData } = await window.supabaseClient
-                  .from('clients')
-                  .select('id, first_name, last_name')
-                  .eq('serial_number', project.client_serial)
-                  .single();
-                client = clientData;
-              }
+              const project = match.projects;
+              const client = project?.clients;
 
               if (project && client) {
                 const clientName = `${client.first_name || 'Client'} ${client.last_name ? client.last_name[0] + '.' : ''}`;
@@ -1233,7 +1239,7 @@
     }
 
     // ============================================================================
-    // PAGE INITIALIZATION
+    // 7. NOTIFICATIONS & PAGE INITIALIZATION
     // ============================================================================
     let practitionerIdGlobal = null;
 
@@ -1245,11 +1251,8 @@
         const currentUser = window.authManager?.getCurrentUser();
         if (!currentUser) return;
 
-        const rvUserStr = localStorage.getItem('rvUser');
-        if (!rvUserStr) return;
-
-        const rvUser = JSON.parse(rvUserStr);
-        const practitionerId = rvUser.id;
+        const practitionerId = getPractitionerId();
+        if (!practitionerId) return;
 
         // Get practitioner serial
         const { data: practitioner } = await window.supabaseClient
@@ -1259,8 +1262,6 @@
           .single();
 
         if (!practitioner) return;
-
-        console.log('[Pro Notifications] Marking notifications as read for:', practitioner.serial_number);
 
         // Update all unread notifications to read
         const { error } = await window.supabaseClient
@@ -1276,8 +1277,6 @@
           console.error('[Pro Notifications] Error marking as read:', error);
           return;
         }
-
-        console.log('[Pro Notifications] ✅ All notifications marked as read');
 
         // Clear badge
         const notificationBadge = document.querySelector('.rv-notification-badge');
@@ -1306,18 +1305,14 @@
 
         const currentUser = window.authManager.getCurrentUser();
         if (!currentUser) {
-          console.log('[Pro Notifications] User not authenticated');
           return;
         }
 
-        const rvUserStr = localStorage.getItem('rvUser');
-        if (!rvUserStr) {
-          console.error('[Pro Notifications] No rvUser in localStorage');
+        const practitionerId = getPractitionerId();
+        if (!practitionerId) {
+          console.error('[Pro Notifications] No practitioner ID available');
           return;
         }
-
-        const rvUser = JSON.parse(rvUserStr);
-        const practitionerId = rvUser.id;
 
         // Get practitioner serial number
         const { data: practitioner, error: practitionerError } = await window.supabaseClient
@@ -1332,7 +1327,6 @@
         }
 
         const practitionerSerial = practitioner.serial_number;
-        console.log('[Pro Notifications] Loading notifications for:', practitionerSerial);
 
         // First, mark all unread notifications as read
         const { error: markError } = await window.supabaseClient
@@ -1358,8 +1352,6 @@
           return;
         }
 
-        console.log('[Pro Notifications] Loaded', notifications?.length || 0, 'notifications');
-
         // Update notification badge - now should be 0 since we marked them all as read
         const notificationBadge = document.querySelector('.rv-notification-badge');
         if (notificationBadge) {
@@ -1369,9 +1361,9 @@
         }
 
         if (notifications && notifications.length > 0) {
-          // Update notification list
+          // Update notification list (selector may not exist if header doesn't render it)
           const notificationsList = document.querySelector('.rv-notifications-list');
-          if (notificationsList) {
+          if (notificationsList && notificationsList instanceof Element) {
             notificationsList.innerHTML = '';
             
             // Fetch client details for each notification
@@ -1414,19 +1406,16 @@
 
         const currentUser = window.authManager.getCurrentUser();
         if (!currentUser) {
-          console.log('[Pro Clients] User not authenticated');
           return;
         }
 
-        // Get practitioner ID
-        const rvUserStr = localStorage.getItem('rvUser');
-        if (!rvUserStr) {
-          console.error('[Pro Clients] No rvUser in localStorage');
+        const practitionerId = getPractitionerId();
+        if (!practitionerId) {
+          console.error('[Pro Clients] No practitioner ID available');
           return;
         }
 
-        const rvUser = JSON.parse(rvUserStr);
-        practitionerIdGlobal = rvUser.id;
+        practitionerIdGlobal = practitionerId;
 
         // Load initial data
         await loadClientsData();
@@ -1438,7 +1427,6 @@
         // Setup notifications realtime listener to auto-refresh when notifications change
         await setupNotificationsRealtimeListener();
 
-        console.log('[Pro Clients] Page initialized with real-time subscriptions');
       } catch (error) {
         console.error('[Pro Clients] Initialization error:', error);
       }
@@ -1453,11 +1441,8 @@
         const currentUser = window.authManager?.getCurrentUser();
         if (!currentUser) return;
 
-        const rvUserStr = localStorage.getItem('rvUser');
-        if (!rvUserStr) return;
-
-        const rvUser = JSON.parse(rvUserStr);
-        const practitionerId = rvUser.id;
+        const practitionerId = getPractitionerId();
+        if (!practitionerId) return;
 
         // Get practitioner serial
         const { data: practitioner } = await window.supabaseClient
@@ -1467,8 +1452,6 @@
           .single();
 
         if (!practitioner) return;
-
-        console.log('[Pro Notifications] 🔌 Setting up realtime listener for notifications');
 
         const channel = window.supabaseClient
           .channel(`prac-notif:${practitioner.serial_number}`)
@@ -1481,12 +1464,10 @@
               filter: `practitioner_serial=eq.${practitioner.serial_number}`
             },
             (payload) => {
-              console.log('[Pro Notifications] 🔔 Notifications changed via realtime:', payload.eventType, payload);
               
               // Handle new notifications (INSERT)
               if (payload.eventType === 'INSERT' && payload.new) {
                 const newNotif = payload.new;
-                console.log('[Pro Notifications] New notification received:', newNotif);
                 
                 // Update badge to show there's an unread notification
                 const notificationBadge = document.querySelector('.rv-notification-badge');
@@ -1495,12 +1476,11 @@
                   notificationBadge.textContent = currentCount + 1;
                   notificationBadge.classList.add('active');
                   notificationBadge.style.backgroundColor = '#FFD700'; // Gold color
-                  console.log('[Pro Notifications] Badge updated to:', currentCount + 1);
                 }
                 
-                // Add notification to the list at the top
+                // Add notification to the list at the top (defensive selector check)
                 const notificationsList = document.querySelector('.rv-notifications-list');
-                if (notificationsList) {
+                if (notificationsList && notificationsList instanceof Element) {
                   const notifElement = document.createElement('a');
                   notifElement.className = 'rv-notifications-item unread';
                   notifElement.href = '#';
@@ -1519,25 +1499,26 @@
                   } else {
                     notificationsList.appendChild(notifElement);
                   }
-                  console.log('[Pro Notifications] Notification added to list');
                 }
               } else {
                 // For other changes (UPDATE, DELETE), reload notifications
-                console.log('[Pro Notifications] Reloading notifications for:', payload.eventType);
                 loadPractitionerNotifications();
               }
             }
           )
           .subscribe((status) => {
-            console.log('[Pro Notifications] Realtime subscription status:', status);
-            if (status === 'SUBSCRIBED') {
-              console.log('[Pro Notifications] ✅ Notifications realtime SUBSCRIBED');
-            }
           });
       } catch (error) {
-        console.error('[Pro Notifications] Error setting up realtime listener:', error);
+        console.error('[Pro Notifications] Exception setting up realtime listener:', error);
       }
     }
+
+    // Cleanup real-time subscriptions on page unload to prevent memory leaks
+    window.addEventListener('beforeunload', () => {
+      if (realtimeSubscription) {
+        realtimeSubscription.unsubscribe();
+      }
+    });
 
     // Load when page is ready
     if (document.readyState === 'loading') {
@@ -1555,7 +1536,6 @@
         // Check if this link points to the clients page (index.html)
         if (href && (href.includes('/pro/pages/index.html') || href.includes('/pro/index.html') || href.endsWith('/pro/'))) {
           link.classList.add('active');
-          console.log('[Rooted Vitality] Set Clients as active nav link, href:', href);
         }
       });
     }
@@ -1571,60 +1551,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

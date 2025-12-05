@@ -1,23 +1,23 @@
-/*
+﻿/*
 ╔════════════════════════════════════════════════════════════════════╗
 ║  ROOTED VITALITY, INC.                                             ║
-║  File: scripts/authManager.js                                      ║
-║  Purpose: Supabase Authentication & Session Management              ║
+║  File: authManager.js                                              ║
+║  Purpose: Centralized authentication management (register/login)    ║
 ║  Holistic Wellness · Modern Connection Platform                    ║
 ║  rootedvitality.com | 2025                                         ║
 ╚════════════════════════════════════════════════════════════════════╝
 
-TABLE OF CONTENTS
-  1. AUTH MANAGER NAMESPACE
-  2. REGISTRATION FUNCTION
-  3. LOGIN FUNCTION
-  4. PASSWORD RESET FUNCTION
-  5. LOGOUT FUNCTION
-  6. SESSION MANAGEMENT
-  7. HELPER FUNCTIONS
+ TABLE OF CONTENTS
+   1. AUTH MANAGER NAMESPACE
+   2. REGISTRATION FUNCTION
+   3. LOGIN FUNCTION
+   4. PASSWORD RESET FUNCTION
+   5. CHANGE EMAIL FUNCTION
+   6. LOGOUT FUNCTION
+   7. SESSION MANAGEMENT
+   8. HELPER FUNCTIONS
+   9. AUTO-INITIALIZE SESSION ON PAGE LOAD
 */
-
-console.log('[Rooted Vitality] authManager.js loading...');
 
 // ======================================================
 // 1. AUTH MANAGER NAMESPACE
@@ -34,7 +34,6 @@ window.authManager = {
      * @param {string} password - User password
      */
     async register(role, email, password) {
-        console.log(`[Rooted Vitality] Registering ${role}: ${email}`);
         
         // Validation
         if (!this._validateInput(email, password, role)) return false;
@@ -59,13 +58,15 @@ window.authManager = {
                 return false;
             }
             
-            console.log('[Rooted Vitality] User registered, ID:', data.user.id);
-            
             // Assign role to profile
             await this._setRole(role, data.user);
             
             // Show success message
             alert('Account created successfully! Please check your email to verify your account.');
+            
+            // TODO: Email verification is disabled until fully tested
+            // Supabase will NOT send verification email yet - this is intentional
+            console.warn('[Rooted Vitality] EMAIL VERIFICATION DISABLED - User must manually verify in Supabase dashboard');
             
             // Close modal and reset form
             if (typeof closeLoginModal === 'function') {
@@ -90,7 +91,6 @@ window.authManager = {
      * @param {string} password - User password
      */
     async login(email, password) {
-        console.log(`[Rooted Vitality] Signing in: ${email}`);
         
         // Validation
         if (!this._validateInput(email, password)) return false;
@@ -118,22 +118,11 @@ window.authManager = {
                 alert(`Sign in failed: ${error.message}`);
                 return false;
             }
-
-            console.log('[Rooted Vitality] User signed in, ID:', data.user.id);
             
             // Retrieve user profile including role and firstName
             const userProfile = await this._getUserProfile(data.user.id);
             const userRole = userProfile?.role || role;
             const firstName = userProfile?.first_name || '';
-            
-            console.log('[Rooted Vitality] User profile retrieved:', {
-                id: data.user.id,
-                email: data.user.email,
-                profileRole: userProfile?.role,
-                firstName: userProfile?.first_name,
-                finalRole: userRole
-            });
-            
             // Update last_login timestamp in database
             await this._updateLastLogin(data.user.id, userRole);
             
@@ -144,7 +133,6 @@ window.authManager = {
             if (rememberMe) {
                 localStorage.setItem('rvRememberEmail', email);
                 localStorage.setItem('rvRememberMe', 'true');
-                console.log('[Rooted Vitality] Email saved for next login');
             } else {
                 localStorage.removeItem('rvRememberEmail');
                 localStorage.removeItem('rvRememberMe');
@@ -152,7 +140,6 @@ window.authManager = {
             
             // Set default view for all users (client)
             localStorage.setItem('active_view', 'client');
-            console.log('[Rooted Vitality] Default view set to: client');
             
             // Update header UI
             this._updateHeader(userRole || role);
@@ -161,8 +148,6 @@ window.authManager = {
             if (typeof closeLoginModal === 'function') {
                 closeLoginModal();
             }
-            
-            console.log('[Rooted Vitality] Login successful');
             
             // ALWAYS clear any redirect URLs on login - go to role-specific dashboard
             sessionStorage.removeItem('redirectAfterAuth');
@@ -173,15 +158,12 @@ window.authManager = {
             
             let redirectPath;
             if (finalRole === 'practitioner') {
-                console.log('[Rooted Vitality] Redirecting to practitioner dashboard');
                 redirectPath = baseUrl + 'dashboard/pro/pages/index.html';
             } else if (finalRole === 'client') {
-                console.log('[Rooted Vitality] Redirecting to client index');
                 redirectPath = baseUrl + 'index.html';
             }
             
             if (redirectPath) {
-                console.log('[Rooted Vitality] Final redirect URL:', redirectPath);
                 window.location.href = redirectPath;
                 return true;
             }
@@ -193,7 +175,9 @@ window.authManager = {
             alert('An unexpected error occurred during sign in.');
             return false;
         }
-    },    // ======================================================
+    },    
+    
+    // ======================================================
     // 4. PASSWORD RESET FUNCTION
     // ======================================================
     /**
@@ -206,9 +190,8 @@ window.authManager = {
             return false;
         }
         
-        console.log('[Rooted Vitality] Password reset requested for:', email);
-        
         try {
+            console.log('[Rooted Vitality] PASSWORD RESET requested for:', email);
             const baseUrl = (typeof RootedVitality !== 'undefined' && RootedVitality.config.siteUrl) ? RootedVitality.config.siteUrl : '/rooted-vitality/';
             const { error } = await window.supabaseClient.auth.resetPasswordForEmail(email, {
                 redirectTo: `${window.location.origin}${baseUrl}reset.html`
@@ -220,7 +203,8 @@ window.authManager = {
                 return false;
             }
             
-            console.log('[Rooted Vitality] Password reset link sent');
+            console.log('[Rooted Vitality] ✓ PASSWORD RESET EMAIL SENT to:', email);
+            console.log('[Rooted Vitality] Works for: Clients, Practitioners, All authenticated users');
             alert('Password reset link sent to your email. Please check your inbox.');
             return true;
         } catch (error) {
@@ -231,14 +215,50 @@ window.authManager = {
     },
     
     // ======================================================
-    // 5. LOGOUT FUNCTION
+    // 5. CHANGE EMAIL FUNCTION
+    // ======================================================
+    /**
+     * Initiate email change request for user
+     * Sends verification link to new email address
+     * @param {string} newEmail - New email address to change to
+     */
+    async changeEmail(newEmail) {
+        if (!newEmail || !newEmail.includes('@')) {
+            alert('Please enter a valid email address.');
+            return false;
+        }
+        
+        try {
+            console.log('[Rooted Vitality] EMAIL CHANGE requested for:', newEmail);
+            const baseUrl = (typeof RootedVitality !== 'undefined' && RootedVitality.config.siteUrl) ? RootedVitality.config.siteUrl : '/rooted-vitality/';
+            const { error } = await window.supabaseClient.auth.updateUser({
+                email: newEmail
+            });
+            
+            if (error) {
+                console.error('[Rooted Vitality] Email change error:', error.message);
+                alert(`Email change failed: ${error.message}`);
+                return false;
+            }
+            
+            console.log('[Rooted Vitality] ✓ EMAIL CHANGE CONFIRMATION SENT to:', newEmail);
+            console.log('[Rooted Vitality] Works for: Clients, Practitioners, All authenticated users');
+            alert('A confirmation link has been sent to your new email address. Please check your inbox to verify the change.');
+            return true;
+        } catch (error) {
+            console.error('[Rooted Vitality] Unexpected email change error:', error);
+            alert('An unexpected error occurred while changing your email.');
+            return false;
+        }
+    },
+    
+    // ======================================================
+    // 6. LOGOUT FUNCTION
     // ======================================================
     /**
      * Logout user and clear session
      */
-    async logout() {
-        console.log('[Rooted Vitality] Signing out...');
-        
+    async logout() {        
         try {
             const { error } = await window.supabaseClient.auth.signOut();
             
@@ -253,8 +273,6 @@ window.authManager = {
             
             // Reset header UI
             this._resetHeader();
-            
-            console.log('[Rooted Vitality] Logout successful');
             
             // Show logout modal instead of alert
             this._showLogoutModal();
@@ -367,7 +385,6 @@ window.authManager = {
         try {
             // Role is now implicit based on which table the user is in (clients vs practitioners)
             // This method is deprecated but keeping for compatibility
-            console.log('[Rooted Vitality] Role assignment:', role, '(stored in clients/practitioners tables)');
             return true;
         } catch (error) {
             console.error('[Rooted Vitality] Unexpected role assignment error:', error);
@@ -419,7 +436,6 @@ window.authManager = {
      */
     async _getUserProfile(userId) {
         try {
-            console.log('[Rooted Vitality] Fetching profile for user:', userId);
             
             // IMPORTANT: Check practitioners FIRST
             // Users who are practitioners should always be identified as practitioners
@@ -431,7 +447,6 @@ window.authManager = {
                 .maybeSingle();
             
             if (practitioner && !practError) {
-                console.log('[Rooted Vitality] User found in practitioners table');
                 return { role: 'practitioner', ...practitioner };
             }
             
@@ -443,7 +458,6 @@ window.authManager = {
                 .maybeSingle();
             
             if (client && !clientError) {
-                console.log('[Rooted Vitality] User found in clients table');
                 return { role: 'client', ...client };
             }
             
@@ -478,7 +492,6 @@ window.authManager = {
             if (error) {
                 console.error('[Rooted Vitality] Error updating last_login:', error);
             } else {
-                console.log(`[Rooted Vitality] last_login updated for ${tableName}`);
             }
         } catch (error) {
             console.error('[Rooted Vitality] Exception updating last_login:', error);
@@ -499,9 +512,7 @@ window.authManager = {
                 timestamp: Date.now(),
                 isAuthenticated: true
             };
-            console.log('[Rooted Vitality] Persisting session data:', sessionData);
             localStorage.setItem('rvUser', JSON.stringify(sessionData));
-            console.log('[Rooted Vitality] Session persisted to localStorage');
         } catch (error) {
             console.error('[Rooted Vitality] Error persisting session:', error);
         }
@@ -514,11 +525,8 @@ window.authManager = {
     _updateHeader(role) {
         // Use new role-based header system
         if (typeof RootedVitality !== 'undefined' && typeof RootedVitality.renderHeader === 'function') {
-            console.log('[Rooted Vitality] Updating header to role:', role);
             RootedVitality.renderHeader(role);
         } else {
-            console.warn('[Rooted Vitality] renderHeader not available, falling back to DOM manipulation');
-            
             // Fallback to old method if renderHeader not available
             const loginBtn = document.getElementById('rvLoginBtn');
             const nav = loginBtn?.parentElement;
@@ -526,7 +534,6 @@ window.authManager = {
             if (loginBtn && nav) {
                 // Check if buttons already exist
                 if (document.getElementById('rvDashboardBtn') || document.getElementById('rvLogoutBtn')) {
-                    console.log('[Rooted Vitality] Header already updated, skipping duplicate');
                     return;
                 }
                 
@@ -546,9 +553,8 @@ window.authManager = {
                     const currentPath = window.location.pathname;
                     const isInSubdir = currentPath.includes('/articles/') || currentPath.includes('/policies/') || currentPath.includes('/dashboard/');
                     const baseDir = isInSubdir ? '../' : '';
-                    const dashboardFile = role === 'practitioner' ? 'dashboard/pro/pages/index.html' : 'dashboard/client/pages/dashboard.html';
+                    const dashboardFile = role === 'practitioner' ? 'dashboard/pro/pages/index.html' : 'dashboard/client/pages/client-profile.html';
                     window.location.href = baseDir + dashboardFile;
-                    console.log('[Dashboard] Navigating to:', baseDir + dashboardFile);
                 });
                 
                 // Create Logout button
@@ -566,8 +572,6 @@ window.authManager = {
                 // Insert buttons after login button
                 loginBtn.parentNode.insertBefore(dashboardBtn, loginBtn.nextSibling);
                 loginBtn.parentNode.insertBefore(logoutBtn, dashboardBtn.nextSibling);
-                
-                console.log('[Rooted Vitality] Header updated: Dashboard + Logout buttons added');
             }
         }
     },
@@ -579,11 +583,8 @@ window.authManager = {
     _resetHeader() {
         // Use new role-based header system
         if (typeof RootedVitality !== 'undefined' && typeof RootedVitality.renderHeader === 'function') {
-            console.log('[Rooted Vitality] Resetting header to public role');
             RootedVitality.renderHeader('public');
         } else {
-            console.warn('[Rooted Vitality] renderHeader not available, falling back to DOM manipulation');
-            
             // Fallback to old method if renderHeader not available
             const loginBtn = document.getElementById('rvLoginBtn');
             const dashboardBtn = document.getElementById('rvDashboardBtn');
@@ -606,7 +607,6 @@ window.authManager = {
                     }
                 });
                 
-                console.log('[Rooted Vitality] Header reset to Login');
             }
         }
     }
@@ -618,12 +618,12 @@ window.authManager = {
 /**
  * Check for existing session on page load and restore it
  */
-window.addEventListener('DOMContentLoaded', async () => {
+if (typeof window !== 'undefined' && window.addEventListener) {
+    window.addEventListener('DOMContentLoaded', async () => {
     try {
         const session = await authManager.getSession();
         
         if (session && session.user) {
-            console.log('[Rooted Vitality] Existing session found, restoring...');
             
             // Get user profile including role and firstName
             const userProfile = await authManager._getUserProfile(session.user.id);
@@ -641,7 +641,6 @@ window.addEventListener('DOMContentLoaded', async () => {
                     const header = document.getElementById('rvHeader');
                     if (header) {
                         authManager._updateHeader(role);
-                        console.log('[Rooted Vitality] Session restored for:', session.user.email, '| Role:', role);
                     } else {
                         // Header not ready yet, wait and retry
                         setTimeout(updateHeaderWhenReady, 100);
@@ -654,65 +653,9 @@ window.addEventListener('DOMContentLoaded', async () => {
     } catch (error) {
         console.error('[Rooted Vitality] Error checking session on load:', error);
     }
-});
+    });
+}
 
-console.log('[Rooted Vitality] authManager ready (Supabase integration)');
-
-// End of authManager.js — Rooted Vitality Supabase Authentication Module
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// End of authManager.js â€” Rooted Vitality Supabase Authentication Module
 
 

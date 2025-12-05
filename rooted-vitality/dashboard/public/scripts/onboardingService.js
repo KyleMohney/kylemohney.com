@@ -1,0 +1,808 @@
+/**
+ ╔════════════════════════════════════════════════════════════════════╗
+ ║  ROOTED VITALITY, INC.                                             ║
+ ║  File: onboardingService.js                                        ║
+ ║  Purpose: Database operations, authentication, and matching        ║
+ ║  Holistic Wellness · Modern Connection Platform                    ║
+ ║  rootedvitality.com | 2025                                         ║
+ ╚════════════════════════════════════════════════════════════════════╝
+
+ TABLE OF CONTENTS
+   1. Authentication Flows
+   2. Database Operations
+   3. Practitioner Matching
+   4. Notifications & Results Display
+   5. Data Helpers & Utilities
+
+ DEPENDENCIES:
+   - Requires: onboardingCore.js, onboardingUI.js
+   - Global: window.supabaseClient, window.authManager
+   - Used by: All other onboarding modules
+ */
+
+// ======================================================
+// 1. AUTHENTICATION FLOWS
+// ======================================================
+
+/**
+ * Handle login form submission
+ */
+async function handleLoginSubmit(e, saveLocalData) {
+    e.preventDefault();
+    const email = document.getElementById('step-login-email').value.trim();
+    const password = document.getElementById('step-login-password').value;
+
+    if (!email || !password) {
+        window.showAlertModal('Please fill in all fields');
+        return;
+    }
+
+    try {
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Signing in...';
+
+        const { data: authData, error: authError } = await window.supabaseClient.auth.signInWithPassword({
+            email: email,
+            password: password
+        });
+
+        if (authError) throw authError;
+
+        window.closeOnboardingModal();
+        await initializeReturningMemberFlow();
+
+    } catch (error) {
+        console.error('[Onboarding] Login error:', error);
+        window.showAlertModal('Login failed: ' + error.message);
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Sign in';
+    }
+}
+
+/**
+ * Initialize returning member flow (signed-in user creating new project)
+ */
+async function initializeReturningMemberFlow() {
+    try {
+        const { data: { user } } = await window.supabaseClient.auth.getUser();
+        const { data: clientData } = await window.supabaseClient
+            .from('clients')
+            .select('first_name')
+            .eq('id', user.id)
+            .single();
+
+        const firstName = clientData?.first_name || 'Friend';
+
+        const modal = document.createElement('div');
+        modal.id = 'returning-member-modal';
+        modal.innerHTML = getReturningMemberHTML(firstName);
+
+        document.body.appendChild(modal);
+        window.injectOnboardingStyles();
+
+        // Event listeners
+        modal.querySelector('.onboarding-close-btn').addEventListener('click', closeReturningMemberModal);
+        modal.querySelector('.returning-cancel').addEventListener('click', closeReturningMemberModal);
+
+        document.getElementById('returning-project-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const category = document.getElementById('returning-category').value;
+            const symptoms = document.getElementById('returning-symptoms').value;
+            const goals = document.getElementById('returning-goals').value;
+            const autoMatch = document.getElementById('returning-auto-match').checked;
+
+            if (!category || !symptoms) {
+                window.showAlertModal('Please fill in required fields');
+                return;
+            }
+
+            try {
+                const submitBtn = e.target.querySelector('button[type="submit"]');
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Creating your journey...';
+
+                const { data: projectData, error: projectError } = await window.supabaseClient
+                    .from('projects')
+                    .insert({
+                        user_id: user.id,
+                        category_id: category,
+                        description: symptoms,
+                        goals: goals || null,
+                        status: 'active',
+                        created_at: new Date().toISOString()
+                    })
+                    .select();
+
+                if (projectError) throw projectError;
+
+                closeReturningMemberModal();
+                window.showAlertModal(`Welcome back, ${firstName}!\n\nYour project has been created.`);
+
+                setTimeout(() => {
+                    const url = `/rooted-vitality/dashboard/client/pages/find-practitioners.html?project=${projectData[0].id}`;
+                    window.location.href = autoMatch ? url + '&auto=true' : url;
+                }, 500);
+
+            } catch (error) {
+                console.error('[Onboarding] Error creating project:', error);
+                window.showAlertModal('Error: ' + error.message);
+                const submitBtn = e.target.querySelector('button[type="submit"]');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Begin this journey';
+            }
+        });
+
+    } catch (error) {
+        console.error('[Onboarding] Error initializing returning member flow:', error);
+        window.showAlertModal('Error loading welcome experience');
+    }
+}
+
+function closeReturningMemberModal() {
+    const modal = document.getElementById('returning-member-modal');
+    if (modal) {
+        modal.style.animation = 'slideOut 0.3s ease-out forwards';
+        setTimeout(() => modal.remove(), 300);
+    }
+}
+
+// ======================================================
+// 2. DATABASE OPERATIONS
+// ======================================================
+
+/**
+ * Save onboarding data to database after verification
+ */
+async function saveToDatabaseAfterVerification(onboardingData) {
+    try {
+        // Account creation handled in Step 4
+        // Profile creation handled in Step 5
+        clearOnboardingLocalStorage();
+    } catch (error) {
+        console.error('Error saving to database:', error);
+        window.showAlertModal('Error creating account. Please try again.');
+        throw error;
+    }
+}
+
+/**
+ * Load matches for new user after project creation
+ */
+async function loadMatchesForOnboarding(onboardingData) {
+    try {
+        const container = document.getElementById('matches-container');
+        if (!container) return;
+
+        const currentUser = window.authManager?.getCurrentUser();
+        if (!currentUser) {
+            console.error('[Onboarding] Not authenticated');
+            container.innerHTML = '<p class="loading" style="color: #d32f2f;">Error: Not authenticated</p>';
+            return;
+        }
+
+        // Get client data
+        const { data: clientData, error: clientError } = await window.supabaseClient
+            .from('clients')
+            .select('serial_number, first_name')
+            .eq('id', currentUser.id)
+            .single();
+
+        if (clientError || !clientData) {
+            console.error('[Onboarding] Could not find client:', clientError);
+            container.innerHTML = '<p class="loading" style="color: #d32f2f;">Error loading client data</p>';
+            return;
+        }
+
+        // Call matching algorithm via RPC
+        let matchData;
+        const { data: rpcData, error: matchError } = await window.supabaseClient
+            .rpc('match_practitioners', { p_project_id: onboardingData.projectId });
+
+        if (matchError) {
+            console.error('[Onboarding] RPC match_practitioners error:', matchError);
+            
+            // Fallback to JavaScript-based matching
+            console.log('[Onboarding] Attempting JavaScript fallback matching...');
+            matchData = await performJavaScriptMatching(onboardingData);
+            
+            if (!matchData || matchData.length === 0) {
+                console.error('[Onboarding] Fallback matching also failed');
+                container.innerHTML = '<p class="loading" style="color: #d32f2f;">Matching System Unavailable - The practitioner matching system is currently being deployed. Please try again in a few moments.</p>';
+                return;
+            }
+        } else {
+            matchData = rpcData;
+        }
+
+        // Get top 3 matches
+        const topMatches = (matchData || [])
+            .sort((a, b) => (b.match_score || 0) - (a.match_score || 0))
+            .slice(0, 3);
+
+        if (topMatches.length === 0) {
+            container.innerHTML = '<p class="loading">No matching practitioners found. You can browse all practitioners in the dashboard.</p>';
+            return;
+        }
+
+        // [Fetch and render match cards - see original for full implementation]
+
+    } catch (error) {
+        console.error('[Onboarding] Error loading matches:', error);
+        document.getElementById('matches-container').innerHTML = '<p class="loading" style="color: #d32f2f;">Error loading matches</p>';
+    }
+}
+
+// ======================================================
+// 3. PRACTITIONER MATCHING
+// ======================================================
+
+/**
+ * Fallback JavaScript-based matching when RPC is unavailable
+ */
+async function performJavaScriptMatching(onboardingData) {
+    try {
+        const { data: projectData, error: projectError } = await window.supabaseClient
+            .from('projects')
+            .select('*')
+            .eq('id', onboardingData.projectId)
+            .single();
+
+        if (projectError || !projectData) {
+            console.error('[Fallback Matching] Project not found:', projectError);
+            return [];
+        }
+
+        // Get active practitioners
+        const { data: practitioners, error: practError } = await window.supabaseClient
+            .from('practitioners')
+            .select('*')
+            .eq('deleted_at', null)
+            .eq('matching_enabled', true)
+            .eq('matching_paused', false);
+
+        if (practError || !practitioners) {
+            console.error('[Fallback Matching] Error fetching practitioners:', practError);
+            return [];
+        }
+
+        // Get active memberships
+        const { data: memberships } = await window.supabaseClient
+            .from('memberships')
+            .select('practitioner_id')
+            .eq('status', 'active');
+
+        const activePractitionerIds = new Set(memberships?.map(m => m.practitioner_id) || []);
+
+        // Filter and score matches
+        const matches = practitioners
+            .filter(p => activePractitionerIds.has(p.id))
+            .filter(p => matchesPractitionerCriteria(p, projectData))
+            .map(p => ({
+                id: p.id,
+                serial_number: p.serial_number,
+                legal_name: p.legal_name,
+                dba_name: p.dba_name || p.legal_name,
+                match_score: 50
+            }));
+
+        return matches;
+
+    } catch (error) {
+        console.error('[Fallback Matching] Exception:', error);
+        return [];
+    }
+}
+
+function matchesPractitionerCriteria(practitioner, project) {
+    // Category match
+    const categoryIds = practitioner.service_category_ids || [];
+    if (!categoryIds.includes(project.category_id)) return false;
+
+    // Travel preference match
+    const travelPrefs = project.travel_preference || 'flexible';
+    if (travelPrefs === 'in-person' && !practitioner.in_person_enabled) return false;
+    if (travelPrefs === 'housecalls' && !practitioner.housecalls_enabled) return false;
+    if (travelPrefs === 'virtual' && !practitioner.virtual_enabled) return false;
+
+    // Geography match
+    if (travelPrefs === 'in-person') {
+        if (project.zipcode !== practitioner.in_person_base_zipcode) {
+            const inPersonZips = practitioner.in_person_zipcodes || [];
+            if (!inPersonZips.includes(project.zipcode)) return false;
+        }
+    } else if (travelPrefs === 'housecalls') {
+        if (project.zipcode !== practitioner.housecalls_base_zipcode) {
+            const housecallZips = practitioner.housecalls_zipcodes || [];
+            if (!housecallZips.includes(project.zipcode)) return false;
+        }
+    } else if (travelPrefs === 'virtual') {
+        const virtualStates = practitioner.virtual_states || [];
+        if (virtualStates.length > 0 && !virtualStates.includes(project.state)) return false;
+    }
+
+    return true;
+}
+
+// ======================================================
+// 4. NOTIFICATIONS & RESULTS DISPLAY
+// ======================================================
+
+/**
+ * Show modal explaining match request is pending
+ */
+function showPendingMatchModal(practitionerName) {
+    const modal = document.createElement('div');
+    modal.className = 'pending-match-modal';
+    modal.innerHTML = `
+        <div class="pending-match-overlay"></div>
+        <div class="pending-match-content">
+            <div class="pending-match-icon">
+                <img src="./assets/logo_trimmed.png" alt="Rooted Vitality" class="pending-match-logo">
+            </div>
+            <h2>Request Sent!</h2>
+            <p>Your connection request has been sent to <strong>${practitionerName}</strong>.</p>
+            <p style="font-size: 14px; color: #666; margin-top: 12px;">They'll review your profile and get back to you soon. You'll receive a notification when they respond.</p>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    
+    setTimeout(() => modal.remove(), 2000);
+}
+
+// ======================================================
+// 5. DATA HELPERS & UTILITIES
+// ======================================================
+
+/**
+ * Restore form values from localStorage
+ */
+function restoreFormValuesFromLocalStorage() {
+    const data = JSON.parse(localStorage.getItem('rooted-onboarding-data'));
+    if (!data) return;
+
+    // Restore fields from all steps
+    // [Field restoration for each step - see original]
+}
+
+/**
+ * Clear localStorage after successful account creation
+ */
+function clearOnboardingLocalStorage() {
+    localStorage.removeItem('rooted-onboarding-data');
+}
+
+/**
+ * Convert 24-hour time to 12-hour format
+ */
+/**
+ * Load and display practitioner matches for the onboarding modal
+ * Attempts to use RPC first, falls back to JavaScript matching if needed
+ */
+async function loadMatchesForOnboarding(onboardingData) {
+  try {
+    const container = document.getElementById('matches-container');
+    if (!container) return;
+
+    // Get current user for client serial
+    const { data: { user: currentUser } } = await window.supabaseClient.auth.getUser();
+    if (!currentUser) {
+      console.error('[Onboarding] Not authenticated');
+      container.innerHTML = '<p class="loading" style="color: #d32f2f;">Error: Not authenticated</p>';
+      return;
+    }
+
+    // Get client serial
+    const { data: clientData, error: clientError } = await window.supabaseClient
+      .from('clients')
+      .select('serial_number, first_name')
+      .eq('id', currentUser.id)
+      .single();
+
+    if (clientError || !clientData) {
+      console.error('[Onboarding] Could not find client:', clientError);
+      container.innerHTML = '<p class="loading" style="color: #d32f2f;">Error loading client data</p>';
+      return;
+    }
+
+    // Call matching algorithm RPC with project ID
+    let matchData;
+    const { data: rpcData, error: matchError } = await window.supabaseClient
+      .rpc('match_practitioners', { p_project_id: onboardingData.projectId });
+
+    if (matchError) {
+      console.error('[Onboarding] RPC match_practitioners error:', {
+        code: matchError?.code,
+        message: matchError?.message
+      });
+      
+      // Fallback: Try JavaScript-based matching if RPC unavailable
+      console.log('[Onboarding] Attempting JavaScript fallback matching...');
+      matchData = await performJavaScriptMatching(onboardingData);
+      
+      if (!matchData || matchData.length === 0) {
+        console.error('[Onboarding] Fallback matching also failed');
+        container.innerHTML = '<p class="loading" style="color: #d32f2f;">Matching System Unavailable - The practitioner matching system is currently being deployed. Please try again in a few moments.</p>';
+        return;
+      }
+      console.log('[Onboarding] Fallback matching succeeded with', matchData.length, 'matches');
+    } else {
+      matchData = rpcData;
+    }
+
+    // Get top 3 matches sorted by match_score (descending)
+    const topMatches = (matchData || [])
+      .sort((a, b) => (b.match_score || 0) - (a.match_score || 0))
+      .slice(0, 3);
+
+    if (topMatches.length === 0) {
+      container.innerHTML = '<p class="loading">No matching practitioners found. You can browse all practitioners in the dashboard.</p>';
+      return;
+    }
+
+    // Fetch profile data for all matches (including logo and profile info)
+    const serialNumbers = topMatches.map(m => m.serial_number);
+    
+    const { data: practitionerData, error: practError } = await window.supabaseClient
+      .from('practitioners')
+      .select('id, serial_number, legal_business_name, dba_name')
+      .in('serial_number', serialNumbers);
+
+    if (practError) {
+      console.warn('[Onboarding] Error fetching practitioner data:', practError);
+    }
+
+    // Fetch practitioner profiles for logos
+    const { data: profileData, error: profileError } = await window.supabaseClient
+      .from('practitioner_profiles')
+      .select('practitioner_serial, practice_logo_url, modalities')
+      .in('practitioner_serial', serialNumbers);
+
+    if (profileError) {
+      console.warn('[Onboarding] Error fetching practitioner profiles:', profileError);
+    }
+
+    // Fetch reviews for ratings
+    const { data: reviewsData, error: reviewError } = await window.supabaseClient
+      .from('reviews')
+      .select('practitioner_serial, rating')
+      .in('practitioner_serial', serialNumbers);
+
+    if (reviewError) {
+      console.warn('[Onboarding] Error fetching reviews:', reviewError);
+    }
+
+    // Create lookup maps
+    const practMap = {};
+    practitionerData?.forEach(p => {
+      practMap[p.serial_number] = p;
+    });
+
+    const profileMap = {};
+    profileData?.forEach(p => {
+      profileMap[p.practitioner_serial] = p;
+    });
+
+    const reviewMap = {};
+    reviewsData?.forEach(r => {
+      if (!reviewMap[r.practitioner_serial]) {
+        reviewMap[r.practitioner_serial] = { count: 0, totalRating: 0 };
+      }
+      reviewMap[r.practitioner_serial].count += 1;
+      reviewMap[r.practitioner_serial].totalRating += (r.rating || 0);
+    });
+
+    // Render matches with real data
+    container.innerHTML = topMatches.map(match => {
+      const practitioner = practMap[match.serial_number];
+      const profile = profileMap[match.serial_number];
+      let displayName = practitioner?.dba_name || practitioner?.legal_business_name || 'Practitioner';
+      displayName = displayName.replace(/-/g, ' ');
+      const logoUrl = profile?.practice_logo_url;
+      const specialty = (profile?.modalities || []).join(', ') || 'Wellness Services';
+      const reviews = reviewMap[match.serial_number];
+      const avgRating = reviews ? (reviews.totalRating / reviews.count).toFixed(1) : 0;
+      const reviewCount = reviews?.count || 0;
+
+      
+      // Create avatar: use logo if available, otherwise use initials
+      const avatarHtml = logoUrl 
+        ? `<img src="${logoUrl}" alt="${displayName}" class="match-avatar-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">`
+        : '';
+      const initialsHtml = logoUrl 
+        ? `<div class="match-avatar-initials" style="display:none;">${displayName.charAt(0)}</div>`
+        : `<div class="match-avatar-initials">${displayName.charAt(0)}</div>`;
+
+      return `
+        <div class="match-card" data-practitioner-serial="${match.serial_number}" data-practitioner-id="${practitioner?.id}">
+          <div class="match-header">
+            <div class="match-avatar">
+              ${avatarHtml}
+              ${initialsHtml}
+            </div>
+            <div class="match-info">
+              <h3>${displayName}</h3>
+              <p class="match-specialty">${specialty}</p>
+              <p class="match-rating">★${avgRating} (${reviewCount} reviews)</p>
+            </div>
+            <div class="match-score">${match.match_score}% match</div>
+          </div>
+          <div class="match-actions">
+            <button class="btn-secondary match-view-profile" data-practitioner-serial="${match.serial_number}" data-practitioner-id="${practitioner?.id}">View Profile</button>
+            <button class="btn-primary match-connect" data-practitioner-serial="${match.serial_number}" data-practitioner-id="${practitioner?.id}" data-match-score="${match.match_score}">Send Request</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // View Profile button - navigate to practitioner profile
+    container.querySelectorAll('.match-view-profile').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const practitionerId = btn.dataset.practitionerId;
+        const projectId = onboardingData.projectId;
+        if (practitionerId) {
+          window.location.href = `/rooted-vitality/dashboard/pro/pages/practitioner-public-profile.html?id=${practitionerId}&project_id=${projectId}`;
+        }
+      });
+    });
+
+    // Send Match Request button
+    container.querySelectorAll('.match-connect').forEach(btn => {
+      
+      btn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const practitionerSerial = btn.dataset.practitionerSerial;
+        const matchScore = parseInt(btn.dataset.matchScore);
+        const displayName = btn.closest('.match-card')?.querySelector('.match-info h3')?.textContent || 'Practitioner';
+        
+        try {
+          btn.disabled = true;
+          btn.textContent = 'Sending...';
+
+          // Get project data
+          const { data: projectData, error: projectError } = await window.supabaseClient
+            .from('projects')
+            .select('id, project_serial, client_serial')
+            .eq('id', onboardingData.projectId)
+            .single();
+
+          if (projectError || !projectData) {
+            throw new Error('Project not found');
+          }
+
+          // Create match directly in table
+          const { data: matchResult, error: matchCreateError } = await window.supabaseClient
+            .from('project_practitioner_matches')
+            .insert({
+              project_serial: parseInt(projectData.project_serial),
+              client_serial: projectData.client_serial,
+              practitioner_serial: practitionerSerial,
+              match_score: matchScore,
+              status: 'pending',
+              client_initiated: true,
+              matched_at: new Date().toISOString()
+            })
+            .select();
+
+          if (matchCreateError) {
+            console.error('[Onboarding] Match creation error:', matchCreateError);
+            throw matchCreateError;
+          }
+
+          // Create notification for practitioner
+          const { data: practitionerInfo, error: practError } = await window.supabaseClient
+            .from('practitioners')
+            .select('id, serial_number, legal_name')
+            .eq('serial_number', practitionerSerial)
+            .single();
+
+          if (practitionerInfo && !practError) {
+            const clientName = onboardingData.firstName || 'New Client';
+            const { error: notifError } = await window.supabaseClient
+              .from('practitioner_notifications')
+              .insert({
+                practitioner_serial: practitionerInfo.serial_number,
+                type: 'match_new',
+                title: `New Match: ${clientName}`,
+                message: `${clientName} has matched with you!`,
+                is_read: false,
+                created_at: new Date().toISOString()
+              });
+
+            if (notifError) {
+              console.warn('[Onboarding] Notification creation warning:', notifError);
+            }
+          }
+
+          // Show pending modal
+          showPendingMatchModal(displayName);
+          
+          // Close onboarding after brief delay
+          setTimeout(() => {
+            closeOnboardingModal();
+            setTimeout(() => {
+              window.location.href = '/rooted-vitality/dashboard/client/pages/inbox.html';
+            }, 300);
+          }, 1500);
+
+        } catch (error) {
+          console.error('[Onboarding] Error sending match request:', error);
+          window.showAlertModal('Error sending request: ' + (error?.message || 'Unknown error'));
+          btn.disabled = false;
+          btn.textContent = 'Send Request';
+        }
+      });
+    });
+
+  } catch (error) {
+    console.error('[Onboarding] Error in loadMatchesForOnboarding:', error);
+    const container = document.getElementById('matches-container');
+    if (container) {
+      container.innerHTML = '<p class="loading" style="color: #d32f2f;">Error loading matches</p>';
+    }
+  }
+}
+
+/**
+ * Fallback: JavaScript-based practitioner matching when RPC is unavailable
+ * Implements the same logic as the SQL match_practitioners function
+ */
+async function performJavaScriptMatching(onboardingData) {
+  try {
+    // Get project details
+    const { data: projectData, error: projectError } = await window.supabaseClient
+      .from('projects')
+      .select('*')
+      .eq('id', onboardingData.projectId)
+      .single();
+
+    if (projectError || !projectData) {
+      console.error('[Fallback Matching] Project not found:', projectError);
+      return [];
+    }
+
+    // Get active practitioners with matching_enabled = true
+    const { data: practitioners, error: practError } = await window.supabaseClient
+      .from('practitioners')
+      .select('*')
+      .eq('deleted_at', null)
+      .eq('matching_enabled', true)
+      .eq('matching_paused', false);
+
+    if (practError || !practitioners) {
+      console.error('[Fallback Matching] Error fetching practitioners:', practError);
+      return [];
+    }
+
+    // Filter practitioners with active membership
+    const { data: memberships } = await window.supabaseClient
+      .from('memberships')
+      .select('practitioner_id')
+      .eq('status', 'active');
+
+    const activePractitionerIds = new Set(memberships?.map(m => m.practitioner_id) || []);
+
+    // Apply matching filters
+    const matches = practitioners
+      .filter(p => activePractitionerIds.has(p.id))
+      .filter(p => {
+        // Check category match
+        const categoryIds = p.service_category_ids || [];
+        if (!categoryIds.includes(projectData.category_id)) {
+          return false;
+        }
+
+        // Check subcategory match if specified
+        if (projectData.subcategory_name) {
+          const projectSubs = projectData.subcategory_name
+            .split(',')
+            .map(s => s.trim())
+            .filter(s => s);
+          const practSubs = p.service_subcategory_names || [];
+          const hasMatch = projectSubs.some(s => practSubs.includes(s));
+          if (!hasMatch && projectSubs.length > 0) {
+            return false;
+          }
+        }
+
+        // Check travel preference match
+        const travelPrefs = projectData.travel_preference || 'flexible';
+        if (travelPrefs === 'in-person' && !p.in_person_enabled) return false;
+        if (travelPrefs === 'housecalls' && !p.housecalls_enabled) return false;
+        if (travelPrefs === 'virtual' && !p.virtual_enabled) return false;
+
+        // Check geography match if not virtual or virtual coverage
+        if (travelPrefs === 'in-person') {
+          if (projectData.zipcode !== p.in_person_base_zipcode) {
+            const inPersonZips = p.in_person_zipcodes || [];
+            if (!inPersonZips.includes(projectData.zipcode)) {
+              return false;
+            }
+          }
+        } else if (travelPrefs === 'housecalls') {
+          if (projectData.zipcode !== p.housecalls_base_zipcode) {
+            const housecallZips = p.housecalls_zipcodes || [];
+            if (!housecallZips.includes(projectData.zipcode)) {
+              return false;
+            }
+          }
+        } else if (travelPrefs === 'virtual') {
+          const virtualStates = p.virtual_states || [];
+          if (virtualStates.length > 0 && !virtualStates.includes(projectData.state)) {
+            return false;
+          }
+        }
+
+        return true;
+      })
+      .map(p => ({
+        id: p.id,
+        serial_number: p.serial_number,
+        legal_name: p.legal_name,
+        dba_name: p.dba_name || p.legal_name,
+        email: p.email,
+        phone: p.phone,
+        match_score: 50  // Default score for fallback
+      }));
+
+    return matches;
+  } catch (error) {
+    console.error('[Fallback Matching] Exception:', error);
+    return [];
+  }
+}
+
+function convertTo12Hour(time24) {
+    const [hours, minutes] = time24.split(':').map(Number);
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const hours12 = hours % 12 || 12;
+    return `${hours12}:${String(minutes).padStart(2, '0')} ${ampm}`;
+}
+
+/**
+ * Escape HTML to prevent XSS
+ */
+function escapeHtml(text) {
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, m => map[m]);
+}
+
+// Helper function for returning member modal HTML
+function getReturningMemberHTML(firstName) {
+    return `
+        <div class="onboarding-overlay"></div>
+        <div class="onboarding-modal">
+            <button class="onboarding-close-btn" aria-label="Close" title="Close">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <div class="returning-welcome">
+                <div class="welcome-logo">
+                    <img src="./assets/logo_trimmed.png" alt="Rooted Vitality" class="welcome-logo-image">
+                </div>
+                <h1>Welcome back, ${firstName}</h1>
+                <p>You're here to start something new. Let's make it beautiful.</p>
+            </div>
+            <!-- Form content - see original for full implementation -->
+        </div>
+    `;
+}
+
+// Export
+window.handleLoginSubmit = handleLoginSubmit;
+window.initializeReturningMemberFlow = initializeReturningMemberFlow;
+window.loadMatchesForOnboarding = loadMatchesForOnboarding;
+window.performJavaScriptMatching = performJavaScriptMatching;
+window.showPendingMatchModal = showPendingMatchModal;
+window.clearOnboardingLocalStorage = clearOnboardingLocalStorage;

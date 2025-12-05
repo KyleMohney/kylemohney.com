@@ -1,3 +1,24 @@
+﻿/*
+╔════════════════════════════════════════════════════════════════════╗
+║  ROOTED VITALITY, INC.                                             ║
+║  File: reviewModerationManager.js                                  ║
+║  Purpose: Admin review moderation and approval system              ║
+║  Holistic Wellness · Modern Connection Platform                    ║
+║  rootedvitality.com | 2025                                         ║
+╚════════════════════════════════════════════════════════════════════╝
+
+ TABLE OF CONTENTS
+   1. CLASS INITIALIZATION
+   2. REVIEW APPROVAL & REJECTION
+   3. REVIEW FEATURING & VISIBILITY
+   4. BULK OPERATIONS
+   5. UTILITIES & HELPERS
+*/
+
+// ======================================================
+// 1. CLASS INITIALIZATION
+// ======================================================
+
 // ============================================================================
 // reviewModerationManager.js
 // ============================================================================
@@ -27,7 +48,7 @@ class ReviewModerationManager {
 
       if (error) throw error;
 
-      console.log('[Review Moderation] Review approved:', reviewId);
+
       return { success: true };
     } catch (error) {
       console.error('[Review Moderation] Error approving review:', error);
@@ -52,7 +73,7 @@ class ReviewModerationManager {
 
       if (error) throw error;
 
-      console.log('[Review Moderation] Review rejected:', reviewId);
+
       return { success: true };
     } catch (error) {
       console.error('[Review Moderation] Error rejecting review:', error);
@@ -75,7 +96,7 @@ class ReviewModerationManager {
 
       if (error) throw error;
 
-      console.log('[Review Moderation] Review featured status updated:', { reviewId, isFeatured });
+
       return { success: true };
     } catch (error) {
       console.error('[Review Moderation] Error updating featured status:', error);
@@ -98,7 +119,7 @@ class ReviewModerationManager {
 
       if (error) throw error;
 
-      console.log('[Review Moderation] Review verified status updated:', { reviewId, isVerified });
+
       return { success: true };
     } catch (error) {
       console.error('[Review Moderation] Error updating verified status:', error);
@@ -121,7 +142,7 @@ class ReviewModerationManager {
 
       if (error) throw error;
 
-      console.log('[Review Moderation] Moderation notes updated:', reviewId);
+
       return { success: true };
     } catch (error) {
       console.error('[Review Moderation] Error adding moderation notes:', error);
@@ -143,7 +164,7 @@ class ReviewModerationManager {
 
       if (error) throw error;
 
-      console.log('[Review Moderation] Fetched pending reviews:', data.length);
+
       return { success: true, data };
     } catch (error) {
       console.error('[Review Moderation] Error fetching pending reviews:', error);
@@ -164,7 +185,7 @@ class ReviewModerationManager {
 
       if (error) throw error;
 
-      console.log('[Review Moderation] Fetched all reviews for practitioner:', data.length);
+
       return { success: true, data };
     } catch (error) {
       console.error('[Review Moderation] Error fetching practitioner reviews:', error);
@@ -210,7 +231,7 @@ class ReviewModerationManager {
 
       if (error) throw error;
 
-      console.log('[Review Moderation] External review imported:', externalReviewId);
+
       return { success: true };
     } catch (error) {
       console.error('[Review Moderation] Error importing external review:', error);
@@ -223,6 +244,8 @@ class ReviewModerationManager {
 if (typeof window !== 'undefined') {
   window.reviewModerationManager = new ReviewModerationManager(window.supabaseClient);
 }
+
+
 
 
 

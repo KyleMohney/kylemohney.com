@@ -8,10 +8,10 @@ The Practitioner Inbox is a modern, two-column messaging interface for practitio
 
 ### File Structure
 ```
-/dashboard/pro/inbox.html          - Main inbox page markup
-/styles/inbox.css                  - Polished, modern styling
-/scripts/inboxManager.js           - Business logic and interactions
-/components/header_practitioner.html - Updated with Inbox link
+/dashboard/pro/pages/inbox.html         - Main inbox page markup
+/dashboard/pro/scripts/inboxManager.js  - Business logic and interactions
+/dashboard/pro/styles/inbox.css         - Polished, modern styling
+/components/header_practitioner.html    - Updated with Inbox link
 ```
 
 ### Components

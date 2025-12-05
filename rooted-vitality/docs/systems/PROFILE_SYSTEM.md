@@ -115,12 +115,12 @@ Unified profile system for both practitioners and clients, supporting avatars, b
 
 ## 10. File Map
 ```
-dashboard/pro/profile.html           # Practitioner profile UI
-scripts/proProfile.js                # Practitioner profile logic
-scripts/practitionerHeaderAvatar.js  # Avatar header logic
-scripts/dashboard-client.js          # Client profile logic
-sql/PROFILE_DATABASE_MIGRATION.sql   # One-time migration (archive if not needed)
-docs/profile/PROFILE_SYSTEM_MASTER.md # This file
+dashboard/pro/profile.html                      # Practitioner profile UI
+scripts/practitioner_profile.js                # Practitioner profile logic
+dashboard/pro/scripts/practitionerHeaderAvatar.js  # Avatar header logic
+dashboard/client/scripts/client-profile.js           # Client profile logic
+sql/PROFILE_DATABASE_MIGRATION.sql              # One-time migration (archive if not needed)
+docs/profile/PROFILE_SYSTEM_MASTER.md           # This file
 ```
 
 ---

@@ -33,14 +33,14 @@
   <meta property="og:title" content="Callie's Story: Why Rural Ohio Needs Better Wellness Access">
   <meta property="og:description" content="One mother's journey finding home birth support in the country and discovering how Rooted Vitality solves the rural practitioner access problem.">
   <meta property="og:url" content="https://rootedvitality.com/articles/home-birth-without-midwife.html">
-  <meta property="og:image" content="../../assets/article-assets/family1.jpg">
+  <meta property="og:image" content="../../../assets/article-assets/family1.jpg">
   <meta property="og:site_name" content="Rooted Vitality">
   
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Callie's Story: Why Rural Ohio Needs Better Wellness Access">
   <meta name="twitter:description" content="How one mother fought to find a midwife in rural Ohio—and why she's using Rooted Vitality for her next pregnancy.">
-  <meta name="twitter:image" content="../../assets/article-assets/family1.jpg">
+  <meta name="twitter:image" content="../../../assets/article-assets/family1.jpg">
   
   <!-- Canonical URL -->
   <link rel="canonical" href="https://rootedvitality.com/articles/home-birth-without-midwife.html">
@@ -52,7 +52,7 @@
     "@type": "Article",
     "headline": "Callie's Story: Why Rural Ohio Needs Better Wellness Access",
     "description": "A mother's journey finding home birth midwife support in rural Ohio and discovering the critical gap in holistic wellness access.",
-    "image": "../../assets/article-assets/family1.jpg",
+    "image": "../../../assets/article-assets/family1.jpg",
     "author": {
       "@type": "Organization",
       "name": "Rooted Vitality"
@@ -62,7 +62,7 @@
       "name": "Rooted Vitality",
       "logo": {
         "@type": "ImageObject",
-        "url": "../../assets/logo.png"
+        "url": "../../../assets/logo.png"
       }
     },
     "datePublished": "2024-12-01",
@@ -102,7 +102,7 @@
 
           <!-- Featured Image -->
           <figure class="article__featured-image">
-            <img src="../../assets/article-assets/family1.jpg" alt="Callie's home birth story - mother and family moments">
+            <img src="../../../assets/article-assets/family1.jpg" alt="Callie's home birth story - mother and family moments">
             <figcaption>One mother's journey to finding the wellness support she needed</figcaption>
           </figure>
         </header>
@@ -233,10 +233,16 @@
   <script src="../../scripts/injections.js"></script>
   <script>
     function handleCTA() {
-      window.location.href = '/rooted-vitality/index.html#hero';
-      setTimeout(() => {
-        document.querySelector('#hero-cta-btn')?.click();
-      }, 500);
+      // Check if user is signed in
+      const currentUser = window.authManager?.getCurrentUser();
+      
+      if (currentUser) {
+        // User is signed in - go directly to my-wellness page
+        window.location.href = '/rooted-vitality/dashboard/client/pages/my-wellness.html';
+      } else {
+        // User is not signed in - go to signup form
+        window.location.href = '/rooted-vitality/dashboard/client/pages/client-signup.html';
+      }
     }
   </script>
 </body>

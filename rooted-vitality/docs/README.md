@@ -59,7 +59,7 @@ The **world-class landing page** is now live at `/index.html` — a conversion-o
 
 ### Core Pages
 - `index.html` — Public homepage
-- `signup.html` — Client registration
+- `client-signup.html` — Client registration
 - `verify.html` — Email verification
 - `dashboard/` — Client and practitioner dashboards
 
@@ -96,8 +96,8 @@ All SQL infrastructure is in `sql/`:
 
 ### Scripts
 - Authentication: `authManager.js`, `authHooks.js`, `authModal.js`
-- Signup: `signupHandler.js`, `practitioner-signup.js`
-- Dashboards: `dashboard-client.js`, `practitionerHelpers.js`
+- Signup: `dashboard/client/scripts/client-signup.js`, `dashboard/pro/scripts/practitioner-signup.js`
+- Dashboards: `dashboard/client/scripts/client-profile.js`, `dashboard/pro/scripts/practitionerHelpers.js`
 - Matching: Matching UI and logic for clients and practitioners
 - Utilities: Rendering, search, tab control, verification
 
@@ -107,7 +107,7 @@ Modular CSS architecture:
 - `layout.css` — Containers, grid, spacing
 - `components.css` — Buttons, cards, forms, modals
 - `pages.css` — Page-specific overrides
-- Page-specific: `dashboard-client.css`, `practitioner-signup.css`, `profile.css`, etc.
+- Page-specific: `dashboard-client.css`, `practitioner-signup.css`, `dashboard/pro/styles/profile.css`, etc.
 
 ### Components
 Reusable HTML templates:
@@ -135,7 +135,7 @@ Reusable HTML templates:
 ## Key Workflows
 
 ### Client Signup
-1. User fills `signup.html` form
+1. User fills `client-signup.html` form
 2. Backend validates and creates auth record
 3. Email verification sent
 4. User confirms via `verify.html`

@@ -23,11 +23,87 @@ Extracted from: styles_legacy.css (lines 1-890)
 :root {
     /* Brand Palette */
     --rooted-primary: #77883e;
+    --rooted-primary-dark: #5f7030;
     --rooted-accent: #d4c47c;
     --rooted-neutral: #fbf7ec;
     --rooted-sage: #fbf7ec;
     --rooted-dark: #2e2b28;
     --rooted-light: #fbf7ec;
+    
+    /* Status Colors */
+    --rooted-success: #77883e;
+    --rooted-warning: #ff9800;
+    --rooted-danger: #d32f2f;
+    
+    /* Card & Alert Design Tokens */
+    --card-bg-primary: #fbf7ec;
+    --card-bg-gradient-light: rgba(119, 136, 62, 0.08);
+    --card-bg-gradient-accent: rgba(235, 246, 232, 0.6);
+    --card-bg-gradient-accent-soft: rgba(235, 246, 232, 0.5);
+    --card-border-primary: #d4c47c;
+    --card-border-accent: #77883e;
+    --card-border-light: #e0dcd5;
+    --card-shadow-subtle: 0 2px 8px rgba(119, 136, 62, 0.1);
+    --card-shadow-hover: 0 4px 12px rgba(119, 136, 62, 0.12);
+    --card-text-primary: #3e3c38;
+    --card-text-secondary: #6b6b6b;
+    --card-accent-color: #77883e;
+    --card-icon-color: #77883e;
+    
+    /* Primary Color Opacity Variants */
+    --primary-opacity-01: rgba(119, 136, 62, 0.01);
+    --primary-opacity-02: rgba(119, 136, 62, 0.02);
+    --primary-opacity-03: rgba(119, 136, 62, 0.03);
+    --primary-opacity-05: rgba(119, 136, 62, 0.05);
+    --primary-opacity-08: rgba(119, 136, 62, 0.08);
+    --primary-opacity-10: rgba(119, 136, 62, 0.1);
+    --primary-opacity-12: rgba(119, 136, 62, 0.12);
+    --primary-opacity-15: rgba(119, 136, 62, 0.15);
+    --primary-opacity-20: rgba(119, 136, 62, 0.2);
+    --primary-opacity-30: rgba(119, 136, 62, 0.3);
+    --primary-opacity-40: rgba(119, 136, 62, 0.4);
+    
+    /* Accent Color Opacity Variants */
+    --accent-opacity-05: rgba(212, 196, 124, 0.05);
+    --accent-opacity-10: rgba(212, 196, 124, 0.1);
+    --accent-opacity-12: rgba(212, 196, 124, 0.12);
+    --accent-opacity-15: rgba(212, 196, 124, 0.15);
+    
+    /* Dark Color Opacity Variants */
+    --dark-opacity-02: rgba(46, 43, 40, 0.02);
+    --dark-opacity-05: rgba(46, 43, 40, 0.05);
+    --dark-opacity-10: rgba(46, 43, 40, 0.1);
+    --dark-opacity-15: rgba(46, 43, 40, 0.15);
+    --dark-opacity-20: rgba(46, 43, 40, 0.2);
+    --dark-opacity-50: rgba(46, 43, 40, 0.5);
+    
+    /* Neutral Color Opacity Variants */
+    --neutral-opacity-60: rgba(251, 247, 236, 0.6);
+    --neutral-opacity-80: rgba(251, 247, 236, 0.8);
+    --neutral-opacity-95: rgba(251, 247, 236, 0.95);
+    
+    /* Status Colors */
+    --status-success: #10b981;
+    --status-success-dark: #065f46;
+    --status-warning: #f59e0b;
+    --status-warning-dark: #92400e;
+    --status-danger: #ef4444;
+    --status-danger-dark: #dc2626;
+    --status-danger-darker: #b91c1c;
+    --status-inactive: #d1d5db;
+    --status-inactive-dark: #6b7280;
+    --status-paused: #d4a574;
+    --status-completed: #c84c5c;
+    
+    /* Border & Light Colors */
+    --border-light: #e8e4d8;
+    --border-dark: #bfb5a8;
+    --text-light-grey: #bbb;
+    --text-muted-light: #999;
+    --primary-light: rgba(119, 136, 62, 0.05);
+    --accent-light: rgba(212, 196, 124, 0.05);
+    --hover: #fde8a9;
+    --radius: 12px;
     
     /* Legacy Support */
     --color-hero-green: #ebf6e8;
@@ -109,6 +185,7 @@ html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
+    color-scheme: light;
 }
 
 body {
@@ -120,6 +197,7 @@ body {
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    color-scheme: light;
 }
 
 /* Logo Watermark */
@@ -265,60 +343,38 @@ select:focus-visible {
     body::before { width: 700px; height: 700px; opacity: 0.08; }
 }
 
+/* ========================================== */
+/* 5. ACCESSIBILITY & FOCUS STATES */
+/* ========================================== */
 
+/* Base badge styles */
+.status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+    user-select: none;
+}
 
+/* Status badge variants */
+.status-badge--hired {
+    background: var(--rooted-primary);
+    color: var(--rooted-neutral);
+}
 
+.status-badge--reviewed {
+    background: var(--rooted-accent);
+    color: #4a3c2a;
+}
 
+.status-badge--declined {
+    background: #e8e4d8;
+    color: #666666;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+.status-badge--blocked {
+    background: #7a7a7a;
+    color: var(--rooted-neutral);
+}

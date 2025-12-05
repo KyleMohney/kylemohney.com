@@ -1,23 +1,34 @@
-/*
-•”•••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••—
-•‘  ROOTED VITALITY, INC. - NY STATE COMPLIANCE ENFORCEMENT            •‘
-•‘  File: scripts/ny-state-compliance.js                              •‘
-•‘  Purpose: HARD BLOCK - Prevent ALL submissions from NY state       •‘
-•‘  This is a legal/regulatory requirement - DO NOT MODIFY            •‘
-•‘  š–ï¸  NEW YORK STATE COMPLIANCE MANDATE š–ï¸                         •‘
-•š•••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+ï»¿/*
+â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+â•‘  ROOTED VITALITY, INC.                                             â•‘
+â•‘  File: ny-state-compliance.js                                      â•‘
+â•‘  Purpose: NY state legal compliance - block NY zipcodes             â•‘
+â•‘  Holistic Wellness Â· Modern Connection Platform                    â•‘
+â•‘  rootedvitality.com | 2025                                         â•‘
+â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
-CRITICAL COMPLIANCE RULE:
-- NO project/request submissions from NY state (any zipcode therein)
-- NO practitioner profile/service registrations from NY state
-- Applies to: In-person house calls, remote services, all travel types
-- Applies to: ALL users (clients, practitioners)
-- Applies to: ALL service types and subcategories
-- This is UNBREAKABLE - lawsuit protection mandate
+ TABLE OF CONTENTS
+   1. NY STATE ZIPCODES CONFIGURATION
+   2. COMPLIANCE CHECKING FUNCTIONS
+   3. FORM VALIDATION HOOKS
+   4. ERROR HANDLING & MESSAGING
+   5. UTILITIES & HELPERS
 
-NY STATE ZIPCODES BLOCKED:
-All 10004-14980 ranges + specific metro area codes covered
+ CRITICAL COMPLIANCE RULE:
+   - NO project/request submissions from NY state (any zipcode therein)
+   - NO practitioner profile/service registrations from NY state
+   - Applies to: In-person house calls, remote services, all travel types
+   - Applies to: ALL users (clients, practitioners)
+   - Applies to: ALL service types and subcategories
+   - This is UNBREAKABLE - lawsuit protection mandate
+
+ NY STATE ZIPCODES BLOCKED:
+   All 10004-14980 ranges + specific metro area codes covered
 */
+
+// ======================================================
+// 1. NY STATE ZIPCODES CONFIGURATION
+// ======================================================
 
 /**
  * NY STATE ZIPCODES - Complete list of all New York state zipcodes
@@ -228,7 +239,7 @@ function validateNYComplianceBlock(zipcode, submissionType = 'project') {
   const isNY = isNewYorkZipcode(zipcode);
   
   if (isNY) {
-    console.error(`[NY COMPLIANCE] š–ï¸ BLOCKED: ${submissionType} submission from NY zipcode ${zipcode}`);
+    console.error(`[NY COMPLIANCE] Å¡â€“Ã¯Â¸Â BLOCKED: ${submissionType} submission from NY zipcode ${zipcode}`);
     console.error('[NY COMPLIANCE] This is a legal mandate - submission cannot be processed');
     
     return {
@@ -293,7 +304,7 @@ function validateNYStateCompliance(data, dataType = 'client') {
 async function guardianCheckBeforeSubmit(zipcode, state, successCallback, errorCallback) {
   // Double-check: is this NY?
   if (isNewYorkZipcode(zipcode) || state?.toUpperCase() === 'NY') {
-    console.error('[NY COMPLIANCE GUARDIAN] ğŸš« SUBMISSION BLOCKED - NY STATE DETECTED');
+    console.error('[NY COMPLIANCE GUARDIAN] Ã°Å¸Å¡Â« SUBMISSION BLOCKED - NY STATE DETECTED');
     console.error('[NY COMPLIANCE GUARDIAN] Zipcode:', zipcode);
     console.error('[NY COMPLIANCE GUARDIAN] State:', state);
     
@@ -327,7 +338,8 @@ if (typeof window !== 'undefined') {
   };
 }
 
-console.log('[NY COMPLIANCE] š–ï¸ NY State compliance system loaded and active');
+
+
 
 
 

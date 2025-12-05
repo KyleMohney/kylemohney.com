@@ -1,12 +1,23 @@
-/*
+﻿/*
 ╔════════════════════════════════════════════════════════════════════╗
 ║  ROOTED VITALITY, INC.                                             ║
-║  File: scripts/unifiedMessagingSystem.js                           ║
-║  Purpose: Unified messaging renderer for modern 2-way messaging    ║
+║  File: unifiedMessagingSystem.js                                   ║
+║  Purpose: Unified message rendering (iMessage-style interface)     ║
 ║  Holistic Wellness · Modern Connection Platform                    ║
 ║  rootedvitality.com | 2025                                         ║
 ╚════════════════════════════════════════════════════════════════════╝
+
+ TABLE OF CONTENTS
+   1. INITIALIZATION & MESSAGE RENDERING
+   2. MESSAGE GROUPING & FORMATTING
+   3. TIMESTAMP & TIME FORMATTING
+   4. EMPTY STATE & ERROR HANDLING
+   5. UTILITIES & HELPERS
 */
+
+// ======================================================
+// 1. INITIALIZATION & MESSAGE RENDERING
+// ======================================================
 
 /**
  * Unified message renderer for both client and practitioner views
@@ -21,13 +32,10 @@
  * @param {object} otherUserInfo - Info about the other person {name, avatar}
  */
 function renderUnifiedMessages(messages, containerSelector, currentUserType, otherUserInfo = {}) {
-  console.log('[Unified Messaging] renderUnifiedMessages called with currentUserType:', currentUserType, 'messages count:', messages?.length);
-  
   // Handle case where an HTMLElement is passed instead of a string
   let container;
   
   if (containerSelector instanceof HTMLElement) {
-    console.warn('[Messaging] Container passed as HTMLElement, using directly');
     container = containerSelector;
   } else if (typeof containerSelector === 'string') {
     container = document.querySelector(containerSelector) || document.getElementById(containerSelector);
@@ -63,7 +71,6 @@ function renderUnifiedMessages(messages, containerSelector, currentUserType, oth
     const groupEl = document.createElement('div');
     const className = `message-group ${isCurrentUser ? 'message-group--sent' : 'message-group--received'}`;
     groupEl.className = className;
-    console.log('[Unified Messaging] Message group', idx, '- sender_type:', group.sender_type, 'isCurrentUser:', isCurrentUser, 'className:', className);
 
     // Message bubbles container
     const bubblesContainer = document.createElement('div');
@@ -292,8 +299,8 @@ function injectUnifiedMessagingStyles() {
     }
 
     .message-group--sent .message-bubble {
-      background: linear-gradient(135deg, #77883e 0%, #4a8460 100%);
-      color: #fbf7ec;
+      background: linear-gradient(135deg, var(--rooted-primary) 0%, var(--rooted-primary-dark) 100%);
+      color: var(--rooted-neutral);
       border-bottom-right-radius: 6px;
       margin-left: auto;
       max-width: none;
@@ -367,60 +374,4 @@ if (document.readyState === 'loading') {
 } else {
   injectUnifiedMessagingStyles();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

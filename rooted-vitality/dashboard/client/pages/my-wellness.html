@@ -1,21 +1,93 @@
+
+<!--
+╔═════════════════════════════════════════════════════════════════════════════╗
+║                         ROOTED VITALITY DASHBOARD                           ║
+║                 CLIENT MY WELLNESS (HTML)                                   ║
+║                                                                             ║
+║ File:        my-wellness.html                                               ║
+║ Purpose:     Client wellness journeys - create and manage care requests     ║
+║ Description: 3-Column layout with stats, wellness journey cards, create     ║
+║              journey modal, close journey modal, match status management    ║
+║ Last Update: November 2025                                                  ║
+║ Status:      Production-Ready | Build Standard v2.0 Compliant               ║
+║                                                                             ║
+║ QUICK REFERENCE:                                                            ║
+║ - Layout: 3-Column | Sidebar | Journey Cards | Modals                       ║
+║ - Design System: CSS Classes, Form Elements, Modal Dialogs                  ║
+║ - Features: Journey Management, Practitioner Matching, Status Tracking      ║
+║                                                                             ║
+╚═════════════════════════════════════════════════════════════════════════════╝
+-->
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     TABLE OF CONTENTS
+     ═════════════════════════════════════════════════════════════════════════
+     
+     1. HEAD METADATA & SEO
+     2. STYLESHEETS
+     3. HEADER (INJECTED)
+     4. MAIN CONTENT - 3-COLUMN LAYOUT
+     5. LEFT COLUMN - STATS & FILTERS
+     6. RIGHT COLUMN - WELLNESS JOURNEY CARDS
+     7. CREATE JOURNEY MODAL
+     8. CLOSE JOURNEY MODAL
+     9. OPEN TO MATCH STATUS MODAL
+     10. REPORT CONCERN WIDGET
+     11. FOOTER (INJECTED)
+     12. SCRIPTS
+     
+     ═════════════════════════════════════════════════════════════════════════
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       1. HEAD METADATA & SEO
+       ═════════════════════════════════════════════════════════════════════════ -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Manage your wellness journeys on Rooted Vitality. Create care requests, connect with qualified practitioners, and track your progress. Find practitioners matching your wellness goals.">
+  <meta name="keywords" content="wellness journeys, care requests, practitioner matching, wellness goals, holistic health, find practitioners">
+  <meta name="author" content="Rooted Vitality, Inc.">
   <meta name="robots" content="noindex,nofollow">
-  <title>My Wellness • Rooted Vitality</title>
+  
+  <!-- Open Graph / Social Media -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="My Wellness · Rooted Vitality">
+  <meta property="og:description" content="Create wellness journeys and connect with qualified practitioners. Manage your holistic health journey.">
+  <meta property="og:url" content="https://rootedvitality.com/dashboard/client/pages/my-wellness.html">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="My Wellness · Rooted Vitality">
+  <meta name="twitter:description" content="Create wellness journeys and connect with qualified practitioners.">
+  
+  <title>My Wellness · Rooted Vitality</title>
+  
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       2. STYLESHEETS
+       ═════════════════════════════════════════════════════════════════════ -->
   <link rel="stylesheet" href="../../../styles/styles.css">
-  <link rel="stylesheet" href="../styles/my-projects.css">
+  <link rel="stylesheet" href="../styles/my-wellness-layout.css">
+  <link rel="stylesheet" href="../styles/my-wellness-interactive.css">
   <link rel="stylesheet" href="../../../styles/report-concern-widget.css">
 </head>
 <body>
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       3. HEADER (INJECTED)
+       ═════════════════════════════════════════════════════════════════════════ -->
   <header id="header-inject"></header>
   
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       4. MAIN CONTENT - 3-COLUMN LAYOUT
+       ═════════════════════════════════════════════════════════════════════════ -->
   <main class="my-projects-container">
-    <!-- Main Content Grid -->
     <div class="projects-grid">
-      <!-- Left Sidebar: Educational Info -->
+      <!-- ═══════════════════════════════════════════════════════════════════════════
+           5. LEFT COLUMN - STATS & FILTERS
+           ═════════════════════════════════════════════════════════════════════════ -->
       <aside class="projects-sidebar">
         <!-- Stats Cards - Side by Side -->
         <div class="projects-stats-card">
@@ -25,7 +97,7 @@
               <span class="stat-item__value" id="total-projects">0</span>
             </div>
             <div class="stat-item">
-              <span class="stat-item__label">Active<br>Practitioners</span>
+              <span class="stat-item__label">Completed<br>Care</span>
               <span class="stat-item__value" id="total-practitioners">0</span>
             </div>
           </div>
@@ -35,7 +107,7 @@
         <button class="btn btn-path-style projects-sidebar__cta" id="create-project-btn">
           Create New Care Request
         </button>
-        <span id="create-status" style="display:none; margin-top:0.5rem; font-size:0.9rem; color:#d4534f;"></span>
+        <span id="create-status" class="hidden create-status-message"></span>
 
         <!-- Open to Match Toggle -->
         <div class="open-to-match-section">
@@ -68,30 +140,46 @@
         </div>
 
         <!-- Tips Section -->
-        <div class="sidebar-tips-section">
-          <h4 class="sidebar-section__title">Tips</h4>
-          <ul class="sidebar-tips">
-            <li>Create wellness journeys to find matching practitioners</li>
-            <li>Keep journeys open to receive proactive practitioner matches</li>
-            <li>Review and accept or reject practitioner connections</li>
+        <div class="article-card tips-section">
+          <div class="tips-section__header">
+            <span class="tips-icon">ℹ</span>
+            <h4 class="tips-section__title">TIPS</h4>
+          </div>
+          <ul class="tips-list">
+            <li>Click on any practitioner to message and connect with them</li>
+            <li>Update your care request status in the chat window to track if you hired or declined a practitioner</li>
+            <li>Messages are disabled until the practitioner accepts your connection request</li>
+            <li>Close a care request once you've found the right practitioner for that need</li>
           </ul>
         </div>
       </aside>
 
-      <!-- Right Side: Projects List -->
+      <!-- ═══════════════════════════════════════════════════════════════════════════
+           6. RIGHT COLUMN - WELLNESS JOURNEY CARDS
+           ═════════════════════════════════════════════════════════════════════════ -->
       <section class="projects-main">
-        <!-- Projects Cards Container -->
-        <div class="projects-cards" id="projects-container">
-          <!-- Project cards will be injected here -->
-          <div class="projects-empty">
-            <p>No wellness journeys yet. Create your first journey to get started!</p>
+        <!-- Active Projects Section -->
+        <div class="projects-section">
+          <h3 class="projects-section__title">Active Care Requests</h3>
+          <div class="projects-cards" id="active-projects-container">
+            <!-- Active project cards will be injected here -->
+          </div>
+        </div>
+
+        <!-- Closed Projects Section -->
+        <div class="projects-section">
+          <h3 class="projects-section__title">Closed Care Requests</h3>
+          <div class="projects-cards" id="closed-projects-container">
+            <!-- Closed project cards will be injected here -->
           </div>
         </div>
       </section>
     </div>
   </main>
 
-  <!-- Create Project Modal - Complete Single Page Form -->
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       7. CREATE JOURNEY MODAL
+       ═════════════════════════════════════════════════════════════════════════ -->
   <div id="create-project-modal" class="modal modal--hidden">
     <div class="modal__overlay"></div>
     <div class="modal__content modal__content--large">
@@ -110,7 +198,7 @@
           <span class="form-hint">Choose your wellness focus area</span>
         </div>
 
-        <div class="form-group" id="subcategories-group" style="display:none;">
+        <div class="form-group hidden" id="subcategories-group">
           <label>Specific Concerns *</label>
           <div id="subcategories-container" class="checkboxes-grid">
             <!-- Checkboxes injected by JS -->
@@ -258,7 +346,9 @@
     </div>
   </div>
 
-  <!-- Close Project Modal -->
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       8. CLOSE JOURNEY MODAL
+       ═════════════════════════════════════════════════════════════════════════ -->
   <div id="close-project-modal" class="modal modal--hidden">
     <div class="modal__overlay"></div>
     <div class="modal__content modal__content--small">
@@ -301,7 +391,7 @@
             </div>
           </div>
 
-          <div class="form-group" id="other-reason-group" style="display: none;">
+          <div class="form-group hidden" id="other-reason-group">
             <label for="other-reason" class="form-label">Please explain</label>
             <textarea 
               id="other-reason" 
@@ -320,7 +410,9 @@
     </div>
   </div>
 
-  <!-- Open to Match Status Modal -->
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       9. OPEN TO MATCH STATUS MODAL
+       ═════════════════════════════════════════════════════════════════════════ -->
   <div id="open-to-match-modal" class="modal modal--hidden">
     <div class="modal__overlay"></div>
     <div class="modal__content modal__content--small">
@@ -331,19 +423,28 @@
       </div>
       
       <div class="modal__body modal__body--centered">
-        <p id="otm-details" style="color: #666; font-size: 0.95rem; line-height: 1.6;"></p>
+        <p id="otm-details" class="otm-details-text"></p>
       </div>
 
       <div class="modal__footer modal__footer--centered">
-        <button type="button" class="btn btn-primary" onclick="closeModal('open-to-match-modal')">Got it</button>
+        <button type="button" class="btn btn-primary" id="otm-close-btn">Got it</button>
       </div>
     </div>
   </div>
 
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       10. REPORT CONCERN WIDGET
+       ═════════════════════════════════════════════════════════════════════════ -->
   <div id="report-concern-widget"></div>
 
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       11. FOOTER (INJECTED)
+       ═════════════════════════════════════════════════════════════════════════ -->
   <footer id="footer-inject"></footer>
 
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       12. SCRIPTS
+       ═════════════════════════════════════════════════════════════════════════ -->
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -352,21 +453,34 @@
   <script src="../../../scripts/authManager.js"></script>
   <script src="../../../scripts/authHooks.js"></script>
   <script src="../../../injections.js"></script>
-  <script src="../../../scripts/guidedOnboarding.js"></script>
-  <script src="../../../scripts/my-projects.js"></script>
+  <!-- Modular Onboarding System -->
+  <script src="../../public/scripts/onboardingCore.js"></script>
+  <script src="../../public/scripts/onboardingUI.js"></script>
+  <script src="../../public/scripts/onboardingService.js"></script>
+  <script src="../scripts/my-wellness-manager.js"></script>
+  <script src="../scripts/my-wellness-ui.js"></script>
   
   <script>
+    // ======================================================
+    // EVENT LISTENERS & INITIALIZATION
+    // ======================================================
+    function setupEventListeners() {
+      const otmCloseBtn = document.getElementById('otm-close-btn');
+      if (otmCloseBtn) {
+        otmCloseBtn.addEventListener('click', () => closeModal('open-to-match-modal'));
+      }
+    }
+
     // Trigger onboarding modal if user clicked "Get Started" button
     document.addEventListener('DOMContentLoaded', function() {
+      setupEventListeners();
+      
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('action') === 'new') {
-        console.log('[My Wellness] action=new detected, opening onboarding modal');
         // Give the page a moment to fully load before opening modal
         setTimeout(() => {
           if (typeof showOnboardingModal === 'function') {
             showOnboardingModal();
-          } else {
-            console.warn('[My Wellness] showOnboardingModal function not found');
           }
         }, 500);
       }
@@ -374,59 +488,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

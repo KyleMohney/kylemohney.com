@@ -1,0 +1,454 @@
+<!--
+╔════════════════════════════════════════════════════════════════════╗
+║  ROOTED VITALITY, INC.                                             ║
+║  File: dashboard/pro/pages/practitioner-signup.html                ║
+║  Purpose: 4-step practitioner signup wizard and onboarding         ║
+║  Holistic Wellness · Modern Connection Platform                    ║
+║  rootedvitality.com | 2025                                         ║
+╚════════════════════════════════════════════════════════════════════╝
+
+TABLE OF CONTENTS:
+  1. Meta Tags & Stylesheets
+  2. Header Injection Zone
+  3. Hero Section
+  4. Progress Bar & Step Indicators
+  5. Form Wizard (Steps 1-4)
+  6. Success Modal
+  7. Footer Injection Zone
+  8. Scripts & Supabase Integration
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Basic Meta Tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO & Metadata -->
+    <meta name="description" content="Join Rooted Vitality as a holistic wellness practitioner. Create your professional profile, verify credentials, and connect with clients seeking your expertise.">
+    <meta name="keywords" content="practitioner signup, join rooted vitality, holistic wellness platform, create practitioner profile, wellness provider network, acupuncture, massage, coaching">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Rooted Vitality, Inc.">
+    <meta name="theme-color" content="#77883e">
+    
+    <!-- Open Graph (Social Sharing & SEO) -->
+    <meta property="og:title" content="Join Rooted Vitality - Grow Your Holistic Practice">
+    <meta property="og:description" content="Create your professional practitioner profile and connect with clients seeking holistic wellness services on Rooted Vitality.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://kylemohney.com/rooted-vitality/dashboard/pro/pages/practitioner-signup.html">
+    <meta property="og:image" content="https://kylemohney.com/rooted-vitality/assets/logos/rooted-vitality-og.png">
+    <meta property="og:site_name" content="Rooted Vitality">
+    
+    <!-- Twitter Card Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Join Rooted Vitality - Grow Your Holistic Practice">
+    <meta name="twitter:description" content="Create your professional practitioner profile and grow your wellness practice on Rooted Vitality.">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://kylemohney.com/rooted-vitality/dashboard/pro/pages/practitioner-signup.html">
+    
+    <!-- Mobile App Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Rooted Vitality">
+    
+    <!-- Schema.org Markup (Structured Data) -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "Join Rooted Vitality - Practitioner Signup",
+        "description": "Create your professional practitioner profile and connect with clients on Rooted Vitality.",
+        "url": "https://kylemohney.com/rooted-vitality/dashboard/pro/pages/practitioner-signup.html",
+        "publisher": {
+            "@type": "Organization",
+            "name": "Rooted Vitality, Inc.",
+            "url": "https://kylemohney.com/rooted-vitality"
+        },
+        "potentialAction": {
+            "@type": "RegisterAction",
+            "target": "https://kylemohney.com/rooted-vitality/dashboard/pro/pages/practitioner-signup.html"
+        }
+    }
+    </script>
+    
+    <title>Become a Practitioner | Rooted Vitality</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Lora:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="../../../assets/favicon.ico">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="../../../styles/base.css">
+    <link rel="stylesheet" href="../../../styles/layout.css">
+    <link rel="stylesheet" href="../../../styles/components.css">
+    <link rel="stylesheet" href="../../../styles/pages.css">
+    <link rel="stylesheet" href="../styles/practitioner-signup.css">
+    
+    <!-- Supabase JS Client Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<!-- ========================================== -->
+<!-- 2. HEADER INJECTION ZONE -->
+<!-- ========================================== -->
+<header id="header-inject"></header>
+
+<!-- ========================================== -->
+<!-- 3. HERO SECTION -->
+<!-- ========================================== -->
+<section class="practitioner-hero">
+    <div class="hero-content">
+        <h1 class="hero-title">Grow Your Holistic Practice with Rooted Vitality</h1>
+        <p class="hero-subtitle">Join our community of wellness professionals — create your profile, verify your credentials, and share your work.</p>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- 4. PROGRESS BAR & INDICATORS -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<section class="progress-section">
+    <div class="container">
+        <div class="progress-container">
+            <div class="progress-bar-wrapper">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="progress-steps">
+                <div class="step active" data-step="1">
+                    <div class="step-circle">1</div>
+                    <div class="step-label">Business Info</div>
+                </div>
+                <div class="step" data-step="2">
+                    <div class="step-circle">2</div>
+                    <div class="step-label">Legal Agreement</div>
+                </div>
+                <div class="step" data-step="3">
+                    <div class="step-circle">3</div>
+                    <div class="step-label">Membership</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- 5. FORM WIZARD -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<section class="form-wizard-section">
+    <div class="container">
+        <form id="practitionerForm" class="practitioner-form">
+            
+            <!-- STEP 1: BUSINESS INFORMATION -->
+            <div class="form-step active" data-step="1">
+                <div class="step-card">
+                    <h2 class="step-title">Business Information</h2>
+                    <p class="step-description">Tell us about your practice.</p>
+                    
+                    <div class="form-group">
+                        <label for="practitionerName">Your Legal Name <span class="required">*</span></label>
+                        <input type="text" id="practitionerName" name="legal_name" placeholder="Your first and last name" required>
+                        <small class="field-note"><span class="info-icon">ℹ</span> Your full legal name (individual)</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="legalName">Legal Business Name <span class="required">*</span></label>
+                        <input type="text" id="legalName" name="legal_business_name" placeholder="Your official business name" required>
+                        <small class="field-note"><span class="info-icon">ℹ</span> As it appears on your licenses and registrations</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="dbaName">Doing Business As (DBA) <span class="required">*</span></label>
+                        <input type="text" id="dbaName" name="dba_name" placeholder="Public-facing business name" required>
+                        <small class="field-note"><span class="info-icon">ℹ</span> How clients will see your business name</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="yearEstablished">Year Established <span class="required">*</span></label>
+                        <input type="number" id="yearEstablished" name="year_established" placeholder="YYYY" min="1900" max="2025" required>
+                        <small class="field-note"><span class="info-icon">ℹ</span> When did you start your practice?</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="businessSize">Business Size <span class="required">*</span></label>
+                        <select id="businessSize" name="business_size" required>
+                            <option value="">-- Select business size --</option>
+                            <option value="solo">Solo Practitioner</option>
+                            <option value="2-10">2–10 employees</option>
+                            <option value="11-50">11–50 employees</option>
+                            <option value="50+">50+ employees</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phone">Phone Number <span class="required">*</span></label>
+                        <input type="tel" id="phone" name="phone" placeholder="+1 (555) 123-4567" required>
+                        <small class="field-note"><span class="info-icon">ℹ</span> For client communication and Rooted Vitality support</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address">Physical Address <span class="required">*</span></label>
+                        <input type="text" id="address" name="physical_address" placeholder="Street address" required>
+                        <small class="field-note"><span class="info-icon">ℹ</span> Your practice location (may differ from your client profile)</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="practiceCity">City <span class="required">*</span></label>
+                        <input type="text" id="practiceCity" name="practice_city" placeholder="e.g., Cleveland" required>
+                        <small class="field-note"><span class="info-icon">ℹ</span> City where your practice is located</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="practiceState">State <span class="required">*</span></label>
+                        <input type="text" id="practiceState" name="practice_state" placeholder="e.g., OH" maxlength="2" required>
+                        <small class="field-note"><span class="info-icon">ℹ</span> Two-letter state abbreviation (e.g., CA, NY, OH)</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="zipcode">Zip Code <span class="required">*</span></label>
+                        <input type="text" id="zipcode" name="zipcode" placeholder="12345" required>
+                        <small class="field-note"><span class="info-icon">ℹ</span> Practice location zip code (separate from client profile)</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" readonly>
+                        <small class="field-note"><span class="info-icon">ℹ</span> Verified through your Rooted Vitality account</small>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-primary" id="step1Next">Continue</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- STEP 2: LEGAL AGREEMENT & SUBMISSION -->
+            <div class="form-step" data-step="2">
+                <div class="step-card">
+                    <h2 class="step-title">Legal Agreement</h2>
+                    <p class="step-description">Review and agree to our participation terms.</p>
+                    
+                    <div class="legal-document">
+                        <h3>Practitioner Participation Agreement</h3>
+                        <div class="legal-content">
+                            <p><strong>Effective Date:</strong> October 31, 2025</p>
+                            
+                            <p>By continuing, I acknowledge and agree that I am an independent practitioner using Rooted Vitality's platform to promote my own services.</p>
+                            
+                            <h4>1. Independent Practitioner Status</h4>
+                            <p>Rooted Vitality does not employ me, guarantee clients, income, or results. I operate as an independent professional using the platform as a marketing and connection tool.</p>
+                            
+                            <h4>2. Professional Responsibility</h4>
+                            <p>I am solely responsible for my practice's conduct, legality, and outcomes. This includes maintaining proper licensing, insurance, and compliance with all applicable laws and regulations in my jurisdiction.</p>
+                            
+                            <h4>3. Platform Services</h4>
+                            <p>Rooted Vitality provides tools and community resources only. The platform facilitates connections between practitioners and clients but does not provide, supervise, or control the services delivered by practitioners.</p>
+                            
+                            <h4>4. Limitation of Liability</h4>
+                            <p>I release and hold harmless Rooted Vitality, Inc., its officers, directors, employees, and agents from any claim, damage, or liability arising from my use of the platform or my interactions with clients.</p>
+                            
+                            <h4>5. Professional Standards</h4>
+                            <p>I agree to maintain professional standards of conduct, honor client confidentiality, and operate my practice ethically and legally.</p>
+                            
+                            <h4>6. Data Accuracy</h4>
+                            <p>I confirm that all information provided in this application is accurate, complete, and truthful. I understand that false or misleading information may result in removal from the platform.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="agreeTerms" name="agreeTerms" required>
+                            I have read and agree to the Practitioner Participation Agreement <span class="required">*</span>
+                        </label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="confirmAccuracy" name="confirmAccuracy" required>
+                            I confirm the information above is accurate and truthful <span class="required">*</span>
+                        </label>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="step2Prev">Back</button>
+                        <button type="button" class="btn btn-primary" id="step2Next">Continue</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- STEP 3: MEMBERSHIP SETUP -->
+            <div class="form-step" data-step="3">
+                <div class="step-card">
+                    <h2 class="step-title">Membership Setup</h2>
+                    <p class="step-description">Start your membership and connect with clients.</p>
+                    
+                    <div class="membership-card">
+                        <div class="membership-header">
+                            <h3 class="membership-title">Rooted Vitality Professional Membership</h3>
+                            <p class="membership-tagline">Join our community of wellness practitioners</p>
+                        </div>
+                        
+                        <div class="membership-pricing">
+                            <div class="price-display">
+                                <span class="price-amount">$222</span>
+                                <span class="price-period">/month</span>
+                            </div>
+                            <p class="price-note">First month free • Cancel anytime</p>
+                        </div>
+                        
+                        <div class="membership-features">
+                            <h4>What's Included:</h4>
+                            <ul>
+                                <li>
+                                    <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                    <span>Public practitioner profile</span>
+                                </li>
+                                <li>
+                                    <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                    <span>Client matching and discovery</span>
+                                </li>
+                                <li>
+                                    <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                    <span>Direct client messaging</span>
+                                </li>
+                                <li>
+                                    <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                    <span>Full profile management dashboard</span>
+                                </li>
+                                <li>
+                                    <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                    <span>Analytics and match insights</span>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="membership-info">
+                            <p><strong>How it works:</strong></p>
+                            <p>Your first month is completely free. After 30 days, recurring billing will begin at $222/month. You can cancel your membership at any time from your account settings with no cancellation fees.</p>
+                        </div>
+                        
+                        <div class="stripe-powered">
+                            <p>Secure payment processing</p>
+                            <img src="../../../assets/stripe.logo.png" alt="Powered by Stripe" class="stripe-logo">
+                        </div>
+                        
+                        <div class="form-group checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="agreeMembership" name="agreeMembership" required>
+                                I understand the membership terms and would like to activate my account <span class="required">*</span>
+                            </label>
+                        </div>
+                        
+                        <div class="membership-warning">
+                            <p><strong>⚠️ Note:</strong> Client matching will not be available until you activate a membership. You can set up your membership anytime from your settings page.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="step3Prev">Back</button>
+                        <button type="button" class="btn btn-secondary" id="skipMembershipBtn">Skip for Now</button>
+                        <button type="submit" class="btn btn-success" id="submitBtn">Activate Membership</button>
+                    </div>
+                </div>
+            </div>
+            
+        </form>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- 6. SUCCESS MODAL -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div id="successModal" class="modal hidden">
+    <div class="success-modal-overlay"></div>
+    <div class="success-modal-content">
+        <div class="success-modal-header">
+            <img src="../../../assets/logo_trimmed.png" alt="Rooted Vitality" class="success-modal-logo">
+        </div>
+        
+        <div class="success-modal-body">
+            <h1 class="success-modal-title">Welcome to Rooted Vitality</h1>
+            
+            <p class="success-modal-subtitle">You're now part of a community dedicated to holistic wellness and meaningful practitioner-client connections.</p>
+            
+            <div class="success-modal-checklist">
+                <div class="checklist-item">
+                    <span class="checklist-check">✓</span>
+                    <span class="checklist-text">Account created and verified</span>
+                </div>
+                <div class="checklist-item">
+                    <span class="checklist-check">✓</span>
+                    <span class="checklist-text">Profile initialized</span>
+                </div>
+                <div class="checklist-item">
+                    <span class="checklist-check">✓</span>
+                    <span class="checklist-text">Ready to connect with clients</span>
+                </div>
+            </div>
+            
+            <p class="success-modal-message">Complete your profile to showcase your expertise and start attracting clients who are looking for exactly what you offer.</p>
+            
+            <p class="success-modal-redirect">Redirecting to your dashboard...</p>
+        </div>
+        
+        <div class="success-modal-footer">
+            <div class="success-modal-progress">
+                <div class="success-modal-progress-bar"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- 7. FOOTER (INJECTED) -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<footer id="footer-inject"></footer>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- 8. SCRIPTS -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<script src="../../../scripts/supabaseClient.js"></script>
+<script src="../../../scripts/config.js"></script>
+<script src="../../../scripts/authManager.js"></script>
+<script src="../../../injections.js"></script>
+<script>
+    // ======================================================
+    // INITIALIZE PRACTITIONER SIGNUP PAGE
+    // ======================================================
+    // Render appropriate header based on user role
+    
+    async function initializePractitionerSignup() {
+        try {
+            if (typeof window.authManager !== 'undefined') {
+                const userData = window.authManager.getCurrentUser();
+                if (userData && typeof RootedVitality !== 'undefined') {
+                    await RootedVitality.renderHeader(userData.role);
+                }
+            }
+        } catch (error) {
+            console.error('[Practitioner Signup] Initialization error:', error);
+        }
+    }
+    
+    // Initialize after critical scripts load
+    setTimeout(initializePractitionerSignup, 100);
+</script>
+<script src="../scripts/practitioner-signup.js"></script>
+
+</body>
+</html>

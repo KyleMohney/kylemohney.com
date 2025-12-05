@@ -54,7 +54,7 @@ IMPLEMENTATION LOCATIONS
    Action: Validates state/zipcode BEFORE database insert
    
 3. PRACTITIONER PROFILE SAVES
-   File: scripts/proProfile.js
+   File: scripts/practitioner_profile.js
    Function:
      - saveProfile()  [Line ~2055 - NY BLOCK ADDED]
    
@@ -112,7 +112,7 @@ HTML Files where ny-state-compliance.js is loaded:
    - Protects client project submissions
 
 2. rooted-vitality/dashboard/pro/pages/profile.html
-   - Loaded BEFORE proProfile.js
+   - Loaded BEFORE practitioner_profile.js
    - Protects practitioner profile saves
 
 3. rooted-vitality/dashboard/pro/pages/coverage-area.html

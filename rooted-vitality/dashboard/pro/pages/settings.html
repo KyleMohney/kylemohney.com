@@ -1,24 +1,71 @@
+<!--
+╔════════════════════════════════════════════════════════════════════╗
+║  ROOTED VITALITY, INC.                                             ║
+║  File: dashboard/pro/pages/settings.html                           ║
+║  Purpose: Practitioner settings management - accounts, notifs, sec ║
+║  Holistic Wellness · Modern Connection Platform                    ║
+║  rootedvitality.com | 2025                                         ║
+╚════════════════════════════════════════════════════════════════════╝
+
+TABLE OF CONTENTS
+  1. HEADER
+  2. ACCOUNT SETTINGS
+  3. NOTIFICATION SETTINGS
+  4. MEMBERSHIPS & BILLING
+  5. SECURITY & PRIVACY
+  6. FOOTER
+  7. SCRIPTS
+
+═══════════════════════════════════════════════════════════════════
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Basic Meta Tags -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com https://r2cdn.perplexity.ai; connect-src 'self' https://*.supabase.co https://r2cdn.perplexity.ai; img-src 'self' data: https:; frame-src 'self';">
+  
+  <!-- SEO & Metadata (Private Dashboard - No Indexing) -->
+  <meta name="description" content="Manage your Rooted Vitality account settings, notifications, billing, and security preferences.">
+  <meta name="keywords" content="settings, account management, notifications, billing, security, privacy">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="author" content="Rooted Vitality, Inc.">
+  <meta name="theme-color" content="#77883e">
+  
+  <!-- Open Graph (Internal Sharing) -->
+  <meta property="og:title" content="Settings - Rooted Vitality Practitioner Dashboard">
+  <meta property="og:description" content="Manage your account settings, notifications, billing, and security preferences.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://kylemohney.com/rooted-vitality/dashboard/pro/pages/settings.html">
+  <meta property="og:site_name" content="Rooted Vitality">
+  
+  <!-- Mobile App Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Rooted Vitality">
+  
+  <!-- Page Title -->
   <title>Settings | Rooted Vitality Practitioner Dashboard</title>
+  
+  <!-- Content Security Policy -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com https://r2cdn.perplexity.ai; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://r2cdn.perplexity.ai; img-src 'self' data: https:; frame-src 'self';">
+  
+  <!-- Stylesheets -->
   <link rel="stylesheet" href="../../../styles/styles.css">
   <link rel="stylesheet" href="../styles/settings.css">
   <link rel="stylesheet" href="../../../styles/report-concern-widget.css">
 </head>
 <body class="rooted-body practitioner-view">
   
-  <!-- ========================================== -->
-  <!-- HEADER (Injected via injections.js) -->
-  <!-- ========================================== -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <!-- 1. HEADER -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
   <header id="rooted-header"></header>
 
-  <!-- ========================================== -->
-  <!-- MAIN CONTENT -->
-  <!-- ========================================== -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <!-- 2. ACCOUNT SETTINGS -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
   <main class="settings-main">
     
     <!-- Settings Sidebar Navigation -->
@@ -29,6 +76,7 @@
       <ul class="settings-nav-list">
         <li><a href="#account" class="settings-nav-link active" data-section="account">Account</a></li>
         <li><a href="#notifications" class="settings-nav-link" data-section="notifications">Notifications</a></li>
+        <li><a href="#integrations" class="settings-nav-link" data-section="integrations">Integrations</a></li>
         <li><a href="#memberships" class="settings-nav-link" data-section="memberships">Memberships</a></li>
         <li><a href="#privacy" class="settings-nav-link" data-section="privacy">Security</a></li>
       </ul>
@@ -37,9 +85,9 @@
     <!-- Settings Content Area -->
     <div class="settings-content">
       
-      <!-- ========================================== -->
-      <!-- 1. ACCOUNT SETTINGS -->
-      <!-- ========================================== -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <!-- 2. ACCOUNT SETTINGS -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
       <section class="settings-section active" data-section="account" id="account">
         <div class="settings-section-header">
           <h1>Account Settings</h1>
@@ -56,13 +104,13 @@
             <div id="email-display-view" class="info-group">
               <p class="info-value" id="display-email">Loading...</p>
             </div>
-            <form id="email-edit-view" class="inline-edit-form" style="display: none;">
+            <form id="email-edit-view" class="inline-edit-form hidden">
               <div class="form-group">
                 <label for="email-inline">Email Address</label>
                 <input type="email" id="email-inline" class="form-input" placeholder="your@email.com" required>
               </div>
               <p class="form-help">You'll need to verify this email address before it becomes active.</p>
-              <div class="modal-footer" style="margin-top: 1.5rem;">
+              <div class="modal-footer">
                 <button type="button" class="btn-secondary" id="btn-cancel-email">Cancel</button>
                 <button type="submit" class="btn-accent">Save Email</button>
               </div>
@@ -80,13 +128,13 @@
             <div id="phone-display-view" class="info-group">
               <p class="info-value" id="display-phone">Loading...</p>
             </div>
-            <form id="phone-edit-view" class="inline-edit-form" style="display: none;">
+            <form id="phone-edit-view" class="inline-edit-form hidden">
               <div class="form-group">
                 <label for="phone-inline">Phone Number</label>
                 <input type="tel" id="phone-inline" class="form-input" placeholder="(555) 123-4567" required>
               </div>
               <p class="form-help">Include area code and any extensions if applicable.</p>
-              <div class="modal-footer" style="margin-top: 1.5rem;">
+              <div class="modal-footer">
                 <button type="button" class="btn-secondary" id="btn-cancel-phone">Cancel</button>
                 <button type="submit" class="btn-accent">Save Phone</button>
               </div>
@@ -104,7 +152,7 @@
             <div id="address-display-view" class="info-group">
               <p class="info-value" id="display-address">Loading...</p>
             </div>
-            <form id="address-edit-view" class="inline-edit-form" style="display: none;">
+            <form id="address-edit-view" class="inline-edit-form hidden">
               <div class="form-group">
                 <label for="address-street-inline">Street Address</label>
                 <input type="text" id="address-street-inline" class="form-input" placeholder="123 Main Street, Suite 100" required>
@@ -119,7 +167,7 @@
                   <input type="text" id="address-state-inline" class="form-input" placeholder="CO" required>
                 </div>
               </div>
-              <div class="modal-footer" style="margin-top: 1.5rem;">
+              <div class="modal-footer">
                 <button type="button" class="btn-secondary" id="btn-cancel-address">Cancel</button>
                 <button type="submit" class="btn-accent">Save Address</button>
               </div>
@@ -150,9 +198,9 @@
         </div>
       </section>
 
-      <!-- ========================================== -->
-      <!-- 2. NOTIFICATION SETTINGS -->
-      <!-- ========================================== -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <!-- 3. NOTIFICATION SETTINGS -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
       <section class="settings-section" data-section="notifications" id="notifications">
         <div class="settings-section-header">
           <h1>Notification Preferences</h1>
@@ -304,9 +352,81 @@
         </div>
       </section>
 
-      <!-- ========================================== -->
-      <!-- 3. MEMBERSHIPS -->
-      <!-- ========================================== -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <!-- 4. CRM INTEGRATIONS -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <section class="settings-section" data-section="integrations" id="integrations">
+        <div class="settings-section-header">
+          <h1>CRM Integrations</h1>
+          <p class="section-description">Connect your CRM platform to manage customers and projects in one place</p>
+        </div>
+
+        <!-- Connected CRMs List -->
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>Connected Services</h3>
+          </div>
+          <div class="card-content" id="crm-connections-list">
+            <div class="crm-loading" id="crm-loading">Loading integrations...</div>
+          </div>
+        </div>
+
+        <!-- Available CRMs -->
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>Available CRM Platforms</h3>
+          </div>
+          <div class="card-content">
+            <div class="crm-providers-grid" id="crm-providers-grid">
+              <!-- Dynamically populated by crmManager.js -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Sync Settings -->
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>Sync Settings</h3>
+          </div>
+          <div class="card-content">
+            <div class="form-group">
+              <label for="auto-sync-toggle" class="checkbox-label">
+                <input type="checkbox" id="auto-sync-toggle" class="checkbox-input">
+                <span>Auto-sync matches to CRM</span>
+              </label>
+              <p class="form-help">Automatically sync new matches and project information to your connected CRM</p>
+            </div>
+
+            <div class="form-group">
+              <label for="sync-frequency">Sync Frequency</label>
+              <select id="sync-frequency" class="form-input">
+                <option value="real-time">Real-time</option>
+                <option value="hourly">Hourly</option>
+                <option value="daily">Daily</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="sync-messages-toggle" class="checkbox-label">
+                <input type="checkbox" id="sync-messages-toggle" class="checkbox-input">
+                <span>Include messages in sync</span>
+              </label>
+              <p class="form-help">Sync project messages and notes to your CRM</p>
+            </div>
+
+            <div class="info-group">
+              <p class="info-label">Last Sync:</p>
+              <p class="info-value" id="last-sync-time">Never</p>
+            </div>
+
+            <button class="btn-primary" id="sync-now-btn">Sync Now</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <!-- MEMBERSHIPS & BILLING -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
       <section class="settings-section" data-section="memberships" id="memberships">
         <div class="settings-section-header">
           <h1>Memberships & Billing</h1>
@@ -346,8 +466,8 @@
                 </div>
                 
                 <div class="membership-actions">
-                  <button class="btn-secondary" id="cancel-membership-btn" style="display: none;">Cancel Membership</button>
-                  <button class="btn-secondary" id="reactivate-membership-btn" style="display: none;">Reactivate Membership</button>
+                  <button class="btn-secondary hidden-btn" id="cancel-membership-btn">Cancel Membership</button>
+                  <button class="btn-secondary hidden-btn" id="reactivate-membership-btn">Reactivate Membership</button>
                 </div>
                 
                 <p class="membership-note">You can cancel your membership anytime. If canceled, you'll retain access through the end of the current billing period.</p>
@@ -390,9 +510,9 @@
         </div>
       </section>
 
-      <!-- ========================================== -->
-      <!-- 4. SECURITY -->
-      <!-- ========================================== -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <!-- 5. SECURITY & PRIVACY -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
       <section class="settings-section" data-section="privacy" id="privacy">
         <div class="settings-section-header">
           <h1>Security</h1>
@@ -412,42 +532,42 @@
             </div>
 
             <!-- Setup View -->
-            <form id="2fa-setup-view" class="inline-edit-form" style="display: none;">
+            <form id="2fa-setup-view" class="inline-edit-form hidden">
               <div class="form-group">
                 <p class="form-help"><strong>Step 1:</strong> Scan this QR code with an authenticator app (Google Authenticator, Authy, Microsoft Authenticator, etc.)</p>
-                <div id="qr-code-container" style="text-align: center; padding: 1.5rem; background: #fbf7ec; border-radius: 8px; margin: 1rem 0;">
-                  <p style="color: #999;">Loading QR code...</p>
+                <div id="qr-code-container">
+                  <p>Loading QR code...</p>
                 </div>
                 <p class="form-help">Can't scan? Enter this code manually:</p>
-                <div style="background: #fbf7ec; padding: 1rem; border-radius: 8px; word-break: break-all; font-family: monospace; font-size: 0.9rem; margin: 0.5rem 0;" id="manual-entry-code">
+                <div id="manual-entry-code">
                   Loading...
                 </div>
               </div>
 
               <div class="form-group">
                 <label for="2fa-verify-code"><strong>Step 2:</strong> Enter the 6-digit code from your authenticator app</label>
-                <input type="text" id="2fa-verify-code" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" placeholder="000000" required style="font-size: 1.5rem; text-align: center; letter-spacing: 0.5rem;">
+                <input type="text" id="2fa-verify-code" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" placeholder="000000" required>
               </div>
 
               <div class="form-group">
                 <p class="form-help">⚠️ <strong>Save these backup codes</strong> in a safe place. You can use them to access your account if you lose access to your authenticator.</p>
-                <div style="background: #fff3cd; border: 1px solid #ffc107; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
-                  <div id="backup-codes-display" style="font-family: monospace; line-height: 1.8; font-size: 0.9rem;">
+                <div class="backup-codes-container">
+                  <div id="backup-codes-display">
                     Loading backup codes...
                   </div>
-                  <button type="button" id="copy-backup-codes-btn" class="btn-secondary" style="margin-top: 0.5rem; width: 100%;">Copy Backup Codes</button>
+                  <button type="button" id="copy-backup-codes-btn" class="btn-secondary">Copy Backup Codes</button>
                 </div>
               </div>
 
-              <div class="modal-footer" style="margin-top: 1.5rem;">
+              <div class="modal-footer">
                 <button type="button" class="btn-secondary" id="btn-cancel-2fa">Cancel</button>
                 <button type="submit" class="btn-accent">Confirm & Enable 2FA</button>
               </div>
             </form>
 
             <!-- Enabled View -->
-            <div id="2fa-enabled-view" style="display: none;">
-              <p class="setting-description" style="color: #77883e; font-weight: 600;">✓ Two-Factor Authentication is enabled</p>
+            <div id="2fa-enabled-view">
+              <p class="setting-description">✓ Two-Factor Authentication is enabled</p>
               <button class="btn-secondary" id="disable-2fa-btn">Disable Two-Factor Authentication</button>
             </div>
           </div>
@@ -487,25 +607,25 @@
         </div>
       </section>
 
-      <!-- ========================================== -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
       <!-- END OF SETTINGS SECTIONS -->
-      <!-- ========================================== -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
 
-      <!-- ========================================== -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
       <!-- END OF SETTINGS MODALS -->
-      <!-- ========================================== -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
 
     </div>
   </main>
 
-  <!-- ========================================== -->
-  <!-- FOOTER (Injected via injections.js) -->
-  <!-- ========================================== -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <!-- 6. FOOTER -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
   <footer id="rooted-footer"></footer>
 
-  <!-- ========================================== -->
-  <!-- SCRIPTS -->
-  <!-- ========================================== -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <!-- 7. SCRIPTS -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
   <!-- Supabase JS Client Library -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
@@ -514,64 +634,8 @@
   <script src="../../../scripts/authModal.js"></script>
   <script src="../../../scripts/authHooks.js"></script>
   <script src="../../../injections.js"></script>
-  <script src="../../../scripts/proDashboard.js"></script>
+  <script src="../../../scripts/crmManager.js"></script>
   <script src="../scripts/proSettings.js"></script>
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

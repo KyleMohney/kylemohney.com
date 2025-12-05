@@ -21,7 +21,7 @@ When a practitioner accepts or declines a match on their dashboard (`/rooted-vit
 
 ### Modified Files:
 - ✅ `/rooted-vitality/dashboard/pro/index.html` - Added notification calls to accept/decline handlers
-- ✅ `/rooted-vitality/dashboard/client/pages/my-matches.html` - Added notificationManager.js script include
+- ✅ `/rooted-vitality/dashboard/client/pages/inbox.html` - Added notificationManager.js script include
 
 ## Key Functions
 

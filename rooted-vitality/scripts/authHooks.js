@@ -1,23 +1,20 @@
-/*
+﻿/*
 ╔════════════════════════════════════════════════════════════════════╗
 ║  ROOTED VITALITY, INC.                                             ║
-║  File: scripts/authHooks.js                                        ║
-║  Purpose: Universal auth initialization on every page              ║
+║  File: authHooks.js                                                ║
+║  Purpose: Auth initialization and session restoration on all pages  ║
 ║  Holistic Wellness · Modern Connection Platform                    ║
 ║  rootedvitality.com | 2025                                         ║
 ╚════════════════════════════════════════════════════════════════════╝
 
-TABLE OF CONTENTS
-  1. INITIALIZATION
-  2. SESSION RESTORATION
-  3. HEADER UPDATES
-  4. REDIRECT LOGIC
-
-PURPOSE: Single function called on every page to handle auth state consistently.
-Ensures logged-in status shows, logout is available, and redirects work everywhere.
+ TABLE OF CONTENTS
+   1. INITIALIZATION & SESSION RESTORATION
+   2. AUTO-CALL ON PAGE LOAD
 */
 
-console.log('[Rooted Vitality] authHooks.js loading...');
+// ======================================================
+// 1. INITIALIZATION & SESSION RESTORATION
+// ======================================================
 
 /**
  * Initialize auth on any page
@@ -28,25 +25,15 @@ console.log('[Rooted Vitality] authHooks.js loading...');
  * - Redirects if needed
  */
 window.initializeAuthOnPage = async () => {
-    console.log('[Rooted Vitality] initializeAuthOnPage() called');
 
     try {
         // Check for existing session
         const session = await window.authManager.getSession();
         const userData = window.authManager.getCurrentUser();
 
-        console.log('[Rooted Vitality Auth] Session:', session ? 'found' : 'none', 'LocalStorage:', userData ? 'found' : 'none');
-
         // Header is now rendered by RootedVitality.init() which checks auth status
         // This function can be used for other auth-related tasks if needed
         // (previously updated header here, but that's now handled by init())
-        
-        if ((session || userData) && userData?.role) {
-            console.log('[Rooted Vitality Auth] User authenticated:', userData.email);
-            // Header already rendered by init() - no need to update again
-        } else {
-            console.log('[Rooted Vitality Auth] No active session');
-        }
 
     } catch (error) {
         console.error('[Rooted Vitality Auth] Error in initializeAuthOnPage:', error);
@@ -68,61 +55,4 @@ if (document.readyState === 'loading') {
         window.initializeAuthOnPage();
     }
 }
-
-console.log('[Rooted Vitality] authHooks.js loaded');
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

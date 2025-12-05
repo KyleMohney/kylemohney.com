@@ -1,24 +1,73 @@
+<!--
+╔════════════════════════════════════════════════════════════════════╗
+║  ROOTED VITALITY, INC.                                             ║
+║  File: inbox.html                                                  ║
+║  Purpose: Practitioner Inbox - Message threads & client management ║
+║  Holistic Wellness · Modern Connection Platform                    ║
+║  rootedvitality.com | 2025                                         ║
+╚════════════════════════════════════════════════════════════════════╝
+
+TABLE OF CONTENTS:
+  1. Meta Tags & Stylesheets
+  2. Header Injection Zone
+  3. Main Inbox Container (3-Column Layout)
+  4. Sidebar Navigation & Filters
+  5. Conversation Threads List
+  6. Message Thread View
+  7. Modal Dialogs (Block/Unblock/Decline)
+  8. Supabase & Script Dependencies
+  9. Initialization & Event Handlers
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- ========================================== -->
+    <!-- 1. META TAGS & STYLESHEETS -->
+    <!-- ========================================== -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inbox - Rooted Vitality Practitioner</title>
+    
+    <!-- SEO & Metadata -->
+    <title>Inbox - Manage Client Messages | Rooted Vitality</title>
+    <meta name="description" content="Manage your client messages and conversations. Connect with clients, track inquiries, and coordinate wellness appointments on Rooted Vitality.">
+    <meta name="keywords" content="practitioner inbox, client messages, wellness conversations, appointment coordination, holistic health platform">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="author" content="Rooted Vitality, Inc.">
+    
+    <!-- Open Graph (Social Sharing) -->
+    <meta property="og:title" content="Inbox - Rooted Vitality Practitioner Dashboard">
+    <meta property="og:description" content="Manage your client messages and conversations on Rooted Vitality.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://kylemohney.com/rooted-vitality/dashboard/pro/pages/inbox.html">
+    
+    <!-- Additional Meta Tags -->
+    <meta name="theme-color" content="#77883e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
     <link rel="stylesheet" href="../../../styles/base.css">
     <link rel="stylesheet" href="../../../styles/layout.css">
     <link rel="stylesheet" href="../../../styles/components.css">
-    <link rel="stylesheet" href="../../../styles/inbox.css">
+    <link rel="stylesheet" href="../styles/inbox.css">
     <link rel="stylesheet" href="../../../styles/report-concern-widget.css">
 </head>
 <body>
-    <!-- Header Injection -->
+    <!-- ========================================== -->
+    <!-- 2. HEADER INJECTION ZONE -->
+    <!-- ========================================== -->
     <div id="header-inject"></div>
 
+    <!-- ========================================== -->
+    <!-- 3. MAIN INBOX CONTAINER (3-Column Layout) -->
+    <!-- ========================================== -->
     <main class="inbox-container">
-        <!-- Left Sidebar Column: Navigation & Filters -->
-        <aside class="matches-sidebar">
-            <!-- Tabs Card -->
-            <div class="sidebar-tab active" data-tab="all">
+    <!-- ========================================== -->
+    <!-- 4. SIDEBAR NAVIGATION & FILTERS -->
+    <!-- ========================================== -->
+    <aside class="matches-sidebar">
+        <!-- Tabs Card -->
+        <div class="sidebar-tab active" data-tab="all">
                 <h3 class="sidebar-tab__title">Messages</h3>
                 <div class="sidebar-tab__badge" id="badge-all">0</div>
             </div>
@@ -70,8 +119,11 @@
             </div>
 
             <!-- Tips Section -->
-            <div class="sidebar-tips-section">
-                <h4 class="sidebar-section__title">TIPS</h4>
+            <div class="universal-card sidebar-tips-section">
+                <div style="display: flex; align-items: center; gap: 0.75rem; height: 28px;">
+                    <span class="tips-icon">ℹ</span>
+                    <h4 class="sidebar-section__title">TIPS</h4>
+                </div>
                 <ul class="sidebar-tips">
                     <li>Reply within 60 seconds for best results</li>
                     <li>Blocked and declined clients are in Archive</li>
@@ -80,7 +132,9 @@
             </div>
         </aside>
 
-        <!-- Middle Column: Conversation List -->
+        <!-- ========================================== -->
+        <!-- 5. CONVERSATION THREADS LIST -->
+        <!-- ========================================== -->
         <section class="inbox-list">
             <div class="inbox-search">
                 <input 
@@ -96,7 +150,9 @@
             </div>
         </section>
 
-        <!-- Right Column: Message Thread -->
+        <!-- ========================================== -->
+        <!-- 6. MESSAGE THREAD VIEW -->
+        <!-- ========================================== -->
         <section class="inbox-content">
             <!-- Empty State -->
             <div class="inbox-empty-state" id="empty-state">
@@ -106,7 +162,7 @@
             </div>
 
             <!-- Conversation Thread View -->
-            <div class="conversation-thread" id="conversation-thread" style="display: none;">
+            <div class="conversation-thread hidden" id="conversation-thread">
                 <div class="thread-header">
                     <a href="#" class="thread-header-info" id="thread-header-link">
                         <div class="thread-avatar">
@@ -139,9 +195,14 @@
         </section>
     </main>
 
-    <!-- Footer Injection -->
+    <!-- ========================================== -->
+    <!-- 7. FOOTER INJECTION ZONE -->
+    <!-- ========================================== -->
     <footer id="footer-inject"></footer>
 
+    <!-- ========================================== -->
+    <!-- 8. SUPABASE & SCRIPT DEPENDENCIES -->
+    <!-- ========================================== -->
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
@@ -150,46 +211,98 @@
     <script src="../../../scripts/authManager.js"></script>
     <script src="../../../scripts/authModal.js"></script>
     <script src="../../../scripts/authHooks.js"></script>
+    <script src="../../../scripts/emailTemplates.js"></script>
+    <script src="../../../scripts/notificationManager.js"></script>
     <script src="../../../injections.js"></script>
     <script src="../../../scripts/unifiedMessagingSystem.js"></script>
+
+    <!-- ========================================== -->
+    <!-- 9. INITIALIZATION & EVENT HANDLERS -->
+    <!-- ========================================== -->
     <script>
-        // Mark Inbox as active in the header navigation
+        // Modal Dialog Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+          // Block Modal
+          document.querySelectorAll('.close-block-modal').forEach(btn => {
+            btn.addEventListener('click', function() {
+              document.getElementById('block-modal-overlay').classList.add('hidden');
+            });
+          });
+          document.querySelector('.confirm-block-btn')?.addEventListener('click', function() {
+            document.getElementById('block-modal-overlay').classList.add('hidden');
+            if (typeof window.confirmBlock === 'function') window.confirmBlock();
+          });
+
+          // Unblock Modal
+          document.querySelectorAll('.close-unblock-modal').forEach(btn => {
+            btn.addEventListener('click', function() {
+              document.getElementById('unblock-modal-overlay').classList.add('hidden');
+            });
+          });
+          document.querySelector('.confirm-unblock-btn')?.addEventListener('click', function() {
+            document.getElementById('unblock-modal-overlay').classList.add('hidden');
+            if (typeof window.confirmUnblock === 'function') window.confirmUnblock();
+          });
+
+          // Decline Modal
+          document.querySelectorAll('.close-decline-modal').forEach(btn => {
+            btn.addEventListener('click', function() {
+              document.getElementById('decline-modal-overlay').classList.add('hidden');
+            });
+          });
+          document.querySelector('.confirm-decline-btn')?.addEventListener('click', function() {
+            document.getElementById('decline-modal-overlay').classList.add('hidden');
+            if (typeof window.confirmDecline === 'function') window.confirmDecline();
+          });
+        });
+
+        // Maintain original modal functions as wrappers
+        function closeBlockModal() {
+          document.getElementById('block-modal-overlay').classList.add('hidden');
+        }
+        function closeUnblockModal() {
+          document.getElementById('unblock-modal-overlay').classList.add('hidden');
+        }
+        function closeDeclineModal() {
+          document.getElementById('decline-modal-overlay').classList.add('hidden');
+        }
+    </script>
+    <script>
         function setInboxNavActive() {
             const navLinks = document.querySelectorAll('.rv-nav-link');
             navLinks.forEach(link => {
                 link.classList.remove('active');
                 const href = link.getAttribute('href');
-                // Check if this link points to the current page (inbox.html)
                 if (href && (href.includes('inbox.html') || href.endsWith('/pages/'))) {
                     link.classList.add('active');
-                    console.log('[Rooted Vitality] Set Inbox as active nav link, href:', href);
                 }
             });
         }
         
-        // Try to set active immediately and retry if header not ready
         if (document.querySelectorAll('.rv-nav-link').length > 0) {
             setInboxNavActive();
         } else {
             document.addEventListener('DOMContentLoaded', setInboxNavActive);
-            // Also retry after a short delay in case header is still loading
-            setTimeout(setInboxNavActive, 500);
         }
     </script>
+
+    <!-- ========================================== -->
+    <!-- 7. MODAL DIALOGS (Block/Unblock/Decline) -->
+    <!-- ========================================== -->
     <!-- Block/Unblock Confirmation Modals -->
     <div id="block-modal-overlay" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Block Client</h2>
-                <button class="modal-close" onclick="closeBlockModal()">×</button>
+                <button class="modal-close close-block-modal">×</button>
             </div>
             <div class="modal-body">
                 <p class="modal-intro">You're about to block <strong id="block-client-name"></strong>. They won't be able to send you new project matches.</p>
-                <p class="modal-intro" style="color: #d97706; margin-top: 1rem;">This action can be undone from your Archive.</p>
+                <p class="modal-intro warning-text">This action can be undone from your Archive.</p>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeBlockModal()">Cancel</button>
-                <button class="btn btn-danger" onclick="confirmBlock()" style="background: #dc2626; color: #fbf7ec;">Block Client</button>
+                <button class="btn btn-secondary close-block-modal">Cancel</button>
+                <button class="btn btn-danger confirm-block-btn">Block Client</button>
             </div>
         </div>
     </div>
@@ -198,14 +311,14 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Unblock Client</h2>
-                <button class="modal-close" onclick="closeUnblockModal()">×</button>
+                <button class="modal-close close-unblock-modal">×</button>
             </div>
             <div class="modal-body">
                 <p class="modal-intro">You're about to unblock <strong id="unblock-client-name"></strong>. They can send you project matches again.</p>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeUnblockModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="confirmUnblock()">Unblock Client</button>
+                <button class="btn btn-secondary close-unblock-modal">Cancel</button>
+                <button class="btn btn-primary confirm-unblock-btn">Unblock Client</button>
             </div>
         </div>
     </div>
@@ -214,75 +327,19 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Decline Project Match</h2>
-                <button class="modal-close" onclick="closeDeclineModal()">×</button>
+                <button class="modal-close close-decline-modal">×</button>
             </div>
             <div class="modal-body">
                 <p class="modal-intro">You're about to decline <strong id="decline-client-name"></strong>'s project match request. This will move them to your Archive.</p>
-                <p class="modal-intro" style="color: #d97706; margin-top: 1rem;">You can still block them later if needed.</p>
+                <p class="modal-intro warning-text">You can still block them later if needed.</p>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeDeclineModal()">Cancel</button>
-                <button class="btn btn-danger" onclick="confirmDecline()" style="background: #dc2626; color: #fbf7ec;">Decline Match</button>
+                <button class="btn btn-secondary close-decline-modal">Cancel</button>
+                <button class="btn btn-danger confirm-decline-btn">Decline Match</button>
             </div>
         </div>
     </div>
 
-    <script src="../../../scripts/inboxManager.js"></script>
+    <script src="../scripts/inboxManager.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,10 +1,20 @@
-// ======================================================
-// renderManager.js
-// ======================================================
-// Purpose: Handles rendering of featured heros and articles
+﻿/*
+╔════════════════════════════════════════════════════════════════════╗
+║  ROOTED VITALITY, INC.                                             ║
+║  File: renderManager.js                                            ║
+║  Purpose: Render featured articles and heros on landing page        ║
+║  Holistic Wellness · Modern Connection Platform                    ║
+║  rootedvitality.com | 2025                                         ║
+╚════════════════════════════════════════════════════════════════════╝
 
-let articleData = null;
-let currentTab = 'client';
+ TABLE OF CONTENTS
+   1. LOAD ARTICLE DATA
+   2. RENDER FEATURED HEROS
+   3. RENDER ARTICLES IN INLINE SECTION
+   4. RENDER ARTICLE GRID (MAIN SECTION)
+   5. UPDATE TAB STATE & RE-RENDER
+   6. HANDLE SEARCH INPUT
+*/
 
 // ======================================================
 // 1. LOAD ARTICLE DATA
@@ -13,7 +23,7 @@ async function loadArticleData() {
   try {
     const response = await fetch('/rooted-vitality/data/articles.json');
     articleData = await response.json();
-    console.log('Article data loaded successfully');
+
   } catch (error) {
     console.error('Error loading article data:', error);
   }
@@ -46,7 +56,7 @@ function renderFeaturedHeros() {
       searchInput.type = 'text';
       searchInput.className = 'search-bar';
       searchInput.id = 'searchInput-inline';
-      searchInput.placeholder = 'Search help articles…';
+      searchInput.placeholder = 'Search help articlesâ€¦';
       searchInput.setAttribute('aria-label', 'Search help articles');
       
       const articlesGrid = document.createElement('div');
@@ -222,6 +232,8 @@ window.renderManager = {
   setCurrentTab,
   handleSearch
 };
+
+
 
 
 

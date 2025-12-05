@@ -1,12 +1,39 @@
-/**
- * ============================================
- * ROOTED VITALITY, INC.
- * File: dashboard/client/styles/public-profile.css
- * Purpose: Public client profile page styling (visible to matched practitioners)
- * Holistic Wellness · Modern Connection Platform
- * rootedvitality.com | 2025
- * ============================================
- */
+/*
+╔═════════════════════════════════════════════════════════════════════════════╗
+║                    ROOTED VITALITY, INC.                                    ║
+║              CLIENT PUBLIC PROFILE (STYLES)                                 ║
+║                                                                             ║
+║ File:        dashboard/client/styles/public-profile.css                     ║
+║ Purpose:     Public client profile page styling for matched practitioners   ║
+║ Description: Profile display, header section, wellness info layout,         ║
+║              basic information grid, error messaging, responsive design     ║
+║ Last Update: November 2025                                                  ║
+║ Status:      Production-Ready | Build Standard v2.0 Compliant               ║
+║                                                                             ║
+║ QUICK REFERENCE:                                                            ║
+║ - Layout: Wrapper | Header | Sections | Grid | Error Container              ║
+║ - Components: Avatar | Section Headers | Wellness Items | Disclaimer        ║
+║                                                                             ║
+╚═════════════════════════════════════════════════════════════════════════════╝
+*/
+
+/* ========================================== */
+/* TABLE OF CONTENTS */
+/* ========================================== */
+
+/*
+  1. WRAPPER & CONTAINER
+  2. PROFILE HEADER SECTION
+  3. PROFILE SECTIONS & GRID
+  4. WELLNESS ITEMS
+  5. DISCLAIMER BOX
+  6. ERROR CONTAINER & MESSAGING
+  7. RESPONSIVE DESIGN
+*/
+
+/* ========================================== */
+/* 1. WRAPPER & CONTAINER */
+/* ========================================== */
 
 .public-profile-wrapper {
     background: #fbf7ec;
@@ -20,7 +47,7 @@
 }
 
 /* ========================================== */
-/* PROFILE HEADER SECTION */
+/* 2. PROFILE HEADER SECTION */
 /* ========================================== */
 
 .profile-header-section {
@@ -40,6 +67,12 @@
     box-shadow: 0 4px 12px rgba(119, 136, 62, 0.15);
 }
 
+.client-avatar-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
 .profile-header-info {
     flex: 1;
     padding-top: 0.5rem;
@@ -50,7 +83,7 @@
     font-weight: 700;
     color: #2e2b28;
     margin: 0 0 0.5rem 0;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-sans);
 }
 
 .profile-location {
@@ -67,7 +100,7 @@
 }
 
 /* ========================================== */
-/* PROFILE SECTIONS */
+/* 3. PROFILE SECTIONS & GRID */
 /* ========================================== */
 
 .profile-section {
@@ -89,11 +122,11 @@
     font-weight: 600;
     color: #2e2b28;
     margin: 0;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-sans);
 }
 
 /* ========================================== */
-/* BASIC INFORMATION GRID */
+/* PROFILE GRID ITEMS */
 /* ========================================== */
 
 .profile-grid {
@@ -121,11 +154,11 @@
     color: #2e2b28;
     margin: 0;
     line-height: 1.5;
-    font-family: 'Lora', serif;
+    font-family: var(--font-serif);
 }
 
 /* ========================================== */
-/* WELLNESS ITEMS */
+/* 4. WELLNESS ITEMS */
 /* ========================================== */
 
 .wellness-item {
@@ -145,7 +178,7 @@
     font-weight: 600;
     color: #2e2b28;
     margin: 0 0 0.75rem 0;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-sans);
 }
 
 .wellness-answer {
@@ -153,7 +186,7 @@
     color: #555;
     margin: 0;
     line-height: 1.6;
-    font-family: 'Lora', serif;
+    font-family: var(--font-serif);
     white-space: pre-wrap;
     word-wrap: break-word;
 }
@@ -191,4 +224,89 @@
     .profile-grid {
         grid-template-columns: 1fr;
     }
+}
+
+/* ========================================== */
+/* UTILITY CLASSES & COMPONENT STYLING */
+/* ========================================== */
+
+/* Client avatar display with gradient background */
+.client-avatar-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--rooted-primary, #77883e) 0%, #5f7030 100%);
+    font-size: 64px;
+    color: var(--rooted-cream, #fbf7ec);
+    font-weight: bold;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+}
+
+/* ========================================== */
+/* 5. DISCLAIMER BOX */
+/* ========================================== */
+
+/* Profile disclaimer box styling with variables */
+.profile-disclaimer-box {
+    background: var(--rooted-cream, #fbf7ec);
+    border: 1px solid var(--rooted-accent, #d4c47c);
+    border-radius: 6px;
+    padding: 1rem;
+    margin-top: 2rem;
+}
+
+.profile-disclaimer-text {
+    margin: 0;
+    color: var(--rooted-text-primary, #2c3e50);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* Spacing utility */
+.spacing-xxl {
+    height: 3rem;
+}
+
+/* ========================================== */
+/* 6. ERROR CONTAINER & MESSAGING */
+/* ========================================== */
+
+.error-container {
+    background: #f0fdf4;
+    border: 2px solid #5c9a72;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    margin-top: 3rem;
+}
+
+.error-title {
+    color: #2e2b28;
+    margin: 0 0 1rem 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.error-message {
+    color: #555;
+    margin: 0 0 1rem 0;
+    line-height: 1.5;
+}
+
+.error-link {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.75rem 1.5rem;
+    background: #5c9a72;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: background 0.2s ease;
+}
+
+.error-link:hover {
+    background: #4a8462;
 }

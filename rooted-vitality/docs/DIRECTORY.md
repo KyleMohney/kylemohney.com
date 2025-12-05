@@ -2,7 +2,7 @@
 
 ## Root
 - `index.html` — Landing page (world-class, conversion-optimized)
-- `signup.html` — Client registration
+- `client-signup.html` — Client registration
 - `verify.html` — Email verification
 - `chatbot.js` — AI chatbot
 - `injections.js` — Universal header/footer/utilities
@@ -12,10 +12,10 @@
 - `dashboard/`
   - `client-dashboard.html` — Client dashboard
   - `client-find-practitioners.html` — Find practitioners
-  - `client-my-matches.html` — Client matches
+  - `client-inbox.html` — Client inbox (connections and messaging)
   - `client-my-projects.html` — Client projects
   - `client-settings.html` — Client settings
-  - `practitioner-profile.html` — Practitioner profile
+  - `practitioner-public-profile.html` — Practitioner public profile
   - `practitioner-signup.html` — Practitioner onboarding
   - `pro/`
     - `index.html` — Pro dashboard

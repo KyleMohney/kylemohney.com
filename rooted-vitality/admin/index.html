@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rooted Vitality Admin Panel</title>
+  <link rel="stylesheet" href="styles/admin.css">
+</head>
+<body>
+  <div id="auth-check" class="loading">
+    <div class="spinner"></div>
+    <p>Verifying access...</p>
+  </div>
+
+  <div id="admin-panel" style="display: none;">
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>Admin Panel</h2>
+        <p class="user-email" id="user-email"></p>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#dashboard" class="nav-item active" data-page="dashboard">
+          <span>Dashboard</span>
+        </a>
+        <a href="#search-users" class="nav-item" data-page="search-users">
+          <span>Search Users</span>
+        </a>
+        <a href="#search-projects" class="nav-item" data-page="search-projects">
+          <span>Search Projects</span>
+        </a>
+        <a href="#categories" class="nav-item" data-page="categories">
+          <span>Categories List</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button id="logout-btn" class="btn-logout">Logout</button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      <!-- DASHBOARD PAGE -->
+      <section id="page-dashboard" class="page active">
+        <div class="page-header">
+          <h1>Analytics Dashboard</h1>
+          <p class="subtitle">Platform metrics and statistics</p>
+        </div>
+
+        <div class="analytics-grid">
+          <div class="metric-card users">
+            <div class="metric-label">Total Users</div>
+            <div class="metric-value" id="stat-total-users">0</div>
+            <div class="metric-change">All practitioners and clients</div>
+          </div>
+
+          <div class="metric-card users">
+            <div class="metric-label">Practitioners</div>
+            <div class="metric-value" id="stat-practitioners">0</div>
+            <div class="metric-change">Active wellness professionals</div>
+          </div>
+
+          <div class="metric-card users">
+            <div class="metric-label">Clients</div>
+            <div class="metric-value" id="stat-clients">0</div>
+            <div class="metric-change">Seeking practitioners</div>
+          </div>
+
+          <div class="metric-card requests">
+            <div class="metric-label">Care Requests Created</div>
+            <div class="metric-value" id="stat-requests">0</div>
+            <div class="metric-change">Total created requests</div>
+          </div>
+
+          <div class="metric-card hired">
+            <div class="metric-label">Matches Hired</div>
+            <div class="metric-value" id="stat-hired">0</div>
+            <div class="metric-change">Successful pairings</div>
+          </div>
+        </div>
+
+        <div class="traffic-widget">
+          <h3>Weekly Traffic</h3>
+          <div class="traffic-chart">
+            <div style="display: flex; flex-direction: column; align-items: center;">
+              <div class="traffic-bar" style="height: 60%;"></div>
+              <div class="traffic-bar-label">Mon</div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+              <div class="traffic-bar" style="height: 75%;"></div>
+              <div class="traffic-bar-label">Tue</div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+              <div class="traffic-bar" style="height: 85%;"></div>
+              <div class="traffic-bar-label">Wed</div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+              <div class="traffic-bar" style="height: 70%;"></div>
+              <div class="traffic-bar-label">Thu</div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+              <div class="traffic-bar" style="height: 90%;"></div>
+              <div class="traffic-bar-label">Fri</div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+              <div class="traffic-bar" style="height: 65%;"></div>
+              <div class="traffic-bar-label">Sat</div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+              <div class="traffic-bar" style="height: 50%;"></div>
+              <div class="traffic-bar-label">Sun</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="traffic-widget">
+          <h3>Monthly Traffic</h3>
+          <div class="monthly-chart">
+            <div style="display: flex; flex-direction: column; align-items: center;">
+              <div class="traffic-bar" style="height: 45%;"></div>
+              <div class="traffic-bar-label">Jan</div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+              <div class="traffic-bar" style="height: 52%;"></div>
+              <div class="traffic-bar-label">Feb</div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+              <div class="traffic-bar" style="height: 58%;"></div>
+              <div class="traffic-bar-label">Mar</div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+              <div class="traffic-bar" style="height: 62%;"></div>
+              <div class="traffic-bar-label">Apr</div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+              <div class="traffic-bar" style="height: 68%;"></div>
+              <div class="traffic-bar-label">May</div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+              <div class="traffic-bar" style="height: 72%;"></div>
+              <div class="traffic-bar-label">Jun</div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+              <div class="traffic-bar" style="height: 78%;"></div>
+              <div class="traffic-bar-label">Jul</div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+              <div class="traffic-bar" style="height: 82%;"></div>
+              <div class="traffic-bar-label">Aug</div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+              <div class="traffic-bar" style="height: 75%;"></div>
+              <div class="traffic-bar-label">Sep</div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+              <div class="traffic-bar" style="height: 80%;"></div>
+              <div class="traffic-bar-label">Oct</div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+              <div class="traffic-bar" style="height: 85%;"></div>
+              <div class="traffic-bar-label">Nov</div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+              <div class="traffic-bar" style="height: 88%;"></div>
+              <div class="traffic-bar-label">Dec</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SEARCH USERS PAGE -->
+      <section id="page-search-users" class="page">
+        <div class="page-header">
+          <h1>Search Users</h1>
+          <p class="subtitle">Find practitioners and clients by name, email, or ID</p>
+        </div>
+
+        <div class="search-container">
+          <div class="search-bar">
+            <input 
+              type="text" 
+              id="search-input" 
+              placeholder="Search by name, email, phone, serial, or UUID..."
+              class="search-field"
+            >
+            <button id="search-btn" class="btn-primary">Search</button>
+          </div>
+
+          <div id="search-results" style="display: none;">
+            <div class="results-header">
+              <h3>Search Results</h3>
+              <p class="result-count">Found <span id="result-count">0</span> users</p>
+            </div>
+            <div id="results-list" class="results-list">
+              <!-- Results populated here -->
+            </div>
+          </div>
+
+          <div id="no-results" class="no-results" style="display: none;">
+            <p>No users found. Try a different search.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SEARCH PROJECTS PAGE -->
+      <section id="page-search-projects" class="page">
+        <div class="page-header">
+          <h1>Search Projects</h1>
+          <p class="subtitle">Find care requests by title, client, or status</p>
+        </div>
+
+        <div class="search-container">
+          <div class="search-bar">
+            <input 
+              type="text" 
+              id="search-projects-input" 
+              placeholder="Search by project title, client name, or status..."
+              class="search-field"
+            >
+            <button id="search-projects-btn" class="btn-primary">Search</button>
+          </div>
+
+          <div id="projects-results" style="display: none;">
+            <div class="results-header">
+              <h3>Projects Found</h3>
+              <p class="result-count"><span id="projects-result-count">0</span> projects</p>
+            </div>
+            <div id="projects-list" class="results-list">
+              <!-- Projects populated here -->
+            </div>
+          </div>
+
+          <div id="no-projects" class="no-results" style="display: none;">
+            <p>No projects found. Try a different search.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- CATEGORIES LIST PAGE -->
+      <section id="page-categories" class="page">
+        <div class="page-header">
+          <h1>Categories</h1>
+          <p class="subtitle">Manage wellness service categories</p>
+        </div>
+
+        <div class="search-container">
+          <div id="categories-list" class="results-list">
+            <!-- Categories populated here -->
+          </div>
+          <div id="no-categories" class="no-results" style="display: none;">
+            <p>No categories found.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- PRACTITIONER DETAIL PAGE -->
+      <section id="page-practitioner-detail" class="page">
+        <div class="detail-header">
+          <button class="btn-back" onclick="backToSearch()">← Back</button>
+          <h1 id="detail-practitioner-name">Practitioner Profile</h1>
+          <p class="subtitle" id="detail-practitioner-serial"></p>
+        </div>
+
+        <div id="practitioner-detail-content" class="detail-content">
+          <!-- BASIC INFORMATION -->
+          <div class="detail-section">
+            <div class="section-title collapsible" onclick="toggleSection(event)">
+              <span class="toggle-icon">▼</span>
+              Basic Information
+            </div>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <label>Legal Name</label>
+                <div id="detail-legal-name">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Email</label>
+                <div id="detail-email">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Phone</label>
+                <div id="detail-phone">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Serial Number</label>
+                <div id="detail-serial">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Status</label>
+                <div id="detail-status" class="status-badge">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Account Created</label>
+                <div id="detail-created">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Last Login</label>
+                <div id="detail-last-login">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Last Updated</label>
+                <div id="detail-updated">—</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- BUSINESS INFORMATION -->
+          <div class="detail-section">
+            <div class="section-title collapsible" onclick="toggleSection(event)">
+              <span class="toggle-icon">▼</span>
+              Business Information
+            </div>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <label>Business Name</label>
+                <div id="detail-business-name">—</div>
+              </div>
+              <div class="detail-item">
+                <label>DBA Name</label>
+                <div id="detail-dba-name">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Business Size</label>
+                <div id="detail-business-size">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Practice City</label>
+                <div id="detail-practice-city">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Practice State</label>
+                <div id="detail-practice-state">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Timezone</label>
+                <div id="detail-timezone">—</div>
+              </div>
+              <div class="detail-item full-width">
+                <label>Physical Address</label>
+                <div id="detail-address">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Zipcode</label>
+                <div id="detail-zipcode">—</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SERVICE INFORMATION -->
+          <div class="detail-section">
+            <div class="section-title collapsible" onclick="toggleSection(event)">
+              <span class="toggle-icon">▼</span>
+              Service Information
+            </div>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <label>Service Categories</label>
+                <div id="detail-service-categories">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Service Subcategories</label>
+                <div id="detail-service-subcategories">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Pricing (JSON)</label>
+                <div id="detail-pricing" class="code-block">—</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SERVICE MODES -->
+          <div class="detail-section">
+            <div class="section-title collapsible" onclick="toggleSection(event)">
+              <span class="toggle-icon">▼</span>
+              Service Modes
+            </div>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <label>Virtual</label>
+                <div id="detail-virtual">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Virtual States</label>
+                <div id="detail-virtual-states">—</div>
+              </div>
+              <div class="detail-item">
+                <label>In-Person</label>
+                <div id="detail-in-person">—</div>
+              </div>
+              <div class="detail-item">
+                <label>In-Person Base Zipcode</label>
+                <div id="detail-in-person-zipcode">—</div>
+              </div>
+              <div class="detail-item">
+                <label>In-Person Radius</label>
+                <div id="detail-in-person-radius">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Housecalls</label>
+                <div id="detail-housecalls">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Housecalls Base Zipcode</label>
+                <div id="detail-housecalls-zipcode">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Housecalls Radius</label>
+                <div id="detail-housecalls-radius">—</div>
+              </div>
+          </div>
+
+          <!-- PAYMENT & INSURANCE -->
+          <div class="detail-section">
+            <div class="section-title collapsible" onclick="toggleSection(event)">
+              <span class="toggle-icon">▼</span>
+              Payment & Insurance
+            </div>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <label>Accepts Insurance</label>
+                <div id="detail-accepts-insurance">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Insurance Providers</label>
+                <div id="detail-insurance-providers">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Custom Insurance Providers</label>
+                <div id="detail-custom-insurance">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Payment Methods</label>
+                <div id="detail-payment-methods">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Custom Payment Methods</label>
+                <div id="detail-custom-payment">—</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PROFILE INFORMATION -->
+          <div class="detail-section">
+            <div class="section-title collapsible" onclick="toggleSection(event)">
+              <span class="toggle-icon">▼</span>
+              Profile Information
+            </div>
+            <div class="detail-grid">
+              <div class="detail-item full-width">
+                <label>Bio</label>
+                <div id="detail-bio" class="bio-text">—</div>
+              </div>
+              <div class="detail-item full-width">
+                <label>Ethos Statement</label>
+                <div id="detail-ethos" class="bio-text">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Languages</label>
+                <div id="detail-languages">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Modalities</label>
+                <div id="detail-modalities">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Conditions Treated</label>
+                <div id="detail-conditions">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Practice Type</label>
+                <div id="detail-practice-type">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Year Established</label>
+                <div id="detail-year-established">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Profile Completeness</label>
+                <div id="detail-profile-completeness">—</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CREDENTIALS & VERIFICATION -->
+          <div class="detail-section">
+            <div class="section-title collapsible" onclick="toggleSection(event)">
+              <span class="toggle-icon">▼</span>
+              Credentials & Verification
+            </div>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <label>Verified Badge</label>
+                <div id="detail-badge-verified">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Certified Badge</label>
+                <div id="detail-badge-certified">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Licensed Badge</label>
+                <div id="detail-badge-licensed">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Background Check Verified</label>
+                <div id="detail-badge-bg-check">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Background Check Status</label>
+                <div id="detail-bg-check-status">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Background Check Date</label>
+                <div id="detail-bg-check-date">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Background Check Provider</label>
+                <div id="detail-bg-check-provider">—</div>
+              </div>
+              <div class="detail-item full-width">
+                <label>Credentials (JSON)</label>
+                <div id="detail-credentials-json" class="code-block">—</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- MATCHING & STATUS -->
+          <div class="detail-section">
+            <div class="section-title collapsible" onclick="toggleSection(event)">
+              <span class="toggle-icon">▼</span>
+              Matching & Status
+            </div>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <label>Matching Enabled</label>
+                <div id="detail-matching-enabled">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Matching Paused</label>
+                <div id="detail-matching-paused">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Total Matches</label>
+                <div id="detail-total-matches">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Blocked Clients</label>
+                <div id="detail-blocked-count">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Account Deleted</label>
+                <div id="detail-deleted">—</div>
+              </div>
+              <div class="detail-item">
+                <label>Deleted At</label>
+                <div id="detail-deleted-at">—</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- MEMBERSHIP STATUS -->
+          <div class="detail-section">
+            <div class="section-title collapsible" onclick="toggleSection(event)">
+              <span class="toggle-icon">▼</span>
+              Membership Status
+            </div>
+            <div id="membership-info" class="detail-grid">
+              <div class="detail-item">
+                <label>No memberships found</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- RECENT REVIEWS -->
+          <div class="detail-section">
+            <div class="section-title collapsible" onclick="toggleSection(event)">
+              <span class="toggle-icon">▼</span>
+              Recent Reviews
+            </div>
+            <div id="reviews-info" class="detail-grid">
+              <div class="detail-item">
+                <label>No reviews found</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- UNAUTHORIZED PAGE -->
+  <div id="unauthorized" style="display: none;" class="unauthorized">
+    <div class="unauthorized-content">
+      <div class="icon">🔒</div>
+      <h1>Access Denied</h1>
+      <p>This admin panel is restricted to @rootedvitality.health email addresses only.</p>
+      <p style="font-size: 14px; color: #666; margin-top: 12px;">If you believe you should have access, please contact your administrator.</p>
+      <div style="margin-top: 24px; display: flex; gap: 12px; justify-content: center;">
+        <button onclick="window.location.href='/rooted-vitality/admin/login.html'" class="btn-primary">Admin Login</button>
+        <button onclick="window.location.href='/rooted-vitality/'" class="btn-secondary">Go Home</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="scripts/adminAuth.js"></script>
+  <script src="scripts/userSearch.js"></script>
+  <script src="scripts/practitionerDetails.js"></script>
+  <script src="scripts/adminManager.js"></script>
+</body>
+</html>
+

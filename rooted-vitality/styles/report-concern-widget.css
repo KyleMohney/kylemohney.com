@@ -1,15 +1,21 @@
 /* 
 ╔════════════════════════════════════════════════════════════════════╗
 ║  ROOTED VITALITY, INC.                                             ║
-║  Report Concern Widget Styles                                      ║
-║  Universal styling for all pages                                   ║
+║  File: styles/report-concern-widget.css                            ║
+║  Purpose: Report Concern Widget styling (universal footer)         ║
 ║  Holistic Wellness · Modern Connection Platform                    ║
 ║  rootedvitality.com | 2025                                         ║
 ╚════════════════════════════════════════════════════════════════════╝
+
+TABLE OF CONTENTS
+  1. REPORT CONCERN FOOTER LINK
+  2. MODAL STYLING (DELEGATED)
+  3. FORM STYLING (DELEGATED)
+  4. RESPONSIVE DESIGN
 */
 
 /* ============================================================
-   REPORT CONCERN FOOTER (Before footer on every page)
+   1. REPORT CONCERN FOOTER LINK
    ============================================================ */
 
 .report-concern-footer {
@@ -50,386 +56,34 @@
 }
 
 /* ============================================================
-   MODAL STYLES (Report Concern Widget Only)
+   2. MODAL STYLING (DELEGATED)
    ============================================================ */
 
-#report-concern-modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    animation: fadeIn 0.2s ease;
-}
+/* Note: All modal overlay, centering, and backdrop styling 
+   is handled by .modal-overlay and .modal-overlay.active in modal-system.css */
 
-#report-concern-modal.show {
-    display: flex;
-}
+/* Modal Form - Deferred to Universal Form Styling */
 
-#report-concern-modal .modal-content {
-    background-color: #fbf7ec;
-    border-radius: 12px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-    animation: slideDown 0.3s ease;
-    min-width: 400px;
-}
-
-#report-concern-modal .modal-content--small {
-    max-width: 500px;
-    width: 90vw;
-}
-
-@keyframes slideDown {
-    from {
-        transform: translateY(-50px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
-.report-concern-modal-content {
-    background-color: #fbf7ec;
-    padding: 0;
-    border-radius: 12px;
-    width: 90%;
-    max-width: 600px;
-    max-height: 90vh;
-    overflow-y: auto;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-    animation: slideDown 0.3s ease;
-}
-
-@keyframes slideDown {
-    from {
-        transform: translateY(-50px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
-/* Modal Header */
-.modal-header {
-    background: linear-gradient(135deg, #77883e 0%, #4a8b62 100%);
-    color: #fbf7ec;
-    padding: 25px;
-    border-radius: 12px 12px 0 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #3d7451;
-}
-
-.modal-header h2 {
-    margin: 0;
-    font-size: 22px;
-    font-weight: 600;
-    color: #fbf7ec;
-}
-
-.close-btn {
-    background: none;
-    border: none;
-    color: #fbf7ec;
-    font-size: 28px;
-    cursor: pointer;
-    padding: 0;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-    transition: background 0.2s ease;
-}
-
-.close-btn:hover {
-    background: rgba(251, 247, 236, 0.1);
-}
-
-/* Modal Form */
 #report-concern-form {
-    padding: 30px;
-}
-
-.form-group {
-    margin-bottom: 20px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    color: #2e2b28;
-    font-size: 14px;
-}
-
-.form-group input,
-.form-group textarea,
-.form-group select {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #d4cec9;
-    border-radius: 6px;
-    font-family: inherit;
-    font-size: 14px;
-    background: #fbf7ec;
-    color: #2e2b28;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    box-sizing: border-box;
-}
-
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
-    outline: none;
-    border-color: #77883e;
-    box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.1);
-}
-
-.form-group textarea {
-    resize: vertical;
-    min-height: 120px;
-    max-height: 200px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-}
-
-.form-group select {
-    cursor: pointer;
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235c9a72' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    background-size: 20px;
-    padding-right: 40px;
-}
-
-.form-group small {
-    display: block;
-    margin-top: 6px;
-    color: #a8a39f;
-    font-size: 12px;
-}
-
-/* Form Actions */
-.form-actions {
-    display: flex;
-    gap: 12px;
-    justify-content: flex-end;
-    align-items: center;
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px solid #fbf7ec;
-}
-
-#report-concern-modal .btn-primary,
-#report-concern-modal .btn-secondary {
-    padding: 12px 24px;
-    border-radius: 6px;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    border: none;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    flex: 1;
-    min-width: 120px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#report-concern-modal .btn-primary {
-    background: var(--rooted-primary) !important;
-    color: #fbf7ec;
-}
-
-#report-concern-modal .btn-primary:hover:not(:disabled) {
-    background: var(--rooted-primary) !important;
-    opacity: 0.9;
-    box-shadow: 0 4px 12px rgba(92, 154, 114, 0.3);
-    transform: translateY(-2px);
-}
-
-#report-concern-modal .btn-primary:active:not(:disabled) {
-    transform: translateY(0);
-}
-
-#report-concern-modal .btn-primary:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-#report-concern-modal .btn-secondary {
-    background: #fbf7ec;
-    color: #77883e;
-    border: 1px solid #fbf7ec;
-}
-
-#report-concern-modal .btn-secondary:hover {
-    background: #fbf7ec;
+    padding: 2rem;
 }
 
 /* ============================================================
-   RESPONSIVE DESIGN
+   3. FORM STYLING (DELEGATED)
    ============================================================ */
 
-@media (max-width: 640px) {
-    .report-concern-modal-content {
-        width: 95%;
-        max-height: 95vh;
-    }
+/* Form Groups - Use Universal form-group from modal-system.css */
 
-    .modal-header {
-        padding: 20px;
-    }
+/* Form Actions - Use Universal form-actions and btn-modal from modal-system.css */
 
-    .modal-header h2 {
-        font-size: 20px;
-    }
-
-    #report-concern-form {
-        padding: 20px;
-    }
-
-    .form-actions {
-        flex-direction: column-reverse;
-    }
-
-    #report-concern-modal .btn-primary,
-    #report-concern-modal .btn-secondary {
-        width: 100%;
-    }
-
-    .report-concern-footer {
-        padding: 20px;
-        margin-top: 40px;
-    }
-
-    .report-concern-link {
-        width: 100%;
-        max-width: 300px;
-    }
+#report-concern-form {
+    padding: 2rem;
 }
 
 /* ============================================================
-   DARK MODE SUPPORT (optional)
+   4. RESPONSIVE DESIGN
    ============================================================ */
 
-@media (prefers-color-scheme: dark) {
-    .report-concern-modal-content {
-        background-color: #2e2b28;
-        color: #fbf7ec;
-    }
+/* Responsive design handled by universal modal-system.css */
 
-    .modal-header h2 {
-        color: #fbf7ec;
-    }
-
-    .form-group label {
-        color: #fbf7ec;
-    }
-
-    .form-group input,
-    .form-group textarea,
-    .form-group select {
-        background-color: #3d3935;
-        color: #fbf7ec;
-        border-color: #4d4935;
-    }
-
-    .form-group input:focus,
-    .form-group textarea:focus,
-    .form-group select:focus {
-        border-color: #77883e;
-        box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.2);
-    }
-
-    .form-group small {
-        color: #a8a39f;
-    }
-
-    .btn-secondary {
-        background: #3d3935;
-        color: #77883e;
-        border-color: #4d4935;
-    }
-
-    .btn-secondary:hover {
-        background: #4d4935;
-    }
-
-    .close-btn:hover {
-        background: rgba(251, 247, 236, 0.05);
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/* Dark mode support handled by universal modal-system.css */

@@ -11,7 +11,7 @@
 CREATE TABLE IF NOT EXISTS crm_integrations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   practitioner_serial TEXT NOT NULL REFERENCES practitioners(serial_number) ON DELETE CASCADE,
-  provider TEXT NOT NULL CHECK (provider IN ('hubspot', 'pipedrive', 'salesforce', 'zoho')),
+  provider TEXT NOT NULL CHECK (provider IN ('highlevel', 'servicetitan', 'mhelpdesk', 'hubspot', 'pipedrive', 'salesforce', 'zoho')),
   api_key TEXT NOT NULL,
   webhook_url TEXT,
   is_active BOOLEAN DEFAULT true,

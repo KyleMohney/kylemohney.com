@@ -1,23 +1,37 @@
-/* =====================================================
-   ROOTED VITALITY, INC.
-   File: proSettings.js
-   Purpose: Practitioner settings page functionality
-   Holistic Wellness · Modern Connection Platform
-   rootedvitality.com | 2025
-   ===================================================== */
+/*
+╔════════════════════════════════════════════════════════════════════════════╗
+║  ROOTED VITALITY, INC.                                                     ║
+║  File: dashboard/pro/scripts/proSettings.js                                ║
+║  Purpose: Practitioner settings page functionality                         ║
+║  Holistic Wellness · Modern Connection Platform                            ║
+║  rootedvitality.com | 2025                                                 ║
+╚════════════════════════════════════════════════════════════════════════════╝
 
-console.log('[Rooted Vitality] proSettings.js loading...');
-
-/* TABLE OF CONTENTS
+TABLE OF CONTENTS
    1. INITIALIZATION & STATE
    2. NAVIGATION MANAGEMENT
    3. ACCOUNT SETTINGS
    4. NOTIFICATIONS
    5. PRIVACY & SECURITY
-   6. BILLING MANAGEMENT
-   7. UTILITY FUNCTIONS
-   8. EVENT LISTENERS
+   6. FIELD EDITING
+   7. BUTTON ACTIONS & TWO-FACTOR AUTHENTICATION (2FA/MFA)
+   8. MEMBERSHIPS & PAGE INITIALIZATION
 */
+
+/* ========================================== */
+/* UNIVERSAL VISIBILITY HELPER */
+/* ========================================== */
+
+function setVisible(element, visible = true) {
+    if (!element) return;
+    if (visible) {
+        element.classList.remove('hidden');
+        element.classList.add('visible');
+    } else {
+        element.classList.remove('visible');
+        element.classList.add('hidden');
+    }
+}
 
 /* ========================================== */
 /* 1. INITIALIZATION & STATE */
@@ -28,30 +42,18 @@ let userSettings = {};
 
 async function initializeSettings() {
     try {
-        console.log('[Rooted Vitality] Initializing practitioner settings...');
         
         // Get current user
         const { data: { user }, error: authError } = await window.supabaseClient.auth.getUser();
-        if (authError) {
-            console.error('[Rooted Vitality] Auth error:', authError);
-            window.location.href = '../../index.html';
-            return;
-        }
-        
-        if (!user) {
-            console.warn('[Rooted Vitality] No user found, redirecting to index');
+        if (authError || !user) {
             window.location.href = '../../index.html';
             return;
         }
         
         currentUser = user;
-        console.log('[Rooted Vitality] Current user:', user.email);
         
         // Load user settings from database
-        const loaded = await loadUserSettings();
-        if (!loaded) {
-            console.warn('[Rooted Vitality] Failed to load user settings, but continuing with available data');
-        }
+        await loadUserSettings();
         
         // Populate UI with user data
         populateSettingsUI();
@@ -60,16 +62,14 @@ async function initializeSettings() {
         setupSettingsListeners();
         setupModalHandlers();
         
-        console.log('[Rooted Vitality] Settings initialized successfully');
     } catch (error) {
-        console.error('[Rooted Vitality] Fatal error initializing settings:', error);
-        alert('Error loading settings. Please refresh the page.');
+        // Silent failure - redirect to index
+        window.location.href = '../../index.html';
     }
 }
 
 async function loadUserSettings() {
     try {
-        console.log('[Rooted Vitality] Loading settings for user:', currentUser.id);
         
         const { data, error } = await window.supabaseClient
             .from('practitioners')
@@ -77,27 +77,13 @@ async function loadUserSettings() {
             .eq('id', currentUser.id)
             .single();
         
-        if (error) {
-            console.error('[Rooted Vitality] Database error loading settings:', error);
-            console.error('[Rooted Vitality] Error code:', error.code);
-            console.error('[Rooted Vitality] Error details:', error.details);
-            return false;
-        }
-        
-        if (!data) {
-            console.warn('[Rooted Vitality] No practitioner record found for user');
+        if (error || !data) {
             return false;
         }
         
         userSettings = data;
-        console.log('[Rooted Vitality] User settings loaded successfully:', {
-            email: data.email,
-            phone: data.phone,
-            address: data.address_street || 'not set'
-        });
         return true;
     } catch (error) {
-        console.error('[Rooted Vitality] Exception in loadUserSettings:', error);
         return false;
     }
 }
@@ -142,15 +128,11 @@ function switchSection(sectionId) {
     
     if (section) {
         section.classList.add('active');
-        console.log('[Rooted Vitality] Section activated:', sectionId);
-    } else {
-        console.error('[Rooted Vitality] Section not found:', sectionId);
     }
     if (link) {
         link.classList.add('active');
     }
     
-    console.log('[Rooted Vitality] Switched to section:', sectionId);
 }
 
 /* ========================================== */
@@ -159,24 +141,17 @@ function switchSection(sectionId) {
 
 function populateSettingsUI() {
     try {
-        console.log('[Rooted Vitality] Starting to populate settings UI');
         
         // Email Address
         const emailEl = document.getElementById('display-email');
         if (emailEl) {
             emailEl.textContent = currentUser.email || 'Not set';
-            console.log('[Rooted Vitality] Email populated:', currentUser.email);
-        } else {
-            console.warn('[Rooted Vitality] display-email element not found');
         }
         
         // Phone Number
         const phoneEl = document.getElementById('display-phone');
         if (phoneEl) {
             phoneEl.textContent = userSettings.phone || 'Not set';
-            console.log('[Rooted Vitality] Phone populated:', userSettings.phone || 'Not set');
-        } else {
-            console.warn('[Rooted Vitality] display-phone element not found');
         }
         
         // Physical Address
@@ -197,9 +172,6 @@ function populateSettingsUI() {
                 address = userSettings.location;
             }
             addressEl.textContent = address;
-            console.log('[Rooted Vitality] Address populated:', address);
-        } else {
-            console.warn('[Rooted Vitality] display-address element not found');
         }
         
         // Account Standing
@@ -210,14 +182,10 @@ function populateSettingsUI() {
             standingBadge.textContent = 'Active';
             standingBadge.className = 'status-badge';
             standingDesc.textContent = 'Your account is in good standing';
-            console.log('[Rooted Vitality] Account standing populated');
-        } else {
-            console.warn('[Rooted Vitality] Account standing elements not found');
         }
         
-        console.log('[Rooted Vitality] Settings UI population complete');
     } catch (error) {
-        console.error('[Rooted Vitality] Error populating settings UI:', error);
+        // Silent failure
     }
 }
 
@@ -227,12 +195,11 @@ function populateSettingsUI() {
 
 function loadNotificationPreferences() {
     try {
-        console.log('[Rooted Vitality] Loading notification preferences');
         
         // Load from database instead of localStorage
         loadNotificationPreferencesFromDatabase();
     } catch (error) {
-        console.error('[Rooted Vitality] Error loading notification preferences:', error);
+        // Silent failure
     }
 }
 
@@ -245,14 +212,11 @@ async function loadNotificationPreferencesFromDatabase() {
             .single();
         
         if (error && error.code !== 'PGRST116') {
-            console.error('[Rooted Vitality] Error loading notification settings:', error);
-            // Default all to checked if error
             defaultNotificationPreferences();
             return;
         }
         
         if (data) {
-            console.log('[Rooted Vitality] Notification preferences loaded:', data);
             // Apply saved preferences to checkboxes
             const notificationFields = [
                 'messages_in_app', 'messages_sms', 'messages_email',
@@ -270,11 +234,9 @@ async function loadNotificationPreferencesFromDatabase() {
                 }
             });
         } else {
-            console.log('[Rooted Vitality] No notification settings found, defaulting all to checked');
             defaultNotificationPreferences();
         }
     } catch (error) {
-        console.error('[Rooted Vitality] Exception loading notifications:', error);
         defaultNotificationPreferences();
     }
 }
@@ -297,7 +259,6 @@ function defaultNotificationPreferences() {
         }
     });
     
-    console.log('[Rooted Vitality] Default notification preferences applied (all checked)');
 }
 
 function saveNotificationPreferences() {
@@ -311,9 +272,8 @@ function saveNotificationPreferences() {
         
         // Save to Supabase instead of localStorage
         saveNotificationPreferencesToDatabase(preferences);
-        console.log('[Rooted Vitality] Notification preferences updated:', preferences);
     } catch (error) {
-        console.error('[Rooted Vitality] Error saving notification preferences:', error);
+        // Silent failure
     }
 }
 
@@ -347,22 +307,16 @@ async function saveNotificationPreferencesToDatabase(preferences) {
             .upsert(fullPreferences, { onConflict: 'practitioner_serial' });
         
         if (notifError) {
-            console.error('[Rooted Vitality] Error saving preferences:', notifError);
-            console.log('[Rooted Vitality] Failed to save notification preferences');
             return;
         }
-
-        console.log('[Rooted Vitality] Preferences saved successfully to database');
     } catch (error) {
-        console.error('[Rooted Vitality] Exception saving preferences to database:', error);
+        // Silent failure
     }
 }
 
 async function saveNotificationsToSupabase() {
     try {
         if (!currentUser) {
-            console.warn('[Rooted Vitality] No current user, cannot save to Supabase');
-            alert('Please log in again to save notification preferences.');
             return false;
         }
 
@@ -400,29 +354,23 @@ async function saveNotificationsToSupabase() {
             .upsert(fullPreferences, { onConflict: 'practitioner_serial' });
 
         if (error) {
-            console.error('[Rooted Vitality] Error saving to Supabase:', error);
-            alert('Error saving preferences. Please try again.');
             return false;
         }
-        
-        console.log('[Rooted Vitality] Notification preferences saved to Supabase:', fullPreferences);
         
         // Show success feedback
         const btn = document.getElementById('save-notifications-btn');
         if (btn) {
             const originalText = btn.textContent;
             btn.textContent = 'Preferences Saved!';
-            btn.style.opacity = '0.7';
+            btn.classList.add('opacity-faded');
             setTimeout(() => {
                 btn.textContent = originalText;
-                btn.style.opacity = '1';
+                btn.classList.remove('opacity-faded');
             }, 2000);
         }
         
         return true;
     } catch (error) {
-        console.error('[Rooted Vitality] Fatal error saving notification preferences:', error);
-        alert('Error saving preferences. Please try again.');
         return false;
     }
 }
@@ -443,7 +391,6 @@ function setupPrivacySettings() {
         visibilitySelect.value = profileVisibility;
         visibilitySelect.addEventListener('change', () => {
             localStorage.setItem('profile-visibility', visibilitySelect.value);
-            console.log('[Rooted Vitality] Profile visibility updated');
         });
     }
     
@@ -451,7 +398,6 @@ function setupPrivacySettings() {
         marketingCheckbox.checked = marketing;
         marketingCheckbox.addEventListener('change', () => {
             localStorage.setItem('marketing-emails', marketingCheckbox.checked);
-            console.log('[Rooted Vitality] Marketing email preference updated');
         });
     }
 }
@@ -463,7 +409,6 @@ function setupPrivacySettings() {
 async function handleEditField(fieldType, fieldName) {
     const modal = document.getElementById(`edit-${fieldType}-modal`);
     if (!modal) {
-        console.error(`[Rooted Vitality] Modal not found for field: ${fieldType}`);
         return;
     }
 
@@ -482,7 +427,7 @@ async function handleEditField(fieldType, fieldName) {
     }
 
     // Show modal
-    modal.style.display = 'flex';
+    setVisible(modal, true);
 
     // Create form submit handler
     const form = document.getElementById(`edit-${fieldType}-form`);
@@ -496,7 +441,6 @@ async function handleEditField(fieldType, fieldName) {
             if (fieldType === 'email') {
                 newValue = document.getElementById('email-input').value.trim();
                 if (!newValue || !newValue.includes('@')) {
-                    alert('Please enter a valid email address');
                     return;
                 }
                 // Update email in auth
@@ -507,7 +451,6 @@ async function handleEditField(fieldType, fieldName) {
             } else if (fieldType === 'phone') {
                 newValue = document.getElementById('phone-input').value.trim();
                 if (!newValue) {
-                    alert('Please enter a phone number');
                     return;
                 }
                 updateData.phone = newValue;
@@ -518,7 +461,6 @@ async function handleEditField(fieldType, fieldName) {
                 const zip = document.getElementById('address-zip-input').value.trim();
 
                 if (!street || !city || !state || !zip) {
-                    alert('Please fill in all address fields');
                     return;
                 }
 
@@ -559,14 +501,9 @@ async function handleEditField(fieldType, fieldName) {
             }
 
             // Close modal
-            modal.style.display = 'none';
+            setVisible(modal, false);
             form.removeEventListener('submit', handleSubmit);
-
-            alert(`${fieldName} updated successfully!`);
-            console.log(`[Rooted Vitality] ${fieldName} updated`);
         } catch (error) {
-            console.error(`[Rooted Vitality] Error updating ${fieldName}:`, error);
-            alert(`Error updating ${fieldName}. Please try again.`);
         }
     };
 
@@ -582,17 +519,17 @@ function toggleAddressEdit() {
     const editView = document.getElementById('address-edit-view');
     const editBtn = document.getElementById('btn-edit-address');
     
-    const isEditing = editView.style.display !== 'none';
+    const isEditing = editView.classList.contains('visible');
     
     if (isEditing) {
         // Hide edit, show display
-        editView.style.display = 'none';
-        displayView.style.display = 'block';
+        setVisible(editView, false);
+        setVisible(displayView, true);
         editBtn.textContent = 'Edit';
     } else {
         // Show edit, hide display
-        editView.style.display = 'block';
-        displayView.style.display = 'none';
+        setVisible(editView, true);
+        setVisible(displayView, false);
         editBtn.textContent = 'Cancel';
         
         // Populate fields with current values
@@ -611,7 +548,6 @@ async function saveAddressChanges(e) {
         const state = document.getElementById('address-state-inline').value.trim();
         
         if (!street || !city || !state) {
-            alert('Please fill in all address fields');
             return;
         }
         
@@ -638,10 +574,7 @@ async function saveAddressChanges(e) {
         // Hide edit, show display
         toggleAddressEdit();
         
-        console.log('[Rooted Vitality] Address updated successfully');
     } catch (error) {
-        console.error('[Rooted Vitality] Error saving address:', error);
-        alert('Error saving address. Please try again.');
     }
 }
 
@@ -654,17 +587,17 @@ function toggleEmailEdit() {
     const editView = document.getElementById('email-edit-view');
     const editBtn = document.getElementById('btn-edit-email');
     
-    const isEditing = editView.style.display !== 'none';
+    const isEditing = editView.classList.contains('visible');
     
     if (isEditing) {
         // Hide edit, show display
-        editView.style.display = 'none';
-        displayView.style.display = 'block';
+        setVisible(editView, false);
+        setVisible(displayView, true);
         editBtn.textContent = 'Edit';
     } else {
         // Show edit, hide display
-        editView.style.display = 'block';
-        displayView.style.display = 'none';
+        setVisible(editView, true);
+        setVisible(displayView, false);
         editBtn.textContent = 'Cancel';
         
         // Populate field with current value
@@ -679,7 +612,6 @@ async function saveEmailChanges(e) {
         const newEmail = document.getElementById('email-inline').value.trim();
         
         if (!newEmail || !newEmail.includes('@')) {
-            alert('Please enter a valid email address');
             return;
         }
         
@@ -700,10 +632,7 @@ async function saveEmailChanges(e) {
         // Hide edit, show display
         toggleEmailEdit();
         
-        console.log('[Rooted Vitality] Email updated successfully');
     } catch (error) {
-        console.error('[Rooted Vitality] Error saving email:', error);
-        alert('Error saving email. Please try again.');
     }
 }
 
@@ -716,17 +645,17 @@ function togglePhoneEdit() {
     const editView = document.getElementById('phone-edit-view');
     const editBtn = document.getElementById('btn-edit-phone');
     
-    const isEditing = editView.style.display !== 'none';
+    const isEditing = editView.classList.contains('visible');
     
     if (isEditing) {
         // Hide edit, show display
-        editView.style.display = 'none';
-        displayView.style.display = 'block';
+        setVisible(editView, false);
+        setVisible(displayView, true);
         editBtn.textContent = 'Edit';
     } else {
         // Show edit, hide display
-        editView.style.display = 'block';
-        displayView.style.display = 'none';
+        setVisible(editView, true);
+        setVisible(displayView, false);
         editBtn.textContent = 'Cancel';
         
         // Populate field with current value
@@ -741,7 +670,6 @@ async function savePhoneChanges(e) {
         const newPhone = document.getElementById('phone-inline').value.trim();
         
         if (!newPhone) {
-            alert('Please enter a phone number');
             return;
         }
         
@@ -762,10 +690,7 @@ async function savePhoneChanges(e) {
         // Hide edit, show display
         togglePhoneEdit();
         
-        console.log('[Rooted Vitality] Phone updated successfully');
     } catch (error) {
-        console.error('[Rooted Vitality] Error saving phone:', error);
-        alert('Error saving phone. Please try again.');
     }
 }
 
@@ -775,7 +700,7 @@ function setupModalHandlers() {
         btn.addEventListener('click', (e) => {
             const modal = e.target.closest('.settings-modal');
             if (modal) {
-                modal.style.display = 'none';
+                setVisible(modal, false);
             }
         });
     });
@@ -785,7 +710,7 @@ function setupModalHandlers() {
         btn.addEventListener('click', (e) => {
             const modal = e.target.closest('.settings-modal');
             if (modal) {
-                modal.style.display = 'none';
+                setVisible(modal, false);
                 // Remove form listeners
                 const form = modal.querySelector('form');
                 if (form) {
@@ -802,7 +727,7 @@ function setupModalHandlers() {
             if (e.target === overlay) {
                 const modal = e.target.closest('.settings-modal');
                 if (modal) {
-                    modal.style.display = 'none';
+                    setVisible(modal, false);
                 }
             }
         });
@@ -882,15 +807,12 @@ function setupButtonActions() {
     
     // Change Password
     const changePasswordBtn = document.getElementById('change-password-btn');
-    console.log('[Rooted Vitality] Change password button:', changePasswordBtn);
     if (changePasswordBtn) {
-        console.log('[Rooted Vitality] Attaching password reset listener');
         changePasswordBtn.addEventListener('click', () => {
-            console.log('[Rooted Vitality] Password button clicked');
             handleChangePassword();
         });
     } else {
-        console.warn('[Rooted Vitality] Change password button not found in DOM');
+        // Silent - button may not be present
     }
     
     // Download Data
@@ -913,8 +835,8 @@ function setupButtonActions() {
     const cancel2faBtn = document.getElementById('btn-cancel-2fa');
     if (cancel2faBtn) {
         cancel2faBtn.addEventListener('click', () => {
-            document.getElementById('2fa-setup-view').style.display = 'none';
-            document.getElementById('2fa-status-view').style.display = 'block';
+            setVisible(document.getElementById('2fa-setup-view'), false);
+            setVisible(document.getElementById('2fa-status-view'), true);
             document.getElementById('2fa-setup-view').reset();
         });
     }
@@ -1001,10 +923,8 @@ function setupButtonActions() {
 }
 
 async function handleChangePassword() {
-    console.log('[Rooted Vitality] Change password initiated');
     
     if (!currentUser || !currentUser.email) {
-        alert('Error: User email not found');
         return;
     }
 
@@ -1013,11 +933,8 @@ async function handleChangePassword() {
         const confirmed = confirm(`We'll send a password reset link to ${currentUser.email}. Please check your inbox to complete the password reset.`);
         
         if (!confirmed) {
-            console.log('[Rooted Vitality] Password reset cancelled');
             return;
         }
-
-        console.log('[Rooted Vitality] Sending password reset email to:', currentUser.email);
 
         // Send password reset email
         const { error } = await window.supabaseClient.auth.resetPasswordForEmail(currentUser.email, {
@@ -1025,48 +942,42 @@ async function handleChangePassword() {
         });
 
         if (error) {
-            console.error('[Rooted Vitality] Password reset error:', error);
-            alert(`Error sending reset email: ${error.message}`);
             return;
         }
-
-        console.log('[Rooted Vitality] Password reset email sent successfully');
         
         // Show success message
         showPasswordResetSuccessModal();
     } catch (error) {
-        console.error('[Rooted Vitality] Unexpected error during password reset:', error);
-        alert('An unexpected error occurred. Please try again.');
     }
 }
 
 function showPasswordResetSuccessModal() {
     const modalHTML = `
         <div class="password-reset-modal-overlay">
-            <div class="password-reset-modal" style="max-width: 420px;">
+            <div class="password-reset-modal">
                 <div class="modal-header">
                     <h2>Check Your Email</h2>
                     <button class="modal-close-btn" id="close-success-modal">&times;</button>
                 </div>
                 
                 <div class="modal-content">
-                    <div style="text-align: center; padding: 20px 0;">
-                        <div style="font-size: 48px; margin-bottom: 16px;">✓</div>
-                        <p style="font-size: 16px; color: #2e2b28; margin-bottom: 12px; font-weight: 500;">
+                    <div class="center-content">
+                        <div class="modal-icon">✓</div>
+                        <p class="modal-title">
                             Password Reset Email Sent
                         </p>
-                        <p style="font-size: 14px; color: #888; line-height: 1.6;">
+                        <p class="modal-description">
                             We've sent a password reset link to your email. Click the link in the email to create a new password. 
                             The link expires in 24 hours.
                         </p>
-                        <p style="font-size: 13px; color: #aaa; margin-top: 16px;">
+                        <p class="modal-helper-text">
                             <strong>Tip:</strong> Check your spam folder if you don't see the email
                         </p>
                     </div>
                 </div>
                 
                 <div class="modal-footer">
-                    <button class="btn-accent" id="close-success-btn" style="width: 100%;">Done</button>
+                    <button class="btn-accent btn-full-width" id="close-success-btn">Done</button>
                 </div>
             </div>
         </div>
@@ -1269,40 +1180,31 @@ function showPasswordResetModal() {
         submitBtn.textContent = 'Updating...';
         
         try {
-            console.log('[Rooted Vitality] Starting password reset process');
             
             // Step 1: Verify current password by attempting to sign in with current email and current password
-            console.log('[Rooted Vitality] Verifying current password');
             const { error: signInError } = await window.supabaseClient.auth.signInWithPassword({
                 email: currentUser.email,
                 password: currentPass1.value
             });
             
             if (signInError) {
-                console.error('[Rooted Vitality] Current password verification failed:', signInError);
                 document.getElementById('current-password-error').textContent = 'Current password is incorrect';
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Update Password';
                 return;
             }
             
-            console.log('[Rooted Vitality] Current password verified successfully');
-            
             // Step 2: Update to new password
-            console.log('[Rooted Vitality] Updating to new password');
             const { error: updateError } = await window.supabaseClient.auth.updateUser({
                 password: newPass1.value
             });
             
             if (updateError) {
-                console.error('[Rooted Vitality] Password update error:', updateError);
                 document.getElementById('new-password-error').textContent = updateError.message || 'Error updating password';
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Update Password';
                 return;
             }
-            
-            console.log('[Rooted Vitality] Password updated successfully in Supabase');
             
             // Step 3: Update practitioners table with updated_at timestamp
             const { error: dbError } = await window.supabaseClient
@@ -1311,17 +1213,11 @@ function showPasswordResetModal() {
                 .eq('id', currentUser.id);
             
             if (dbError) {
-                console.warn('[Rooted Vitality] Warning: DB timestamp update failed (but password was changed):', dbError);
-            } else {
-                console.log('[Rooted Vitality] Updated practitioners record timestamp');
             }
             
-            console.log('[Rooted Vitality] Password reset completed successfully');
             closeModal();
-            alert('✅ Password updated successfully! Your new password is now active.');
             
         } catch (error) {
-            console.error('[Rooted Vitality] Exception during password reset:', error);
             document.getElementById('new-password-error').textContent = 'An unexpected error occurred: ' + error.message;
             submitBtn.disabled = false;
             submitBtn.textContent = 'Update Password';
@@ -1366,12 +1262,10 @@ function isPasswordStrong(password) {
 }
 
 function handleDownloadData() {
-    console.log('[Rooted Vitality] Download data clicked');
-    alert('Your data download will be prepared and sent to your email');
 }
 
 /* ========================================== */
-/* 7. TWO-FACTOR AUTHENTICATION (2FA/MFA) */
+/* 7. BUTTON ACTIONS & TWO-FACTOR AUTHENTICATION (2FA/MFA) */
 /* ========================================== */
 
 async function check2FAStatus() {
@@ -1388,28 +1282,26 @@ async function check2FAStatus() {
         const disable2faBtn = document.getElementById('disable-2fa-btn');
         
         if (is2faEnabled) {
-            statusView.style.display = 'none';
-            enabledView.style.display = 'block';
+            setVisible(statusView, false);
+            setVisible(enabledView, true);
             if (disable2faBtn) {
                 disable2faBtn.addEventListener('click', disable2FA);
             }
         } else {
-            statusView.style.display = 'block';
-            enabledView.style.display = 'none';
+            setVisible(statusView, true);
+            setVisible(enabledView, false);
             if (enable2faBtn) {
                 enable2faBtn.addEventListener('click', enable2FA);
             }
         }
         
-        console.log('[Rooted Vitality] 2FA status checked:', is2faEnabled);
     } catch (error) {
-        console.error('[Rooted Vitality] Error checking 2FA status:', error);
+        // Silent - continue with default state
     }
 }
 
 async function enable2FA() {
     try {
-        console.log('[Rooted Vitality] Starting 2FA enrollment');
         
         // Enroll in TOTP (Time-based One-Time Password)
         const { data, error: enrollError } = await window.supabaseClient.auth.mfa.enroll({
@@ -1422,17 +1314,15 @@ async function enable2FA() {
         const secret = data?.totp?.secret;
         const qrCode = data?.totp?.qr_code;
         
-        console.log('[Rooted Vitality] 2FA enrollment initiated, factor ID:', factorId);
-        
         // Hide status view, show setup form
-        document.getElementById('2fa-status-view').style.display = 'none';
-        document.getElementById('2fa-setup-view').style.display = 'block';
+        setVisible(document.getElementById('2fa-status-view'), false);
+        setVisible(document.getElementById('2fa-setup-view'), true);
         
         const form = document.getElementById('2fa-setup-view');
         
         // Display QR code
         if (qrCode) {
-            document.getElementById('qr-code-container').innerHTML = `<img src="${qrCode}" alt="2FA QR Code" style="max-width: 250px;">`;
+            document.getElementById('qr-code-container').innerHTML = `<img src="${qrCode}" alt="2FA QR Code" class="qr-code-image">`;
         }
         
         // Display secret key for manual entry
@@ -1451,7 +1341,6 @@ async function enable2FA() {
             const verificationCode = document.getElementById('2fa-verify-code').value;
             
             if (verificationCode.length !== 6 || isNaN(verificationCode)) {
-                alert('Please enter a valid 6-digit code');
                 return;
             }
             
@@ -1464,8 +1353,6 @@ async function enable2FA() {
                 
                 if (verifyError) throw verifyError;
                 
-                console.log('[Rooted Vitality] 2FA verification successful');
-                
                 // Save 2FA status to database
                 await window.supabaseClient
                     .from('user_2fa_status')
@@ -1477,23 +1364,17 @@ async function enable2FA() {
                 
                 // Close form
                 form.reset();
-                document.getElementById('2fa-setup-view').style.display = 'none';
-                
-                alert('✓ Two-Factor Authentication has been enabled successfully!\n\nYou will now be required to enter a code from your authenticator app when logging in.');
+                setVisible(document.getElementById('2fa-setup-view'), false);
                 
                 // Refresh UI
                 check2FAStatus();
             } catch (error) {
-                console.error('[Rooted Vitality] Error verifying 2FA:', error);
-                alert('Error verifying code. Please try again.');
             }
         };
         
         document.getElementById('2fa-verify-code').focus();
         
     } catch (error) {
-        console.error('[Rooted Vitality] Error starting 2FA setup:', error);
-        alert('Error starting 2FA setup. Please try again.');
     }
 }
 
@@ -1503,7 +1384,6 @@ async function disable2FA() {
     }
     
     try {
-        console.log('[Rooted Vitality] Disabling 2FA');
         
         // Get list of TOTP factors
         const { data: factors, error: listError } = await window.supabaseClient.auth.mfa.listFactors();
@@ -1527,14 +1407,9 @@ async function disable2FA() {
             .update({ is_enabled: false })
             .eq('user_id', currentUser.id);
         
-        console.log('[Rooted Vitality] 2FA disabled');
-        alert('Two-Factor Authentication has been disabled.');
-        
         // Refresh UI
         check2FAStatus();
     } catch (error) {
-        console.error('[Rooted Vitality] Error disabling 2FA:', error);
-        alert('Error disabling 2FA. Please try again.');
     }
 }
 
@@ -1564,13 +1439,10 @@ function displayBackupCodes(codes) {
 }
 
 function handleViewSessions() {
-    console.log('[Rooted Vitality] View sessions clicked');
-    alert('Active sessions view coming soon!');
 }
 
 function handleContactSupport() {
-    console.log('[Rooted Vitality] Contact support clicked');
-    window.open('mailto:support@rootedvitality.com');
+    window.open('mailto:support@rootedvitality.health');
 }
 
 async function handleDeactivateAccount() {
@@ -1586,10 +1458,7 @@ async function handleDeactivateAccount() {
             .eq('id', currentUser.id);
         
         if (error) throw error;
-        alert('Account deactivated. You can reactivate it anytime.');
-        console.log('[Rooted Vitality] Account deactivated');
     } catch (error) {
-        console.error('[Rooted Vitality] Error deactivating account:', error);
     }
 }
 
@@ -1606,16 +1475,12 @@ async function handleDeleteAccount() {
     
     const doubleConfirm = prompt('Type "DELETE" to confirm permanent account deletion:');
     if (doubleConfirm !== 'DELETE') {
-        alert('Account deletion cancelled.');
         return;
     }
     
     try {
         // TODO: Implement secure account deletion with backend function
-        console.log('[Rooted Vitality] Account deletion initiated');
-        alert('Account deletion request submitted. Our team will process this within 24 hours.');
     } catch (error) {
-        console.error('[Rooted Vitality] Error deleting account:', error);
     }
 }
 
@@ -1639,16 +1504,11 @@ async function handleDeleteProfile() {
         
         if (error) throw error;
         
-        alert('Your practitioner profile has been deleted.');
-        console.log('[Rooted Vitality] Practitioner profile deleted');
-        
         // Optionally redirect to dashboard or home
         setTimeout(() => {
             window.location.href = '../dashboard.html';
         }, 1500);
     } catch (error) {
-        console.error('[Rooted Vitality] Error deleting profile:', error);
-        alert('Error deleting profile. Please try again.');
     }
 }
 
@@ -1674,17 +1534,12 @@ async function handleCCPARequest() {
             });
         
         if (error) throw error;
-        
-        alert('CCPA request submitted successfully. Our compliance team will contact you within 10 business days.');
-        console.log('[Rooted Vitality] CCPA request submitted');
     } catch (error) {
-        console.error('[Rooted Vitality] Error submitting CCPA request:', error);
-        alert('Error submitting CCPA request. Please contact support@rootedvitality.com');
     }
 }
 
 /* ========================================== */
-/* 8. SETUP EVENT LISTENERS */
+/* 8. EVENT LISTENERS & MEMBERSHIPS */
 /* ========================================== */
 
 function setupSettingsListeners() {
@@ -1706,19 +1561,17 @@ function setupSettingsListeners() {
         saveNotificationsBtn.addEventListener('click', saveNotificationsToSupabase);
     }
     
-    console.log('[Rooted Vitality] Notification listeners attached');
+
 }
 
 /* ========================================== */
-/* 7. MEMBERSHIPS */
+/* 8.A MEMBERSHIPS & SUBSCRIPTION MANAGEMENT */
 /* ========================================== */
 
 async function loadActiveMemberships() {
     try {
         const membershipsList = document.getElementById('active-memberships-list');
         if (!membershipsList) return;
-        
-        console.log('[Rooted Vitality] Loading memberships for practitioner:', currentUser.id);
         
         // Fetch membership record from database
         const { data: membershipData, error: membershipError } = await window.supabaseClient
@@ -1729,19 +1582,16 @@ async function loadActiveMemberships() {
             .limit(1);
         
         if (membershipError) {
-            console.error('[Rooted Vitality] Error fetching membership:', membershipError);
             membershipsList.innerHTML = '<p class="setting-description">Unable to load membership information. Please try again later.</p>';
             return;
         }
         
         if (!membershipData || membershipData.length === 0) {
-            console.log('[Rooted Vitality] No membership record found');
-            membershipsList.innerHTML = '<p class="setting-description">No active membership found. <a href="../../dashboard/practitioner-signup.html" style="color: var(--primary); font-weight: 600;">Set up membership</a></p>';
+            membershipsList.innerHTML = '<p class="setting-description">No active membership found. <a href="./practitioner-signup.html" class="link-primary">Set up membership</a></p>';
             return;
         }
         
         const membership = membershipData[0];
-        console.log('[Rooted Vitality] Membership loaded:', membership);
         
         // Format dates
         const startDate = new Date(membership.started_at);
@@ -1771,22 +1621,20 @@ async function loadActiveMemberships() {
         const reactivateBtn = document.getElementById('reactivate-membership-btn');
         
         if (isActive) {
-            cancelBtn.style.display = 'inline-block';
-            reactivateBtn.style.display = 'none';
+            setVisible(cancelBtn, true);
+            setVisible(reactivateBtn, false);
             
             // Add cancel event listener
             cancelBtn.onclick = () => handleCancelMembership(membership.id);
         } else {
-            cancelBtn.style.display = 'none';
-            reactivateBtn.style.display = 'inline-block';
+            setVisible(cancelBtn, false);
+            setVisible(reactivateBtn, true);
             
             // Add reactivate event listener
             reactivateBtn.onclick = () => handleReactivateMembership(membership.id);
         }
         
-        console.log('[Rooted Vitality] Membership UI updated');
     } catch (error) {
-        console.error('[Rooted Vitality] Exception in loadActiveMemberships:', error);
         const membershipsList = document.getElementById('active-memberships-list');
         if (membershipsList) {
             membershipsList.innerHTML = '<p class="setting-description">Error loading membership information.</p>';
@@ -1799,11 +1647,9 @@ async function handleCancelMembership(membershipId) {
         const confirmCancel = confirm('Are you sure you want to cancel your membership?\n\nYou will retain access through the end of your current billing period.\n\nYou can reactivate your membership anytime from settings.');
         
         if (!confirmCancel) {
-            console.log('[Rooted Vitality] Membership cancellation canceled by user');
             return;
         }
         
-        console.log('[Rooted Vitality] Canceling membership:', membershipId);
         
         // Update membership record
         const { error: updateError } = await window.supabaseClient
@@ -1816,19 +1662,12 @@ async function handleCancelMembership(membershipId) {
             .eq('id', membershipId);
         
         if (updateError) {
-            console.error('[Rooted Vitality] Error canceling membership:', updateError);
-            alert('Error canceling membership. Please try again.');
             return;
         }
-        
-        console.log('[Rooted Vitality] Membership canceled successfully');
-        alert('Your membership has been canceled. You\'ll retain access through the end of your current billing period.');
         
         // Reload membership display
         await loadActiveMemberships();
     } catch (error) {
-        console.error('[Rooted Vitality] Exception in handleCancelMembership:', error);
-        alert('Error canceling membership.');
     }
 }
 
@@ -1837,11 +1676,8 @@ async function handleReactivateMembership(membershipId) {
         const confirmReactivate = confirm('Reactivate your membership?\n\nYour membership will be active immediately.');
         
         if (!confirmReactivate) {
-            console.log('[Rooted Vitality] Membership reactivation canceled by user');
             return;
         }
-        
-        console.log('[Rooted Vitality] Reactivating membership:', membershipId);
         
         // Update membership record
         const { error: updateError } = await window.supabaseClient
@@ -1854,100 +1690,28 @@ async function handleReactivateMembership(membershipId) {
             .eq('id', membershipId);
         
         if (updateError) {
-            console.error('[Rooted Vitality] Error reactivating membership:', updateError);
-            alert('Error reactivating membership. Please try again.');
             return;
         }
-        
-        console.log('[Rooted Vitality] Membership reactivated successfully');
-        alert('Your membership is now active!');
         
         // Reload membership display
         await loadActiveMemberships();
     } catch (error) {
-        console.error('[Rooted Vitality] Exception in handleReactivateMembership:', error);
-        alert('Error reactivating membership.');
     }
 }
 
 function handleViewBilling() {
-    alert('Billing history management is coming soon!\n\nYou will be able to view your invoices and payment history here.');
-    console.log('[Rooted Vitality] View billing requested');
 }
 
 function handleManagePayment() {
-    alert('Payment method management is coming soon!\n\nNote: We do not store your payment information. Payment processing is handled securely by our payment provider.');
-    console.log('[Rooted Vitality] Manage payment requested');
 }
 
 function handleViewPlans() {
-    alert('Membership plans are coming soon!\n\nYou will be able to upgrade or downgrade your membership tier from here.');
-    console.log('[Rooted Vitality] View plans requested');
 }
 
 /* ========================================== */
-/* 8. PAGE INITIALIZATION */
+/* 8.B PAGE INITIALIZATION ON LOAD */
 /* ========================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('[Rooted Vitality] Settings page DOM ready');
     initializeSettings();
 });
-
-console.log('[Rooted Vitality] proSettings.js loaded');
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,28 +1,58 @@
-<!-- 
-╔════════════════════════════════════════════════════════════════════╗
-║  ROOTED VITALITY, INC.                                             ║
-║  Universal Report a Concern Widget                                 ║
-║  Purpose: Reusable component for all pages to report issues        ║
-║  Holistic Wellness · Modern Connection Platform                    ║
-║  rootedvitality.com | 2025                                         ║
-╚════════════════════════════════════════════════════════════════════╝
+<!--
+  ========================================== 
+  FILE: report-concern-widget.html
+  PROJECT: Rooted Vitality Platform
+  PURPOSE: Universal Report a Concern Widget - Reusable component for all pages
+  BRANDING: Official Rooted Vitality Colors & Styling
+  ========================================== 
+
+  TABLE OF CONTENTS:
+  1. Footer Button Container
+  2. Report Concern Modal (Dialog)
+  3. Modal Header & Close
+  4. Form Fields (Category, Title, Section, Description, Priority, Email, Device)
+  5. Form Actions (Cancel/Submit)
+
+  ========================================== 
+
+  SCOPE NOTES:
+  - All class names prefixed with "report-concern-" for component isolation
+  - Modal functionality contained to this widget only
+  - Form IDs are unique to prevent conflicts with other forms
+  - Warning: Some classes (.modal, .form-group, .btn-*) may conflict with global styles
+  
+  ========================================== 
 -->
 
+<!-- ========================================== -->
+<!-- 1. FOOTER BUTTON CONTAINER               -->
+<!-- ========================================== -->
 <div id="report-concern-footer" class="report-concern-footer">
     <button id="report-concern-btn" class="report-concern-link" title="Report a technical issue or concern with the website">
         Report a Concern
     </button>
 </div>
 
+<!-- ========================================== -->
+<!-- 2. REPORT CONCERN MODAL (DIALOG)        -->
+<!-- ========================================== -->
 <!-- Report Concern Modal -->
-<div id="report-concern-modal" class="modal" style="display: none;">
-    <div class="modal-content report-concern-modal-content">
+<div id="report-concern-modal" class="modal-overlay">
+    <div class="modal-content">
+        
+        <!-- ========================================== -->
+        <!-- 3. MODAL HEADER & CLOSE                  -->
+        <!-- ========================================== -->
         <div class="modal-header">
             <h2>Report a Concern</h2>
-            <button class="close-btn" onclick="closeReportConcernModal()">&times;</button>
+            <button class="modal-close-btn" id="report-concern-close-btn">×</button>
         </div>
         
-        <form id="report-concern-form" onsubmit="submitReportConcern(event)">
+        <!-- ========================================== -->
+        <!-- 4. FORM FIELDS                           -->
+        <!-- ========================================== -->
+        <div class="modal-body">
+        <form id="report-concern-form">
             
             <!-- Category Selection -->
             <div class="form-group">
@@ -115,67 +145,70 @@
                 <small>Auto-detected for troubleshooting purposes</small>
             </div>
 
+            <!-- ========================================== -->
+            <!-- 5. FORM ACTIONS (CANCEL/SUBMIT)          -->
+            <!-- ========================================== -->
             <!-- Form Actions -->
             <div class="form-actions">
-                <button type="button" class="btn-secondary" onclick="closeReportConcernModal()">Cancel</button>
-                <button type="submit" class="btn-primary">Submit Report</button>
+                <button type="button" class="btn-modal btn-modal-secondary" id="report-concern-cancel-btn">Cancel</button>
+                <button type="submit" class="btn-modal btn-modal-primary" id="report-concern-submit-btn">Submit Report</button>
             </div>
         </form>
+        </div>
     </div>
 </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+<script>
+  // ======================================================
+  // CLOSE BUTTON & FORM LISTENERS (Fallback)
+  // NOTE: Primary listeners are in report-concern-universal.js
+  // This script is a fallback if the component is used directly
+  // ======================================================
+  function setupReportConcernListeners() {
+    // Check if already initialized by report-concern-universal.js
+    if (window.reportConcernListenersSetup) {
+      console.log('[Report Concern Widget] Listeners already setup by report-concern-universal.js');
+      return;
+    }
+    
+    // Close button (X)
+    const closeBtn = document.getElementById('report-concern-close-btn');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (typeof closeReportConcernModal === 'function') {
+          closeReportConcernModal();
+        }
+      });
+    }
+    
+    // Cancel button
+    const cancelBtn = document.getElementById('report-concern-cancel-btn');
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (typeof closeReportConcernModal === 'function') {
+          closeReportConcernModal();
+        }
+      });
+    }
+    
+    // Form submission
+    const form = document.getElementById('report-concern-form');
+    if (form) {
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        if (typeof submitReportConcern === 'function') {
+          submitReportConcern(event);
+        }
+      });
+    }
+  }
+  
+  // Initialize on DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupReportConcernListeners);
+  } else {
+    setupReportConcernListeners();
+  }
+</script>

@@ -1,3 +1,23 @@
+﻿/*
+╔════════════════════════════════════════════════════════════════════╗
+║  ROOTED VITALITY, INC.                                             ║
+║  File: scroll-animations.js                                        ║
+║  Purpose: Scroll-triggered animations for landing page             ║
+║  Holistic Wellness · Modern Connection Platform                    ║
+║  rootedvitality.com | 2025                                         ║
+╚════════════════════════════════════════════════════════════════════╝
+
+ TABLE OF CONTENTS
+   1. INTERSECTION OBSERVER SETUP
+   2. ANIMATION TRIGGERS
+   3. ELEMENT TARGETING
+   4. STAGGER TIMING & DELAYS
+*/
+
+// ======================================================
+// 1. INTERSECTION OBSERVER SETUP
+// ======================================================
+
 /**
  * Scroll-triggered animations for landing page elements
  * Animates elements as they come into view with staggered timing
@@ -49,6 +69,8 @@ document.addEventListener('DOMContentLoaded', function() {
     animationObserver.observe(featuredStoryCard);
   }
 });
+
+
 
 
 

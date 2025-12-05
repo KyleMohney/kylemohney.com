@@ -1,19 +1,17 @@
-/*
+﻿/*
 ╔════════════════════════════════════════════════════════════════════╗
 ║  ROOTED VITALITY, INC.                                             ║
-║  File: scripts/supabaseClient.js                                   ║
-║  Purpose: Supabase client initialization and configuration         ║
+║  File: supabaseClient.js                                           ║
+║  Purpose: Supabase client initialization and configuration          ║
 ║  Holistic Wellness · Modern Connection Platform                    ║
 ║  rootedvitality.com | 2025                                         ║
 ╚════════════════════════════════════════════════════════════════════╝
 
-TABLE OF CONTENTS
-  1. SUPABASE CLIENT INITIALIZATION
-  2. CONFIGURATION
-  3. DIAGNOSTICS
+ TABLE OF CONTENTS
+   1. SUPABASE CLIENT INITIALIZATION
+   2. CONFIGURATION
+   3. DIAGNOSTICS
 */
-
-console.log('[Rooted Vitality] supabaseClient.js loading...');
 
 // ======================================================
 // 1. SUPABASE CLIENT INITIALIZATION
@@ -25,7 +23,7 @@ console.log('[Rooted Vitality] supabaseClient.js loading...');
  */
 if (!window.supabaseClient) {
     if (!window.supabase) {
-        console.error('❌ [Supabase Client] supabase.js library not loaded');
+        console.error('âŒ [Supabase Client] supabase.js library not loaded');
         throw new Error('Supabase JS library required before supabaseClient.js');
     }
 
@@ -35,9 +33,6 @@ if (!window.supabaseClient) {
 
     // Initialize Supabase client
     window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    console.log('✅ [Supabase Client] Initialized');
-    console.log('📍 [Supabase Client] URL:', SUPABASE_URL);
 }
 
 // Export for use in modules (if using ES modules)
@@ -79,10 +74,9 @@ async function testConnection() {
     try {
         const { data, error } = await window.supabaseClient.auth.getSession();
         if (error) throw error;
-        console.log('✅ [Supabase Diagnostics] Connection test passed');
         return true;
     } catch (error) {
-        console.error('❌ [Supabase Diagnostics] Connection test failed:', error);
+        console.error('âŒ [Supabase Diagnostics] Connection test failed:', error);
         return false;
     }
 }
@@ -93,6 +87,8 @@ if (document.readyState === 'loading') {
 } else {
     testConnection();
 }
+
+
 
 
 

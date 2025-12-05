@@ -55,7 +55,7 @@ TABLE OF CONTENTS:
 }
 
 .directory-hero__title {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 2.5rem;
   font-weight: 700;
   color: #fbf7ec;
@@ -63,7 +63,7 @@ TABLE OF CONTENTS:
 }
 
 .directory-hero__subtitle {
-  font-family: 'Lora', serif;
+  font-family: var(--font-serif);
   font-size: 1.1rem;
   color: rgba(251, 247, 236, 0.9);
 }
@@ -89,7 +89,7 @@ TABLE OF CONTENTS:
 }
 
 .project-info-title {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 1.5rem;
   font-weight: 700;
   color: #1f2937;
@@ -97,7 +97,7 @@ TABLE OF CONTENTS:
 }
 
 .project-info-category {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.9rem;
   color: #6b7280;
   margin: 0;
@@ -118,7 +118,7 @@ TABLE OF CONTENTS:
 }
 
 .project-info-label {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.8rem;
   font-weight: 600;
   color: #77883e;
@@ -127,7 +127,7 @@ TABLE OF CONTENTS:
 }
 
 .project-info-value {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 1rem;
   color: #374151;
   margin: 0;
@@ -188,7 +188,7 @@ TABLE OF CONTENTS:
 }
 
 .directory-sidebar__title {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 1rem;
   font-weight: 600;
   color: #1f2937;
@@ -201,7 +201,7 @@ TABLE OF CONTENTS:
   padding: 0.75rem;
   border: 1px solid #d1d5db;
   border-radius: 8px;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.95rem;
   color: #374151;
   background: #fbf7ec;
@@ -221,7 +221,7 @@ TABLE OF CONTENTS:
 }
 
 .directory-sidebar__hint {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.85rem;
   color: #6b7280;
   margin-top: 0.75rem;
@@ -229,7 +229,7 @@ TABLE OF CONTENTS:
 }
 
 .directory-sidebar__text {
-  font-family: 'Lora', serif;
+  font-family: var(--font-serif);
   font-size: 0.95rem;
   color: #4b5563;
   line-height: 1.6;
@@ -255,14 +255,14 @@ TABLE OF CONTENTS:
 }
 
 .match-stat__label {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.85rem;
   color: #6b7280;
   font-weight: 500;
 }
 
 .match-stat__value {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 1.5rem;
   font-weight: 700;
   color: #3b82f6;
@@ -280,7 +280,7 @@ TABLE OF CONTENTS:
   align-items: center;
   gap: 0.5rem;
   cursor: pointer;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.95rem;
   color: #374151;
   user-select: none;
@@ -317,7 +317,7 @@ TABLE OF CONTENTS:
 }
 
 .controls-left {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.95rem;
   color: #6b7280;
 }
@@ -363,6 +363,11 @@ TABLE OF CONTENTS:
 .practitioner-card--matched {
   opacity: 0.65;
   background: #fbf7ec;
+  color: #5a5450;
+}
+
+.practitioner-card--matched * {
+  color: #5a5450;
 }
 
 .practitioner-card--matched:hover {
@@ -422,7 +427,7 @@ TABLE OF CONTENTS:
 }
 
 .card-name {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 1.1rem;
   font-weight: 600;
   color: #1f2937;
@@ -430,7 +435,7 @@ TABLE OF CONTENTS:
 }
 
 .card-specialty {
-  font-family: 'Lora', serif;
+  font-family: var(--font-serif);
   font-size: 0.9rem;
   color: #6b7280;
   margin-bottom: 0.75rem;
@@ -466,7 +471,7 @@ TABLE OF CONTENTS:
   background: #fbf7ec;
   border: 1px solid #d1d5db;
   border-radius: 20px;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.75rem;
   font-weight: 500;
   color: #374151;
@@ -479,7 +484,7 @@ TABLE OF CONTENTS:
 }
 
 .card-bio {
-  font-family: 'Lora', serif;
+  font-family: var(--font-serif);
   font-size: 0.85rem;
   color: #6b7280;
   line-height: 1.5;
@@ -498,7 +503,7 @@ TABLE OF CONTENTS:
   padding: 0.75rem;
   border: none;
   border-radius: 8px;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.85rem;
   font-weight: 500;
   cursor: pointer;
@@ -595,7 +600,7 @@ TABLE OF CONTENTS:
 }
 
 .modal__header h2 {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 1.5rem;
   font-weight: 700;
   color: #1f2937;
@@ -653,7 +658,7 @@ TABLE OF CONTENTS:
 }
 
 .profile-name {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 1.5rem;
   font-weight: 700;
   color: #1f2937;
@@ -661,7 +666,7 @@ TABLE OF CONTENTS:
 }
 
 .profile-specialty {
-  font-family: 'Lora', serif;
+  font-family: var(--font-serif);
   font-size: 1rem;
   color: #6b7280;
   margin-bottom: 0.75rem;
@@ -679,7 +684,7 @@ TABLE OF CONTENTS:
 }
 
 .rating-count {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.85rem;
   color: #9ca3af;
 }
@@ -690,7 +695,7 @@ TABLE OF CONTENTS:
 }
 
 .profile-section__title {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 1rem;
   font-weight: 600;
   color: #1f2937;
@@ -710,14 +715,14 @@ TABLE OF CONTENTS:
 }
 
 .profile-bio {
-  font-family: 'Lora', serif;
+  font-family: var(--font-serif);
   font-size: 0.95rem;
   color: #4b5563;
   line-height: 1.6;
 }
 
 .profile-coverage {
-  font-family: 'Lora', serif;
+  font-family: var(--font-serif);
   font-size: 0.95rem;
   color: #4b5563;
   line-height: 1.6;
@@ -730,7 +735,7 @@ TABLE OF CONTENTS:
 }
 
 .contact-item {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.95rem;
   color: #4b5563;
 }
@@ -768,7 +773,7 @@ TABLE OF CONTENTS:
 }
 
 .pagination__info {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.9rem;
   color: #6b7280;
   min-width: 120px;
@@ -790,7 +795,7 @@ TABLE OF CONTENTS:
 }
 
 .empty-state__title {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 1.5rem;
   font-weight: 700;
   color: #1f2937;
@@ -798,7 +803,7 @@ TABLE OF CONTENTS:
 }
 
 .empty-state__text {
-  font-family: 'Lora', serif;
+  font-family: var(--font-serif);
   font-size: 0.95rem;
   color: #6b7280;
   line-height: 1.6;
@@ -915,7 +920,7 @@ TABLE OF CONTENTS:
    ============================================================================ */
 
 .btn {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.9rem;
   font-weight: 500;
   padding: 0.75rem 1.25rem;
@@ -951,7 +956,7 @@ TABLE OF CONTENTS:
 }
 
 .form-hint {
-  font-family: 'Lora', serif;
+  font-family: var(--font-serif);
   font-size: 0.85rem;
   color: #6b7280;
   margin-top: 0.5rem;
@@ -963,7 +968,7 @@ TABLE OF CONTENTS:
   display: inline-block;
   padding: 0.35rem 0.7rem;
   border-radius: 16px;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -1028,7 +1033,7 @@ TABLE OF CONTENTS:
   gap: 0.4rem;
   color: #fbf7ec;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-  #fbf7ec-space: nowrap;
+  white-space: nowrap;
   list-style: none;
   padding: 0.25rem 0;
 }
@@ -1054,61 +1059,31 @@ TABLE OF CONTENTS:
   font-size: 0.8rem;
 }
 
+/* ============================================================================
+   UTILITY CLASSES (Class-based Styling)
+   ============================================================================ */
 
+.btn--full-width {
+  width: 100%;
+  display: block;
+}
 
+.btn--mb-sm {
+  margin-bottom: 0.5rem;
+}
 
+.btn--mb-md {
+  margin-bottom: 1rem;
+}
 
+.btn--mb-lg {
+  margin-bottom: 1.5rem;
+}
 
+.hidden {
+  display: none;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+.visible {
+  display: block;
+}

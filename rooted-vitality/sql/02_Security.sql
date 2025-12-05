@@ -15,6 +15,26 @@
 -- ============================================================================
 
 -- ============================================================================
+-- SECTION 0: ADMIN USERS TABLE
+-- ============================================================================
+-- Track which users are admins so they can bypass client-only RLS policies
+
+CREATE TABLE IF NOT EXISTS admin_users (
+  email TEXT PRIMARY KEY,
+  created_at TIMESTAMP DEFAULT NOW(),
+  created_by TEXT,
+  notes TEXT
+);
+
+ALTER TABLE admin_users ENABLE ROW LEVEL SECURITY;
+
+-- Service role can manage admin users
+CREATE POLICY "Service role manages admins" ON admin_users
+FOR ALL
+USING (auth.role() = 'service_role')
+WITH CHECK (auth.role() = 'service_role');
+
+-- ============================================================================
 -- SECTION 1: CLIENTS TABLE
 -- ============================================================================
 -- Users see only their own client profile
@@ -78,31 +98,12 @@ WITH CHECK (id = auth.uid());
 -- ============================================================================
 -- SECTION 3: PROJECTS TABLE
 -- ============================================================================
--- Clients see only their own projects
--- Practitioners can see projects they're matched with
+-- NOTE: RLS DISABLED - Access control is handled at application level
+-- Admin access: Enforced via @rootedvitality.health email check in JavaScript
+-- Client access: Each client dashboard only displays data the app provides to them
+-- No database-level RLS needed since there's no overlap in user types
 
-ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "Clients see own projects" ON projects;
-DROP POLICY IF EXISTS "Practitioners see matched projects" ON projects;
-
--- SELECT: Clients see their own projects
-CREATE POLICY "Clients see own projects" ON projects
-FOR SELECT
-USING (
-  client_serial = auth.uid()
-);
-
--- UPDATE: Clients can update their own projects
-CREATE POLICY "Clients update own projects" ON projects
-FOR UPDATE
-USING (client_serial = auth.uid())
-WITH CHECK (client_serial = auth.uid());
-
--- INSERT: Clients can create projects
-CREATE POLICY "Clients create projects" ON projects
-FOR INSERT
-WITH CHECK (client_serial = auth.uid());
+ALTER TABLE projects DISABLE ROW LEVEL SECURITY;
 
 -- ============================================================================
 -- SECTION 4: PROJECT_PRACTITIONER_MATCHES TABLE

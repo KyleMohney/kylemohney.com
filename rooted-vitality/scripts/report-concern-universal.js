@@ -1,22 +1,73 @@
-/*
+﻿/*
 ╔════════════════════════════════════════════════════════════════════╗
 ║  ROOTED VITALITY, INC.                                             ║
-║  Global Report Concern System                                      ║
-║  Purpose: Universal concern reporting for all pages                ║
+║  File: report-concern-universal.js                                 ║
+║  Purpose: Universal concern/issue reporting widget and modal       ║
 ║  Holistic Wellness · Modern Connection Platform                    ║
 ║  rootedvitality.com | 2025                                         ║
 ╚════════════════════════════════════════════════════════════════════╝
+
+ TABLE OF CONTENTS
+   1. INITIALIZATION & SETUP
+   2. MODAL OPEN/CLOSE FUNCTIONS
+   3. FORM SUBMISSION & VALIDATION
+   4. AUTO-DETECTION & HELPERS
+   5. TICKET MANAGEMENT & STORAGE
 */
+
+// ======================================================
+// 1. INITIALIZATION & SETUP
+// ======================================================
 
 /**
  * Initialize Report Concern System
  * Call this after page load or when injecting the widget
  */
 function initializeReportConcernSystem() {
+    // Ensure modal starts CLOSED (not active)
+    const modal = document.getElementById('report-concern-modal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+    
+    // Open button listener
     const reportBtn = document.getElementById('report-concern-btn');
     if (reportBtn) {
         reportBtn.addEventListener('click', openReportConcernModal);
     }
+    
+    // Close button (X) listener
+    const closeBtn = document.getElementById('report-concern-close-btn');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeReportConcernModal);
+    }
+    
+    // Cancel button listener
+    const cancelBtn = document.getElementById('report-concern-cancel-btn');
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', closeReportConcernModal);
+    }
+    
+    // Form submit listener
+    const form = document.getElementById('report-concern-form');
+    if (form) {
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            if (form.checkValidity()) {
+                submitReportConcern(event);
+            }
+        });
+    }
+    
+    // ESC key to close modal
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            const modal = document.getElementById('report-concern-modal');
+            if (modal && modal.classList.contains('active')) {
+                closeReportConcernModal();
+            }
+        }
+    });
     
     // Set auto-detected browser/device info
     setDeviceInfo();
@@ -27,7 +78,8 @@ function initializeReportConcernSystem() {
     // Auto-detect current page section
     fillCurrentSection();
     
-    console.log('[Report Concern] System initialized');
+    // Mark as initialized to prevent duplicate listener setup
+    window.reportConcernListenersSetup = true;
 }
 
 /**
@@ -45,7 +97,7 @@ function getNextTicketNumber() {
 function openReportConcernModal() {
     const modal = document.getElementById('report-concern-modal');
     if (modal) {
-        modal.style.display = 'flex';
+        modal.classList.add('active');
         document.body.style.overflow = 'hidden';
         
         // Focus on first input
@@ -61,7 +113,7 @@ function openReportConcernModal() {
 function closeReportConcernModal() {
     const modal = document.getElementById('report-concern-modal');
     if (modal) {
-        modal.style.display = 'none';
+        modal.classList.remove('active');
         document.body.style.overflow = 'auto';
         
         // Reset form
@@ -139,7 +191,6 @@ async function fillUserEmail() {
             emailInput.value = window.currentUser.email;
         }
     } catch (error) {
-        console.warn('[Report Concern] Could not auto-fill email:', error);
     }
 }
 
@@ -190,7 +241,9 @@ function getPageSection() {
  * Submit Report Concern
  */
 async function submitReportConcern(event) {
-    event.preventDefault();
+    if (event && event.preventDefault) {
+        event.preventDefault();
+    }
     
     const form = document.getElementById('report-concern-form');
     if (!form.checkValidity()) {
@@ -227,7 +280,6 @@ async function submitReportConcern(event) {
                 userId = window.currentUser.id;
             }
         } catch (e) {
-            console.warn('[Report Concern] Could not get user ID:', e);
         }
         
         // Prepare report data
@@ -265,13 +317,10 @@ async function submitReportConcern(event) {
         
         // Show success message
         alert(
-            `✓ Thank you for reporting this concern!\n\n` +
+            `âœ“ Thank you for reporting this concern!\n\n` +
             `Ticket ID: ${ticketId}\n\n` +
             `We appreciate your feedback and will investigate this right away.`
         );
-        
-        console.log('[Report Concern] Report submitted successfully:', ticketId);
-        
         // Close modal and reset form
         closeReportConcernModal();
         
@@ -314,6 +363,9 @@ if (document.readyState === 'loading') {
 } else {
     initializeReportConcernSystem();
 }
+
+
+
 
 
 

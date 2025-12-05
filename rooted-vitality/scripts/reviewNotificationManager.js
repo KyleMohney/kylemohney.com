@@ -1,18 +1,29 @@
-/*
-+--------------------------------------------------------------------+
-│  ROOTED VITALITY, INC.                                             │
-│  File: scripts/reviewNotificationManager.js                        │
-│  Purpose: Real-time review notifications for practitioners         │
-│  Holistic Wellness – Modern Connection Platform                    │
-│  rootedvitality.com | 2025                                         │
-+--------------------------------------------------------------------+
+﻿/*
+╔════════════════════════════════════════════════════════════════════╗
+║  ROOTED VITALITY, INC.                                             ║
+║  File: reviewNotificationManager.js                                ║
+║  Purpose: Real-time review notifications for practitioners         ║
+║  Holistic Wellness · Modern Connection Platform                    ║
+║  rootedvitality.com | 2025                                         ║
+╚════════════════════════════════════════════════════════════════════╝
 
-ARCHITECTURE:
-- Listens for new reviews posted in real-time
-- Notifies practitioners via in-app notifications when they receive reviews
-- Uses Supabase Realtime subscriptions to watch reviews table
-- Sends notification data via events system
+ TABLE OF CONTENTS
+   1. INITIALIZATION & CONFIGURATION
+   2. REAL-TIME SUBSCRIPTION SETUP
+   3. NOTIFICATION HANDLING & DISPATCH
+   4. EVENT LISTENERS & UI UPDATE
+   5. UTILITIES & HELPERS
+
+ ARCHITECTURE:
+   - Listens for new reviews posted in real-time
+   - Notifies practitioners via in-app notifications when they receive reviews
+   - Uses Supabase Realtime subscriptions to watch reviews table
+   - Sends notification data via events system
 */
+
+// ======================================================
+// 1. INITIALIZATION & CONFIGURATION
+// ======================================================
 
 let reviewNotificationManager = {
   supabaseClient: null,
@@ -31,14 +42,13 @@ let reviewNotificationManager = {
     
     const user = authManager.getCurrentUser();
     if (!user || user.role !== 'practitioner') {
-      console.log('[Review Notifications] Not a practitioner, skipping initialization');
+
       return;
     }
 
     this.practitionerId = user.id;
     this.setupRealtimeSubscription();
     this.isInitialized = true;
-    console.log('[Review Notifications] Manager initialized for practitioner:', this.practitionerId);
   },
 
   // ======================================================
@@ -64,17 +74,17 @@ let reviewNotificationManager = {
             filter: `practitioner_id=eq.${this.practitionerId}`
           },
           (payload) => {
-            console.log('[Review Notifications] New review received:', payload);
+
             this.handleNewReview(payload.new);
           }
         )
         .subscribe((status) => {
           if (status === 'SUBSCRIBED') {
-            console.log('[Review Notifications] Real-time subscription active');
+            // Subscription established
           } else if (status === 'CHANNEL_ERROR') {
-            console.warn('[Review Notifications] Subscription channel error');
+
           } else if (status === 'CLOSED') {
-            console.log('[Review Notifications] Subscription closed');
+
           }
         });
     } catch (error) {
@@ -89,24 +99,17 @@ let reviewNotificationManager = {
   handleNewReview(review) {
     if (!review) return;
 
-    console.log('[Review Notifications] Processing new review:', {
-      id: review.id,
-      rating: review.rating,
-      clientName: review.client_name,
-      reviewText: review.review_text?.substring(0, 50) + '...'
-    });
-
     // Create notification object
     const notification = {
       id: review.id,
       type: 'review_posted',
-      title: '⭐ New Review Received!',
+      title: 'â­ New Review Received!',
       message: `${review.client_name} left a ${review.rating}-star review: "${review.review_text?.substring(0, 50)}${review.review_text?.length > 50 ? '...' : ''}"`,
       rating: review.rating,
       clientName: review.client_name,
       reviewId: review.id,
       timestamp: new Date(review.created_at).toLocaleTimeString(),
-      link: '/rooted-vitality/dashboard/pro/pages/practitioner-profile.html?section=reviews',
+      link: '/rooted-vitality/dashboard/pro/pages/practitioner-public-profile.html?section=reviews',
       isRead: false
     };
 
@@ -122,7 +125,7 @@ let reviewNotificationManager = {
     }
 
     // Log for monitoring
-    console.log('[Review Notifications] Notification dispatched:', notification.title);
+
   },
 
   // ======================================================
@@ -132,7 +135,7 @@ let reviewNotificationManager = {
   destroy() {
     if (this.subscription) {
       this.subscription.unsubscribe();
-      console.log('[Review Notifications] Subscription cleaned up');
+
     }
     this.isInitialized = false;
   }
@@ -140,6 +143,8 @@ let reviewNotificationManager = {
 
 // Make available globally
 window.reviewNotificationManager = reviewNotificationManager;
+
+
 
 
 

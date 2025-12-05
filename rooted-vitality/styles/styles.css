@@ -7,6 +7,12 @@
 ║  rootedvitality.com | 2025                                         ║
 ╚════════════════════════════════════════════════════════════════════╝
 
+TABLE OF CONTENTS
+  1. BASE STYLES (Variables, Resets, Typography)
+  2. LAYOUT (Containers, Grid, Spacing)
+  3. COMPONENTS (Buttons, Cards, Forms, Modals)
+  4. PAGES (Page-Specific Styles)
+
 REFACTORED STRUCTURE (Per System Prompt.md #5)
   - Styles.css MUST remain lightweight (universals only)
   - Modular architecture for maintainability
@@ -20,64 +26,26 @@ IMPORT ORDER
   4. pages.css     → Page-specific styles
 */
 
+/* ========================================== */
+/* 1. BASE STYLES (VARIABLES, RESETS, TYPOGRAPHY) */
+/* ========================================== */
+
 @import url("base.css");
+
+/* ========================================== */
+/* 2. LAYOUT (CONTAINERS, GRID, SPACING) */
+/* ========================================== */
+
 @import url("layout.css");
+
+/* ========================================== */
+/* 3. COMPONENTS (BUTTONS, CARDS, FORMS, MODALS) */
+/* ========================================== */
+
 @import url("components.css");
+
+/* ========================================== */
+/* 4. PAGES (PAGE-SPECIFIC STYLES) */
+/* ========================================== */
+
 @import url("pages.css");
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
