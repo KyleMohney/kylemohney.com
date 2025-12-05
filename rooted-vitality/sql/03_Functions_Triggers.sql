@@ -827,6 +827,57 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
  * SECURITY DEFINER bypasses RLS policies
  * Returns the notification ID or throws error if it fails
  */
+-- ============================================================================
+-- CREATE CLIENT WELCOME NOTIFICATION (SECURITY DEFINER - BYPASSES RLS)
+-- ============================================================================
+/**
+ * Creates a welcome notification for a newly registered client
+ * SECURITY DEFINER bypasses RLS policies that restrict anon users
+ * Returns the UUID of the created notification
+ */
+CREATE OR REPLACE FUNCTION create_client_welcome_notification_signup(
+  p_client_serial TEXT
+)
+RETURNS UUID AS $$
+DECLARE
+  v_notification_id UUID;
+BEGIN
+  -- Insert welcome notification
+  INSERT INTO client_notifications (
+    client_serial,
+    type,
+    title,
+    message,
+    is_read,
+    created_at
+  )
+  VALUES (
+    p_client_serial,
+    'welcome',
+    'Welcome to Rooted Vitality!',
+    'Thank you for joining our community! We''re excited to help you on your wellness journey. Get started by creating your first wellness project and connecting with trusted practitioners.',
+    false,
+    NOW()
+  )
+  RETURNING id INTO v_notification_id;
+  
+  IF v_notification_id IS NULL THEN
+    RAISE EXCEPTION 'Failed to create welcome notification for client %', p_client_serial;
+  END IF;
+  
+  RAISE NOTICE 'Created client welcome notification: %', v_notification_id;
+  RETURN v_notification_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- ============================================================================
+-- CREATE PRACTITIONER WELCOME NOTIFICATION (SECURITY DEFINER - BYPASSES RLS)
+-- ============================================================================
+/**
+ * Creates a welcome notification for a newly registered practitioner
+ * SECURITY DEFINER bypasses RLS policies that restrict anon users
+ * Returns the UUID of the created notification
+ */
 CREATE OR REPLACE FUNCTION create_welcome_notification_signup(
   p_practitioner_serial TEXT
 )
