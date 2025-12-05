@@ -194,7 +194,10 @@ window.addEventListener('DOMContentLoaded', async () => {
         throw new Error(friendlyMsg);
       }
 
-
+      // Verify newClient was created
+      if (!newClient || !newClient.serial_number) {
+        throw new Error('Client record was not created. Please try again.');
+      }
 
       // ============ 6A. Create Notification Settings (ALL ENABLED) ============
       try {
