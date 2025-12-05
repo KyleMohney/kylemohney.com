@@ -1593,6 +1593,13 @@ async function submitCreateProjectAndFindMatches(e) {
     const zipcode = formData.get('zipcode');
     const street = formData.get('street') || null;
 
+    console.log('[submitCreateProjectAndFindMatches] Form values:', {
+      urgency,
+      travelPreference,
+      categoryId,
+      description
+    });
+
     // Get category name from taxonomy
     const categoryName = taxonomyData[categoryId]?.name || 'Wellness Journey';
 
