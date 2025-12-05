@@ -417,7 +417,9 @@
   cursor: pointer;
   accent-color: var(--rooted-primary);
   appearance: none;
-  display: none;
+  opacity: 0;
+  position: relative;
+  pointer-events: auto;
 }
 
 .radio-label input[type="radio"]:checked {
