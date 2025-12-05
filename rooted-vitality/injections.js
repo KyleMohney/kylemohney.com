@@ -607,26 +607,38 @@ const RootedVitality = {
         const switchToPractitionerBtn = document.getElementById('switchToPractitioner');
         if (switchToPractitionerBtn) {
             try {
-                // Get user data - try authManager first, fallback to localStorage
+                // Get user data from authManager
                 let userData = null;
                 if (typeof window.authManager !== 'undefined' && window.authManager.getCurrentUser) {
                     userData = window.authManager.getCurrentUser();
-                } else {
-                    // Fallback: check localStorage for user_role
-                    const storedRole = localStorage.getItem('user_role');
-                    if (storedRole) {
-                        userData = { role: storedRole };
+                }
+                
+                // If no user or role not in userData, check localStorage directly
+                let userRole = userData?.role;
+                if (!userRole) {
+                    const storedUser = localStorage.getItem('rvUser');
+                    if (storedUser) {
+                        try {
+                            const parsedUser = JSON.parse(storedUser);
+                            userRole = parsedUser.role;
+                        } catch (e) {
+                            // ignore parse errors
+                        }
                     }
                 }
                 
                 const activeView = localStorage.getItem('active_view') || 'client';
+                
                 // Show button if: user is practitioner AND they're viewing the client dashboard
-                if (userData?.role === 'practitioner' && activeView === 'client') {
+                if (userRole === 'practitioner' && activeView === 'client') {
+                    switchToPractitionerBtn.classList.remove('hidden');
                     switchToPractitionerBtn.style.display = 'block';
                 } else {
+                    switchToPractitionerBtn.classList.add('hidden');
                     switchToPractitionerBtn.style.display = 'none';
                 }
             } catch (error) {
+                console.error('[Header] Error determining practitioner status:', error);
                 switchToPractitionerBtn.style.display = 'none';
             }
         }

@@ -86,11 +86,16 @@ async function loadProject() {
       return;
     }
 
+    // Determine if projectId is a UUID or project_serial (integer)
+    // UUIDs are 36 characters with hyphens, project_serial is numeric
+    const isUUID = projectId.includes('-') && projectId.length === 36;
+    const queryField = isUUID ? 'id' : 'project_serial';
+
     // Get project - explicitly select all fields including project_serial (INTEGER for matching)
     const { data: project, error: projectError } = await supabaseClient
       .from('projects')
       .select('*')
-      .eq('id', projectId)
+      .eq(queryField, isUUID ? projectId : parseInt(projectId))
       .single();
 
     if (projectError || !project) {
@@ -158,6 +163,61 @@ async function loadExistingMatches() {
 }
 
 // ============================================================================
+// CREATE MATCH RECORDS
+// ============================================================================
+
+/**
+ * Create match records for all matching practitioners
+ * This generates notification entries for practitioners when a new project is created
+ */
+async function createMatchRecordsForPractitioners(project, practitioners) {
+  if (!project || !practitioners || practitioners.length === 0) {
+    console.log('[createMatchRecordsForPractitioners] No practitioners to create matches for');
+    return;
+  }
+
+  try {
+    // Get client serial number
+    const { data: clientProfile, error: clientError } = await supabaseClient
+      .from('clients')
+      .select('serial_number')
+      .eq('id', currentUser.id)
+      .single();
+    
+    if (clientError || !clientProfile) {
+      console.error('[createMatchRecordsForPractitioners] Could not load client profile');
+      return;
+    }
+
+    // Prepare match records for all practitioners
+    const matchRecords = practitioners.map(practitioner => ({
+      project_serial: project.project_serial,
+      practitioner_serial: practitioner.serial_number,
+      client_serial: clientProfile.serial_number,
+      status: 'pending',
+      match_score: practitioner.match_score || 50,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }));
+
+    // Insert all match records
+    const { error: insertError } = await supabaseClient
+      .from('project_practitioner_matches')
+      .insert(matchRecords);
+
+    if (insertError) {
+      console.error('[createMatchRecordsForPractitioners] Error inserting matches:', insertError);
+      return;
+    }
+
+    console.log('[createMatchRecordsForPractitioners] Successfully created', matchRecords.length, 'match records');
+
+  } catch (error) {
+    console.error('[createMatchRecordsForPractitioners] Exception:', error);
+  }
+}
+
+// ============================================================================
 // PRACTITIONER LOADING & FILTERING
 // ============================================================================
 
@@ -204,6 +264,16 @@ async function loadPractitioners(project) {
     await enrichPractitionersWithProfileData(practitioners);
     
     allPractitioners = practitioners;
+
+    // Create match records for all matching practitioners (auto-matching)
+    if (practitioners && practitioners.length > 0) {
+      try {
+        await createMatchRecordsForPractitioners(project, practitioners);
+      } catch (error) {
+        console.error('[loadPractitioners] Error creating match records:', error);
+        // Continue even if match creation fails - not critical
+      }
+    }
 
     // Update project info display
     updateProjectInfo(project);

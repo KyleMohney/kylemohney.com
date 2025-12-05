@@ -1600,8 +1600,25 @@ async function submitCreateProjectAndFindMatches(e) {
       description
     });
 
-    // Get category name from taxonomy
-    const categoryName = taxonomyData[categoryId]?.name || 'Wellness Journey';
+    // Get category info from taxonomy (categoryId is the UUID)
+    const taxonomyEntry = taxonomyData[categoryId];
+    const categoryName = taxonomyEntry?.name || 'Wellness Journey';
+    const categoryIdText = taxonomyEntry?.category_id; // This is the text ID needed for projects table
+
+    console.log('[submitCreateProjectAndFindMatches] Category lookup:', {
+      categoryId,
+      categoryIdText,
+      categoryName,
+      taxonomyKeys: Object.keys(taxonomyData || {}),
+      categoryFromTaxonomy: taxonomyEntry
+    });
+
+    // Validate category exists
+    if (!categoryId || !taxonomyEntry) {
+      showNotification('Please select a valid category', 'error');
+      console.error('[submitCreateProjectAndFindMatches] Invalid category:', categoryId);
+      return;
+    }
 
     // Get selected subcategories
     const subcategoryCheckboxes = form.querySelectorAll('input[name="subcategories"]:checked');
@@ -1613,7 +1630,7 @@ async function submitCreateProjectAndFindMatches(e) {
       .insert([{
         client_id: currentUser.id,
         client_serial: clientProfile.serial_number,
-        category_id: categoryId,
+        category_id: categoryIdText,
         category_name: categoryName,
         description: description,
         urgency: urgency,
