@@ -592,28 +592,20 @@ async function loadMatchesForOnboarding(onboardingData) {
             throw matchCreateError;
           }
 
-          // Create notification for practitioner
-          const { data: practitionerInfo, error: practError } = await window.supabaseClient
-            .from('practitioners')
-            .select('id, serial_number, legal_name')
-            .eq('serial_number', practitionerSerial)
-            .single();
-
-          if (practitionerInfo && !practError) {
-            const clientName = onboardingData.firstName || 'New Client';
-            const { error: notifError } = await window.supabaseClient
-              .from('practitioner_notifications')
-              .insert({
-                practitioner_serial: practitionerInfo.serial_number,
-                type: 'match_new',
-                title: `New Match: ${clientName}`,
-                message: `${clientName} has matched with you!`,
-                is_read: false,
-                created_at: new Date().toISOString()
+          // Notify practitioner of new match using reliability manager
+          const clientName = onboardingData.firstName || 'New Client';
+          const projectName = onboardingData.projectCategory || 'wellness project';
+          
+          if (window.notifyPractitionerOfNewMatch && typeof window.notifyPractitionerOfNewMatch === 'function') {
+            try {
+              await window.notifyPractitionerOfNewMatch({
+                practitionerSerial: practitionerSerial,
+                clientName: clientName,
+                projectName: projectName,
+                matchScore: matchScore
               });
-
-            if (notifError) {
-              console.warn('[Onboarding] Notification creation warning:', notifError);
+            } catch (notifyError) {
+              console.warn('[Onboarding] Non-blocking error notifying practitioner:', notifyError);
             }
           }
 

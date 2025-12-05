@@ -951,16 +951,16 @@ TABLE OF CONTENTS:
             .select('id, project_serial, description, category_name, created_at, client_serial')
             .in('project_serial', projectSerials);
           
-          // Get clients
+          // Get clients by serial number
           const { data: clients } = await window.supabaseClient
             .from('clients')
-            .select('id, first_name, last_name, profile_picture_url')
-            .in('id', clientSerials);
+            .select('id, serial_number, first_name, last_name, profile_picture_url')
+            .in('serial_number', clientSerials);
           
           // Merge data with matches
           matches.forEach(match => {
             const project = projects?.find(p => p.project_serial === match.project_serial);
-            const client = clients?.find(c => c.id === match.client_serial);
+            const client = clients?.find(c => c.serial_number === match.client_serial);
             match.projects = project;
             match.clients = client;
           });

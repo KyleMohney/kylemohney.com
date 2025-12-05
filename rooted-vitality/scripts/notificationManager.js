@@ -265,7 +265,7 @@ async function notifyPractitionerOfNewMatch(options) {
       };
 
       const { error } = await window.supabaseClient
-        .from('notifications')
+        .from('practitioner_notifications')
         .insert([notification]);
 
       if (error) {

@@ -205,9 +205,35 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 
 
-      // ============ 6. Create Welcome Notification ============
+      // ============ 6A. Create Notification Settings (ALL ENABLED) ============
+      try {
+        const clientSerial = newClient.serial_number;
+        console.log('[Signup] Creating notification settings for client:', clientSerial);
+
+        await window.supabaseClient
+          .from('client_notification_settings')
+          .insert([{
+            client_serial: clientSerial,
+            matches_email: true,
+            matches_sms: true,
+            messages_email: true,
+            messages_sms: true,
+            reviews_email: true,
+            reviews_sms: true,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }])
+          .select();
+
+        console.log('[Signup] ✓ Notification settings created for', clientSerial);
+      } catch (settingsErr) {
+        console.warn('[Signup] Warning: Could not create notification settings:', settingsErr);
+        // Don't fail signup if settings creation fails - continue anyway
+      }
+
+      // ============ 6B. Create Welcome Notification (GUARANTEED) ============
       const welcomeNotification = {
-        client_serial: authData.user.id,
+        client_serial: newClient.serial_number,
         type: 'welcome',
         title: 'Welcome to Rooted Vitality!',
         message: 'Thank you for joining our community! We\'re excited to help you on your wellness journey. Get started by creating your first wellness project and connecting with trusted practitioners.',
@@ -216,11 +242,28 @@ window.addEventListener('DOMContentLoaded', async () => {
       };
 
       try {
-        await window.supabaseClient
-          .from('client_notifications')
-          .insert([welcomeNotification]);
-      } catch (err) {
-
+        // Try with reliability manager if available
+        if (window.createGuaranteedNotification) {
+          console.log('[Signup] Creating welcome notification using reliability manager...');
+          const result = await window.createGuaranteedNotification({
+            recipientSerial: newClient.serial_number,
+            type: 'welcome',
+            userType: 'client',
+            title: welcomeNotification.title,
+            message: welcomeNotification.message
+          });
+          console.log('[Signup] Welcome notification result:', result);
+        } else {
+          // Fallback: Direct insert if reliability manager not available
+          console.log('[Signup] Creating welcome notification (direct method)...');
+          await window.supabaseClient
+            .from('client_notifications')
+            .insert([welcomeNotification]);
+          console.log('[Signup] ✓ Welcome notification created');
+        }
+      } catch (notifErr) {
+        console.warn('[Signup] Warning: Could not create welcome notification:', notifErr);
+        // Don't fail signup if welcome notification fails
       }
 
 
