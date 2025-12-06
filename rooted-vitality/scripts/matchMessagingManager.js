@@ -187,9 +187,6 @@ async function loadMessages() {
 
     if (error) {
       console.error('[Messaging] Error loading messages:', error);
-      console.error('[Messaging] Error status:', error.status);
-      console.error('[Messaging] Error message:', error.message);
-      console.error('[Messaging] Error details:', JSON.stringify(error));
       return;
     }
 
@@ -219,36 +216,8 @@ async function displayMessages(messages) {
   if (!messages || messages.length === 0) {
     // Only update if we haven't already shown messages
     if (loadedMessageIds.size === 0) {
-      let emptyMessageHTML = '<p>No messages yet. Start the conversation!</p>';
-      let backgroundColor = '#f5f7f0';
-      let textColor = '#2e2b28';
-      let headingColor = '#77883e';
-      
-      if (selectedMatchStatus === 'pending' && !selectedMatchResponse) {
-        emptyMessageHTML = `
-          <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem; color: #77883e;">Awaiting Practitioner Response</p>
-          <p style="margin: 0.5rem 0;">You've sent a connection request with an automatic introduction message.</p>
-          <p style="margin: 0.5rem 0;">Once they accept, you'll be able to message them here.</p>
-        `;
-        backgroundColor = '#f5f7f0';
-        textColor = '#2e2b28';
-      } else if (selectedMatchResponse === 'declined') {
-        emptyMessageHTML = `
-          <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem; color: #999;">Connection Declined</p>
-          <p style="margin: 0.5rem 0;">This practitioner has declined your request.</p>
-        `;
-        backgroundColor = '#f5f7f0';
-        textColor = '#666';
-      } else if (selectedMatchResponse === 'accepted' && selectedMatchStatus === 'in-progress') {
-        emptyMessageHTML = `
-          <p style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem; color: #77883e;">Connection Active</p>
-          <p style="margin: 0.5rem 0;">Start your conversation with this practitioner here.</p>
-        `;
-        backgroundColor = '#f5f7f0';
-        textColor = '#2e2b28';
-      }
-      
-      messageThread.innerHTML = `<div class="message-empty" style="display: flex; align-items: center; justify-content: center; height: 100%; min-height: 300px; background-color: ${backgroundColor}; border-radius: 8px; padding: 2rem; text-align: center; color: ${textColor}; line-height: 1.6;">${emptyMessageHTML}</div>`;
+      // Keep message thread completely empty for pending state
+      messageThread.innerHTML = '';
     }
     return;
   }

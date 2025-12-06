@@ -19,10 +19,22 @@ FUNCTIONALITY:
 // UI INITIALIZATION & SETUP
 // ═══════════════════════════════════════════════════════════════════
 
+// Debounce flag to prevent duplicate renders
+let renderInProgress = false;
+
+// Prevent multiple initialization
+let myWellnessInitialized = false;
+
 /**
  * Initialize the entire My Wellness application
  */
 async function initializeMyWellness() {
+  if (myWellnessInitialized) {
+    console.log('[My Wellness] Already initialized, skipping');
+    return;
+  }
+  myWellnessInitialized = true;
+
   try {
     if (!window.supabaseClient) {
       return;
@@ -54,6 +66,12 @@ async function initializeMyWellness() {
     // Load taxonomy data first
     await loadTaxonomy();
 
+    // Initialize handlers BEFORE loading projects so updateOpenToMatchToggle exists
+    initFilterHandlers();
+    initModalHandlers();
+    initMessageThreadHandlers();
+    initProjectFormHandlers();
+
     // Load matches BEFORE projects so project card creation has access to match data
     await loadMatches(clientProfile.serial_number);
     
@@ -62,12 +80,6 @@ async function initializeMyWellness() {
 
     // Update journey counters now that projects are loaded
     updateJourneyCounters();
-
-    // Initialize handlers
-    initFilterHandlers();
-    initModalHandlers();
-    initMessageThreadHandlers();
-    initProjectFormHandlers();
 
     // Check if redirected from contact button with auto-open params
     const urlParams = new URLSearchParams(window.location.search);
@@ -150,6 +162,32 @@ async function initializeMyWellness() {
                 }
               });
 
+            loadMatches(clientSerial).then(() => {
+              renderMatches();
+            });
+          }
+        })
+        .subscribe((status) => {
+          // Subscription status
+        });
+
+      // Also listen for project status changes (when project is marked hired/completed)
+      window.supabaseClient
+        .channel(`client-projects:${clientSerial}`)
+        .on('postgres_changes', {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'projects',
+          filter: `client_serial=eq.${clientSerial}`,
+        }, (payload) => {
+          const oldStatus = payload.old.status;
+          const newStatus = payload.new.status;
+
+          // If project status changed to hired/completed/closed
+          if ((oldStatus !== 'hired' && newStatus === 'hired') ||
+              (oldStatus !== 'completed' && newStatus === 'completed') ||
+              (oldStatus !== 'closed' && newStatus === 'closed')) {
+            
             loadMatches(clientSerial).then(() => {
               renderMatches();
             });
@@ -397,7 +435,21 @@ function displayMatches(page) {
  * Render match list using current filtered matches
  */
 function renderMatches() {
-  displayMatches(myWellnessState.currentPage);
+  // Prevent duplicate renders
+  if (renderInProgress) {
+    console.log('[My Wellness] Render already in progress, skipping');
+    return;
+  }
+  
+  renderInProgress = true;
+  try {
+    displayMatches(myWellnessState.currentPage);
+  } finally {
+    // Reset flag after a short delay to allow UI updates
+    setTimeout(() => {
+      renderInProgress = false;
+    }, 100);
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1009,6 +1061,7 @@ function openPractitionerModal(matchId) {
   const modal = document.getElementById('practitioner-modal');
   if (modal) {
     modal.classList.remove('modal--hidden');
+    modal.classList.add('active');
   }
 }
 
@@ -1265,6 +1318,7 @@ function openCloseProjectModal(projectId) {
     }
     
     closeProjectModal.classList.remove('modal--hidden');
+    closeProjectModal.classList.add('active');
   }
 }
 
@@ -1465,6 +1519,52 @@ function initProjectFormHandlers() {
       await handleOpenToMatchToggle(e.target.checked);
     });
   }
+
+  // Load and display the "open to match" toggle state for the client
+  async function updateOpenToMatchToggle() {
+    const toggle = document.getElementById('open-to-match-toggle');
+    if (!toggle) {
+      console.log('[updateOpenToMatchToggle] Toggle element not found');
+      return;
+    }
+    
+    try {
+      const currentUser = window.authManager?.getCurrentUser();
+      if (!currentUser) {
+        console.log('[updateOpenToMatchToggle] No current user');
+        toggle.checked = false;
+        return;
+      }
+      
+      console.log('[updateOpenToMatchToggle] Loading state for user:', currentUser.id);
+      
+      const { data: client, error } = await window.supabaseClient
+        .from('clients')
+        .select('open_to_match')
+        .eq('id', currentUser.id)
+        .single();
+      
+      if (error) {
+        console.error('[updateOpenToMatchToggle] Database error:', error);
+        toggle.checked = false;
+        return;
+      }
+      
+      if (client) {
+        toggle.checked = client.open_to_match || false;
+        console.log('[updateOpenToMatchToggle] Successfully loaded state:', client.open_to_match, '(toggle.checked now =', toggle.checked, ')');
+      } else {
+        console.log('[updateOpenToMatchToggle] No client data returned');
+        toggle.checked = false;
+      }
+    } catch (err) {
+      console.error('[updateOpenToMatchToggle] Exception:', err);
+      toggle.checked = false;
+    }
+  }
+  
+  // Call this after page loads
+  window.updateOpenToMatchToggle = updateOpenToMatchToggle;
 
   document.querySelectorAll('.modal__close').forEach(btn => {
     btn.addEventListener('click', (e) => {
@@ -1770,15 +1870,50 @@ async function submitCloseProject(e) {
  * Handle Open to Match toggle
  */
 async function handleOpenToMatchToggle(isChecked) {
-  console.log('[handleOpenToMatchToggle] Toggle:', isChecked);
-}
+  console.log('[handleOpenToMatchToggle] Toggle changed to:', isChecked);
+  
+  try {
+    // Get current user (client)
+    const currentUser = window.authManager?.getCurrentUser();
+    if (!currentUser) {
+      console.error('[handleOpenToMatchToggle] No authenticated user');
+      showNotification('Error: Not authenticated', 'error');
+      const toggle = document.getElementById('open-to-match-toggle');
+      if (toggle) toggle.checked = !isChecked;
+      return;
+    }
 
-/**
- * Initialize project form handlers when DOM is ready
- */
-document.addEventListener('DOMContentLoaded', () => {
-  initProjectFormHandlers();
-});
+    console.log('[handleOpenToMatchToggle] Saving for client ID:', currentUser.id);
+
+    // Update the CLIENT in the database
+    const { error } = await window.supabaseClient
+      .from('clients')
+      .update({ 
+        open_to_match: isChecked,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', currentUser.id);
+
+    if (error) {
+      console.error('[handleOpenToMatchToggle] Database error:', error);
+      showNotification('Failed to update setting: ' + (error?.message || 'Unknown error'), 'error');
+      // Reset toggle
+      const toggle = document.getElementById('open-to-match-toggle');
+      if (toggle) toggle.checked = !isChecked;
+      return;
+    }
+
+    console.log('[handleOpenToMatchToggle] Successfully updated to:', isChecked);
+    showNotification(isChecked ? 'Your care requests are now visible to practitioners' : 'Your care requests are hidden from practitioners', 'success');
+
+  } catch (error) {
+    console.error('[handleOpenToMatchToggle] Exception:', error);
+    showNotification('Error updating setting', 'error');
+    // Reset toggle
+    const toggle = document.getElementById('open-to-match-toggle');
+    if (toggle) toggle.checked = !isChecked;
+  }
+}
 
 // ═══════════════════════════════════════════════════════════════════
 // EXPORTS

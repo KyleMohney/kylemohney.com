@@ -1024,3 +1024,247 @@ BEGIN
   RETURN v_notification_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- ============================================================================
+-- MATCH RESPONSE NOTIFICATION FUNCTION (SECURITY DEFINER - BYPASSES RLS)
+-- ============================================================================
+
+/**
+ * Create notification when practitioner responds to a match request
+ * SECURITY DEFINER bypasses RLS policies
+ * Returns UUID of created notification
+ * Called when practitioner accepts, declines, or blocks a match
+ */
+CREATE OR REPLACE FUNCTION create_match_response_notification(
+  p_client_serial TEXT,
+  p_action TEXT,
+  p_practitioner_name TEXT,
+  p_project_name TEXT,
+  p_reason TEXT DEFAULT NULL
+)
+RETURNS UUID AS $$
+DECLARE
+  v_notification_id UUID;
+  v_title TEXT;
+  v_message TEXT;
+  v_type TEXT;
+BEGIN
+  -- Determine notification type and message based on action
+  CASE p_action
+    WHEN 'accepted' THEN
+      v_type := 'match_accepted';
+      v_title := 'Great News! Practitioner Accepted Your Request';
+      v_message := p_practitioner_name || ' has accepted your request for ' || p_project_name || '! They will contact you shortly to get started.';
+    WHEN 'declined' THEN
+      v_type := 'match_declined';
+      v_title := 'Update: Practitioner Not Available';
+      v_message := p_practitioner_name || ' was not available at this time for your ' || p_project_name || ' request. Don''t worry, we''ll continue matching you with other practitioners.';
+    WHEN 'blocked' THEN
+      v_type := 'match_blocked';
+      v_title := 'Match Request Update';
+      v_message := 'A practitioner has declined your request for ' || p_project_name || '. Our matching system will connect you with other qualified practitioners.';
+    ELSE
+      v_type := 'match_update';
+      v_title := 'Match Request Update';
+      v_message := 'There''s an update on your ' || p_project_name || ' request.';
+  END CASE;
+
+  -- Insert match response notification
+  INSERT INTO client_notifications (
+    client_serial,
+    type,
+    title,
+    message,
+    is_read,
+    created_at
+  )
+  VALUES (
+    p_client_serial,
+    v_type,
+    v_title,
+    v_message,
+    false,
+    NOW()
+  )
+  RETURNING id INTO v_notification_id;
+  
+  IF v_notification_id IS NULL THEN
+    RAISE EXCEPTION 'Failed to create match response notification for client %', p_client_serial;
+  END IF;
+  
+  RAISE NOTICE 'Created % notification for client: %', p_action, v_notification_id;
+  RETURN v_notification_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- ============================================================================
+-- PRACTITIONER NEW MATCH NOTIFICATION (SECURITY DEFINER - BYPASSES RLS)
+-- ============================================================================
+
+/**
+ * Create notification when a new match is generated for a practitioner
+ * SECURITY DEFINER bypasses RLS policies
+ * Returns UUID of created notification
+ * Called when client creates a project that matches practitioner
+ */
+DROP FUNCTION IF EXISTS create_practitioner_new_match_notification(TEXT, TEXT, TEXT, INTEGER) CASCADE;
+
+CREATE OR REPLACE FUNCTION create_practitioner_new_match_notification(
+  p_practitioner_serial TEXT,
+  p_client_name TEXT,
+  p_project_name TEXT,
+  p_match_score INTEGER
+)
+RETURNS UUID AS $$
+DECLARE
+  v_notification_id UUID;
+BEGIN
+  -- Insert new match notification
+  INSERT INTO practitioner_notifications (
+    practitioner_serial,
+    type,
+    title,
+    message,
+    is_read,
+    created_at
+  )
+  VALUES (
+    p_practitioner_serial,
+    'new_match',
+    'New Match Request',
+    p_client_name || ' has requested to connect with you for "' || p_project_name || '" (' || p_match_score || '% match)',
+    false,
+    NOW()
+  )
+  RETURNING id INTO v_notification_id;
+  
+  IF v_notification_id IS NULL THEN
+    RAISE EXCEPTION 'Failed to create new match notification for practitioner %', p_practitioner_serial;
+  END IF;
+  
+  RAISE NOTICE 'Created new match notification for practitioner: %', v_notification_id;
+  RETURN v_notification_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Grant execute permission to authenticated users
+GRANT EXECUTE ON FUNCTION create_practitioner_new_match_notification(TEXT, TEXT, TEXT, INTEGER) TO authenticated;
+
+-- ============================================================================
+-- GET PRACTITIONER NOTIFICATION PREFERENCES (SECURITY DEFINER - BYPASSES RLS)
+-- ============================================================================
+
+/**
+ * Get practitioner notification preferences by serial number
+ * SECURITY DEFINER bypasses RLS policies
+ * Used by notification system to determine how to notify practitioner
+ * Returns row with matches_email and matches_sms flags
+ */
+DROP FUNCTION IF EXISTS get_practitioner_notification_preferences(TEXT) CASCADE;
+
+CREATE OR REPLACE FUNCTION get_practitioner_notification_preferences(p_practitioner_serial TEXT)
+RETURNS TABLE (
+  matches_email BOOLEAN,
+  matches_sms BOOLEAN
+) 
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  RETURN QUERY
+  SELECT 
+    COALESCE(pns.matches_email, true) AS matches_email,
+    COALESCE(pns.matches_sms, true) AS matches_sms
+  FROM practitioner_notification_settings pns
+  WHERE pns.practitioner_serial = p_practitioner_serial;
+  
+  -- If no settings found, return defaults (both true)
+  IF NOT FOUND THEN
+    RETURN QUERY SELECT true, true;
+  END IF;
+END;
+$$;
+
+-- Grant execute permission to authenticated users
+GRANT EXECUTE ON FUNCTION get_practitioner_notification_preferences(TEXT) TO authenticated;
+
+-- ============================================================================
+-- GET CLIENT NOTIFICATION PREFERENCES (SECURITY DEFINER - BYPASSES RLS)
+-- ============================================================================
+
+/**
+ * Get client notification preferences by client serial
+ * SECURITY DEFINER bypasses RLS policies
+ * Used by notification system to determine how to notify client
+ * Returns row with matches_email and matches_sms flags
+ */
+DROP FUNCTION IF EXISTS get_client_notification_preferences(TEXT) CASCADE;
+
+CREATE OR REPLACE FUNCTION get_client_notification_preferences(p_client_serial TEXT)
+RETURNS TABLE (
+  matches_email BOOLEAN,
+  matches_sms BOOLEAN
+) 
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  RETURN QUERY
+  SELECT 
+    COALESCE(cns.matches_email, true) AS matches_email,
+    COALESCE(cns.matches_sms, true) AS matches_sms
+  FROM client_notification_settings cns
+  WHERE cns.client_serial = p_client_serial;
+  
+  -- If no settings found, return defaults (both true)
+  IF NOT FOUND THEN
+    RETURN QUERY SELECT true, true;
+  END IF;
+END;
+$$;
+
+-- Grant execute permission to authenticated users
+GRANT EXECUTE ON FUNCTION get_client_notification_preferences(TEXT) TO authenticated;
+
+-- ============================================================================
+-- GET EXISTING REVIEW (SECURITY DEFINER - BYPASSES RLS)
+-- ============================================================================
+
+/**
+ * Check if a client has already left a review for a practitioner on a project
+ * SECURITY DEFINER bypasses RLS policies
+ * Returns the existing review if found, or empty result if not
+ */
+DROP FUNCTION IF EXISTS get_existing_review(INTEGER, UUID, UUID) CASCADE;
+
+CREATE OR REPLACE FUNCTION get_existing_review(
+  p_project_serial INTEGER,
+  p_practitioner_id UUID,
+  p_client_id UUID
+)
+RETURNS TABLE (
+  id UUID,
+  rating INTEGER,
+  review_text TEXT
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  RETURN QUERY
+  SELECT 
+    r.id,
+    r.rating,
+    r.review_text
+  FROM reviews r
+  WHERE r.project_serial = p_project_serial
+    AND r.practitioner_id = p_practitioner_id
+    AND r.client_id = p_client_id;
+END;
+$$;
+
+-- Grant execute permission to authenticated users
+GRANT EXECUTE ON FUNCTION get_existing_review(INTEGER, UUID, UUID) TO authenticated;

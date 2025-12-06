@@ -21,20 +21,28 @@ interface ResendResponse {
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "authorization, x-client-id, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS, GET",
+  "Access-Control-Allow-Headers": "authorization, x-client-id, content-type, authorization",
+  "Access-Control-Max-Age": "86400",
 };
 
 serve(async (req: Request): Promise<Response> => {
-  // Handle CORS
+  console.log(`[Email] Received ${req.method} request from origin: ${req.headers.get('origin')}`);
+  
+  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    console.log("[Email] Responding to CORS preflight request");
+    return new Response("ok", {
+      status: 200,
+      headers: corsHeaders,
+    });
   }
 
   try {
     const { to, subject, html, type } = (await req.json()) as EmailRequest;
 
     if (!to || !subject || !html) {
+      console.error("[Email] Missing required fields");
       return new Response(
         JSON.stringify({ error: "Missing required fields: to, subject, html" }),
         {
@@ -52,14 +60,15 @@ serve(async (req: Request): Promise<Response> => {
     const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
     if (!RESEND_API_KEY) {
-      console.error("[Email] RESEND_API_KEY not configured in environment");
+      console.error("[Email] RESEND_API_KEY not configured in environment - this must be set in Supabase project settings under Functions / Environment Variables");
       return new Response(
         JSON.stringify({
           error: "Email service not configured",
-          message: "Set RESEND_API_KEY in Supabase project settings",
+          message: "RESEND_API_KEY environment variable not set. Set it in Supabase project settings.",
+          details: "Go to Supabase dashboard > Functions > Environment Variables > Add RESEND_API_KEY"
         }),
         {
-          status: 500,
+          status: 503,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         }
       );

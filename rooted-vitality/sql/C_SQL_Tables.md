@@ -532,6 +532,19 @@ holistic_health_taxonomy
 | 9a940329-e847-42a7-ad5e-ce84f680ae67 | reflexology         | Reflexology                | certification    | 🟡 Certification Recommended | null        | 20            | true      | 2025-11-02 16:40:48.932142+00 | 2025-11-02 16:40:48.932142+00 |
 | fabdc312-1892-4819-8ee7-3873fcfbe0e7 | osteopathy          | Osteopathy                 | license          | 🔴 License Required          | null        | 21            | true      | 2025-11-02 16:40:48.932142+00 | 2025-11-02 16:40:48.932142+00 |
 
+| column_name            | data_type                | is_nullable | column_default    |
+| ---------------------- | ------------------------ | ----------- | ----------------- |
+| id                     | uuid                     | NO          | gen_random_uuid() |
+| category_id            | text                     | NO          | null              |
+| name                   | text                     | NO          | null              |
+| credential_level       | text                     | YES         | 'none'::text      |
+| credential_description | text                     | YES         | null              |
+| description            | text                     | YES         | null              |
+| display_order          | integer                  | YES         | 0                 |
+| is_active              | boolean                  | YES         | true              |
+| created_at             | timestamp with time zone | YES         | now()             |
+| updated_at             | timestamp with time zone | YES         | now()             |
+
 
 ====================================
 taxonomy_subcategories
@@ -639,7 +652,14 @@ taxonomy_subcategories
 | 348be3c4-5163-43ef-9a55-cdbcbb9e2323 | aabcf233-1849-48d8-ae03-5fe7fdd5b4ef | HIIT Training                    | 7             | true      | 2025-11-06 15:42:32.288419+00 |
 | 056b3d6e-d00c-49fb-820d-19d0bef06737 | aabcf233-1849-48d8-ae03-5fe7fdd5b4ef | Nutrition Coaching               | 8             | true      | 2025-11-06 15:42:32.288419+00 |
 
-
+| column_name   | data_type                | is_nullable | column_default    |
+| ------------- | ------------------------ | ----------- | ----------------- |
+| id            | uuid                     | NO          | gen_random_uuid() |
+| taxonomy_id   | uuid                     | NO          | null              |
+| name          | text                     | NO          | null              |
+| display_order | integer                  | YES         | 0                 |
+| is_active     | boolean                  | YES         | true              |
+| created_at    | timestamp with time zone | YES         | now()             |
 
 
 

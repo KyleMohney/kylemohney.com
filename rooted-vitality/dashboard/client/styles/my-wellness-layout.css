@@ -331,7 +331,7 @@
   background-color: #fbf7ec;
   border-radius: 13px;
   transition: all 0.3s ease;
-  border: none;
+  border: 1.5px solid #d4cfc4;
 }
 
 .toggle-checkbox:checked + .toggle-slider {

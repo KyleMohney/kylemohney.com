@@ -37,11 +37,6 @@ let matchedPractitioners = []; // Track which practitioners have been matched
 // INITIALIZATION
 // ============================================================================
 
-// Initialize when page loads
-document.addEventListener('DOMContentLoaded', () => {
-  initializePage();
-});
-
 async function initializePage() {
   try {
 
@@ -177,15 +172,27 @@ async function createMatchRecordsForPractitioners(project, practitioners) {
   }
 
   try {
-    // Get client serial number
+    // Get client serial number and name
     const { data: clientProfile, error: clientError } = await supabaseClient
       .from('clients')
-      .select('serial_number')
+      .select('serial_number, first_name')
       .eq('id', currentUser.id)
       .single();
     
     if (clientError || !clientProfile) {
       console.error('[createMatchRecordsForPractitioners] Could not load client profile');
+      return;
+    }
+
+    // CHECK FOR EXISTING MATCHES - prevent duplicates
+    const { data: existingMatches, error: checkError } = await supabaseClient
+      .from('project_practitioner_matches')
+      .select('id')
+      .eq('project_serial', project.project_serial)
+      .eq('client_serial', clientProfile.serial_number);
+    
+    if (!checkError && existingMatches && existingMatches.length > 0) {
+      console.log('[createMatchRecordsForPractitioners] Matches already exist for this project, skipping creation');
       return;
     }
 
@@ -211,6 +218,26 @@ async function createMatchRecordsForPractitioners(project, practitioners) {
     }
 
     console.log('[createMatchRecordsForPractitioners] Successfully created', matchRecords.length, 'match records');
+
+    // Notify each practitioner of new match (respects their notification preferences)
+    const projectName = project.custom_name || project.category_name || 'a wellness project';
+    const clientName = clientProfile.first_name || 'A client';
+    
+    for (const practitioner of practitioners) {
+      try {
+        if (window.notifyPractitionerOfNewMatch && typeof window.notifyPractitionerOfNewMatch === 'function') {
+          await window.notifyPractitionerOfNewMatch({
+            practitionerSerial: practitioner.serial_number,
+            clientName: clientName,
+            projectName: projectName,
+            matchScore: practitioner.match_score || 50
+          });
+        }
+      } catch (notifyError) {
+        console.warn('[createMatchRecordsForPractitioners] Error notifying practitioner:', notifyError);
+        // Continue with next practitioner even if notification fails
+      }
+    }
 
   } catch (error) {
     console.error('[createMatchRecordsForPractitioners] Exception:', error);
@@ -837,7 +864,7 @@ async function sendConnectionRequest(practitionerId, practitionerSerial) {
 
     // Create auto-message via RPC
     const clientName = clientData.first_name || 'Client';
-    const messageText = `${clientName} wants connect about their wellness project!`;
+    const messageText = `${clientName} wants to connect!`;
 
     const { error: messageError } = await supabaseClient
       .rpc('create_project_message', {

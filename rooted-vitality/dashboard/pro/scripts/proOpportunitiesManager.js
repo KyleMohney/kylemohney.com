@@ -106,7 +106,7 @@ async function loadOpportunities() {
       .from('practitioners')
       .select(`
         service_category_ids,
-        service_subcategory_ids,
+        service_subcategory_names,
         in_person_enabled,
         virtual_enabled,
         housecalls_enabled,
@@ -133,8 +133,8 @@ async function loadOpportunities() {
       return;
     }
 
-    // Get all open projects where clients are open to contact
-    const { data: allProjects, error: projectsError } = await supabaseClient
+    // Get all open projects (pending status) with client details
+      const { data: allProjects, error: projectsError } = await supabaseClient
       .from('projects')
       .select(`
         id,
@@ -153,11 +153,9 @@ async function loadOpportunities() {
         state,
         travel_preference,
         urgency,
-        client_open_to_contact,
         project_status,
         created_at
       `)
-      .eq('client_open_to_contact', true)
       .eq('project_status', 'pending')
       .order('created_at', { ascending: false });
 
@@ -167,18 +165,49 @@ async function loadOpportunities() {
       return;
     }
 
-    if (!allProjects || allProjects.length === 0) {
+    // Projects table already has client_first_name and client_last_name denormalized
+    const flatProjects = allProjects || [];    // Get clients that are open_to_match
+    const { data: openToMatchClients } = await supabaseClient
+      .from('clients')
+      .select('id')
+      .eq('open_to_match', true);
+
+    const openToMatchClientIds = new Set((openToMatchClients || []).map(c => c.id));
+
+    if (!flatProjects || flatProjects.length === 0) {
       renderOpportunities([]);
       return;
     }
 
     // Get practitioner's existing matches to exclude
+    // IMPORTANT: Only exclude matches that are ACTIVE, IN-PROGRESS, or HIRED
+    // Pending matches should still show as opportunities since they haven't been accepted yet
     const { data: existingMatches } = await supabaseClient
       .from('project_practitioner_matches')
       .select('project_serial')
-      .eq('practitioner_serial', currentPractitioner.serial_number);
+      .eq('practitioner_serial', currentPractitioner.serial_number)
+      .in('status', ['active', 'in-progress', 'hired']);
 
     const matchedProjectSerials = new Set((existingMatches || []).map(m => m.project_serial));
+
+    // ALSO get pending matches - these should NOT appear in opportunities tab
+    // They appear in the "New Clients" tab instead
+    const { data: pendingMatches } = await supabaseClient
+      .from('project_practitioner_matches')
+      .select('project_serial')
+      .eq('practitioner_serial', currentPractitioner.serial_number)
+      .eq('status', 'pending');
+
+    const pendingProjectSerials = new Set((pendingMatches || []).map(m => m.project_serial));
+
+    // ALSO get declined matches - these should NOT reappear in opportunities tab
+    const { data: declinedMatches } = await supabaseClient
+      .from('project_practitioner_matches')
+      .select('project_serial')
+      .eq('practitioner_serial', currentPractitioner.serial_number)
+      .eq('status', 'declined');
+
+    const declinedProjectSerials = new Set((declinedMatches || []).map(m => m.project_serial));
 
     // Get practitioner's blocked clients
     const { data: blockedClients } = await supabaseClient
@@ -189,57 +218,117 @@ async function loadOpportunities() {
 
     const blockedClientSerials = new Set((blockedClients || []).map(b => b.client_serial));
 
+    // Map category slugs to UUIDs for comparison
+    const categorySlugToUuid = {
+      'midwifery': '900f680e-15e1-4ce1-95df-6c5e2cd10d6a',
+      'acupuncture': '17d4d957-905e-411a-9b4d-1165a9940b4f',
+      'chiropractic': '88e8ef68-ea5c-4ef5-af89-53f08502845a'
+    };
+
     // Smart filter: keep only projects that match practitioner's settings
-    const filteredProjects = allProjects.filter(project => {
-      // Exclude if already matched
+    const filteredProjects = flatProjects.filter(project => {
+      // Exclude if already matched (active/in-progress/hired)
       if (matchedProjectSerials.has(project.project_serial)) {
+        console.log('[Pro Opp Debug] Project', project.project_serial, 'already matched');
+        return false;
+      }
+      // Exclude if pending match exists
+      if (pendingProjectSerials.has(project.project_serial)) {
+        console.log('[Pro Opp Debug] Project', project.project_serial, 'has pending match');
+        return false;
+      }
+      // Exclude if already declined
+      if (declinedProjectSerials.has(project.project_serial)) {
+        console.log('[Pro Opp Debug] Project', project.project_serial, 'already declined');
         return false;
       }
 
       // Exclude if client is blocked
       if (blockedClientSerials.has(project.client_serial)) {
+        console.log('[Pro Opp Debug] Project', project.project_serial, 'client is blocked');
+        return false;
+      }
+
+      // Exclude if client is not open to match
+      if (!openToMatchClientIds.has(project.client_id)) {
+        console.log('[Pro Opp Debug] Project', project.project_serial, 'client not open to match. open_to_match IDs:', Array.from(openToMatchClientIds), 'project client_id:', project.client_id);
         return false;
       }
 
       // Check if practitioner's service categories match project category
       const practitionerCategories = matchSettings?.service_category_ids || [];
-      if (!practitionerCategories.includes(project.category_id)) {
+      const projectCategoryUuid = categorySlugToUuid[project.category_id] || project.category_id;
+      if (!practitionerCategories.includes(projectCategoryUuid)) {
+        console.log('[Pro Opp Debug] Project', project.project_serial, 'category mismatch. Practitioner:', practitionerCategories, 'Project:', projectCategoryUuid);
         return false;
       }
 
-      // Check travel preference match
-      const travelPrefs = (project.travel_preference || '').split(',').map(p => p.trim().toLowerCase());
-      
-      // If project requires in-person service, check if practitioner offers it in that area
-      if (travelPrefs.includes('in_person') || travelPrefs.includes('in-person')) {
-        if (!matchSettings?.in_person_enabled) {
-          return false;
-        }
-        // Check if project location is within practitioner's in-person coverage area
-        if (!isWithinZipcodeRadius(project.zipcode, matchSettings.in_person_base_zipcode, matchSettings.in_person_radius_miles)) {
-          return false;
-        }
-      }
-
-      // If project requires virtual service, check if practitioner offers it in that state
-      if (travelPrefs.includes('virtual') || travelPrefs.includes('remote')) {
-        if (!matchSettings?.virtual_enabled) {
-          return false;
-        }
-        // Check if project state is in practitioner's virtual coverage
-        if (matchSettings.virtual_states && !matchSettings.virtual_states.includes(project.state)) {
+      // Check subcategory match (if project has subcategories specified)
+      if (project.subcategory_name && project.subcategory_name.trim()) {
+        const projectSubcategories = project.subcategory_name.split(',').map(s => s.trim());
+        const practitionerSubcategories = matchSettings?.service_subcategory_names || [];
+        const hasMatchingSubcategory = projectSubcategories.some(sub => 
+          practitionerSubcategories.includes(sub)
+        );
+        if (!hasMatchingSubcategory) {
           return false;
         }
       }
 
-      // If project requires housecalls, check if practitioner offers it in that area
-      if (travelPrefs.includes('housecalls') || travelPrefs.includes('house_calls')) {
-        if (!matchSettings?.housecalls_enabled) {
+      // Parse travel preferences - handle flexible option
+      const travelPrefs = (project.travel_preference || 'flexible').split(',').map(p => p.trim().toLowerCase());
+      const normalizedPrefs = new Set(
+        travelPrefs.map(p => 
+          p === 'in_person' ? 'in-person' : p
+        )
+      );
+
+      // FLEXIBLE: practitioner must offer at least ONE delivery method and matching location
+      if (normalizedPrefs.has('flexible')) {
+        const hasInPerson = matchSettings?.in_person_enabled && 
+          isWithinZipcodeRadius(project.zipcode, matchSettings.in_person_base_zipcode, matchSettings.in_person_radius_miles);
+        
+        const hasHousecalls = matchSettings?.housecalls_enabled &&
+          isWithinZipcodeRadius(project.zipcode, matchSettings.housecalls_base_zipcode, matchSettings.housecalls_radius_miles);
+        
+        const hasVirtual = matchSettings?.virtual_enabled && 
+          (!matchSettings.virtual_states || matchSettings.virtual_states.includes(project.state));
+        
+        if (!hasInPerson && !hasHousecalls && !hasVirtual) {
           return false;
         }
-        // Check if project location is within practitioner's housecalls coverage area
-        if (!isWithinZipcodeRadius(project.zipcode, matchSettings.housecalls_base_zipcode, matchSettings.housecalls_radius_miles)) {
-          return false;
+      } else {
+        // Specific travel preferences - ALL must match
+        
+        // If project requires in-person, practitioner must offer it in that area
+        if (normalizedPrefs.has('in-person')) {
+          if (!matchSettings?.in_person_enabled) {
+            return false;
+          }
+          if (!isWithinZipcodeRadius(project.zipcode, matchSettings.in_person_base_zipcode, matchSettings.in_person_radius_miles)) {
+            return false;
+          }
+        }
+
+        // If project requires virtual, practitioner must offer it in that state
+        if (normalizedPrefs.has('virtual') || normalizedPrefs.has('remote')) {
+          if (!matchSettings?.virtual_enabled) {
+            return false;
+          }
+          // Virtual with no state restrictions OR state matches
+          if (matchSettings.virtual_states && !matchSettings.virtual_states.includes(project.state)) {
+            return false;
+          }
+        }
+
+        // If project requires housecalls, practitioner must offer it in that area
+        if (normalizedPrefs.has('housecalls') || normalizedPrefs.has('house_calls')) {
+          if (!matchSettings?.housecalls_enabled) {
+            return false;
+          }
+          if (!isWithinZipcodeRadius(project.zipcode, matchSettings.housecalls_base_zipcode, matchSettings.housecalls_radius_miles)) {
+            return false;
+          }
         }
       }
 
@@ -298,21 +387,25 @@ function renderOpportunities() {
     return;
   }
 
+  console.log('[Pro Opportunities] Rendering', opportunities.length, 'opportunities');
+  console.log('[Pro Opportunities] First opportunity:', opportunities[0]);
+
   if (opportunities.length === 0) {
     container.innerHTML = `
       <div class="empty-state">
-        <h3>No Opportunities</h3>
-        <p>No clients matching your services are currently open to contact. Check back soon!</p>
+        <h3>No Opportunities Available</h3>
+        <p>No clients matching your services are currently open to opportunities. Check back soon!</p>
       </div>
     `;
     return;
   }
 
-  container.innerHTML = opportunities.map(project => {
+  const htmlCards = opportunities.map(project => {
+    console.log('[Pro Opportunities] Rendering card for project:', project.project_serial, 'client:', project.client_first_name, project.client_last_name);
     const clientName = `${project.client_first_name || 'Unknown'} ${project.client_last_name || 'Client'}`;
     const avatar = project.client_first_name?.charAt(0).toUpperCase() || 'C';
 
-    return `
+    const html = `
       <div class="client-card" data-project-id="${project.id}" data-project-serial="${project.project_serial}">
         <div class="card-header">
           <div class="client-avatar">${avatar}</div>
@@ -358,7 +451,12 @@ function renderOpportunities() {
         </div>
       </div>
     `;
+    return html;
   }).join('');
+
+  console.log('[Pro Opportunities] Generated HTML, length:', htmlCards.length);
+  container.innerHTML = htmlCards;
+  console.log('[Pro Opportunities] Cards rendered to DOM');
 
   // Attach event listeners to buttons
   attachOpportunityListeners();
@@ -371,10 +469,10 @@ function attachOpportunityListeners() {
   // Message buttons
   document.querySelectorAll('.opp-message-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
-      const oppId = e.currentTarget.dataset.oppId;
-      const opp = opportunities.find(o => o.id === oppId);
-      if (opp) {
-        openOpportunityMessageModal(opp);
+      const projectId = e.currentTarget.dataset.projectId;
+      const project = opportunities.find(o => o.id === projectId);
+      if (project) {
+        openOpportunityMessageModal(project);
       }
     });
   });
@@ -382,10 +480,11 @@ function attachOpportunityListeners() {
   // Decline buttons
   document.querySelectorAll('.opp-decline-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
-      const oppId = e.currentTarget.dataset.oppId;
-      const opp = opportunities.find(o => o.id === oppId);
-      if (opp) {
-        declineOpportunity(opp);
+      const projectSerial = e.currentTarget.dataset.projectSerial;
+      const clientSerial = e.currentTarget.dataset.clientSerial;
+      const project = opportunities.find(o => o.project_serial == projectSerial);
+      if (project) {
+        declineOpportunity(project);
       }
     });
   });
@@ -393,10 +492,9 @@ function attachOpportunityListeners() {
   // Block buttons
   document.querySelectorAll('.opp-block-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
-      const oppId = e.currentTarget.dataset.oppId;
-      const opp = opportunities.find(o => o.id === oppId);
-      if (opp) {
-        blockOpportunityClient(opp);
+      const clientSerial = e.currentTarget.dataset.clientSerial;
+      if (clientSerial) {
+        blockOpportunityClient(clientSerial);
       }
     });
   });
@@ -464,15 +562,15 @@ function openOpportunityMessageModal(opp) {
 /**
  * Send opportunity message (1 per opportunity)
  */
-async function sendOpportunityMessage(opp, messageText) {
+async function sendOpportunityMessage(project, messageText) {
   try {
     // First, create a project_practitioner_match (so it appears in inbox)
     const { data: matchData, error: matchError } = await supabaseClient
       .from('project_practitioner_matches')
       .insert({
-        project_serial: opp.projects[0]?.project_serial || 0,
+        project_serial: project.project_serial,
         practitioner_serial: currentPractitioner.serial_number,
-        client_serial: opp.clients[0]?.serial_number || 'unknown',
+        client_serial: project.client_serial,
         status: 'pending',
         match_score: 0,
         client_initiated: false,
@@ -492,45 +590,22 @@ async function sendOpportunityMessage(opp, messageText) {
     const { data: msgData, error: msgError } = await supabaseClient
       .from('project_messages')
       .insert({
-        project_id: opp.project_id,
+        project_id: project.id,
         practitioner_id: currentPractitioner.id,
-        client_id: opp.client_id,
+        client_id: project.client_id,
         sender_id: currentPractitioner.id,
         sender_type: 'practitioner',
         message: messageText,
         is_read: false,
         is_opportunity_message: true,
-        opportunity_id: opp.id,
         practitioner_serial: currentPractitioner.serial_number,
-        client_serial: opp.clients[0]?.serial_number || 'unknown',
-        project_serial: opp.projects[0]?.project_serial || 0
+        client_serial: project.client_serial,
+        project_serial: project.project_serial
       })
       .select()
       .single();
 
     if (msgError) throw msgError;
-
-    // Update opportunity to mark message as sent and link to match
-    const { error: oppError } = await supabaseClient
-      .from('opportunities')
-      .update({
-        message_sent: true,
-        message_count: 1,
-        converted_to_match: true,
-        match_id: matchData?.id || null,
-        status: 'accepted'
-      })
-      .eq('id', opp.id);
-
-    if (oppError) throw oppError;
-
-    // Create notification for client (accepted match)
-    await createClientNotification(
-      opp.clients[0]?.serial_number || 'unknown',
-      'match_accepted',
-      'Practitioner Match Accepted',
-      `${currentPractitioner.legal_name} has accepted your match request and sent you a message!`
-    );
 
     showToast('Message sent! The client will see it in their inbox.', 'success');
 
@@ -546,31 +621,24 @@ async function sendOpportunityMessage(opp, messageText) {
 /**
  * Decline opportunity (notify client)
  */
-async function declineOpportunity(opp) {
-  if (!confirm(`Decline this opportunity from ${opp.clients[0]?.first_name}? They will be notified of your decline.`)) {
+async function declineOpportunity(project) {
+  if (!confirm(`Decline this opportunity from ${project.client_first_name}? We'll record your decline.`)) {
     return;
   }
 
   try {
-
-
+    // Create a decline record in project_practitioner_matches if doesn't exist
     const { error } = await supabaseClient
-      .from('opportunities')
+      .from('project_practitioner_matches')
       .update({
-        declined_by_practitioner: true,
-        is_archived: true
+        status: 'declined'
       })
-      .eq('id', opp.id);
+      .eq('project_serial', project.project_serial)
+      .eq('practitioner_serial', currentPractitioner.serial_number);
 
-    if (error) throw error;
-
-    // Create notification for client (declined match)
-    await createClientNotification(
-      opp.clients[0]?.serial_number || 'unknown',
-      'match_declined',
-      'Practitioner Match Declined',
-      `Unfortunately, ${currentPractitioner.legal_name} has declined your match request.`
-    );
+    if (error && error.code !== 'PGRST116') {
+      throw error;
+    }
 
     showToast('Opportunity declined', 'success');
 
@@ -586,20 +654,18 @@ async function declineOpportunity(opp) {
 /**
  * Block client from opportunity (notify client)
  */
-async function blockOpportunityClient(opp) {
-  if (!confirm(`Block ${opp.clients[0]?.first_name} from reaching you again? They will be notified.`)) {
+async function blockOpportunityClient(clientSerial) {
+  if (!confirm(`Block this client from reaching you again? They will be notified.`)) {
     return;
   }
 
   try {
-
-
     // Create block record
     const { error: blockError } = await supabaseClient
       .from('practitioner_blocks')
       .insert({
         practitioner_id: currentPractitioner.id,
-        client_serial: opp.clients[0]?.serial_number || 'unknown',
+        client_serial: clientSerial,
         practitioner_serial: currentPractitioner.serial_number,
         is_blocked: true,
         from_opportunity: true
@@ -608,22 +674,6 @@ async function blockOpportunityClient(opp) {
     if (blockError && blockError.code !== 'PGRST116') {
       throw blockError; // Ignore unique constraint errors
     }
-
-    // Update all opportunities from this client to blocked
-    const { error: oppError } = await supabaseClient
-      .from('opportunities')
-      .update({ practitioner_blocked: true })
-      .eq('client_id', opp.client_id);
-
-    if (oppError) throw oppError;
-
-    // Create notification for client (blocked/declined)
-    await createClientNotification(
-      opp.clients[0]?.serial_number || 'unknown',
-      'match_declined',
-      'Practitioner Match Declined',
-      `Unfortunately, ${currentPractitioner.legal_name} has declined your match request.`
-    );
 
     showToast('Client blocked. They will be notified.', 'success');
 

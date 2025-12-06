@@ -35,6 +35,12 @@
 // 1. INITIALIZATION & SETUP
 // ═══════════════════════════════════════════════════════════════════════════
 
+// Debounce flag to prevent duplicate renders
+let renderInProgress = false;
+
+// Prevent multiple initialization
+let inboxInitialized = false;
+
 // Note: State variables (currentPage, allMatches, etc.) are declared in inbox-manager.js
 // This file accesses them globally
 
@@ -166,6 +172,7 @@ function displayMatches(page) {
 
   // Attach button listeners
   attachOpportunityButtonListeners();
+  attachReviewButtonListeners();
 
   // Hide pagination
   const paginationContainer = document.getElementById('pagination-container');
@@ -178,7 +185,21 @@ function displayMatches(page) {
  * Render match list using current filtered matches
  */
 function renderMatches() {
-  displayMatches(currentPage);
+  // Prevent duplicate renders
+  if (renderInProgress) {
+    console.log('[Inbox-UI] Render already in progress, skipping');
+    return;
+  }
+  
+  renderInProgress = true;
+  try {
+    displayMatches(currentPage);
+  } finally {
+    // Reset flag after a short delay to allow UI updates
+    setTimeout(() => {
+      renderInProgress = false;
+    }, 100);
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -843,6 +864,7 @@ function attachOpportunityButtonListeners() {
  */
 function attachReviewButtonListeners() {
   const reviewBtns = document.querySelectorAll('.thread-review-btn');
+  console.log('[Inbox-UI] Found', reviewBtns.length, 'review buttons');
 
   reviewBtns.forEach(btn => {
     initializeReviewButtonText(btn);
@@ -850,6 +872,7 @@ function attachReviewButtonListeners() {
     btn.addEventListener('click', async (e) => {
       e.preventDefault();
       e.stopPropagation();
+      console.log('[Inbox-UI] Review button clicked');
 
       const matchId = btn.dataset.matchId;
       const practitionerId = btn.dataset.practitionerId;
@@ -859,8 +882,11 @@ function attachReviewButtonListeners() {
       const clientLastName = btn.dataset.clientLastName;
       const clientId = window.authManager?.getCurrentUser()?.id;
 
+      console.log('[Inbox-UI] Review data:', { matchId, practitionerId, practitionerName, projectId, clientId });
+
       if (window.reviewsManager && typeof window.reviewsManager.openReviewModal === 'function') {
         try {
+          console.log('[Inbox-UI] Checking for existing review...');
           const hasExistingReview = await window.reviewsManager.checkForExistingReview(
             projectId,
             practitionerId,
@@ -873,9 +899,10 @@ function attachReviewButtonListeners() {
             btn.textContent = 'Leave Review';
           }
         } catch (e) {
-          // Error checking for existing review - will use default text
+          console.warn('[Inbox-UI] Error checking for existing review:', e);
         }
 
+        console.log('[Inbox-UI] Opening review modal...');
         window.reviewsManager.openReviewModal(
           matchId,
           practitionerId,
@@ -885,6 +912,9 @@ function attachReviewButtonListeners() {
           clientLastName,
           clientId
         );
+      } else {
+        console.error('[Inbox-UI] reviewsManager not found or openReviewModal not available');
+        console.log('[Inbox-UI] window.reviewsManager:', window.reviewsManager);
       }
     });
   });
@@ -956,6 +986,12 @@ function renderPagination(totalPages) {
  * Initialize the entire inbox application
  */
 async function initializeInbox() {
+  if (inboxInitialized) {
+    console.log('[Inbox] Already initialized, skipping');
+    return;
+  }
+  inboxInitialized = true;
+
   try {
     if (!window.supabaseClient) {
       return;

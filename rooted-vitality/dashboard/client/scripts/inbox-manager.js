@@ -237,7 +237,26 @@ async function loadMatches(clientSerial) {
     }
 
     // Merge practitioner, project, and message data into matches
-    allMatches = (matchesData || []).map(match => {
+    // DEDUPLICATE: Only keep the first occurrence of each project+practitioner combo
+    // Prefer the one with the latest updated_at
+    const matchesByCombo = {};
+    
+    (matchesData || []).forEach(match => {
+      const combo = `${match.project_serial}:${match.practitioner_serial}`;
+      
+      if (!matchesByCombo[combo]) {
+        matchesByCombo[combo] = match;
+      } else {
+        // Keep the newer one (latest updated_at)
+        const existingDate = new Date(matchesByCombo[combo].updated_at || matchesByCombo[combo].created_at);
+        const newDate = new Date(match.updated_at || match.created_at);
+        if (newDate > existingDate) {
+          matchesByCombo[combo] = match;
+        }
+      }
+    });
+    
+    allMatches = Object.values(matchesByCombo).map(match => {
       const messages = messagesMap[match.id] || [];
       return {
         ...match,
@@ -306,7 +325,7 @@ async function loadMatches(clientSerial) {
           const { data: projData } = await window.supabaseClient
             .from('projects')
             .select('id, category_id, category_name, zipcode, travel_preference, description, custom_name, client_id')
-            .in('id', projectIds);
+            .in('project_serial', projectSerials);
           
           if (projData) {
             projData.forEach(proj => {
@@ -315,7 +334,13 @@ async function loadMatches(clientSerial) {
           }
         }
 
-        const oppItems = opportunities.map(opp => {
+        const oppItems = opportunities
+          // Filter out opportunities that already have a converted match
+          .filter(opp => !matchesData.some(m => 
+            m.project_serial === opp.project_serial && 
+            m.practitioner_serial === opp.practitioner_serial
+          ))
+          .map(opp => {
           const practitioner = practitionersDetailsMap[opp.practitioner_serial] || {};
           const project = projectsDetailsMap[opp.project_serial] || {};
           

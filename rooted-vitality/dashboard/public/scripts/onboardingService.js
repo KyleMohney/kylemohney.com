@@ -612,7 +612,7 @@ async function loadMatchesForOnboarding(onboardingData) {
 
           // Create auto-message via RPC (same as find-practitioners.js)
           const clientName = onboardingData.firstName || 'Client';
-          const messageText = `${clientName} wants connect about their wellness project!`;
+          const messageText = `${clientName} wants to connect!`;
 
           const { error: messageError } = await window.supabaseClient
             .rpc('create_project_message', {

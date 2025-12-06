@@ -655,6 +655,11 @@ async function loadProjects(clientSerial) {
 
     // Render the projects grid
     renderProjectsGrid();
+    
+    // Update the "open to match" toggle to reflect the first project's state
+    if (window.updateOpenToMatchToggle) {
+      window.updateOpenToMatchToggle();
+    }
 
   } catch (err) {
     console.error('[loadProjects] Exception:', err);

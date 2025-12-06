@@ -189,7 +189,6 @@ TABLE OF CONTENTS:
       background: #fbf7ec;
       border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-      overflow: hidden;
       transition: all 0.3s ease;
       display: flex;
       flex-direction: column;
@@ -301,6 +300,68 @@ TABLE OF CONTENTS:
     
     .btn-danger:hover {
       background: #fdd;
+    }
+
+    /* Card Menu */
+    .card-menu {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-menu-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: #77883e;
+      cursor: pointer;
+      padding: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      min-width: auto;
+    }
+
+    .card-menu-btn:hover {
+      color: #5f7030;
+      transform: scale(1.1);
+    }
+
+    .card-menu-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      z-index: 100;
+      min-width: 150px;
+      overflow: hidden;
+    }
+
+    .card-menu-dropdown.hidden {
+      display: none;
+    }
+
+    .card-menu-item {
+      display: block;
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: none;
+      background: none;
+      text-align: left;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: #333;
+      transition: all 0.2s ease;
+    }
+
+    .card-menu-item:hover {
+      background: #f5f5f5;
+      color: #77883e;
     }
     
     .empty-state {
@@ -683,57 +744,81 @@ TABLE OF CONTENTS:
 
     function showConfirmDeclineModal() {
       const modal = document.getElementById('decline-modal');
-      modal.style.display = 'flex';
+      console.log('[Pro Clients] Showing decline modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('active');
       modal.onclick = (e) => {
+        console.log('[Pro Clients] Modal clicked, target:', e.target);
         if (e.target === modal) closeDeclineModal();
       };
     }
 
     function closeDeclineModal() {
       const modal = document.getElementById('decline-modal');
-      modal.style.display = 'none';
+      modal.classList.add('hidden');
+      modal.classList.remove('active');
       pendingDeclineMatch = null;
     }
 
-    async function confirmDecline() {
-      if (!pendingDeclineMatch) return;
+    async function confirmDecline(event) {
+      console.log('[Pro Clients] confirmDecline called, pendingDeclineMatch:', pendingDeclineMatch);
+      if (!pendingDeclineMatch) {
+        console.error('[Pro Clients] No pending decline match');
+        return;
+      }
       
-      const confirmBtn = event.target;
-      confirmBtn.disabled = true;
-      confirmBtn.textContent = 'Processing...';
+      const confirmBtn = event?.target;
+      if (confirmBtn) {
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = 'Processing...';
+      }
       
       await handleDeclineConfirmed();
       
-      confirmBtn.disabled = false;
-      confirmBtn.textContent = 'Decline';
+      if (confirmBtn) {
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Decline';
+      }
       closeDeclineModal();
     }
 
     function showConfirmBlockModal() {
       const modal = document.getElementById('block-modal');
-      modal.style.display = 'flex';
+      console.log('[Pro Clients] Showing block modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('active');
       modal.onclick = (e) => {
+        console.log('[Pro Clients] Block modal clicked, target:', e.target);
         if (e.target === modal) closeBlockModal();
       };
     }
 
     function closeBlockModal() {
       const modal = document.getElementById('block-modal');
-      modal.style.display = 'none';
+      modal.classList.add('hidden');
+      modal.classList.remove('active');
       pendingBlockClientSerial = null;
     }
 
-    async function confirmBlock() {
-      if (!pendingBlockClientSerial) return;
+    async function confirmBlock(event) {
+      console.log('[Pro Clients] confirmBlock called, pendingBlockClientSerial:', pendingBlockClientSerial);
+      if (!pendingBlockClientSerial) {
+        console.error('[Pro Clients] No pending block client serial');
+        return;
+      }
       
-      const confirmBtn = event.target;
-      confirmBtn.disabled = true;
-      confirmBtn.textContent = 'Processing...';
+      const confirmBtn = event?.target;
+      if (confirmBtn) {
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = 'Processing...';
+      }
       
       await handleBlockConfirmed();
       
-      confirmBtn.disabled = false;
-      confirmBtn.textContent = 'Block';
+      if (confirmBtn) {
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Block';
+      }
       closeBlockModal();
     }
 
@@ -741,6 +826,7 @@ TABLE OF CONTENTS:
       if (!pendingDeclineMatch) return;
       
       const match = pendingDeclineMatch;
+      console.log('[Pro Clients] Declining match:', match.id);
       const { error } = await window.supabaseClient
         .from('project_practitioner_matches')
         .update({
@@ -752,6 +838,7 @@ TABLE OF CONTENTS:
         .eq('id', match.id);
 
       if (!error) {
+        console.log('[Pro Clients] Match declined successfully');
         const currentUser = window.authManager.getCurrentUser();
         if (window.notifyClientOfMatchResponse) {
           await notifyClientOfMatchResponse({
@@ -759,29 +846,32 @@ TABLE OF CONTENTS:
             practitionerName: currentUser?.dba_name || currentUser?.legal_name || 'A practitioner',
             projectName: match.projectName || 'your project',
             action: 'declined',
-            reason: 'Not available at this time'
+            reason: 'Not available at this time',
+            matchId: match.id
           });
         }
         
-        const clientName = `${match.projects?.clients?.first_name || 'Client'}`;
+        const clientName = `${match.clients?.first_name || 'Client'}`;
         showToast('Declined', `You declined ${clientName}`, 'info');
         // Remove the card from the DOM
         const card = document.querySelector(`[data-match-id="${match.id}"]`)?.closest('.client-card');
+        console.log('[Pro Clients] Removing card:', card);
         if (card) card.remove();
         
         pendingDeclineMatch = null;
       } else {
+        console.error('[Pro Clients] Error declining match:', error);
         showToast('Error', 'Failed to decline client', 'error');
       }
       
       pendingDeclineMatch = null;
-      document.getElementById('confirm-decline-confirm').disabled = false;
     }
 
     async function handleBlockConfirmed() {
       try {
         if (!pendingBlockClientSerial) return;
 
+        console.log('[Pro Clients] Blocking client:', pendingBlockClientSerial);
         const clientSerial = pendingBlockClientSerial;
         const currentUser = window.authManager.getCurrentUser();
         const practitionerSerial = currentUser?.serial_number;
@@ -795,10 +885,12 @@ TABLE OF CONTENTS:
 
         if (fetchError) {
           showToast('Error', 'Failed to find all matches', 'error');
+          console.error('[Pro Clients] Block error:', fetchError);
           pendingBlockClientSerial = null;
-          document.getElementById('confirm-block-confirm').disabled = false;
           return;
         }
+
+        console.log('[Pro Clients] Found', allMatches?.length || 0, 'matches to decline');
 
         if (allMatches && allMatches.length > 0) {
           const { error: updateError } = await window.supabaseClient
@@ -812,12 +904,13 @@ TABLE OF CONTENTS:
             .in('id', allMatches.map(m => m.id));
 
           if (!updateError) {
+            console.log('[Pro Clients] All matches declined successfully');
             // Add to blocklist
             const practitionerId = getPractitionerId();
             if (!practitionerId) {
               showToast('Error', 'Failed to get practitioner info', 'error');
+              console.error('[Pro Clients] Could not get practitioner ID');
               pendingBlockClientSerial = null;
-              document.getElementById('confirm-block-confirm').disabled = false;
               return;
             }
             
@@ -833,6 +926,7 @@ TABLE OF CONTENTS:
               });
 
             if (!blockError) {
+              console.log('[Pro Clients] Client blocked successfully');
               showToast('Blocked', 'Client blocked successfully', 'info');
               // Remove all cards for this client
               document.querySelectorAll(`.client-card`).forEach(card => {
@@ -842,17 +936,16 @@ TABLE OF CONTENTS:
                 }
               });
             } else {
+              console.error('[Pro Clients] Block error:', blockError);
               showToast('Error', 'Failed to block client', 'error');
             }
           }
         }
 
         pendingBlockClientSerial = null;
-        document.getElementById('confirm-block-confirm').disabled = false;
       } catch (error) {
         console.error('[Pro Clients] Error in handleBlockConfirmed:', error);
         pendingBlockClientSerial = null;
-        document.getElementById('confirm-block-confirm').disabled = false;
       }
     }
 
@@ -940,10 +1033,23 @@ TABLE OF CONTENTS:
           return;
         }
 
+        // Deduplicate matches by project_serial - only keep the first (newest) match per project
+        const seenProjectSerials = new Set();
+        const deduplicatedMatches = [];
+        for (const match of matches) {
+          if (!seenProjectSerials.has(match.project_serial)) {
+            seenProjectSerials.add(match.project_serial);
+            deduplicatedMatches.push(match);
+          }
+        }
+
+        // Use deduplicated matches
+        const finalMatches = deduplicatedMatches;
+
         // Fetch related data separately
-        if (matches && matches.length > 0) {
-          const projectSerials = [...new Set(matches.map(m => m.project_serial))];
-          const clientSerials = [...new Set(matches.map(m => m.client_serial))];
+        if (finalMatches && finalMatches.length > 0) {
+          const projectSerials = [...new Set(finalMatches.map(m => m.project_serial))];
+          const clientSerials = [...new Set(finalMatches.map(m => m.client_serial))];
           
           // Get projects
           const { data: projects } = await window.supabaseClient
@@ -958,7 +1064,7 @@ TABLE OF CONTENTS:
             .in('serial_number', clientSerials);
           
           // Merge data with matches
-          matches.forEach(match => {
+          finalMatches.forEach(match => {
             const project = projects?.find(p => p.project_serial === match.project_serial);
             const client = clients?.find(c => c.serial_number === match.client_serial);
             match.projects = project;
@@ -968,7 +1074,7 @@ TABLE OF CONTENTS:
 
         // Get first message from each match
         const newClientsContainer = document.getElementById('new-clients');
-        if (!matches || matches.length === 0) {
+        if (!finalMatches || finalMatches.length === 0) {
           newClientsContainer.innerHTML = '<div class="empty-state"><h3>No New Clients Yet</h3><p>Clients who contact you will appear here</p></div>';
         } else {
           newClientsContainer.innerHTML = '';
@@ -977,11 +1083,11 @@ TABLE OF CONTENTS:
         const opportunitiesContainer = document.getElementById('opportunities');
         opportunitiesContainer.innerHTML = '<div class="empty-state"><h3>No Opportunities Yet</h3><p>Clients looking for practitioners will appear here soon</p></div>';
 
-        for (const match of matches) {
-          if (!match.projects?.clients) continue;
+        for (const match of finalMatches) {
+          if (!match.projects || !match.clients) continue;
 
           const project = match.projects;
-          const client = project.clients;
+          const client = match.clients;
           const clientName = `${client.first_name || 'Client'} ${client.last_name ? client.last_name[0] + '.' : ''}`;
           const initials = (client.first_name?.[0] || 'C') + (client.last_name?.[0] || 'L');
           
@@ -1004,6 +1110,7 @@ TABLE OF CONTENTS:
           const card = document.createElement('div');
           card.className = 'client-card';
           card.setAttribute('data-client-serial', match.client_serial);
+          card.setAttribute('data-match-id', match.id);
           card.innerHTML = `
             <div class="card-header">
               <div class="client-avatar">${avatarHTML}</div>
@@ -1014,6 +1121,12 @@ TABLE OF CONTENTS:
                 <span class="match-quality-badge ${matchQuality}">
                   ${qualityLabel} (${matchScore}/100)
                 </span>
+              </div>
+              <div class="card-menu">
+                <button class="card-menu-btn" data-match-id="${match.id}">⋮</button>
+                <div class="card-menu-dropdown hidden" data-match-id="${match.id}">
+                  <button class="card-menu-item archive-item" data-action="archive" data-match-id="${match.id}">Archive</button>
+                </div>
               </div>
             </div>
             <div class="message-preview-box">
@@ -1031,6 +1144,10 @@ TABLE OF CONTENTS:
 
           card.querySelector('[data-action="accept"]').addEventListener('click', async () => {
               try {
+                  // Get current user and practitioner info
+                  const currentUser = window.authManager.getCurrentUser();
+                  const practitionerSerial = currentUser?.serial_number;
+                  
                   const { error } = await window.supabaseClient
                     .from('project_practitioner_matches')
                     .update({
@@ -1047,48 +1164,18 @@ TABLE OF CONTENTS:
                     return;
                 }
                 
-                // Create initial message from client to practitioner
-                // This is the match notification message that appears in the inbox
-                const clientFullName = match.projects?.clients?.first_name && match.projects?.clients?.last_name 
-                  ? `${match.projects.clients.first_name} ${match.projects.clients.last_name}`
-                  : match.projects?.clients?.first_name || 'A client';
-                
-                const defaultMessage = `${clientFullName} has matched with you and is interested in your services for: ${match.projects?.category_name || 'wellness services'}.`;
-                
-                // Get project and client IDs for the message
-                const projectId = match.projects?.id;
-                const clientId = match.projects?.clients?.id;
-                
-                const { data: msgData, error: msgError } = await window.supabaseClient
-                  .from('project_messages')
-                  .insert({
-                    project_id: projectId,
-                    practitioner_id: currentUser?.id,
-                    client_id: clientId,
-                    sender_id: currentUser?.id, // Practitioner is sending the initial message
-                    project_serial: match.project_serial,
-                    practitioner_serial: practitionerSerial,
-                    client_serial: match.client_serial,
-                    sender_type: 'practitioner', // Practitioner sending initial message
-                    message: defaultMessage,
-                    is_read: false
-                  });
-
-                if (msgError) {
-                  console.error('[Pro Clients] Error creating initial message:', msgError);
-                } else {
-                }
-                
                 // Notify client of acceptance
                 if (window.notifyClientOfMatchResponse) {
                   await notifyClientOfMatchResponse({
                     clientSerial: match.client_serial,
                     practitionerName: currentUser?.dba_name || currentUser?.legal_name || 'A practitioner',
                     projectName: match.projectName || 'your project',
-                    action: 'accepted'
+                    action: 'accepted',
+                    matchId: match.id
                   });
                 }
                 
+                const clientName = `${match.clients?.first_name || 'Client'} ${match.clients?.last_name ? match.clients.last_name[0] + '.' : ''}`;
                 showToast('Client Accepted', `You accepted ${clientName}. Opening your inbox...`, 'success');
                 card.remove();
                 
@@ -1106,6 +1193,47 @@ TABLE OF CONTENTS:
           card.querySelector('[data-action="decline"]').addEventListener('click', async () => {
             pendingDeclineMatch = match;
             showConfirmDeclineModal();
+          });
+
+          // Menu Button Handler
+          const menuBtn = card.querySelector('.card-menu-btn');
+          const menuDropdown = card.querySelector('.card-menu-dropdown');
+          
+          menuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            menuDropdown.classList.toggle('hidden');
+          });
+
+          // Archive Item Handler
+          const archiveItem = card.querySelector('[data-action="archive"]');
+          archiveItem.addEventListener('click', async () => {
+            try {
+              const { error } = await window.supabaseClient
+                .from('project_practitioner_matches')
+                .update({
+                  status: 'archived',
+                  updated_at: new Date().toISOString()
+                })
+                .eq('id', match.id);
+
+              if (error) {
+                console.error('[Pro Clients] Error archiving match:', error);
+                alert('Error archiving match: ' + (error?.message || 'Unknown error'));
+                return;
+              }
+
+              showToast('Archived', 'Project archived successfully', 'success');
+              card.remove();
+              menuDropdown.classList.add('hidden');
+            } catch (archiveError) {
+              console.error('[Pro Clients] Unexpected error archiving match:', archiveError);
+              alert('Unexpected error: ' + (archiveError?.message || 'Please try again'));
+            }
+          });
+
+          // Close menu when clicking outside
+          document.addEventListener('click', () => {
+            menuDropdown.classList.add('hidden');
           });
 
           card.querySelector('[data-action="block"]').addEventListener('click', async () => {
@@ -1188,8 +1316,8 @@ TABLE OF CONTENTS:
             
             const { data: clientData } = await window.supabaseClient
               .from('clients')
-              .select('id, first_name, last_name')
-              .eq('id', matchResult.client_serial)
+              .select('id, serial_number, first_name, last_name, profile_picture_url')
+              .eq('serial_number', matchResult.client_serial)
               .single();
             
             // Merge data
@@ -1201,7 +1329,7 @@ TABLE OF CONTENTS:
 
             if (match && match.status === 'pending') {
               const project = match.projects;
-              const client = project?.clients;
+              const client = match.clients;
 
               if (project && client) {
                 const clientName = `${client.first_name || 'Client'} ${client.last_name ? client.last_name[0] + '.' : ''}`;
@@ -1416,6 +1544,31 @@ TABLE OF CONTENTS:
         }
 
         practitionerIdGlobal = practitionerId;
+
+        // Setup modal button listeners
+        const declineBtns = document.querySelectorAll('.close-decline-modal');
+        console.log('[Pro Clients] Found', declineBtns.length, 'close-decline-modal buttons');
+        declineBtns.forEach(btn => {
+          btn.addEventListener('click', closeDeclineModal);
+        });
+        
+        const confirmDeclineBtn = document.querySelector('.confirm-decline-btn');
+        console.log('[Pro Clients] confirmDeclineBtn:', confirmDeclineBtn);
+        if (confirmDeclineBtn) {
+          confirmDeclineBtn.addEventListener('click', confirmDecline);
+        }
+        
+        const blockBtns = document.querySelectorAll('.close-block-modal');
+        console.log('[Pro Clients] Found', blockBtns.length, 'close-block-modal buttons');
+        blockBtns.forEach(btn => {
+          btn.addEventListener('click', closeBlockModal);
+        });
+        
+        const confirmBlockBtn = document.querySelector('.confirm-block-btn');
+        console.log('[Pro Clients] confirmBlockBtn:', confirmBlockBtn);
+        if (confirmBlockBtn) {
+          confirmBlockBtn.addEventListener('click', confirmBlock);
+        }
 
         // Load initial data
         await loadClientsData();

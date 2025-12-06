@@ -497,6 +497,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         setupFilterListeners();
         setupThreadCloseListener();
         setupBackButtonListener();
+        setupMenuClickHandler();
         
         // Load and render conversations
         await loadConversations();
@@ -621,6 +622,22 @@ function setupBackButtonListener() {
         selectedConversationId = null;
         renderThreadsList();
         closeThreadView();
+    });
+}
+
+// Setup global click handler to close open menus
+function setupMenuClickHandler() {
+    document.addEventListener('click', (e) => {
+        // Close all open thread menus when clicking outside
+        const threadMenus = document.querySelectorAll('.thread-menu-dropdown.visible');
+        threadMenus.forEach(menu => {
+            // Check if click was on a menu button or menu item
+            const menuBtn = menu.parentElement?.querySelector('.thread-menu-btn');
+            if (!menu.contains(e.target) && !menuBtn?.contains(e.target)) {
+                menu.classList.remove('visible');
+                menu.classList.add('hidden');
+            }
+        });
     });
 }
 
@@ -1061,12 +1078,15 @@ function createThreadElement(conversation) {
     if (menuBtn && menuDropdown) {
         menuBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            menuDropdown.classList.toggle('visible');
-        });
-        
-        // Close menu when clicking outside
-        document.addEventListener('click', () => {
-            menuDropdown.classList.remove('visible');
+            // Remove hidden class and toggle visible class
+            const isHidden = menuDropdown.classList.contains('hidden');
+            if (isHidden) {
+                menuDropdown.classList.remove('hidden');
+                menuDropdown.classList.add('visible');
+            } else {
+                menuDropdown.classList.remove('visible');
+                menuDropdown.classList.add('hidden');
+            }
         });
     }
     
@@ -1074,6 +1094,7 @@ function createThreadElement(conversation) {
         archiveOption.addEventListener('click', (e) => {
             e.stopPropagation();
             menuDropdown.classList.remove('visible');
+            menuDropdown.classList.add('hidden');
             archiveConversation(conversation);
         });
     }
@@ -1082,6 +1103,7 @@ function createThreadElement(conversation) {
         blockOption.addEventListener('click', (e) => {
             e.stopPropagation();
             menuDropdown.classList.remove('visible');
+            menuDropdown.classList.add('hidden');
             blockConversation(conversation);
         });
     }

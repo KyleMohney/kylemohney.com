@@ -63,8 +63,30 @@ function renderUnifiedMessages(messages, containerSelector, currentUserType, oth
     return;
   }
 
+  // Filter out auto-generated system match messages
+  const filteredMessages = messages.filter(msg => {
+    // Remove messages that match the pattern: "[Name] has matched with you and is interested in your services for: [service]"
+    if (msg.message && msg.message.includes('has matched with you and is interested in your services for:')) {
+      return false;
+    }
+    return true;
+  });
+
+  // If all messages were filtered out, show empty state
+  if (filteredMessages.length === 0) {
+    container.innerHTML = `
+      <div class="messages-empty-state">
+        <div class="empty-state-content">
+          <p class="empty-state-title">No messages yet</p>
+          <p class="empty-state-text">Start the conversation with ${otherUserInfo.name || 'this person'}</p>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
   // Group consecutive messages from the same sender
-  const groupedMessages = groupConsecutiveMessages(messages);
+  const groupedMessages = groupConsecutiveMessages(filteredMessages);
 
   groupedMessages.forEach((group, idx) => {
     const isCurrentUser = group.sender_type === currentUserType;

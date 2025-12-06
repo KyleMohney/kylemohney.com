@@ -811,7 +811,7 @@ async function sendPractitionerMatch(project, practitionerId, practitionerSerial
         // Create auto-message
         try {
             const clientName = clientData.first_name || 'Client';
-            const messageText = `${clientName} wants connect about their wellness project!`;
+            const messageText = `${clientName} wants to connect!`;
 
             const { error: msgInsertError } = await window.supabaseClient.rpc('create_project_message', {
                 p_project_id: project.id,

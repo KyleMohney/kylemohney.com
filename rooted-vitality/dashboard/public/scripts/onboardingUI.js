@@ -679,7 +679,6 @@ function setupStep5Handler(onboardingData, saveLocalData) {
                 const insertObject = {
                     ...projectInsertData,
                     project_status: 'pending',
-                    client_open_to_contact: true,
                     start_date: new Date().toISOString().split('T')[0]
                 };
 
