@@ -1,4 +1,4 @@
-﻿
+
 
 
 /*
@@ -53,8 +53,11 @@ let selectedOpportunity = null;document.addEventListener('DOMContentLoaded', asy
     // Set up sidebar tab switching
     setupTabSwitching();
 
-    // Load opportunities
-    await loadOpportunities();
+    // TEMPORARILY DISABLED: Opportunities feature is disabled while investigating auto-matching bug
+    // To re-enable, uncomment the loadOpportunities call below and remove the showDisabledMessage call
+    console.log('[Pro Opportunities] Opportunities feature is temporarily disabled');
+    showDisabledMessage();
+    // await loadOpportunities();
 
     // Set up event listeners
     setupEventListeners();
@@ -96,6 +99,30 @@ function setupTabSwitching() {
 }
 
 /**
+ * Show disabled message for opportunities feature
+ * TEMPORARY: Opportunities feature is disabled while investigating auto-matching bug
+ */
+function showDisabledMessage() {
+  const opportunitiesList = document.getElementById('opportunities');
+  if (opportunitiesList) {
+    opportunitiesList.innerHTML = `
+      <div style="display: flex; align-items: center; justify-content: center; height: 400px; text-align: center;">
+        <div>
+          <h2 style="color: #666; margin-bottom: 16px;">Opportunities Temporarily Disabled</h2>
+          <p style="color: #999; max-width: 400px; margin: 0 auto;">
+            The opportunities feature is temporarily disabled while we investigate and fix a matching issue. 
+            You can still view and manage <strong>New Clients</strong> in the tab above.
+          </p>
+          <p style="color: #999; font-size: 12px; margin-top: 16px;">
+            We apologize for any inconvenience. This will be re-enabled shortly.
+          </p>
+        </div>
+      </div>
+    `;
+  }
+}
+
+/**
  * Load opportunities from open-to-match clients with active projects
  * Uses smart matching: shows projects where practitioner's settings match the project requirements
  */
@@ -124,12 +151,6 @@ async function loadOpportunities() {
     if (settingsError) {
       console.error('[Pro Opportunities] Error loading match settings:', settingsError);
       showToast('Error loading match settings', 'error');
-      return;
-    }
-
-    // If matching is disabled or paused, show empty state
-    if (!matchSettings?.matching_enabled || matchSettings?.matching_paused) {
-      renderOpportunities([]);
       return;
     }
 
@@ -227,19 +248,14 @@ async function loadOpportunities() {
 
     // Smart filter: keep only projects that match practitioner's settings
     const filteredProjects = flatProjects.filter(project => {
-      // Exclude if already matched (active/in-progress/hired)
+      // Exclude if project is already in-progress/hired (not pending anymore)
       if (matchedProjectSerials.has(project.project_serial)) {
-        console.log('[Pro Opp Debug] Project', project.project_serial, 'already matched');
+        console.log('[Pro Opp Debug] Project', project.project_serial, 'already matched (in-progress/hired)');
         return false;
       }
-      // Exclude if pending match exists
-      if (pendingProjectSerials.has(project.project_serial)) {
-        console.log('[Pro Opp Debug] Project', project.project_serial, 'has pending match');
-        return false;
-      }
-      // Exclude if already declined
+      // Exclude if already declined by this practitioner
       if (declinedProjectSerials.has(project.project_serial)) {
-        console.log('[Pro Opp Debug] Project', project.project_serial, 'already declined');
+        console.log('[Pro Opp Debug] Project', project.project_serial, 'already declined by this practitioner');
         return false;
       }
 
@@ -439,14 +455,11 @@ function renderOpportunities() {
         </div>
         
         <div class="card-actions">
-          <button class="btn-accent opp-message-btn" data-project-id="${project.id}">
-            Send Message & Create Match
+          <button class="btn-accent opp-connect-btn" data-project-id="${project.id}" data-project-serial="${project.project_serial}" data-client-id="${project.client_id}">
+            Connect with Client
           </button>
-          <button class="btn-neutral opp-decline-btn" data-project-serial="${project.project_serial}" data-client-serial="${project.client_serial}">
-            Decline
-          </button>
-          <button class="btn-danger opp-block-btn" data-client-serial="${project.client_serial}">
-            Block Client
+          <button class="btn-neutral opp-not-interested-btn" data-project-serial="${project.project_serial}">
+            Not Interested
           </button>
         </div>
       </div>
@@ -466,155 +479,71 @@ function renderOpportunities() {
  * Attach event listeners to opportunity action buttons
  */
 function attachOpportunityListeners() {
-  // Message buttons
-  document.querySelectorAll('.opp-message-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
+  // Connect with Client button
+  document.querySelectorAll('.opp-connect-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
       const projectId = e.currentTarget.dataset.projectId;
       const project = opportunities.find(o => o.id === projectId);
       if (project) {
-        openOpportunityMessageModal(project);
+        await connectWithClient(project);
       }
     });
   });
 
-  // Decline buttons
-  document.querySelectorAll('.opp-decline-btn').forEach(btn => {
+  // Not Interested button
+  document.querySelectorAll('.opp-not-interested-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
       const projectSerial = e.currentTarget.dataset.projectSerial;
-      const clientSerial = e.currentTarget.dataset.clientSerial;
       const project = opportunities.find(o => o.project_serial == projectSerial);
       if (project) {
         declineOpportunity(project);
       }
     });
   });
-
-  // Block buttons
-  document.querySelectorAll('.opp-block-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const clientSerial = e.currentTarget.dataset.clientSerial;
-      if (clientSerial) {
-        blockOpportunityClient(clientSerial);
-      }
-    });
-  });
 }
 
 /**
- * Open modal to send message from opportunity
+ * Connect with client from an opportunity
+ * TEMPORARILY DISABLED: Match creation is disabled while investigating auto-matching bug
  */
-function openOpportunityMessageModal(opp) {
-  const client = opp.clients[0];
-  const project = opp.projects[0];
-  const clientName = client ? `${client.first_name} ${client.last_name}` : 'Unknown Client';
-
-  const modal = document.createElement('div');
-  modal.className = 'modal';
-  modal.id = 'opp-message-modal';
-  modal.innerHTML = `
-    <div class="modal__overlay"></div>
-    <div class="modal__content modal__content--small">
-      <div class="modal__header">
-        <h2>Send Message to ${clientName}</h2>
-        <button class="modal__close" aria-label="Close modal">&times;</button>
-      </div>
-      <div class="modal__body">
-        <div style="background: #fbf7ec; padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem;">
-          <p style="margin: 0; font-size: 0.85rem; color: #666;"><strong>Project:</strong> ${project?.custom_name}</p>
-          <p style="margin: 0.5rem 0 0 0; font-size: 0.85rem; color: #666;"><strong>Need:</strong> ${project?.category_name}</p>
-        </div>
-        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.9rem;">Your Message (max 1):</label>
-        <textarea 
-          id="opp-message-text" 
-          placeholder="Introduce yourself and why you're a good fit for their needs..."
-          style="width: 100%; height: 120px; padding: 0.75rem; border: 1px solid #fbf7ec; border-radius: 6px; font-family: inherit; font-size: 0.9rem; resize: vertical;"
-        ></textarea>
-        <p style="font-size: 0.8rem; color: #999; margin: 0.5rem 0 0 0;">ðŸ’¡ Tip: This is your only message. Make it count!</p>
-      </div>
-      <div class="modal__footer">
-        <button id="opp-message-cancel" class="btn btn--secondary">Cancel</button>
-        <button id="opp-message-send" class="btn btn-accent" data-opp-id="${opp.id}">Send Message</button>
-      </div>
-    </div>
-  `;
-
-  document.body.appendChild(modal);
-
-  // Close button
-  modal.querySelector('.modal__close').addEventListener('click', () => modal.remove());
-  document.getElementById('opp-message-cancel').addEventListener('click', () => modal.remove());
-
-  // Send button
-  document.getElementById('opp-message-send').addEventListener('click', async () => {
-    const messageText = document.getElementById('opp-message-text').value.trim();
-    if (!messageText) {
-      showToast('Please type a message', 'error');
+async function connectWithClient(project) {
+  try {
+    if (!currentPractitioner) {
+      showToast('Error: Practitioner not loaded', 'error');
       return;
     }
+
+    // TEMPORARILY DISABLED: Match creation via opportunities
+    // This feature is disabled while investigating the auto-matching bug where matches
+    // were being created automatically when clients create projects
+    // TODO: Re-enable after root cause is identified and fixed
+    showToast('Feature temporarily disabled', 'info');
+    console.log('[Pro Opportunities] connectWithClient disabled - match creation via opportunities is temporarily unavailable');
+    return;
+
+    // Create a match for this practitioner + project via RPC
+    // const { data: matchData, error: matchError } = await supabaseClient
+    //   .rpc('create_practitioner_match', {
+    //     p_project_serial: project.project_serial,
+    //     p_client_serial: project.client_serial,
+    //     p_practitioner_serial: currentPractitioner.serial_number,
+    //     p_match_score: 75,
+    //     p_creation_source: 'practitioner_opportunities'
+    //   });
+
+    // if (matchError) {
+    //   console.error('[Pro Opportunities] Error creating match:', matchError);
+    //   showToast('Failed to connect with client', 'error');
+    //   return;
+    // }
+
+    // showToast('Connected!', `You've connected with ${project.client_first_name}`, 'success');
     
-    await sendOpportunityMessage(opp, messageText);
-    modal.remove();
-  });
-
-  modal.style.display = 'flex';
-}
-
-/**
- * Send opportunity message (1 per opportunity)
- */
-async function sendOpportunityMessage(project, messageText) {
-  try {
-    // First, create a project_practitioner_match (so it appears in inbox)
-    const { data: matchData, error: matchError } = await supabaseClient
-      .from('project_practitioner_matches')
-      .insert({
-        project_serial: project.project_serial,
-        practitioner_serial: currentPractitioner.serial_number,
-        client_serial: project.client_serial,
-        status: 'pending',
-        match_score: 0,
-        client_initiated: false,
-        matched_at: new Date().toISOString(),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      })
-      .select()
-      .single();
-
-    if (matchError) {
-      console.warn('[Pro Opportunities] Error creating match (may already exist):', matchError);
-      // Continue anyway - match may already exist
-    }
-
-    // Create project message
-    const { data: msgData, error: msgError } = await supabaseClient
-      .from('project_messages')
-      .insert({
-        project_id: project.id,
-        practitioner_id: currentPractitioner.id,
-        client_id: project.client_id,
-        sender_id: currentPractitioner.id,
-        sender_type: 'practitioner',
-        message: messageText,
-        is_read: false,
-        is_opportunity_message: true,
-        practitioner_serial: currentPractitioner.serial_number,
-        client_serial: project.client_serial,
-        project_serial: project.project_serial
-      })
-      .select()
-      .single();
-
-    if (msgError) throw msgError;
-
-    showToast('Message sent! The client will see it in their inbox.', 'success');
-
-    // Reload opportunities
-    await loadOpportunities();
-
+    // Reload opportunities to remove this from the list
+    // await loadOpportunities();
   } catch (error) {
-    console.error('[Pro Opportunities] Error sending message:', error);
-    showToast('Failed to send message', 'error');
+    console.error('[Pro Opportunities] Error in connectWithClient:', error);
+    showToast('Error connecting with client', 'error');
   }
 }
 
@@ -774,62 +703,3 @@ window.onNewMatchReceived = async function(matchData) {
     console.error('[Pro Opportunities] Error reloading opportunities on new match:', error);
   }
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

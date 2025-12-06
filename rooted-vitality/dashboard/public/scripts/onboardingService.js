@@ -585,7 +585,8 @@ async function loadMatchesForOnboarding(onboardingData) {
               p_project_serial: parseInt(projectData.project_serial),
               p_client_serial: projectData.client_serial,
               p_practitioner_serial: practitionerSerial,
-              p_match_score: matchScore
+              p_match_score: matchScore,
+              p_creation_source: 'onboarding_signup'
             });
 
           if (matchCreateError) {

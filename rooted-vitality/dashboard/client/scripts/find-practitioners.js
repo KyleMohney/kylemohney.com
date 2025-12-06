@@ -165,84 +165,8 @@ async function loadExistingMatches() {
  * Create match records for all matching practitioners
  * This generates notification entries for practitioners when a new project is created
  */
-async function createMatchRecordsForPractitioners(project, practitioners) {
-  if (!project || !practitioners || practitioners.length === 0) {
-    console.log('[createMatchRecordsForPractitioners] No practitioners to create matches for');
-    return;
-  }
-
-  try {
-    // Get client serial number and name
-    const { data: clientProfile, error: clientError } = await supabaseClient
-      .from('clients')
-      .select('serial_number, first_name')
-      .eq('id', currentUser.id)
-      .single();
-    
-    if (clientError || !clientProfile) {
-      console.error('[createMatchRecordsForPractitioners] Could not load client profile');
-      return;
-    }
-
-    // CHECK FOR EXISTING MATCHES - prevent duplicates
-    const { data: existingMatches, error: checkError } = await supabaseClient
-      .from('project_practitioner_matches')
-      .select('id')
-      .eq('project_serial', project.project_serial)
-      .eq('client_serial', clientProfile.serial_number);
-    
-    if (!checkError && existingMatches && existingMatches.length > 0) {
-      console.log('[createMatchRecordsForPractitioners] Matches already exist for this project, skipping creation');
-      return;
-    }
-
-    // Prepare match records for all practitioners
-    const matchRecords = practitioners.map(practitioner => ({
-      project_serial: project.project_serial,
-      practitioner_serial: practitioner.serial_number,
-      client_serial: clientProfile.serial_number,
-      status: 'pending',
-      match_score: practitioner.match_score || 50,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    }));
-
-    // Insert all match records
-    const { error: insertError } = await supabaseClient
-      .from('project_practitioner_matches')
-      .insert(matchRecords);
-
-    if (insertError) {
-      console.error('[createMatchRecordsForPractitioners] Error inserting matches:', insertError);
-      return;
-    }
-
-    console.log('[createMatchRecordsForPractitioners] Successfully created', matchRecords.length, 'match records');
-
-    // Notify each practitioner of new match (respects their notification preferences)
-    const projectName = project.custom_name || project.category_name || 'a wellness project';
-    const clientName = clientProfile.first_name || 'A client';
-    
-    for (const practitioner of practitioners) {
-      try {
-        if (window.notifyPractitionerOfNewMatch && typeof window.notifyPractitionerOfNewMatch === 'function') {
-          await window.notifyPractitionerOfNewMatch({
-            practitionerSerial: practitioner.serial_number,
-            clientName: clientName,
-            projectName: projectName,
-            matchScore: practitioner.match_score || 50
-          });
-        }
-      } catch (notifyError) {
-        console.warn('[createMatchRecordsForPractitioners] Error notifying practitioner:', notifyError);
-        // Continue with next practitioner even if notification fails
-      }
-    }
-
-  } catch (error) {
-    console.error('[createMatchRecordsForPractitioners] Exception:', error);
-  }
-}
+// REMOVED: createMatchRecordsForPractitioners function
+// Auto-matching is disabled. Matches are only created when client explicitly clicks "Send Request"
 
 // ============================================================================
 // PRACTITIONER LOADING & FILTERING
@@ -292,15 +216,17 @@ async function loadPractitioners(project) {
     
     allPractitioners = practitioners;
 
-    // Create match records for all matching practitioners (auto-matching)
-    if (practitioners && practitioners.length > 0) {
-      try {
-        await createMatchRecordsForPractitioners(project, practitioners);
-      } catch (error) {
-        console.error('[loadPractitioners] Error creating match records:', error);
-        // Continue even if match creation fails - not critical
-      }
-    }
+    // DISABLED: Auto-matching is removed. Matches are only created when client explicitly clicks "Send Request"
+    // This allows practitioners to see all matching projects in the Opportunities tab without auto-matches
+    // appearing in their New Clients tab until the client actively chooses to connect.
+    // Previously this auto-created matches which made Opportunities and New Clients show the same projects
+    // if (practitioners && practitioners.length > 0) {
+    //   try {
+    //     await createMatchRecordsForPractitioners(project, practitioners);
+    //   } catch (error) {
+    //     console.error('[loadPractitioners] Error creating match records:', error);
+    //   }
+    // }
 
     // Update project info display
     updateProjectInfo(project);
@@ -820,7 +746,8 @@ async function sendConnectionRequest(practitionerId, practitionerSerial) {
         p_project_serial: parseInt(selectedProject.project_serial),
         p_client_serial: selectedProject.client_serial,
         p_practitioner_serial: practitionerSerial,
-        p_match_score: matchScore
+        p_match_score: matchScore,
+        p_creation_source: 'client_find_practitioners'
       });
     
     if (error) {

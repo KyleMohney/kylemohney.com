@@ -358,6 +358,10 @@ opportunities
 | practitioner_blocked     | boolean                  | YES         | false              |
 | converted_to_match       | boolean                  | YES         | false              |
 | match_id                 | uuid                     | YES         | null               |
+| client_serial            | text                     | YES         | null               |
+| practitioner_serial      | text                     | YES         | null               |
+| project_serial           | integer                  | YES         | null               |
+| opportunity_serial       | text                     | YES         | null               |
 
 
 ====================================

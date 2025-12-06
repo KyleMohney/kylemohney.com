@@ -747,7 +747,8 @@ async function sendPractitionerMatch(project, practitionerId, practitionerSerial
                 p_project_serial: parseInt(project.project_serial),
                 p_client_serial: project.client_serial,
                 p_practitioner_serial: practitionerSerial,
-                p_match_score: matchScore
+                p_match_score: matchScore,
+                p_creation_source: 'practitioner_public_profile'
             });
         
         if (error) {

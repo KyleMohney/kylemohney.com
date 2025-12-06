@@ -385,7 +385,8 @@ CREATE OR REPLACE FUNCTION create_practitioner_match(
   p_project_serial INT,
   p_client_serial TEXT,
   p_practitioner_serial TEXT,
-  p_match_score INT DEFAULT 75
+  p_match_score INT DEFAULT 75,
+  p_creation_source TEXT DEFAULT 'manual_unknown'
 )
 RETURNS TABLE (match_id uuid, status text) AS $$
 DECLARE
@@ -399,7 +400,8 @@ BEGIN
     status,
     match_score,
     client_initiated,
-    matched_at
+    matched_at,
+    creation_source
   )
   VALUES (
     p_project_serial,
@@ -408,7 +410,8 @@ BEGIN
     'pending',
     p_match_score,
     true,
-    NOW()
+    NOW(),
+    p_creation_source
   )
   ON CONFLICT DO NOTHING
   RETURNING id INTO v_match_id;
