@@ -1,0 +1,148 @@
+/*
+╔════════════════════════════════════════════════════════════════════╗
+║  ROOTED VITALITY, INC.                                             ║
+║  File: membershipStyles.css                                        ║
+║  Purpose: Membership and billing UI styles                         ║
+║  Holistic Wellness · Modern Connection Platform                    ║
+║  rootedvitality.com | 2025                                         ║
+╚════════════════════════════════════════════════════════════════════╝
+
+TABLE OF CONTENTS
+  1. MEMBERSHIP STATUS DISPLAY
+  2. STRIPE INTEGRATION UI
+  3. LOADING STATES
+  4. ERROR STATES
+*/
+
+/* ========================================== */
+/* 1. MEMBERSHIP STATUS DISPLAY */
+/* ========================================== */
+
+.membership-container {
+    max-width: 600px;
+}
+
+.membership-status-badge {
+    display: inline-block;
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.membership-status-badge.active {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border: 2px solid #4caf50;
+}
+
+.membership-status-badge.cancelled {
+    background-color: #ffebee;
+    color: #c62828;
+    border: 2px solid #f44336;
+}
+
+.membership-status-badge.past-due {
+    background-color: #fff3e0;
+    color: #e65100;
+    border: 2px solid #ff9800;
+}
+
+.membership-status-badge.inactive {
+    background-color: #f5f5f5;
+    color: #424242;
+    border: 2px solid #9e9e9e;
+}
+
+/* ========================================== */
+/* 2. STRIPE INTEGRATION UI */
+/* ========================================== */
+
+.stripe-loading {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid var(--accent-primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.stripe-button-group {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.stripe-error-message {
+    background-color: #ffebee;
+    color: #c62828;
+    padding: 1rem;
+    border-left: 4px solid #f44336;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+}
+
+.stripe-success-message {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    padding: 1rem;
+    border-left: 4px solid #4caf50;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+}
+
+/* ========================================== */
+/* 3. LOADING STATES */
+/* ========================================== */
+
+.membership-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.membership-loading .stripe-loading {
+    width: 32px;
+    height: 32px;
+}
+
+.membership-loading p {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+/* ========================================== */
+/* 4. ERROR STATES */
+/* ========================================== */
+
+.membership-error {
+    background-color: #ffebee;
+    border: 1px solid #ffcdd2;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.membership-error h3 {
+    color: #c62828;
+    margin-bottom: 0.5rem;
+}
+
+.membership-error p {
+    color: #d32f2f;
+    font-size: 0.875rem;
+    margin: 0;
+}

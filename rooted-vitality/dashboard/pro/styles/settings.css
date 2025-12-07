@@ -1790,10 +1790,241 @@
 }
 
 /* ========================================== */
+/* 10. MEMBERSHIP & BILLING */
+/* ========================================== */
+
+.membership-status-section {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.membership-status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.status-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.status-item label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-item p {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+/* Membership Badges */
+.membership-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.membership-badge--active {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #4caf50;
+}
+
+.membership-badge--inactive {
+    background-color: #f5f5f5;
+    color: #757575;
+    border: 1px solid #bdbdbd;
+}
+
+.membership-badge--past-due {
+    background-color: #fff3e0;
+    color: #e65100;
+    border: 1px solid #ff9800;
+}
+
+/* Membership Actions */
+.membership-actions {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.membership-actions button {
+    flex: 1;
+    min-width: 160px;
+}
+
+/* Billing History */
+.billing-history-container {
+    margin-top: 2rem;
+    border-top: 1px solid var(--border);
+    padding-top: 1.5rem;
+}
+
+.billing-history-header {
+    background: none;
+    border: none;
+    padding: 0.75rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    width: 100%;
+    text-align: left;
+    transition: color 0.2s ease;
+}
+
+.billing-history-header:hover {
+    color: var(--accent-primary);
+}
+
+.billing-history-toggle-icon {
+    display: inline-block;
+    transition: transform 0.3s ease;
+    font-size: 0.75rem;
+}
+
+.billing-history-header.expanded .billing-history-toggle-icon {
+    transform: rotate(90deg);
+}
+
+.billing-history-content {
+    margin-top: 1rem;
+    padding: 0;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+        overflow: hidden;
+    }
+    to {
+        opacity: 1;
+        max-height: 500px;
+    }
+}
+
+.billing-history-empty {
+    padding: 1.5rem;
+    background-color: var(--bg-secondary);
+    border-radius: 8px;
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+.billing-history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.billing-history-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1rem;
+    align-items: center;
+    padding: 1rem;
+    background-color: var(--bg-secondary);
+    border-radius: 6px;
+    border-left: 3px solid var(--accent-primary);
+}
+
+.billing-history-date {
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+}
+
+.billing-history-amount {
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--accent-primary);
+}
+
+.billing-history-link {
+    padding: 0.5rem 1rem;
+    background-color: var(--accent-primary);
+    color: white;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+    white-space: nowrap;
+}
+
+.billing-history-link:hover {
+    background-color: #6a7a35;
+}
+
+/* Membership Note */
+.membership-note {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    background-color: var(--bg-secondary);
+    padding: 1rem;
+    border-radius: 6px;
+    margin-top: 1.5rem;
+    line-height: 1.6;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.stripe-logo-note {
+    height: 20px;
+    width: auto;
+    flex-shrink: 0;
+    display: block;
+}
+
+/* ========================================== */
 /* RESPONSIVE */
 /* ========================================== */
 
 @media (max-width: 768px) {
+    .membership-status-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .membership-actions {
+        flex-direction: column;
+    }
+
+    .membership-actions button {
+        width: 100%;
+    }
+
+    .billing-history-item {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+
+    .billing-history-amount,
+    .billing-history-link {
+        text-align: left;
+    }
+
     .crm-providers-grid {
         grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     }
@@ -1809,3 +2040,4 @@
         flex-wrap: wrap;
     }
 }
+

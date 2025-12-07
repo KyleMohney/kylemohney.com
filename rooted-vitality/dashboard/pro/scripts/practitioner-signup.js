@@ -620,7 +620,7 @@ async function registerPractitioner(event) {
             const membershipRecord = {
                 practitioner_id: state.session.id,
                 practitioner_serial: practitionerSerial,
-                status: 'active',
+                status: 'inactive',  // Start as inactive until payment succeeds
                 started_at: new Date().toISOString(),
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString()
@@ -714,8 +714,40 @@ async function registerPractitioner(event) {
         // Clear draft
         clearDraft();
         
-        // Complete the registration flow
-        completeRegistrationFlow(true);
+        // Launch Stripe checkout for membership activation
+        try {
+            // Call the Edge Function to create checkout session
+            const checkoutResponse = await fetch(
+                'https://racktdyrveypyvmdbzs.supabase.co/functions/v1/create-checkout-session',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${state.session.access_token}`
+                    },
+                    body: JSON.stringify({
+                        practitioner_id: state.session.id
+                    })
+                }
+            );
+            
+            if (!checkoutResponse.ok) {
+                throw new Error('Failed to create checkout session');
+            }
+            
+            const checkoutData = await checkoutResponse.json();
+            
+            if (checkoutData.checkout_url) {
+                // Redirect to Stripe checkout
+                window.location.href = checkoutData.checkout_url;
+            } else {
+                // Fallback if checkout URL not returned
+                completeRegistrationFlow(true);
+            }
+        } catch (stripeError) {
+            // If Stripe fails, still complete registration
+            completeRegistrationFlow(true);
+        }
         
     } catch (error) {
         const submitBtn = document.getElementById('submitBtn');

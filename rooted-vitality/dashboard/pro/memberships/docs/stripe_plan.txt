@@ -1,0 +1,78 @@
+STRIPE MEMBERSHIP SYSTEM - FULL BUILD PLAN
+
+====================================
+PHASE 1: DATABASE SCHEMA (COMPLETE)
+====================================
+Add columns to memberships table:
+
+stripe_customer_id (text, nullable)
+stripe_subscription_id (text, nullable)
+current_period_end (timestamp, nullable)
+
+====================================
+PHASE 2: BACKEND (Supabase Functions)
+====================================
+    ====================================
+    Function 1: create_checkout_session() (COMPLETE)
+    ====================================
+    Creates Stripe checkout session for $0 first month, then $222/month recurring
+    Returns checkout URL
+    Settings: payment_behavior: 'default_incomplete' to allow $0 first charge
+    
+    ====================================
+    Function 2: cancel_subscription() (COMPLETE)
+    ====================================
+    Cancels Stripe subscription immediately
+    Updates memberships table: status = 'cancelled', canceled_at = now()
+
+    ====================================
+    Function 3: update_payment_method_session() (COMPLETE)
+    ====================================
+    Creates Stripe billing portal session for payment method update
+    Returns portal URL
+    Webhook Handler: handle_stripe_webhook()
+
+    Listens for: customer.subscription.created, customer.subscription.updated, invoice.payment_succeeded
+    On creation: status = 'active', captures stripe_subscription_id, current_period_end
+    On payment success: updates current_period_end
+    On cancellation: status = 'cancelled', canceled_at = now()
+
+====================================    
+PHASE 3: FRONTEND (Memberships Tab - /dashboard/pro/pages/settings.html) (COMPLETE)
+====================================
+New Manager File: membershipManager.js
+
+Load practitioner's membership status
+Render appropriate UI state
+Handle button clicks (activate, cancel, update payment)
+Fetch invoices from Stripe API (via backend function) for billing history
+Open Stripe checkout/portal in new window
+UI States:
+
+No Membership: Show price ($222/month), features, "Activate Membership" button
+Active: Show status badge, next billing date, "Update Payment Method" + "Cancel Membership" buttons
+Cancelled: Show status badge, "Reactivate Membership" button
+Billing History (Collapsible):
+
+Collapsed by default
+Shows list of invoices with date, amount, "View PDF" link
+"View PDF" opens Stripe invoice directly in new tab
+
+====================================
+PHASE 4: CONFIGURATION
+====================================
+Create /rooted-vitality/scripts/stripeConfig.js
+
+Stores STRIPE_PUBLISHABLE_KEY (injected at runtime)
+Initializes Stripe.js library
+Available globally for all pages needing Stripe
+
+====================================
+BUILD ORDER
+====================================
+Update memberships table schema
+Create Supabase functions (checkout, cancel, webhook handler)
+Create stripeConfig.js
+Create membershipManager.js
+Update memberships tab HTML/CSS in settings page
+Test with Stripe test keys

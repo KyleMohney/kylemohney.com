@@ -55,6 +55,7 @@ TABLE OF CONTENTS
   <link rel="stylesheet" href="../../../styles/styles.css">
   <link rel="stylesheet" href="../styles/settings.css">
   <link rel="stylesheet" href="../../../styles/report-concern-widget.css">
+  <link rel="stylesheet" href="../memberships/styles/membershipStyles.css">
 </head>
 <body class="rooted-body practitioner-view">
   
@@ -430,84 +431,70 @@ TABLE OF CONTENTS
       <section class="settings-section" data-section="memberships" id="memberships">
         <div class="settings-section-header">
           <h1>Memberships & Billing</h1>
-          <p class="section-description">Manage your active memberships and billing information</p>
+          <p class="section-description">Manage your professional membership and billing information</p>
         </div>
 
-        <!-- Active Memberships -->
+        <!-- Professional Membership -->
         <div class="settings-card">
           <div class="card-header">
             <h3>Professional Membership</h3>
+            <span id="membership-status-badge" class="membership-badge">Loading...</span>
           </div>
           <div class="card-content">
-            <div id="active-memberships-list" class="memberships-list">
-              <div class="membership-status-card">
-                <div class="membership-status-header">
-                  <h4 id="membership-status-title">Loading...</h4>
-                  <span id="membership-status-badge" class="status-badge">—</span>
+            
+            <!-- Membership Status & Details -->
+            <div class="membership-status-section">
+              <div class="membership-status-grid">
+                <div class="status-item">
+                  <label>Status</label>
+                  <p id="membership-status-text">Loading...</p>
                 </div>
-                
-                <div class="membership-details-grid">
-                  <div class="detail-item">
-                    <label>Status</label>
-                    <p id="membership-status-display">—</p>
-                  </div>
-                  <div class="detail-item">
-                    <label>Started</label>
-                    <p id="membership-started-date">—</p>
-                  </div>
-                  <div class="detail-item">
-                    <label>Monthly Cost</label>
-                    <p id="membership-cost">$222/month</p>
-                  </div>
-                  <div class="detail-item">
-                    <label>Renewal Date</label>
-                    <p id="membership-renewal-date">—</p>
-                  </div>
+                <div class="status-item">
+                  <label>Monthly Price</label>
+                  <p id="membership-price-per-month">$222/month</p>
                 </div>
-                
-                <div class="membership-actions">
-                  <button class="btn-secondary hidden-btn" id="cancel-membership-btn">Cancel Membership</button>
-                  <button class="btn-secondary hidden-btn" id="reactivate-membership-btn">Reactivate Membership</button>
+                <div class="status-item">
+                  <label>Next Billing Date</label>
+                  <p id="membership-next-billing-date">—</p>
                 </div>
-                
-                <p class="membership-note">You can cancel your membership anytime. If canceled, you'll retain access through the end of the current billing period.</p>
               </div>
             </div>
+
+            <!-- Membership Actions -->
+            <div class="membership-actions">
+              <button id="membership-activate-btn" class="btn-accent" style="display: none;">
+                Activate Membership
+              </button>
+              <button id="membership-update-payment-btn" class="btn-secondary" style="display: none;">
+                Update Payment Method
+              </button>
+              <button id="membership-cancel-btn" class="btn-secondary" style="display: none;">
+                Cancel Membership
+              </button>
+            </div>
+
+            <!-- Billing History (Collapsible) -->
+            <div class="billing-history-container">
+              <button id="membership-billing-history-toggle" class="billing-history-header">
+                <span class="billing-history-toggle-icon">▶</span>
+                Payment History
+              </button>
+              <div id="membership-billing-history-content" class="billing-history-content" style="display: none;">
+                <div id="membership-billing-history-empty" class="billing-history-empty">
+                  <p>No payment history yet. Your membership will begin billing on your next renewal date.</p>
+                </div>
+                <div id="membership-billing-history-list" class="billing-history-list"></div>
+              </div>
+            </div>
+
+            <!-- Membership Note -->
+            <p class="membership-note">
+              <img src="../../../assets/stripe.logo.png" alt="Stripe" class="stripe-logo-note">
+              Secure Payment: All payments are processed securely through Stripe. We never store your payment method on our servers.
+            </p>
           </div>
         </div>
 
-        <!-- Billing Information -->
-        <div class="settings-card">
-          <div class="card-header">
-            <h3>Billing Information</h3>
-          </div>
-          <div class="card-content">
-            <p class="setting-description">View and manage your billing details</p>
-            <button class="btn-secondary" id="view-billing-btn">View Billing History</button>
-          </div>
-        </div>
-
-        <!-- Payment Methods -->
-        <div class="settings-card">
-          <div class="card-header">
-            <h3>Payment Methods</h3>
-          </div>
-          <div class="card-content">
-            <p class="setting-description">Manage your payment methods on file</p>
-            <button class="btn-secondary" id="manage-payment-btn">Manage Payment Methods</button>
-          </div>
-        </div>
-
-        <!-- Subscription Plans -->
-        <div class="settings-card">
-          <div class="card-header">
-            <h3>Available Plans</h3>
-          </div>
-          <div class="card-content">
-            <p class="setting-description">Upgrade or downgrade your membership plan</p>
-            <button class="btn-secondary" id="view-plans-btn">View Plans</button>
-          </div>
-        </div>
       </section>
 
       <!-- ══════════════════════════════════════════════════════════════ -->
@@ -638,6 +625,10 @@ TABLE OF CONTENTS
   <script src="../../../injections.js"></script>
   <script src="../../../scripts/crmManager.js"></script>
   <script src="../scripts/proSettings.js"></script>
+  
+  <!-- Stripe Membership Integration -->
+  <script src="../memberships/scripts/stripeConfig.js"></script>
+  <script src="../memberships/scripts/membershipManager.js"></script>
 
 
 
