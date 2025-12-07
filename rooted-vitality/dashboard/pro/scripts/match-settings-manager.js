@@ -274,7 +274,7 @@ class MatchSettingsManager {
       // First, get all practitioner services with basic info
       const { data: services, error: servicesError } = await this.supabase
         .from('practitioner_selected_services')
-        .select('id, taxonomy_id, subcategory_id, is_active, price_per_service, created_at, updated_at')
+        .select('id, taxonomy_id, subcategory_id, is_active, price_per_service, price_range_min, price_range_max, created_at, updated_at')
         .eq('practitioner_serial', this.practitionerSerial);
 
       if (servicesError) {
@@ -352,7 +352,7 @@ class MatchSettingsManager {
    * - categoryId (string like "acupuncture") + subcategoryName (string like "Fertility Support")
    * - OR taxonomyId (UUID) + subcategoryId (UUID)
    */
-  async addServiceCategory(categoryIdOrTaxonomyId, subcategoryNameOrId, pricePerService = null) {
+  async addServiceCategory(categoryIdOrTaxonomyId, subcategoryNameOrId, pricePerService = null, priceRangeMin = null, priceRangeMax = null) {
     try {
       let taxonomyId, subcategoryId;
 
@@ -436,7 +436,9 @@ class MatchSettingsManager {
         taxonomy_id: taxonomyId,
         subcategory_id: subcategoryId,
         is_active: false,  // Default to inactive
-        price_per_service: pricePerService || null
+        price_per_service: pricePerService || null,
+        price_range_min: priceRangeMin || null,
+        price_range_max: priceRangeMax || null
       };
 
 
@@ -480,6 +482,8 @@ class MatchSettingsManager {
             .from('practitioner_selected_services')
             .update({
               price_per_service: pricePerService || null,
+              price_range_min: priceRangeMin || null,
+              price_range_max: priceRangeMax || null,
               updated_at: new Date().toISOString()
             })
             .eq('id', existing.id)
@@ -678,7 +682,7 @@ class MatchSettingsManager {
     try {
       const { data, error } = await this.supabase
         .from('practitioners')
-        .select('id, serial_number, availability_schedule')
+        .select('id, serial_number, availability_schedule, timezone')
         .eq('id', this.practitionerId)
         .single();
 
@@ -758,9 +762,22 @@ class MatchSettingsManager {
    * Update timezone
    */
   async updateTimezone(timezone) {
-    const schedule = this.getAvailabilitySchedule();
-    schedule.timezone = timezone;
-    return this.updateAvailabilitySchedule(schedule);
+    try {
+      const { data, error } = await this.supabase
+        .from('practitioners')
+        .update({ timezone: timezone, updated_at: new Date().toISOString() })
+        .eq('id', this.practitionerId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      this.practitioners = data;
+
+      return data;
+    } catch (error) {
+      console.error('[MatchSettingsManager] Error updating timezone:', error);
+      throw error;
+    }
   }
 
   // ================================================================

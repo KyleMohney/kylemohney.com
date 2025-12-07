@@ -241,7 +241,7 @@ function createThreadItem(match) {
   const description = project.description?.substring(0, 50) + '...' || '-';
 
   const isOpportunity = match.is_opportunity_message === true;
-  const isClosed = match.status === 'hired' || match.status === 'not-hired' || match.status === 'declined';
+  const isClosed = match.status === 'hired' || match.status === 'not-hired';
   const isReviewable = match.status === 'hired' || match.status === 'not-hired';
 
   const item = document.createElement('button');
@@ -300,7 +300,7 @@ function createThreadItem(match) {
         </div>
       ` : (isReviewable ? `
         <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #ede9e2;">
-          <button class="thread-review-btn" data-match-id="${match.id}" data-practitioner-id="${match.practitioners?.id || ''}" data-practitioner-name="${escapeHtml(displayName)}" data-project-id="${match.project_serial || ''}" data-client-first-name="${escapeHtml(match.client_first_name || '')}" data-client-last-name="${escapeHtml(match.client_last_name || '')}">Leave Review</button>
+          <button class="thread-review-btn" data-match-id="${match.id}" data-practitioner-id="${match.practitioners?.id || ''}" data-practitioner-name="${escapeHtml(displayName)}" data-project-id="${match.project_serial || ''}">Leave Review</button>
         </div>
       ` : '')}
     </div>
@@ -464,7 +464,7 @@ function openMessagingThread(match) {
 
     const msgResponse = match.practitioner_response;
     const isLocked = match.status === 'pending' && !msgResponse;
-    const isCompleted = match.status === 'not-hired' || match.status === 'hired' || match.status === 'declined';
+    const isCompleted = match.status === 'not-hired' || match.status === 'hired';
     updatedDropdownEl.disabled = isLocked || isCompleted;
 
     if (updatedDropdownEl) {
@@ -733,7 +733,7 @@ function openPractitionerModal(matchId) {
     statusMessageEl.style.display = 'block';
     statusContentEl.innerHTML = `
       <p><strong>✗ Connection Declined</strong></p>
-      <p>${displayName} declined your connection request${match.practitioner_response_reason ? ': ' + match.practitioner_response_reason : ''}.</p>
+      <p>${displayName} declined your connection request.</p>
       <p>You can search for other practitioners on the Find Practitioners page.</p>
     `;
   } else if (msgStatus === 'in-progress' && response === 'accepted') {
@@ -748,7 +748,7 @@ function openPractitionerModal(matchId) {
       <p><strong>✓ Engagement Active</strong></p>
       <p>${displayName} is engaged on your project. Continue communication on the <strong>My Team</strong> page.</p>
     `;
-  } else if (msgStatus === 'hired' || msgStatus === 'not-hired' || msgStatus === 'declined') {
+  } else if (msgStatus === 'hired' || msgStatus === 'not-hired') {
     statusMessageEl.style.display = 'block';
     statusContentEl.innerHTML = `
       <p><strong>✓ Engagement Complete</strong></p>
@@ -774,7 +774,7 @@ function openPractitionerModal(matchId) {
   document.getElementById('modal-availability').innerHTML = `
     <div style="font-size: 0.95rem; line-height: 1.6; color: #555;">
       <p><strong>Timezone:</strong> ${p.timezone || 'Not specified'}</p>
-      <p><strong>Modalities:</strong> ${p.modalities?.join(', ') || 'Not specified'}</p>
+
     </div>
   `;
 
@@ -864,7 +864,6 @@ function attachOpportunityButtonListeners() {
  */
 function attachReviewButtonListeners() {
   const reviewBtns = document.querySelectorAll('.thread-review-btn');
-  console.log('[Inbox-UI] Found', reviewBtns.length, 'review buttons');
 
   reviewBtns.forEach(btn => {
     initializeReviewButtonText(btn);
@@ -878,9 +877,22 @@ function attachReviewButtonListeners() {
       const practitionerId = btn.dataset.practitionerId;
       const practitionerName = btn.dataset.practitionerName;
       const projectId = btn.dataset.projectId;
-      const clientFirstName = btn.dataset.clientFirstName;
-      const clientLastName = btn.dataset.clientLastName;
       const clientId = window.authManager?.getCurrentUser()?.id;
+
+      // Fetch client name from clients table (not from button attributes)
+      let clientFirstName = '';
+      let clientLastName = '';
+      if (clientId) {
+        const { data: clientData } = await window.supabaseClient
+          .from('clients')
+          .select('first_name, last_name')
+          .eq('id', clientId)
+          .single();
+        if (clientData) {
+          clientFirstName = clientData.first_name || '';
+          clientLastName = clientData.last_name || '';
+        }
+      }
 
       console.log('[Inbox-UI] Review data:', { matchId, practitionerId, practitionerName, projectId, clientId });
 
@@ -1063,7 +1075,7 @@ async function initializeInbox() {
           
           // If practitioner declined or blocked (practitioner_response changed to 'declined')
           if ((oldResponse !== 'declined' && newResponse === 'declined') || 
-              (oldStatus === 'pending' && newStatus === 'declined')) {
+              (oldResponse !== 'blocked' && newResponse === 'blocked')) {
             
             // Auto-update status to not-hired in the database
             window.supabaseClient

@@ -129,7 +129,6 @@ async function executeSave(section, isAutoSave = false) {
         switch(section) {
             case 'header':
                 // Collect header data - only fields that exist in schema
-                // Note: years_in_service field doesn't exist in current schema
                 const headerData = {
                     updated_at: new Date().toISOString()
                 };
@@ -847,7 +846,6 @@ function setupPaymentInsuranceSection() {
 
 function getPaymentCheckboxValues() {
     const paymentData = {
-        accepts_insurance: document.getElementById('accepts-insurance')?.checked || false,
         insurance_providers: [],
         custom_insurance_providers: [],  // Changed to array
         payment_methods: [],
@@ -1015,7 +1013,7 @@ async function loadReviews() {
                 const last = review.client_last_name?.trim();
                 
                 if (first && last) {
-                    displayName = `${first} ${last[0]}`;
+                    displayName = `${first} ${last[0].toUpperCase()}`;
                 } else if (last) {
                     displayName = last;
                 } else if (first) {

@@ -372,9 +372,9 @@ async function updateBadgeCounts() {
     const messagesBadge = document.getElementById('messages-badge');
     if (messagesBadge) messagesBadge.textContent = messagesCount;
 
-    // Count completed (hired/not-hired/declined ONLY)
+    // Count completed (hired/not-hired ONLY)
     const completedCount = allMatches.filter(m =>
-      m.status === 'hired' || m.status === 'not-hired' || m.status === 'declined'
+      m.status === 'hired' || m.status === 'not-hired'
     ).length;
     const completedBadge = document.getElementById('completed-badge');
     if (completedBadge) completedBadge.textContent = completedCount;
@@ -441,7 +441,7 @@ function applyTabFilter(tabName) {
     case 'completed':
       // Show only completed/closed matches
       filteredMatches = allMatches.filter(m =>
-        m.status === 'hired' || m.status === 'not-hired' || m.status === 'declined'
+        m.status === 'hired' || m.status === 'not-hired'
       );
       break;
     default:

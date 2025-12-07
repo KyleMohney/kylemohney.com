@@ -215,6 +215,8 @@ TABLE OF CONTENTS:
     <script src="../../../scripts/notificationManager.js"></script>
     <script src="../../../injections.js"></script>
     <script src="../../../scripts/unifiedMessagingSystem.js"></script>
+    <script src="../scripts/practitioner-notifications.js"></script>
+    <script src="../scripts/inboxManager.js"></script>
 
     <!-- ========================================== -->
     <!-- 9. INITIALIZATION & EVENT HANDLERS -->
@@ -284,6 +286,44 @@ TABLE OF CONTENTS:
         } else {
             document.addEventListener('DOMContentLoaded', setInboxNavActive);
         }
+
+        // Load and display practitioner notifications using centralized module
+        async function initializeInboxNotifications() {
+            try {
+                // Initialize notification manager
+                if (window.supabaseClient && window.authManager) {
+                    await PractitionerNotifications.init(window.supabaseClient, window.authManager);
+                    
+                    // Fetch and render notifications
+                    await PractitionerNotifications.fetchNotifications();
+                    PractitionerNotifications.renderNotifications('.rv-notifications-list');
+                    PractitionerNotifications.updateBadge();
+                    
+                    // Setup real-time listener
+                    await PractitionerNotifications.setupRealtimeListener(async (eventType, notification) => {
+                        console.log('[Inbox] Notification event:', eventType);
+                        PractitionerNotifications.renderNotifications('.rv-notifications-list');
+                        PractitionerNotifications.updateBadge();
+                    });
+                }
+            } catch (error) {
+                console.error('[Inbox] Error initializing notifications:', error);
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', async () => {
+                await new Promise(resolve => setTimeout(resolve, 500));
+                await initializeInboxNotifications();
+            });
+        } else {
+            setTimeout(initializeInboxNotifications, 500);
+        }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            PractitionerNotifications.cleanup();
+        });
     </script>
 
     <!-- ========================================== -->

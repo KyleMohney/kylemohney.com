@@ -24,6 +24,12 @@
  * Call this after page load or when injecting the widget
  */
 function initializeReportConcernSystem() {
+    // Prevent duplicate initialization
+    if (window.reportConcernSystemInitialized) {
+        return;
+    }
+    window.reportConcernSystemInitialized = true;
+    
     // Ensure modal starts CLOSED (not active)
     const modal = document.getElementById('report-concern-modal');
     if (modal) {

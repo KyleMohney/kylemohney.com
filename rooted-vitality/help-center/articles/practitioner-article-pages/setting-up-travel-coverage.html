@@ -1,0 +1,137 @@
+<!--
+╔════════════════════════════════════════════════════════════════════╗
+║  ROOTED VITALITY, INC.                                             ║
+║  File: help-center/articles/practitioner-article-pages/setting-up-travel-coverage.html ║
+║  Purpose: Guide practitioners on configuring travel and service area ║
+║  Holistic Wellness · Modern Connection Platform                    ║
+║  rootedvitality.com | 2025                                         ║
+╚════════════════════════════════════════════════════════════════════╝
+
+TABLE OF CONTENTS
+  1. HEAD: Meta, Fonts, Styles
+  2. BODY: Article Structure
+  3. SECTION 1: Understanding Travel Types
+  4. SECTION 2: Configuring Your Coverage
+  5. RELATED ARTICLES: Internal Links
+  6. SCRIPTS: Universal & Platform
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Learn how to set up your travel coverage and service areas on Rooted Vitality. Choose in-office, housecalls, or virtual options that work for your practice.">
+    <meta name="keywords" content="travel coverage, service area, in-office, housecalls, virtual, match settings, practitioner setup">
+    <meta name="author" content="Rooted Vitality">
+    
+    <title>Setting Up Your Travel Coverage | Rooted Vitality Practitioner Guide</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Universal Article Styles -->
+    <link rel="stylesheet" href="../styles/articles.css">
+    
+    <!-- Global Platform Styles (header, footer, background) -->
+    <link rel="stylesheet" href="../../../styles/styles.css">
+</head>
+
+<body data-article-type="practitioner" data-page-depth="4">
+    <!-- ========================================== -->
+    <!-- HEADER (INJECTED) -->
+    <!-- ========================================== -->
+    <header id="header-inject"></header>
+
+    <!-- ========================================== -->
+    <!-- BEGIN ARTICLE CONTENT -->
+    <!-- ========================================== -->
+    <main id="mainContent">
+        <!-- Back to Help Center Link (inside container for proper width) -->
+        <div class="container">
+            <div class="article-back-link">
+                <a href="../../index.html">← Back to Help Center</a>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SECTION 1: UNDERSTANDING TRAVEL TYPES -->
+        <!-- ========================================== -->
+        <section class="article-section">
+            <div class="container">
+                <h2>Understanding Travel Types</h2>
+                
+                <p>Your travel and service area settings tell clients how you prefer to work and where you're available. From your Match Settings, navigate to the Coverage tab to set this up. You can offer one, two, or all three travel types—choose what works for your practice.</p>
+                
+                <h3>The Three Travel Options</h3>
+                <p><strong>In-Office:</strong> Clients come to your location. <strong>Housecalls:</strong> You travel to clients' homes or preferred locations. <strong>Virtual/Remote:</strong> Sessions happen online. Many practitioners offer a combination of these to give clients flexibility.</p>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- SECTION 2: CONFIGURING YOUR COVERAGE -->
+        <!-- ========================================== -->
+        <section class="article-section">
+            <div class="container">
+                <h2>Configuring Your Coverage</h2>
+                
+                <p>Each travel type has flexible options to match how you work. We suggest choosing the approach that feels most natural for your practice.</p>
+                
+                <h3>In-Office and Housecalls</h3>
+                <p>For both options, you can choose between two approaches: <strong>Option A</strong> uses a simple radius tool—select a base zipcode and the distance you're willing to travel, and we'll map the coverage area for you. <strong>Option B</strong> lets you get specific—manually add individual zipcodes, or import a CSV file if you have a list. Choose whichever approach matches how you think about your service area.</p>
+                
+                <h3>Virtual/Remote</h3>
+                <p>For virtual sessions, you can offer <strong>nationwide coverage</strong> (available in all states except New York), or <strong>select specific states</strong> where you'd like to work. Pick whichever option feels right for your practice and any licensing considerations you might have. Please note that coverage is not available in New York state at this time.</p>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- RELATED ARTICLES SECTION -->
+        <!-- ========================================== -->
+        <section class="article-section">
+            <div class="container">
+                <h2>Learn More</h2>
+                <p>Explore these related guides to manage your practice on Rooted Vitality:</p>
+                <ul>
+                    <li><a href="/rooted-vitality/help-center/articles/practitioner-article-pages/choosing-your-specialties.html">Choosing Your Specialties</a></li>
+                    <li><a href="/rooted-vitality/help-center/articles/practitioner-article-pages/setting-up-your-profile.html">Setting Up Your Practitioner Profile</a></li>
+                </ul>
+            </div>
+        </section>
+
+    </main>
+    <!-- ========================================== -->
+    <!-- END ARTICLE CONTENT -->
+    <!-- ========================================== -->
+
+    <!-- ========================================== -->
+    <!-- FOOTER (INJECTED) -->
+    <!-- ========================================== -->
+    <footer id="footer-inject"></footer>
+
+    <!-- Supabase JS Client (MUST be loaded first) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Path configuration for deep article pages (MUST RUN FIRST, BEFORE injections.js) -->
+    <script>
+        // For article pages at /help-center/articles/practitioner-article-pages/
+        // Set correct path prefix so injections.js fetches components from right location
+        window.ARTICLE_PATH_PREFIX = '../../../';
+    </script>
+
+    <!-- Authentication & Global Scripts (BEFORE injections.js) -->
+    <script src="../../../scripts/config.js"></script>
+    <script src="../../../scripts/authManager.js"></script>
+    
+    <!-- Universal Article Scripts -->
+    <script src="../scripts/articles.js"></script>
+    
+    <!-- Platform Global Scripts (must be after auth is set) -->
+    <script src="../../../injections.js"></script>
+    <link rel="stylesheet" href="../../../chat-bot/styles/chatbot.css">
+  <script src="../../../chat-bot/scripts/chatbot.js"></script>
+</body>
+
+</html>

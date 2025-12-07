@@ -247,62 +247,58 @@ practitioner_notification_settings
 projects
 ====================================
 
-| column_name               | data_type                |
-| ------------------------- | ------------------------ |
-| id                        | uuid                     |
-| client_serial             | text                     |
-| category_id               | text                     |
-| description               | text                     |
-| street                    | text                     |
-| zipcode                   | text                     |
-| state                     | text                     |
-| start_date                | date                     |
-| urgency                   | text                     |
-| project_status            | text                     |
-| client_open_to_contact    | boolean                  |
-| created_at                | timestamp with time zone |
-| updated_at                | timestamp with time zone |
-| review_left               | boolean                  |
-| travel_preference         | text                     |
-| subcategory_name          | text                     |
-| category_name             | text                     |
-| custom_name               | text                     |
-| city                      | text                     |
-| closed_date               | date                     |
-| reopened_date             | date                     |
-| matched_practitioners     | text                     |
-| client_first_name         | text                     |
-| client_last_name          | text                     |
-| client_id                 | uuid                     |
-| closure_reason            | text                     |
-| closure_notes             | text                     |
-| project_serial            | integer                  |
-| hired_practitioner_serial | text                     |
+| column_name               | data_type                | is_nullable | column_default    |
+| ------------------------- | ------------------------ | ----------- | ----------------- |
+| id                        | uuid                     | NO          | gen_random_uuid() |
+| client_serial             | text                     | NO          | null              |
+| category_id               | text                     | NO          | null              |
+| description               | text                     | NO          | null              |
+| street                    | text                     | YES         | null              |
+| zipcode                   | text                     | NO          | null              |
+| state                     | text                     | NO          | null              |
+| start_date                | date                     | NO          | null              |
+| urgency                   | text                     | YES         | 'browsing'::text  |
+| project_status            | text                     | YES         | 'pending'::text   |
+| created_at                | timestamp with time zone | YES         | now()             |
+| updated_at                | timestamp with time zone | YES         | now()             |
+| review_left               | boolean                  | YES         | false             |
+| travel_preference         | text                     | YES         | null              |
+| subcategory_name          | text                     | YES         | null              |
+| category_name             | text                     | YES         | null              |
+| custom_name               | text                     | YES         | null              |
+| city                      | text                     | YES         | null              |
+| closed_date               | date                     | YES         | null              |
+| reopened_date             | date                     | YES         | null              |
+| matched_practitioners     | text                     | YES         | null              |
+| client_id                 | uuid                     | YES         | null              |
+| closure_reason            | text                     | YES         | null              |
+| closure_notes             | text                     | YES         | null              |
+| project_serial            | integer                  | NO          | null              |
+| hired_practitioner_serial | text                     | YES         | null              |
 
 
 ====================================
 project_practitioner_matches
 ====================================
 
-| column_name                  | data_type                |
-| ---------------------------- | ------------------------ |
-| id                           | uuid                     |
-| status                       | text                     |
-| match_score                  | integer                  |
-| matched_concerns             | ARRAY                    |
-| client_initiated             | boolean                  |
-| contacted_at                 | timestamp with time zone |
-| created_at                   | timestamp with time zone |
-| updated_at                   | timestamp with time zone |
-| practitioner_serial          | text                     |
-| client_serial                | text                     |
-| matched_at                   | timestamp with time zone |
-| is_read                      | boolean                  |
-| match_status                 | text                     |
-| practitioner_response        | text                     |
-| practitioner_response_reason | text                     |
-| practitioner_responded_at    | timestamp with time zone |
-| project_serial               | integer        
+| column_name               | data_type                | is_nullable | column_default    |
+| ------------------------- | ------------------------ | ----------- | ----------------- |
+| id                        | uuid                     | NO          | gen_random_uuid() |
+| status                    | text                     | YES         | 'pending'::text   |
+| match_score               | integer                  | YES         | null              |
+| client_initiated          | boolean                  | YES         | false             |
+| contacted_at              | timestamp with time zone | YES         | null              |
+| created_at                | timestamp with time zone | YES         | now()             |
+| updated_at                | timestamp with time zone | YES         | now()             |
+| practitioner_serial       | text                     | YES         | null              |
+| client_serial             | text                     | YES         | null              |
+| matched_at                | timestamp with time zone | NO          | now()             |
+| is_read                   | boolean                  | YES         | false             |
+| practitioner_response     | text                     | YES         | null              |
+| practitioner_responded_at | timestamp with time zone | YES         | null              |
+| project_serial            | integer                  | NO          | null              |
+| created_by                | text                     | YES         | 'unknown'::text   |
+| creation_source           | text                     | YES         | 'unknown'::text   |
 
 
 ============================
@@ -676,5 +672,4 @@ Practitioner blocks = match status = declined
 client changes dropdown to hired = match AND project status change to Hired and CLOSE
 client changes dropdown to not hired = match status changes to not hired and match closes
 client cancels project itself = project status AND ALL match status change to not hired  and CLOSE
-
 

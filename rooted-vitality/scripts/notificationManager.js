@@ -473,7 +473,7 @@ async function markNotificationAsRead(notificationId, userType) {
       return;
     }
 
-    const table = userType === 'client' ? 'client_notifications' : 'notifications';
+    const table = userType === 'client' ? 'client_notifications' : 'practitioner_notifications';
 
     const { error } = await window.supabaseClient
       .from(table)
@@ -648,6 +648,13 @@ if (typeof module !== 'undefined' && module.exports) {
     deleteNotification
   };
 }
+
+// Attach functions to window object for use in other scripts
+window.notifyClientOfMatchResponse = notifyClientOfMatchResponse;
+window.notifyPractitionerOfNewMatch = notifyPractitionerOfNewMatch;
+window.notifyPractitionerOfMatchAcceptance = notifyPractitionerOfMatchAcceptance;
+window.markNotificationAsRead = markNotificationAsRead;
+window.deleteNotification = deleteNotification;
 
 
 

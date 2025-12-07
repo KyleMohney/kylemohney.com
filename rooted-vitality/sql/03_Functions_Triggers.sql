@@ -239,8 +239,8 @@ BEGIN
     p.serial_number,
     p.legal_name,
     COALESCE(p.dba_name, p.legal_name) AS dba_name,
-    COALESCE(pp.modalities, ARRAY[]::TEXT[]) AS modalities,
-    COALESCE(pp.conditions_treated, ARRAY[]::TEXT[]) AS conditions_treated,
+    ARRAY[]::TEXT[] AS modalities,
+    ARRAY[]::TEXT[] AS conditions_treated,
     p.email,
     p.phone,
     LEAST(100, GREATEST(2, 1 + COALESCE(pp.profile_completeness_percent, 1)))::INTEGER AS match_score
@@ -314,7 +314,6 @@ ALTER TABLE project_practitioner_matches
 ADD COLUMN IF NOT EXISTS match_score INTEGER DEFAULT 0,
 ADD COLUMN IF NOT EXISTS distance_miles NUMERIC(8,2) DEFAULT NULL,
 ADD COLUMN IF NOT EXISTS practitioner_response TEXT DEFAULT NULL,
-ADD COLUMN IF NOT EXISTS practitioner_response_reason TEXT DEFAULT NULL,
 ADD COLUMN IF NOT EXISTS practitioner_responded_at TIMESTAMP WITH TIME ZONE DEFAULT NULL,
 ADD COLUMN IF NOT EXISTS match_status TEXT DEFAULT 'pending';
 
@@ -386,7 +385,8 @@ CREATE OR REPLACE FUNCTION create_practitioner_match(
   p_client_serial TEXT,
   p_practitioner_serial TEXT,
   p_match_score INT DEFAULT 75,
-  p_creation_source TEXT DEFAULT 'manual_unknown'
+  p_creation_source TEXT DEFAULT 'manual_unknown',
+  p_created_by TEXT DEFAULT 'unknown'
 )
 RETURNS TABLE (match_id uuid, status text) AS $$
 DECLARE
@@ -401,7 +401,8 @@ BEGIN
     match_score,
     client_initiated,
     matched_at,
-    creation_source
+    creation_source,
+    created_by
   )
   VALUES (
     p_project_serial,
@@ -411,7 +412,8 @@ BEGIN
     p_match_score,
     true,
     NOW(),
-    p_creation_source
+    p_creation_source,
+    p_created_by
   )
   ON CONFLICT DO NOTHING
   RETURNING id INTO v_match_id;
@@ -437,6 +439,9 @@ BEGIN
   RETURN;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Grant execute permission to authenticated users and anonymous users
+GRANT EXECUTE ON FUNCTION create_practitioner_match(INT, TEXT, TEXT, INT, TEXT, TEXT) TO authenticated, anon;
 
 CREATE OR REPLACE FUNCTION create_project_message(
   p_project_id uuid,
@@ -693,8 +698,6 @@ BEGIN
     id,
     practitioner_serial,
     languages,
-    modalities,
-    conditions_treated,
     profile_completeness_percent,
     created_at,
     updated_at
@@ -703,9 +706,7 @@ BEGIN
     p_practitioner_id,
     p_practitioner_serial,
     ARRAY[]::TEXT[],
-    ARRAY[]::TEXT[],
-    ARRAY[]::TEXT[],
-    10,
+    0,
     NOW(),
     NOW()
   )
@@ -1150,8 +1151,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Grant execute permission to authenticated users
-GRANT EXECUTE ON FUNCTION create_practitioner_new_match_notification(TEXT, TEXT, TEXT, INTEGER) TO authenticated;
+-- Grant execute permission to authenticated users and anonymous users
+GRANT EXECUTE ON FUNCTION create_practitioner_new_match_notification(TEXT, TEXT, TEXT, INTEGER) TO authenticated, anon;
 
 -- ============================================================================
 -- GET PRACTITIONER NOTIFICATION PREFERENCES (SECURITY DEFINER - BYPASSES RLS)

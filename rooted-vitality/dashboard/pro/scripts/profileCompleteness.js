@@ -191,7 +191,7 @@ class ProfileCompletenessTracker {
     try {
       const { data, error } = await supabase
         .from('practitioner_profiles')
-        .update({ profile_completeness: completenessPercentage })
+        .update({ profile_completeness_percent: completenessPercentage })
         .eq('user_id', this.userId);
 
       if (error) {

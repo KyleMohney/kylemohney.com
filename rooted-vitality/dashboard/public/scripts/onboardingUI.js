@@ -595,11 +595,11 @@ function setupStep5Handler(onboardingData, saveLocalData) {
                         try {
                             const { data: profileInsertData, error: profileError } = await window.supabaseClient
                                 .from('client_profiles')
-                                .insert(profileData)
+                                .upsert(profileData, { onConflict: 'user_id' })
                                 .select();
 
                             if (profileError) {
-                                console.error('[Onboarding] Client profile insert error:', profileError);
+                                console.error('[Onboarding] Client profile upsert error:', profileError);
                                 // CONTINUE ANYWAY - do not throw, we want to save project even if profile fails
                             } else {
                                 profileSaveSucceeded = true;
@@ -629,16 +629,6 @@ function setupStep5Handler(onboardingData, saveLocalData) {
                     categoryName = categoryObj ? categoryObj.name : onboardingData.category;
                 }
 
-                // Format subcategory - can be array or string
-                let subcategoryStr = '';
-                if (onboardingData.subcategory) {
-                    if (Array.isArray(onboardingData.subcategory)) {
-                        subcategoryStr = onboardingData.subcategory.join(', ');
-                    } else {
-                        subcategoryStr = onboardingData.subcategory;
-                    }
-                }
-
                 // Get raw values from form
                 let travelPref = document.querySelector('input[name="travel_preference"]:checked')?.value || onboardingData.travel_preference;
                 let urgency = document.querySelector('input[name="urgency"]:checked')?.value || onboardingData.urgency;
@@ -663,16 +653,14 @@ function setupStep5Handler(onboardingData, saveLocalData) {
                     client_serial: onboardingData.clientSerial,
                     category_id: (data && onboardingData.category) ? data[onboardingData.category]?.category_id : null,
                     category_name: categoryName || null,
-                    subcategory_name: subcategoryStr || null,
+                    subcategory_name: Array.isArray(onboardingData.subcategory) ? onboardingData.subcategory.join(',') : (onboardingData.subcategory || ''),
                     description: onboardingData.description || onboardingData.symptoms || '',
                     zipcode: onboardingData.zipcode || null,
                     city: onboardingData.city || null,
                     state: onboardingData.state || null,
                     street: onboardingData.street || null,
                     travel_preference: travelPref || null,
-                    urgency: urgency,
-                    client_first_name: onboardingData.firstName || null,
-                    client_last_name: onboardingData.lastName || null
+                    urgency: urgency
                 };
 
                 // Create project with ALL required fields

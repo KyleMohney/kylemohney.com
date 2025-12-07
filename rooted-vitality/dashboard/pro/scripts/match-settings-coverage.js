@@ -569,6 +569,72 @@ function removeHouseCallsZip(btn) {
   btn.closest('[data-zip]').remove();
 }
 
+/**
+ * Populate in-office ZIP code tags from inofficeZipsList
+ */
+function populateZipTagsForInoffice() {
+  const container = document.getElementById('inoffice-zip-tags');
+  container.innerHTML = '';
+  
+  inofficeZipsList.forEach(zipCode => {
+    const tag = document.createElement('div');
+    tag.setAttribute('data-zip', zipCode);
+    tag.className = 'zip-tag';
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn-remove-item';
+    btn.textContent = '×';
+    btn.addEventListener('click', (e) => removeInofficeZip(e.target));
+    tag.textContent = zipCode;
+    tag.appendChild(btn);
+    container.appendChild(tag);
+  });
+}
+
+/**
+ * Populate house calls ZIP code tags from housecallsZipsList
+ */
+function populateZipTagsForHouseCalls() {
+  const container = document.getElementById('housecalls-zip-tags');
+  container.innerHTML = '';
+  
+  housecallsZipsList.forEach(zipCode => {
+    const tag = document.createElement('div');
+    tag.setAttribute('data-zip', zipCode);
+    tag.className = 'zip-tag';
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn-remove-item';
+    btn.textContent = '×';
+    btn.addEventListener('click', (e) => removeHouseCallsZip(e.target));
+    tag.textContent = zipCode;
+    tag.appendChild(btn);
+    container.appendChild(tag);
+  });
+}
+
+/**
+ * Populate virtual/remote state tags from virtualStatesList
+ */
+function populateStateTagsForVirtual() {
+  const container = document.getElementById('virtualremote-state-tags');
+  container.innerHTML = '';
+  
+  virtualStatesList.forEach(stateCode => {
+    const tag = document.createElement('div');
+    tag.setAttribute('data-state', stateCode);
+    tag.className = 'state-tag';
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn-remove-item';
+    btn.textContent = '×';
+    btn.addEventListener('click', (e) => removeVirtualRemoteState(e.target));
+    tag.textContent = stateCode;
+    tag.appendChild(btn);
+    container.appendChild(tag);
+  });
+}
+
 
 /* ========================================== */
 /* 8. CSV IMPORT HANDLER */
@@ -857,6 +923,32 @@ async function loadCoverageSettings() {
         document.getElementById('inoffice-base-zip').value = practitioner.in_person_base_zipcode || '';
         document.getElementById('inoffice-radius-slider').value = practitioner.in_person_radius_miles || 10;
         updateInofficeRadiusDisplay();
+      } else if (practitioner.in_person_option === 'zipcodes') {
+        document.getElementById('inoffice-mode-zips').checked = true;
+        const inofficeZipsContent = document.getElementById('inoffice-zips-content');
+        inofficeZipsContent.classList.remove('hidden');
+        inofficeZipsContent.classList.add('active');
+        // Load ZIP codes
+        inofficeZipsList = Array.isArray(practitioner.in_person_zipcodes) ? practitioner.in_person_zipcodes : [];
+        
+        // Ensure container is empty before populating
+        const container = document.getElementById('inoffice-zip-tags');
+        if (container) {
+          container.innerHTML = '';
+          inofficeZipsList.forEach(zipCode => {
+            const tag = document.createElement('div');
+            tag.setAttribute('data-zip', zipCode);
+            tag.className = 'zip-tag';
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn-remove-item';
+            btn.textContent = '×';
+            btn.addEventListener('click', (e) => removeInofficeZip(e.target));
+            tag.textContent = zipCode;
+            tag.appendChild(btn);
+            container.appendChild(tag);
+          });
+        }
       }
     }
 
@@ -871,6 +963,33 @@ async function loadCoverageSettings() {
         document.getElementById('housecalls-base-zip').value = practitioner.housecalls_base_zipcode || '';
         document.getElementById('housecalls-radius-slider').value = practitioner.housecalls_radius_miles || 10;
         updateHouseCallsRadiusDisplay();
+      } else if (practitioner.housecalls_option === 'zipcodes') {
+        document.getElementById('housecalls-mode-zips').checked = true;
+        const housecallsZipsContent = document.getElementById('housecalls-zips-content');
+        housecallsZipsContent.classList.remove('hidden');
+        housecallsZipsContent.classList.add('active');
+        // Load ZIP codes
+        const rawZips = practitioner.housecalls_zipcodes;
+        housecallsZipsList = Array.isArray(rawZips) && rawZips.length > 0 ? rawZips : [];
+        
+        // Ensure container is empty before populating
+        const container = document.getElementById('housecalls-zip-tags');
+        if (container) {
+          container.innerHTML = '';
+          housecallsZipsList.forEach((zipCode) => {
+            const tag = document.createElement('div');
+            tag.setAttribute('data-zip', zipCode);
+            tag.className = 'zip-tag';
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn-remove-item';
+            btn.textContent = '×';
+            btn.addEventListener('click', (e) => removeHouseCallsZip(e.target));
+            tag.textContent = zipCode;
+            tag.appendChild(btn);
+            container.appendChild(tag);
+          });
+        }
       }
     }
 
@@ -883,7 +1002,30 @@ async function loadCoverageSettings() {
         document.getElementById('virtualremote-mode-nationwide').checked = true;
       } else if (practitioner.virtual_option === 'states') {
         document.getElementById('virtualremote-mode-states').checked = true;
-        document.getElementById('virtualremote-states-content').classList.remove('hidden');
+        const virtualStatesContent = document.getElementById('virtualremote-states-content');
+        virtualStatesContent.classList.remove('hidden');
+        virtualStatesContent.classList.add('active');
+        // Load states
+        virtualStatesList = Array.isArray(practitioner.virtual_states) ? practitioner.virtual_states : [];
+        
+        // Ensure container is empty before populating
+        const container = document.getElementById('virtualremote-state-tags');
+        if (container) {
+          container.innerHTML = '';
+          virtualStatesList.forEach(stateCode => {
+            const tag = document.createElement('div');
+            tag.setAttribute('data-state', stateCode);
+            tag.className = 'state-tag';
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn-remove-item';
+            btn.textContent = '×';
+            btn.addEventListener('click', (e) => removeVirtualRemoteState(e.target));
+            tag.textContent = stateCode;
+            tag.appendChild(btn);
+            container.appendChild(tag);
+          });
+        }
       }
     }
 
@@ -895,17 +1037,13 @@ async function loadCoverageSettings() {
 
 async function saveCoverageSettings() {
   try {
-    console.log('[Coverage] Save button clicked, starting save...');
-    
     const { data: { user }, error: userError } = await window.supabaseClient.auth.getUser();
     if (userError || !user) {
-      console.error('[Coverage] Auth error:', userError);
       showToast('Please log in to save coverage settings.', 'error');
       return;
     }
 
     const practitionerId = user.id;
-    console.log('[Coverage] User authenticated:', practitionerId);
     
     const coverageData = {
       in_person_enabled: document.getElementById('travel-in-person')?.checked || false,
@@ -922,8 +1060,6 @@ async function saveCoverageSettings() {
       virtual_option: null,
       virtual_states: []
     };
-
-    console.log('[Coverage] Coverage data collected:', coverageData);
 
     if (coverageData.in_person_enabled) {
       if (document.getElementById('inoffice-mode-radius')?.checked) {
@@ -959,15 +1095,14 @@ async function saveCoverageSettings() {
       }
     }
 
-    console.log('[Coverage] Final coverage data:', coverageData);
-
     const { data, error } = await window.supabaseClient
       .from('practitioners')
       .update(coverageData)
-      .eq('id', practitionerId);
+      .eq('id', practitionerId)
+      .select()
+      .single();
 
     if (error) {
-      console.error('[Coverage] Database error:', error);
       try {
         showToast('Failed to save coverage settings: ' + error.message, 'error');
       } catch (e) {
@@ -976,13 +1111,28 @@ async function saveCoverageSettings() {
       return;
     }
 
+    // Reload coverage settings to show saved values
+    try {
+      if (window.matchSettingsManager) {
+        await window.matchSettingsManager.loadPractitionerData();
+      }
+      loadCoverageSettings();
+      
+      // Update map visualization if it exists
+      setTimeout(() => {
+        if (coverageMap) {
+          updateCoverageMapVisualization();
+        }
+      }, 100);
+    } catch (reloadError) {
+    }
+
     try {
       showToast('Coverage area saved successfully!', 'success');
     } catch (e) {
       console.error('[Coverage] showToast error:', e);
     }
   } catch (error) {
-    console.error('[Coverage] Exception error:', error);
     try {
       showToast('An unexpected error occurred: ' + error.message, 'error');
     } catch (e) {

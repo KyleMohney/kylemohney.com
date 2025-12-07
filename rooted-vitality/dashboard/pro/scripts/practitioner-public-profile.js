@@ -31,6 +31,7 @@ DESIGN SYSTEM
 
 let practitioner = null;
 let reviews = [];
+let urlParams = null;
 
 // Flag for injections.js to know this page handles its own header
 window.PRACTITIONER_PROFILE_PAGE = true;
@@ -155,7 +156,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     try {
         // Get practitioner ID from URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
+        urlParams = new URLSearchParams(window.location.search);
         let practitionerId = urlParams.get('id');
         
         // If no ID provided, try to get logged-in user's profile
@@ -748,7 +749,8 @@ async function sendPractitionerMatch(project, practitionerId, practitionerSerial
                 p_client_serial: project.client_serial,
                 p_practitioner_serial: practitionerSerial,
                 p_match_score: matchScore,
-                p_creation_source: 'practitioner_public_profile'
+                p_creation_source: 'practitioner_public_profile',
+                p_created_by: 'client'
             });
         
         if (error) {
@@ -768,31 +770,20 @@ async function sendPractitionerMatch(project, practitionerId, practitionerSerial
             .eq('serial_number', practitionerSerial)
             .single();
 
-        if (isValidQueryResult(practitionerData, practitionerError)) {
-            // Create notification for the practitioner
-            const clientName = clientData.first_name || 'Client';
-            const notificationTitle = `New Match: ${clientName}`;
-            const notificationMessage = `${clientName} has matched with you!`;
-
-            const { error: notifError } = await window.supabaseClient
-                .from('practitioner_notifications')
-                .insert({
-                    practitioner_id: practitionerData.id,
-                    practitioner_serial: practitionerData.serial_number,
-                    type: 'match_new',
-                    title: notificationTitle,
-                    message: notificationMessage,
-                    client_name: clientName,
-                    client_serial: project.client_serial,
-                    match_id: data?.[0]?.id,
-                    is_read: false,
-                    created_at: new Date().toISOString()
+        // Notify practitioner of new match using the centralized function
+        // This prevents duplicate notifications
+        if (window.notifyPractitionerOfNewMatch && typeof window.notifyPractitionerOfNewMatch === 'function') {
+            try {
+                const clientName = clientData.first_name || 'A client';
+                const projectName = project.custom_name || project.category_name || 'your request';
+                await window.notifyPractitionerOfNewMatch({
+                    practitionerSerial: practitionerSerial,
+                    clientName: clientName,
+                    projectName: projectName,
+                    matchScore: matchScore
                 });
-
-            if (notifError) {
-
-            } else {
-
+            } catch (notifyError) {
+                console.warn('[Public Profile] Error notifying practitioner:', notifyError);
             }
         }
 
@@ -871,10 +862,36 @@ function renderProfile() {
     renderServicesCard();
     renderCredentialsCard();
     renderContactCard();
+    renderFAQ();
+    
+    // Old grid section visibility logic removed - sections now display independently
+    
+    // Show connect section if it has content
+    const hasConnect = !document.getElementById('contact-links-list').textContent.trim() === '';
+    if (hasConnect) {
+        setVisible('connect-section', true);
+    }
+    
     renderMediaCard();
     renderReviewsCard();
-    renderFAQ();
-
+    
+    // ===== HANDLE BACK TO MATCHES BUTTON (from onboarding modal) =====
+    const fromOnboarding = urlParams.get('from_onboarding') === 'true';
+    const projectIdFromUrl = urlParams.get('project_id');
+    
+    if (fromOnboarding && projectIdFromUrl) {
+        // Show the back button section
+        setVisible('back-to-matches-section', true);
+        
+        // Set up the back button click handler
+        const backBtn = document.getElementById('back-to-matches-btn');
+        if (backBtn) {
+            backBtn.addEventListener('click', () => {
+                // Navigate to find-practitioners page with the project ID
+                window.location.href = `/rooted-vitality/dashboard/client/pages/find-practitioners.html?project_id=${projectIdFromUrl}`;
+            });
+        }
+    }
 }
 
 // ======================================================
@@ -1002,25 +1019,21 @@ function renderHero() {
         .map((_, i) => `<span class="star${i < Math.round(avgRating) ? ' filled' : ''}">★</span>`)
         .join('');
     
-    // Years in practice
+    // Years in practice (from practitioner_profiles.year_established)
     if (practitioner.year_established) {
-        let yearsInPractice;
-        const value = parseInt(practitioner.year_established);
+        const yearEstablished = parseInt(practitioner.year_established);
+        const yearsInPractice = new Date().getFullYear() - yearEstablished;
         
-        // If value is < 100, treat it as years directly
-        // If value is >= 1900, treat it as a year and calculate
-        if (value < 100) {
-            yearsInPractice = value;
+        if (yearsInPractice <= 1) {
+            document.getElementById('stat-years').textContent = '>1 yr';
         } else {
-            yearsInPractice = new Date().getFullYear() - value;
+            document.getElementById('stat-years').textContent = yearsInPractice + ' yrs';
         }
-        
-        document.getElementById('stat-years').textContent = yearsInPractice + ' yrs';
     }
     
-    // Business type (team size)
-    if (practitioner.business_size) {
-        document.getElementById('stat-business-type').textContent = practitioner.business_size;
+    // Practice type (from practitioner_profiles.practice_type)
+    if (practitioner.practice_type) {
+        document.getElementById('stat-business-type').textContent = practitioner.practice_type;
     }
 }
 
@@ -1028,12 +1041,12 @@ function renderHero() {
 function renderAbout() {
     if (practitioner.bio) {
         setVisible('about-section', true);
-        document.getElementById('profile-bio').textContent = practitioner.bio;
+        document.getElementById('about-content').textContent = practitioner.bio;
     }
     
     if (practitioner.ethos_statement) {
         setVisible('approach-section', true);
-        document.getElementById('profile-approach').textContent = practitioner.ethos_statement;
+        document.getElementById('approach-content').textContent = practitioner.ethos_statement;
     }
 }
 
@@ -1060,21 +1073,30 @@ function renderVideo() {
 // Render Payments & Insurance Section
 function renderPaymentsSection() {
     try {
+        console.log('[renderPaymentsSection] practitioner data:', practitioner);
+        console.log('[renderPaymentsSection] payment_methods:', practitioner.payment_methods);
+        console.log('[renderPaymentsSection] custom_payment_methods:', practitioner.custom_payment_methods);
+        console.log('[renderPaymentsSection] insurance_providers:', practitioner.insurance_providers);
+        
         let hasContent = false;
         
         // ===== PAYMENT METHODS =====
         if (practitioner.payment_methods) {
             let methods = [];
             
-            // Try to parse as JSON first (handles ["stripe", "square", "paypal"])
-            try {
-                const parsed = JSON.parse(practitioner.payment_methods);
-                if (Array.isArray(parsed)) {
-                    methods = parsed.filter(m => m && typeof m === 'string');
-                }
-            } catch (e) {
-                // If not JSON, treat as comma-separated string
-                if (typeof practitioner.payment_methods === 'string') {
+            // Check if it's already an array
+            if (Array.isArray(practitioner.payment_methods)) {
+                methods = practitioner.payment_methods.filter(m => m && typeof m === 'string');
+                console.log('[renderPaymentsSection] payment_methods is already an array:', methods);
+            } else if (typeof practitioner.payment_methods === 'string') {
+                // Try to parse as JSON first (handles ["stripe", "square", "paypal"])
+                try {
+                    const parsed = JSON.parse(practitioner.payment_methods);
+                    if (Array.isArray(parsed)) {
+                        methods = parsed.filter(m => m && typeof m === 'string');
+                    }
+                } catch (e) {
+                    // If not JSON, treat as comma-separated string
                     methods = practitioner.payment_methods
                         .split(',')
                         .map(m => m.trim().replace(/^["']|["']$/g, '')) // Remove quotes
@@ -1082,8 +1104,9 @@ function renderPaymentsSection() {
                 }
             }
             
+            console.log('[renderPaymentsSection] Parsed payment methods:', methods);
+            
             if (methods.length > 0) {
-                hasContent = true;
                 // Format method names: capitalize words, replace hyphens with spaces
                 const paymentHtml = methods
                     .map(m => {
@@ -1095,37 +1118,26 @@ function renderPaymentsSection() {
                     })
                     .join('');
                 document.getElementById('payment-methods-list').innerHTML = paymentHtml;
-                setVisible('payments-row', true);
+                setVisible('payments-section', true);
             }
         }
         
         // ===== INSURANCE =====
-        if (practitioner.accepts_insurance || (practitioner.insurance_providers && practitioner.insurance_providers.length > 0)) {
-            const providers = practitioner.insurance_providers || [];
-            if (providers.length > 0) {
-                hasContent = true;
-                // Format provider names: capitalize words, replace hyphens with spaces
-                const insuranceHtml = providers
-                    .map(p => {
-                        const formatted = p
-                            .split('-')
-                            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                            .join(' ');
-                        return `<div class="payment-insurance-item">${escapeHtml(formatted)}</div>`;
-                    })
-                    .join('');
-                document.getElementById('insurance-list').innerHTML = insuranceHtml;
-                setVisible('insurance-row', true);
-            } else if (practitioner.accepts_insurance) {
-                hasContent = true;
-                document.getElementById('insurance-list').innerHTML = '<div class="payment-insurance-item">Yes</div>';
-                setVisible('insurance-row', true);
-            }
-        }
-        
-        // Show payments section if has any content
-        if (hasContent) {
-            setVisible('payments-section', true);
+        if (practitioner.insurance_providers && practitioner.insurance_providers.length > 0) {
+            const providers = practitioner.insurance_providers;
+            console.log('[renderPaymentsSection] Providers:', providers);
+            // Format provider names: capitalize words, replace hyphens with spaces
+            const insuranceHtml = providers
+                .map(p => {
+                    const formatted = p
+                        .split('-')
+                        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                        .join(' ');
+                    return `<div class="payment-insurance-item">${escapeHtml(formatted)}</div>`;
+                })
+                .join('');
+            document.getElementById('insurance-list').innerHTML = insuranceHtml;
+            setVisible('insurance-section', true);
         }
     } catch (error) {
 
@@ -1299,9 +1311,7 @@ function renderCredentialsCard() {
     }
     
     if (hasContent) {
-        setVisible('credentials-card-section', true);
-    } else {
-        setVisible('credentials-card-section', false);
+        setVisible('credentials-section', true);
     }
 }
 
@@ -1336,7 +1346,7 @@ function renderContactCard() {
     
     const contactHtml = links.join('<span class="contact-link-separator"> · </span>');
     document.getElementById('contact-links-list').innerHTML = contactHtml;
-    setVisible('contact-card-section', true);
+    setVisible('connect-section', true);
 
 }
 
@@ -1370,7 +1380,7 @@ function renderReviewsCard() {
             const last = review.client_last_name?.trim();
             
             if (first && last) {
-                displayName = `${first} ${last[0]}`;
+                displayName = `${first} ${last[0].toUpperCase()}`;
             } else if (last) {
                 displayName = last;
             } else if (first) {
@@ -1392,7 +1402,7 @@ function renderReviewsCard() {
                             .getPublicUrl(photoPath);
                           photoUrl = data?.publicUrl || photoPath;
                         }
-                        return `<img src="${photoUrl}" alt="Review photo ${idx + 1}" class="review-photo-thumbnail" loading="lazy">`;
+                        return `<img src="${photoUrl}" alt="Review photo ${idx + 1}" class="review-photo-thumbnail" data-full-url="${escapeHtml(photoUrl)}" loading="lazy">`;
                     })
                     .join('');
                 photosHtml = `<div class="review-photos-gallery">${photoThumbnails}</div>`;
@@ -1410,6 +1420,19 @@ function renderReviewsCard() {
         .join('');
     
     document.getElementById('reviews-container').innerHTML = reviewsHtml;
+    
+    // Attach click handlers to review photo thumbnails
+    const reviewContainer = document.getElementById('reviews-container');
+    if (reviewContainer) {
+        reviewContainer.querySelectorAll('.review-photo-thumbnail').forEach(img => {
+            img.addEventListener('click', (e) => {
+                const fullUrl = img.getAttribute('data-full-url');
+                if (fullUrl) {
+                    openImageModal(fullUrl);
+                }
+            });
+        });
+    }
 }
 
 // Render Media & Connect Card - gallery + social compact

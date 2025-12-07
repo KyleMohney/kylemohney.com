@@ -100,11 +100,6 @@ const ProfileState = {
                 await saveSectionPhotosVideo();
             }
             
-            // Save years_in_service if in practitioner data
-            if (this.practitionerData && this.practitionerData.years_in_service !== undefined) {
-                await routeUpdateData({ years_in_service: this.practitionerData.years_in_service });
-            }
-            
             console.log('[ProfileState] Save complete');
         } catch (error) {
             console.error('[ProfileState] Save failed:', error);
@@ -212,8 +207,8 @@ const PROFILE_TABLE_FIELDS = [
     // Photos & Video
     'gallery_photos', 'intro_video_url', 'practice_logo_url',
     // Additional Details
-    'faq', 'social_media', 'practice_type', 'year_established', 'years_in_service',
-    // Insurance & Payment
+    'faq', 'social_media', 'practice_type', 'year_established',
+    // Insurance & Payment (moved to practitioner_profiles)
     'insurance_providers', 'payment_methods', 'custom_insurance_providers', 'custom_payment_methods',
     // Profile management
     'profile_completeness_percent'
@@ -365,6 +360,12 @@ async function routeUpdateData(updateData) {
             ...ProfileState.practitionerData,
             ...mergedResult
         };
+        
+        // Recalculate profile completeness after successful save
+        if (typeof recalculateProfileCompleteness === 'function') {
+            await recalculateProfileCompleteness();
+        }
+        
         return finalMerged;
         
     } catch (error) {
@@ -513,16 +514,17 @@ async function loadProfile(userId) {
         
         // Fetch credentials from practitioner_credentials table
         let credentialsData = null;
-        if (practitioner) {
+        if (practitioner && practitioner.serial_number) {
             const { data: credentials, error: credError } = await window.supabaseClient
                 .from('practitioner_credentials')
                 .select('*')
-                .eq('id', practitioner.id)
-                .single();
+                .eq('practitioner_serial', practitioner.serial_number)
+                .maybeSingle();
             
             if (!credError && credentials) {
                 credentialsData = credentials;
-            } else if (credError && credError.code !== 'PGRST116') {
+            } else if (credError) {
+                console.error('[Profile] Error fetching credentials:', credError);
             }
         }
         
@@ -585,26 +587,7 @@ async function populateProfileFields(data) {
         document.getElementById('profile-dba-name').value = displayDbaName;
     }
     
-    // Team Size - try business_size (from signup) first
-    const teamSize = data.business_size || data.team_size || '';
-    if (teamSize) {
-        document.getElementById('profile-teamsize').value = teamSize;
-    }
-    
     // Location fields - pull from address_city and address_state if available
-    // Years in Service - calculate from year_established
-    let yearsValue = data.years_in_practice || data.years_in_service || null;
-    
-    // If no stored years value, calculate from year_established
-    if (!yearsValue && data.year_established) {
-        const established = parseInt(data.year_established);
-        const currentYear = new Date().getFullYear();
-        yearsValue = Math.max(1, currentYear - established); // At least 1 year
-    }
-    
-    if (yearsValue) {
-        document.getElementById('profile-years').value = yearsValue;
-    }
     
     // Avatar - from practitioners table (display only in profile form)
     // Use practice_logo_url for practitioner logo
@@ -693,8 +676,6 @@ async function populateProfileFields(data) {
         if (social.website) document.getElementById('social-website').value = social.website;
     }
     
-    // Modalities/Specialties removed - managed in Match Settings
-    
     // Load photos from gallery
     if (data.gallery_photos && Array.isArray(data.gallery_photos)) {
         loadPhotos(data.gallery_photos);
@@ -735,7 +716,7 @@ async function populateProfileFields(data) {
         }
     }
     
-    // Load insurance providers list - check both insurance_providers and insurance_accepted for backwards compatibility
+    // Load insurance providers list
     let insuranceData = [];
     if (data.insurance_providers) {
         // Handle both array and JSON string formats (stored as TEXT in DB)
@@ -747,17 +728,6 @@ async function populateProfileFields(data) {
             }
         } else if (Array.isArray(data.insurance_providers)) {
             insuranceData = data.insurance_providers;
-        }
-    } else if (data.insurance_accepted) {
-        // Backwards compatibility
-        if (typeof data.insurance_accepted === 'string') {
-            try {
-                insuranceData = JSON.parse(data.insurance_accepted);
-            } catch (e) {
-                insuranceData = [];
-            }
-        } else if (Array.isArray(data.insurance_accepted)) {
-            insuranceData = data.insurance_accepted;
         }
     }
     ProfileState.selectedInsurance = insuranceData;
@@ -828,10 +798,6 @@ async function populateProfileFields(data) {
         ProfileState.faqNextId = 0;
     }
     
-    // Legacy support: accepts_insurance boolean (will be migrated)
-    if (data.accepts_insurance !== null && data.accepts_insurance !== undefined) {
-        // Just store in state - UI will handle display
-    }
     
     // NOTE: All credential UI rendering happens in profile.js
     // Data is stored in ProfileState, UI functions are called during page initialization
@@ -1361,8 +1327,14 @@ async function saveSectionMoreDetails() {
         // INSURANCE PROVIDERS - collect from ProfileState
         insurance_providers: ProfileState.selectedInsurance || [],
         
+        // CUSTOM INSURANCE PROVIDERS - collect from form input
+        custom_insurance_providers: document.getElementById('custom-insurance-input')?.value || '',
+        
         // PAYMENT METHODS - collect from ProfileState
         payment_methods: ProfileState.selectedPaymentMethods || [],
+        
+        // CUSTOM PAYMENT METHODS - collect from form input
+        custom_payment_methods: document.getElementById('custom-payment-input')?.value || '',
         
         updated_at: new Date().toISOString()
     };

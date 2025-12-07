@@ -269,105 +269,13 @@ async function loadMatches(clientSerial) {
     });
 
     // Load opportunity messages and merge them into allMatches
-    try {
-      // Query opportunities directly for this client
-      const { data: opportunities, error: oppError } = await window.supabaseClient
-        .from('opportunities')
-        .select('id, project_serial, practitioner_serial, client_serial, status, converted_to_match, declined_by_client, is_archived, created_at, updated_at')
-        .eq('client_serial', clientSerial)
-        .eq('declined_by_client', false)
-        .eq('converted_to_match', false)
-        .eq('is_archived', false)
-        .order('updated_at', { ascending: false });
+    // COMING SOON: Opportunities feature launching January 2025
+    // Temporarily disabled - opportunities will be handled differently when launched
+    const opportunities = [];
 
-      if (oppError) {
-        console.warn('Error loading opportunities:', oppError);
-      }
-
-      if (!oppError && opportunities && opportunities.length > 0) {
-        // Fetch full details for practitioners and projects
-        const practitionerSerials = [...new Set(opportunities.map(o => o.practitioner_serial).filter(Boolean))];
-        const projectSerials = [...new Set(opportunities.map(o => o.project_serial).filter(Boolean))];
-
-        let practitionersDetailsMap = {};
-        let projectsDetailsMap = {};
-
-        if (practitionerSerials.length > 0) {
-          const { data: practData } = await window.supabaseClient
-            .from('practitioners')
-            .select('serial_number, id, legal_name, phone, practice_city, practice_state, in_person_enabled, housecalls_enabled, virtual_enabled, timezone, email')
-            .in('serial_number', practitionerSerials);
-          
-          if (practData) {
-            practData.forEach(p => {
-              practitionersDetailsMap[p.serial_number] = p;
-            });
-          }
-
-          const { data: profData } = await window.supabaseClient
-            .from('practitioner_profiles')
-            .select('practitioner_serial, bio, dba_name, practice_logo_url')
-            .in('practitioner_serial', practitionerSerials);
-          
-          if (profData) {
-            profData.forEach(prof => {
-              if (practitionersDetailsMap[prof.practitioner_serial]) {
-                practitionersDetailsMap[prof.practitioner_serial] = {
-                  ...practitionersDetailsMap[prof.practitioner_serial],
-                  ...prof
-                };
-              }
-            });
-          }
-        }
-
-        if (projectSerials.length > 0) {
-          const { data: projData } = await window.supabaseClient
-            .from('projects')
-            .select('id, category_id, category_name, zipcode, travel_preference, description, custom_name, client_id')
-            .in('project_serial', projectSerials);
-          
-          if (projData) {
-            projData.forEach(proj => {
-              projectsDetailsMap[proj.id] = proj;
-            });
-          }
-        }
-
-        const oppItems = opportunities
-          // Filter out opportunities that already have a converted match
-          .filter(opp => !matchesData.some(m => 
-            m.project_serial === opp.project_serial && 
-            m.practitioner_serial === opp.practitioner_serial
-          ))
-          .map(opp => {
-          const practitioner = practitionersDetailsMap[opp.practitioner_serial] || {};
-          const project = projectsDetailsMap[opp.project_serial] || {};
-          
-          return {
-            id: opp.id,
-            is_opportunity_message: true,
-            opportunity_id: opp.id,
-            project_serial: opp.project_serial,
-            practitioner_serial: opp.practitioner_serial,
-            client_serial: opp.client_serial,
-            status: 'opportunity',
-            created_at: opp.created_at,
-            updated_at: opp.updated_at,
-            practitioners: practitioner,
-            project: project,
-            last_message: 'Opportunity',
-            opportunity_message_text: 'Interested in connecting with you about this project.'
-          };
-        });
-
-        allMatches = [...allMatches, ...oppItems].sort((a, b) => 
-          new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at)
-        );
-      }
-    } catch (oppLoadError) {
-      console.error('Error loading opportunity messages:', oppLoadError);
-      // Continue with matches loaded so far - opportunities are optional
+    if (opportunities && opportunities.length > 0) {
+      // COMING SOON: Opportunities feature - this code will be activated in January 2025
+      // Placeholder for future opportunity processing
     }
 
     filteredMatches = [...allMatches];
@@ -411,9 +319,9 @@ async function updateBadgeCounts() {
     const messagesBadge = document.getElementById('messages-badge');
     if (messagesBadge) messagesBadge.textContent = messagesCount;
 
-    // Count completed (hired/not-hired/declined only)
+    // Count completed (hired/not-hired only)
     const completedCount = allMatches.filter(m => 
-      m.status === 'hired' || m.status === 'not-hired' || m.status === 'declined'
+      m.status === 'hired' || m.status === 'not-hired'
     ).length;
 
     const completedBadge = document.getElementById('completed-badge');
@@ -486,25 +394,6 @@ function applyTabFilter(tabName) {
       });
       break;
 
-    case 'opportunities':
-      if (opportunitiesContent) opportunitiesContent.classList.remove('hidden');
-      
-      // Lock messaging when in opportunities view
-      if (messageInputEl) {
-        messageInputEl.disabled = true;
-        messageInputEl.placeholder = 'Complete opportunities first';
-        messageInputEl.setAttribute('data-locked', 'true');
-      }
-      if (sendMessageBtn) {
-        sendMessageBtn.disabled = true;
-      }
-      
-      // Load opportunities if available
-      if (typeof window.loadClientOpportunities === 'function') {
-        window.loadClientOpportunities();
-      }
-      return; // Don't call renderMatches for opportunities tab
-
     case 'unread':
       if (messagesContent) messagesContent.classList.remove('hidden');
       if (messageThreadPanel) messageThreadPanel.classList.remove('hidden');
@@ -542,7 +431,7 @@ function applyTabFilter(tabName) {
       }
       
       filteredMatches = allMatches.filter(m => 
-        m.status === 'hired' || m.status === 'not-hired' || m.status === 'declined'
+        m.status === 'hired' || m.status === 'not-hired'
       );
       break;
 
@@ -616,9 +505,12 @@ async function updateMatchStatus(matchId, newStatus) {
       .eq('id', matchId);
 
     if (error) {
+      console.error('[Inbox] Error updating match status:', error);
       alert('Error updating status: ' + error.message);
       return;
     }
+
+    console.log('[Inbox] Match status updated successfully to:', newStatus);
 
     // Update local match object
     if (selectedMatch && selectedMatch.id === matchId) {
@@ -636,27 +528,38 @@ async function updateMatchStatus(matchId, newStatus) {
 
     // Sync status to pro side
     if ((newStatus === 'hired' || newStatus === 'not-hired') && selectedMatch) {
-      const { error: syncError } = await window.supabaseClient
-        .from('project_practitioner_matches')
-        .update({
-          status: newStatus,
-          updated_at: new Date().toISOString()
-        })
-        .eq('project_serial', selectedMatch.project_serial)
-        .eq('practitioner_serial', selectedMatch.practitioner_serial)
-        .neq('id', matchId);
-
-      if (!syncError && window.supabaseClient) {
-        const channel = window.supabaseClient.channel('match-status-changes');
-        channel.send('broadcast', {
-          event: 'match_status_changed',
-          payload: {
-            practitioner_serial: selectedMatch.practitioner_serial,
-            project_serial: selectedMatch.project_serial,
+      // Make sure we have the serial numbers before attempting sync
+      if (selectedMatch.project_serial && selectedMatch.practitioner_serial) {
+        const { error: syncError } = await window.supabaseClient
+          .from('project_practitioner_matches')
+          .update({
             status: newStatus,
-            timestamp: new Date().toISOString()
-          }
-        });
+            updated_at: new Date().toISOString()
+          })
+          .eq('project_serial', selectedMatch.project_serial)
+          .eq('practitioner_serial', selectedMatch.practitioner_serial)
+          .neq('id', matchId);
+
+        if (syncError) {
+          console.warn('[Inbox] Sync error updating other matches:', syncError);
+        }
+      }
+
+      if (window.supabaseClient) {
+        try {
+          const channel = window.supabaseClient.channel('match-status-changes');
+          channel.send('broadcast', {
+            event: 'match_status_changed',
+            payload: {
+              practitioner_serial: selectedMatch.practitioner_serial,
+              project_serial: selectedMatch.project_serial,
+              status: newStatus,
+              timestamp: new Date().toISOString()
+            }
+          });
+        } catch (broadcastError) {
+          console.warn('[Inbox] Broadcast error:', broadcastError);
+        }
       }
     }
 
@@ -766,7 +669,7 @@ function setupRealtimeSubscriptions(clientSerial) {
 
       // Handle practitioner decline
       if ((oldResponse !== 'declined' && newResponse === 'declined') || 
-          (oldStatus === 'pending' && newStatus === 'declined')) {
+          (oldResponse !== 'blocked' && newResponse === 'blocked')) {
         window.supabaseClient
           .from('project_practitioner_matches')
           .update({ 

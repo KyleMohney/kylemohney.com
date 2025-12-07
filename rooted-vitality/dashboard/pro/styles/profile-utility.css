@@ -394,6 +394,8 @@
     font-family: inherit;
     transition: all 0.2s ease;
     background: transparent;
+    -webkit-appearance: none;
+    appearance: none;
 }
 
 .profile-name-input:focus {
@@ -402,8 +404,15 @@
 }
 
 .profile-name-input:read-only {
-    opacity: 0.8;
+    opacity: 1;
     cursor: default;
+    background: transparent !important;
+    border: none !important;
+    border-bottom: none !important;
+    padding: 0 !important;
+    color: var(--rooted-light) !important;
+    -webkit-appearance: none;
+    appearance: none;
 }
 
 .profile-name-input::placeholder {
@@ -679,8 +688,10 @@
     font-weight: 500;
     font-size: 0.9rem;
     transition: all 0.2s ease;
-    display: inline-block;
-    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0;
+    margin-left: auto;
 }
 
 .profile-preview-link:hover {

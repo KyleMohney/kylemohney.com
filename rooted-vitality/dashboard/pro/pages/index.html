@@ -180,9 +180,13 @@ TABLE OF CONTENTS:
     }
     
     .clients-list {
-      display: flex;
+      display: none;
       flex-direction: column;
       gap: 1.25rem;
+    }
+
+    .clients-list.active {
+      display: flex;
     }
     
     .client-card {
@@ -596,13 +600,13 @@ TABLE OF CONTENTS:
       <!-- MIDDLE COLUMN: Clients List -->
       <section class="clients-main-content">
         <!-- New Clients Tab -->
-        <div id="new-clients" class="clients-list">
+        <div id="new-clients" class="clients-list active">
           <!-- Client cards will be populated here by JavaScript -->
         </div>
         
         <!-- Opportunities Tab -->
-        <div id="opportunities" class="clients-list hidden">
-          <!-- Opportunity cards will be populated here by JavaScript -->
+        <div id="opportunities" class="clients-list">
+          <!-- Opportunities coming in future release -->
         </div>
       </section>
     </div>
@@ -656,7 +660,9 @@ TABLE OF CONTENTS:
   <script src="../../../scripts/authHooks.js"></script>
   <script src="../../../scripts/emailTemplates.js"></script>
   <script src="../../../scripts/notificationManager.js"></script>
+  <script src="../../../scripts/reviewNotificationManager.js"></script>
   <script src="../../../injections.js"></script>
+  <script src="../scripts/practitioner-notifications.js"></script>
   
   <script>
     // ============================================================================
@@ -1079,8 +1085,7 @@ TABLE OF CONTENTS:
           newClientsContainer.innerHTML = '';
         }
 
-        const opportunitiesContainer = document.getElementById('opportunities');
-        opportunitiesContainer.innerHTML = '<div class="empty-state"><h3>No Opportunities Yet</h3><p>Clients looking for practitioners will appear here soon</p></div>';
+        // COMING SOON: Opportunities feature - keep the COMING SOON message
 
         for (const match of finalMatches) {
           if (!match.projects || !match.clients) continue;
@@ -1105,6 +1110,18 @@ TABLE OF CONTENTS:
           const qualityLabel = matchScore >= 80 ? 'Excellent Match' : matchScore >= 60 ? 'Good Match' : 'Potential Match';
           const daysAgo = Math.floor((new Date() - new Date(match.created_at)) / (1000 * 60 * 60 * 24));
           const daysText = daysAgo === 0 ? 'Today' : daysAgo === 1 ? 'Yesterday' : `${daysAgo} days ago`;
+          
+          // Format exact date and time for tooltip
+          const matchDate = new Date(match.created_at);
+          const exactDateTime = matchDate.toLocaleDateString('en-US', { 
+            month: 'short', 
+            day: 'numeric', 
+            year: 'numeric' 
+          }) + ' at ' + matchDate.toLocaleTimeString('en-US', { 
+            hour: 'numeric', 
+            minute: '2-digit',
+            hour12: true 
+          });
 
           const card = document.createElement('div');
           card.className = 'client-card';
@@ -1116,7 +1133,7 @@ TABLE OF CONTENTS:
               <div class="client-info">
                 <h3 class="client-name">${clientName}</h3>
                 <p class="client-service">${project.category_name || 'Wellness'}</p>
-                <p class="client-meta">Matched ${daysText}</p>
+                <p class="client-meta" title="${exactDateTime}">Matched ${daysText}</p>
                 <span class="match-quality-badge ${matchQuality}">
                   ${qualityLabel} (${matchScore}/100)
                 </span>
@@ -1370,160 +1387,6 @@ TABLE OF CONTENTS:
     // ============================================================================
     let practitionerIdGlobal = null;
 
-    /**
-     * Mark all unread notifications as read
-     */
-    async function markNotificationsAsRead() {
-      try {
-        const currentUser = window.authManager?.getCurrentUser();
-        if (!currentUser) return;
-
-        const practitionerId = getPractitionerId();
-        if (!practitionerId) return;
-
-        // Get practitioner serial
-        const { data: practitioner } = await window.supabaseClient
-          .from('practitioners')
-          .select('serial_number')
-          .eq('id', practitionerId)
-          .single();
-
-        if (!practitioner) return;
-
-        // Update all unread notifications to read
-        const { error } = await window.supabaseClient
-          .from('practitioner_notifications')
-          .update({
-            is_read: true,
-            updated_at: new Date().toISOString()
-          })
-          .eq('practitioner_serial', practitioner.serial_number)
-          .eq('is_read', false);
-
-        if (error) {
-          console.error('[Pro Notifications] Error marking as read:', error);
-          return;
-        }
-
-        // Clear badge
-        const notificationBadge = document.querySelector('.rv-notification-badge');
-        if (notificationBadge) {
-          notificationBadge.textContent = '0';
-          notificationBadge.classList.remove('active');
-          notificationBadge.style.backgroundColor = '';
-        }
-
-        // Reload notifications to show no unread
-        await loadPractitionerNotifications();
-      } catch (error) {
-        console.error('[Pro Notifications] Exception marking as read:', error);
-      }
-    }
-
-    /**
-     * Load practitioner notifications from database
-     */
-    async function loadPractitionerNotifications() {
-      try {
-        if (!window.supabaseClient || !window.authManager) {
-          console.error('[Pro Notifications] Supabase or auth not ready');
-          return;
-        }
-
-        const currentUser = window.authManager.getCurrentUser();
-        if (!currentUser) {
-          return;
-        }
-
-        const practitionerId = getPractitionerId();
-        if (!practitionerId) {
-          console.error('[Pro Notifications] No practitioner ID available');
-          return;
-        }
-
-        // Get practitioner serial number
-        const { data: practitioner, error: practitionerError } = await window.supabaseClient
-          .from('practitioners')
-          .select('serial_number')
-          .eq('id', practitionerId)
-          .single();
-
-        if (practitionerError || !practitioner) {
-          console.error('[Pro Notifications] Error loading practitioner:', practitionerError);
-          return;
-        }
-
-        const practitionerSerial = practitioner.serial_number;
-
-        // First, mark all unread notifications as read
-        const { error: markError } = await window.supabaseClient
-          .from('practitioner_notifications')
-          .update({ is_read: true, updated_at: new Date().toISOString() })
-          .eq('practitioner_serial', practitionerSerial)
-          .eq('is_read', false);
-
-        if (markError) {
-          console.warn('[Pro Notifications] Error marking notifications as read:', markError);
-        }
-
-        // Then fetch all notifications (read and unread) 
-        const { data: notifications, error } = await window.supabaseClient
-          .from('practitioner_notifications')
-          .select('*')
-          .eq('practitioner_serial', practitionerSerial)
-          .order('created_at', { ascending: false })
-          .limit(20);
-
-        if (error) {
-          console.error('[Pro Notifications] Error loading notifications:', error);
-          return;
-        }
-
-        // Update notification badge - now should be 0 since we marked them all as read
-        const notificationBadge = document.querySelector('.rv-notification-badge');
-        if (notificationBadge) {
-          notificationBadge.textContent = '0';
-          notificationBadge.classList.remove('active');
-          notificationBadge.style.backgroundColor = '';
-        }
-
-        if (notifications && notifications.length > 0) {
-          // Update notification list (selector may not exist if header doesn't render it)
-          const notificationsList = document.querySelector('.rv-notifications-list');
-          if (notificationsList && notificationsList instanceof Element) {
-            notificationsList.innerHTML = '';
-            
-            // Fetch client details for each notification
-            for (const notif of notifications) {
-              // Get client name if this is a match notification
-              let clientName = 'Client';
-              if (notif.type === 'match_new') {
-                // Extract client serial from the database if available
-                // For now, we'll query based on the match data
-                // This should be added to the notification or we fetch separately
-                clientName = notif.client_name || 'Client';
-              }
-              
-              const notifElement = document.createElement('a');
-              notifElement.className = 'rv-notifications-item';  // Remove 'unread' class since we just marked them all as read
-              notifElement.href = '#';
-              notifElement.innerHTML = `
-                <p class="rv-notifications-title">${notif.title}</p>
-                <p class="rv-notifications-message">${notif.message}</p>
-                <p class="rv-notifications-time">${new Date(notif.created_at).toLocaleDateString()}</p>
-              `;
-              notifElement.addEventListener('click', (e) => {
-                e.preventDefault();
-              });
-              notificationsList.appendChild(notifElement);
-            }
-          }
-        }
-      } catch (error) {
-        console.error('[Pro Notifications] Exception loading notifications:', error);
-      }
-    }
-
     async function initializeClientsPage() {
       try {
         if (!window.supabaseClient || !window.authManager) {
@@ -1544,129 +1407,82 @@ TABLE OF CONTENTS:
 
         practitionerIdGlobal = practitionerId;
 
+        // Initialize notification manager
+        await PractitionerNotifications.init(window.supabaseClient, window.authManager);
+
+        // Setup tab switching
+        const tabs = document.querySelectorAll('.sidebar-tab');
+        tabs.forEach(tab => {
+          tab.addEventListener('click', () => {
+            const tabName = tab.dataset.tab;
+            
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            
+            const clientLists = document.querySelectorAll('.clients-list');
+            clientLists.forEach(list => list.classList.remove('active'));
+            
+            const selectedList = document.getElementById(tabName);
+            if (selectedList) {
+              selectedList.classList.add('active');
+            }
+          });
+        });
+
         // Setup modal button listeners
         const declineBtns = document.querySelectorAll('.close-decline-modal');
-        console.log('[Pro Clients] Found', declineBtns.length, 'close-decline-modal buttons');
         declineBtns.forEach(btn => {
           btn.addEventListener('click', closeDeclineModal);
         });
         
         const confirmDeclineBtn = document.querySelector('.confirm-decline-btn');
-        console.log('[Pro Clients] confirmDeclineBtn:', confirmDeclineBtn);
         if (confirmDeclineBtn) {
           confirmDeclineBtn.addEventListener('click', confirmDecline);
         }
         
         const blockBtns = document.querySelectorAll('.close-block-modal');
-        console.log('[Pro Clients] Found', blockBtns.length, 'close-block-modal buttons');
         blockBtns.forEach(btn => {
           btn.addEventListener('click', closeBlockModal);
         });
         
         const confirmBlockBtn = document.querySelector('.confirm-block-btn');
-        console.log('[Pro Clients] confirmBlockBtn:', confirmBlockBtn);
         if (confirmBlockBtn) {
           confirmBlockBtn.addEventListener('click', confirmBlock);
         }
 
         // Load initial data
         await loadClientsData();
-        await loadPractitionerNotifications();
+
+        // Load notifications and setup real-time
+        await PractitionerNotifications.fetchNotifications();
+        PractitionerNotifications.renderNotifications('.rv-notifications-list');
+        PractitionerNotifications.updateBadge();
 
         // Setup real-time subscriptions
         await setupRealtimeSubscription(practitionerIdGlobal);
         
-        // Setup notifications realtime listener to auto-refresh when notifications change
-        await setupNotificationsRealtimeListener();
+        // Setup notifications realtime listener with callback
+        await PractitionerNotifications.setupRealtimeListener(async (eventType, notification) => {
+          console.log('[Pro Clients] Notification event:', eventType, notification);
+          
+          // Refresh notifications display and badge
+          PractitionerNotifications.renderNotifications('.rv-notifications-list');
+          PractitionerNotifications.updateBadge();
+        });
+
+        // Setup review notifications listener
+        if (window.reviewNotificationManager && typeof window.reviewNotificationManager.init === 'function') {
+          window.reviewNotificationManager.init(window.supabaseClient, window.authManager);
+        }
 
       } catch (error) {
         console.error('[Pro Clients] Initialization error:', error);
       }
     }
-    
-    /**
-     * Setup realtime listener for practitioner notifications
-     * Auto-refreshes local notification list when notifications change in database
-     */
-    async function setupNotificationsRealtimeListener() {
-      try {
-        const currentUser = window.authManager?.getCurrentUser();
-        if (!currentUser) return;
 
-        const practitionerId = getPractitionerId();
-        if (!practitionerId) return;
-
-        // Get practitioner serial
-        const { data: practitioner } = await window.supabaseClient
-          .from('practitioners')
-          .select('serial_number')
-          .eq('id', practitionerId)
-          .single();
-
-        if (!practitioner) return;
-
-        const channel = window.supabaseClient
-          .channel(`prac-notif:${practitioner.serial_number}`)
-          .on(
-            'postgres_changes',
-            {
-              event: '*',  // Listen for all changes (INSERT, UPDATE, DELETE)
-              schema: 'public',
-              table: 'practitioner_notifications',
-              filter: `practitioner_serial=eq.${practitioner.serial_number}`
-            },
-            (payload) => {
-              
-              // Handle new notifications (INSERT)
-              if (payload.eventType === 'INSERT' && payload.new) {
-                const newNotif = payload.new;
-                
-                // Update badge to show there's an unread notification
-                const notificationBadge = document.querySelector('.rv-notification-badge');
-                if (notificationBadge) {
-                  const currentCount = parseInt(notificationBadge.textContent) || 0;
-                  notificationBadge.textContent = currentCount + 1;
-                  notificationBadge.classList.add('active');
-                  notificationBadge.style.backgroundColor = '#FFD700'; // Gold color
-                }
-                
-                // Add notification to the list at the top (defensive selector check)
-                const notificationsList = document.querySelector('.rv-notifications-list');
-                if (notificationsList && notificationsList instanceof Element) {
-                  const notifElement = document.createElement('a');
-                  notifElement.className = 'rv-notifications-item unread';
-                  notifElement.href = '#';
-                  notifElement.innerHTML = `
-                    <p class="rv-notifications-title">${newNotif.title}</p>
-                    <p class="rv-notifications-message">${newNotif.message}</p>
-                    <p class="rv-notifications-time">${new Date(newNotif.created_at).toLocaleDateString()}</p>
-                  `;
-                  notifElement.addEventListener('click', (e) => {
-                    e.preventDefault();
-                  });
-                  
-                  // Insert at the top of the list
-                  if (notificationsList.firstChild) {
-                    notificationsList.insertBefore(notifElement, notificationsList.firstChild);
-                  } else {
-                    notificationsList.appendChild(notifElement);
-                  }
-                }
-              } else {
-                // For other changes (UPDATE, DELETE), reload notifications
-                loadPractitionerNotifications();
-              }
-            }
-          )
-          .subscribe((status) => {
-          });
-      } catch (error) {
-        console.error('[Pro Notifications] Exception setting up realtime listener:', error);
-      }
-    }
-
-    // Cleanup real-time subscriptions on page unload to prevent memory leaks
+    // Cleanup real-time subscriptions on page unload
     window.addEventListener('beforeunload', () => {
+      PractitionerNotifications.cleanup();
       if (realtimeSubscription) {
         realtimeSubscription.unsubscribe();
       }
@@ -1685,19 +1501,16 @@ TABLE OF CONTENTS:
       navLinks.forEach(link => {
         link.classList.remove('active');
         const href = link.getAttribute('href');
-        // Check if this link points to the clients page (index.html)
         if (href && (href.includes('/pro/pages/index.html') || href.includes('/pro/index.html') || href.endsWith('/pro/'))) {
           link.classList.add('active');
         }
       });
     }
     
-    // Try to set active immediately and retry if header not ready
     if (document.querySelectorAll('.rv-nav-link').length > 0) {
       setClientsNavActive();
     } else {
       document.addEventListener('DOMContentLoaded', setClientsNavActive);
-      // Also retry after a short delay in case header is still loading
       setTimeout(setClientsNavActive, 500);
     }
   </script>

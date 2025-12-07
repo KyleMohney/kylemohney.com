@@ -589,13 +589,18 @@ async function saveSectionCredentials() {
         
         // AUTOMATICALLY set badges based on credentials saved
         // Pro accepts all responsibility for accurate information
-        if ((ProfileState.educationCredentials || []).length > 0) {
+        // Only set badge to true if there are actual filled-in credentials
+        const filledEducation = (ProfileState.educationCredentials || []).filter(c => c.institution || c.field_of_study);
+        const filledLicenses = (ProfileState.licenseCredentials || []).filter(c => c.license_number || c.license_type);
+        const filledCertifications = (ProfileState.certificationCredentials || []).filter(c => c.certification_name || c.issuing_organization);
+        
+        if (filledEducation.length > 0) {
             credentialsToSave.badge_certified = true; // Has education/degrees
         }
-        if ((ProfileState.licenseCredentials || []).length > 0) {
+        if (filledLicenses.length > 0) {
             credentialsToSave.badge_licensed = true; // Has licenses
         }
-        if ((ProfileState.certificationCredentials || []).length > 0) {
+        if (filledCertifications.length > 0) {
             credentialsToSave.badge_certified = true; // Has certifications
         }
         

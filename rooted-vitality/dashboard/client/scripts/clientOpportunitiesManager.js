@@ -63,68 +63,8 @@ async function initializeClientOpportunitiesManager() {
 
  // Load opportunities where this client has toggled "open to match"
 async function loadClientOpportunities() {
-  try {
-
-    // Query project_messages that are opportunity messages from practitioners
-    const { data: messages, error } = await window.supabaseClient
-      .from('project_messages')
-      .select(`
-        *,
-        opportunities (
-          id,
-          project_serial,
-          practitioner_serial,
-          status,
-          message_sent,
-          message_count,
-          declined_by_practitioner,
-          declined_by_client,
-          is_archived,
-          practitioner_blocked,
-          converted_to_match,
-          match_id
-        ),
-        practitioners (
-          id,
-          serial_number,
-          legal_name,
-          dba_name
-        ),
-        projects (
-          id,
-          project_serial,
-          custom_name,
-          description,
-          project_status
-        )
-      `)
-      .eq('is_opportunity_message', true)
-      .eq('client_serial', currentClientSerial)
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error('[Client Opportunities] Error loading opportunities:', error);
-      showOpportunitiesError('Failed to load opportunities');
-      return;
-    }
-
-    // Only show active opportunities (not declined, not blocked, not archived, not converted)
-    clientOpportunities = (messages || []).filter(msg => {
-      if (!msg.opportunities) return false;
-      const opp = msg.opportunities;
-      return !opp.declined_by_client && !opp.practitioner_blocked && !opp.is_archived && !opp.converted_to_match;
-    });
-
-    // Display opportunities
-    displayClientOpportunities();
-
-    // Update badge
-    updateOpportunitiesBadge();
-
-  } catch (error) {
-    console.error('[Client Opportunities] Exception loading opportunities:', error);
-    showOpportunitiesError('Error loading opportunities');
-  }
+  // COMING SOON: Opportunities feature launching January 2025
+  return;
 }
 
 // Display opportunities in the inbox

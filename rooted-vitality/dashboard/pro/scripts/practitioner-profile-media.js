@@ -53,6 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
             fileName: null
         };
     }
+    // Setup avatar upload with modal
+    setupAvatarUpload();
 });
 
 // ======================================================
@@ -114,7 +116,7 @@ function addPhotoToGallery() {
             ProfileState.currentPhotos.push(photoData);
             renderPhotosList();
             showSaveStatus('Photo uploaded successfully', 'success');
-            debounceAutoSave();
+            debounceAutoSave('photos');
             
         } catch (error) {
             console.error('Error uploading photo:', error);
@@ -128,14 +130,14 @@ function addPhotoToGallery() {
 function removePhoto(photoId) {
     ProfileState.currentPhotos = ProfileState.currentPhotos.filter(p => p.id !== photoId);
     renderPhotosList();
-    debounceAutoSave();
+    debounceAutoSave('photos');
 }
 
 function updatePhotoCaption(photoId, caption) {
     const photo = ProfileState.currentPhotos.find(p => p.id === photoId);
     if (photo) {
         photo.caption = caption;
-        debounceAutoSave();
+        debounceAutoSave('photos');
     }
 }
 
@@ -276,7 +278,7 @@ async function addVideoToProfile() {
             
             renderVideoPreview();
             showSaveStatus('Video uploaded successfully', 'success');
-            debounceAutoSave();
+            debounceAutoSave('media');
             
         } catch (error) {
             console.error('Error uploading video:', error);
@@ -333,7 +335,7 @@ function renderVideoPreview() {
 function removeVideo() {
     ProfileState.videoData = null;
     renderVideoPreview();
-    debounceAutoSave();
+    debounceAutoSave('media');
 }
 
 function loadVideo(videoUrl) {
@@ -451,9 +453,8 @@ function removeVideo() {
 function openProfilePictureModal() {
     const modal = document.getElementById('profile-picture-modal');
     if (modal) {
-        // Show modal container using class toggle
+        // Show modal using only CSS class
         modal.classList.add('active');
-        modal.style.display = 'flex';
         
         // Activate overlay for backdrop
         const overlay = modal.querySelector('.modal-overlay');
@@ -470,7 +471,6 @@ function closeProfilePictureModal() {
     const modal = document.getElementById('profile-picture-modal');
     if (modal) {
         modal.classList.remove('active');
-        modal.style.display = 'none';
         
         // Deactivate overlay
         const overlay = modal.querySelector('.modal-overlay');
@@ -489,7 +489,7 @@ function closeProfilePictureModal() {
     document.getElementById('upload-dropzone').classList.remove('hidden');
     document.getElementById('upload-progress-section').classList.add('hidden');
     document.getElementById('confirm-upload-btn').classList.add('hidden');
-    document.getElementById('confirm-upload-btn').disabled = false;  // Re-enable button for next upload
+    document.getElementById('confirm-upload-btn').disabled = false;
 }
 
 function handleProfilePictureSelect(e) {

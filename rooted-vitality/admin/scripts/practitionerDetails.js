@@ -267,10 +267,7 @@ function renderPractitionerDetail(data) {
   document.getElementById('detail-ethos').textContent = prof.ethos_statement || '—';
   document.getElementById('detail-languages').innerHTML = 
     formatArray(prof.languages);
-  document.getElementById('detail-modalities').innerHTML = 
-    formatArray(prof.modalities);
-  document.getElementById('detail-conditions').innerHTML = 
-    formatArray(prof.conditions_treated);
+
   document.getElementById('detail-practice-type').textContent = 
     prof.practice_type || '—';
   document.getElementById('detail-year-established').textContent = 

@@ -219,9 +219,7 @@ DESIGN SYSTEM
                         <div class="card-header">
                             <h2 class="card-title">About</h2>
                         </div>
-                        <div class="card-content">
-                            <p id="profile-bio" class="section-text"></p>
-                        </div>
+                        <div class="card-content" id="about-content"></div>
                     </div>
                 </div>
             </section>
@@ -235,33 +233,28 @@ DESIGN SYSTEM
                         <div class="card-header">
                             <h2 class="card-title">My Approach</h2>
                         </div>
-                        <div class="card-content">
-                            <p id="profile-approach" class="section-text"></p>
-                        </div>
+                        <div class="card-content" id="approach-content"></div>
                     </div>
                 </div>
             </section>
 
             <!-- ========================================== -->
-            <!-- 3.2c PAYMENTS SECTION -->
+            <!-- 3.2c PAYMENT METHODS SECTION -->
             <!-- ========================================== -->
             <section id="payments-section" class="profile-section hidden">
-                <h2 class="section-title">Payment & Insurance</h2>
-                
-                <!-- Payment Methods -->
-                <div id="payments-row" class="hidden" style="margin-bottom: 2rem;">
-                    <div class="payment-insurance-group">
-                        <h3 class="payment-insurance-header">Payment Methods</h3>
-                        <div id="payment-methods-list" class="payment-insurance-list"></div>
-                    </div>
+                <div class="section-container">
+                    <h2 class="section-title">Payment Methods</h2>
+                    <div id="payment-methods-list" class="payment-insurance-list"></div>
                 </div>
+            </section>
 
-                <!-- Insurance -->
-                <div id="insurance-row" class="hidden">
-                    <div class="payment-insurance-group">
-                        <h3 class="payment-insurance-header">Insurance</h3>
-                        <div id="insurance-list" class="payment-insurance-list"></div>
-                    </div>
+            <!-- ========================================== -->
+            <!-- 3.2d INSURANCE SECTION -->
+            <!-- ========================================== -->
+            <section id="insurance-section" class="profile-section hidden">
+                <div class="section-container">
+                    <h2 class="section-title">Insurance</h2>
+                    <div id="insurance-list" class="payment-insurance-list"></div>
                 </div>
             </section>
 
@@ -280,14 +273,6 @@ DESIGN SYSTEM
                                 <div class="card-col full-width">
                                     <div class="label">Services Offered</div>
                                     <div id="card-services" class="tag-list"></div>
-                                </div>
-                            </div>
-
-                            <!-- Modalities -->
-                            <div class="card-row" id="card-modalities-row" style="display: none;">
-                                <div class="card-col full-width">
-                                    <div class="label">Modalities</div>
-                                    <div id="card-modalities" class="tag-list"></div>
                                 </div>
                             </div>
 
@@ -312,14 +297,21 @@ DESIGN SYSTEM
             </section>
 
             <!-- ========================================== -->
-            <!-- 3.4 CREDENTIALS & SPECIALIZATIONS CARD -->
+            <!-- 3.4 FAQ SECTION -->
             <!-- ========================================== -->
-            <!-- Credentials & Specializations Section -->
-            <section id="credentials-card-section" class="profile-section profile-credentials-compact profile-card hidden">
+            <section id="faq-section" class="profile-section hidden">
                 <div class="section-container">
-                    <!-- Main Title -->
-                    <h2 class="card-title" style="margin-bottom: var(--spacing-md);">Credentials</h2>
-                    
+                    <h2 class="section-title">Frequently Asked Questions</h2>
+                    <div id="faq-container" class="faq-list"></div>
+                </div>
+            </section>
+
+            <!-- ========================================== -->
+            <!-- 3.5 CREDENTIALS SECTION -->
+            <!-- ========================================== -->
+            <section id="credentials-section" class="profile-section hidden">
+                <div class="section-container">
+                    <h2 class="section-title">Credentials</h2>
                     <!-- Specializations -->
                     <div id="card-specializations-row" class="credentials-group hidden">
                         <h3 class="credentials-group-title">Specializations</h3>
@@ -334,19 +326,21 @@ DESIGN SYSTEM
             </section>
 
             <!-- ========================================== -->
-            <!-- 3.5 CONTACT CARD: Social Media Links -->
+            <!-- 3.6 CONNECT SECTION -->
             <!-- ========================================== -->
-            <!-- Contact Card -->
-            <section id="contact-card-section" class="profile-section profile-card hidden">
+            <section id="connect-section" class="profile-section hidden">
                 <div class="section-container">
-                    <div class="card">
-                        <div class="card-header">
-                            <h2 class="card-title">Connect</h2>
-                        </div>
-                        <div class="card-content">
-                            <div id="contact-links-list" class="contact-links-list"></div>
-                        </div>
-                    </div>
+                    <h2 class="section-title">Connect</h2>
+                    <div id="contact-links-list" class="contact-links-list"></div>
+                </div>
+            </section>
+
+            <!-- ========================================== -->
+            <!-- BACK TO MATCHES BUTTON (from onboarding) -->
+            <!-- ========================================== -->
+            <section id="back-to-matches-section" class="profile-section hidden">
+                <div class="section-container">
+                    <button id="back-to-matches-btn" class="btn btn--primary" style="width: 100%;">← Back to Matches</button>
                 </div>
             </section>
 
@@ -391,15 +385,8 @@ DESIGN SYSTEM
             </section>
 
             <!-- ========================================== -->
-            <!-- 3.8 FAQ SECTION -->
+            <!-- 3.8 END OF PROFILE CONTENT -->
             <!-- ========================================== -->
-            <!-- FAQ Section -->
-            <section id="faq-section" class="profile-section hidden">
-                <div class="section-container">
-                    <h2 class="section-title">Frequently Asked Questions</h2>
-                    <div id="faq-container" class="faq-list"></div>
-                </div>
-            </section>
         </div>
     </main>
 

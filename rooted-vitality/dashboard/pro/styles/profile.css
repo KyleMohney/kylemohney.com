@@ -814,57 +814,13 @@
     border-radius: var(--radius-sm);
     border: 1px solid var(--border);
     margin-top: 1rem;
+    margin-bottom: 2.5rem;
     display: flex;
     flex-direction: column;
     gap: 2rem;
 }
 
-.practice-table-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
 
-.practice-table-wrapper h4 {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: var(--dark-text);
-    margin: 0;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.practice-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: var(--rooted-light);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    overflow: hidden;
-}
-
-.practice-table tbody tr {
-    border-bottom: 1px solid var(--border);
-}
-
-.practice-table tbody tr:last-child {
-    border-bottom: none;
-}
-
-.practice-table td {
-    padding: 0.75rem 1rem;
-    text-align: left;
-}
-
-.practice-table .checkbox-label {
-    margin: 0;
-    padding: 0;
-    background: none;
-}
-
-.practice-display {
-    margin-top: 1rem;
-}
 
 .payment-edit {
     background: var(--light-bg);
@@ -979,11 +935,56 @@
 
 .checkbox-label input[type="radio"],
 .checkbox-label input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    min-height: 20px;
     cursor: pointer;
-    accent-color: var(--primary);
     flex-shrink: 0;
+    appearance: none;
+    border: 2px solid #ccc;
+    border-radius: 3px;
+    background: white;
+    transition: all 0.2s ease;
+    padding: 0;
+    margin: 0;
+}
+
+.checkbox-label input[type="radio"]:checked,
+.checkbox-label input[type="checkbox"]:checked {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+.checkbox-label input[type="radio"]:hover,
+.checkbox-label input[type="checkbox"]:hover {
+    border-color: var(--primary);
+}
+
+/* Ensure practice setting radio buttons match insurance checkbox styling */
+#practice-edit input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    min-height: 20px;
+    cursor: pointer;
+    flex-shrink: 0;
+    appearance: none;
+    border: 2px solid #ccc;
+    border-radius: 3px;
+    background: white;
+    transition: all 0.2s ease;
+    padding: 0;
+    margin: 0;
+}
+
+#practice-edit input[type="radio"]:checked {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+#practice-edit input[type="radio"]:hover {
+    border-color: var(--primary);
 }
 
 /* Custom input fields for insurance and payment "Other" options */

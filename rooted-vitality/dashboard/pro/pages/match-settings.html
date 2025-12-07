@@ -99,13 +99,13 @@ TABLE OF CONTENTS
           Matching Status
         </button>
         <button class="nav-section-item" onclick="switchPanel('categories')">
-          Service Categories
+          Specialties
         </button>
         <button class="nav-section-item" onclick="switchPanel('coverage')">
-          Coverage Area
+          Coverage
         </button>
         <button class="nav-section-item" onclick="switchPanel('availability')">
-          Availability & Hours
+          Availability
         </button>
       </nav>
 
@@ -207,7 +207,7 @@ TABLE OF CONTENTS
       <!-- 3.2 SERVICE CATEGORIES PANEL -->
       <div id="panel-categories" class="content-panel match-settings-card">
         <div class="card-section">
-          <h2 class="card-section-title">Add Service Category</h2>
+          <h2 class="card-section-title">Add Speciality</h2>
           <p class="section-description">Search and add service categories that describe what you offer. You can add multiple categories to reach more clients looking for your specific expertise.</p>
           <div class="universal-card section-tip">
             <div class="universal-card-info">
@@ -376,8 +376,10 @@ TABLE OF CONTENTS
                           id="inoffice-csv-import" 
                           accept=".csv" 
                           class="coverage-csv-input"
+                          style="display: none;"
+                          onchange="importInofficeZipsFromCsv()"
                         />
-                        <button type="button" class="btn-neutral btn-compact" onclick="importInofficeZipsFromCsv()">Import CSV</button>
+                        <button type="button" class="btn-primary btn-compact" onclick="document.getElementById('inoffice-csv-import').click()">Import CSV File</button>
                       </div>
                       <div class="coverage-csv-hint">CSV should have one ZIP code per row, or comma-separated in one column. Headers optional.</div>
                     </div>
@@ -475,8 +477,10 @@ TABLE OF CONTENTS
                           id="housecalls-csv-import" 
                           accept=".csv" 
                           class="coverage-csv-input"
+                          style="display: none;"
+                          onchange="importHouseCallsZipsFromCsv()"
                         />
-                        <button type="button" class="btn-neutral btn-compact" onclick="importHouseCallsZipsFromCsv()">Import CSV</button>
+                        <button type="button" class="btn-primary btn-compact" onclick="document.getElementById('housecalls-csv-import').click()">Import CSV File</button>
                       </div>
                       <div class="coverage-csv-hint">CSV should have one ZIP code per row, or comma-separated in one column. Headers optional.</div>
                     </div>
@@ -605,7 +609,6 @@ TABLE OF CONTENTS
                   <th>Available</th>
                   <th>Opens</th>
                   <th>Closes</th>
-                  <th class="col-notes">Notes</th>
                 </tr>
               </thead>
               <tbody id="availability-table-body">
@@ -643,29 +646,57 @@ TABLE OF CONTENTS
         <div class="modal-section">
           <h3 class="modal-section-title">Select Subcategories</h3>
           <p class="section-helper">Choose which specific services you want to offer under this category. Being specific helps attract better-matched clients.</p>
-          <div class="section-tip section-tip-spaced">
-            <div class="section-tip-content">
-              <p class="section-tip-title">Specificity Wins</p>
-              <p class="section-tip-text">Clients who search for "trauma-informed therapy" vs. just "therapy" are more likely to book. The more specific your subcategories, the better the match—leading to fewer "not a fit" cancellations and higher satisfaction.</p>
-            </div>
-          </div>
           <div id="subcategories-list" class="scrollable-list"></div>
         </div>
         
         <!-- Pricing Section -->
         <div class="modal-section">
-          <h3 class="modal-section-title">Pricing (Optional)</h3>
-          <p class="section-helper">Set a specific price for this service category. Leave blank to use your default pricing from your account settings.</p>
-          <div class="input-wrapper">
-            <span class="input-prefix">$</span>
-            <input 
-              type="number" 
-              id="modal-price-input" 
-              placeholder="0.00" 
-              step="0.01" 
-              min="0"
-            />
-            <span class="input-suffix">per session</span>
+          <h3 class="modal-section-title">Pricing</h3>
+          <p class="section-helper">Set your pricing. You can use either a per-session rate, a price range, or both.</p>
+          
+          <div class="pricing-fields-wrapper">
+            <!-- Per Session Price -->
+            <div class="pricing-field-group">
+              <label for="modal-price-input" class="pricing-field-label">Price Per Session</label>
+              <div class="input-wrapper">
+                <span class="input-prefix">$</span>
+                <input 
+                  type="number" 
+                  id="modal-price-input" 
+                  placeholder="0.00" 
+                  step="0.01" 
+                  min="0"
+                />
+              </div>
+            </div>
+            
+            <!-- Price Range -->
+            <div class="pricing-field-group">
+              <label class="pricing-field-label">Price Range</label>
+              <div class="price-range-inputs">
+                <div class="input-wrapper">
+                  <span class="input-prefix">$</span>
+                  <input 
+                    type="number" 
+                    id="modal-price-min-input" 
+                    placeholder="0.00" 
+                    step="0.01" 
+                    min="0"
+                  />
+                  <span class="price-range-divider">—</span>
+                </div>
+                <div class="input-wrapper">
+                  <span class="input-prefix">$</span>
+                  <input 
+                    type="number" 
+                    id="modal-price-max-input" 
+                    placeholder="0.00" 
+                    step="0.01" 
+                    min="0"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -819,6 +850,8 @@ TABLE OF CONTENTS
   <script src="../../../scripts/authModal.js"></script>
   <script src="../../../scripts/authHooks.js"></script>
   <script src="../../../scripts/modalManager.js"></script>
+  <script src="../../../scripts/notificationManager.js"></script>
+  <script src="../scripts/practitioner-dashboard.js"></script>
   <script src="../../../injections.js"></script>
 
   <!-- ========================================== -->
@@ -836,6 +869,8 @@ TABLE OF CONTENTS
   <script src="../scripts/match-settings.js"></script>
   <script src="../scripts/match-settings-coverage.js"></script>
   <script src="../scripts/match-settings-modals.js"></script>
+
+
 
   <!-- Supabase Auth & Database Client -->
   <script src="../../../scripts/supabaseClient.js"></script>

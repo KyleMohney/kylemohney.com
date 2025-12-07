@@ -1,0 +1,129 @@
+<!--
+╔════════════════════════════════════════════════════════════════════╗
+║  ROOTED VITALITY, INC.                                             ║
+║  File: help-center/articles/client-article-pages/creating-care-request.html ║
+║  Purpose: Guide clients through creating care requests and matching ║
+║  Holistic Wellness · Modern Connection Platform                    ║
+║  rootedvitality.com | 2025                                         ║
+╚════════════════════════════════════════════════════════════════════╝
+
+TABLE OF CONTENTS
+  1. HEAD: Meta, Fonts, Styles
+  2. BODY: Article Structure
+  3. HERO: Creating Your Care Request
+  4. SECTION 1: What is a Care Request?
+  5. SECTION 2: Step-by-Step Guide
+  6. SECTION 3: Understanding Your Matches
+  7. SECTION 4: Connecting with Practitioners
+  8. FAQ: Common Questions
+  9. RELATED ARTICLES: Internal Links
+  10. CTA: Next Steps
+  11. SCRIPTS: Universal & Platform
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Learn how to create a care request on Rooted Vitality and get matched with qualified holistic practitioners who fit your wellness needs.">
+    <meta name="keywords" content="care request, find practitioner, matching, wellness, acupuncture, herbalism, coaching">
+    <meta name="author" content="Rooted Vitality">
+    
+    <title>Creating Your Care Request | Rooted Vitality Guide</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Universal Article Styles -->
+    <link rel="stylesheet" href="../styles/articles.css">
+    
+    <!-- Global Platform Styles (header, footer, background) -->
+    <link rel="stylesheet" href="../../../styles/styles.css">
+</head>
+
+<body data-article-type="client" data-page-depth="4">
+    <!-- ========================================== -->
+    <!-- HEADER (INJECTED) -->
+    <!-- ========================================== -->
+    <header id="header-inject"></header>
+
+    <!-- ========================================== -->
+    <!-- BEGIN ARTICLE CONTENT -->
+    <!-- ========================================== -->
+    <main id="mainContent">
+        <!-- Back to Help Center Link (inside container for proper width) -->
+        <div class="container">
+            <div class="article-back-link">
+                <a href="../../index.html">← Back to Help Center</a>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SECTION 1: WHAT IS A CARE REQUEST -->
+        <!-- ========================================== -->
+        <section class="article-section">
+            <div class="container">
+                <h2>Understanding Care Requests</h2>
+                
+                <p>A Care Request is how you connect your wellness needs with the right practitioner. Instead of scanning through hundreds of profiles, you specify your category, specific concerns, and session preferences—and we show you practitioners that match exactly those selections.</p>
+                
+                <p>From your <strong>My Wellness</strong> page, you create a request by sharing your wellness focus, subcategories, travel preferences, and location. We then present you with practitioners that match your selections. You explore their profiles and reach out to the ones that feel right for you.</p>
+                
+                <p>Once you send your care request to a practitioner, it will appear in your inbox as a pending match. As soon as the practitioner responds and accepts the request, you will be able to contact them through our built-in messenger, or by calling them directly.</p>
+
+                <p>It's a more intentional way to find the practitioner who's the perfect fit for your care journey.</p>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- RELATED ARTICLES SECTION -->
+        <!-- ========================================== -->
+        <section class="article-section">
+            <div class="container">
+                <h2>Learn More</h2>
+                <p>Explore these related guides to make the most of your Rooted Vitality experience:</p>
+                <ul>
+                    <li><a href="/rooted-vitality/help-center/articles/client-article-pages/how-to-book-consultation.html">How to Book a Consultation</a></li>
+                    <li><a href="/rooted-vitality/help-center/articles/client-article-pages/wellness-profile.html">Your Wellness Profile</a></li>
+                    <li><a href="/rooted-vitality/help-center/articles/client-article-pages/what-is-rooted-vitality.html">What is Rooted Vitality?</a></li>
+                </ul>
+            </div>
+        </section>
+
+    </main>
+    <!-- ========================================== -->
+    <!-- END ARTICLE CONTENT -->
+    <!-- ========================================== -->
+
+    <!-- ========================================== -->
+    <!-- FOOTER (INJECTED) -->
+    <!-- ========================================== -->
+    <footer id="footer-inject"></footer>
+
+    <!-- Supabase JS Client (MUST be loaded first) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Path configuration for deep article pages (MUST RUN FIRST, BEFORE injections.js) -->
+    <script>
+        // For article pages at /help-center/articles/client-article-pages/
+        // Set correct path prefix so injections.js fetches components from right location
+        window.ARTICLE_PATH_PREFIX = '../../../';
+    </script>
+
+    <!-- Authentication & Global Scripts (BEFORE injections.js) -->
+    <script src="../../../scripts/config.js"></script>
+    <script src="../../../scripts/authManager.js"></script>
+    
+    <!-- Universal Article Scripts -->
+    <script src="../scripts/articles.js"></script>
+    
+    <!-- Platform Global Scripts (must be after auth is set) -->
+    <script src="../../../injections.js"></script>
+    <link rel="stylesheet" href="../../../chat-bot/styles/chatbot.css">
+  <script src="../../../chat-bot/scripts/chatbot.js"></script>
+</body>
+
+</html>

@@ -339,6 +339,7 @@ async function skipMembership(event) {
             practice_state: state.formData.practice_state,
             zipcode: state.formData.zipcode,
             business_size: state.formData.business_size,
+            year_established: state.formData.year_established ? parseInt(state.formData.year_established) : null,
             status: 'registered',
             submitted_at: new Date().toISOString(),
             // Default values for availability
@@ -347,7 +348,6 @@ async function skipMembership(event) {
             housecalls_enabled: false,
             timezone: 'America/Denver',
             // Default settings
-            accepts_insurance: false,
             matching_enabled: true,
             matching_paused: false,
             notification_preferences: JSON.stringify({
@@ -393,7 +393,6 @@ async function skipMembership(event) {
                     virtual_enabled: payload.virtual_enabled,
                     housecalls_enabled: payload.housecalls_enabled,
                     timezone: payload.timezone,
-                    accepts_insurance: payload.accepts_insurance,
                     matching_enabled: payload.matching_enabled,
                     matching_paused: payload.matching_paused,
                     notification_preferences: payload.notification_preferences,
@@ -568,7 +567,6 @@ async function registerPractitioner(event) {
             housecalls_enabled: false,
             timezone: 'America/Denver',
             // Default settings
-            accepts_insurance: false,
             matching_enabled: true,
             matching_paused: false,
             notification_preferences: JSON.stringify({

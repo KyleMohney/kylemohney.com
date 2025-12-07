@@ -108,10 +108,9 @@ async function initializePublicProfile() {
 
         // Filter out only explicitly declined/blocked matches
         // Allow: pending, matched, hired, accepted, etc.
-        const blockedStatuses = ['declined', 'blocked', 'archived', 'canceled'];
+        const blockedStatuses = ['not-hired', 'blocked', 'archived', 'canceled'];
         const activeMatch = match.find(m => {
-            const isBlocked = blockedStatuses.includes(m.status?.toLowerCase()) || 
-                             blockedStatuses.includes(m.match_status?.toLowerCase());
+            const isBlocked = blockedStatuses.includes(m.status?.toLowerCase());
             return !isBlocked;
         });
 

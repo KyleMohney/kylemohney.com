@@ -1,0 +1,229 @@
+{
+  "knowledgeBase": [
+    {
+      "keywords": ["account issue", "login problem", "technical issue", "cant login", "reset password", "account problem", "access problem", "having trouble logging in", "locked out", "can't access account", "trouble signing in", "account error"],
+      "answer": "For account or technical issues, please contact our support team. We're here to help quickly.",
+      "supportContact": true
+    },
+    {
+      "keywords": ["client signup", "create client account", "sign up as client", "register client", "client registration", "new client account", "become a client", "client sign up", "how to join", "get started as client"],
+      "answer": "To sign up as a client, click the Client tab and enter your email, password, first name, last name, phone number, and date of birth. You must be at least 18 years old. After creating your account, you'll complete your wellness profile and then create your first project to find matching practitioners.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["practitioner signup", "create practitioner account", "sign up as practitioner", "register practitioner", "practitioner registration", "new practitioner account", "become a practitioner", "practitioner sign up", "join as practitioner", "list my services"],
+      "answer": "To sign up as a practitioner, click the Practitioner tab and enter your legal name, business name, DBA name (if applicable), year you established your practice, business size, phone number, and physical address. After account creation, you'll set up your specialties, services, and coverage areas to start receiving matches.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["password requirements", "password rules", "password minimum", "weak password", "password strength", "password length", "secure password", "password policy", "password criteria"],
+      "answer": "Your password must be at least 6 characters long. We recommend using a mix of letters, numbers, and special characters for better security. Make sure your passwords match in both the password and confirmation fields.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["email requirements", "email format", "email validation", "invalid email", "email error", "wrong email", "email address format", "correct email", "email doesnt work"],
+      "answer": "Please enter a valid email address (like yourname@example.com). Your email must be confirmed in both the email and confirmation fields to match exactly. This email will be used for your login and important account notifications.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["age requirement", "how old do i need to be", "age verification", "18 years old", "age limit", "minimum age", "age restriction", "too young", "am i old enough"],
+      "answer": "Clients must be at least 18 years old to create an account. We verify this using your date of birth during signup. Please enter your birthdate accurately.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["after signup", "next after account", "what happens after i sign up", "account created now what", "next step", "after creating account", "then what", "whats next after signup"],
+      "answer": "After you create your account, clients will complete their wellness profile (optional) and then create their first project describing what they're looking for. Practitioners will set up their specialties, service types, pricing, and coverage areas. Then you're ready to start connecting with matches!",
+      "supportContact": false
+    },
+    {
+      "keywords": ["forgot password", "password reset", "reset my password", "cant remember password", "don't remember password", "forgotten password", "lost password", "password recovery", "reset link"],
+      "answer": "Click the 'Forgot Password?' link on the login page and enter your email address. We'll send you a password reset link. Check your email (including spam folder) and follow the link to create a new password.",
+      "supportContact": true
+    },
+    {
+      "keywords": ["already have account", "account already exists", "email already registered", "duplicate account", "account exists", "already registered", "email in use", "existing account"],
+      "answer": "If you already have a Rooted Vitality account, simply log in with your email and password instead of signing up again. If you forgot your email or password, use the password reset option on the login page.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["email not received", "verification email missing", "email didnt arrive", "check spam folder", "no email", "email not coming", "where is my email", "resend email", "email in spam"],
+      "answer": "First, check your spam or promotions folder—emails sometimes end up there. If you still don't see it after 5 minutes, contact our support team and we can help resend it or troubleshoot the issue.",
+      "supportContact": true
+    },
+    {
+      "keywords": ["phone number required", "phone field", "phone format", "phone validation", "phone number format", "how to enter phone", "phone number error", "invalid phone"],
+      "answer": "Your phone number is required for account creation so practitioners or clients can contact you. Enter it in your country's standard format (for US, this is typically 10 digits with or without parentheses and dashes).",
+      "supportContact": false
+    },
+    {
+      "keywords": ["business name fields", "legal business name", "DBA name", "what is dba", "business name vs dba", "doing business as", "legal name vs operating name"],
+      "answer": "For practitioners: your legal business name is your official registered business name. Your DBA (Doing Business As) name is what you operate under if different from the legal name—this is optional but helps clients recognize you.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["terms and conditions", "accept terms", "terms acceptance", "privacy policy", "terms of service", "legal agreement", "policies", "agree to terms", "terms and privacy"],
+      "answer": "You must accept our terms and conditions to complete signup. These outline how Rooted Vitality works, your rights and responsibilities, and our privacy practices. You can review them anytime in your account settings.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["account locked", "too many login attempts", "cant log in locked", "account suspended", "locked account", "unable to login", "account disabled", "security lock"],
+      "answer": "If you've attempted to log in multiple times with the wrong password, your account may be temporarily locked for security. Wait a few minutes and try again, or use the password reset link to create a new password.",
+      "supportContact": true
+    },
+    {
+      "keywords": ["client find practitioners", "how do clients find practitioners", "search for practitioners", "browse practitioners", "find practitioners", "look for practitioners", "view practitioners", "find therapist", "find specialist"],
+      "answer": "After creating a project, clients are shown a list of matching practitioners based on their needs, location, and service preferences. You can browse profiles, see ratings and reviews, check their services and availability, and send connection requests to practitioners you're interested in.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["practitioner receive matches", "how do practitioners get matches", "client projects", "match notifications", "get matches", "receive matches", "match alert", "new matches", "client incoming"],
+      "answer": "Once you complete your setup, practitioners receive match notifications when clients in your service area create projects matching your specialties. You can review each match and decide whether to accept and connect with the client.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["required fields signup", "mandatory fields", "fields required", "what do i have to fill in", "required information", "must fill", "necessary fields", "essential info"],
+      "answer": "For clients: email, password, first name, last name, phone, and birthdate are required. For practitioners: email, password, legal name, business name, phone, and address are required. All other fields help complete your profile for better matches.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["mobile signup", "sign up on phone", "signup mobile app", "mobile friendly", "mobile compatible", "on phone", "mobile device", "smartphone", "responsive design"],
+      "answer": "Rooted Vitality is fully accessible on mobile devices. Simply visit our website on your phone's browser and follow the same signup process. All fields are mobile-friendly and easy to complete on smaller screens.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["edit profile after signup", "change account information", "update profile", "modify details", "edit profile", "change profile", "update info", "edit information", "change details"],
+      "answer": "After signing up, you can edit your profile information from your account dashboard. Most fields can be updated anytime. For practitioners, you can also modify your specialties, pricing, and coverage areas from your match settings.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["onboarding modal", "guided onboarding", "get started button", "wellness journey", "onboarding steps", "get started", "welcome modal", "setup wizard", "guided tour", "step by step"],
+      "answer": "When you click 'Get Started on Your Wellness Journey,' we walk you through a guided onboarding experience. This step-by-step wizard helps you tell us what you're looking for, creates your profile, and connects you with matching practitioners. Each step is designed to make the process warm, personal, and easy.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["what is a wellness project", "create project", "project definition", "wellness request", "wellness journey", "project", "new project", "my wellness project"],
+      "answer": "A wellness project is your request for practitioner support. It captures what you're looking for, your preferred way of connecting (in-person, virtual, or house calls), and your timeline. Once you create a project, we automatically match you with practitioners who can help. You can have multiple projects for different wellness needs.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["wellness profile", "profile questionnaire", "client profile", "share about myself", "wellness questions", "my profile", "health profile", "personal wellness info"],
+      "answer": "Your wellness profile is a series of optional questions that help practitioners understand your wellness journey. You share your wellness goals, what challenges you're facing, what you've tried before, your communication preferences, and any barriers you might face. This information is completely private and only shared with practitioners you match with.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["category selection", "wellness category", "choose category", "service category", "what category", "wellness types", "service types", "select category"],
+      "answer": "When creating your wellness journey, select the category that best describes what you're looking for (like nutrition, massage, mental health coaching, etc.). We have 22+ wellness categories. You can also select specific subcategories or specialties within that main category to refine your match.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["travel preference", "in-person virtual housecalls", "how do you prefer to meet", "meeting format", "appointment format", "virtual or in-person", "house calls", "online sessions", "visit location"],
+      "answer": "Tell us how you prefer to work with practitioners. You can choose in-person appointments at their office, house calls (they come to you), virtual sessions online, or flexible (open to any option). We use this to find practitioners who offer your preferred way of connecting.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["urgency timeline", "how soon do you need", "timeline", "asap", "timeline urgent", "when do you need help", "soon", "time frame", "how quickly"],
+      "answer": "Let us know your timeline. Are you browsing and exploring? Looking to connect in the next few weeks? Or seeking support more urgently? This helps us prioritize which practitioners to match you with—some specialize in quick connections while others prefer building longer-term relationships.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["save for later", "come back to project", "pause onboarding", "complete later", "save progress", "resume later", "draft project", "incomplete project"],
+      "answer": "You can pause onboarding anytime. Your information is saved automatically as you go through the steps. When you come back, just log in and you'll be able to continue from where you left off or see your existing projects on your dashboard.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["how many projects", "multiple wellness journeys", "can i have multiple projects", "multiple projects", "create another project", "more than one project"],
+      "answer": "Yes! You can create multiple wellness projects for different needs. Some clients work with nutrition specialists for diet goals while also connecting with a massage therapist for stress relief. Each project has its own set of matching practitioners.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["practitioner matching", "how matching works", "match algorithm", "get matched", "matching system", "how are matches determined", "match criteria", "find right fit"],
+      "answer": "After you create your wellness project, our matching algorithm automatically finds practitioners who offer the services you need, work in your area or way, and are actively accepting new clients. We show you the top matches, sorted by profile completeness and experience. You can review each one and reach out to practitioners you're interested in.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["send connection request", "message practitioner", "reach out to practitioner", "contact practitioner", "connect with practitioner", "request connection", "send request", "reach out"],
+      "answer": "Once you see practitioners who match what you're looking for, you can send them a connection request. They'll receive a notification about your wellness needs and can choose to accept and connect with you. It's a mutual choice—both of you decide if the fit is right.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["practitioner accepts match", "practitioner response", "waiting for response", "match pending", "acceptance notification", "when practitioner accepts", "accepted match"],
+      "answer": "When you send a connection request, it goes to the practitioner. They'll review your wellness needs and decide if they can help you. You'll get a notification when they accept and are ready to connect. If they decline, that's okay—we have more practitioners to show you.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["cant complete onboarding", "stuck in onboarding", "onboarding not working", "error in wizard", "onboarding error", "onboarding bug", "having trouble with onboarding", "onboarding issue"],
+      "answer": "If you're having trouble completing onboarding, try refreshing the page. Make sure all required fields are filled in and marked with asterisks (*). If you're still stuck, reach out to our support team and we can help walk you through it or complete it with you.",
+      "supportContact": true
+    },
+    {
+      "keywords": ["what information do you collect", "privacy during onboarding", "what data collected", "personal information", "data collection", "what data", "information gathering", "health information"],
+      "answer": "During onboarding, we collect: your name, email, phone, date of birth, location (zipcode), your wellness goals and challenges, and your preferred communication style. All of this is treated as private health information. We only share details with practitioners you match with, and we never sell your data to third parties.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["returning user login", "sign in existing account", "returning to platform", "already have account modal", "sign in", "existing account", "returning member", "previous account"],
+      "answer": "If you already have a Rooted Vitality account, the onboarding modal will detect this and give you the option to log in instead of signing up again. Just enter your email and password to access your dashboard and existing projects.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["new vs returning", "first time user", "first visit", "returning member", "new user", "first timer", "new to platform", "first time here"],
+      "answer": "When you visit Rooted Vitality for the first time, the onboarding modal appears and asks if you're new or returning. If you're new, we guide you through account creation and project setup. If you're returning, we let you log in to your existing account.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["close onboarding modal", "exit guided journey", "cancel onboarding", "back out of wizard", "dismiss modal", "close modal", "skip onboarding", "exit onboarding"],
+      "answer": "You can close the onboarding modal anytime by clicking the X button in the top-right corner. Your progress will be saved, so when you come back, you can continue from where you left off. There's no pressure to complete it all at once.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["create account consent", "terms agreement", "privacy policy", "informed consent", "consent form", "agreement", "acknowledge terms", "accept privacy"],
+      "answer": "Before creating your account, you'll see our Terms of Use and Privacy Policy. You must acknowledge that you've read them and agree to our terms. This is important because your health information is sensitive, and we want to make sure you understand how we protect it.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["contact support", "speak with support", "customer support", "support team", "get help", "need help", "reach support", "contact us", "help wanted"],
+      "answer": "We're building out our support system right now as we launch! You have two ways to reach us: (1) Report a concern using the link at the bottom of each page on the platform, or (2) Email us directly at support@rootedvitality.health with your concern or feedback. We'll get back to you as soon as we can.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["report a problem", "report an issue", "report a concern", "something is broken", "report bug", "bug report", "issue report", "report error", "something wrong"],
+      "answer": "If you encounter a problem, you can report it using the 'Report a Concern' link at the bottom of each page. This sends your feedback directly to our team. Alternatively, you can email support@rootedvitality.health with details about what went wrong, and we'll investigate and fix it.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["send feedback", "give feedback", "submit feedback", "suggestion", "feature request", "idea", "feedback form", "suggest improvement", "improvement idea"],
+      "answer": "We'd love to hear your feedback! Use the 'Report a Concern' link at the bottom of any page to share ideas and suggestions for improving Rooted Vitality. You can also email support@rootedvitality.health with your feature requests. Your input helps us build a better platform.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["email support", "contact email", "email address support", "support email", "email us", "email address", "send email", "message support"],
+      "answer": "You can email our support team at support@rootedvitality.health with any questions, concerns, or feedback. Just send us a message describing your issue and we'll respond as soon as possible.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["help center", "faq", "frequently asked questions", "knowledge base", "help resources", "common questions", "answers", "help section"],
+      "answer": "You're in the help center right now! This chatbot can answer many common questions about the platform. Use the search or ask me anything about finding practitioners, booking, profile setup, or platform features. For concerns that need human attention, use the 'Report a Concern' link at the bottom of the page or email support@rootedvitality.health.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["under construction", "coming soon", "not available yet", "still building", "in development", "beta", "launching", "features coming", "limited features"],
+      "answer": "Rooted Vitality is newly launched and we're still building out some features! Our support system is currently under construction. In the meantime, you can report concerns using the link at the bottom of each page, or email support@rootedvitality.health. Thank you for your patience as we grow!",
+      "supportContact": false
+    },
+    {
+      "keywords": ["how to report concern", "report concern link", "where is report button", "how do i report", "report button", "reporting", "submit concern", "report location"],
+      "answer": "Look for the 'Report a Concern' link at the bottom of any page in the platform. Click it to submit your concern, bug report, or feedback. This goes directly to our team and helps us improve the platform.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["response time", "how long will support respond", "when will you respond", "support response time", "response delay", "wait time", "how long does it take", "turnaround time"],
+      "answer": "We're working hard to respond to all concerns and emails as quickly as possible. Since we're newly launched and building our support system, response times may vary, but we're committed to getting back to you. Email us at support@rootedvitality.health or use the report link at the bottom of any page.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["speak to someone", "talk to someone", "human support", "speak with a person", "live chat", "live person", "talk to a person", "real person", "human agent"],
+      "answer": "Right now, our primary support channels are the 'Report a Concern' link on each page or email at support@rootedvitality.health. While we don't have live chat yet (we're still building our support system), these methods will get your message to our team. We aim to respond promptly to all inquiries.",
+      "supportContact": false
+    }
+  ]
+}

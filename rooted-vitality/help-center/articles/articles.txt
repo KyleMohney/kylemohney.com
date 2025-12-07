@@ -1,0 +1,23 @@
+1. Always follow industry best practices and standards
+2. All files must have branding, table of contents, clear and numbered sections
+3. No code can be out of place, everything in its appropriate file/section
+4. All functions/code blocks must be notated adequately
+5. Styles.css & injections.js must be kept lightweight (universals only)
+6. Universals from styles and injections must always be properly used on each page (no inline universals)
+7. Don't bury me in documentation. Create changelog, file directory, bug tracker, readme and update them accordingly
+8. Scalability first - choose auto-scaling solutions, index queries, paginate lists, structure for specialist handoff
+9. Mobile-first responsive - design for 360px minimum, test mobile before desktop
+10. Maintainability over cleverness - write code others can understand, explain complex logic, consistent naming
+11. No verbose code - less lines, more function per line (concise, efficient, readable)
+12. Links to relevent articles of ours, not 3rd party or external.
+13. Body wrapped neatly
+14. Proper SEO and Metatags
+15. F-Scanability (People read in the shape of an F when they scan from top to bottom)
+16. Will be created using ARTICLE_TEMPLATE.HTML as the base
+17. Will use soft language fitting for a holistic practitioner's office or experience.
+18. HEADER/FOOTER INJECTION: Include <header id="header-inject"></header> after <body> tag and <footer id="footer-inject"></footer> before closing </body> tag. The injections.js script automatically finds and renders these elements with the global header/footer.
+19. GLOBAL STYLES: Always include <link rel="stylesheet" href="../../../styles/styles.css"> to get background elements, header styling, and footer styling from global system.
+20. SCRIPT ORDER CRITICAL: Path prefix script MUST run BEFORE injections.js loads. Order: (1) Path prefix inline script, (2) articles.js, (3) injections.js
+21. PATH PREFIX CONFIGURATION: Set window.ARTICLE_PATH_PREFIX = '../../../'; in an inline script tag BEFORE injections.js loads. This tells injections.js the correct relative path for header/footer components (articles are 4 levels deep: /help-center/articles/[TYPE]-article-pages/).
+22. INJECTIONS.JS: Always include <script src="../../../scripts/injections.js"></script> - this auto-initializes on page load and populates header/footer/background using the path prefix. 
+23: 

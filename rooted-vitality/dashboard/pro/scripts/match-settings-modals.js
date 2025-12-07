@@ -79,17 +79,13 @@ function openModal(modalName) {
  * @param {string} categoryId - The category to edit
  */
 function openPreferencesModal(categoryId) {
-  console.log('[Match Settings Modal] openPreferencesModal called with categoryId:', categoryId);
-  
   const category = window.allCategories?.find(c => c.id === categoryId);
   if (!category) {
-    console.error('[Match Settings Modal] Category not found:', categoryId);
     return;
   }
 
   // Store current category being edited - MUST be local variable for savePreferencesModal() in match-settings.js
   currentEditingCategory = categoryId;
-  console.log('[Match Settings Modal] Set currentEditingCategory to:', currentEditingCategory);
 
   // Set modal title
   const titleElement = document.getElementById('preferences-modal-title');
@@ -99,9 +95,19 @@ function openPreferencesModal(categoryId) {
 
   // Load existing price if available
   const activeCategory = window.activeCategories?.find(ac => ac.id === categoryId);
+  
   const priceInput = document.getElementById('modal-price-input');
+  const priceMinInput = document.getElementById('modal-price-min-input');
+  const priceMaxInput = document.getElementById('modal-price-max-input');
+  
   if (priceInput) {
     priceInput.value = (activeCategory && activeCategory.price_per_service) ? activeCategory.price_per_service : '';
+  }
+  if (priceMinInput) {
+    priceMinInput.value = (activeCategory && activeCategory.price_range_min) ? activeCategory.price_range_min : '';
+  }
+  if (priceMaxInput) {
+    priceMaxInput.value = (activeCategory && activeCategory.price_range_max) ? activeCategory.price_range_max : '';
   }
 
   // Load subcategories
@@ -117,7 +123,8 @@ function openPreferencesModal(categoryId) {
       checkbox.setAttribute('data-subcategory', sub);
       
       // Check if already selected in activeCategories
-      if (activeCategory && activeCategory.subcategories && activeCategory.subcategories.includes(sub)) {
+      const shouldBeChecked = activeCategory && activeCategory.subcategories && activeCategory.subcategories.includes(sub);
+      if (shouldBeChecked) {
         checkbox.checked = true;
       }
       
@@ -132,7 +139,6 @@ function openPreferencesModal(categoryId) {
   }
 
   // Open the modal using generic opener
-  console.log('[Match Settings Modal] Opening preferences modal...');
   openModal('preferences');
 }
 

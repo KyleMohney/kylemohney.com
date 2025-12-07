@@ -2,11 +2,11 @@
 
 <!--
 +--------------------------------------------------------------------+
-│  ROOTED VITALITY, INC.                                             │
-│  File: index.html                                                  │
-│  Purpose: Home / Platform Hub - Client & Practitioner Portal      │
-│  Holistic Wellness · Modern Connection Platform                    │
-│  rootedvitality.com | 2025                                         │
+|  ROOTED VITALITY, INC.                                             |
+|  File: index.html                                                  |
+|  Purpose: Home / Platform Hub - Client & Practitioner Portal      |
+|  Holistic Wellness · Modern Connection Platform                    |
+|  rootedvitality.com | 2025                                         |
 +--------------------------------------------------------------------+
 
 TABLE OF CONTENTS
@@ -78,7 +78,7 @@ TABLE OF CONTENTS
             <section class="search-articles-section">
                 <h2 id="articlesTitle">Explore More Articles</h2>
                 <div class="search-container">
-                    <input type="text" class="search-bar" id="searchInput" placeholder="Search help articles�" aria-label="Search help articles">
+                    <input type="text" class="search-bar" id="searchInput" placeholder="Find articles" aria-label="Find articles">
                 </div>
                 <div class="articles-grid" id="articleGrid" aria-live="polite" aria-label="Filtered articles list"></div>
             </section>
@@ -118,10 +118,9 @@ TABLE OF CONTENTS
     <script src="../scripts/authModal.js"></script>
     <script src="../scripts/authHooks.js"></script>
     <script src="../injections.js"></script>
-    <script src="../scripts/renderManager.js"></script>
     <script src="../scripts/tabController.js"></script>
+    <script src="../scripts/renderManager.js"></script>
     <script src="../scripts/searchHandler.js"></script>
-    <script src="../injections.js"></script>
     
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
@@ -137,7 +136,8 @@ TABLE OF CONTENTS
         });
     </script>
     
-    <script src="../chatbot.js"></script>
+    <link rel="stylesheet" href="../chat-bot/styles/chatbot.css">
+  <script src="../chat-bot/scripts/chatbot.js"></script>
 </body>
 
 </html>

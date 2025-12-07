@@ -503,7 +503,56 @@ USING (auth.role() = 'service_role')
 WITH CHECK (auth.role() = 'service_role');
 
 -- ============================================================================
--- SECTION 12: PROFILE COMPLETENESS MIGRATION
+-- SECTION 12: PRACTITIONER_CREDENTIALS TABLE
+-- ============================================================================
+-- Practitioners can view and update their own credentials/verification data
+
+ALTER TABLE practitioner_credentials ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Practitioners view own credentials" ON practitioner_credentials;
+DROP POLICY IF EXISTS "Practitioners update own credentials" ON practitioner_credentials;
+DROP POLICY IF EXISTS "Service role manages credentials" ON practitioner_credentials;
+
+-- SELECT: Practitioners can view their own credentials
+CREATE POLICY "Practitioners view own credentials" ON practitioner_credentials
+FOR SELECT
+USING (
+  practitioner_serial IN (
+    SELECT serial_number FROM practitioners WHERE id = auth.uid()
+  )
+);
+
+-- UPDATE: Practitioners can update their own credentials
+CREATE POLICY "Practitioners update own credentials" ON practitioner_credentials
+FOR UPDATE
+USING (
+  practitioner_serial IN (
+    SELECT serial_number FROM practitioners WHERE id = auth.uid()
+  )
+)
+WITH CHECK (
+  practitioner_serial IN (
+    SELECT serial_number FROM practitioners WHERE id = auth.uid()
+  )
+);
+
+-- INSERT: Practitioners can insert their own credentials
+CREATE POLICY "Practitioners insert own credentials" ON practitioner_credentials
+FOR INSERT
+WITH CHECK (
+  practitioner_serial IN (
+    SELECT serial_number FROM practitioners WHERE id = auth.uid()
+  )
+);
+
+-- Service role can manage all credentials
+CREATE POLICY "Service role manages credentials" ON practitioner_credentials
+FOR ALL
+USING (auth.role() = 'service_role')
+WITH CHECK (auth.role() = 'service_role');
+
+-- ============================================================================
+-- SECTION 13: PROFILE COMPLETENESS MIGRATION
 -- ============================================================================
 -- Add profile completeness tracking column to practitioners table
 ALTER TABLE practitioners

@@ -1,0 +1,436 @@
+{
+  "knowledgeBase": [
+    {
+      "keywords": ["my wellness dashboard", "my wellness page", "wellness journey management", "view projects", "my dashboard", "wellness home", "dashboard page", "my projects"],
+      "answer": "My Wellness is your personal dashboard where you manage all your wellness journeys (care requests). You can see active and closed projects, view all practitioners you're connected with, track conversation status, leave reviews, and create new care requests whenever you need to connect with another practitioner.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["wellness journey", "care request", "create wellness journey", "start new project", "new wellness project", "create care request", "what is journey", "journey creation"],
+      "answer": "A wellness journey is a care request for a specific wellness need. You create one by entering your wellness goal or symptom, selecting a category (Acupuncture, Nutrition, Yoga, Massage, etc.), describing what you're looking for, and specifying your location and travel preferences. Then the system finds matching practitioners for you.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["active care requests", "closed care requests", "project status", "hired status", "canceled status", "completed projects", "open projects", "active projects", "finished projects"],
+      "answer": "Active care requests are wellness journeys you're currently working on or looking for practitioners for. Closed care requests are ones that have been completed (when you hired a practitioner) or canceled. You can see both on your My Wellness dashboard, organized in separate sections.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["find practitioners", "browse practitioners", "search practitioners", "matching", "show matches", "view matches", "practitioner search", "find matches"],
+      "answer": "Once you create a wellness journey, click 'Find Practitioners' to browse matched practitioners for that specific project. The system shows you practitioners in your area with matching specialties, sorted by match quality. You can review their profiles and send connection requests.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["connect with practitioner", "send connection request", "message practitioner", "reach out", "initial contact", "request connection", "send request"],
+      "answer": "When you find a practitioner you like, click 'Connect' to send them a connection request with an auto-generated introduction about your wellness need. They'll receive notification of your request. Once they accept, you can message them directly through your chat thread.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["practitioner response", "waiting for practitioner", "pending response", "accepted declined", "response status", "waiting status", "replied yet"],
+      "answer": "After sending a connection request, your match status shows 'Pending' while waiting for their response. They can either accept your request or decline it. Once they accept, your status changes to 'In-Progress' and you can start messaging them. If they decline, the status shows 'Declined' and you can search for other practitioners.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["message thread", "chat with practitioner", "messaging", "send message", "conversation", "message history", "chat thread", "reply message"],
+      "answer": "Once a practitioner accepts your connection request, a message thread opens where you can communicate back and forth. Messages appear in real-time, and you can discuss details about your wellness needs, scheduling, pricing, and next steps. All messages are saved in your thread history.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["messaging disabled", "can't message", "why no messages", "pending messages", "message locked", "message not available", "disabled chat"],
+      "answer": "Messaging is disabled until the practitioner accepts your connection request. This is intentional—it gives practitioners control over unsolicited direct messages. Once they accept, full messaging is enabled and you can have a full conversation.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["match status", "update status", "in-progress hired not-hired", "status dropdown", "change status", "status options", "current status"],
+      "answer": "You can update a match's status using the dropdown in your message thread: 'In-Progress' means you're actively working with them, 'Hired' means you've decided to work with them, 'Not Hired' means you're declining to work with them. Once a match is Hired or Not Hired, it moves to your completed section.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["hired practitioner", "engaged practitioner", "active engagement", "working with", "hired status", "active match", "engaged match"],
+      "answer": "When you mark a match as 'Hired', it means you've decided to work with that practitioner and the engagement is active. The match shows their name and a 'Hired' status badge. You can continue messaging them and leave a review once you've completed your work together.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["leave review", "write review", "rate practitioner", "review star rating", "submit review", "give feedback", "post review", "rating review"],
+      "answer": "After completing work with a practitioner (when the match is marked as Hired or Not Hired), you can leave a review. Click the 'Leave Review' or 'Update Review' button in your My Team section, add a star rating, and write your feedback about the experience. Reviews help other clients make informed decisions.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["close wellness journey", "end project", "close care request", "close project", "cancel project", "stop project", "finish project"],
+      "answer": "To close a wellness journey, click the × button on the project card or select 'Close Project' from the options. You can optionally provide a reason why it's closed (found another practitioner, no longer needed, etc.). Closed projects move to your 'Closed Care Requests' section and can't receive new matches.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["urgency level", "project urgency", "low urgency", "medium urgent urgent", "how urgent", "timeline urgent", "urgency options"],
+      "answer": "When creating a wellness journey, you specify how urgent your need is. This helps practitioners understand your timeline. Options typically range from low (no rush, open timeline) to urgent (need help soon). Practitioners use this to determine if they can accommodate you.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["travel preference", "in-person virtual housecalls", "service delivery", "meeting location", "how to meet", "session format", "appointment type"],
+      "answer": "When creating a wellness journey, you specify how you want to meet the practitioner: In-Person (at their office), Virtual (video/phone), or House Calls (they come to you). Practitioners filter by your preferences, so you only see matches who offer your preferred service type.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["project description", "wellness need description", "symptom description", "what to write", "describe needs", "wellness details", "symptom details"],
+      "answer": "When creating a project, write a detailed description of your wellness need or symptoms. Be specific about what you're experiencing, any relevant history, and what you're hoping to achieve. This helps practitioners understand if they're a good fit and how they can best help you.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["total care requests", "completed care", "project counter", "stats", "dashboard stats", "project count", "care count"],
+      "answer": "Your My Wellness dashboard shows two key stats: Total Care Requests (all your active and closed journeys), and Completed Care (the number of practitioners you've successfully hired and engaged with). These help you track your wellness activity over time.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["open to match toggle", "available for matching", "receive matches", "match status", "match toggle", "receive offers", "visible to practitioners"],
+      "answer": "The 'Open to Match' toggle controls whether your account is available to receive new practitioner matches. When enabled, your wellness journey appears in the practitioner matching system and they can see it as an opportunity. When disabled, your projects are hidden from practitioners.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["project categories", "wellness categories", "acupuncture nutrition yoga massage", "category selection", "choose category", "available categories"],
+      "answer": "When creating a wellness journey, you select from 8 wellness categories: Acupuncture, Nutrition, Yoga, Energy Healing, Herbal Medicine, Mental Wellness, Massage, and Naturopathic Medicine. Your selection helps the system match you with relevant practitioners.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["project location", "city state zipcode", "geographic location", "where do you live", "location field", "service area", "geographic info"],
+      "answer": "When creating a project, enter your city, state, and zipcode. This information is used to find practitioners in your area (within reasonable distance based on travel preference). It's also visible to practitioners you connect with so they can confirm they can serve your location.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["no active journeys", "create your first journey", "getting started", "empty dashboard", "no projects yet", "start first project"],
+      "answer": "If you see 'No active wellness journeys' on your dashboard, you haven't created any projects yet. Click 'Create Wellness Journey' to get started. This opens a form where you describe what wellness support you're looking for and the system will find practitioners for you.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["practitioner not interested", "declined connection", "rejection", "try again", "declined match", "not interested", "rejected request"],
+      "answer": "If a practitioner declines your connection request, their status shows 'Declined'. You can still search for other practitioners who might be a better fit for your wellness needs. Use the 'Find Practitioners' button to browse other options for that project.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["multiple projects", "multiple practitioners", "many journeys", "several care requests", "simultaneous projects", "multiple requests"],
+      "answer": "Yes! You can create multiple wellness journeys simultaneously. For example, you might have one project for nutrition guidance and another for massage therapy. Each project is separate and can be at different stages with different practitioners.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["client inbox", "inbox messages", "conversation threads", "messaging area", "all conversations", "chat area", "message center"],
+      "answer": "The client inbox is where you view and manage all your match messages and conversations with practitioners. It displays all practitioners you've been matched with, shows message threads, and allows you to change the status of matches (Hired/Not Hired).",
+      "supportContact": false
+    },
+    {
+      "keywords": ["access inbox", "open inbox", "view inbox messages", "find my conversations", "open chat", "see messages", "messages area"],
+      "answer": "You can access your inbox from the main dashboard. The inbox displays all practitioners you're matched with in a threads list on the left side, and clicking any thread opens the full conversation and messaging interface on the right.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["inbox match status", "pending in-progress hired not-hired", "status types", "match states", "status labels"],
+      "answer": "Match statuses in your inbox are: 'pending' (waiting for practitioner response), 'in-progress' (practitioner accepted and active), 'hired' (you selected this practitioner), or 'not-hired' (you declined this practitioner). The status dropdown shows available options based on the match state.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["hire practitioner", "change status to hired", "mark as hired", "hire someone", "select hired", "confirm hired"],
+      "answer": "Click the status dropdown in the message thread and select 'Hired'. This marks the match as hired and automatically closes the associated project (changes project_status to 'hired' and sets closed_date). A confirmation modal shows the change.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["what happens when hired", "hired consequences", "hired closes project", "auto close", "after hired", "hired effects"],
+      "answer": "When you change match status to 'Hired': (1) The match is marked as hired, (2) The project automatically closes and moves to 'Hired' status, (3) The hired_practitioner_serial is recorded on the project, (4) A closed_date is set, (5) All other matches on that project are also marked as 'hired', and (6) A status confirmation modal appears.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["not hired", "change status to not hired", "mark as not hired", "decline practitioner", "not selected", "not a fit"],
+      "answer": "When you change match status to 'Not Hired': (1) The match is marked as 'not-hired', (2) The match closes but the project stays open (you can match with other practitioners), (3) The status is synced to the practitioner's side, and (4) A confirmation modal shows the status change.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["change status back", "undo hired", "undo not-hired", "revert status", "change again", "modify status"],
+      "answer": "No, hiring and not-hiring are terminal statuses. Once a match is marked 'hired' or 'not-hired', the status dropdown becomes disabled and you cannot change it further. The match is permanently closed.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["status dropdown locked", "dropdown disabled", "can't change status", "why disabled", "locked status", "frozen status"],
+      "answer": "The status dropdown is locked when: (1) match is still pending and practitioner hasn't responded yet, or (2) the match is already hired or not-hired (terminal status). It's only active once the practitioner accepts (in-progress status).",
+      "supportContact": false
+    },
+    {
+      "keywords": ["practitioner accepted", "connection accepted", "what happens after accept", "accepted state", "acceptance", "accepted notification"],
+      "answer": "When a practitioner accepts: (1) The match status changes to 'in-progress', (2) The message input becomes enabled so you can message, (3) The status dropdown becomes available, (4) A notification is sent to you, and (5) You can now change the status to 'hired' or 'not-hired'.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["practitioner declined", "connection declined", "what happens after decline", "decline notification", "after decline", "declined match"],
+      "answer": "When a practitioner declines: (1) The match status automatically changes to 'not-hired', (2) The messaging area shows a decline notice, (3) The message input is disabled, (4) You can no longer change the status, and (5) This match is closed and you can continue matching with other practitioners.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["message practitioner inbox", "send message in inbox", "type message", "message thread", "compose message", "write reply"],
+      "answer": "Open a thread by clicking a practitioner card in the threads list. Once the match is accepted, a message input field appears at the bottom of the thread. Type your message and click send. Messages only work once the practitioner has accepted the match.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["can't message yet", "message disabled", "waiting for response", "pending message", "message unavailable", "no messaging yet"],
+      "answer": "If a match is still pending and the practitioner hasn't responded, the message input shows a 'Waiting for response' notice. Messaging is only enabled after the practitioner accepts (status becomes 'in-progress').",
+      "supportContact": false
+    },
+    {
+      "keywords": ["inbox review button", "leave review inbox", "review practitioners", "rate in inbox", "add review", "write review button"],
+      "answer": "Click the 'Leave Review' button on a practitioner's thread card. A review modal opens where you can: (1) Enter a 1-5 star rating, (2) Write review text (5-2000 characters), (3) Upload up to 5 photos, and (4) Submit. The review is pending approval before becoming public.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["update review", "edit review", "change review", "modify review", "revise review", "update rating"],
+      "answer": "If you already left a review, the button changes to 'Update Review'. Clicking it pre-fills the form with your existing review. You can edit the rating, text, and photos, then save the changes. Your updated review goes through approval again.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["review information", "what's in a review", "review data", "review fields", "review content", "stored review"],
+      "answer": "Reviews store: (1) Your rating (1-5 stars), (2) Review text (5-2000 chars), (3) Photos (up to 5), (4) Your name and client info, (5) Practitioner's name and serial, (6) Project serial, (7) Timestamp, (8) Approval status, and (9) Visibility status (public/hidden).",
+      "supportContact": false
+    },
+    {
+      "keywords": ["when can i review", "leave review requirements", "review availability", "review eligibility", "can review"],
+      "answer": "You can leave or update a review once a match is 'in-progress' (practitioner accepted). Reviews appear as a button on practitioner thread cards and also in the My Wellness dashboard on project cards.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["review approval", "review pending", "review visibility", "when is review public", "approval process", "pending approval"],
+      "answer": "Reviews are submitted with is_approved: false and is_visible: false. They're pending moderation by the admin. Once approved by admin, they become is_approved: true and is_visible: true, then show on the practitioner's public profile.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["multiple matches per project", "matching multiple practitioners", "many practitioners same project", "multiple simultaneous matches"],
+      "answer": "You can have multiple active matches (in-progress status) for the same project. Once you hire one practitioner, all other matches for that project are also marked as 'hired' and the project closes. You can also mark matches 'not-hired' to continue matching with others.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["practitioner sees status", "sync to pro", "practitioner notification", "real-time sync", "status sync", "notification sync"],
+      "answer": "Yes. When you change a match to 'hired' or 'not-hired', the system broadcasts the status change in real-time to the practitioner's side. Their inbox automatically updates, showing the match as 'hired' or 'not-hired'.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["inbox tabs", "messages tab", "closed tab", "all matches tab", "filter tabs", "tab categories"],
+      "answer": "The inbox has filter tabs: (1) 'All Matches' shows all active matches, (2) 'Messages' shows threads with conversations, (3) 'Closed' shows hired/not-hired matches that are complete. Each tab updates badge counts showing how many matches in that category.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["search inbox", "find practitioner inbox", "search messages", "search practitioners", "search filter"],
+      "answer": "Use the search field above the threads list. Search by practitioner name, project name, or service type. Results filter the threads list in real-time as you type.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["messages after hired", "conversation history hired", "preserve messages", "see old messages", "message history"],
+      "answer": "Messages are preserved after hiring. The match becomes 'hired' and appears in the 'Closed' tab, but all previous messages remain visible. You can still view the conversation history with the hired practitioner.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["connect multiple practitioners", "match with many", "multiple connections", "many practitioners", "compare practitioners"],
+      "answer": "Yes. You can match with and accept multiple practitioners for the same project. Each becomes an 'in-progress' match. You can then compare and eventually hire one (which closes the project) or mark others as 'not-hired' to keep matching.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["inbox vs my wellness", "difference inbox my wellness", "which to use", "both pages", "compare pages"],
+      "answer": "The Inbox and My Wellness are two ways to manage matches: Inbox focuses on messaging and 1-to-1 match management (hire/not-hire status). My Wellness shows all projects and their match summaries. Both sync in real-time—changes in one appear in the other.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["read receipts", "message read", "seen status", "unread messages", "delivery status"],
+      "answer": "The inbox shows message delivery but not read receipts. You can see the conversation history and timestamps of messages. Real-time messaging updates the thread when new messages arrive from the practitioner.",
+      "supportContact": false
+    }
+  ],
+  "supportResources": [
+    {
+      "keywords": ["client profile", "wellness profile", "profile questionnaire", "health information", "my profile", "profile info", "client info"],
+      "answer": "Your client profile is a comprehensive wellness questionnaire that helps practitioners understand you better. It includes 10 questions about your wellness goals, health history, current challenges, lifestyle, preferences, and desired outcomes. This information is completely optional and helps practitioners personalize their care.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["profile privacy", "who sees profile", "profile visibility", "profile confidential", "private profile", "profile access"],
+      "answer": "Your wellness profile is private and only visible to practitioners you have matched with AND who have already accepted your match. Practitioners cannot see your detailed profile information until they accept your connection request. Once accepted, they can view your complete wellness questionnaire.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["wellness questionnaire", "health questions", "intake form", "profile questions", "questionnaire fields", "health form"],
+      "answer": "The wellness questionnaire captures: main wellness goal, how long you've dealt with the issue, approaches that have resonated with you, allergies/sensitivities, current medications/supplements, typical day description, communication preference, biggest barriers to healing, prior practitioner experience, and desired success outcome.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["edit profile", "update wellness profile", "change profile information", "modify questionnaire", "edit questionnaire", "update info"],
+      "answer": "You can edit your wellness profile anytime from your Client Profile page. All questionnaire responses can be updated, and changes are saved immediately. There's no limit to how many times you can edit or re-save your profile information.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["optional questionnaire", "required questions", "skip questions", "which fields required", "mandatory fields", "optional fields"],
+      "answer": "The wellness questionnaire is entirely optional. You're not required to answer any questions. However, the more information you provide, the better practitioners can understand your needs and provide personalized care. Communication preference is the only field that has a suggested selection.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["main wellness goal", "what is your wellness goal", "health goal question", "primary goal", "main objective"],
+      "answer": "This question asks about your primary wellness objective right now. Examples include: better sleep, manage pain, reduce anxiety, improve digestion, increase energy, balance hormones, or address specific symptoms. This helps practitioners understand your main priority.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["duration of issue", "how long illness", "how long problem", "symptom duration", "timeline issue", "how long condition"],
+      "answer": "This question asks how long you've been dealing with your main wellness concern. Examples: 3 months, 2 years, since childhood. Knowing the timeline helps practitioners understand the depth and chronicity of your condition.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["approaches that resonate", "what works for you", "past treatments", "tried before", "helpful modalities", "what helped"],
+      "answer": "This asks about wellness approaches, modalities, or treatments that have been helpful to you in the past. Examples: acupuncture, meditation, herbal medicine, yoga, massage. This helps practitioners know what resonates with you and what to build on.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["allergies sensitivities", "food allergies", "medication allergies", "sensitivities", "allergic reactions", "intolerances"],
+      "answer": "This question asks about any allergies, sensitivities, or medical conditions practitioners should be aware of. Examples: latex allergy, sensitive to strong oils, thyroid condition, pregnancy. This ensures practitioners can adapt their approach safely.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["current medications supplements", "medications list", "supplements taking", "prescriptions", "drugs taking", "current meds"],
+      "answer": "This asks about any medications or supplements you're currently taking. Practitioners need this information to understand potential interactions and ensure their recommendations are compatible with your current health regimen.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["typical day description", "daily routine", "lifestyle description", "what's your day like", "daily schedule", "routine"],
+      "answer": "This question asks you to describe your typical day: work schedule, exercise, meals, stress levels, sleep pattern, hobbies. This helps practitioners understand your lifestyle context and how to provide recommendations that fit into your real life.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["communication preference", "how communicate", "email phone text video", "contact method", "preferred contact", "communication style"],
+      "answer": "This asks how you prefer to communicate with practitioners: Email, Phone, Text/SMS, Video Call, or In-Person. Select the method that works best for you. Practitioners will try to honor your preference when following up about sessions or next steps.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["barriers to healing", "challenges to healing", "obstacles to wellness", "what might get in way", "obstacles", "challenges"],
+      "answer": "This asks about potential challenges or obstacles that might make it difficult to move forward with your wellness journey. Examples: busy schedule, budget constraints, difficulty with consistency, skepticism about certain modalities. This helps practitioners understand and plan around your constraints.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["prior practitioner experience", "worked with healers", "holistic experience", "previous practitioners", "past healers", "healer experience"],
+      "answer": "This asks if you've previously worked with holistic practitioners or healers. Options: Yes, No, A Little. This helps practitioners know if they need to explain concepts or if you have existing experience with holistic approaches.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["desired success outcome", "what success looks like", "goals vision", "outcome you want", "ideal outcome", "vision of success"],
+      "answer": "This asks you to paint a picture of what success would look like for you. Example: 'I have energy to play with my kids, sleep through the night, and manage my anxiety without medication.' This gives practitioners a clear vision of your ideal outcome.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["profile basic information", "age sex location", "basic profile data", "demographic information", "basic info"],
+      "answer": "Your basic profile includes: Age, Sex, City/State/Zipcode. This information helps practitioners understand your geographic location and some demographic context. This basic info is visible to practitioners who have accepted your match.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["view your profile", "see your profile", "how practitioners see profile", "public profile view", "profile page"],
+      "answer": "Your profile is viewable at your client public profile page. Practitioners who have accepted your match can visit this page which displays your basic information, wellness goal, health history, allergies, medications, daily routine, preferences, and any barriers to healing.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["profile not matching", "profile not used for matching", "matching criteria", "how matching works", "matching algorithm"],
+      "answer": "Important: Your wellness profile information is NOT used for practitioner matching. Matches are based solely on your project category, subcategory, location, and availability. Your profile is provided to practitioners after matching to help them understand you better and personalize their care.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["profile incomplete", "finish profile later", "save as draft", "incomplete questionnaire", "partial profile"],
+      "answer": "You can leave the wellness questionnaire incomplete and save your progress. No fields are required, so you can add information gradually as you're comfortable. You can always return to your profile page and add more details later.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["profile information shared", "who has access", "data privacy", "profile confidentiality", "share profile", "profile sharing"],
+      "answer": "Your profile information is only shared with practitioners you've explicitly matched with AND who have accepted your match. It's never shown to practitioners during the initial matching process, only after they accept your connection request. Your privacy is protected at all stages.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["settings page", "account settings", "manage account", "account preferences", "settings menu"],
+      "answer": "Your Settings page is where you manage your account, notification preferences, memberships, and security. You can access it from your dashboard. The settings are organized into tabs: Account, Notifications, Memberships, and Security.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["change email", "update email address", "email settings", "edit email", "new email"],
+      "answer": "To change your email, go to Settings > Account and click Edit next to your email address. Enter your new email and submit. A confirmation link will be sent to your new email. Click the link to verify and complete the change.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["change password", "reset password", "password change", "forgot password", "new password"],
+      "answer": "To change your password, go to Settings > Security and click 'Change Password'. A password reset link will be sent to your email. Click the link in the email to set a new password. You must confirm before the change takes effect.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["notification preferences", "manage notifications", "notification settings", "customize notifications", "notification control"],
+      "answer": "Go to Settings > Notifications to manage how you receive notifications. You can control notifications for: Practitioner Messages, Matches, Promotions, and Account & Security alerts. For each, choose to receive In-App, Email, or SMS notifications.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["practitioner messages notifications", "message notifications", "when practitioner messages", "message alert"],
+      "answer": "Practitioner Message notifications alert you when a practitioner messages you or accepts your match request. You can receive these via: In-App (notification bell), Email (to your email address), or SMS (text message).",
+      "supportContact": false
+    },
+    {
+      "keywords": ["match notifications", "when new matches", "new match alert", "match alerts", "match notification"],
+      "answer": "Match notifications alert you when a practitioner accepts or declines your connection request. You can receive these via: In-App (notification bell), Email (to your email address), or SMS (text message).",
+      "supportContact": false
+    },
+    {
+      "keywords": ["promotion notifications", "promotional emails", "marketing notifications", "special offers", "offers alerts"],
+      "answer": "Promotion notifications are special offers and updates from Rooted Vitality. You can enable/disable these in Settings > Notifications under 'Promotions'. When enabled, you'll receive offers about new features or services.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["account security notifications", "security alerts", "account alerts", "critical account notifications", "security notification"],
+      "answer": "Account & Security notifications are critical alerts about your account, such as password changes, email updates, or suspicious login attempts. These are important for your security and are recommended to stay enabled.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["notification channels", "email SMS in-app", "notification types", "how receive notifications", "notification method"],
+      "answer": "There are 3 notification channels: In-App (appears in your notification bell), Email (sent to your email address), SMS (sent as text message). For each notification type, you can choose which channels to use.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["save notification preferences", "apply notification settings", "notification changes take effect", "save settings"],
+      "answer": "Notification preferences are saved automatically when you check or uncheck a box. You'll see a confirmation message that preferences were updated. Changes take effect immediately.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["default notifications", "all notifications enabled", "notification defaults", "turned on by default", "default settings"],
+      "answer": "By default, all notification channels are enabled when you sign up. This means you'll receive in-app, email, and SMS notifications for all notification types (messages, matches, promotions, account alerts).",
+      "supportContact": false
+    },
+    {
+      "keywords": ["disable notifications", "turn off notifications", "stop notifications", "mute notifications", "disable alerts"],
+      "answer": "To disable a notification type, go to Settings > Notifications and uncheck the boxes for the channels you don't want. For example, uncheck 'Email' to stop receiving emails but still get in-app notifications.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["email notifications contact", "email goes where", "notification email address", "where emails sent", "email destination"],
+      "answer": "Email and SMS notifications are sent to the contact information in your Account Settings (Settings > Account). This is the primary email address associated with your Rooted Vitality account.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["memberships section", "subscription", "membership status", "active memberships", "subscription status"],
+      "answer": "The Memberships section in Settings shows your current subscription status with Rooted Vitality. It displays your membership type, renewal date, and any benefits. Client memberships are typically included with your account.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["security section", "two factor authentication", "2fa mfa", "security settings", "account security"],
+      "answer": "The Security section in Settings manages your account security. This includes password management, and security alerts. This section helps protect your account from unauthorized access.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["edit account information", "update personal info", "modify account", "change account details", "edit info"],
+      "answer": "To edit account information, go to Settings > Account. Click the Edit button next to the field you want to change (email, password, etc.). Make your changes and save. Your updates are synced to the database immediately.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["account information display", "see my account info", "view profile details", "what's in account", "account details"],
+      "answer": "Your Account section displays: Email Address, Password (shown as dots for security), Age, Sex, and Location. Some fields are editable (click Edit), while others are read-only display fields.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["notification history", "see past notifications", "notification archive", "old notifications", "notification log"],
+      "answer": "Notifications appear in your notification bell in the header. In-app notifications are typically kept for a session. For a record of important notifications (like match updates), check your email inbox for email notifications.",
+      "supportContact": false
+    },
+    {
+      "keywords": ["reset all settings", "restore default settings", "reset preferences", "clear settings", "reset account"],
+      "answer": "There's no 'reset all' option in Settings. To return to default notification preferences, go to Settings > Notifications and manually check all boxes for the channels you want. This restores them to the default 'all enabled' state.",
+      "supportContact": false
+    }
+  ]
+}

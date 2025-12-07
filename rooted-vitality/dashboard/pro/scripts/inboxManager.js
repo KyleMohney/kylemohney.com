@@ -155,7 +155,7 @@ async function _confirmBlock() {
     if (projectIds?.length > 0) {
         await window.supabaseClient
             .from('project_practitioner_matches')
-            .update({ status: 'declined', updated_at: new Date().toISOString() })
+            .update({ practitioner_response: 'blocked', updated_at: new Date().toISOString() })
             .eq('practitioner_serial', practitionerId)
             .in('project_id', projectIds.map(p => p.id));
     }
@@ -174,10 +174,10 @@ async function _confirmDecline() {
     const { clientName, matchId, conversation } = pendingModalAction;
     closeConfirmationModal();
     
-    // Update match status to declined
+    // Update practitioner_response to declined - trigger will sync status
     const { error } = await window.supabaseClient
         .from('project_practitioner_matches')
-        .update({ status: 'declined', updated_at: new Date().toISOString() })
+        .update({ practitioner_response: 'declined', updated_at: new Date().toISOString() })
         .eq('id', matchId);
     
     if (error) throw error;
@@ -780,12 +780,12 @@ async function loadConversations() {
             return;
         }
 
-        // Load declined matches now
+        // Load not-hired matches now
         const { data: declinedMatches, error: declinedError } = await window.supabaseClient
             .from('project_practitioner_matches')
             .select('id, project_serial, status, created_at')
             .eq('practitioner_serial', practitionerSerial)
-            .eq('status', 'declined');
+            .eq('status', 'not-hired');
 
         if (declinedError) {
             console.error('[Inbox] Error loading declined matches:', declinedError);
@@ -1538,20 +1538,37 @@ function closeThreadView() {
 }
 
 // Archive/decline a conversation (from thread menu)
-// WORKFLOW: Decline match = set status to 'declined' + notify client
+// WORKFLOW: Decline match = set practitioner_response to 'declined'
+// Status will automatically flip to 'not-hired' via trigger
 async function archiveConversation(conversation) {
     try {
-        // Update the match status to 'declined'
-        const { error } = await window.supabaseClient
-            .from('project_practitioner_matches')
-            .update({ status: 'declined', updated_at: new Date().toISOString() })
-            .eq('id', conversation.matchId);
+        console.log('[Inbox] Archiving conversation:', conversation);
         
-        if (error) {
-            console.error('[Inbox] Error archiving conversation:', error);
-            alert('Failed to archive conversation');
+        if (!conversation.matchId) {
+            console.error('[Inbox] Missing matchId for archive operation');
+            showToast('Error: Missing match ID', 'error');
             return;
         }
+        
+        // Update both practitioner_response AND status to complete the archive
+        // practitioner_response = 'declined' for notification purposes
+        // status = 'not-hired' for the archive category
+        const { error: updateError } = await window.supabaseClient
+            .from('project_practitioner_matches')
+            .update({ 
+                practitioner_response: 'declined',
+                status: 'not-hired',
+                updated_at: new Date().toISOString() 
+            })
+            .eq('id', conversation.matchId);
+        
+        if (updateError) {
+            console.error('[Inbox] Error archiving conversation:', updateError);
+            showToast('Failed to archive conversation', 'error');
+            return;
+        }
+        
+        console.log('[Inbox] ✓ Conversation archived successfully');
         
         // Send notification to client that practitioner declined
         if (window.notifyClientOfMatchResponse) {
@@ -1563,43 +1580,79 @@ async function archiveConversation(conversation) {
             });
         }
         
+        // Show success toast
+        showToast('Conversation archived', 'success');
+        
         // Remove from conversations list and close thread view
         conversations = conversations.filter(c => c.id !== conversation.id);
         closeThreadView();
         
         // Reload conversations to update UI
-        loadConversations();
+        await loadConversations();
+        renderThreadsList();
     } catch (error) {
         console.error('[Inbox] Exception archiving conversation:', error);
-        alert('Error archiving conversation');
+        showToast('Error archiving conversation', 'error');
     }
 }
 
 // Block a client conversation (from thread menu)
-// WORKFLOW: Practitioner blocks = match status = declined
+// WORKFLOW: Practitioner blocks = match status = declined + blocked in practitioner_blocks table
 async function blockConversation(conversation) {
     try {
-        // Update the match status to 'declined' (WORKFLOW requirement)
-        const { error } = await window.supabaseClient
-            .from('project_practitioner_matches')
-            .update({ status: 'declined', updated_at: new Date().toISOString() })
-            .eq('id', conversation.matchId);
+        console.log('[Inbox] Blocking conversation:', conversation);
         
-        if (error) {
-            console.error('[Inbox] Error blocking conversation:', error);
-            alert('Failed to block client');
+        if (!conversation.matchId) {
+            console.error('[Inbox] Missing matchId for block operation');
+            showToast('Error: Missing match ID', 'error');
             return;
         }
+        
+        // Update match to declined
+        const { error: updateError } = await window.supabaseClient
+            .from('project_practitioner_matches')
+            .update({ 
+                practitioner_response: 'declined',
+                status: 'not-hired',
+                updated_at: new Date().toISOString() 
+            })
+            .eq('id', conversation.matchId);
+        
+        if (updateError) {
+            console.error('[Inbox] Error updating match for block:', updateError);
+            showToast('Failed to block client', 'error');
+            return;
+        }
+        
+        // Add to practitioner blocks table
+        const { error: blockError } = await window.supabaseClient
+            .from('practitioner_blocks')
+            .upsert({
+                practitioner_serial: conversation.practitionerSerial,
+                client_serial: conversation.clientSerial,
+                is_blocked: true,
+                created_at: new Date().toISOString()
+            }, { onConflict: 'practitioner_serial,client_serial' });
+        
+        if (blockError) {
+            console.error('[Inbox] Error adding to block list:', blockError);
+            showToast('Failed to block client', 'error');
+            return;
+        }
+        
+        console.log('[Inbox] ✓ Client blocked successfully');
+        showToast('Client blocked', 'success');
         
         // Remove from conversations list and close thread view
         conversations = conversations.filter(c => c.id !== conversation.id);
         closeThreadView();
         
         // Reload conversations to update UI
-        loadConversations();
+        await loadConversations();
+        renderThreadsList();
     } catch (error) {
         console.error('[Inbox] Exception blocking conversation:', error);
-        alert('Error blocking client');
+        showToast('Error blocking client', 'error');
     }
 }
 

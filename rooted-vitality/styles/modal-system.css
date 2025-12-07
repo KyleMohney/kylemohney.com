@@ -63,12 +63,12 @@ ARCHITECTURE:
   justify-content: center;
   z-index: 10000;
   pointer-events: none;
-  animation: fadeIn 0.2s ease;
 }
 
 .modal-overlay.active {
   display: flex !important;
   pointer-events: auto;
+  animation: fadeIn 0.2s ease;
 }
 
 @keyframes fadeIn {
@@ -96,6 +96,8 @@ ARCHITECTURE:
   pointer-events: auto;
   display: flex;
   flex-direction: column;
+  position: relative;
+  z-index: 10001;
 }
 
 @keyframes slideUp {

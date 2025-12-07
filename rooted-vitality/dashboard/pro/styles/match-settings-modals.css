@@ -61,7 +61,7 @@
   background: var(--rooted-neutral);
   border-radius: 12px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-  max-width: 700px;
+  max-width: 800px;
   width: 90%;
   max-height: 80vh;
   overflow-y: auto;
@@ -72,6 +72,11 @@
 /* Wider modal variant */
 .modal-content.modal-large {
   max-width: 900px;
+}
+
+/* Modal-specific overrides */
+#preferences-modal .modal-content {
+  max-width: 700px;
 }
 
 /* ========================================== */
@@ -565,5 +570,74 @@
 
 .toast.error {
   background: #dc3545;
+}
+
+/* ========================================== */
+/* PRICING FIELDS STYLING */
+/* ========================================== */
+
+.pricing-fields-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.pricing-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.pricing-field-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--rooted-dark, #1a1a1a);
+}
+
+/* Override input-wrapper for pricing fields to prevent wrapping */
+.pricing-field-group .input-wrapper {
+  flex-wrap: nowrap !important;
+  max-width: 150px;
+}
+
+.pricing-field-group .input-wrapper input {
+  min-width: 80px;
+}
+
+.price-range-inputs {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* Override input-wrapper flex-wrap for price range inputs */
+.price-range-inputs .input-wrapper {
+  flex: 0 1 auto;
+  flex-wrap: nowrap !important;
+  max-width: 90px;
+  min-width: 0;
+}
+
+.price-range-inputs .input-wrapper input {
+  min-width: 60px;
+  max-width: 100%;
+}
+
+.price-range-divider {
+  color: var(--rooted-secondary, #999);
+  font-weight: 500;
+  padding: 0 0.25rem;
+  white-space: nowrap;
+  line-height: 38px;
+  font-size: 1.2rem;
+}
+
+/* Responsive: stack pricing fields on smaller screens */
+@media (max-width: 768px) {
+  .pricing-fields-wrapper {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
 }
 

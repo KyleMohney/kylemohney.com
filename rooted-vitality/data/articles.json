@@ -3,79 +3,79 @@
     "featured": [
       {
         "title": "What is Rooted Vitality?",
-        "url": "/rooted-vitality/articles/what-is-rooted-vitality.html",
-        "description": "Rooted Vitality connects you with holistic practitioners and alternative medicine experts to support your wellness journey. Our platform bridges the gap between those seeking meaningful natural healing and certified practitioners dedicated to transformative care."
+        "url": "./articles/client-article-pages/what-is-rooted-vitality.html",
+        "description": "Rooted Vitality connects you with holistic practitioners and alternative wellness experts to support your wellness journey. Our platform bridges the gap between those seeking meaningful natural healing and certified practitioners dedicated to transformative care."
       },
       {
         "title": "How to Book a Consultation",
-        "url": "/rooted-vitality/articles/how-to-book-consultation.html",
+        "url": "./articles/client-article-pages/how-to-book-consultation.html",
         "description": "Finding the right practitioner is the foundation of your wellness journey. Our platform makes it easy to discover practitioners who align with your goals and schedule your first appointment seamlessly. Take the first step toward natural healing today."
       }
     ],
     "other": [
       {
-        "title": "What Makes Holistic Medicine Different",
-        "url": "/rooted-vitality/articles/holistic-medicine-explained.html"
+        "title": "Understanding Care Requests",
+        "url": "./articles/client-article-pages/creating-care-request.html"
       },
       {
-        "title": "Healing Plants to Keep Around Your Home",
-        "url": "/rooted-vitality/articles/healing-plants-home.html"
+        "title": "Safe Hiring Practices",
+        "url": "./articles/client-article-pages/safe-hiring-practices.html"
       },
       {
-        "title": "How to Find the Right Practitioner for You",
-        "url": "/rooted-vitality/articles/finding-right-practitioner.html"
+        "title": "Your First Consultation",
+        "url": "./articles/client-article-pages/first-consultation.html"
       },
       {
-        "title": "Nutrition and Holistic Wellness",
-        "url": "/rooted-vitality/articles/nutrition-holistic-wellness.html"
+        "title": "Your Wellness Profile",
+        "url": "./articles/client-article-pages/wellness-profile.html"
       },
       {
-        "title": "Mindfulness and Stress Relief",
-        "url": "/rooted-vitality/articles/mindfulness-stress-relief.html"
+        "title": "What Makes Holistic Wellness Different",
+        "url": "./articles/client-article-pages/holistic-wellness-difference.html"
       },
       {
-        "title": "Seasonal Wellness and Natural Rhythms",
-        "url": "/rooted-vitality/articles/seasonal-wellness.html"
+        "title": "Building Long-Term Wellness Partnerships",
+        "url": "./articles/client-article-pages/long-term-partnerships.html"
       }
     ]
   },
   "practitioner": {
     "featured": [
       {
-        "title": "Understanding the Pay-Per-Lead Model",
-        "url": "/rooted-vitality/articles/pay-per-lead-basics.html",
-        "description": "Master the fundamentals of growing your holistic practice through qualified patient leads, proven lead generation strategies, and sustainable client acquisition on the Rooted Vitality platform."
+        "title": "Membership-Based Matchmaking",
+        "url": "./articles/practitioner-article-pages/membership-matchmaking.html",
+        "description": "Discover how Rooted Vitality's membership model connects you with unlimited client potential. You control your services, pricing, and availability. We handle the connections. Fair partnerships. Meaningful growth."
       },
       {
-        "title": "Building Your Winning Practitioner Profile",
-        "url": "/rooted-vitality/articles/building-your-profile.html",
-        "description": "Create a compelling holistic practitioner profile that showcases your expertise, attracts ideal clients, and generates quality leads through strategic positioning and authentic patient testimonials."
+        "title": "Managing Your Practice on Rooted Vitality",
+        "url": "./articles/practitioner-article-pages/managing-your-practice.html",
+        "description": "Discover all the tools available to manage your practice. Control your profile, specialties, coverage, and matching. Integrate with your favorite CRM. Everything you need in one place."
       }
     ],
     "other": [
       {
-        "title": "Lead Follow-Up Best Practices",
-        "url": "/rooted-vitality/articles/lead-followup-practices.html"
+        "title": "Match Follow-Up Best Practices",
+        "url": "./articles/practitioner-article-pages/match-follow-up-best-practices.html"
       },
       {
-        "title": "Measuring Success: Your ROI Dashboard",
-        "url": "/rooted-vitality/articles/measuring-roi.html"
+        "title": "Setting Up Your Travel Coverage",
+        "url": "./articles/practitioner-article-pages/setting-up-travel-coverage.html"
       },
       {
-        "title": "Pricing Strategies and Rate Cards",
-        "url": "/rooted-vitality/articles/pricing-strategies.html"
+        "title": "Setting Up Your Practitioner Profile",
+        "url": "./articles/practitioner-article-pages/setting-up-your-profile.html"
       },
       {
-        "title": "Building Trust Through Client Reviews",
-        "url": "/rooted-vitality/articles/importance-of-reviews.html"
+        "title": "Interacting with New Matches",
+        "url": "./articles/practitioner-article-pages/interacting-with-new-matches.html"
       },
       {
-        "title": "Earning Credentials & Certifications",
-        "url": "/rooted-vitality/articles/earning-credentials.html"
+        "title": "Choosing Your Specialties",
+        "url": "./articles/practitioner-article-pages/choosing-your-specialties.html"
       },
       {
-        "title": "Setting Your Service Area & Expanding Your Reach",
-        "url": "/rooted-vitality/articles/coverage-area-services.html"
+        "title": "CRM Integrations",
+        "url": "./articles/practitioner-article-pages/crm-integrations.html"
       }
     ]
   }

@@ -1,0 +1,139 @@
+<!--
+╔════════════════════════════════════════════════════════════════════╗
+║  ROOTED VITALITY, INC.                                             ║
+║  File: help-center/articles/practitioner-article-pages/setting-up-your-profile.html ║
+║  Purpose: Guide practitioners on creating a complete, compelling profile ║
+║  Holistic Wellness · Modern Connection Platform                    ║
+║  rootedvitality.com | 2025                                         ║
+╚════════════════════════════════════════════════════════════════════╝
+
+TABLE OF CONTENTS
+  1. HEAD: Meta, Fonts, Styles
+  2. BODY: Article Structure
+  3. SECTION 1: Why Profile Completeness Matters
+  4. SECTION 2: Building Your Profile Information
+  5. SECTION 3: Your Introduction Video
+  6. RELATED ARTICLES: Internal Links
+  7. SCRIPTS: Universal & Platform
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Learn how to create a complete practitioner profile on Rooted Vitality. Attract more clients by showcasing your expertise, experience, and authentic personality.">
+    <meta name="keywords" content="practitioner profile, profile setup, client visibility, profile video, directory ranking, wellness practitioner">
+    <meta name="author" content="Rooted Vitality">
+    
+    <title>Setting Up Your Practitioner Profile | Rooted Vitality Guide</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Universal Article Styles -->
+    <link rel="stylesheet" href="../styles/articles.css">
+    
+    <!-- Global Platform Styles (header, footer, background) -->
+    <link rel="stylesheet" href="../../../styles/styles.css">
+</head>
+
+<body data-article-type="practitioner" data-page-depth="4">
+    <!-- ========================================== -->
+    <!-- HEADER (INJECTED) -->
+    <!-- ========================================== -->
+    <header id="header-inject"></header>
+
+    <!-- ========================================== -->
+    <!-- BEGIN ARTICLE CONTENT -->
+    <!-- ========================================== -->
+    <main id="mainContent">
+        <!-- Back to Help Center Link (inside container for proper width) -->
+        <div class="container">
+            <div class="article-back-link">
+                <a href="../../index.html">← Back to Help Center</a>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SECTION 1: WHY PROFILE COMPLETENESS MATTERS -->
+        <!-- ========================================== -->
+        <section class="article-section">
+            <div class="container">
+                <h2>Why Profile Completeness Matters</h2>
+                
+                <p>Your profile is your first impression with every potential client. When clients are searching for their ideal practitioner, they review multiple matches to find the best fit. The information you share directly influences whether they'll reach out to you—and where your profile appears in their search results.</p>
+                
+                <h3>How Profile Completeness Affects Your Visibility</h3>
+                <p>Profile completeness is a key factor in how practitioners are ranked in our directory. When clients are evaluating matches, the system shows all available practitioners, but those with more complete profiles appear higher on the list. This means a fully completed profile gives you better visibility and more opportunities to connect with clients who are right for you.</p>
+                
+                <h3>Think of It as Your Professional Storefront</h3>
+                <p>Every section you complete tells clients something important about who you are and what you offer. A well-crafted profile says you're serious about your practice, organized, and thoughtful about how you communicate. It's an investment in being discovered by the clients you want to work with.</p>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- SECTION 2: BUILDING YOUR PROFILE -->
+        <!-- ========================================== -->
+        <section class="article-section">
+            <div class="container">
+                <h2>Building Your Profile</h2>
+                
+                <p>Each section you complete tells clients something important about who you are and what you offer. Complete as many as possible—each one contributes to your overall profile completeness and helps clients make informed decisions.</p>
+                
+                <h3>Share Your Background, Credentials, and Approach</h3>
+                <p>Tell your story: what drew you to this work, your certifications and training, and your wellness philosophy. Describe how you work and what clients can expect during sessions. Use warm, accessible language that reflects your authentic personality. Include your specialties, modalities, session length, recommended frequency, and whether you offer in-person, virtual, or both. Be transparent about your rates so clients know what to expect.</p>
+                
+                <h3>Your Introduction Video</h3>
+                <p>A brief video gives potential clients a chance to see and hear you. You don't need professional equipment—use your smartphone and natural lighting. In 1-2 minutes, introduce yourself, share what you're passionate about in your work, and invite them to reach out if they feel like a good fit. Authentic and genuine is far more powerful than polished. When clients can see and hear you, they get a much better sense of whether there's a connection, and many will reach out more readily.
+
+        <!-- ========================================== -->
+        <!-- RELATED ARTICLES SECTION -->
+        <!-- ========================================== -->
+        <section class="article-section">
+            <div class="container">
+                <h2>Learn More</h2>
+                <p>Explore these related guides to grow your practice on Rooted Vitality:</p>
+                <ul>
+                    <li><a href="/rooted-vitality/help-center/articles/practitioner-article-pages/match-follow-up-best-practices.html">Match Follow-Up Best Practices</a></li>
+                    <li><a href="/rooted-vitality/help-center/articles/practitioner-article-pages/first-consultation-guide.html">First Consultation Guide for Practitioners</a></li>
+                </ul>
+            </div>
+        </section>
+
+    </main>
+    <!-- ========================================== -->
+    <!-- END ARTICLE CONTENT -->
+    <!-- ========================================== -->
+
+    <!-- ========================================== -->
+    <!-- FOOTER (INJECTED) -->
+    <!-- ========================================== -->
+    <footer id="footer-inject"></footer>
+
+    <!-- Supabase JS Client (MUST be loaded first) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Path configuration for deep article pages (MUST RUN FIRST, BEFORE injections.js) -->
+    <script>
+        // For article pages at /help-center/articles/practitioner-article-pages/
+        // Set correct path prefix so injections.js fetches components from right location
+        window.ARTICLE_PATH_PREFIX = '../../../';
+    </script>
+
+    <!-- Authentication & Global Scripts (BEFORE injections.js) -->
+    <script src="../../../scripts/config.js"></script>
+    <script src="../../../scripts/authManager.js"></script>
+    
+    <!-- Universal Article Scripts -->
+    <script src="../scripts/articles.js"></script>
+    
+    <!-- Platform Global Scripts (must be after auth is set) -->
+    <script src="../../../injections.js"></script>
+    <link rel="stylesheet" href="../../../chat-bot/styles/chatbot.css">
+  <script src="../../../chat-bot/scripts/chatbot.js"></script>
+</body>
+
+</html>

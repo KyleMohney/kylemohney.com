@@ -206,8 +206,13 @@ const RootedVitality = {
             let isSubdirectory = false;
             let pathPrefix = './';
             
+            // Check if page has set a custom path prefix (for deep article pages) - HIGHEST PRIORITY
+            if (window.ARTICLE_PATH_PREFIX) {
+                pathPrefix = window.ARTICLE_PATH_PREFIX;
+                isSubdirectory = true;
+            }
             // Check if we're in /dashboard/pro/pages/ (three levels deep)
-            if (currentPath.includes('/dashboard/pro/pages/')) {
+            else if (currentPath.includes('/dashboard/pro/pages/')) {
                 isSubdirectory = true;
                 pathPrefix = '../../../';
             }
@@ -259,14 +264,17 @@ const RootedVitality = {
             
             // Replace absolute paths with correct relative paths based on current location
             if (isSubdirectory) {
-                // Determine correct path prefix for replacements
+                // Use the calculated pathPrefix for replacements (respects window.ARTICLE_PATH_PREFIX if set)
                 let replacementPrefix = pathPrefix;
                 
-                // For /dashboard/pro/ we need ../../
-                if (currentPath.includes('/dashboard/pro/')) {
-                    replacementPrefix = '../../';
-                } else {
-                    replacementPrefix = '../';
+                // Only override if we didn't use a custom path prefix
+                if (!window.ARTICLE_PATH_PREFIX) {
+                    // For /dashboard/pro/ we need ../../
+                    if (currentPath.includes('/dashboard/pro/')) {
+                        replacementPrefix = '../../';
+                    } else {
+                        replacementPrefix = '../';
+                    }
                 }
                 
                 // Replace absolute paths (/) with relative paths
@@ -278,9 +286,18 @@ const RootedVitality = {
             }
             // In root: paths remain as-is (/)
             
-            // Inject at top of body
+            // Find header-inject element if it exists on the page
+            const headerContainer = document.getElementById('header-inject');
+            
+            // Inject at top of body or into header-inject container
             if (document.body) {
-                document.body.insertAdjacentHTML('afterbegin', headerHTML);
+                if (headerContainer) {
+                    // If header-inject element exists, inject into it
+                    headerContainer.innerHTML = headerHTML;
+                } else {
+                    // Otherwise inject at beginning of body (legacy behavior)
+                    document.body.insertAdjacentHTML('afterbegin', headerHTML);
+                }
                 
                 // Mark the header with role and view for future reference
                 const injectedHeader = document.getElementById('rvHeader');
@@ -333,7 +350,11 @@ const RootedVitality = {
                         this.subscribeToNewMatches();
                         
                         // Subscribe to real-time notification updates (badge, dropdown list)
-                        this.subscribeToNotificationUpdates();
+                        // NOTE: For practitioner pages, this is handled by practitioner-notifications.js module
+                        // Only activate for client pages to avoid duplicate listeners
+                        if (role === 'client') {
+                            this.subscribeToNotificationUpdates();
+                        }
                         
                         // Load initial notifications to populate badge on page load
                         this.loadNotifications();
@@ -924,16 +945,80 @@ const RootedVitality = {
             const userRole = window.authManager?.getCurrentUser()?.role || 'client';
             const table = userRole === 'client' ? 'client_notifications' : 'practitioner_notifications';
             
-            const { error } = await window.supabaseClient
+            // Fetch the current user and their serial
+            const { data: { user } } = await window.supabaseClient.auth.getUser();
+            if (!user) {
+                console.error('[Rooted Vitality] No authenticated user');
+                return;
+            }
+            
+            // Get the serial number to include in the UPDATE filter (required by RLS policy)
+            let serialField, serialValue;
+            if (userRole === 'client') {
+                const { data: clientData } = await window.supabaseClient
+                    .from('clients')
+                    .select('serial_number')
+                    .eq('id', user.id)
+                    .single();
+                if (clientData) {
+                    serialField = 'client_serial';
+                    serialValue = clientData.serial_number;
+                }
+            } else {
+                const { data: practData } = await window.supabaseClient
+                    .from('practitioners')
+                    .select('serial_number')
+                    .eq('id', user.id)
+                    .single();
+                if (practData) {
+                    serialField = 'practitioner_serial';
+                    serialValue = practData.serial_number;
+                }
+            }
+            
+            // Build query with both id and serial filters (required by RLS)
+            let query = window.supabaseClient
                 .from(table)
                 .update({ is_read: true })
                 .eq('id', notifId);
+            
+            if (serialField && serialValue) {
+                query = query.eq(serialField, serialValue);
+            }
+            
+            const { error, data } = await query;
+            
+            // If direct update fails or returns no data, try the SECURITY DEFINER function
+            if (!error && (!data || data.length === 0)) {
+                
+                const functionName = userRole === 'client' 
+                  ? 'mark_client_notification_read'
+                  : 'mark_practitioner_notification_read';
+                
+                const { data: funcResult, error: funcError } = await window.supabaseClient
+                  .rpc(functionName, { p_notification_id: notifId });
+                
+                if (funcError) {
+                    console.error('[Rooted Vitality] Error marking notification as read:', funcError);
+                    return;
+                }
+                return;
+            }
             
             if (error) {
                 console.error('[Rooted Vitality] Error marking notification as read:', error);
                 return;
             }
-            this.loadNotifications(); // Refresh to update bell state
+            
+            console.log('[Rooted Vitality] Successfully marked notification as read. Data returned:', data);
+            
+            // If on practitioner page and PractitionerNotifications module is available, update it
+            if (window.PractitionerNotifications && typeof window.PractitionerNotifications.markAsRead === 'function') {
+              await window.PractitionerNotifications.markAsRead(notifId);
+            }
+            
+            // DO NOT reload - let the real-time listener handle UI update
+            // This prevents the flip-back bug where notifications revert to unread
         } catch (error) {
             console.error('[Rooted Vitality] Exception marking notification as read:', error);
         }
@@ -993,11 +1078,46 @@ const RootedVitality = {
             }
 
             if (!whereValue) {
+                console.error('[Rooted Vitality] whereValue is empty - cannot mark notifications as read');
                 return;
             }
 
-            // Update all unread notifications to read
-            const { error } = await window.supabaseClient
+            // Test if there are unread notifications to mark as read
+            const testSelect = await window.supabaseClient
+              .from(notificationTable)
+              .select('id, ' + whereField + ', is_read')
+              .eq(whereField, whereValue)
+              .eq('is_read', false);
+
+            if (testSelect.data && testSelect.data.length > 0) {
+              
+              // Call the server function that bypasses RLS
+              const functionName = userRole === 'client' 
+                ? 'mark_all_client_notifications_read'
+                : 'mark_all_practitioner_notifications_read';
+              
+              await window.supabaseClient
+                .rpc(functionName, { 
+                  p_client_serial: userRole === 'client' ? whereValue : undefined,
+                  p_practitioner_serial: userRole === 'practitioner' ? whereValue : undefined
+                });
+              return;
+            }
+
+            // Fallback: Update using direct query (if function didn't work)
+            if (testSelect.data && testSelect.data.length > 0) {
+              for (const notif of testSelect.data) {
+                await window.supabaseClient
+                  .from(notificationTable)
+                  .update({ is_read: true })
+                  .eq('id', notif.id)
+                  .eq(whereField, whereValue);
+              }
+              return;
+            }
+
+            // Update all unread notifications to read (fallback)
+            const { error, data: updatedData, status } = await window.supabaseClient
                 .from(notificationTable)
                 .update({ is_read: true })
                 .eq(whereField, whereValue)
@@ -1007,8 +1127,14 @@ const RootedVitality = {
                 console.error('[Rooted Vitality] Error marking all notifications as read:', error);
                 return;
             }
-            // Reload to update UI
-            this.loadNotifications();
+            
+            // If on practitioner page and PractitionerNotifications module is available, update it
+            if (window.PractitionerNotifications && typeof window.PractitionerNotifications.markAllAsRead === 'function') {
+              await window.PractitionerNotifications.markAllAsRead();
+            }
+            
+            // DO NOT reload - let the real-time listener handle UI update
+            // This prevents the flip-back bug where notifications revert to unread
         } catch (error) {
             console.error('[Rooted Vitality] Exception marking all notifications as read:', error);
         }
@@ -1037,11 +1163,26 @@ const RootedVitality = {
                 return;
             }
 
-            const practitionerSerial = user.user_metadata?.serial_number || currentUser?.serial_number;
+            // Get practitioner serial from practitioners table
+            const { data: practData, error: practError } = await window.supabaseClient
+                .from('practitioners')
+                .select('serial_number')
+                .eq('id', user.id)
+                .single();
+            
+            if (practError || !practData) {
+                console.error('[Realtime] Error fetching practitioner serial for matches:', practError);
+                return;
+            }
+            
+            const practitionerSerial = practData.serial_number;
             if (!practitionerSerial) {
                 return;
             }
+            
             // Subscribe to changes in project_practitioner_matches table
+            // NOTE: Notifications are created by window.notifyPractitionerOfNewMatch() in find-practitioners.js
+            // This subscription only refreshes the UI, does NOT duplicate notifications
             const subscription = window.supabaseClient
                 .channel(`matches:${practitionerSerial}`)
                 .on(
@@ -1053,47 +1194,30 @@ const RootedVitality = {
                         filter: `practitioner_serial=eq.${practitionerSerial}`
                     },
                     async (payload) => {
-                        // Get match details to create a notification
-                        const { data: matchData } = await window.supabaseClient
-                            .from('project_practitioner_matches')
-                            .select('*, projects(*)')
-                            .eq('id', payload.new.id)
-                            .single();
-
-                        if (matchData && matchData.projects) {
-                            // Create a notification for the new match
-                            const notificationTitle = `New Match: ${matchData.projects.title || 'Wellness Journey'}`;
-                            const notificationMessage = `You've been matched with a new client. Review the project to get started.`;
-
-                            const { error } = await window.supabaseClient
-                                .from('practitioner_notifications')
-                                .insert([{
-                                    practitioner_serial: practitionerSerial,
-                                    title: notificationTitle,
-                                    message: notificationMessage,
-                                    type: 'new_match',
-                                    link: '/dashboard/pro/pages/inbox.html',
-                                    is_read: false,
-                                    created_at: new Date().toISOString()
-                                }]);
-
-                            if (error) {
-                                console.error('[Rooted Vitality] Error creating match notification:', error);
-                            } else {
-                                // Update the notification bell immediately
-                                this.loadNotifications();
-                            }
+                        console.log('[Realtime] New match INSERT detected for:', practitionerSerial);
+                        
+                        // Just refresh notifications UI - the actual notification was created
+                        // by window.notifyPractitionerOfNewMatch() RPC in find-practitioners.js
+                        this.loadNotifications();
+                        
+                        // Trigger any page-specific handlers
+                        if (window.onNewMatchReceived) {
+                            window.onNewMatchReceived(payload.new);
                         }
                     }
                 )
-                .subscribe();
+                .subscribe((status) => {
+                    if (status === 'SUBSCRIBED') {
+                        console.log('[Realtime] Subscribed to new matches for:', practitionerSerial);
+                    }
+                });
 
             // Store subscription for cleanup if needed
             window.notificationSubscriptions = window.notificationSubscriptions || [];
             window.notificationSubscriptions.push(subscription);
 
         } catch (error) {
-            console.error('[Rooted Vitality] Error setting up match listener:', error);
+            console.error('[Realtime] Error setting up match listener:', error);
         }
     },
 
@@ -1136,8 +1260,21 @@ const RootedVitality = {
                 roleLabel = 'client';
             } else {
                 table = 'practitioner_notifications';
-                serial = user.user_metadata?.serial_number || currentUser?.serial_number;
                 roleLabel = 'practitioner';
+                
+                // Get practitioner serial from practitioners table - MUST fetch from DB
+                const { data: practData, error: practError } = await window.supabaseClient
+                    .from('practitioners')
+                    .select('serial_number')
+                    .eq('id', user.id)
+                    .single();
+                
+                if (practError || !practData) {
+                    console.error('[Realtime] Error fetching practitioner serial:', practError);
+                    return;
+                }
+                
+                serial = practData.serial_number;
             }
 
             if (!serial) {
@@ -1157,7 +1294,7 @@ const RootedVitality = {
                             : `practitioner_serial=eq.${serial}`
                     },
                     async (payload) => {
-                        
+                        console.log('[Realtime] Notification change detected:', payload.eventType, 'is_read:', payload.new?.is_read);
                         
                         // For new notifications (INSERT), immediately update badge and dropdown
                         if (payload.eventType === 'INSERT' && payload.new) {
@@ -1168,7 +1305,7 @@ const RootedVitality = {
                                 const newCount = currentCount + 1;
                                 badge.textContent = newCount;
                                 badge.classList.add('active');
-                                badge.style.display = 'block';
+                                // CSS handles display via .active class
                             }
 
                             // Update bell icon color to gold to indicate unread
@@ -1213,9 +1350,51 @@ const RootedVitality = {
                                 }
                             }
                         } 
-                        // For any other changes (UPDATE, DELETE), reload the full list
-                        else {
-                            this.loadNotifications();
+                        // For UPDATE events (mark as read/unread), update the UI directly without reloading
+                        else if (payload.eventType === 'UPDATE' && payload.new) {
+                            console.log('[Realtime] Updating notification UI for:', payload.new.id, 'is_read:', payload.new.is_read);
+                            
+                            // Find the notification element in the dropdown (if visible)
+                            const notifElement = document.querySelector(`.rv-notifications-item[data-notif-id="${payload.new.id}"]`);
+                            if (notifElement) {
+                                if (payload.new.is_read) {
+                                    notifElement.classList.remove('unread');
+                                    notifElement.classList.add('read');
+                                } else {
+                                    notifElement.classList.remove('read');
+                                    notifElement.classList.add('unread');
+                                }
+                            }
+                            
+                            // Always recalculate badge count from visible items in dropdown
+                            // This ensures badge reflects current state regardless of page state
+                            const unreadCount = document.querySelectorAll('.rv-notifications-item.unread').length;
+                            const badge = document.querySelector('.rv-notification-badge');
+                            const bellIcon = document.querySelector('.rv-bell-icon');
+                            
+                            if (badge) {
+                                if (unreadCount > 0) {
+                                    badge.textContent = unreadCount;
+                                    badge.classList.add('active');
+                                    if (bellIcon) {
+                                        bellIcon.style.color = '#d4c47c'; // Gold for unread
+                                    }
+                                } else {
+                                    badge.textContent = '0';
+                                    badge.classList.remove('active');
+                                    if (bellIcon) {
+                                        bellIcon.style.color = 'currentColor'; // Normal color
+                                    }
+                                }
+                            }
+                        }
+                        // For DELETE events, remove from the list
+                        else if (payload.eventType === 'DELETE' && payload.old) {
+                            console.log('[Realtime] Removing deleted notification:', payload.old.id);
+                            const notifElement = document.querySelector(`.rv-notifications-item[data-notif-id="${payload.old.id}"]`);
+                            if (notifElement) {
+                                notifElement.remove();
+                            }
                         }
                     }
                 )
@@ -1271,7 +1450,20 @@ const RootedVitality = {
             } else {
                 notificationTable = 'practitioner_notifications';
                 whereField = 'practitioner_serial';
-                whereValue = user.user_metadata?.serial_number || currentUser?.serial_number;
+                
+                // Get practitioner serial from practitioners table - MUST fetch from DB
+                const { data: practData, error: practError } = await window.supabaseClient
+                    .from('practitioners')
+                    .select('serial_number')
+                    .eq('id', user.id)
+                    .single();
+                
+                if (practError || !practData) {
+                    console.error('[Rooted Vitality] Error fetching practitioner serial in loadNotifications:', practError);
+                    return;
+                }
+                
+                whereValue = practData.serial_number;
             }
 
             if (!whereValue) {
@@ -1285,27 +1477,33 @@ const RootedVitality = {
                 .order('created_at', { ascending: false });
 
             if (error) {
+                console.error('[Rooted Vitality] Error loading notifications:', error);
                 return;
             }
+
+
 
             // Update bell color based on unread count
             const unreadCount = data?.filter(n => !n.is_read).length || 0;
             const bellIcon = document.querySelector('.rv-bell-icon');
             const badge = document.querySelector('.rv-notification-badge');
             
-            if (bellIcon) {
+            if (badge) {
                 if (unreadCount > 0) {
-                    bellIcon.style.color = '#d4c47c'; // Gold for unread
-                    if (badge) {
-                        badge.textContent = unreadCount;
-                        badge.style.display = 'block';
-                    }
+                    badge.textContent = unreadCount;
+                    badge.classList.add('active');
+                    // CSS handles display via .active class
                 } else {
-                    bellIcon.style.color = 'currentColor'; // #fbf7ec/normal
-                    if (badge) {
-                        badge.style.display = 'none';
-                    }
+                    badge.textContent = '0';
+                    badge.classList.remove('active');
+                    // CSS hides on .active removal
                 }
+            }
+            
+            if (bellIcon && unreadCount > 0) {
+                bellIcon.style.color = '#d4c47c'; // Gold for unread
+            } else if (bellIcon) {
+                bellIcon.style.color = 'currentColor'; // Normal color
             }
 
             // Render notifications list
@@ -1378,19 +1576,16 @@ const RootedVitality = {
             } else {
                 notificationTable = 'practitioner_notifications';
                 whereField = 'practitioner_serial';
-                whereValue = user.user_metadata?.serial_number || currentUser?.serial_number;
-
-                // For practitioners, also get it from the practitioners table if needed
-                if (!whereValue) {
-                    const { data: practData } = await window.supabaseClient
-                        .from('practitioners')
-                        .select('serial_number')
-                        .eq('id', user.id)
-                        .single();
-                    
-                    if (practData) {
-                        whereValue = practData.serial_number;
-                    }
+                
+                // Get practitioner serial from practitioners table
+                const { data: practData } = await window.supabaseClient
+                    .from('practitioners')
+                    .select('serial_number')
+                    .eq('id', user.id)
+                    .single();
+                
+                if (practData) {
+                    whereValue = practData.serial_number;
                 }
             }
 
@@ -1430,7 +1625,7 @@ const RootedVitality = {
                 )
                 .subscribe((status) => {
                     if (status === 'SUBSCRIBED') {
-                        console.log(`[Realtime] Successfully subscribed to ${channelName}`);
+                        // Subscribed to realtime channel
                     } else if (status === 'CLOSED') {
                         console.warn(`[Realtime] Channel ${channelName} closed`);
                     } else if (status === 'CHANNEL_ERROR') {
@@ -1492,109 +1687,6 @@ const RootedVitality = {
         }
     },
 
-    /**
-     * Subscribe to new match notifications for practitioners
-     */
-    subscribeToNewMatches: async function() {
-        if (!window.supabaseClient) {
-            return;
-        }
-
-        try {
-            const { data: { user } } = await window.supabaseClient.auth.getUser();
-            if (!user) {
-                return;
-            }
-
-            const currentUser = window.authManager?.getCurrentUser?.();
-            const userRole = currentUser?.role || localStorage.getItem('rvUserRole') || 'practitioner';
-
-            // Only practitioners care about new matches
-            if (userRole !== 'practitioner') {
-                return;
-            }
-
-            let practitionerSerial = user.user_metadata?.serial_number || currentUser?.serial_number;
-            
-            if (!practitionerSerial) {
-                const { data: practData } = await window.supabaseClient
-                    .from('practitioners')
-                    .select('serial_number')
-                    .eq('id', user.id)
-                    .single();
-                
-                if (practData) {
-                    practitionerSerial = practData.serial_number;
-                }
-            }
-
-            if (!practitionerSerial) {
-                return;
-            }
-
-            // Subscribe to new matches
-            const matchChannel = window.supabaseClient
-                .channel(`matches:${practitionerSerial}`)
-                .on('postgres_changes',
-                    {
-                        event: 'INSERT',
-                        schema: 'public',
-                        table: 'project_practitioner_matches',
-                        filter: `practitioner_serial=eq.${practitionerSerial}`
-                    },
-                    (payload) => {
-                        console.log('[Realtime] New match received:', payload);
-                        
-                        // Create and show notification
-                        const notification = {
-                            title: 'New Client Match',
-                            message: 'A new wellness client request matches your services',
-                            is_read: false
-                        };
-                        
-                        this.showNotificationToast(notification);
-                        
-                        // Reload notifications
-                        this.loadNotifications();
-                        
-                        // Trigger any page-specific handlers
-                        if (window.onNewMatchReceived) {
-                            window.onNewMatchReceived(payload.new);
-                        }
-                    }
-                )
-                .subscribe((status) => {
-                    if (status === 'SUBSCRIBED') {
-                        console.log(`[Realtime] Subscribed to new matches for ${practitionerSerial}`);
-                    }
-                });
-
-            if (!window._rvNotificationChannels) {
-                window._rvNotificationChannels = [];
-            }
-            window._rvNotificationChannels.push(matchChannel);
-
-        } catch (error) {
-            console.error('[Realtime] Error subscribing to new matches:', error);
-        }
-    },
-
-    /**
-     * Subscribe to notification updates for real-time badge/list updates
-     */
-    subscribeToNotificationUpdates: async function() {
-        if (!window.supabaseClient) {
-            return;
-        }
-
-        try {
-            // Initialize the comprehensive real-time notification system
-            await this.initializeRealtimeNotifications();
-        } catch (error) {
-            console.error('[Realtime] Error subscribing to notification updates:', error);
-        }
-    },
-
     initNotificationsMenu: function() {
         const notificationsBtn = document.querySelector('.rv-notifications-btn');
         const notificationsDropdown = document.querySelector('.rv-notifications-dropdown');
@@ -1618,13 +1710,13 @@ const RootedVitality = {
                     bellIcon.style.color = 'currentColor'; // Reset to normal color
                 }
                 if (badge) {
-                    badge.style.display = 'none';
-                    badge.textContent = '';
+                    badge.classList.remove('active');
+                    badge.textContent = '0';
+                    // CSS handles display via .active class
                 }
                 
-                // Then mark all as read and load notifications in background
+                // Mark all as read (which will reload notifications when complete)
                 this.markAllNotificationsAsRead();
-                this.loadNotifications();
             }
         });
         
@@ -1842,6 +1934,9 @@ const RootedVitality = {
             return;
         }
         
+        // Find the footer-inject element (if it exists on the page)
+        const footerContainer = document.getElementById('footer-inject');
+        
         // Detect if we're in a subdirectory and adjust paths for links and images
         const currentPath = window.location.pathname;
         
@@ -1850,17 +1945,16 @@ const RootedVitality = {
         const pathAfterBase = baseIndex !== -1 ? currentPath.substring(baseIndex + '/rooted-vitality/'.length) : currentPath;
         const slashCount = (pathAfterBase.match(/\//g) || []).length;
         
-        // Build pathPrefix based on depth
-        let pathPrefix = './';
-        if (slashCount >= 3) {
-            // 3+ levels deep (e.g., /dashboard/pro/pages/profile.html)
-            pathPrefix = '../../../';
-        } else if (slashCount >= 2) {
-            // 2 levels deep (e.g., /dashboard/pro/index.html or /articles/page.html)
-            pathPrefix = '../../';
-        } else if (slashCount >= 1) {
-            // 1 level deep (e.g., /dashboard/index.html)
-            pathPrefix = '../';
+        // Build pathPrefix based on depth, but prefer window.ARTICLE_PATH_PREFIX if set
+        let pathPrefix = window.ARTICLE_PATH_PREFIX || './';
+        if (!window.ARTICLE_PATH_PREFIX) {
+            if (slashCount >= 3) {
+                pathPrefix = '../../../';
+            } else if (slashCount >= 2) {
+                pathPrefix = '../../';
+            } else if (slashCount >= 1) {
+                pathPrefix = '../';
+            }
         }
         const logoPath = `${pathPrefix}assets/logo_trimmed.png`;
         
@@ -1928,8 +2022,12 @@ const RootedVitality = {
         </footer>
         `;
         
-        // Inject footer at end of body
-        document.body.insertAdjacentHTML('beforeend', footerHTML);
+        // Inject footer into footer-inject container if it exists, otherwise at end of body
+        if (footerContainer) {
+            footerContainer.innerHTML = footerHTML;
+        } else {
+            document.body.insertAdjacentHTML('beforeend', footerHTML);
+        }
         this.log('Rooted Vitality Footer injected successfully');
     },
 

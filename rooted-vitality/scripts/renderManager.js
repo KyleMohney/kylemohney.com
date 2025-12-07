@@ -8,16 +8,23 @@
 ╚════════════════════════════════════════════════════════════════════╝
 
  TABLE OF CONTENTS
-   1. LOAD ARTICLE DATA
-   2. RENDER FEATURED HEROS
-   3. RENDER ARTICLES IN INLINE SECTION
-   4. RENDER ARTICLE GRID (MAIN SECTION)
-   5. UPDATE TAB STATE & RE-RENDER
-   6. HANDLE SEARCH INPUT
+   1. STATE VARIABLES
+   2. LOAD ARTICLE DATA
+   3. RENDER FEATURED HEROS
+   4. RENDER ARTICLES IN INLINE SECTION
+   5. RENDER ARTICLE GRID (MAIN SECTION)
+   6. UPDATE TAB STATE & RE-RENDER
+   7. HANDLE SEARCH INPUT
 */
 
 // ======================================================
-// 1. LOAD ARTICLE DATA
+// 1. STATE VARIABLES
+// ======================================================
+let currentTab = 'client'; // Default to client tab
+let articleData = {};
+
+// ======================================================
+// 2. LOAD ARTICLE DATA
 // ======================================================
 async function loadArticleData() {
   try {
@@ -30,7 +37,7 @@ async function loadArticleData() {
 }
 
 // ======================================================
-// 2. RENDER FEATURED HEROS
+// 3. RENDER FEATURED HEROS
 // ======================================================
 function renderFeaturedHeros() {
   const tabData = articleData[currentTab];
@@ -56,8 +63,8 @@ function renderFeaturedHeros() {
       searchInput.type = 'text';
       searchInput.className = 'search-bar';
       searchInput.id = 'searchInput-inline';
-      searchInput.placeholder = 'Search help articlesâ€¦';
-      searchInput.setAttribute('aria-label', 'Search help articles');
+      searchInput.placeholder = 'Find articles';
+      searchInput.setAttribute('aria-label', 'Search articles');
       
       const articlesGrid = document.createElement('div');
       articlesGrid.className = 'articles-grid';
@@ -146,7 +153,7 @@ function renderFeaturedHeros() {
 }
 
 // ======================================================
-// 3. RENDER ARTICLES IN INLINE SECTION
+// 4. RENDER ARTICLES IN INLINE SECTION
 // ======================================================
 function renderArticlesInline(gridContainer, searchInput) {
   const tabData = articleData[currentTab];
@@ -180,7 +187,7 @@ function renderArticlesInline(gridContainer, searchInput) {
 }
 
 // ======================================================
-// 4. RENDER ARTICLE GRID (MAIN SECTION)
+// 5. RENDER ARTICLE GRID (MAIN SECTION)
 // ======================================================
 function renderArticles() {
   const tabData = articleData[currentTab];
@@ -207,7 +214,7 @@ function renderArticles() {
 }
 
 // ======================================================
-// 5. UPDATE TAB STATE & RE-RENDER
+// 6. UPDATE TAB STATE & RE-RENDER
 // ======================================================
 function setCurrentTab(tabType) {
   currentTab = tabType;
@@ -218,7 +225,7 @@ function setCurrentTab(tabType) {
 }
 
 // ======================================================
-// 6. HANDLE SEARCH INPUT
+// 7. HANDLE SEARCH INPUT
 // ======================================================
 function handleSearch() {
   renderArticles();

@@ -400,7 +400,7 @@ body { font-family: var(--font-sans); color: var(--color-text); background: #fbf
 }
 
 #payments-section {
-    padding: var(--spacing-lg);
+    padding: 0;
     background: #fbf7ec;
     border-bottom: 1px solid var(--color-border);
 }
@@ -440,6 +440,44 @@ body { font-family: var(--font-sans); color: var(--color-text); background: #fbf
     box-shadow: 0 2px 8px rgba(119, 136, 62, 0.1);
 }
 
+/* Payment & Insurance Grid Layout (Side by Side) */
+.payment-insurance-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg);
+}
+
+.payment-insurance-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.payment-insurance-column.hidden {
+    display: none;
+}
+
+.payment-insurance-card {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+}
+
+.payment-insurance-header-group {
+    margin-bottom: var(--spacing-md);
+    padding: 0;
+}
+
+.payment-insurance-title {
+    display: inline-block;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--color-dark);
+    font-family: var(--font-serif);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 3px solid var(--color-secondary);
+}
+
 .section-title-centered {
     display: block;
     text-align: center;
@@ -452,6 +490,111 @@ body { font-family: var(--font-sans); color: var(--color-text); background: #fbf
     font-size: 1rem;
     line-height: 1.7;
     color: var(--color-text);
+}
+
+/* Credentials & Connect Grid Layout (Side by Side) */
+.credentials-connect-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg);
+}
+
+.credentials-connect-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.credentials-connect-column.hidden {
+    display: none;
+}
+
+.credentials-connect-card {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+}
+
+.credentials-connect-header-group {
+    margin-bottom: var(--spacing-md);
+    padding: 0;
+}
+
+.credentials-connect-title {
+    display: inline-block;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--color-dark);
+    font-family: var(--font-serif);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 3px solid var(--color-secondary);
+}
+
+/* FAQ & Credentials Grid Layout (Side by Side) */
+.faq-credentials-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg);
+}
+
+.faq-credentials-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.faq-credentials-column.hidden {
+    display: none;
+}
+
+.faq-credentials-card {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+}
+
+.faq-credentials-header-group {
+    margin-bottom: var(--spacing-md);
+    padding: 0;
+}
+
+.faq-credentials-title {
+    display: inline-block;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--color-dark);
+    font-family: var(--font-serif);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 3px solid var(--color-secondary);
+}
+
+/* Connect Card Styling */
+#connect-section {
+    padding: 0;
+    background: #fbf7ec;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.connect-card {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+}
+
+.connect-header-group {
+    margin-bottom: var(--spacing-md);
+    padding: 0;
+}
+
+.connect-title {
+    display: inline-block;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--color-dark);
+    font-family: var(--font-serif);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 3px solid var(--color-secondary);
 }
 
 /* ============================================
@@ -556,6 +699,50 @@ body { font-family: var(--font-sans); color: var(--color-text); background: #fbf
 }
 
 #about-section .card-content {
+    padding: 0;
+    gap: var(--spacing-md);
+}
+
+/* About & Approach Grid Layout (Side by Side) */
+.about-approach-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg);
+}
+
+.about-approach-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.about-approach-column.hidden {
+    display: none;
+}
+
+.about-approach-column .card {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+}
+
+.about-approach-column .card-header {
+    padding: 0;
+    background: transparent;
+    border-bottom: none;
+}
+
+.about-approach-column .card-title {
+    display: inline-block;
+    margin: 0 0 var(--spacing-md) 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--color-dark);
+    font-family: var(--font-serif);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 3px solid var(--color-secondary);
+}
+
+.about-approach-column .card-content {
     padding: 0;
     gap: var(--spacing-md);
 }
@@ -1198,6 +1385,30 @@ body { font-family: var(--font-sans); color: var(--color-text); background: #fbf
     font-weight: 500;
 }
 
+.review-photos-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.review-photo-thumbnail {
+    width: 80px !important;
+    height: 80px !important;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid rgba(92, 154, 114, 0.15);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: block;
+}
+
+.review-photo-thumbnail:hover {
+    border-color: #d4c47c;
+    box-shadow: 0 2px 8px rgba(92, 154, 114, 0.2);
+    transform: scale(1.05);
+}
+
 .no-reviews-state {
     padding: 2rem;
     text-align: center;
@@ -1219,6 +1430,10 @@ body { font-family: var(--font-sans); color: var(--color-text); background: #fbf
     z-index: 1000;
     align-items: center;
     justify-content: center;
+}
+
+.image-modal.visible {
+    display: flex;
 }
 
 .image-modal-content {
@@ -1404,6 +1619,26 @@ body { font-family: var(--font-sans); color: var(--color-text); background: #fbf
    ============================================ */
 
 @media (max-width: 768px) {
+    .about-approach-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+    }
+
+    .payment-insurance-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+    }
+
+    .credentials-connect-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+    }
+
+    .faq-credentials-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+    }
+
     .hero-content {
         grid-template-columns: 1fr;
         align-items: center;

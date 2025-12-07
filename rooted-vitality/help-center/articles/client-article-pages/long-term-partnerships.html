@@ -1,0 +1,155 @@
+<!--
+╔════════════════════════════════════════════════════════════════════╗
+║  ROOTED VITALITY, INC.                                             ║
+║  File: help-center/articles/client-article-pages/long-term-partnerships.html ║
+║  Purpose: Guide clients on building sustainable wellness relationships ║
+║  Holistic Wellness · Modern Connection Platform                    ║
+║  rootedvitality.com | 2025                                         ║
+╚════════════════════════════════════════════════════════════════════╝
+
+TABLE OF CONTENTS
+  1. HEAD: Meta, Fonts, Styles
+  2. BODY: Article Structure
+  3. SECTION 1: The Power of Ongoing Relationships
+  4. SECTION 2: Starting Your Partnership
+  5. SECTION 3: Deepening the Connection Over Time
+  6. SECTION 4: Supporting Different Aspects of Wellness
+  7. RELATED ARTICLES: Internal Links
+  8. SCRIPTS: Universal & Platform
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Learn how to build lasting wellness partnerships with practitioners. Discover why long-term relationships create deeper healing and lasting results.">
+    <meta name="keywords" content="wellness partnership, long-term healing, practitioner relationships, holistic support, sustainable wellness">
+    <meta name="author" content="Rooted Vitality">
+    
+    <title>Building Long-Term Wellness Partnerships | Rooted Vitality Guide</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Universal Article Styles -->
+    <link rel="stylesheet" href="../styles/articles.css">
+    
+    <!-- Global Platform Styles (header, footer, background) -->
+    <link rel="stylesheet" href="../../../styles/styles.css">
+</head>
+
+<body data-article-type="client" data-page-depth="4">
+    <!-- ========================================== -->
+    <!-- HEADER (INJECTED) -->
+    <!-- ========================================== -->
+    <header id="header-inject"></header>
+
+    <!-- ========================================== -->
+    <!-- BEGIN ARTICLE CONTENT -->
+    <!-- ========================================== -->
+    <main id="mainContent">
+        <!-- Back to Help Center Link (inside container for proper width) -->
+        <div class="container">
+            <div class="article-back-link">
+                <a href="../../index.html">← Back to Help Center</a>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SECTION 1: WHY LONG-TERM MATTERS -->
+        <!-- ========================================== -->
+        <section class="article-section">
+            <div class="container">
+                <h2>Why Long-Term Partnerships Matter</h2>
+                
+                <p>Long-term relationships with practitioners create deeper healing than one-off consultations. When practitioners work with you over time, they understand your patterns, responses, and unique needs—allowing them to provide increasingly personalized support.</p>
+                
+                <ul>
+                    <li><strong>Trust and Continuity:</strong> Your practitioner remembers your history and can build on previous progress</li>
+                    <li><strong>Deeper Results:</strong> Consistent, ongoing work often produces more profound changes than sporadic visits</li>
+                    <li><strong>Pattern Recognition:</strong> Practitioners notice seasonal cycles and triggers that might not be obvious in a single session</li>
+                    <li><strong>Adaptive Care:</strong> As your goals evolve, your practitioner adjusts their approach to meet your changing needs</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- SECTION 2: BUILDING YOUR PARTNERSHIP -->
+        <!-- ========================================== -->
+        <section class="article-section">
+            <div class="container">
+                <h2>Building Your Partnership</h2>
+                
+                <p>Start by finding the right match. Take time with your initial care requests and consultations. During early sessions, discuss your wellness goals, desired frequency of meetings, and what success looks like.</p>
+                
+                <p>Commit to consistency. Regular sessions—whether weekly, monthly, or seasonally—create the conditions for real transformation. Many practitioners can recommend optimal frequency based on your specific goals.</p>
+                
+                <p>As your relationship develops, share context about your life and wellness experiences. Keep notes from sessions to track progress. Over time, you'll naturally develop deeper conversations and explore new frontiers in your wellness journey.</p>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- SECTION 3: MULTIPLE PRACTITIONERS -->
+        <!-- ========================================== -->
+        <section class="article-section">
+            <div class="container">
+                <h2>Working with Multiple Practitioners</h2>
+                
+                <p>Many clients benefit from working with different practitioners for different aspects of wellness. You might use acupuncture for physical balance, herbalism for seasonal support, and coaching for lifestyle goals. This integrated approach creates more comprehensive wellness support over time.</p>
+                
+                <p>Your wellness needs naturally evolve. You might work intensively with one practitioner for a specific goal, then maintain that relationship while exploring new modalities with others. This rhythm of focus and exploration deepens your overall wellness.</p>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- RELATED ARTICLES SECTION -->
+        <!-- ========================================== -->
+        <section class="article-section">
+            <div class="container">
+                <h2>Learn More</h2>
+                <p>Explore these related guides to support your wellness journey:</p>
+                <ul>
+                    <li><a href="/rooted-vitality/help-center/articles/client-article-pages/creating-care-request.html">Understanding Care Requests</a></li>
+                    <li><a href="/rooted-vitality/help-center/articles/client-article-pages/first-consultation.html">Your First Consultation</a></li>
+                    <li><a href="/rooted-vitality/help-center/articles/client-article-pages/holistic-wellness-difference.html">What Makes Holistic Wellness Different</a></li>
+                </ul>
+            </div>
+        </section>
+
+    </main>
+    <!-- ========================================== -->
+    <!-- END ARTICLE CONTENT -->
+    <!-- ========================================== -->
+
+    <!-- ========================================== -->
+    <!-- FOOTER (INJECTED) -->
+    <!-- ========================================== -->
+    <footer id="footer-inject"></footer>
+
+    <!-- Supabase JS Client (MUST be loaded first) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Path configuration for deep article pages (MUST RUN FIRST, BEFORE injections.js) -->
+    <script>
+        // For article pages at /help-center/articles/client-article-pages/
+        // Set correct path prefix so injections.js fetches components from right location
+        window.ARTICLE_PATH_PREFIX = '../../../';
+    </script>
+
+    <!-- Authentication & Global Scripts (BEFORE injections.js) -->
+    <script src="../../../scripts/config.js"></script>
+    <script src="../../../scripts/authManager.js"></script>
+    
+    <!-- Universal Article Scripts -->
+    <script src="../scripts/articles.js"></script>
+    
+    <!-- Platform Global Scripts (must be after auth is set) -->
+    <script src="../../../injections.js"></script>
+    <link rel="stylesheet" href="../../../chat-bot/styles/chatbot.css">
+  <script src="../../../chat-bot/scripts/chatbot.js"></script>
+</body>
+
+</html>

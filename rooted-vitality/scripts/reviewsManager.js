@@ -189,22 +189,45 @@ let reviewsManager = {
       if (existingReview) {
         console.log('[Reviews] Found existing review:', existingReview);
 
-        // Show message that review already exists
         const form = document.getElementById('review-form');
         const submitBtn = document.getElementById('btn-submit-review');
         if (form && submitBtn) {
+          // Remove any existing message first (avoid duplicates)
+          const oldMessage = form.querySelector('.review-form__message');
+          if (oldMessage) oldMessage.remove();
+
           // Store the existing review info
           this.currentReview.existingReviewId = existingReview.id;
           this.currentReview.isUpdating = true;
           
-          // Change form state
+          // Pre-fill form with existing review data
+          const reviewTextEl = document.getElementById('review-text');
+          if (reviewTextEl) {
+            reviewTextEl.value = existingReview.review_text;
+            const charCount = document.getElementById('char-count');
+            if (charCount) charCount.textContent = `${existingReview.review_text.length} / 1000`;
+          }
+
+          // Set rating stars
+          const ratingInput = document.getElementById('review-rating');
+          if (ratingInput) ratingInput.value = existingReview.rating;
+          this.currentReview.rating = existingReview.rating;
+          document.querySelectorAll('.star-btn').forEach((btn, index) => {
+            if (index < existingReview.rating) {
+              btn.classList.add('star-btn--active');
+            } else {
+              btn.classList.remove('star-btn--active');
+            }
+          });
+          
+          // Create and insert message at the top
           const formMessage = document.createElement('div');
           formMessage.className = 'review-form__message review-form__message--info';
           formMessage.innerHTML = `
             <p><strong>You already left a review:</strong></p>
             <p style="margin: 8px 0 0 0; font-size: 0.9rem;">${escapeHtmlReview(existingReview.review_text.substring(0, 100))}...</p>
             <p style="margin: 8px 0 0 0; font-size: 0.85rem; color: #999;">Rating: ${existingReview.rating} / 5 stars</p>
-            <p style="margin: 8px 0 0 0; font-size: 0.85rem; font-style: italic;">You can submit a new review to update it.</p>
+            <p style="margin: 8px 0 0 0; font-size: 0.85rem; font-style: italic;">Edit below to update your review.</p>
           `;
           
           // Insert at the top of the form
@@ -222,7 +245,7 @@ let reviewsManager = {
       return false; // No review found
     } catch (error) {
       if (error.code !== 'PGRST116') { // PGRST116 = no rows returned
-
+        console.error('[Reviews] Exception in checkForExistingReview:', error);
       }
       return false;
     }
@@ -448,9 +471,9 @@ let reviewsManager = {
       let clientFirstName = this.currentReview.clientFirstName || '';
       let clientLastName = this.currentReview.clientLastName || '';
       
-      // Format client name intelligently
+      // Format client name intelligently - store display format for client_name field
       if (clientFirstName && clientLastName) {
-        clientName = `${clientFirstName[0]}. ${clientLastName}`;
+        clientName = `${clientFirstName} ${clientLastName[0].toUpperCase()}`;
       } else if (clientLastName) {
         clientName = clientLastName;
       } else if (clientFirstName) {

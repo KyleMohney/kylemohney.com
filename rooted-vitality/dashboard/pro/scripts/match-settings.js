@@ -151,9 +151,6 @@ function populateAvailabilityTable() {
       <td class="col-time">
         <input type="time" class="time-input time-close" value="17:00" ${isDisabled}>
       </td>
-      <td class="col-notes">
-        <input type="text" class="notes-input" placeholder="e.g., Lunch 12-1pm" ${isDisabled}>
-      </td>
     `;
     tbody.appendChild(tr);
   });
@@ -184,18 +181,17 @@ async function saveAvailabilitySettings() {
       schedule[day] = {
         available: available,
         open: available && timeOpen?.value ? timeOpen.value : null,
-        close: available && timeClose?.value ? timeClose.value : null,
-        notes: null
+        close: available && timeClose?.value ? timeClose.value : null
       };
     });
-    
-    // Add timezone to schedule
-    schedule.timezone = timezone;
     
     if (!window.matchSettingsManager) {
       showToast('Error: Settings manager not ready. Please refresh the page.', 'error');
       return;
     }
+    
+    // Update timezone separately
+    await window.matchSettingsManager.updateTimezone(timezone);
     
     // Update via manager
     await window.matchSettingsManager.updateAvailabilitySchedule(schedule);
@@ -225,11 +221,12 @@ async function loadAvailabilityIntoUI() {
     // Handle both old format (flat) and new format (with week property)
     let weekData = schedule.week || schedule;
 
-    // Load timezone if available
-    if (schedule.timezone) {
+    // Load timezone from practitioners data, not from schedule
+    const practitioners = window.matchSettingsManager.practitioners;
+    if (practitioners?.timezone) {
       const tzSelect = document.getElementById('timezone-select');
       if (tzSelect) {
-        tzSelect.value = schedule.timezone;
+        tzSelect.value = practitioners.timezone;
       }
     }
 
@@ -298,6 +295,17 @@ let currentPractitionerId = null;
 let allCategories = [];
 let activeCategories = [];
 window.matchSettingsManager = null;
+
+// Expose activeCategories and allCategories to window for use in other scripts
+Object.defineProperty(window, 'activeCategories', {
+  get: function() { return activeCategories; },
+  set: function(val) { activeCategories = val; }
+});
+
+Object.defineProperty(window, 'allCategories', {
+  get: function() { return allCategories; },
+  set: function(val) { allCategories = val; }
+});
 
 /**
  * Initialize the Match Settings page
@@ -532,6 +540,8 @@ async function loadSettingsIntoUI() {
           subcategories: [],
           active: false,
           price_per_service: null,
+          price_range_min: null,
+          price_range_max: null,
           serviceIds: [],
           requiresLicense: categoryWithService.requiresLicense,
           requiresCertification: categoryWithService.requiresCertification
@@ -547,6 +557,12 @@ async function loadSettingsIntoUI() {
       }
       if (s.price_per_service) {
         category.price_per_service = s.price_per_service;
+      }
+      if (s.price_range_min) {
+        category.price_range_min = s.price_range_min;
+      }
+      if (s.price_range_max) {
+        category.price_range_max = s.price_range_max;
       }
       if (s.is_active === true) {
         category.active = true;
@@ -1645,9 +1661,14 @@ async function savePreferencesModal() {
     const checkboxes = document.querySelectorAll('#subcategories-list input[type="checkbox"]:checked');
     const selectedSubs = Array.from(checkboxes).map(cb => cb.getAttribute('data-subcategory'));
     
-    // Get price from modal input
+    // Get price from modal inputs
     const priceInput = document.getElementById('modal-price-input');
+    const priceMinInput = document.getElementById('modal-price-min-input');
+    const priceMaxInput = document.getElementById('modal-price-max-input');
+    
     const price = priceInput.value ? parseFloat(priceInput.value) : null;
+    const priceMin = priceMinInput.value ? parseFloat(priceMinInput.value) : null;
+    const priceMax = priceMaxInput.value ? parseFloat(priceMaxInput.value) : null;
     
     const active = activeCategories.find(ac => ac.id === currentEditingCategory);
     if (active) {
@@ -1655,47 +1676,75 @@ async function savePreferencesModal() {
       if (price !== null) {
         active.price_per_service = price;
       }
+      if (priceMin !== null) {
+        active.price_range_min = priceMin;
+      }
+      if (priceMax !== null) {
+        active.price_range_max = priceMax;
+      }
       
       // Save to database if manager is initialized
       if (matchSettingsManager && selectedSubs.length > 0) {
         try {
-          // For each selected subcategory, add it to the database
+          // For each selected subcategory, add it to the database using Promise.all() for parallel execution
           const newServiceIds = [];
-          for (const subcategoryName of selectedSubs) {
-            const result = await matchSettingsManager.addServiceCategory(currentEditingCategory, subcategoryName, price);
-            if (result && result.id) {
-              newServiceIds.push(result.id);
-            }
-          }
+          const savePromises = selectedSubs.map(subcategoryName => 
+            matchSettingsManager.addServiceCategory(currentEditingCategory, subcategoryName, price, priceMin, priceMax)
+              .then(result => {
+                if (result && result.id) {
+                  newServiceIds.push(result.id);
+                }
+                return result;
+              })
+              .catch(error => {
+                console.warn('[Preferences] Error saving subcategory:', subcategoryName, error);
+                return null;
+              })
+          );
+          
+          // Wait for all saves to complete in parallel
+          await Promise.all(savePromises);
+          
           // Update the serviceIds in activeCategories so toggle works
           active.serviceIds = newServiceIds;
+          
+          // IMMEDIATELY reload the saved services from the database to populate prices and subcategories
+          try {
+            const { data: savedServices, error: loadError } = await window.supabaseClient
+              .from('practitioner_selected_services')
+              .select(`
+                taxonomy_id, 
+                subcategory_id, 
+                price_per_service, 
+                price_range_min, 
+                price_range_max,
+                taxonomy_subcategories(name)
+              `)
+              .eq('practitioner_serial', matchSettingsManager.practitionerSerial)
+              .eq('taxonomy_id', currentEditingCategory);
+            
+            if (!loadError && savedServices && savedServices.length > 0) {
+              // Extract subcategory names and prices from the saved services
+              const subcategoryNames = savedServices
+                .map(s => s.taxonomy_subcategories?.name)
+                .filter(name => name); // Filter out null/undefined
+              
+              const firstSave = savedServices[0];
+              
+              // Update activeCategories with all saved data
+              active.subcategories = subcategoryNames;
+              active.price_per_service = firstSave.price_per_service || null;
+              active.price_range_min = firstSave.price_range_min || null;
+              active.price_range_max = firstSave.price_range_max || null;
+            }
+          } catch (reloadError) {
+            // If reload fails, that's OK - user can still reopen modal
+          }
+          
           showToast(`${selectedSubs.length} service(s) saved successfully.`, 'success');
         } catch (dbError) {
           // Still close the modal even if database save fails
           showToast('Services saved locally, but database save failed. Please try again.', 'warning');
-        }
-        
-        // After services are saved, sync all pricing to practitioners table
-        try {
-          const { data: { user } } = await window.supabaseClient.auth.getUser();
-          if (user) {
-            await matchSettingsManager.syncServicePricingToPractitioner(user.id);
-          }
-        } catch (syncError) {
-          // Pricing sync error
-        }
-        
-        // CRITICAL: Sync denormalized service arrays after all services are saved
-        try {
-          const { data: { user } } = await window.supabaseClient.auth.getUser();
-          if (user && matchSettingsManager?.practitionerSerial) {
-            const { data: syncResult, error: syncError } = await window.supabaseClient
-              .rpc('sync_practitioner_service_arrays', {
-                p_practitioner_serial: matchSettingsManager.practitionerSerial
-              });
-          }
-        } catch (arraySyncError) {
-          // Service array sync error
         }
       } else {
         showToast('Services saved successfully.', 'success');

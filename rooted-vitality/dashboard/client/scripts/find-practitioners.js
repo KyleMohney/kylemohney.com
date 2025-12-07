@@ -747,7 +747,8 @@ async function sendConnectionRequest(practitionerId, practitionerSerial) {
         p_client_serial: selectedProject.client_serial,
         p_practitioner_serial: practitionerSerial,
         p_match_score: matchScore,
-        p_creation_source: 'client_find_practitioners'
+        p_creation_source: 'client_find_practitioners',
+        p_created_by: 'client'
       });
     
     if (error) {
