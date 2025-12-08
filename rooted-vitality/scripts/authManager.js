@@ -152,6 +152,12 @@ window.authManager = {
             // ALWAYS clear any redirect URLs on login - go to role-specific dashboard
             sessionStorage.removeItem('redirectAfterAuth');
             
+            // Check if we're in onboarding modal - if so, skip redirect
+            if (window.skipAuthRedirect) {
+                console.log('[Rooted Vitality] In onboarding flow, skipping redirect');
+                return true;
+            }
+            
             // Determine final role and redirect
             const finalRole = userRole || role;
             const baseUrl = (typeof RootedVitality !== 'undefined' && RootedVitality.config.siteUrl) ? RootedVitality.config.siteUrl : '/rooted-vitality/';

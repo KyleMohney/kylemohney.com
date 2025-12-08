@@ -333,7 +333,7 @@
 /* Radio Button Styles */
 .options-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
     margin-top: 1rem;
 }
@@ -343,16 +343,17 @@
     align-items: center;
     gap: 1rem;
     padding: 1.25rem;
-    border: 2px solid #d0d0d0;
+    border: 2px solid #d4c47c;
     border-radius: 8px;
-    background-color: #fff;
+    background: linear-gradient(135deg, #fbf7ec 0%, #f5f0e6 100%);
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .option-card:hover {
     border-color: #77883e;
-    background-color: #f5f7f0;
+    background: linear-gradient(135deg, #f0ebe3 0%, #ebe4db 100%);
+    box-shadow: 0 4px 12px rgba(119, 136, 62, 0.15);
 }
 
 .option-card input[type="radio"] {
@@ -365,7 +366,7 @@
 }
 
 .option-card input[type="radio"]:checked + .option-content {
-    color: #77883e;
+    /* Do not change text color when checked */
 }
 
 .option-card input[type="radio"]:checked {

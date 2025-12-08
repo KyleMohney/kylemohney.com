@@ -49,16 +49,108 @@ async function handleLoginSubmit(e, saveLocalData) {
 
         if (authError) throw authError;
 
-        window.closeOnboardingModal();
-        await initializeReturningMemberFlow();
+        console.log('[Onboarding] Login successful, advancing to Step 1 (Guided Path)');
+        
+        // Set flag to prevent redirect on auth state change
+        window.skipAuthRedirect = true;
+        
+        // Set path to guided and advance directly to Step 1 (skip Step 1 path choice)
+        if (window.onboardingData) {
+            window.onboardingData.path = 'guided';
+        }
+        const modal = document.getElementById('guided-onboarding-modal');
+        if (window.goToStep) {
+            window.goToStep('1', modal);
+        }
 
     } catch (error) {
         console.error('[Onboarding] Login error:', error);
-        window.showAlertModal('Login failed: ' + error.message);
         const submitBtn = e.target.querySelector('button[type="submit"]');
         submitBtn.disabled = false;
         submitBtn.textContent = 'Sign in';
+        
+        // Show custom branded error modal
+        showLoginErrorModal(error);
     }
+}
+
+/**
+ * Show custom branded login error modal
+ */
+function showLoginErrorModal(error) {
+    // Remove any existing error modal
+    const existingModal = document.getElementById('login-error-modal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+    // Determine error message
+    let title = 'Sign In Failed';
+    let message = 'Please check your credentials and try again.';
+    
+    if (error.message && error.message.includes('Invalid login credentials')) {
+        message = 'Invalid email or password. Please double-check and try again.';
+    } else if (error.message && error.message.includes('Email not confirmed')) {
+        message = 'Please verify your email address before signing in.';
+        title = 'Email Not Verified';
+    } else if (error.message) {
+        message = error.message;
+    }
+
+    // Create modal HTML
+    const modal = document.createElement('div');
+    modal.id = 'login-error-modal';
+    modal.className = 'modal-overlay active';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header" style="border-bottom: 1px solid rgba(212, 196, 124, 0.2); padding-bottom: 1rem;">
+                <h2 style="color: #2d2416; font-family: var(--font-inter); font-size: 1.4rem; font-weight: 700; margin: 0;">
+                    ${title}
+                </h2>
+                <button class="modal-close-btn" id="login-error-close-btn" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #2d2416; padding: 0; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">
+                    ×
+                </button>
+            </div>
+            
+            <div class="modal-body" style="padding: 2rem;">
+                <p style="font-family: var(--font-lora); font-size: 1rem; color: #2d2416; line-height: 1.6; margin: 0 0 1.5rem 0;">
+                    ${message}
+                </p>
+                
+                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button id="login-error-retry-btn" class="btn-modal btn-modal-primary" style="background: #77883e; color: #fbf7ec; border: none; padding: 0.75rem 1.5rem; border-radius: 6px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;">
+                        Try Again
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Event listeners
+    const closeBtn = document.getElementById('login-error-close-btn');
+    const retryBtn = document.getElementById('login-error-retry-btn');
+    
+    const closeErrorModal = () => {
+        modal.classList.remove('active');
+        setTimeout(() => modal.remove(), 200);
+    };
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeErrorModal);
+    }
+    
+    if (retryBtn) {
+        retryBtn.addEventListener('click', closeErrorModal);
+    }
+
+    // Click outside to close
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeErrorModal();
+        }
+    });
 }
 
 /**

@@ -82,7 +82,7 @@ function setupOnboardingEventListeners(isReturningUser = false) {
     setupPasswordToggles(modal);
 
     // Setup category picker
-    setupCategoryPickerForStep1b();
+    setupCategoryPickerForStep1();
 
     // Close button
     modal.querySelector('.onboarding-close-btn').addEventListener('click', () => {
@@ -99,7 +99,11 @@ function setupOnboardingEventListeners(isReturningUser = false) {
     }
     if (newUserBtn) {
         newUserBtn.addEventListener('click', () => {
-            goToStep(1);
+            // Set path to guided and go directly to Step 1 (skip Step 1 path choice)
+            if (window.onboardingData) {
+                window.onboardingData.path = 'guided';
+            }
+            goToStep('1');
         });
     }
 
@@ -116,22 +120,8 @@ function setupOnboardingEventListeners(isReturningUser = false) {
         }
     }
 
-    // ====== STEP 1: Path choice ======
-    document.getElementById('path-direct')?.addEventListener('click', () => {
-        onboardingData.path = 'direct';
-        goToStep('1a');
-    });
-
-    document.getElementById('path-guided')?.addEventListener('click', () => {
-        onboardingData.path = 'guided';
-        goToStep('1b');
-    });
-
-    // ====== STEP 1A: Direct category selection ======
-    setupStep1aHandler(onboardingData, saveLocalData);
-
-    // ====== STEP 1B: Guided path ======
-    setupStep1bHandler(onboardingData, saveLocalData);
+    // ====== STEP 1: Guided project creation (formerly 1B) ======
+    setupStep1Handler(onboardingData, saveLocalData);
 
     // ====== STEP 2: Client profile ======
     setupStep2Handler(onboardingData, saveLocalData);
@@ -158,81 +148,11 @@ function setupOnboardingEventListeners(isReturningUser = false) {
 // 3. FORM SUBMISSION HANDLERS
 // ======================================================
 
-function setupStep1aHandler(onboardingData, saveLocalData) {
-    const categorySelect = document.getElementById('onboarding-category-direct');
-    const subcategoriesGrid = document.getElementById('onboarding-subcategories-direct');
-    
-    if (!categorySelect) return;
-
-    // Handle category dropdown changes
-    categorySelect.addEventListener('change', (e) => {
-        const categoryId = e.target.value;
-
-        // Clear and repopulate subcategories based on selected category
-        if (subcategoriesGrid) {
-            subcategoriesGrid.innerHTML = '';
-            
-            if (categoryId) {
-                const data = (typeof taxonomyData !== 'undefined' && Object.keys(taxonomyData).length > 0) 
-                    ? taxonomyData 
-                    : onboardingTaxonomyCache;
-
-                const category = data?.[categoryId];
-                if (category?.subcategories?.length) {
-                    category.subcategories.forEach(subName => {
-                        const label = document.createElement('label');
-                        label.className = 'checkbox-label';
-                        label.innerHTML = `
-                            <input type="checkbox" name="subcategories" value="${subName}">
-                            <span class="checkbox-text">${subName}</span>
-                        `;
-                        subcategoriesGrid.appendChild(label);
-                    });
-                }
-            }
-        }
-    });
-
-    // Handle form submission
-    document.getElementById('step-1a-form')?.addEventListener('submit', (e) => {
-        e.preventDefault();
-        
-        const categoryId = document.getElementById('onboarding-category-direct').value;
-        
-        const selectedSubcategories = Array.from(
-            document.querySelectorAll('input[name="subcategories"]:checked')
-        ).map(input => input.value);
-
-        if (!categoryId) {
-            window.showAlertModal('Please select a wellness category');
-            return;
-        }
-
-        if (selectedSubcategories.length === 0) {
-            window.showAlertModal('Please select at least one specific concern');
-            return;
-        }
-
-        onboardingData.category = categoryId;
-        onboardingData.subcategories = selectedSubcategories;
-        onboardingData.description = document.getElementById('onboarding-description-direct').value.trim() || '';
-        onboardingData.travel_preference = document.querySelector('input[name="travel_preference"]:checked')?.value || null;
-        onboardingData.urgency = document.querySelector('input[name="urgency"]:checked')?.value || null;
-        onboardingData.currentPath = '1a';
-        saveLocalData();
-        goToStep(2);
-    });
-}
-
-// Step 1B, 2, 3, 4, 5, 6 handlers defined similarly...
-// [Handlers extracted from the monolith - keeping actual form logic]
-
-function setupStep1bHandler(onboardingData, saveLocalData) {
-    document.getElementById('step-1b-form')?.addEventListener('submit', (e) => {
+function setupStep1Handler(onboardingData, saveLocalData) {
+    document.getElementById('step-1-form')?.addEventListener('submit', (e) => {
         e.preventDefault();
         const symptoms = document.getElementById('guided-symptoms').value.trim();
         const category = document.getElementById('guided-category-selected').value;
-        const urgency = document.querySelector('input[name="urgency"]:checked').value;
         const travelPref = document.querySelector('input[name="travel_preference"]:checked').value;
         const selectedSubcategories = Array.from(document.querySelectorAll('#guided-subcategories-list input[type="checkbox"]:checked')).map(cb => cb.value);
 
@@ -244,9 +164,8 @@ function setupStep1bHandler(onboardingData, saveLocalData) {
         onboardingData.category = category;
         onboardingData.description = symptoms;
         onboardingData.subcategory = selectedSubcategories;
-        onboardingData.urgency = urgency;
         onboardingData.travel_preference = travelPref;
-        onboardingData.currentPath = '1b';
+        onboardingData.currentPath = '1';
         saveLocalData();
         goToStep(2);
     });
@@ -399,8 +318,8 @@ function setupStep4Handler(onboardingData, saveLocalData) {
     const editProjectBtn = document.getElementById('edit-project-btn');
     if (editProjectBtn) {
         editProjectBtn.addEventListener('click', () => {
-            // Go back to path choice step to edit
-            goToStep(onboardingData.path === 'direct' ? '1a' : '1b');
+            // Go back to Step 1 (project creation) to edit
+            goToStep('1');
         });
     }
 
@@ -518,6 +437,9 @@ function setupStep4Handler(onboardingData, saveLocalData) {
 
                 onboardingData.userId = authData.user.id;
                 onboardingData.signupCompleted = true; // Mark that user completed signup (for back button logic)
+                
+                // Set flag to prevent redirect on auth state change during onboarding
+                window.skipAuthRedirect = true;
 
                 // Continue to Step 5 (project confirmation)
                 goToStep(5);
@@ -544,19 +466,11 @@ function setupStep5Handler(onboardingData, saveLocalData) {
                 step5NextBtn.disabled = true;
                 step5NextBtn.textContent = 'Saving your profile...';
 
-                // VALIDATION: Check that travel_preference and urgency are selected
+                // VALIDATION: Check that travel_preference is selected
                 const travelPrefSelected = document.querySelector('input[name="travel_preference"]:checked');
-                const urgencySelected = document.querySelector('input[name="urgency"]:checked');
                 
                 if (!travelPrefSelected) {
-                    window.showAlertModal('Please select a travel preference (In-Person, House Calls, Virtual, or Flexible)');
-                    step5NextBtn.disabled = false;
-                    step5NextBtn.textContent = 'Find my matches';
-                    return;
-                }
-                
-                if (!urgencySelected) {
-                    window.showAlertModal('Please select your urgency level');
+                    window.showAlertModal('Please select a travel preference (In-Office, Housecalls, Virtual, or Flexible)');
                     step5NextBtn.disabled = false;
                     step5NextBtn.textContent = 'Find my matches';
                     return;
@@ -845,18 +759,6 @@ function populateStep5Display(onboardingData) {
         };
         travelSpan.textContent = travelLabels[travelValue] || 'Not specified';
     }
-    
-    // Populate urgency
-    const urgencySpan = document.getElementById('confirm-urgency');
-    if (urgencySpan) {
-        const urgencyValue = document.querySelector('input[name="urgency"]:checked')?.value || onboardingData.urgency;
-        const urgencyLabels = {
-            'browsing': 'Just browsing',
-            'interested': 'Interested',
-            'urgent': 'Urgent'
-        };
-        urgencySpan.textContent = urgencyLabels[urgencyValue] || 'Not specified';
-    }
 }
 
 //======================================================
@@ -864,18 +766,18 @@ function populateStep5Display(onboardingData) {
 //======================================================
 
 /**
- * Setup category picker with search and subcategories for Step 1b
+ * Setup category picker with search and subcategories for Step 1
  * Renders interactive category cards with descriptions and subcategory checkboxes
  * Features: Category search, descriptions, subcategory multi-select with full descriptions
  */
-function setupCategoryPickerForStep1b() {
+function setupCategoryPickerForStep1() {
     const searchInput = document.getElementById('guided-category-search');
     const categoriesList = document.getElementById('guided-categories-list');
     const subcategoriesGroup = document.getElementById('guided-subcategories-group');
     const subcategoriesList = document.getElementById('guided-subcategories-list');
     const categorySelected = document.getElementById('guided-category-selected');
     
-    if (!searchInput) return; // Step 1b not visible yet
+    if (!searchInput) return; // Step 1 not visible yet
 
     // Soft spiritual descriptions for each category
     const categoryDescriptions = {

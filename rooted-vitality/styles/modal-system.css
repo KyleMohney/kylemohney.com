@@ -63,11 +63,16 @@ ARCHITECTURE:
   justify-content: center;
   z-index: 10000;
   pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
 }
 
 .modal-overlay.active {
   display: flex !important;
   pointer-events: auto;
+  opacity: 1;
+  visibility: visible;
   animation: fadeIn 0.2s ease;
 }
 

@@ -176,6 +176,15 @@ async function initializeGuidedOnboarding(skipAuth = false, isReturningUser = fa
     console.log('[onboardingCore] Setting up event listeners...');
     setupOnboardingEventListeners(isReturningUser);
     console.log('[onboardingCore] Modal fully initialized');
+
+    // If user is already signed in (skipAuth=true), skip Step 0 and go directly to Step 1
+    if (skipAuth) {
+        console.log('[onboardingCore] User already signed in, skipping Step 0 and going directly to Step 1');
+        if (window.onboardingData) {
+            window.onboardingData.path = 'guided';
+        }
+        window.goToStep('1', modal);
+    }
 }
 
 /**
@@ -263,92 +272,53 @@ function getOnboardingModalHTML(skipAuth = false, isReturningUser = false) {
                 </div>
             </div>
 
-            <!-- STEP 1: Know what you need? -->
+
+            <!-- STEP 1: Guided project creation (formerly 1B) -->
             <div class="onboarding-step ${skipAuth ? 'active' : ''}" data-step="1">
                 <div class="step-content">
                     <div class="step-logo">
                         <img src="/rooted-vitality/assets/logo_trimmed.png" alt="Rooted Vitality" class="logo-image">
                     </div>
                     <div class="step-opening">
-                        <h2>Welcome to Rooted Vitality</h2>
-                        <p class="step-subtitle">We're so glad you're here. How would you like to get started?</p>
+                        <h2>We're so excited you're here!</h2>
+                        <p class="step-subtitle">Taking this step toward your wellbeing takes courage. We're here to help you connect with the right practitioner who understands your needs.</p>
                     </div>
 
-                    <div class="step-path-choice">
-                        <button type="button" class="path-btn" id="path-direct">I know what I need</button>
-                        <button type="button" class="path-btn" id="path-guided">I'm not sure what I need</button>
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="button" class="btn-secondary onboarding-back" style="display: none;">Back</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- STEP 1A: Direct path - Choose category -->
-            <div class="onboarding-step" data-step="1a">
-                <div class="step-content">
-                    <div class="step-logo">
-                        <img src="/rooted-vitality/assets/logo_trimmed.png" alt="Rooted Vitality" class="logo-image">
-                    </div>
-                    <div class="step-opening">
-                        <h2>What are you looking for?</h2>
-                        <p class="step-subtitle">Tell us about your wellness needs so we can find the right practitioner for you.</p>
-                    </div>
-
-                    <form id="step-1a-form" class="onboarding-form">
-                        <!-- CATEGORY -->
+                    <form id="step-1-form" class="onboarding-form">
+                        <!-- SYMPTOMS/DESCRIPTION -->
                         <div class="form-group">
-                            <label for="onboarding-category-direct">Wellness Category *</label>
-                            <select id="onboarding-category-direct" name="category" required>
-                                <option value="">Choose a category...</option>
-                            </select>
+                            <label for="guided-symptoms">Share what's on your wellness journey</label>
+                            <p class="form-helper" style="color: #666;">Don't worry about being perfect—just let it flow. This is a safe space, and everything you share will help your practitioner understand exactly how to support you.</p>
+                            <textarea id="guided-symptoms" name="symptoms" placeholder="Share what's going on..." rows="4" maxlength="1000" required></textarea>
+                            <span class="form-hint"><span id="guided-symptoms-count">0</span> / 1000 characters</span>
                         </div>
 
-                        <!-- SUBCATEGORY -->
+                        <!-- CATEGORY PICKER WITH SEARCH -->
                         <div class="form-group">
-                            <label>Specific Concerns *</label>
-                            <div id="onboarding-subcategories-direct" class="checkbox-grid"></div>
+                            <label for="guided-category-search">What type of healing are you drawn to?</label>
+                            <p class="form-helper" style="color: #666;">Pick one main healing path below, then choose as many specific focuses as you want within it. There are no wrong answers—trust what feels right.</p>
+                            <div class="category-picker">
+                                <input type="text" id="guided-category-search" class="category-search" placeholder="Type to find your healing..." autocomplete="off">
+                                <div id="guided-categories-list" class="categories-list">
+                                    <!-- Categories injected by JS with descriptions -->
+                                </div>
+                                <input type="hidden" id="guided-category-selected" name="category" required>
+                            </div>
                         </div>
 
-                        <!-- DESCRIPTION -->
-                        <div class="form-group">
-                            <label for="onboarding-description-direct">Description / Notes *</label>
-                            <textarea id="onboarding-description-direct" name="description" placeholder="Share what's going on..." rows="4" maxlength="1000" required></textarea>
-                            <span class="form-hint"><span id="onboarding-char-count">0</span> / 1000 characters</span>
-                        </div>
-
-                        <!-- URGENCY -->
-                        <div class="form-group">
-                            <label>How Urgent? *</label>
-                            <div class="options-grid">
-                                <label class="option-card">
-                                    <input type="radio" name="urgency" value="browsing" required>
-                                    <div class="option-content">
-                                        <span class="option-title">Just Browsing</span>
-                                        <span class="option-desc">Exploring options, no rush</span>
-                                    </div>
-                                </label>
-                                <label class="option-card">
-                                    <input type="radio" name="urgency" value="interested" required>
-                                    <div class="option-content">
-                                        <span class="option-title">Interested</span>
-                                        <span class="option-desc">Moderate priority</span>
-                                    </div>
-                                </label>
-                                <label class="option-card">
-                                    <input type="radio" name="urgency" value="urgent" required>
-                                    <div class="option-content">
-                                        <span class="option-title">Urgent</span>
-                                        <span class="option-desc">Need help soon</span>
-                                    </div>
-                                </label>
+                        <!-- SUBCATEGORY PICKER (APPEARS AFTER CATEGORY SELECTED) -->
+                        <div class="form-group" id="guided-subcategories-group" style="display: none;">
+                            <label>Pick everything that speaks to your soul</label>
+                            <p class="form-helper" style="color: #666;">Check as many as you want. Your practitioner will see all of these and know exactly what you need.</p>
+                            <div id="guided-subcategories-list" class="subcategories-list">
+                                <!-- Subcategory checkboxes injected by JS -->
                             </div>
                         </div>
 
                         <!-- SESSION TYPE PREFERENCE -->
                         <div class="form-group">
-                            <label>Session Type Preference *</label>
+                            <label>How do you prefer to receive care?</label>
+                            <p class="form-helper" style="color: #666;">Pick whichever option makes you feel most comfortable and safe. Your space, their space, or yours on screen—it's all good.</p>
                             <div class="options-grid">
                                 <label class="option-card">
                                     <input type="radio" name="travel_preference" value="in-person" required>
@@ -360,7 +330,7 @@ function getOnboardingModalHTML(skipAuth = false, isReturningUser = false) {
                                 <label class="option-card">
                                     <input type="radio" name="travel_preference" value="housecalls" required>
                                     <div class="option-content">
-                                        <span class="option-title">House Calls</span>
+                                        <span class="option-title">Housecalls</span>
                                         <span class="option-desc">Practitioner comes to me</span>
                                     </div>
                                 </label>
@@ -376,148 +346,6 @@ function getOnboardingModalHTML(skipAuth = false, isReturningUser = false) {
                                     <div class="option-content">
                                         <span class="option-title">Flexible</span>
                                         <span class="option-desc">Open to any option</span>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- LOCATION -->
-                        <fieldset class="form-fieldset">
-                            <legend>Location</legend>
-                            
-                            <div class="form-group">
-                                <label for="onboarding-street">Street Address</label>
-                                <input type="text" id="onboarding-street" name="street">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="onboarding-city">City *</label>
-                                <input type="text" id="onboarding-city" name="city" required>
-                            </div>
-
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="onboarding-state">State *</label>
-                                    <input type="text" id="onboarding-state" name="state" maxlength="2" required>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="onboarding-zipcode-direct">Zip Code *</label>
-                                    <input type="text" id="onboarding-zipcode-direct" name="zipcode" maxlength="5" required>
-                                </div>
-                            </div>
-                        </fieldset>
-
-                        <div class="form-actions">
-                            <button type="button" class="btn-secondary onboarding-back">Back</button>
-                            <button type="submit" class="btn-primary">Continue</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- STEP 1B: Guided path - Full taxonomy picker with search -->
-            <div class="onboarding-step" data-step="1b">
-                <div class="step-content">
-                    <div class="step-logo">
-                        <img src="/rooted-vitality/assets/logo_trimmed.png" alt="Rooted Vitality" class="logo-image">
-                    </div>
-                    <div class="step-opening">
-                        <h2>We're so excited you're here!</h2>
-                        <p class="step-subtitle">Taking this step toward your wellbeing takes courage. We're here to help you connect with the right practitioner who understands your needs.</p>
-                    </div>
-
-                    <form id="step-1b-form" class="onboarding-form">
-                        <!-- SYMPTOMS/DESCRIPTION -->
-                        <div class="form-group">
-                            <label for="guided-symptoms">Share what's on your wellness journey</label>
-                            <p class="form-helper">Don't worry about being perfect—just let it flow. This is a safe space, and everything you share will help your practitioner understand exactly how to support you.</p>
-                            <textarea id="guided-symptoms" name="symptoms" placeholder="Share what's going on..." rows="4" maxlength="1000" required></textarea>
-                            <span class="form-hint"><span id="guided-symptoms-count">0</span> / 1000 characters</span>
-                        </div>
-
-                        <!-- CATEGORY PICKER WITH SEARCH -->
-                        <div class="form-group">
-                            <label for="guided-category-search">What type of healing are you drawn to?</label>
-                            <p class="form-helper">Pick one main healing path below, then choose as many specific focuses as you want within it. There are no wrong answers—trust what feels right.</p>
-                            <div class="category-picker">
-                                <input type="text" id="guided-category-search" class="category-search" placeholder="Type to find your healing..." autocomplete="off">
-                                <div id="guided-categories-list" class="categories-list">
-                                    <!-- Categories injected by JS with descriptions -->
-                                </div>
-                                <input type="hidden" id="guided-category-selected" name="category" required>
-                            </div>
-                        </div>
-
-                        <!-- SUBCATEGORY PICKER (APPEARS AFTER CATEGORY SELECTED) -->
-                        <div class="form-group" id="guided-subcategories-group" style="display: none;">
-                            <label>Pick everything that speaks to your soul</label>
-                            <p class="form-helper">Check as many as you want. Your practitioner will see all of these and know exactly what you need.</p>
-                            <div id="guided-subcategories-list" class="subcategories-list">
-                                <!-- Subcategory checkboxes injected by JS -->
-                            </div>
-                        </div>
-
-                        <!-- URGENCY -->
-                        <div class="form-group">
-                            <label>What does your timeline feel like right now?</label>
-                            <p class="form-helper">There's no rush—we'll match you with someone amazing whenever you're ready.</p>
-                            <div class="options-grid">
-                                <label class="option-card">
-                                    <input type="radio" name="urgency" value="browsing" required>
-                                    <div class="option-content">
-                                        <span class="option-title">Just Exploring</span>
-                                        <span class="option-desc">I'm dreaming and discovering</span>
-                                    </div>
-                                </label>
-                                <label class="option-card">
-                                    <input type="radio" name="urgency" value="interested" required>
-                                    <div class="option-content">
-                                        <span class="option-title">I'm Ready</span>
-                                        <span class="option-desc">This really matters to me</span>
-                                    </div>
-                                </label>
-                                <label class="option-card">
-                                    <input type="radio" name="urgency" value="urgent" required>
-                                    <div class="option-content">
-                                        <span class="option-title">I Need This Now</span>
-                                        <span class="option-desc">My body's calling for help</span>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- SESSION TYPE PREFERENCE -->
-                        <div class="form-group">
-                            <label>How do you prefer to receive care?</label>
-                            <p class="form-helper">Pick whichever option makes you feel most comfortable and safe. Your space, their space, or yours on screen—it's all good.</p>
-                            <div class="options-grid">
-                                <label class="option-card">
-                                    <input type="radio" name="travel_preference" value="in-person" required>
-                                    <div class="option-content">
-                                        <span class="option-title">In Their Sacred Space</span>
-                                        <span class="option-desc">I'll travel to them</span>
-                                    </div>
-                                </label>
-                                <label class="option-card">
-                                    <input type="radio" name="travel_preference" value="housecalls" required>
-                                    <div class="option-content">
-                                        <span class="option-title">In My Sanctuary</span>
-                                        <span class="option-desc">They come to my space</span>
-                                    </div>
-                                </label>
-                                <label class="option-card">
-                                    <input type="radio" name="travel_preference" value="virtual" required>
-                                    <div class="option-content">
-                                        <span class="option-title">Through the Screen</span>
-                                        <span class="option-desc">From my cozy home</span>
-                                    </div>
-                                </label>
-                                <label class="option-card">
-                                    <input type="radio" name="travel_preference" value="flexible" required>
-                                    <div class="option-content">
-                                        <span class="option-title">I'm Flexible</span>
-                                        <span class="option-desc">I'm open to any option</span>
                                     </div>
                                 </label>
                             </div>
@@ -818,7 +646,6 @@ function getOnboardingModalHTML(skipAuth = false, isReturningUser = false) {
                             <h3 style="margin-top: 1.5rem;">Your location & preferences:</h3>
                             <p><strong>Zipcode:</strong> <span id="confirm-zipcode">Not provided</span></p>
                             <p><strong>Travel Type:</strong> <span id="confirm-travel">Not specified</span></p>
-                            <p><strong>Urgency:</strong> <span id="confirm-urgency">Not specified</span></p>
 
                             <button type="button" class="btn-link" id="edit-project-btn" style="margin-top: 1.5rem;">Edit these details</button>
                         </div>
@@ -875,27 +702,15 @@ function populateCategoryDropdowns() {
         return;
     }
 
-    // Step 1a direct form dropdown for categories
-    const step1aCategorySelect = document.getElementById('onboarding-category-direct');
-    if (step1aCategorySelect) {
-        step1aCategorySelect.innerHTML = '<option value="">Choose a category...</option>';
+    // Step 1 form dropdown (if it exists)
+    const step1Select = document.getElementById('returning-category');
+    if (step1Select) {
+        step1Select.innerHTML = '<option value="">Choose a category...</option>';
         Object.entries(data).forEach(([id, category]) => {
             const option = document.createElement('option');
             option.value = id;
             option.textContent = category.name;
-            step1aCategorySelect.appendChild(option);
-        });
-    }
-
-    // Step 1b/returning form dropdown (if it exists)
-    const step1bSelect = document.getElementById('returning-category');
-    if (step1bSelect) {
-        step1bSelect.innerHTML = '<option value="">Choose a category...</option>';
-        Object.entries(data).forEach(([id, category]) => {
-            const option = document.createElement('option');
-            option.value = id;
-            option.textContent = category.name;
-            step1bSelect.appendChild(option);
+            step1Select.appendChild(option);
         });
     }
 }
@@ -933,7 +748,7 @@ function goToStep(stepNumber, modal = null) {
         }
     }
 
-    // Update progress bar (Total numeric steps: 0, 0a, 1, 1a/1b, 2, 3, 4, 5, 6 = 7 main steps)
+    // Update progress bar (Total numeric steps: 0, 0a, 1, 2, 3, 4, 5, 6 = 6 main steps)
     let progressPercent;
     if (stepNumber === '0' || stepNumber === 0) {
         progressPercent = (1 / 7) * 100;
@@ -974,11 +789,9 @@ function handleBackButton(onboardingData) {
     } else if (currentStep === '0a') {
         goToStep(0, modal);
     } else if (currentStep === '1') {
-        goToStep(0, modal);
-    } else if (currentStep === '1a' || currentStep === '1b') {
-        goToStep(1, modal);
+        goToStep('0a', modal);
     } else if (currentStep === '2') {
-        const previousPath = onboardingData.currentPath || '1a';
+        const previousPath = onboardingData.currentPath || '1';
         goToStep(previousPath, modal);
     } else if (currentStep === '3') {
         goToStep(2, modal);
