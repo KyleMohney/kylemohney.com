@@ -490,14 +490,9 @@ function getOnboardingModalHTML(skipAuth = false, isReturningUser = false) {
                         </div>
 
                         <div class="form-group">
-                            <label for="onboarding-confirmEmail">Confirm email *</label>
-                            <input type="email" id="onboarding-confirmEmail" name="confirmEmail" placeholder="Confirm your email" required>
-                        </div>
-
-                        <div class="form-group">
                             <label for="onboarding-password">Create a password *</label>
                             <div class="password-input-container">
-                                <input type="password" id="onboarding-password" name="password" placeholder="At least 6 characters" required>
+                                <input type="password" id="onboarding-password" name="password" placeholder="12+ chars, uppercase, lowercase, number, special character" required>
                                 <button type="button" class="password-toggle" id="toggle-password-3" aria-label="Show/hide password">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -505,7 +500,19 @@ function getOnboardingModalHTML(skipAuth = false, isReturningUser = false) {
                                     </svg>
                                 </button>
                             </div>
-                            <small class="form-hint">Minimum 6 characters required</small>
+                            <small class="form-hint">Password must have: 12+ characters, uppercase letter, lowercase letter, number, special character (!@#$%^&*)</small>
+                            <div id="password-strength-indicator" class="password-strength" style="display: none; margin-top: 8px;">
+                                <div class="strength-bar">
+                                    <div class="strength-fill"></div>
+                                </div>
+                                <div id="password-requirements" style="font-size: 12px; color: #666; margin-top: 6px;">
+                                    <div><span id="req-length">✗</span> 12+ characters</div>
+                                    <div><span id="req-uppercase">✗</span> Uppercase letter (A-Z)</div>
+                                    <div><span id="req-lowercase">✗</span> Lowercase letter (a-z)</div>
+                                    <div><span id="req-number">✗</span> Number (0-9)</div>
+                                    <div><span id="req-special">✗</span> Special character (!@#$%^&*)</div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="form-group">

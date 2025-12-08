@@ -5,6 +5,86 @@
 // Includes password confirmation and email verification
 // ======================================================
 
+// ======================================================
+// PASSWORD STRENGTH VALIDATION
+// ======================================================
+
+/**
+ * Validate password strength against HIPAA-compliant requirements
+ * @param {string} password - Password to validate
+ * @returns {object} Object with boolean properties for each requirement
+ */
+function validatePasswordStrength(password) {
+    return {
+        length: password.length >= 12,
+        uppercase: /[A-Z]/.test(password),
+        lowercase: /[a-z]/.test(password),
+        number: /[0-9]/.test(password),
+        special: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)
+    };
+}
+
+/**
+ * Update password strength indicator UI with real-time feedback
+ * @param {string} password - Password to validate
+ */
+function updatePasswordStrengthIndicator(password) {
+    const indicator = document.getElementById('password-strength-indicator');
+    if (!indicator) return;
+
+    const requirements = validatePasswordStrength(password);
+    const metCount = Object.values(requirements).filter(Boolean).length;
+
+    // Show/hide indicator based on user input
+    if (password.length > 0) {
+        indicator.style.display = 'block';
+    } else {
+        indicator.style.display = 'none';
+        return;
+    }
+
+    // Update strength bar
+    const strengthFill = indicator.querySelector('.strength-fill');
+    const percentage = (metCount / 5) * 100;
+    strengthFill.style.width = percentage + '%';
+
+    // Color strength bar based on met requirements
+    if (metCount <= 2) {
+        strengthFill.style.backgroundColor = '#d32f2f'; // Red
+    } else if (metCount <= 3) {
+        strengthFill.style.backgroundColor = '#ff9800'; // Orange
+    } else if (metCount <= 4) {
+        strengthFill.style.backgroundColor = '#fbc02d'; // Yellow
+    } else {
+        strengthFill.style.backgroundColor = '#4CAF50'; // Green
+    }
+
+    // Update individual requirement indicators
+    const requirementElements = {
+        length: indicator.querySelector('[data-requirement="length"]'),
+        uppercase: indicator.querySelector('[data-requirement="uppercase"]'),
+        lowercase: indicator.querySelector('[data-requirement="lowercase"]'),
+        number: indicator.querySelector('[data-requirement="number"]'),
+        special: indicator.querySelector('[data-requirement="special"]')
+    };
+
+    for (const [key, element] of Object.entries(requirementElements)) {
+        if (!element) continue;
+        const icon = element.querySelector('.requirement-icon');
+        const isMet = requirements[key];
+
+        if (isMet) {
+            icon.textContent = '✓';
+            icon.style.color = '#4CAF50';
+            element.style.color = '#4CAF50';
+        } else {
+            icon.textContent = '✗';
+            icon.style.color = '#d32f2f';
+            element.style.color = '#666';
+        }
+    }
+}
+
 window.addEventListener('DOMContentLoaded', async () => {
 
   
@@ -26,6 +106,14 @@ window.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
+  // Add real-time password strength indicator
+  const passwordInput = document.getElementById('password');
+  if (passwordInput) {
+    passwordInput.addEventListener('input', (e) => {
+      updatePasswordStrengthIndicator(e.target.value);
+    });
+  }
+
   form.addEventListener('submit', async e => {
     e.preventDefault();
 
@@ -34,7 +122,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     const firstName = form.querySelector('#firstName').value.trim();
     const lastName  = form.querySelector('#lastName').value.trim();
     const email     = form.querySelector('#email').value.trim();
-    const confirmEmail = form.querySelector('#confirmEmail').value.trim();
     const phone     = form.querySelector('#phone').value.trim();
     const address   = form.querySelector('#address').value.trim();
     const city      = form.querySelector('#city').value.trim();
@@ -47,13 +134,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     const termsAccepted = form.querySelector('#terms').checked;
 
     // ============ 2. Validate Required Fields ============
-    if (!firstName || !lastName || !email || !confirmEmail || !phone || !address || !city || !state || !zipcode || !sex || !password || !dob) {
+    if (!firstName || !lastName || !email || !phone || !address || !city || !state || !zipcode || !sex || !password || !dob) {
       alert('Please complete all required fields (marked with *).');
-      return;
-    }
-
-    if (email !== confirmEmail) {
-      alert('Email addresses do not match. Please check your entries.');
       return;
     }
 
@@ -71,8 +153,12 @@ window.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    if (password.length < 6) {
-      alert('Password must be at least 6 characters long.');
+    // Validate password meets HIPAA-compliant strength requirements
+    const passwordRequirements = validatePasswordStrength(password);
+    if (!passwordRequirements.length || !passwordRequirements.uppercase || 
+        !passwordRequirements.lowercase || !passwordRequirements.number || 
+        !passwordRequirements.special) {
+      alert('Password must be at least 12 characters and include uppercase, lowercase, number, and special character (!@#$%^&*), etc.');
       return;
     }
 
@@ -127,7 +213,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         } else if (authError.message.includes('invalid email')) {
           friendlyMessage = 'Please enter a valid email address.';
         } else if (authError.message.includes('password')) {
-          friendlyMessage = 'Password is too weak. Please use at least 6 characters.';
+          friendlyMessage = 'Password does not meet requirements: 12+ characters, uppercase, lowercase, number, and special character.';
         } else if (authError.message.includes('network') || authError.message.includes('Connection')) {
           friendlyMessage = 'Network error. Please check your connection and try again.';
         } else if (authError.status === 500) {

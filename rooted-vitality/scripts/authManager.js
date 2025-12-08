@@ -362,6 +362,7 @@ window.authManager = {
     // ======================================================
     /**
      * Validate email and password input
+     * HIPAA Compliance: Enforce strong password requirements
      * @private
      */
     _validateInput(email, password) {
@@ -375,8 +376,20 @@ window.authManager = {
             return false;
         }
         
-        if (password.length < 6) {
-            alert('Password must be at least 6 characters.');
+        // HIPAA requirement: Minimum 12 characters
+        if (password.length < 12) {
+            alert('Password must be at least 12 characters long.');
+            return false;
+        }
+        
+        // Check for complexity: uppercase, lowercase, number, special character
+        const hasUppercase = /[A-Z]/.test(password);
+        const hasLowercase = /[a-z]/.test(password);
+        const hasNumber = /[0-9]/.test(password);
+        const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+        
+        if (!hasUppercase || !hasLowercase || !hasNumber || !hasSpecialChar) {
+            alert('Password must contain uppercase, lowercase, number, and special character.');
             return false;
         }
         

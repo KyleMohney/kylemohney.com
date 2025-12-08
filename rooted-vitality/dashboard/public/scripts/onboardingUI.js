@@ -210,7 +210,66 @@ function setupStep2Handler(onboardingData, saveLocalData) {
     });
 }
 
+// ======================================================
+// PASSWORD VALIDATION - Real-time feedback
+// ======================================================
+function validatePasswordStrength(password) {
+    const requirements = {
+        length: password.length >= 12,
+        uppercase: /[A-Z]/.test(password),
+        lowercase: /[a-z]/.test(password),
+        number: /[0-9]/.test(password),
+        special: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)
+    };
+    return requirements;
+}
+
+function updatePasswordStrengthIndicator(password) {
+    const indicator = document.getElementById('password-strength-indicator');
+    if (!indicator) return;
+
+    if (!password) {
+        indicator.style.display = 'none';
+        return;
+    }
+
+    indicator.style.display = 'block';
+    const reqs = validatePasswordStrength(password);
+    
+    // Update requirement checklist
+    document.getElementById('req-length').textContent = reqs.length ? '✓' : '✗';
+    document.getElementById('req-length').style.color = reqs.length ? '#4CAF50' : '#d32f2f';
+    
+    document.getElementById('req-uppercase').textContent = reqs.uppercase ? '✓' : '✗';
+    document.getElementById('req-uppercase').style.color = reqs.uppercase ? '#4CAF50' : '#d32f2f';
+    
+    document.getElementById('req-lowercase').textContent = reqs.lowercase ? '✓' : '✗';
+    document.getElementById('req-lowercase').style.color = reqs.lowercase ? '#4CAF50' : '#d32f2f';
+    
+    document.getElementById('req-number').textContent = reqs.number ? '✓' : '✗';
+    document.getElementById('req-number').style.color = reqs.number ? '#4CAF50' : '#d32f2f';
+    
+    document.getElementById('req-special').textContent = reqs.special ? '✓' : '✗';
+    document.getElementById('req-special').style.color = reqs.special ? '#4CAF50' : '#d32f2f';
+    
+    // Update strength bar
+    const allMet = Object.values(reqs).every(r => r);
+    const strengthFill = document.querySelector('.strength-fill');
+    const metCount = Object.values(reqs).filter(r => r).length;
+    const percentage = (metCount / 5) * 100;
+    strengthFill.style.width = percentage + '%';
+    strengthFill.style.backgroundColor = allMet ? '#4CAF50' : percentage > 60 ? '#FFC107' : '#d32f2f';
+}
+
 function setupStep3Handler(onboardingData, saveLocalData) {
+    // Add real-time password validation
+    const passwordInput = document.getElementById('onboarding-password');
+    if (passwordInput) {
+        passwordInput.addEventListener('input', (e) => {
+            updatePasswordStrengthIndicator(e.target.value);
+        });
+    }
+
     document.getElementById('step-3-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         
@@ -236,7 +295,6 @@ function setupStep3Handler(onboardingData, saveLocalData) {
         const dob = document.getElementById('onboarding-dob-signup').value;
         const sex = document.getElementById('onboarding-sex').value;
         const email = document.getElementById('onboarding-email').value.trim();
-        const confirmEmail = document.getElementById('onboarding-confirmEmail').value.trim();
         const password = document.getElementById('onboarding-password').value;
         const confirmPassword = document.getElementById('onboarding-confirmPassword').value;
         const phone = document.getElementById('onboarding-phone-signup').value.trim();
@@ -271,8 +329,8 @@ function setupStep3Handler(onboardingData, saveLocalData) {
             window.showAlertModal('Please select your sex');
             return;
         }
-        if (!email || email !== confirmEmail) {
-            window.showAlertModal('Please enter matching email addresses');
+        if (!email) {
+            window.showAlertModal('Please enter your email address');
             return;
         }
         if (!password || !confirmPassword) {
@@ -283,8 +341,18 @@ function setupStep3Handler(onboardingData, saveLocalData) {
             window.showAlertModal('Passwords do not match');
             return;
         }
-        if (password.length < 6) {
-            window.showAlertModal('Password must be at least 6 characters');
+        if (password.length < 12) {
+            window.showAlertModal('Password must be at least 12 characters');
+            return;
+        }
+        // Check password complexity: uppercase, lowercase, number, special character
+        const hasUppercase = /[A-Z]/.test(password);
+        const hasLowercase = /[a-z]/.test(password);
+        const hasNumber = /[0-9]/.test(password);
+        const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+        
+        if (!hasUppercase || !hasLowercase || !hasNumber || !hasSpecialChar) {
+            window.showAlertModal('Password must contain uppercase, lowercase, number, and special character');
             return;
         }
         if (!phone) {
