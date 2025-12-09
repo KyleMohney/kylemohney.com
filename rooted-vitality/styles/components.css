@@ -868,6 +868,22 @@ label {
 /* ========================================== */
 /* 5. MODALS & OVERLAYS */
 /* ========================================== */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    display: none;
+}
+
+.modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -2755,4 +2771,186 @@ label {
     font-size: 0.95rem;
     margin: 0;
     font-style: italic;
+}
+
+/* ========================================== */
+/* REVIEWS STYLING */
+/* ========================================== */
+
+.reviews-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.review-card {
+    background: var(--glass-overlay);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--card-border-light);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    box-shadow: var(--card-shadow-subtle);
+}
+
+.review-card:hover {
+    box-shadow: var(--card-shadow-hover);
+    border-color: var(--primary-opacity-20);
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    gap: 1rem;
+}
+
+.review-client-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.review-client-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--rooted-dark);
+    margin: 0;
+}
+
+.review-source-badge,
+.review-category-badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.35rem 0.75rem;
+    border-radius: var(--radius-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.review-source-badge {
+    background: var(--primary-opacity-10);
+    color: var(--rooted-primary);
+}
+
+.review-source-badge.platform {
+    background: var(--status-success-opacity);
+    color: var(--status-success);
+}
+
+.review-source-badge.external {
+    background: var(--primary-opacity-15);
+    color: var(--rooted-primary);
+}
+
+.review-category-badge {
+    background: var(--primary-opacity-10);
+    color: var(--rooted-primary);
+    text-transform: capitalize;
+    letter-spacing: normal;
+}
+
+.review-stars {
+    display: flex;
+    gap: 0.25rem;
+    font-size: 1.25rem;
+}
+
+.review-stars .star {
+    color: #d4af37;
+}
+
+.review-stars .star.empty {
+    color: #ccc;
+    opacity: 0.4;
+}
+
+.review-text {
+    color: var(--card-text-secondary);
+    line-height: 1.6;
+    margin: 0 0 1rem 0;
+    font-size: 0.95rem;
+}
+
+.review-photos-gallery {
+    display: flex;
+    gap: 0.75rem;
+    margin: 1rem 0;
+    flex-wrap: wrap;
+}
+
+.review-photo-thumbnail {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    border: 1px solid var(--card-border-light);
+}
+
+.review-photo-thumbnail:hover {
+    transform: scale(1.05);
+}
+
+.review-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid var(--primary-opacity-05);
+}
+
+.review-date {
+    font-size: 0.85rem;
+    color: var(--card-text-secondary);
+    font-style: italic;
+}
+
+.review-link-container {
+    margin: 1.5rem 0;
+}
+
+.review-link-container label {
+    display: block;
+    font-weight: 500;
+    color: var(--rooted-dark);
+    margin-bottom: 0.5rem;
+}
+
+.review-link-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--card-border-light);
+    border-radius: var(--radius-sm);
+    background: var(--glass-overlay);
+    color: var(--rooted-dark);
+    font-size: 0.9rem;
+    font-family: 'Monaco', 'Courier New', monospace;
+}
+
+.copy-input-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.copy-input-group .review-link-input {
+    flex: 1;
+}
+
+/* Empty state for no reviews */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    background: var(--glass-overlay);
+    border: 1px dashed var(--card-border-light);
+    border-radius: var(--radius-md);
+}
+
+.empty-icon {
+    color: var(--primary-opacity-30);
+    margin-bottom: 1rem;
 }

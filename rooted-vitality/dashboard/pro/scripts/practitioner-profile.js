@@ -996,7 +996,7 @@ async function loadReviews() {
         // Fetch real reviews from database
         const { data: dbReviews, error: reviewsError } = await window.supabaseClient
             .from('reviews')
-            .select('*')
+            .select('*, holistic_health_taxonomy(name)')
             .eq('practitioner_serial', practitionerData.serial_number)  // Use serial_number for queries
             .eq('is_visible', true)
             .order('created_at', { ascending: false });
@@ -1022,6 +1022,9 @@ async function loadReviews() {
                     displayName = review.client_name;
                 }
                 
+                // Extract category name from joined data
+                const categoryName = review.holistic_health_taxonomy?.name || null;
+                
                 return {
                     id: review.id,
                     clientName: displayName,
@@ -1030,7 +1033,9 @@ async function loadReviews() {
                     date: new Date(review.created_at),
                     source: 'platform',
                     verified: true,
-                    photos: review.photos || []
+                    photos: review.photos || [],
+                    categoryId: review.category_id || null,
+                    categoryName: categoryName
                 };
             });
         }
@@ -1098,6 +1103,7 @@ function createReviewCard(review) {
                 <div class="review-client-info">
                     <h3 class="review-client-name">${escapeHtml(review.clientName)}</h3>
                     <span class="review-source-badge ${review.source}">${source}</span>
+                    ${review.categoryName ? `<span class="review-category-badge">${escapeHtml(review.categoryName)}</span>` : ''}
                 </div>
                 <div class="review-stars">${stars}</div>
             </div>
@@ -1161,6 +1167,12 @@ function applyReviewFilters() {
 function showReviewLinkModal() {
     const modal = document.getElementById('review-link-modal');
     if (!modal) {
+        console.warn('[Reviews] Modal element not found');
+        return;
+    }
+    
+    if (!ProfileState.currentUser || !ProfileState.currentUser.id) {
+        console.warn('[Reviews] User not available for review link');
         return;
     }
     
@@ -1170,14 +1182,14 @@ function showReviewLinkModal() {
         linkInput.value = reviewLink;
     }
     
-    modal.style.display = 'block';
+    modal.classList.add('active');
 }
 
 // Close review link modal
 function closeReviewLinkModal() {
     const modal = document.getElementById('review-link-modal');
     if (modal) {
-        modal.style.display = 'none';
+        modal.classList.remove('active');
     }
 }
 

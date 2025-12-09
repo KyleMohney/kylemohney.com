@@ -347,7 +347,7 @@ async function loadReviews() {
                
         const { data, error } = await window.supabaseClient
             .from('reviews')
-            .select('*')
+            .select('*, holistic_health_taxonomy(name)')
             .eq('practitioner_serial', practitioner.serial_number)
             .eq('is_visible', true)
             .order('created_at', { ascending: false })
@@ -358,7 +358,11 @@ async function loadReviews() {
 
             reviews = [];
         } else {
-            reviews = data || [];
+            // Transform data to include category name from joined table
+            reviews = (data || []).map(review => ({
+                ...review,
+                category_name: review.holistic_health_taxonomy?.name || null
+            }));
 
             if (reviews.length > 0) {
 
@@ -1408,9 +1412,14 @@ function renderReviewsCard() {
                 photosHtml = `<div class="review-photos-gallery">${photoThumbnails}</div>`;
             }
             
+            const categoryBadge = review.category_name ? `<span class="review-category-badge">${escapeHtml(review.category_name)}</span>` : '';
+            
             return `
                 <div class="review-item">
-                    <div class="review-stars">${stars}${emptyStars}</div>
+                    <div class="review-header-compact">
+                        <div class="review-stars">${stars}${emptyStars}</div>
+                        ${categoryBadge}
+                    </div>
                     <p class="review-text">"${escapeHtml(review.review_text || '')}"</p>
                     ${photosHtml}
                     <div class="review-author">— ${escapeHtml(displayName)}</div>

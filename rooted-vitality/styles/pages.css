@@ -1157,3 +1157,53 @@ body.pro-dashboard main {
     background: #ac2925;
     border-color: #8b1f1a;
 }
+
+/* ========================================== */
+/* PUBLIC PROFILE REVIEWS */
+/* ========================================== */
+
+.review-item {
+    margin: 1rem 0;
+    padding: 1rem;
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--primary-opacity-10);
+}
+
+.review-header-compact {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    gap: 1rem;
+}
+
+.review-header-compact .review-stars {
+    flex-shrink: 0;
+}
+
+.review-category-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.3rem 0.6rem;
+    border-radius: var(--radius-sm);
+    background: var(--primary-opacity-10);
+    color: var(--rooted-primary);
+    text-transform: capitalize;
+    white-space: nowrap;
+}
+
+.review-text {
+    font-style: italic;
+    color: var(--card-text-secondary);
+    margin: 0.75rem 0;
+    line-height: 1.5;
+}
+
+.review-author {
+    font-size: 0.9rem;
+    color: var(--rooted-dark);
+    font-weight: 500;
+}
+
