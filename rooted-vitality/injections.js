@@ -162,7 +162,7 @@ const RootedVitality = {
      */
     log: function(message, type = 'info') {
         // Color styling removed for accessibility
-        console.log(message);
+        // console.log(message);
     },
     
     // ======================================================

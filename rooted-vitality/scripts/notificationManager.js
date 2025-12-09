@@ -392,7 +392,6 @@ async function notifyPractitionerOfMatchAcceptance(options) {
         console.error('[Notifications] Failed to create practitioner acceptance notification:', error);
       }
     }
-    }
 
     // Send email if enabled
     if (prefs.matches_email) {

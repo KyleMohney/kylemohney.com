@@ -41,8 +41,16 @@ if (typeof ModalManager !== 'undefined') {
 
 const ModalManager = {
   activeModals: new Set(),
+  isInitialized: false,
+  pageLoadTime: Date.now(),
   
   init() {
+    // Mark as initialized after a brief delay to prevent modals during initial page load
+    setTimeout(() => {
+      this.isInitialized = true;
+      // Clean up any orphaned modals from page refresh
+      this.cleanupOrphanedModals();
+    }, 100);
 
     // Ensure functions are available globally
     window.showAlertModal = this.showAlertModal.bind(this);
@@ -53,6 +61,19 @@ const ModalManager = {
     window.showStatusModal = this.showStatusModal.bind(this);
     window.showWelcomeModal = this.showWelcomeModal.bind(this);
     window.showToast = this.showToast.bind(this);
+  },
+
+  /**
+   * Clean up any orphaned modals that might exist from previous page loads
+   */
+  cleanupOrphanedModals() {
+    const overlays = document.querySelectorAll('[id$="-overlay"]');
+    overlays.forEach(overlay => {
+      // Skip if it's part of the onboarding modal
+      if (!overlay.id.includes('guided')) {
+        overlay.remove();
+      }
+    });
   },
 
   /**
@@ -129,6 +150,11 @@ const ModalManager = {
    * Show alert modal - uses CSS classes instead of inline styles
    */
   showAlertModal(message, onClose) {
+    // Prevent showing modals before initialization is complete
+    if (!this.isInitialized) {
+      return;
+    }
+
     const modalId = 'alert-modal-' + Date.now();
     const modalHTML = this.createModalHTML(modalId, 'Notice', message, 'OK', 'info');
     
@@ -149,7 +175,7 @@ const ModalManager = {
     modalOverlay.addEventListener('click', (e) => {
       if (e.target === modalOverlay) closeModal();
     });
-    
+
     // Allow Escape key to close
     const escapeHandler = (e) => {
       if (e.key === 'Escape' && modalOverlay && modalOverlay.parentNode) {
@@ -158,15 +184,18 @@ const ModalManager = {
       }
     };
     document.addEventListener('keydown', escapeHandler);
-  },
-
-  /**
+  },  /**
    * Show confirm modal - uses CSS classes instead of inline styles
    * @param {string} message - Message to display
    * @param {function} onConfirm - Callback on confirm
    * @param {function} onCancel - Callback on cancel
    */
   showConfirmModal(message, onConfirm, onCancel) {
+    // Prevent showing modals before initialization is complete
+    if (!this.isInitialized) {
+      return;
+    }
+
     const modalId = 'confirm-modal-' + Date.now();
     const modalHTML = this.createConfirmModalHTML(modalId, 'Confirm', message, 'Continue', 'Cancel');
     
@@ -217,6 +246,7 @@ const ModalManager = {
    * @param {function} onClose - Callback when closed
    */
   showSuccessModal(message, onClose) {
+    if (!this.isInitialized) return;
     const modalId = 'success-modal-' + Date.now();
     const modalHTML = this.createModalHTML(modalId, '✓ Success', message, 'Great!', 'success');
     
@@ -237,7 +267,7 @@ const ModalManager = {
     modalOverlay.addEventListener('click', (e) => {
       if (e.target === modalOverlay) closeModal();
     });
-    
+
     // Allow Escape key to close
     const escapeHandler = (e) => {
       if (e.key === 'Escape' && modalOverlay && modalOverlay.parentNode) {
@@ -246,18 +276,6 @@ const ModalManager = {
       }
     };
     document.addEventListener('keydown', escapeHandler);
-  },
-    
-    const closeModal = () => {
-      if (modalOverlay) modalOverlay.remove();
-      this.activeModals.delete(modalId);
-      if (onClose) onClose();
-    };
-    
-    closeBtn.addEventListener('click', closeModal);
-    modalOverlay.addEventListener('click', (e) => {
-      if (e.target === modalOverlay) closeModal();
-    });
   },
 
   /**
@@ -271,6 +289,7 @@ const ModalManager = {
    * @param {function} onClose - Callback when closed
    */
   showErrorModal(message, onClose) {
+    if (!this.isInitialized) return;
     const modalId = 'error-modal-' + Date.now();
     const modalHTML = this.createModalHTML(modalId, '✕ Error', message, 'Dismiss', 'error');
     
@@ -299,6 +318,7 @@ const ModalManager = {
    * @param {function} onClose - Callback when closed
    */
   showWarningModal(message, onClose) {
+    if (!this.isInitialized) return;
     const modalId = 'warning-modal-' + Date.now();
     const modalHTML = this.createModalHTML(modalId, '⚠ Warning', message, 'Got it', 'warning');
     
@@ -387,6 +407,7 @@ const ModalManager = {
    * @param {function} onClose - Callback when closed
    */
   showStatusModal(status, onClose) {
+    if (!this.isInitialized) return;
     const modalId = 'status-modal-' + Date.now();
     
     const statusConfig = {
@@ -459,6 +480,7 @@ const ModalManager = {
    * @param {function} onClose - Callback when closed (typically triggers redirect)
    */
   showWelcomeModal(clientName = '', onClose) {
+    if (!this.isInitialized) return;
     const modalId = 'welcome-modal-' + Date.now();
     const greeting = clientName ? `Welcome, ${clientName}!` : 'Welcome to Rooted Vitality!';
     const message = 'You\'re now part of a community dedicated to holistic wellness and meaningful connections. Let\'s find the perfect practitioners for your wellness journey.';

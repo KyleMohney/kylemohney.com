@@ -321,8 +321,8 @@ function injectUnifiedMessagingStyles() {
     }
 
     .message-group--sent .message-bubble {
-      background: linear-gradient(135deg, var(--rooted-primary) 0%, var(--rooted-primary-dark) 100%);
-      color: var(--rooted-neutral);
+      background: linear-gradient(135deg, #77883e 0%, #5f7030 100%) !important;
+      color: #ffffff !important;
       border-bottom-right-radius: 6px;
       margin-left: auto;
       max-width: none;
@@ -330,15 +330,19 @@ function injectUnifiedMessagingStyles() {
     }
 
     .message-group--sent .bubble-text {
-      color: #fbf7ec !important;
+      color: #ffffff !important;
     }
 
     .message-group--received .message-bubble {
-      background: #f3f1ec;
-      color: #333;
+      background: #e8e4d8 !important;
+      color: #2a2622 !important;
       border-bottom-left-radius: 6px;
       max-width: none;
       width: auto;
+    }
+
+    .message-group--received .bubble-text {
+      color: #2a2622 !important;
     }
 
     .bubble-text {

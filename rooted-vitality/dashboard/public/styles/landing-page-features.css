@@ -524,3 +524,44 @@
   }
 }
 
+/* ========================================== */
+/* DARK MODE OVERRIDES                       */
+/* ========================================== */
+@media (prefers-color-scheme: dark) {
+  .practitioners-scroll {
+    background: #1a1714 !important;
+    padding: 0.75rem 1rem;
+    position: relative;
+    overflow: visible;
+  }
+
+  .practitioners-scroll::before {
+    background: none !important;
+  }
+
+  .practitioners-scroll__title {
+    color: #ffffff !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+  }
+
+  .practitioners-scroll__subtitle {
+    color: #d9cc94 !important;
+    opacity: 0.9;
+  }
+
+  .practitioner-logo {
+    background: rgba(119, 136, 62, 0.15) !important;
+    border-color: rgba(119, 136, 62, 0.35) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(119, 136, 62, 0.2) !important;
+  }
+
+  .practitioner-logo:hover {
+    background: rgba(119, 136, 62, 0.25) !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(119, 136, 62, 0.3) !important;
+  }
+
+  .practitioner-logo img {
+    filter: brightness(1.1);
+  }
+}
+

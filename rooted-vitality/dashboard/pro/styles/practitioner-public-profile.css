@@ -1849,3 +1849,274 @@ button[disabled] {
     cursor: not-allowed;
 }
 
+/* ============================================
+   18. DARK MODE OVERRIDES
+   ============================================ */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-light: #1a1714;
+        --color-dark: #ffffff;
+        --color-text: #e8e4d8;
+        --color-muted: #b8b3b0;
+        --color-border: #4a4540;
+    }
+
+    body {
+        background: #1a1714 !important;
+        color: #e8e4d8 !important;
+    }
+
+    .profile-container {
+        background: #1a1714 !important;
+    }
+
+    .section-container {
+        background: #1a1714 !important;
+    }
+
+    .profile-loading,
+    .profile-error {
+        color: #b8b3b0 !important;
+    }
+
+    /* Hero section */
+    .hero-section {
+        background: linear-gradient(135deg, rgba(119, 136, 62, 0.2) 0%, rgba(95, 112, 48, 0.15) 100%), #1a1714 !important;
+    }
+
+    .hero-content h1 {
+        color: #ffffff !important;
+    }
+
+    .hero-content p {
+        color: #e8e4d8 !important;
+    }
+
+    .credential-badges {
+        background: #2a2622 !important;
+    }
+
+    .badge {
+        background: #77883e !important;
+        color: #ffffff !important;
+    }
+
+    /* Cards */
+    .card {
+        background: #2a2622 !important;
+        border-color: #4a4540 !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    .card h2,
+    .card h3,
+    .card h4 {
+        color: #ffffff !important;
+    }
+
+    .card p,
+    .card span {
+        color: #e8e4d8 !important;
+    }
+
+    /* Section cards */
+    .about-card,
+    .services-card,
+    .credentials-card,
+    .faq-card,
+    .reviews-card,
+    .contact-card {
+        background: #2a2622 !important;
+        border-color: #4a4540 !important;
+    }
+
+    .about-card h2,
+    .services-card h2,
+    .credentials-card h2,
+    .faq-card h2,
+    .reviews-card h2,
+    .contact-card h2 {
+        color: #ffffff !important;
+    }
+
+    .about-card p,
+    .services-card p,
+    .credentials-card p,
+    .faq-card p,
+    .reviews-card p,
+    .contact-card p {
+        color: #e8e4d8 !important;
+    }
+
+    /* Service tags */
+    .service-tag {
+        background: #3d3934 !important;
+        border-color: #77883e !important;
+        color: #d9cc94 !important;
+    }
+
+    .service-tag:hover {
+        background: #4a4540 !important;
+        color: #ffffff !important;
+    }
+
+    /* Credentials */
+    .credential-item {
+        background: #3d3934 !important;
+        border-color: #4a4540 !important;
+    }
+
+    .credential-item h4 {
+        color: #ffffff !important;
+    }
+
+    .credential-item p {
+        color: #e8e4d8 !important;
+    }
+
+    /* FAQ items */
+    .faq-item {
+        background: #2a2622 !important;
+        border-color: #4a4540 !important;
+    }
+
+    .faq-question {
+        color: #ffffff !important;
+    }
+
+    .faq-answer {
+        color: #e8e4d8 !important;
+    }
+
+    /* Reviews */
+    .review-item {
+        background: #2a2622 !important;
+        border-color: #4a4540 !important;
+    }
+
+    .review-author {
+        color: #ffffff !important;
+    }
+
+    .review-text {
+        color: #e8e4d8 !important;
+    }
+
+    /* Image gallery */
+    .gallery-grid {
+        background: #1a1714 !important;
+    }
+
+    .gallery-item {
+        background: #2a2622 !important;
+        border-color: #4a4540 !important;
+    }
+
+    /* Modal */
+    .modal-backdrop {
+        background: rgba(0, 0, 0, 0.7) !important;
+    }
+
+    .modal-content {
+        background: #2a2622 !important;
+        border-color: #4a4540 !important;
+    }
+
+    /* Buttons */
+    .btn-primary {
+        background: #77883e !important;
+        color: #ffffff !important;
+        border-color: #77883e !important;
+    }
+
+    .btn-primary:hover {
+        background: #5f7030 !important;
+        border-color: #5f7030 !important;
+    }
+
+    .btn-secondary {
+        background: #3d3934 !important;
+        color: #e8e4d8 !important;
+        border-color: #4a4540 !important;
+    }
+
+    .btn-secondary:hover {
+        background: #4a4540 !important;
+        border-color: #77883e !important;
+        color: #d9cc94 !important;
+    }
+
+    /* Social links */
+    .social-link {
+        background: #2a2622 !important;
+        border-color: #4a4540 !important;
+        color: #e8e4d8 !important;
+    }
+
+    .social-link:hover {
+        background: #77883e !important;
+        border-color: #77883e !important;
+        color: #ffffff !important;
+    }
+
+    /* Contact links */
+    .contact-link {
+        color: #d9cc94 !important;
+    }
+
+    .contact-link:hover {
+        color: #ffffff !important;
+    }
+
+    /* Video container */
+    .video-container {
+        background: #3d3934 !important;
+        border-color: #4a4540 !important;
+    }
+
+    /* Rating stars */
+    .stars {
+        color: #d9cc94 !important;
+    }
+
+    /* Text colors */
+    a {
+        color: #d9cc94 !important;
+    }
+
+    a:hover {
+        color: #ffffff !important;
+    }
+
+    /* Section headers */
+    .section-header {
+        border-bottom-color: #4a4540 !important;
+    }
+
+    .section-header h2 {
+        color: #ffffff !important;
+    }
+
+    /* Loading spinner */
+    .spinner {
+        border-color: #4a4540 !important;
+        border-top-color: #77883e !important;
+    }
+
+    /* Form inputs if any */
+    input,
+    textarea,
+    select {
+        background: #3d3934 !important;
+        color: #e8e4d8 !important;
+        border-color: #4a4540 !important;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+        border-color: #77883e !important;
+        box-shadow: 0 0 0 3px rgba(119, 136, 62, 0.2) !important;
+    }
+}
+

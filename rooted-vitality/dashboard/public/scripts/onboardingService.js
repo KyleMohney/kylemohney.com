@@ -574,9 +574,9 @@ async function loadMatchesForOnboarding(onboardingData) {
         container.innerHTML = '<p class="loading" style="color: #d32f2f;">Matching System Unavailable - The practitioner matching system is currently being deployed. Please try again in a few moments.</p>';
         return;
       }
-      }
-      } else {
-        matchData = rpcData;
+    } else {
+      matchData = rpcData;
+    }
 
     // Get top 3 matches sorted by match_score (descending)
     const topMatches = (matchData || [])

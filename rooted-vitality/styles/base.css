@@ -24,11 +24,11 @@ Extracted from: styles_legacy.css (lines 1-890)
     /* Brand Palette */
     --rooted-primary: #77883e;
     --rooted-primary-dark: #5f7030;
+    --rooted-light: #fbf7ec;
     --rooted-accent: #d4c47c;
-    --rooted-neutral: var(--rooted-light);
-    --rooted-sage: var(--rooted-light);
+    --rooted-neutral: #e8e4d8;
+    --rooted-sage: #fbf7ec;
     --rooted-dark: #2e2b28;
-    --rooted-light: var(--rooted-light);
     
     /* Status Colors */
     --rooted-success: #77883e;
@@ -36,7 +36,7 @@ Extracted from: styles_legacy.css (lines 1-890)
     --rooted-danger: #d32f2f;
     
     /* Card & Alert Design Tokens */
-    --card-bg-primary: var(--rooted-light);
+    --card-bg-primary: #fbf7ec;
     --card-bg-gradient-light: rgba(119, 136, 62, 0.08);
     --card-bg-gradient-accent: rgba(235, 246, 232, 0.6);
     --card-bg-gradient-accent-soft: rgba(235, 246, 232, 0.5);
@@ -119,6 +119,12 @@ Extracted from: styles_legacy.css (lines 1-890)
     --color-white: var(--rooted-light);
     --text-light: #fbf7ec;  /* Light text for dark backgrounds */
     
+    /* Message Bubble Variables - Light Mode (Default) */
+    --message-own-bg: linear-gradient(135deg, var(--rooted-primary) 0%, var(--rooted-primary-dark) 100%);
+    --message-other-bg: var(--rooted-neutral);
+    --message-own-text: #fbf7ec;
+    --message-other-text: var(--rooted-dark);
+    
     /* Shadow System */
     --shadow-minimal: 0 2px 8px rgba(46, 43, 40, 0.08);
     --shadow-light: 0 8px 24px rgba(46, 43, 40, 0.10);
@@ -149,121 +155,6 @@ Extracted from: styles_legacy.css (lines 1-890)
     --glass-white: rgba(251, 247, 236, 0.65);
     --glass-light: rgba(251, 247, 236, 0.80);
     --glass-overlay: rgba(251, 247, 236, 0.95);
-}
-
-/* ========================================== */
-/* DARK MODE PALETTE */
-/* ========================================== */
-@media (prefers-color-scheme: dark) {
-    :root {
-        /* Brand Palette - Dark Mode Variants */
-        --rooted-primary: #88a947;          /* Lighter green for contrast */
-        --rooted-primary-dark: #9bb85f;     /* Even lighter for dark mode */
-        --rooted-accent: #d9cc94;           /* Brighter yellow/gold */
-        --rooted-neutral: #e8e4d8;          /* Light cream text for dark backgrounds */
-        --rooted-sage: #1a1714;             /* Dark background */
-        --rooted-dark: #e8e4d8;             /* Light text */
-        --rooted-light: #1a1714;            /* Dark background */
-        
-        /* Status Colors - Dark Mode */
-        --rooted-success: #10b981;
-        --rooted-warning: #fbbf24;
-        --rooted-danger: #f87171;
-        
-        /* Card & Alert Design Tokens - Dark Mode */
-        --card-bg-primary: #2a2622;
-        --card-bg-gradient-light: rgba(136, 169, 71, 0.08);
-        --card-bg-gradient-accent: rgba(58, 58, 50, 0.6);
-        --card-bg-gradient-accent-soft: rgba(58, 58, 50, 0.5);
-        --card-border-primary: #996633;    /* Warmer border in dark */
-        --card-border-accent: #88a947;
-        --card-border-light: #3d3934;
-        --card-shadow-subtle: 0 2px 8px rgba(0, 0, 0, 0.3);
-        --card-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.4);
-        --card-text-primary: #e8e4d8;
-        --card-text-secondary: #b0aca4;
-        --card-accent-color: #88a947;
-        --card-icon-color: #88a947;
-        
-        /* Primary Color Opacity Variants - Dark Mode */
-        --primary-opacity-01: rgba(136, 169, 71, 0.01);
-        --primary-opacity-02: rgba(136, 169, 71, 0.02);
-        --primary-opacity-03: rgba(136, 169, 71, 0.03);
-        --primary-opacity-05: rgba(136, 169, 71, 0.05);
-        --primary-opacity-08: rgba(136, 169, 71, 0.08);
-        --primary-opacity-10: rgba(136, 169, 71, 0.1);
-        --primary-opacity-12: rgba(136, 169, 71, 0.12);
-        --primary-opacity-15: rgba(136, 169, 71, 0.15);
-        --primary-opacity-20: rgba(136, 169, 71, 0.2);
-        --primary-opacity-30: rgba(136, 169, 71, 0.3);
-        --primary-opacity-40: rgba(136, 169, 71, 0.4);
-        
-        /* Accent Color Opacity Variants - Dark Mode */
-        --accent-opacity-05: rgba(217, 204, 148, 0.05);
-        --accent-opacity-10: rgba(217, 204, 148, 0.1);
-        --accent-opacity-12: rgba(217, 204, 148, 0.12);
-        --accent-opacity-15: rgba(217, 204, 148, 0.15);
-        
-        /* Dark Color Opacity Variants - Dark Mode */
-        --dark-opacity-02: rgba(232, 228, 216, 0.02);
-        --dark-opacity-05: rgba(232, 228, 216, 0.05);
-        --dark-opacity-10: rgba(232, 228, 216, 0.1);
-        --dark-opacity-15: rgba(232, 228, 216, 0.15);
-        --dark-opacity-20: rgba(232, 228, 216, 0.2);
-        --dark-opacity-50: rgba(232, 228, 216, 0.5);
-        
-        /* Neutral Color Opacity Variants - Dark Mode */
-        --neutral-opacity-60: rgba(42, 38, 34, 0.6);
-        --neutral-opacity-80: rgba(42, 38, 34, 0.8);
-        --neutral-opacity-95: rgba(42, 38, 34, 0.95);
-        
-        /* Status Colors Extended - Dark Mode */
-        --status-success: #34d399;
-        --status-success-dark: #6ee7b7;
-        --status-warning: #fbbf24;
-        --status-warning-dark: #fcd34d;
-        --status-danger: #f87171;
-        --status-danger-dark: #fca5a5;
-        --status-danger-darker: #fecaca;
-        --status-inactive: #4b5563;
-        --status-inactive-dark: #6b7280;
-        --status-paused: #c9a47c;
-        --status-completed: #d97e8b;
-        
-        /* Border & Light Colors - Dark Mode */
-        --border-light: #4a4540;
-        --border-dark: #6d6961;
-        --text-light-grey: #7a7670;
-        --text-muted-light: #9e9a95;
-        --primary-light: rgba(136, 169, 71, 0.08);
-        --accent-light: rgba(217, 204, 148, 0.08);
-        --hover: #4a5f2a;
-        
-        /* Legacy Support - Dark Mode */
-        --color-hero-green: #1b3a1b;
-        --color-hero-cream: #2a2622;
-        --color-hero-peach: #3d2820;
-        --color-hover: #4a5f2a;
-        --color-button: #88a947;
-        
-        /* Text Colors - Dark Mode */
-        --color-text: #e8e4d8;
-        --color-text-light: #d4cfc3;
-        --color-text-muted: #9e9a95;
-        --color-white: #1a1714;
-        --text-light: #e8e4d8;  /* Light text for dark backgrounds */
-        
-        /* Shadow System - Dark Mode */
-        --shadow-minimal: 0 2px 8px rgba(0, 0, 0, 0.3);
-        --shadow-light: 0 8px 24px rgba(0, 0, 0, 0.4);
-        --shadow-medium: 0 8px 24px rgba(0, 0, 0, 0.35);
-        --shadow-elevated: 0 24px 48px rgba(0, 0, 0, 0.5);
-        
-        /* Glass-morphism - Dark Mode */
-        --glass-white: rgba(42, 38, 34, 0.65);
-        --glass-light: rgba(42, 38, 34, 0.80);
-        --glass-overlay: rgba(42, 38, 34, 0.95);
-    }
 }
 
 /* ========================================== */
@@ -458,43 +349,7 @@ select:focus-visible {
 }
 
 /* Dark mode support */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --rooted-primary: #92c5a8;
-        --rooted-dark: #e8e8e8;
-        --color-text: #f0f0f0;
-        --glass-light: rgba(45, 52, 45, 0.8);
-    }
-    
-    body {
-        background: #1a1a1a;
-        color: #f0f0f0;
-    }
-    
-    input, textarea, select {
-        background: rgba(255, 255, 255, 0.08) !important;
-        color: #f0f0f0 !important;
-        border-color: rgba(212, 196, 124, 0.3);
-    }
-    
-    input::placeholder, textarea::placeholder {
-        color: rgba(240, 240, 240, 0.5) !important;
-    }
-    
-    .modal-overlay .modal-content {
-        background: #2a2a2a;
-        color: #f0f0f0;
-        border-color: rgba(212, 196, 124, 0.2);
-    }
-    
-    .modal-body {
-        background: #2a2a2a;
-    }
-    
-    label {
-        color: #f0f0f0;
-    }
-}
+
 
 /* High contrast */
 @media (prefers-contrast: high) {
@@ -503,7 +358,7 @@ select:focus-visible {
         --shadow-light: 0 8px 24px rgba(0, 0, 0, 0.25);
         --shadow-medium: 0 8px 24px rgba(0, 0, 0, 0.20);
     }
-    .glass-var(--rooted-light), .glass-light { background: rgba(251, 247, 236, 0.95); }
+    .glass, .glass-light { background: rgba(251, 247, 236, 0.95); }
 }
 
 /* Responsive Watermark Scaling */
@@ -554,6 +409,7 @@ select:focus-visible {
     background: #7a7a7a;
     color: #ffffff;
 }
+
 
 
 

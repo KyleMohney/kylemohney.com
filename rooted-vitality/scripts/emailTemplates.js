@@ -79,13 +79,13 @@ const EmailTemplates = {
       '<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', \'Helvetica Neue\', Arial, sans-serif; background-color: ' + c.lightBg + ';">' +
       '<div style="max-width: 600px; margin: 0 auto; background-color: ' + c.lightBg + ';">' +
       '<div style="background: linear-gradient(135deg, ' + c.primary + ' 0%, ' + c.primaryDark + ' 100%); padding: 40px 20px; text-align: center; border-bottom: 4px solid ' + c.primaryDark + ';">' +
-      '<h1 style="margin: 0; color: ' + c.lightBg + '; font-size: 28px; font-weight: 700; letter-spacing: -0.5px;">âœ" Connection Accepted!</h1>' +
+      '<h1 style="margin: 0; color: ' + c.lightBg + '; font-size: 28px; font-weight: 700; letter-spacing: -0.5px;">✓ Connection Accepted!</h1>' +
       '</div>' +
       '<div style="padding: 40px 30px;">' +
       '<p style="margin: 0 0 20px 0; font-size: 16px; color: ' + c.darkText + '; line-height: 1.6;">Hi <strong>' + clientName + '</strong>,</p>' +
       '<p style="margin: 0 0 24px 0; font-size: 15px; color: ' + c.mediumText + '; line-height: 1.6;">Great news! <strong>' + practitionerName + '</strong> has accepted your match request for <strong>"' + projectName + '"</strong>.</p>' +
       '<div style="background-color: ' + c.lightBg + '; border-left: 4px solid ' + c.primary + '; padding: 20px; margin: 24px 0; border-radius: 4px;">' +
-      '<p style="margin: 0; font-size: 14px; color: ' + c.primaryDark + '; font-weight: 500;">ðŸ'¬ You can now start messaging with ' + practitionerName + ' to discuss your wellness goals.</p>' +
+      '<p style="margin: 0; font-size: 14px; color: ' + c.primaryDark + '; font-weight: 500;">💬 You can now start messaging with ' + practitionerName + ' to discuss your wellness goals.</p>' +
       '</div>' +
       '<div style="text-align: center; margin: 32px 0;">' +
       '<a href="https://rootedvitality.com/rooted-vitality/dashboard/client/pages/inbox.html" style="display: inline-block; background-color: ' + c.primary + '; color: ' + c.lightBg + '; padding: 12px 32px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 15px;">View Your Matches</a>' +

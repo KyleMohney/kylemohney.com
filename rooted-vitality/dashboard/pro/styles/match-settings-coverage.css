@@ -1045,4 +1045,137 @@
   display: none;
 }
 
+/* ========================================== */
+/* DARK MODE OVERRIDES */
+/* ========================================== */
+@media (prefers-color-scheme: dark) {
+  .travel-type-checkboxes {
+    background: #2a2622 !important;
+    border-color: #4a4540 !important;
+  }
+
+  .coverage-section-header {
+    background: #2a2622 !important;
+    border-color: #4a4540 !important;
+  }
+
+  .inoffice-config-title,
+  .housecalls-config-title,
+  .virtual-config-title {
+    color: #ffffff !important;
+  }
+
+  .coverage-section-group {
+    background: #2a2622 !important;
+    border-color: #4a4540 !important;
+  }
+
+  .coverage-option-box {
+    background: #2a2622 !important;
+    border-color: #4a4540 !important;
+  }
+
+  .coverage-option-title {
+    color: #ffffff !important;
+  }
+
+  .coverage-option-description,
+  .coverage-option-note {
+    color: #e8e4d8 !important;
+  }
+
+  .form-control {
+    background: #3d3934 !important;
+    color: #e8e4d8 !important;
+    border-color: #4a4540 !important;
+  }
+
+  .form-control:focus {
+    border-color: #77883e !important;
+    box-shadow: 0 0 0 3px rgba(119, 136, 62, 0.2) !important;
+  }
+
+  .coverage-section-label {
+    color: #e8e4d8 !important;
+  }
+
+  .checkbox-label {
+    color: #e8e4d8 !important;
+  }
+
+  .coverage-radius-display {
+    color: #d9cc94 !important;
+  }
+
+  .radius-slider {
+    accent-color: #77883e !important;
+  }
+
+  .coverage-option-checkbox,
+  .checkbox-item input[type="checkbox"] {
+    accent-color: #77883e !important;
+  }
+
+  .coverage-tags-container {
+    background: #3d3934 !important;
+    border-color: #4a4540 !important;
+  }
+
+  .coverage-tag {
+    background: #77883e !important;
+    color: #ffffff !important;
+  }
+
+  .coverage-csv-hint {
+    color: #b8b3b0 !important;
+  }
+
+  .btn-remove-item {
+    color: #d9cc94 !important;
+  }
+
+  .btn-remove-item:hover {
+    color: #ffffff !important;
+  }
+
+  .map-card-wrapper {
+    background: #2a2622 !important;
+    border-color: #4a4540 !important;
+  }
+
+  .coverage-map-placeholder {
+    background: #3d3934 !important;
+    color: #b8b3b0 !important;
+  }
+
+  .remote-notice-box {
+    background: #2a2622 !important;
+    border-color: #4a4540 !important;
+    color: #e8e4d8 !important;
+  }
+
+  .coverage-workflow-3col {
+    background: #1a1714 !important;
+  }
+
+  .coverage-controls-column {
+    background: #1a1714 !important;
+  }
+
+  .availability-time-selector {
+    background: #2a2622 !important;
+    border-color: #4a4540 !important;
+  }
+
+  .availability-item {
+    background: #2a2622 !important;
+    border-color: #4a4540 !important;
+    color: #e8e4d8 !important;
+  }
+
+  .tooltip-icon-inline {
+    color: #b8b3b0 !important;
+  }
+}
+
 

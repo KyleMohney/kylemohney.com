@@ -9,14 +9,14 @@
   ║ File:        settings.html                                                  ║
   ║ Purpose:     Client account settings and preferences management             ║
   ║ Description: Settings sidebar navigation, account info, notifications,      ║
-  ║              memberships, security, privacy preferences                     ║
+  ║              security, privacy preferences                                   ║
   ║ Last Update: November 2025                                                  ║
   ║ Status:      Production-Ready | Build Standard v2.0 Compliant               ║
   ║                                                                             ║
   ║ QUICK REFERENCE:                                                            ║
   ║ - Layout: Sidebar Navigation | Settings Content Area                        ║
   ║ - Design System: CSS Classes, Settings Cards, Form Elements                 ║
-  ║ - Features: Account, Notifications, Memberships, Security Management        ║
+  ║ - Features: Account, Notifications, Security Management                     ║
   ║                                                                             ║
   ╚═════════════════════════════════════════════════════════════════════════════╝
   -->
@@ -33,10 +33,9 @@
        6. SETTINGS CONTENT AREA
        7. ACCOUNT SETTINGS SECTION
        8. NOTIFICATIONS SETTINGS SECTION
-       9. MEMBERSHIPS SETTINGS SECTION
-       10. SECURITY SETTINGS SECTION
-       11. FOOTER (INJECTED)
-       12. SCRIPTS
+       9. SECURITY SETTINGS SECTION
+       10. FOOTER (INJECTED)
+       11. SCRIPTS
        
        ═════════════════════════════════════════════════════════════════════════
   -->
@@ -68,6 +67,9 @@
        2. STYLESHEETS
        ═════════════════════════════════════════════════════════════════════════ -->
   <link rel="stylesheet" href="../../../styles/styles.css">
+  <link rel="stylesheet" href="../../../styles/dark-mode-foundation.css">
+  <link rel="stylesheet" href="../../../styles/dark-mode-components.css">
+  <link rel="stylesheet" href="../../../styles/dark-mode-pages.css">
   <link rel="stylesheet" href="../styles/client-settings.css">
 </head>
 <body class="rooted-body client-view">
@@ -92,7 +94,6 @@
       <ul class="settings-nav-list">
         <li><a href="#account" class="settings-nav-link active" data-section="account">Account</a></li>
         <li><a href="#notifications" class="settings-nav-link" data-section="notifications">Notifications</a></li>
-        <li><a href="#memberships" class="settings-nav-link" data-section="memberships">Memberships</a></li>
         <li><a href="#security" class="settings-nav-link" data-section="security">Security</a></li>
       </ul>
     </nav>
@@ -336,65 +337,6 @@
         <!-- Section Footer with Save Button -->
         <div class="section-footer">
           <button id="save-notifications-btn" class="btn-accent">Save Notification Preferences</button>
-        </div>
-      </section>
-
-      <!-- ═══════════════════════════════════════════════════════════════════════════
-           9. MEMBERSHIPS SETTINGS SECTION
-           ═════════════════════════════════════════════════════════════════════════ -->
-      <section class="settings-section" data-section="memberships" id="memberships">
-        <div class="settings-section-header">
-          <h1>Memberships & Billing</h1>
-          <p class="section-description">Manage your active memberships and subscription</p>
-        </div>
-
-        <!-- Active Subscription -->
-        <div class="settings-card">
-          <div class="card-header">
-            <h3>Active Subscription</h3>
-          </div>
-          <div class="card-content">
-            <div class="subscription-info">
-              <div class="subscription-status">
-                <p class="subscription-plan" id="current-plan">Free Plan</p>
-                <p class="subscription-detail" id="plan-detail">Get started with wellness guidance</p>
-              </div>
-              <button class="btn-setting-action" id="upgrade-plan-btn">View Plans</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Billing Information -->
-        <div class="settings-card">
-          <div class="card-header">
-            <h3>Billing Information</h3>
-          </div>
-          <div class="card-content">
-            <p class="setting-description">View and manage your billing details</p>
-            <button class="btn-secondary" id="view-billing-btn">View Billing History</button>
-          </div>
-        </div>
-
-        <!-- Payment Methods -->
-        <div class="settings-card">
-          <div class="card-header">
-            <h3>Payment Methods</h3>
-          </div>
-          <div class="card-content">
-            <p class="setting-description">Manage your payment methods on file</p>
-            <button class="btn-secondary" id="manage-payment-btn">Manage Payment Methods</button>
-          </div>
-        </div>
-
-        <!-- Subscription History -->
-        <div class="settings-card">
-          <div class="card-header">
-            <h3>Subscription History</h3>
-          </div>
-          <div class="card-content">
-            <p class="setting-description">View your past and current subscriptions</p>
-            <button class="btn-secondary" id="view-history-btn">View History</button>
-          </div>
         </div>
       </section>
 

@@ -45,7 +45,7 @@
     /* Message bubble backgrounds */
     --message-own-bg: linear-gradient(135deg, var(--rooted-primary) 0%, var(--rooted-primary-dark) 100%);
     --message-other-bg: var(--rooted-neutral);
-    --message-own-text: var(--rooted-neutral);
+    --message-own-text: #fbf7ec;
     --message-other-text: var(--rooted-dark);
     
     /* Custom Shadow Variations (inbox-specific) */
@@ -1070,14 +1070,14 @@
 
 .message-group.own .message-bubble {
     background: var(--message-own-bg);
-    color: var(--text-light) !important;
+    color: var(--message-own-text);
     border-bottom-right-radius: 6px;
     margin-left: auto !important;
 }
 
 .message-group--sent .message-bubble {
     background: var(--message-own-bg);
-    color: var(--text-light) !important;
+    color: var(--message-own-text);
     margin-left: auto !important;
     border-bottom-right-radius: 6px;
 }
@@ -1698,19 +1698,25 @@ button.disabled {
     pointer-events: none;
 }
 
-/* Dark Mode Text & Bubble Override - Readable messaging on dark backgrounds */
+/* ========================================== */
+/* DARK MODE - INBOX SPECIFIC OVERRIDES */
+/* ========================================== */
 @media (prefers-color-scheme: dark) {
-    /* User's own messages: white text on green bubble */
-    .message-group.own .message-bubble,
-    .message-group--sent .message-bubble {
-        color: #ffffff !important;
+    /* Only inbox-specific rules not covered by dark-mode.css */
+    
+    .thread-item-header,
+    .thread-item-content,
+    .thread-name,
+    .thread-phone-display,
+    .thread-status,
+    .thread-date {
+        color: inherit;
     }
     
-    /* Other user's messages: black text on light background */
-    .message-group.other .message-bubble,
-    .message-group--received .message-bubble {
-        color: #000000 !important;
-        background: #e8e4d8 !important;
+    .thread-phone-display,
+    .thread-secondary-text,
+    .thread-metadata {
+        color: #77883e;
     }
 }
 

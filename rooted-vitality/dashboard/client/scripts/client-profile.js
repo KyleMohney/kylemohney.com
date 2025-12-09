@@ -143,23 +143,18 @@ function populateDashboardForms(userData) {
 async function loadWellnessProfileFromSupabase(userId) {
     try {
         
-        const { data: clientProfile, error } = await window.supabaseClient
+        const { data: profiles, error } = await window.supabaseClient
             .from('client_profiles')
             .select('id, user_id, serial_number, main_wellness_goal, duration_of_issue, what_tried_before, allergies_sensitivities, current_medications_supplements, typical_day_description, communication_preference, biggest_barrier_to_healing, prior_practitioner_experience, desired_success_outcome')
-            .eq('user_id', userId)
-            .single();
+            .eq('user_id', userId);
 
         if (error) {
-            if (error.code === 'PGRST116') {
-                // No rows found, which is expected for new profiles
-            } else {
-                console.error('[Dashboard] Error fetching wellness profile:', error);
-            }
+            console.error('[Dashboard] Error fetching wellness profile:', error);
             return;
         }
         
-        if (clientProfile) {
-            populateWellnessForm(clientProfile);
+        if (profiles && profiles.length > 0) {
+            populateWellnessForm(profiles[0]);
         }
     } catch (error) {
         console.error('[Dashboard] Exception loading wellness profile:', error);

@@ -1,0 +1,52 @@
+/*
+DARK MODE SYSTEM MIGRATION - STATUS
+=====================================
+
+COMPLETED ACTIONS:
+✓ Created centralized dark-mode.css with:
+  - Complete dark mode CSS variables palette
+  - Dark mode base elements (body, text, links, forms, buttons)
+  - Dark mode components (nav, modals, alerts, tabs, dropdowns)
+  - Dark mode messaging/chat (message bubbles, conversation lists)
+  - Dark mode dashboard (sidebar, filters, tips)
+  - Dark mode utilities
+
+✓ Added dark-mode.css to all dashboard pages:
+  - Pro dashboard: index.html, inbox.html, profile.html, settings.html, practitioner-signup.html, match-settings.html, practitioner-public-profile.html
+  - Client dashboard: inbox.html, my-wellness.html, find-practitioners.html, settings.html, client-signup.html, client-profile.html, public-profile.html
+
+✓ Cleaned up inbox-specific dark mode overrides:
+  - Removed 200+ lines of !important flags from pro/styles/inbox.css
+  - Replaced with minimal, intelligent overrides
+  - Kept only inbox-specific color definitions for phone/metadata
+
+✓ Removed redundant dark mode from:
+  - rooted-vitality/dashboard/client/styles/inbox-interactive.css
+
+✓ Removed dark mode section from:
+  - rooted-vitality/styles/base.css (verified clean)
+
+REMAINING CLEANUP:
+- Remove @media (prefers-color-scheme: dark) from other CSS files:
+  - rooted-vitality/styles/article.css
+  - rooted-vitality/styles/components.css
+  - rooted-vitality/styles/find-practitioners.css
+  - rooted-vitality/styles/layout.css
+  - rooted-vitality/styles/modal-system.css
+  - rooted-vitality/styles/pages.css
+  - rooted-vitality/styles/report-concern-widget.css
+  - rooted-vitality/styles/styles.css
+  - Dashboard CSS files (multiple)
+
+NEXT STEPS:
+1. Remove dark mode @media blocks from remaining CSS files
+2. Test dark mode on MacBook to verify all elements are styled
+3. Verify chat window conversation bubbles respond to dark mode
+4. Commit all changes
+
+NOTES:
+- dark-mode.css now handles ALL dark mode styling
+- Individual CSS files should NOT have dark mode overrides
+- This creates a single source of truth for dark mode design
+- Performance: One dedicated file loads once vs scattered rules throughout
+*/

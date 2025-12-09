@@ -1660,4 +1660,245 @@ input:checked + .toggle-slider:before {
   outline: none;
 }
 
+/* ========================================== */
+/* DARK MODE OVERRIDES */
+/* ========================================== */
+@media (prefers-color-scheme: dark) {
+  .nav-section-item {
+    background: #2a2622 !important;
+    border-color: #4a4540 !important;
+    color: #e8e4d8 !important;
+  }
+
+  .nav-section-item:hover {
+    background: #3d3934 !important;
+    border-color: #77883e !important;
+    color: #ffffff !important;
+  }
+
+  .nav-section-item.active {
+    background: #3d3934 !important;
+    color: #77883e !important;
+    border-color: #77883e !important;
+    box-shadow: 0 2px 8px rgba(119, 136, 62, 0.2) !important;
+  }
+
+  .match-settings-main {
+    background: #1a1714 !important;
+  }
+
+  .content-panel,
+  .match-settings-card {
+    background: #2a2622 !important;
+    border-color: #4a4540 !important;
+  }
+
+  .card-section {
+    background: #2a2622 !important;
+  }
+
+  .card-section-title {
+    color: #ffffff !important;
+  }
+
+  .section-description {
+    color: #e8e4d8 !important;
+  }
+
+  .universal-card {
+    background: #2a2622 !important;
+    border-color: #4a4540 !important;
+  }
+
+  .matching-status-value {
+    color: #d9cc94 !important;
+  }
+
+  .btn-success,
+  .btn-primary {
+    background-color: #77883e !important;
+    color: #ffffff !important;
+    border-color: #77883e !important;
+  }
+
+  .btn-success:hover,
+  .btn-primary:hover {
+    background-color: #5f7030 !important;
+    border-color: #5f7030 !important;
+  }
+
+  .btn-ghost {
+    background-color: #3d3934 !important;
+    color: #e8e4d8 !important;
+    border-color: #4a4540 !important;
+  }
+
+  .btn-ghost:hover {
+    background-color: #4a4540 !important;
+    border-color: #77883e !important;
+    color: #d9cc94 !important;
+  }
+
+  /* Coverage, Specialties, and Availability tab dark mode */
+  .coverage-option-box {
+    background: #2a2622 !important;
+    border-color: #4a4540 !important;
+    color: #e8e4d8 !important;
+  }
+
+  .coverage-option-title {
+    color: #ffffff !important;
+  }
+
+  .coverage-option-description {
+    color: #e8e4d8 !important;
+  }
+
+  .coverage-config-title,
+  .housecalls-config-title,
+  .virtual-config-title {
+    color: #ffffff !important;
+  }
+
+  .coverage-section-group {
+    background: #2a2622 !important;
+  }
+
+  .coverage-controls-column {
+    background: #1a1714 !important;
+  }
+
+  .form-control {
+    background: #3d3934 !important;
+    color: #e8e4d8 !important;
+    border-color: #4a4540 !important;
+  }
+
+  .form-control:focus {
+    border-color: #77883e !important;
+    box-shadow: 0 0 0 3px rgba(119, 136, 62, 0.2) !important;
+  }
+
+  .coverage-section-label {
+    color: #e8e4d8 !important;
+  }
+
+  .coverage-radius-display {
+    color: #d9cc94 !important;
+  }
+
+  .radius-slider {
+    accent-color: #77883e !important;
+  }
+
+  .coverage-option-checkbox {
+    accent-color: #77883e !important;
+  }
+
+  .coverage-tags-container {
+    background: #3d3934 !important;
+  }
+
+  .coverage-tag {
+    background: #77883e !important;
+    color: #ffffff !important;
+  }
+
+  .coverage-csv-hint {
+    color: #b8b3b0 !important;
+  }
+
+  .search-container {
+    background: #3d3934 !important;
+  }
+
+  .search-input {
+    background: #3d3934 !important;
+    color: #e8e4d8 !important;
+    border-color: #4a4540 !important;
+  }
+
+  .search-input::placeholder {
+    color: #8a8580 !important;
+  }
+
+  .autocomplete-dropdown {
+    background: #2a2622 !important;
+    border-color: #4a4540 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+  }
+
+  .autocomplete-item {
+    background: #2a2622 !important;
+    color: #e8e4d8 !important;
+    border-color: #4a4540 !important;
+  }
+
+  .autocomplete-item:hover {
+    background: #3d3934 !important;
+  }
+
+  .empty-state {
+    background: #2a2622 !important;
+    color: #b8b3b0 !important;
+    border-color: #4a4540 !important;
+  }
+
+  .category-item {
+    background: #2a2622 !important;
+    border-color: #4a4540 !important;
+    color: #e8e4d8 !important;
+  }
+
+  .category-item-badge {
+    background: #77883e !important;
+    color: #ffffff !important;
+  }
+
+  .btn-neutral {
+    background-color: #3d3934 !important;
+    color: #e8e4d8 !important;
+    border-color: #4a4540 !important;
+  }
+
+  .btn-neutral:hover {
+    background-color: #4a4540 !important;
+    border-color: #77883e !important;
+    color: #d9cc94 !important;
+  }
+
+  .availability-item,
+  .availability-slot {
+    background: #2a2622 !important;
+    border-color: #4a4540 !important;
+    color: #e8e4d8 !important;
+  }
+
+  .availability-header {
+    background: #3d3934 !important;
+    color: #ffffff !important;
+  }
+
+  .toggle-switch-large {
+    accent-color: #77883e !important;
+  }
+
+  .matching-disclaimer-content {
+    background: #2a2622 !important;
+    color: #e8e4d8 !important;
+  }
+
+  .pause-info-text {
+    color: #e8e4d8 !important;
+  }
+
+  .pause-info-title {
+    color: #ffffff !important;
+  }
+
+  .pause-info-time {
+    color: #b8b3b0 !important;
+  }
+}
+
 

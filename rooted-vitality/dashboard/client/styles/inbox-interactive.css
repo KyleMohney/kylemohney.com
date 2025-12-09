@@ -207,8 +207,8 @@
 }
 
 .message--practitioner .message__bubble {
-  background: var(--color-border);
-  color: var(--color-text);
+  background: #e8e4d8;
+  color: var(--text-on-light, #2a2622);
   border-bottom-left-radius: 0.25rem;
 }
 
@@ -1426,20 +1426,7 @@
 
 /* Dark Mode Text & Message Bubble Fix */
 @media (prefers-color-scheme: dark) {
-    /* Client's own messages: dark text on green bubble */
-    .message--client .message__bubble {
-        color: #2a2622 !important;
-    }
-    
-    /* Practitioner's messages: black text on light cream background */
-    .message--practitioner .message__bubble {
-        background: #e8e4d8 !important;
-        color: #000000 !important;
-    }
-    
-    /* Timestamp text */
-    .message__time {
-        color: #888888 !important;
-    }
+    /* Client inbox inherits from dark-mode.css */
+    /* No additional overrides needed - base system handles message bubbles */
 }
 
