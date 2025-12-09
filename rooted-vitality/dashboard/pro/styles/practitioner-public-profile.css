@@ -1473,8 +1473,8 @@ body { font-family: var(--font-sans); color: var(--color-text); background: #fbf
 }
 
 .review-photo-thumbnail {
-    width: 80px !important;
-    height: 80px !important;
+    width: 80px;
+    height: 80px;
     object-fit: cover;
     border-radius: 6px;
     border: 1px solid rgba(92, 154, 114, 0.15);
@@ -1848,3 +1848,4 @@ button[disabled] {
     opacity: 0.6;
     cursor: not-allowed;
 }
+

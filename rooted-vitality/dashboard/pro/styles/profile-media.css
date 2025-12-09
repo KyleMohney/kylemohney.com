@@ -20,12 +20,12 @@
 
 /* Utility Classes */
 .hidden {
-    display: none !important;
+    display: none;
 }
 
 /* Hide native file input */
 #profile-picture-input {
-    display: none !important;
+    display: none;
 }
 /* ═══════════════════════════════════════════════════════════════════════════
    TABLE OF CONTENTS
@@ -410,7 +410,7 @@
 .dropzone-note {
     font-size: 0.85rem;
     color: var(--text-muted-secondary);
-    margin-top: 1rem !important;
+    margin-top: 1rem;
 }
 
 .preview-section {
@@ -721,4 +721,5 @@
         grid-template-columns: 1fr;
     }
 }
+
 

@@ -849,11 +849,11 @@
 }
 
 .coverage-map-placeholder .remote-coverage-label {
-  background: var(--rooted-light) !important;
-  border: none !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-  padding: 0.75rem 1rem !important;
-  border-radius: 6px !important;
+  background: var(--rooted-light);
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
 }
 
 /* Remote Notice Box */
@@ -1044,4 +1044,5 @@
 .hidden-state {
   display: none;
 }
+
 

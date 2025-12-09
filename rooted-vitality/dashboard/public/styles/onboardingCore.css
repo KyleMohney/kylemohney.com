@@ -23,29 +23,29 @@
 #returning-member-modal,
 #returning-celebration,
 #onboarding-choice-modal {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    z-index: 9999 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    font-family: var(--font-sans) !important;
-    inset: 0 !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-sans);
+    inset: 0;
 }
 
 .onboarding-overlay {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    background: rgba(0, 0, 0, 0.55) !important;
-    backdrop-filter: blur(5px) !important;
-    -webkit-backdrop-filter: blur(5px) !important;
-    pointer-events: none !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    pointer-events: none;
 }
 
 .onboarding-modal,
@@ -71,8 +71,8 @@
     position: absolute;
     top: 1.5rem;
     right: 1.5rem;
-    background: transparent !important;
-    border: none !important;
+    background: transparent;
+    border: none;
     width: 40px;
     height: 40px;
     display: flex;
@@ -277,3 +277,4 @@
         transform: scale(1);
     }
 }
+

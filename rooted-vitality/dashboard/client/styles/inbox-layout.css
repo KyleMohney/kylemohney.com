@@ -837,7 +837,7 @@
 }
 
 .modal--hidden {
-  display: none !important;
+  display: none;
 }
 
 .modal__overlay {
@@ -1035,7 +1035,18 @@
 /* ========================================== */
 
 .hidden {
-  display: none !important;
+  display: none;
 }
 
+
+
+
+/* Dark Mode Text Fix */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-text: #000000;
+        --color-text-light: #000000;
+        --color-text-muted: #333333;
+    }
+}
 

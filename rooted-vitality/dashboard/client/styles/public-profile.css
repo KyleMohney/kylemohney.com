@@ -310,3 +310,14 @@
 .error-link:hover {
     background: #4a8462;
 }
+
+
+/* Dark Mode Text Fix */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-text: #000000;
+        --color-text-light: #000000;
+        --color-text-muted: #333333;
+    }
+}
+

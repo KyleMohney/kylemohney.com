@@ -444,19 +444,19 @@
 }
 
 [data-section="payment"].section-edit #payment-edit {
-    display: flex !important;
+    display: flex;
 }
 
 [data-section="payment"].section-edit #payment-display {
-    display: none !important;
+    display: none;
 }
 
 [data-section="payment"].section-readonly #payment-edit {
-    display: none !important;
+    display: none;
 }
 
 [data-section="payment"].section-readonly #payment-display {
-    display: flex !important;
+    display: flex;
     flex-direction: column;
 }
 
@@ -1968,15 +1968,15 @@
 /* ========================================== */
 
 .hidden {
-    display: none !important;
+    display: none;
 }
 
 .visible {
-    display: block !important;
+    display: block;
 }
 
 .visible-flex {
-    display: flex !important;
+    display: flex;
 }
 
 .modal-open {
@@ -2008,3 +2008,4 @@
 .completeness-label:not(.complete) {
     color: var(--placeholder);
 }
+

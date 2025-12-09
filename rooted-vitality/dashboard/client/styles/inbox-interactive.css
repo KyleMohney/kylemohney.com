@@ -650,11 +650,11 @@
 }
 
 .form-actions .btn-primary:hover {
-  background: #5f7030 !important;
-  color: #fbf7ec !important;
-  border-color: transparent !important;
-  transform: translateY(-2px) !important;
-  box-shadow: 0 4px 12px rgba(92, 154, 114, 0.25) !important;
+  background: #5f7030;
+  color: #fbf7ec;
+  border-color: transparent;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(92, 154, 114, 0.25);
 }
 
 /* ========================================== */
@@ -770,17 +770,17 @@
 
 /* Keep review button bright and interactive */
 .thread-item--closed .thread-review-btn {
-  opacity: 1 !important;
-  background: #77883e !important;
-  color: #fbf7ec !important;
-  cursor: pointer !important;
+  opacity: 1;
+  background: #77883e;
+  color: #fbf7ec;
+  cursor: pointer;
 }
 
 .thread-item--closed .thread-review-btn:hover {
-  background: #5f7030 !important;
-  opacity: 1 !important;
-  box-shadow: 0 4px 12px rgba(92, 154, 114, 0.25) !important;
-  transform: translateY(-2px) !important;
+  background: #5f7030;
+  opacity: 1;
+  box-shadow: 0 4px 12px rgba(92, 154, 114, 0.25);
+  transform: translateY(-2px);
 }
 
 /* Opportunity thread items */
@@ -1212,7 +1212,7 @@
 }
 
 .modal--hidden {
-  display: none !important;
+  display: none;
 }
 
 .modal__overlay {
@@ -1420,5 +1420,16 @@
     transform: scale(1);
     opacity: 1;
   }
+}
+
+
+
+/* Dark Mode Text Fix */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-text: #000000;
+        --color-text-light: #000000;
+        --color-text-muted: #333333;
+    }
 }
 

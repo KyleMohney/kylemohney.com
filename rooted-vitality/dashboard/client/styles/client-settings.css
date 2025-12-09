@@ -467,24 +467,24 @@
 
 .card-content .btn-setting-action {
     background: #77883e;
-    color: #fbf7ec !important;
-    display: inline-block !important;
-    visibility: visible !important;
+    color: #fbf7ec;
+    display: inline-block;
+    visibility: visible;
 }
 
 #change-password-btn {
-    background: #77883e !important;
-    color: #fbf7ec !important;
-    padding: 0.75rem 1.5rem !important;
-    border: none !important;
-    border-radius: 8px !important;
-    font-weight: 600 !important;
-    font-size: 0.9rem !important;
-    cursor: pointer !important;
-    display: inline-block !important;
-    margin-top: 0.5rem !important;
-    visibility: visible !important;
-    opacity: 1 !important;
+    background: #77883e;
+    color: #fbf7ec;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: inline-block;
+    margin-top: 0.5rem;
+    visibility: visible;
+    opacity: 1;
 }
 
 .btn-secondary {
@@ -775,7 +775,7 @@
 /* ========================================== */
 
 .in-app-notification-toast {
-    animation: slideIn 0.3s ease-out !important;
+    animation: slideIn 0.3s ease-out;
 }
 
 /* ========================================== */
@@ -833,5 +833,16 @@
 
 .btn-inline-cancel:hover {
     background-color: #e0e0e0;
+}
+
+
+
+/* Dark Mode Text Fix */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-text: #000000;
+        --color-text-light: #000000;
+        --color-text-muted: #333333;
+    }
 }
 

@@ -42,11 +42,11 @@ NOTE: Additional modal and responsive styles interspersed throughout
 /* ========================================== */
 
 .hidden {
-  display: none !important;
+  display: none;
 }
 
 .visible {
-  display: flex !important;
+  display: flex;
 }
 
 /* ========================================== */
@@ -1659,4 +1659,5 @@ input:checked + .toggle-slider:before {
   border: none;
   outline: none;
 }
+
 

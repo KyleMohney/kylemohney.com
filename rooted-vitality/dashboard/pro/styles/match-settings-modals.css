@@ -199,16 +199,16 @@
 
 .btn-modal-primary {
   background: var(--rooted-primary);
-  color: var(--text-light) !important;
-  text-decoration: none !important;
+  color: var(--text-light);
+  text-decoration: none;
 }
 
 .btn-modal-primary:hover {
   background: #5f7030;
-  color: var(--text-light) !important;
+  color: var(--text-light);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(92, 154, 114, 0.3);
-  text-decoration: none !important;
+  text-decoration: none;
 }
 
 .btn-modal-secondary {
@@ -597,7 +597,7 @@
 
 /* Override input-wrapper for pricing fields to prevent wrapping */
 .pricing-field-group .input-wrapper {
-  flex-wrap: nowrap !important;
+  flex-wrap: nowrap;
   max-width: 150px;
 }
 
@@ -614,7 +614,7 @@
 /* Override input-wrapper flex-wrap for price range inputs */
 .price-range-inputs .input-wrapper {
   flex: 0 1 auto;
-  flex-wrap: nowrap !important;
+  flex-wrap: nowrap;
   max-width: 90px;
   min-width: 0;
 }
@@ -640,5 +640,6 @@
     gap: 1rem;
   }
 }
+
 
 

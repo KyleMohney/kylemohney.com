@@ -734,15 +734,15 @@ select {
     padding: 0.75rem 1rem;
     border: 2px solid rgba(92, 154, 114, 0.25);
     border-radius: var(--radius-sm);
-    background: var(--glass-light) !important;
+    background: var(--glass-light);
     backdrop-filter: blur(4px);
-    color: var(--color-text) !important;
+    color: var(--color-text);
     transition: all 0.3s ease;
     width: 100%;
     box-sizing: border-box;
-    -webkit-appearance: none !important;
-    -moz-appearance: none !important;
-    appearance: none !important;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 }
 
 /* EXCEPTION: Checkboxes - use native appearance */
@@ -752,7 +752,7 @@ input[type="radio"] {
     padding: 0;
     border: 2px solid #999;
     border-radius: 4px;
-    background: var(--rooted-light) !important;
+    background: var(--rooted-light);
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
@@ -766,13 +766,13 @@ input[type="radio"] {
 
 /* Checkboxes - checked state with green fill and checkmark */
 input[type="checkbox"]:checked {
-    background-color: var(--text-accent) !important;
-    border-color: var(--text-accent) !important;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="white"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>') !important;
-    background-repeat: no-repeat !important;
-    background-position: center !important;
-    background-size: 16px 16px !important;
-    background-attachment: fixed !important;
+    background-color: var(--text-accent);
+    border-color: var(--text-accent);
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="white"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 16px 16px;
+    background-attachment: fixed;
 }
 
 /* Checkboxes - hover state */
@@ -795,9 +795,9 @@ input[type="radio"] {
 }
 
 input[type="radio"]:checked {
-    background-color: var(--text-accent) !important;
-    border-color: var(--text-accent) !important;
-    box-shadow: inset 0 0 0 4px white !important;
+    background-color: var(--text-accent);
+    border-color: var(--text-accent);
+    box-shadow: inset 0 0 0 4px white;
 }
 
 /* Prevent browser autofill styling - BUT NOT FOR CHECKBOXES/RADIOS */
@@ -805,18 +805,18 @@ input:not([type="checkbox"]):not([type="radio"]):-webkit-autofill,
 input:not([type="checkbox"]):not([type="radio"]):-webkit-autofill:hover,
 input:not([type="checkbox"]):not([type="radio"]):-webkit-autofill:focus,
 input:not([type="checkbox"]):not([type="radio"]):-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 30px var(--glass-light) inset !important;
-    -webkit-text-fill-color: var(--color-text) !important;
-    color: var(--color-text) !important;
+    -webkit-box-shadow: 0 0 0 30px var(--glass-light) inset;
+    -webkit-text-fill-color: var(--color-text);
+    color: var(--color-text);
 }
 
 textarea:-webkit-autofill,
 textarea:-webkit-autofill:hover,
 textarea:-webkit-autofill:focus,
 textarea:-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 30px var(--glass-light) inset !important;
-    -webkit-text-fill-color: var(--color-text) !important;
-    color: var(--color-text) !important;
+    -webkit-box-shadow: 0 0 0 30px var(--glass-light) inset;
+    -webkit-text-fill-color: var(--color-text);
+    color: var(--color-text);
 }
 
 /* Ensure placeholder text is visible */
@@ -845,8 +845,8 @@ select:focus {
     outline: none;
     border-color: var(--text-accent);
     box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.1);
-    background: var(--glass-light) !important;
-    color: var(--color-text) !important;
+    background: var(--glass-light);
+    color: var(--color-text);
 }
 
 label {
@@ -1257,13 +1257,13 @@ label {
 
 /* Desktop: notifications and avatar menu visible on right - flex container */
 .rv-notifications-menu {
-    display: flex !important;
+    display: flex;
     align-items: center;
     margin-right: 0.5rem;
 }
 
 .rv-avatar-menu {
-    display: flex !important;
+    display: flex;
     align-items: center;
     margin-left: 0.5rem;
 }
@@ -2956,5 +2956,18 @@ label {
 }
 
 
+
+
+
+
+/* FORCE: Black text in dark mode for maximum readability */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-text: #000000;
+        --color-text-light: #000000;
+        --color-text-muted: #333333;
+        --text-light: #000000;
+    }
+}
 
 

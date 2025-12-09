@@ -47,8 +47,8 @@ Extracted from: styles_legacy.css (lines 1-890)
     --card-shadow-hover: 0 4px 12px rgba(119, 136, 62, 0.12);
     --card-text-primary: #3e3c38;
     --card-text-secondary: #6b6b6b;
-    --card-accent-color: var(--text-accent);
-    --card-icon-color: var(--text-accent);
+    --card-accent-color: #77883e;
+    --card-icon-color: #77883e;
     
     /* Primary Color Opacity Variants */
     --primary-opacity-01: rgba(119, 136, 62, 0.01);
@@ -118,11 +118,6 @@ Extracted from: styles_legacy.css (lines 1-890)
     --color-text-muted: #888888;
     --color-white: var(--rooted-light);
     --text-light: #fbf7ec;  /* Light text for dark backgrounds */
-    
-    /* Semantic Accent & Muted Colors */
-    --text-accent: #77883e;  /* Dark green in light mode */
-    --text-muted-secondary: #999999;  /* Medium grey in light mode */
-    --text-disabled: #cccccc;  /* Light grey in light mode */
     
     /* Shadow System */
     --shadow-minimal: 0 2px 8px rgba(46, 43, 40, 0.08);
@@ -258,10 +253,6 @@ Extracted from: styles_legacy.css (lines 1-890)
         --color-white: #1a1714;
         --text-light: #e8e4d8;  /* Light text for dark backgrounds */
         
-        /* Semantic Accent & Muted Colors - Dark Mode */
-        --text-accent: #d9cc94;  /* Gold/light accent in dark mode */
-        --text-muted-secondary: #b0aca4;  /* Light grey in dark mode */
-        --text-disabled: #6d6961;  /* Medium grey in dark mode */
         /* Shadow System - Dark Mode */
         --shadow-minimal: 0 2px 8px rgba(0, 0, 0, 0.3);
         --shadow-light: 0 8px 24px rgba(0, 0, 0, 0.4);
@@ -421,7 +412,7 @@ h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-sans);
     font-weight: var(--font-weight-bold);
     letter-spacing: 0.02em;
-    color: var(--text-accent);
+    color: var(--rooted-primary);
 }
 
 h1 { font-size: 2rem; line-height: 1.2; }
@@ -441,7 +432,7 @@ a {
 }
 
 a:hover:not(.hero-cta):not(.btn):not(.btn-primary):not(.btn-secondary):not(.back-button) {
-    color: var(--text-accent);
+    color: var(--rooted-primary);
 }
 
 /* ========================================== */
@@ -563,7 +554,6 @@ select:focus-visible {
     background: #7a7a7a;
     color: #ffffff;
 }
-
 
 
 

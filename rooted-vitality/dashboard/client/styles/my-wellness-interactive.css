@@ -103,10 +103,10 @@
 }
 
 .modal--hidden {
-  display: none !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
+  display: none;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .modal__overlay {
@@ -343,24 +343,24 @@
 }
 
 #close-project-form .radio-options {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 0.875rem !important;
-  margin-top: 1rem !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  pointer-events: auto !important;
-  height: auto !important;
-  max-height: none !important;
-  overflow: visible !important;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  margin-top: 1rem;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  height: auto;
+  max-height: none;
+  overflow: visible;
 }
 
 #close-project-form .radio-label {
-  display: flex !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  height: auto !important;
-  max-height: none !important;
+  display: flex;
+  opacity: 1;
+  visibility: visible;
+  height: auto;
+  max-height: none;
 }
 
 #close-project-form .form-control {
@@ -635,20 +635,20 @@
 }
 
 #create-project-form .action-card--primary {
-  background: var(--rooted-primary) !important;
-  border-color: var(--rooted-primary) !important;
-  color: var(--rooted-light) !important;
+  background: var(--rooted-primary);
+  border-color: var(--rooted-primary);
+  color: var(--rooted-light);
 }
 
 #create-project-form .action-card--primary:hover {
-  background: var(--rooted-primary) !important;
-  border-color: var(--rooted-primary) !important;
+  background: var(--rooted-primary);
+  border-color: var(--rooted-primary);
   opacity: 0.9;
   box-shadow: 0 6px 16px var(--primary-opacity-30);
 }
 
 #create-project-form .action-card--primary h4 {
-  color: var(--rooted-light) !important;
+  color: var(--rooted-light);
 }
 
 /* ========================================== */
@@ -656,7 +656,7 @@
 /* ========================================== */
 @media (prefers-color-scheme: dark) {
   #create-project-modal .modal__header h2 {
-    color: var(--rooted-dark) !important;
+    color: var(--rooted-dark);
   }
 
   #create-project-form {
@@ -664,7 +664,7 @@
   }
 
   #create-project-form label {
-    color: var(--rooted-dark) !important;
+    color: var(--rooted-dark);
   }
 
   #create-project-form input[type="text"],
@@ -672,9 +672,9 @@
   #create-project-form input[type="tel"],
   #create-project-form textarea,
   #create-project-form select {
-    background-color: var(--rooted-light) !important;
-    color: var(--rooted-dark) !important;
-    border-color: var(--neutral-opacity-60) !important;
+    background-color: var(--rooted-light);
+    color: var(--rooted-dark);
+    border-color: var(--neutral-opacity-60);
   }
 
   #create-project-form input[type="text"]:focus,
@@ -682,34 +682,34 @@
   #create-project-form input[type="tel"]:focus,
   #create-project-form textarea:focus,
   #create-project-form select:focus {
-    background-color: var(--rooted-light) !important;
-    color: var(--rooted-dark) !important;
-    border-color: var(--rooted-primary) !important;
+    background-color: var(--rooted-light);
+    color: var(--rooted-dark);
+    border-color: var(--rooted-primary);
   }
 
   #create-project-form .form-hint {
-    color: var(--color-text-muted) !important;
+    color: var(--color-text-muted);
   }
 
   #create-project-form .form-fieldset {
-    background: var(--rooted-light) !important;
-    border-color: var(--status-inactive) !important;
+    background: var(--rooted-light);
+    border-color: var(--status-inactive);
   }
 
   #create-project-form .form-fieldset legend {
-    color: var(--rooted-primary) !important;
+    color: var(--rooted-primary);
   }
 
   #create-project-form .radio-label,
   #create-project-form .checkbox-item {
-    background: var(--rooted-light) !important;
-    color: var(--rooted-dark) !important;
-    border-color: var(--neutral-opacity-60) !important;
+    background: var(--rooted-light);
+    color: var(--rooted-dark);
+    border-color: var(--neutral-opacity-60);
   }
 
   #create-project-form .radio-text strong,
   #create-project-form .checkbox-item label {
-    color: var(--rooted-dark) !important;
+    color: var(--rooted-dark);
   }
 }
 
@@ -968,20 +968,20 @@
 }
 
 .action-card--primary {
-  background: var(--rooted-primary) !important;
-  border-color: var(--rooted-primary) !important;
-  color: var(--rooted-light) !important;
+  background: var(--rooted-primary);
+  border-color: var(--rooted-primary);
+  color: var(--rooted-light);
 }
 
 .action-card--primary:hover {
-  background: var(--rooted-primary) !important;
-  border-color: var(--rooted-primary) !important;
+  background: var(--rooted-primary);
+  border-color: var(--rooted-primary);
   opacity: 0.9;
-  color: var(--rooted-light) !important;
+  color: var(--rooted-light);
 }
 
 .action-card--primary h4 {
-  color: var(--rooted-light) !important;
+  color: var(--rooted-light);
 }
 
 /* Descriptor text above action card */
@@ -1007,7 +1007,7 @@
   flex-direction: column;
   justify-content: center;
   padding: 1.75rem 2rem;
-  background: var(--rooted-primary) !important;
+  background: var(--rooted-primary);
   border: 2px solid var(--rooted-primary);
   color: var(--rooted-light);
   box-shadow: 0 8px 24px var(--primary-opacity-25);
@@ -1137,11 +1137,11 @@
 
 /* Hidden/Visible utilities */
 .hidden {
-  display: none !important;
+  display: none;
 }
 
 .visible {
-  display: block !important;
+  display: block;
 }
 
 /* Create status message styling */
@@ -1247,4 +1247,5 @@
 .projects-sidebar__cta {
   font-weight: var(--font-weight-semibold);
 }
+
 

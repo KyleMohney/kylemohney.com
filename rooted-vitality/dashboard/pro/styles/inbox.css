@@ -44,9 +44,9 @@
     
     /* Message bubble backgrounds */
     --message-own-bg: linear-gradient(135deg, var(--rooted-primary) 0%, var(--rooted-primary-dark) 100%);
-    --message-other-bg: var(--rooted-light);
-    --message-own-text: var(--text-light);
-    --message-other-text: var(--color-text);
+    --message-other-bg: var(--rooted-neutral);
+    --message-own-text: var(--rooted-neutral);
+    --message-other-text: var(--rooted-dark);
     
     /* Custom Shadow Variations (inbox-specific) */
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
@@ -55,17 +55,6 @@
     
     /* Interaction Easing */
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Dark Mode Overrides for Inbox */
-@media (prefers-color-scheme: dark) {
-    :root {
-        /* Message bubble backgrounds - Dark Mode */
-        --message-own-bg: linear-gradient(135deg, var(--rooted-primary) 0%, var(--rooted-primary-dark) 100%);
-        --message-other-bg: #2a2622;  /* Dark background for other messages */
-        --message-own-text: var(--text-light);  /* Light text on dark green bubbles */
-        --message-other-text: var(--color-text);  /* Light text on dark backgrounds */
-    }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -1709,7 +1698,11 @@ button.disabled {
     pointer-events: none;
 }
 
-
-
-
+/* Dark Mode Text Override - Force readable text on dark backgrounds */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --message-own-text: #ffffff;      /* White text on dark green bubbles */
+        --message-other-text: #000000;    /* Black text on light backgrounds */
+    }
+}
 
