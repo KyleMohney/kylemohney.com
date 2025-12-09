@@ -105,7 +105,7 @@ Extracted from: styles_legacy.css
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     border: 2px solid var(--rooted-primary);
-    color: var(--rooted-primary);
+    color: var(--text-accent);
 }
 
 .btn-secondary:hover,
@@ -140,7 +140,7 @@ Extracted from: styles_legacy.css
     text-decoration: none;
     background: #77883e;
     background-image: repeating-linear-gradient(135deg, rgba(152,229,142,0.04) 0px, rgba(152,229,142,0.04) 2px, transparent 2px, transparent 12px);
-    color: #fbf7ec;
+    color: var(--text-light);
 }
 
 .btn-success:hover,
@@ -219,7 +219,7 @@ Extracted from: styles_legacy.css
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     text-decoration: none;
     background: #d32f2f;
-    color: #fbf7ec;
+    color: var(--text-light);
 }
 
 .btn-danger:hover {
@@ -372,12 +372,12 @@ Extracted from: styles_legacy.css
 .card-base--collapsed:hover {
   box-shadow: none;
   transform: none;
-  border-color: var(--rooted-primary);
+  border-color: var(--text-accent);
 }
 
 .card-base--inactive {
   opacity: 0.6;
-  background-color: var(--rooted-light);
+  background-color: var(--text-light);
   border-color: var(--status-inactive);
 }
 
@@ -482,7 +482,7 @@ Extracted from: styles_legacy.css
 .tips-section__title {
   margin: 0;
   line-height: 1;
-  color: var(--rooted-primary);
+  color: var(--text-accent);
   font-size: 0.9rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -510,7 +510,7 @@ Extracted from: styles_legacy.css
 
 .tips-list li::before {
   content: "✓";
-  color: var(--rooted-primary);
+  color: var(--text-accent);
   font-weight: 700;
   flex-shrink: 0;
   margin-top: 0.1rem;
@@ -531,13 +531,13 @@ Extracted from: styles_legacy.css
 }
 
 .timezone-select:hover {
-  border-color: var(--rooted-primary);
+  border-color: var(--text-accent);
   box-shadow: 0 2px 6px rgba(92, 154, 114, 0.1);
 }
 
 .timezone-select:focus {
   outline: none;
-  border-color: var(--rooted-primary);
+  border-color: var(--text-accent);
   box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.15);
 }
 
@@ -548,7 +548,7 @@ Extracted from: styles_legacy.css
   border-radius: 6px;
   font-size: 0.9rem;
   text-align: center;
-  color: var(--rooted-primary);
+  color: var(--text-accent);
   font-weight: 600;
 }
 
@@ -650,7 +650,7 @@ Extracted from: styles_legacy.css
 }
 
 .article-card a:hover {
-    color: var(--rooted-primary);
+    color: var(--text-accent);
 }
 
 /* ========================================== */
@@ -702,7 +702,7 @@ Extracted from: styles_legacy.css
 }
 
 .article-content h3 {
-    color: var(--rooted-primary);
+    color: var(--text-accent);
     margin-top: var(--spacing-md);
     margin-bottom: var(--spacing-sm);
 }
@@ -752,7 +752,7 @@ input[type="radio"] {
     padding: 0;
     border: 2px solid #999;
     border-radius: 4px;
-    background: white !important;
+    background: var(--rooted-light) !important;
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
@@ -766,8 +766,8 @@ input[type="radio"] {
 
 /* Checkboxes - checked state with green fill and checkmark */
 input[type="checkbox"]:checked {
-    background-color: #77883e !important;
-    border-color: #77883e !important;
+    background-color: var(--text-accent) !important;
+    border-color: var(--text-accent) !important;
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="white"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>') !important;
     background-repeat: no-repeat !important;
     background-position: center !important;
@@ -777,7 +777,7 @@ input[type="checkbox"]:checked {
 
 /* Checkboxes - hover state */
 input[type="checkbox"]:hover {
-    border-color: #77883e;
+    border-color: var(--text-accent);
     box-shadow: 0 0 0 2px rgba(119, 136, 62, 0.2);
 }
 
@@ -795,8 +795,8 @@ input[type="radio"] {
 }
 
 input[type="radio"]:checked {
-    background-color: #77883e !important;
-    border-color: #77883e !important;
+    background-color: var(--text-accent) !important;
+    border-color: var(--text-accent) !important;
     box-shadow: inset 0 0 0 4px white !important;
 }
 
@@ -843,7 +843,7 @@ input:not([type="checkbox"]):not([type="radio"]):focus,
 textarea:focus,
 select:focus {
     outline: none;
-    border-color: var(--rooted-primary);
+    border-color: var(--text-accent);
     box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.1);
     background: var(--glass-light) !important;
     color: var(--color-text) !important;
@@ -925,7 +925,7 @@ label {
 
 .nav-link:hover {
     background: var(--glass-white);
-    color: var(--rooted-primary);
+    color: var(--text-accent);
 }
 
 .nav-link.active {
@@ -948,7 +948,7 @@ label {
 
 .timeline h3 {
     margin-top: 0;
-    color: var(--rooted-primary);
+    color: var(--text-accent);
 }
 
 .timeline-item {
@@ -958,7 +958,7 @@ label {
 }
 
 .timeline-item strong {
-    color: var(--rooted-primary);
+    color: var(--text-accent);
     font-weight: var(--font-weight-semibold);
 }
 
@@ -1184,7 +1184,7 @@ label {
 
 .rv-logo:hover .rv-brand-name,
 .rv-logo-container:hover .rv-brand-name {
-    color: #77883e;
+    color: var(--text-accent);
 }
 
 /* Desktop navigation - nav + icons in a row */
@@ -1222,7 +1222,7 @@ label {
 }
 
 .rv-nav a:hover {
-    color: #77883e;
+    color: var(--text-accent);
 }
 
 .rv-nav a:focus {
@@ -1281,7 +1281,7 @@ label {
     padding: 0.6rem 1.2rem;
     border-radius: 6px;
     background: transparent;
-    color: var(--rooted-primary);
+    color: var(--text-accent);
     border: 2px solid var(--rooted-primary);
     font-weight: 600;
     cursor: pointer;
@@ -1294,7 +1294,7 @@ label {
 .rv-dashboard-btn,
 .rv-logout-btn {
     background: transparent;
-    color: var(--rooted-primary);
+    color: var(--text-accent);
     border: 2px solid var(--rooted-primary);
 }
 
@@ -1302,7 +1302,7 @@ label {
 .rv-dashboard-btn:hover,
 .rv-logout-btn:hover {
     background: var(--rooted-primary);
-    color: #fbf7ec;
+    color: var(--text-light);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(92, 154, 114, 0.2);
 }
@@ -1325,7 +1325,7 @@ label {
 
 .rv-menu-toggle:hover {
     transform: scale(1.15);
-    color: #77883e;
+    color: var(--text-accent);
 }
 
 /* ======================================================
@@ -1357,7 +1357,7 @@ label {
 
 .rv-header-public .rv-nav-link:hover {
     text-decoration: underline;
-    color: #77883e;
+    color: var(--text-accent);
 }
 
 .rv-header-public .rv-btn-accent {
@@ -1386,7 +1386,7 @@ label {
 }
 
 .rv-header-public .rv-nav-login:hover {
-    color: #77883e;
+    color: var(--text-accent);
 }
 
 .rv-header-public .rv-nav-login:focus-visible {
@@ -1432,7 +1432,7 @@ label {
 }
 
 .rv-logo-public:hover .rv-brand-name {
-    color: #77883e;
+    color: var(--text-accent);
 }
 
 /* ======================================================
@@ -1492,7 +1492,7 @@ label {
 }
 
 .rv-logo-client:hover .rv-brand-name {
-    color: #77883e;
+    color: var(--text-accent);
 }
 
 .rv-header-client .rv-nav-link {
@@ -1505,7 +1505,7 @@ label {
 
 .rv-header-client .rv-nav-link:hover {
     text-decoration: underline;
-    color: #77883e;
+    color: var(--text-accent);
 }
 
 .rv-header-client .rv-nav-link:focus {
@@ -1523,7 +1523,7 @@ label {
 }
 
 .rv-header-client .rv-practitioner-btn:hover {
-    color: #77883e;
+    color: var(--text-accent);
 }
 
 .rv-header-client .rv-practitioner-btn:focus {
@@ -1558,7 +1558,7 @@ label {
 
 .rv-header-client .rv-sign-out-btn:hover {
     text-decoration: underline;
-    color: #77883e;
+    color: var(--text-accent);
 }
 
 .rv-header-client .rv-sign-out-btn:focus {
@@ -1611,7 +1611,7 @@ label {
     background: #d4c47c;
     color: #4a3c2a;
     border-radius: 10px;
-    border: 2px solid #fbf7ec;
+    border: 2px solid var(--rooted-light);
     font-size: 0.7rem;
     font-weight: 700;
     display: flex;
@@ -1666,7 +1666,7 @@ label {
     height: 40px;
     border-radius: 50%;
     background: linear-gradient(135deg, #77883e 0%, #4a8360 100%);
-    color: #fbf7ec;
+    color: var(--text-light);
     font-weight: 700;
     font-size: 16px;
     font-family: var(--font-sans);
@@ -1687,7 +1687,7 @@ label {
     position: absolute;
     top: 100%;
     right: 0;
-    background: #fbf7ec;
+    background: var(--rooted-light);
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 6px;
     min-width: 200px;
@@ -1719,7 +1719,7 @@ label {
 
 .rv-dropdown-item:hover {
     background: rgba(92, 154, 114, 0.05);
-    color: #77883e;
+    color: var(--text-accent);
 }
 
 .rv-dropdown-item:focus {
@@ -1755,7 +1755,7 @@ label {
     position: absolute;
     top: 100%;
     right: 0;
-    background: #fbf7ec;
+    background: var(--rooted-light);
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 6px;
     width: 340px;
@@ -1811,7 +1811,7 @@ label {
 
 .rv-notifications-item:hover {
     background: rgba(92, 154, 114, 0.05);
-    border-left-color: #77883e;
+    border-left-color: var(--text-accent);
 }
 
 .rv-notifications-item.unread {
@@ -1896,7 +1896,7 @@ label {
 }
 
 .rv-logo-practitioner:hover .rv-brand-name {
-    color: #77883e;
+    color: var(--text-accent);
 }
 
 /* Practitioner Header Navigation */
@@ -1915,12 +1915,12 @@ label {
 
 .rv-header-practitioner .rv-nav-link:hover {
     text-decoration: underline;
-    color: #77883e;
+    color: var(--text-accent);
 }
 
 .rv-header-practitioner .rv-nav-link.active {
     text-decoration: underline;
-    color: #77883e;
+    color: var(--text-accent);
 }
 
 .rv-header-practitioner .rv-nav-link:focus {
@@ -1972,7 +1972,7 @@ label {
 
 .rv-footer {
     background: #77883e;
-    color: #fbf7ec;
+    color: var(--text-light);
     position: relative;
     overflow: hidden;
     padding: 3.5rem 0 1rem 0;
@@ -2038,7 +2038,7 @@ label {
     font-weight: 700;
     line-height: 1.1;
     margin: 0;
-    color: #fbf7ec;
+    color: var(--text-light);
     letter-spacing: 0.5px;
 }
 
@@ -2067,7 +2067,7 @@ label {
     height: 36px;
     background: rgba(251, 247, 236, 0.2);
     border-radius: 50%;
-    color: #fbf7ec;
+    color: var(--text-light);
     text-decoration: none;
     font-weight: 700;
     transition: all 0.3s ease;
@@ -2076,7 +2076,7 @@ label {
 
 .rv-social-link:hover {
     background: #d4c47c;
-    color: #77883e;
+    color: var(--text-accent);
     transform: translateY(-2px);
 }
 
@@ -2085,7 +2085,7 @@ label {
     font-size: 1.1rem;
     font-weight: 700;
     margin: 0 0 1.2rem 0;
-    color: #fbf7ec;
+    color: var(--text-light);
     letter-spacing: 0.3px;
 }
 
@@ -2182,7 +2182,7 @@ label {
     display: inline-block;
     padding: 0.6rem 1.2rem;
     background: #d4c47c;
-    color: #77883e;
+    color: var(--text-accent);
     border-radius: 6px;
     text-decoration: none;
     font-weight: 700;
@@ -2192,8 +2192,8 @@ label {
 }
 
 .rv-footer-help-btn:hover {
-    background: #fbf7ec;
-    color: #77883e;
+    background: var(--rooted-light);
+    color: var(--text-accent);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(251, 247, 236, 0.3);
 }
@@ -2269,7 +2269,7 @@ label {
         top: 100%;
         right: 0;
         left: 0;
-        background: #faf7f2;
+        background: var(--rooted-light);
         padding: 1.2rem 1.5rem;
         border-radius: 0 0 8px 8px;
         box-shadow: 0 4px 12px rgba(46, 43, 40, 0.1);
@@ -2451,7 +2451,7 @@ label {
 
 .rv-auth-modal h2 {
     font-size: 1.5rem;
-    color: var(--rooted-primary);
+    color: var(--text-accent);
     margin-bottom: 0.5rem;
     font-weight: 700;
 }
@@ -2475,7 +2475,7 @@ label {
 }
 
 .rv-auth-close:hover {
-    color: var(--rooted-primary);
+    color: var(--text-accent);
 }
 
 .rv-auth-close:focus {
@@ -2504,14 +2504,14 @@ label {
 }
 
 .rv-auth-tab:hover {
-    border-color: var(--rooted-primary);
+    border-color: var(--text-accent);
     background: rgba(92, 154, 114, 0.08);
 }
 
 .rv-auth-tab.active {
-    border-color: var(--rooted-primary);
+    border-color: var(--text-accent);
     background: rgba(92, 154, 114, 0.12);
-    color: var(--rooted-primary);
+    color: var(--text-accent);
 }
 
 #rvAuthForm {
@@ -2534,7 +2534,7 @@ label {
     padding: 0.6rem 0.8rem;
     border: 1px solid rgba(46, 43, 40, 0.2);
     border-radius: 6px;
-    background: #fbf7ec;
+    background: var(--rooted-light);
     font-size: 1rem;
     color: var(--rooted-dark);
     transition: border 0.3s ease, box-shadow 0.3s ease;
@@ -2542,7 +2542,7 @@ label {
 
 .rv-auth-modal input[type="email"]:focus,
 .rv-auth-modal input[type="password"]:focus {
-    border-color: var(--rooted-primary);
+    border-color: var(--text-accent);
     box-shadow: 0 0 6px rgba(92, 154, 114, 0.4);
     outline: none;
 }
@@ -2550,7 +2550,7 @@ label {
 .rv-auth-modal input[type="checkbox"] {
     margin-right: 0.4rem;
     cursor: pointer;
-    accent-color: var(--rooted-primary);
+    accent-color: var(--text-accent);
 }
 
 .rv-auth-actions {
@@ -2569,7 +2569,7 @@ label {
 }
 
 .rv-forgot {
-    color: var(--rooted-primary);
+    color: var(--text-accent);
     text-decoration: none;
     font-weight: 600;
     transition: color 0.2s ease;
@@ -2587,7 +2587,7 @@ label {
     border: none;
     border-radius: 8px;
     background: var(--rooted-primary);
-    color: #fbf7ec;
+    color: var(--text-light);
     font-weight: 700;
     font-size: 1rem;
     cursor: pointer;
@@ -2625,7 +2625,7 @@ label {
     bottom: 24px;
     right: 24px;
     background: linear-gradient(135deg, #77883e 0%, #5e6e30 100%);
-    color: #fbf7ec;
+    color: var(--text-light);
     padding: 16px 20px;
     border-radius: 8px;
     box-shadow: 0 8px 24px rgba(119, 136, 62, 0.3);
@@ -2672,7 +2672,7 @@ label {
 .rv-notification-toast-close {
     background: rgba(255, 255, 255, 0.2);
     border: none;
-    color: #fbf7ec;
+    color: var(--text-light);
     font-size: 20px;
     width: 32px;
     height: 32px;
@@ -2722,13 +2722,13 @@ label {
 
 .contact-info h3 {
     font-size: 1.5rem;
-    color: #77883e;
+    color: var(--text-accent);
     margin-bottom: 0.5rem;
     font-weight: 700;
 }
 
 .contact-info__subtitle {
-    color: #666;
+    color: var(--text-muted-secondary);
     font-size: 0.95rem;
     margin-bottom: 2rem;
     line-height: 1.5;
@@ -2748,7 +2748,7 @@ label {
 
 .contact-method h4 {
     font-size: 1rem;
-    color: #77883e;
+    color: var(--text-accent);
     margin-bottom: 0.8rem;
     font-weight: 600;
 }
@@ -2763,11 +2763,11 @@ label {
 }
 
 .contact-link:hover {
-    color: #77883e;
+    color: var(--text-accent);
 }
 
 .contact-text {
-    color: #999;
+    color: var(--text-muted-secondary);
     font-size: 0.95rem;
     margin: 0;
     font-style: italic;
@@ -2833,7 +2833,7 @@ label {
 
 .review-source-badge {
     background: var(--primary-opacity-10);
-    color: var(--rooted-primary);
+    color: var(--text-accent);
 }
 
 .review-source-badge.platform {
@@ -2843,12 +2843,12 @@ label {
 
 .review-source-badge.external {
     background: var(--primary-opacity-15);
-    color: var(--rooted-primary);
+    color: var(--text-accent);
 }
 
 .review-category-badge {
     background: var(--primary-opacity-10);
-    color: var(--rooted-primary);
+    color: var(--text-accent);
     text-transform: capitalize;
     letter-spacing: normal;
 }
@@ -2954,3 +2954,7 @@ label {
     color: var(--primary-opacity-30);
     margin-bottom: 1rem;
 }
+
+
+
+

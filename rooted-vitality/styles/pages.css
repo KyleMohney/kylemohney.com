@@ -179,7 +179,7 @@ Note: Page-specific selectors wrapped with logical body classes where applicable
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #999;
+    color: var(--text-muted-secondary);
     font-size: 0.9rem;
     text-align: center;
     padding: 1rem;
@@ -218,14 +218,14 @@ Note: Page-specific selectors wrapped with logical body classes where applicable
 
 .tab-btn:hover {
     background: #ebf6e8;
-    border-color: var(--rooted-primary);
-    color: var(--rooted-primary);
+    border-color: var(--text-accent);
+    color: var(--text-accent);
 }
 
 .tab-btn.active {
     background: var(--rooted-primary);
     color: var(--color-white);
-    border-color: var(--rooted-primary);
+    border-color: var(--text-accent);
     box-shadow: 0 4px 12px rgba(92, 154, 114, 0.3);
 }
 
@@ -470,7 +470,7 @@ body.signup .progress-section {
     font-family: inherit;
     font-size: 0.95rem;
     color: #2e2b28;
-    background: #faf7f2;
+    background: var(--rooted-light);
     transition: all 0.3s ease;
 }
 
@@ -532,7 +532,7 @@ body.signup .progress-section {
     width: 100%;
     padding: 1rem 1.5rem;
     background: var(--rooted-primary, #77883e);
-    color: var(--rooted-light);
+    color: var(--text-light);
     border: none;
     border-radius: 6px;
     font-weight: 700;
@@ -827,11 +827,11 @@ body.pro-dashboard main {
 }
 
 .pro-tabs .tab:hover {
-    color: #77883e;
+    color: var(--text-accent);
 }
 
 .pro-tabs .tab.active {
-    color: #77883e;
+    color: var(--text-accent);
     border-bottom: 2px solid #77883e;
 }
 
@@ -870,7 +870,7 @@ body.pro-dashboard main {
 }
 
 .placeholder-table th {
-    background: #f0ebe5;
+    background: var(--rooted-light);
     border: 1px solid #e8ddd5;
     padding: 0.75rem;
     text-align: left;
@@ -891,7 +891,7 @@ body.pro-dashboard main {
 
 .placeholder-table .btn-accent {
     background: #77883e;
-    color: var(--rooted-light);
+    color: var(--text-light);
     border: none;
     padding: 0.5rem 1rem;
     border-radius: 4px;
@@ -923,7 +923,7 @@ body.pro-dashboard main {
 
 .placeholder-table .btn-danger {
     background: #d9534f;
-    color: var(--rooted-light);
+    color: var(--text-light);
     border: 1px solid #c9302c;
     padding: 0.5rem 1rem;
     border-radius: 4px;
@@ -954,7 +954,7 @@ body.pro-dashboard main {
 }
 
 .landing-under-construction main a {
-    color: #77883e;
+    color: var(--text-accent);
     text-decoration: none;
     font-weight: 600;
     transition: text-decoration 0.3s ease;
@@ -985,7 +985,7 @@ body.pro-dashboard main {
     padding: 0.5rem 0.75rem;
     font-size: 1rem;
     font-weight: 600;
-    color: #999;
+    color: var(--text-muted-secondary);
     cursor: pointer;
     transition: color 0.2s ease, border-color 0.2s ease;
     border-bottom: 2px solid transparent;
@@ -994,12 +994,12 @@ body.pro-dashboard main {
 }
 
 .clients-tab:hover {
-    color: #77883e;
+    color: var(--text-accent);
 }
 
 .clients-tab.active {
-    color: #77883e;
-    border-bottom-color: #77883e;
+    color: var(--text-accent);
+    border-bottom-color: var(--text-accent);
 }
 
 /* Scrollable client lists */
@@ -1097,7 +1097,7 @@ body.pro-dashboard main {
 .read-more-toggle {
     display: inline-block;
     margin-top: 0.5rem;
-    color: #77883e;
+    color: var(--text-accent);
     font-weight: 600;
     text-decoration: none;
     cursor: pointer;
@@ -1129,7 +1129,7 @@ body.pro-dashboard main {
 
 .card-actions .btn-accent {
     background: #77883e;
-    color: var(--rooted-light);
+    color: var(--text-light);
 }
 
 .card-actions .btn-accent:hover {
@@ -1149,7 +1149,7 @@ body.pro-dashboard main {
 
 .card-actions .btn-danger {
     background: #d9534f;
-    color: var(--rooted-light);
+    color: var(--text-light);
     border: 1px solid #c9302c;
 }
 
@@ -1189,7 +1189,7 @@ body.pro-dashboard main {
     padding: 0.3rem 0.6rem;
     border-radius: var(--radius-sm);
     background: var(--primary-opacity-10);
-    color: var(--rooted-primary);
+    color: var(--text-accent);
     text-transform: capitalize;
     white-space: nowrap;
 }
@@ -1206,5 +1206,10 @@ body.pro-dashboard main {
     color: var(--rooted-dark);
     font-weight: 500;
 }
+
+
+
+
+
 
 

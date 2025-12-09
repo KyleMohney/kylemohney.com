@@ -49,7 +49,7 @@ TABLE OF CONTENTS
 }
 
 .modal__content {
-    background: #fbf7ec;
+    background: var(--rooted-light);
     border-radius: 12px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
     max-width: 500px;
@@ -72,7 +72,7 @@ TABLE OF CONTENTS
 
 .modal__header {
     background: linear-gradient(135deg, #77883e 0%, #4a8b62 100%);
-    color: #fbf7ec;
+    color: var(--text-light);
     padding: 25px;
     border-radius: 12px 12px 0 0;
     display: flex;
@@ -85,13 +85,13 @@ TABLE OF CONTENTS
     margin: 0;
     font-size: 22px;
     font-weight: 600;
-    color: #fbf7ec;
+    color: var(--text-light);
 }
 
 .modal__close {
     background: none;
     border: none;
-    color: #fbf7ec;
+    color: var(--text-light);
     font-size: 28px;
     cursor: pointer;
     padding: 0;
@@ -133,8 +133,8 @@ TABLE OF CONTENTS
     display: flex;
     gap: 12px;
     justify-content: flex-end;
-    border-top: 1px solid #fbf7ec;
-    background: #fbf7ec;
+    border-top: 1px solid var(--rooted-light);
+    background: var(--rooted-light);
 }
 
 .btn {
@@ -149,7 +149,7 @@ TABLE OF CONTENTS
 
 .btn--primary {
     background: linear-gradient(135deg, #77883e 0%, #4a8b62 100%);
-    color: #fbf7ec;
+    color: var(--text-light);
 }
 
 .btn--primary:hover:not(:disabled) {
@@ -165,3 +165,8 @@ TABLE OF CONTENTS
     opacity: 0.6;
     cursor: not-allowed;
 }
+
+
+
+
+

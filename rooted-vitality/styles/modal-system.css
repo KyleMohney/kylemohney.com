@@ -166,7 +166,7 @@ ARCHITECTURE:
   background: none;
   border: none;
   font-size: 2rem;
-  color: #999;
+  color: var(--text-muted-secondary);
   cursor: pointer;
   padding: 0;
   width: 40px;
@@ -183,7 +183,7 @@ ARCHITECTURE:
 }
 
 .modal-close-btn:active {
-  color: var(--rooted-primary);
+  color: var(--text-accent);
 }
 
 /* ========================================== */
@@ -297,7 +297,7 @@ ARCHITECTURE:
 
 .btn-modal-primary {
   background: var(--rooted-primary);
-  color: var(--rooted-light);
+  color: var(--text-light);
   border: none;
 }
 
@@ -305,7 +305,7 @@ ARCHITECTURE:
   background: var(--rooted-primary-dark);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(92, 154, 114, 0.3);
-  color: var(--rooted-light);
+  color: var(--text-light);
   text-decoration: none;
 }
 
@@ -330,13 +330,13 @@ ARCHITECTURE:
 }
 
 .btn-modal-secondary:hover {
-  background: #f5f1e8;
-  border-color: var(--rooted-primary);
+  background: var(--rooted-light);
+  border-color: var(--text-accent);
   color: var(--rooted-dark);
 }
 
 .btn-modal-secondary:active {
-  background: #ebe7de;
+  background: var(--rooted-light);
 }
 
 /* Tertiary Button (Outline) */
@@ -347,13 +347,13 @@ ARCHITECTURE:
 }
 
 .btn-modal-tertiary:hover {
-  background: #f9f6f1;
+  background: var(--rooted-light);
   border-color: #a8a39f;
   color: var(--rooted-dark);
 }
 
 .btn-modal-tertiary:active {
-  background: #f5f1e8;
+  background: var(--rooted-light);
 }
 
 /* Danger Button */
@@ -433,7 +433,7 @@ ARCHITECTURE:
 .modal-body textarea:focus,
 .modal-body select:focus {
   outline: none;
-  border-color: var(--rooted-primary);
+  border-color: var(--text-accent);
   box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.1);
   background: var(--rooted-light);
 }
@@ -441,7 +441,7 @@ ARCHITECTURE:
 .modal-body .form-help,
 .modal-body small {
   font-size: 0.85rem;
-  color: #666;
+  color: var(--text-muted-secondary);
   margin-top: 0.5rem;
   line-height: 1.4;
   display: block;
@@ -515,7 +515,7 @@ ARCHITECTURE:
   min-width: 20px;
   margin-top: 2px;
   cursor: pointer;
-  accent-color: var(--rooted-primary);
+  accent-color: var(--text-accent);
   transition: transform 0.2s ease;
 }
 
@@ -540,7 +540,7 @@ ARCHITECTURE:
 .list-item label:hover,
 .checkbox-item label:hover,
 .form-item label:hover {
-  color: var(--rooted-primary);
+  color: var(--text-accent);
 }
 
 /* Section containers within modal body */
@@ -605,7 +605,7 @@ ARCHITECTURE:
 }
 
 .input-wrapper:focus-within {
-  border-color: var(--rooted-primary);
+  border-color: var(--text-accent);
   box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.1);
 }
 
@@ -699,7 +699,7 @@ ARCHITECTURE:
 }
 
 .modal-list li:hover {
-  background: #f5f1e8;
+  background: var(--rooted-light);
 }
 
 /* Checkbox List */
@@ -721,14 +721,14 @@ ARCHITECTURE:
 }
 
 .modal-checkbox-item:hover {
-  background: #f5f1e8;
+  background: var(--rooted-light);
 }
 
 .modal-checkbox-item input[type="checkbox"] {
   width: 18px;
   height: 18px;
   cursor: pointer;
-  accent-color: var(--rooted-primary);
+  accent-color: var(--text-accent);
 }
 
 .modal-checkbox-label {
@@ -757,7 +757,7 @@ ARCHITECTURE:
   content: '✓';
   position: absolute;
   left: 0;
-  color: var(--rooted-primary);
+  color: var(--text-accent);
   font-weight: bold;
 }
 
@@ -935,7 +935,7 @@ ARCHITECTURE:
 /* Modal button section */
 .modal-dynamic__button {
   background: var(--rooted-primary);
-  color: var(--rooted-light);
+  color: var(--text-light);
   border: none;
   border-radius: 6px;
   padding: 0.75rem 1.5rem;
@@ -972,5 +972,10 @@ ARCHITECTURE:
 .modal-dynamic--info .modal-dynamic__title {
   color: #3b82f6;
 }
+
+
+
+
+
 
 

@@ -26,7 +26,7 @@ TABLE OF CONTENTS
 :root {
   --rooted-green: #77883e;
   --rooted-dark: #2e2b28;
-  --rooted-light: #fbf7ec;
+  --rooted-light: var(--rooted-light);
   --font-inter: 'Inter', sans-serif;
   --font-lora: 'Lora', serif;
 }
@@ -34,7 +34,7 @@ TABLE OF CONTENTS
 .article {
   min-height: 100vh;
   padding: 4rem 1rem;
-  background: linear-gradient(180deg, #f9f7f5 0%, #fbf7ec 100%);
+  background: linear-gradient(180deg, var(--rooted-light) 0%, var(--rooted-light) 100%);
 }
 
 .article__container {
@@ -190,7 +190,7 @@ TABLE OF CONTENTS
   list-style: none;
   padding: 0;
   margin: 2rem 0;
-  background: #f9f7f5;
+  background: var(--rooted-light);
   padding: 2rem;
   border-radius: 12px;
   border-left: 4px solid var(--rooted-green);
@@ -220,7 +220,7 @@ TABLE OF CONTENTS
 
 /* Related Content */
 .article__related {
-  background: #f9f7f5;
+  background: var(--rooted-light);
   padding: 2rem;
   border-radius: 12px;
   margin-top: 3rem;
@@ -335,7 +335,7 @@ TABLE OF CONTENTS
   display: inline-block;
   padding: 0.9rem 1.8rem;
   background: var(--rooted-green);
-  color: var(--rooted-light);
+  color: var(--text-light);
   text-decoration: none;
   border-radius: 8px;
   font-family: var(--font-inter);
@@ -497,3 +497,8 @@ TABLE OF CONTENTS
     padding: 1rem 1rem 1rem 1rem;
   }
 }
+
+
+
+
+
