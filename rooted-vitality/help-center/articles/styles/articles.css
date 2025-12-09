@@ -411,3 +411,215 @@ blockquote {
         padding-left: 1.5rem;
     }
 }
+
+/* ============================================================================ */
+/* DARK MODE STYLES */
+/* ============================================================================ */
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        /* DARK MODE COLOR OVERRIDES */
+        --rooted-primary: #8fa44a;       /* Lighter sage green for dark mode */
+        --rooted-accent: #d9cc94;        /* Brighter gold for dark mode */
+        --rooted-cream: #1a1714;         /* Dark background instead of cream */
+        --rooted-dark: #e8e4d8;          /* Light text instead of dark */
+        --rooted-bright-green: #7fb833;  /* Adjusted green for dark mode */
+        --rooted-olive: #8a8075;         /* Light olive for dark mode */
+        --rooted-light: #4a4540;         /* Dark border color */
+        --rooted-green-light: #2a2a2a;   /* Dark green-light background */
+        --rooted-white: #1a1714;         /* Dark background */
+    }
+    
+    /* BASE ELEMENTS */
+    html {
+        background-color: #1a1714;
+        color: #e8e4d8;
+    }
+    
+    body {
+        background-color: #1a1714;
+        color: #e8e4d8;
+    }
+    
+    /* HERO SECTION */
+    .hero {
+        background: linear-gradient(135deg, #2a2622 0%, #3d3934 100%);
+        color: #e8e4d8;
+    }
+    
+    .hero__title {
+        color: #d9cc94;
+    }
+    
+    .hero__subtitle {
+        color: #b8b3b0;
+        opacity: 0.9;
+    }
+    
+    /* BACK TO HELP CENTER LINK */
+    .article-back-link a {
+        color: #8fa44a;
+    }
+    
+    .article-back-link a:hover {
+        color: #d9cc94;
+    }
+    
+    /* CONTAINERS & SECTIONS */
+    .container {
+        background-color: transparent;
+    }
+    
+    .article-section {
+        border-bottom-color: #4a4540;
+        background-color: rgba(42, 38, 34, 0.5);
+    }
+    
+    /* HEADING STYLES */
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        color: #8fa44a;
+    }
+    
+    h1 {
+        border-bottom: 1px solid #4a4540;
+        padding-bottom: 0.5rem;
+    }
+    
+    h2 {
+        border-bottom-color: #d9cc94;
+        color: #8fa44a;
+    }
+    
+    h3 {
+        color: #d9cc94;
+    }
+    
+    h4,
+    h5,
+    h6 {
+        color: #8fa44a;
+    }
+    
+    /* PARAGRAPH & TEXT */
+    p {
+        color: #e8e4d8;
+    }
+    
+    strong,
+    b {
+        color: #d9cc94;
+    }
+    
+    em,
+    i {
+        color: #e8e4d8;
+    }
+    
+    /* LINKS */
+    main a,
+    .article-section a {
+        color: #8fa44a;
+        border-bottom-color: #d9cc94;
+    }
+    
+    main a:hover,
+    .article-section a:hover {
+        color: #d9cc94;
+    }
+    
+    /* LISTS & EMPHASIS */
+    ul,
+    ol {
+        color: #e8e4d8;
+    }
+    
+    li {
+        color: #e8e4d8;
+    }
+    
+    ul li::marker,
+    ol li::marker {
+        color: #8fa44a;
+    }
+    
+    blockquote {
+        background-color: #2a2622;
+        border-left-color: #8fa44a;
+        color: #e8e4d8;
+    }
+    
+    hr {
+        border-top-color: #4a4540;
+    }
+    
+    /* CTA SECTION */
+    .cta-section {
+        background: linear-gradient(135deg, #2a2622 0%, rgba(42, 38, 34, 0.8) 100%);
+        border-top-color: #d9cc94;
+    }
+    
+    .cta-section h2 {
+        border-bottom: none;
+        color: #8fa44a;
+    }
+    
+    .cta-section p {
+        color: #e8e4d8;
+    }
+    
+    /* BUTTONS */
+    .btn {
+        background-color: #8fa44a;
+        color: #1a1714;
+        border-color: #8fa44a;
+    }
+    
+    .btn:hover {
+        background-color: transparent;
+        color: #d9cc94;
+        border-color: #d9cc94;
+    }
+    
+    .btn--primary {
+        background-color: #8fa44a;
+        color: #1a1714;
+    }
+    
+    .btn--primary:hover {
+        background-color: #d9cc94;
+        color: #1a1714;
+    }
+    
+    .btn--secondary {
+        background-color: transparent;
+        color: #8fa44a;
+        border-color: #8fa44a;
+    }
+    
+    .btn--secondary:hover {
+        background-color: #8fa44a;
+        color: #1a1714;
+    }
+}
+
+@media (prefers-color-scheme: dark) and (max-width: 768px) {
+    .container {
+        background-color: transparent;
+    }
+    
+    .hero {
+        padding: var(--spacing-xl) var(--spacing-md);
+    }
+}
+
+@media (prefers-color-scheme: dark) and (max-width: 480px) {
+    :root {
+        --rooted-primary: #8fa44a;
+        --rooted-accent: #d9cc94;
+    }
+}
