@@ -1698,11 +1698,13 @@ button.disabled {
     pointer-events: none;
 }
 
-/* Dark Mode Text Override - Force readable text on dark backgrounds */
+/* Dark Mode Text & Bubble Override - Readable messaging on dark backgrounds */
 @media (prefers-color-scheme: dark) {
     :root {
-        --message-own-text: #ffffff;      /* White text on dark green bubbles */
-        --message-other-text: #000000;    /* Black text on light backgrounds */
+        --message-own-text: #ffffff;              /* White text on dark green bubbles */
+        --message-other-text: #000000;            /* Black text on light backgrounds */
+        --message-own-bg: linear-gradient(135deg, #88a947 0%, #9bb85f 100%);  /* Keep green */
+        --message-other-bg: #e8e4d8;              /* Light cream background */
     }
 }
 

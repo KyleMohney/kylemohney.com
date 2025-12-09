@@ -1424,12 +1424,20 @@
 
 
 
-/* Dark Mode Text Fix */
+/* Dark Mode Text & Message Bubble Fix */
 @media (prefers-color-scheme: dark) {
-    :root {
-        --color-text: #000000;
-        --color-text-light: #000000;
-        --color-text-muted: #333333;
+    .message--client .message__bubble {
+        background: var(--rooted-primary);
+        color: #ffffff;  /* White text on green bubble */
+    }
+    
+    .message--practitioner .message__bubble {
+        background: #2a2622;  /* Dark background */
+        color: #000000;       /* Black text for readability */
+    }
+    
+    .message__time {
+        color: #999999;  /* Lighter grey for timestamp */
     }
 }
 
