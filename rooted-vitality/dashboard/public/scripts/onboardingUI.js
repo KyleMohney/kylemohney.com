@@ -700,7 +700,7 @@ function setupStep6Handler(onboardingData) {
         closeOnboardingModal();
         window.showAlertModal('Your project has been created. Explore practitioners anytime from your dashboard.');
         setTimeout(() => {
-            window.location.href = '/rooted-vitality/dashboard/client/pages/client-profile.html';
+            window.location.href = '/rooted-vitality/dashboard/client/pages/my-wellness.html';
         }, 500);
     });
 

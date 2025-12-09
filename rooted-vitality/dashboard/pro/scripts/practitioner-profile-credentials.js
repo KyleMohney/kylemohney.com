@@ -330,40 +330,54 @@ function setupBackgroundCheckButton() {
     }
 }
 
-function updateVerificationStatus(isVerified) {
+function updateVerificationStatus(status) {
     const statusDisplay = document.getElementById('verification-status-display');
     const formContainer = document.getElementById('verification-form-container');
     
-    if (isVerified) {
+    if (status === 'approved') {
         formContainer.style.display = 'none';
         statusDisplay.innerHTML = `
             <div class="verification-status submitted">
                 <span class="status-icon">✓</span>
                 <div>
-                    <p>Business Verification Submitted</p>
-                    <p class="status-date">Your verification documents have been submitted and approved</p>
+                    <p>Business Verification Approved</p>
+                    <p class="status-date">Your verification documents have been reviewed and approved</p>
                 </div>
             </div>
         `;
         statusDisplay.classList.add('submitted');
-    } else {
+    } else if (status === 'pending') {
         formContainer.style.display = 'none';
         statusDisplay.innerHTML = `
-            <button class="btn-accent btn-verification-toggle">
-                + Submit Verification Documents
-            </button>
+            <div class="verification-status pending">
+                <span class="status-icon">⏳</span>
+                <div>
+                    <p>Business Verification Pending</p>
+                    <p class="status-date">Your documents are being reviewed by our admin team</p>
+                </div>
+            </div>
         `;
+        statusDisplay.classList.add('pending');
         statusDisplay.classList.remove('submitted');
-        
-        // Add event listener to toggle button
-        const toggleBtn = statusDisplay.querySelector('.btn-verification-toggle');
-        if (toggleBtn) {
-            toggleBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                const isVisible = formContainer.style.display === 'block';
-                formContainer.style.display = isVisible ? 'none' : 'block';
-            });
-        }
+    } else if (status === 'rejected') {
+        formContainer.style.display = 'block';
+        const rejectionReason = ProfileState.practitionerData?.verification_rejection_reason || 'Please resubmit your documents';
+        statusDisplay.innerHTML = `
+            <div class="verification-status rejected">
+                <span class="status-icon">✗</span>
+                <div>
+                    <p>Verification Rejected</p>
+                    <p class="status-date">${rejectionReason}</p>
+                </div>
+            </div>
+        `;
+        statusDisplay.classList.add('rejected');
+        statusDisplay.classList.remove('submitted', 'pending');
+    } else {
+        // No submission yet
+        formContainer.style.display = 'block';
+        statusDisplay.innerHTML = '';
+        statusDisplay.classList.remove('submitted', 'pending', 'rejected');
     }
 }
 
@@ -383,15 +397,19 @@ function setupBusinessVerification() {
 
     // Check if verification already submitted
     const checkVerificationStatus = () => {
-        if (ProfileState.practitionerData && ProfileState.practitionerData.badge_verified) {
-            updateVerificationStatus(true);
+        const status = ProfileState.practitionerData?.verification_status || null;
+        if (status) {
+            updateVerificationStatus(status);
         } else {
-            updateVerificationStatus(false);
+            updateVerificationStatus(null);
         }
     };
 
-    // Initial status check
+    // Initial status check (may be called before data loads)
     checkVerificationStatus();
+    
+    // Re-check after a short delay to ensure ProfileState is populated
+    setTimeout(checkVerificationStatus, 500);
 
     // Handle form submission
     form.addEventListener('submit', async (e) => {
@@ -420,8 +438,8 @@ function setupBusinessVerification() {
             // Upload front ID to Supabase Storage
             const frontFileName = `verification-id-front-${ProfileState.currentUser.id}-${Date.now()}`;
             const { data: frontData, error: frontError } = await window.supabaseClient.storage
-                .from('verification-documents')
-                .upload(`${ProfileState.currentUser.id}/${frontFileName}`, idFront);
+                .from('practitioner-files')
+                .upload(`verification/${ProfileState.currentUser.id}/${frontFileName}`, idFront);
 
             if (frontError) {
                 console.error('[Rooted Vitality] Error uploading front ID:', frontError);
@@ -433,8 +451,8 @@ function setupBusinessVerification() {
             // Upload back ID to Supabase Storage
             const backFileName = `verification-id-back-${ProfileState.currentUser.id}-${Date.now()}`;
             const { data: backData, error: backError } = await window.supabaseClient.storage
-                .from('verification-documents')
-                .upload(`${ProfileState.currentUser.id}/${backFileName}`, idBack);
+                .from('practitioner-files')
+                .upload(`verification/${ProfileState.currentUser.id}/${backFileName}`, idBack);
 
             if (backError) {
                 console.error('[Rooted Vitality] Error uploading back ID:', backError);
@@ -445,24 +463,29 @@ function setupBusinessVerification() {
 
             // Get public URLs for the uploaded files
             const frontUrl = window.supabaseClient.storage
-                .from('verification-documents')
-                .getPublicUrl(`${ProfileState.currentUser.id}/${frontFileName}`).data.publicUrl;
+                .from('practitioner-files')
+                .getPublicUrl(`verification/${ProfileState.currentUser.id}/${frontFileName}`).data.publicUrl;
 
             const backUrl = window.supabaseClient.storage
-                .from('verification-documents')
-                .getPublicUrl(`${ProfileState.currentUser.id}/${backFileName}`).data.publicUrl;
+                .from('practitioner-files')
+                .getPublicUrl(`verification/${ProfileState.currentUser.id}/${backFileName}`).data.publicUrl;
 
             // Update practitioner_credentials record with verification data
+            const submissionTime = new Date().toISOString();
             const { error: updateError } = await window.supabaseClient
                 .from('practitioner_credentials')
                 .update({
-                    badge_verified: true,
-                    verification_updated_at: new Date().toISOString(),
+                    verification_status: 'pending',
+                    verification_ein_ssn_last4: einSsn.slice(-4),
+                    verification_id_front_url: frontUrl,
+                    verification_id_back_url: backUrl,
+                    verification_submitted_at: submissionTime,
+                    verification_updated_at: submissionTime,
                     verification_audit_trail: {
                         ein_ssn_last4: einSsn.slice(-4),
                         id_front_url: frontUrl,
                         id_back_url: backUrl,
-                        submitted_at: new Date().toISOString()
+                        submitted_at: submissionTime
                     }
                 })
                 .eq('id', ProfileState.practitionerData.id || ProfileState.currentUser.id);
@@ -475,13 +498,17 @@ function setupBusinessVerification() {
             }
 
             // Update local data
-            ProfileState.practitionerData.badge_verified = true;
-            ProfileState.practitionerData.verification_updated_at = new Date().toISOString();
+            ProfileState.practitionerData.verification_status = 'pending';
+            ProfileState.practitionerData.verification_ein_ssn_last4 = einSsn.slice(-4);
+            ProfileState.practitionerData.verification_id_front_url = frontUrl;
+            ProfileState.practitionerData.verification_id_back_url = backUrl;
+            ProfileState.practitionerData.verification_submitted_at = submissionTime;
+            ProfileState.practitionerData.verification_updated_at = submissionTime;
             ProfileState.practitionerData.verification_audit_trail = {
                 ein_ssn_last4: einSsn.slice(-4),
                 id_front_url: frontUrl,
                 id_back_url: backUrl,
-                submitted_at: new Date().toISOString()
+                submitted_at: submissionTime
             };
             showAutoSaveIndicator('success');
 

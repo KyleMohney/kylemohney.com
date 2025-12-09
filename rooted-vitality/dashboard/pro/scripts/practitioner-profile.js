@@ -1164,20 +1164,20 @@ function showReviewLinkModal() {
         return;
     }
     
-    const reviewLink = `${window.location.origin}/rooted-vitality/review?practitioner=${ProfileState.currentUser.id}`;
+    const reviewLink = `${window.location.origin}/rooted-vitality/components/review.html?practitioner=${ProfileState.currentUser.id}`;
     const linkInput = document.getElementById('review-link-input');
     if (linkInput) {
         linkInput.value = reviewLink;
     }
     
-    modal.classList.remove('hidden');
+    modal.style.display = 'block';
 }
 
 // Close review link modal
 function closeReviewLinkModal() {
     const modal = document.getElementById('review-link-modal');
     if (modal) {
-        modal.classList.add('hidden');
+        modal.style.display = 'none';
     }
 }
 
@@ -1279,7 +1279,12 @@ async function initializeProfilePage() {
         // STEP 10: Setup review event listeners
         attachReviewEventListeners();
         
-        // STEP 11: Mark initialization as complete - NOW allow auto-save
+        // STEP 11: Refresh verification status now that ProfileState is fully loaded
+        if (typeof refreshVerificationStatus === 'function') {
+            refreshVerificationStatus();
+        }
+        
+        // STEP 12: Mark initialization as complete - NOW allow auto-save
         ProfileState.isInitializing = false;
         console.log('[Profile] Initialization complete - auto-save now enabled');
         

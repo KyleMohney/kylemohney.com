@@ -548,14 +548,16 @@ async function updateMatchStatus(matchId, newStatus) {
       if (window.supabaseClient) {
         try {
           const channel = window.supabaseClient.channel('match-status-changes');
-          channel.send('broadcast', {
-            event: 'match_status_changed',
-            payload: {
-              practitioner_serial: selectedMatch.practitioner_serial,
-              project_serial: selectedMatch.project_serial,
-              status: newStatus,
-              timestamp: new Date().toISOString()
-            }
+          channel.subscribe(() => {
+            channel.send('broadcast', {
+              event: 'match_status_changed',
+              payload: {
+                practitioner_serial: selectedMatch.practitioner_serial,
+                project_serial: selectedMatch.project_serial,
+                status: newStatus,
+                timestamp: new Date().toISOString()
+              }
+            });
           });
         } catch (broadcastError) {
           console.warn('[Inbox] Broadcast error:', broadcastError);
@@ -587,15 +589,17 @@ async function updateMatchStatus(matchId, newStatus) {
         if (window.supabaseClient) {
           try {
             const channel = window.supabaseClient.channel('project-status-updates');
-            channel.send('broadcast', {
-              event: 'project_status_changed',
-              payload: {
-                project_id: projectUUID,
-                project_serial: selectedMatch.project_serial,
-                new_status: 'hired',
-                hired_practitioner_serial: selectedMatch.practitioner_serial,
-                timestamp: new Date().toISOString()
-              }
+            channel.subscribe(() => {
+              channel.send('broadcast', {
+                event: 'project_status_changed',
+                payload: {
+                  project_id: projectUUID,
+                  project_serial: selectedMatch.project_serial,
+                  new_status: 'hired',
+                  hired_practitioner_serial: selectedMatch.practitioner_serial,
+                  timestamp: new Date().toISOString()
+                }
+              });
             });
           } catch (broadcastError) {
             // Error sending broadcast - will continue
