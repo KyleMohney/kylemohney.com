@@ -483,8 +483,51 @@
     let selectedPhotos = [];
     let practitionerId = null;
     let practitionerData = null;
+    
+    // API proxy URL
+    const API_PROXY = '/rooted-vitality/api/supabase-proxy.php';
 
-    // Direct fetch helper with CORS proxy fallback
+    // Unified fetch helper using server-side PHP proxy
+    async function apiCall(table, filters = {}, method = 'GET', body = null) {
+      try {
+        // Build query string for proxy
+        const params = new URLSearchParams();
+        params.append('table', table);
+        
+        // Add all filter parameters
+        for (const [key, value] of Object.entries(filters)) {
+          params.append(key, value);
+        }
+        
+        const url = `${API_PROXY}?${params.toString()}`;
+        
+        const options = {
+          method: method,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        };
+        
+        if (body && (method === 'POST' || method === 'PATCH' || method === 'PUT')) {
+          options.body = JSON.stringify(body);
+        }
+        
+        console.log('API Call:', method, table, filters);
+        const response = await fetch(url, options);
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+        }
+        
+        return await response.json();
+      } catch (error) {
+        console.error('API call failed:', error);
+        throw error;
+      }
+    }
+
+    // Direct fetch helper with CORS proxy fallback (deprecated - use apiCall instead)
     async function fetchWithFallback(url, options = {}) {
       console.log('Fetching:', url);
       
@@ -608,45 +651,25 @@
     // Load taxonomy categories
     async function loadCategories() {
       try {
-        console.log('Querying holistic_health_taxonomy table...');
+        console.log('Fetching categories from holistic_health_taxonomy...');
         
-        // Try Supabase client first
-        const { data: categories, error } = await supabaseClient
-          .from('holistic_health_taxonomy')
-          .select('id, name')
-          .eq('is_active', true)
-          .order('display_order', { ascending: true });
-
-        if (error) {
-          console.error('Supabase client error:', error.message);
-          throw new Error('Supabase client failed');
-        }
-
+        // Use PHP proxy to fetch categories
+        const categories = await apiCall('holistic_health_taxonomy', {
+          'is_active': 'eq.true',
+          'order': 'display_order.asc',
+          'select': 'id,name'
+        });
+        
         if (!categories || categories.length === 0) {
           throw new Error('No categories available');
         }
 
-        console.log('Categories loaded via Supabase client:', categories.length);
+        console.log('Categories loaded:', categories.length);
         populateCategories(categories);
 
-      } catch (clientError) {
-        console.log('Supabase client failed, using direct API call...');
-        
-        try {
-          // Fallback to direct API call
-          const url = `https://nguwgabvfwzwvpykxkdz.supabase.co/rest/v1/holistic_health_taxonomy?is_active=eq.true&order=display_order.asc`;
-          const categories = await fetchWithFallback(url);
-          
-          if (!categories || categories.length === 0) {
-            throw new Error('No categories available');
-          }
-          
-          console.log('Categories loaded via direct API:', categories.length);
-          populateCategories(categories);
-        } catch (apiError) {
-          console.error('Direct API also failed:', apiError);
-          showError(`Failed to load categories: ${apiError.message}`);
-        }
+      } catch (error) {
+        console.error('Failed to load categories:', error);
+        showError(`Failed to load categories: ${error.message}`);
       }
     }
 
@@ -671,48 +694,25 @@
     // Fetch practitioner info
     async function fetchPractitionerInfo() {
       try {
-        console.log('Querying practitioners table for ID:', practitionerId);
+        console.log('Fetching practitioner info for ID:', practitionerId);
         
-        // Try Supabase client first
-        const { data: practitioner, error } = await supabaseClient
-          .from('practitioners')
-          .select('id, full_name, specialty, avatar_url')
-          .eq('id', practitionerId)
-          .single();
-
-        if (error) {
-          console.error('Supabase client error:', error.message);
-          throw new Error('Supabase client failed');
-        }
-
-        if (!practitioner) {
-          console.error('No practitioner found with ID:', practitionerId);
-          showError('Practitioner not found.');
-          return;
-        }
-
-        console.log('Practitioner data loaded:', practitioner);
-        practitionerData = practitioner;
-
-      } catch (clientError) {
-        console.log('Supabase client failed, using direct API call...');
+        // Use PHP proxy to fetch practitioner
+        const data = await apiCall('practitioners', {
+          'id': `eq.${practitionerId}`,
+          'select': 'id,full_name,specialty,avatar_url'
+        });
         
-        try {
-          // Fallback to direct API call
-          const url = `https://nguwgabvfwzwvpykxkdz.supabase.co/rest/v1/practitioners?id=eq.${practitionerId}&select=id,full_name,specialty,avatar_url`;
-          const data = await fetchWithFallback(url);
-          
-          if (!data || data.length === 0) {
-            throw new Error('Practitioner not found');
-          }
-          
-          practitionerData = data[0];
-          console.log('Practitioner data loaded via direct API:', practitionerData);
-        } catch (apiError) {
-          console.error('Direct API also failed:', apiError);
-          showError(`Failed to load practitioner: ${apiError.message}`);
-          return;
+        if (!data || data.length === 0) {
+          throw new Error('Practitioner not found');
         }
+        
+        practitionerData = data[0];
+        console.log('Practitioner data loaded:', practitionerData);
+
+      } catch (error) {
+        console.error('Failed to load practitioner:', error);
+        showError(`Failed to load practitioner: ${error.message}`);
+        return;
       }
 
       if (!practitionerData) {
@@ -737,18 +737,16 @@
     async function checkReviewLimit() {
       try {
         console.log('Checking review limit for practitioner:', practitionerId);
-        const { count, error } = await supabaseClient
-          .from('reviews')
-          .select('*', { count: 'exact', head: true })
-          .eq('practitioner_id', practitionerId)
-          .eq('source', 'review-link')
-          .eq('is_visible', true);
+        
+        // Use PHP proxy to count reviews
+        const reviews = await apiCall('reviews', {
+          'practitioner_id': `eq.${practitionerId}`,
+          'source': 'eq.review-link',
+          'is_visible': 'eq.true',
+          'select': 'id'
+        });
 
-        if (error) {
-          console.error('Database error checking reviews:', error);
-          throw error;
-        }
-
+        const count = reviews ? reviews.length : 0;
         console.log('Review count for this practitioner:', count);
 
         if (count >= 3) {
@@ -859,29 +857,28 @@
           photoUrls = await uploadPhotos(clientEmail);
         }
 
-        // Submit review
-        const { data, error } = await supabaseClient
-          .from('reviews')
-          .insert({
-            practitioner_id: practitionerId,
-            client_id: null, // Off-platform client
-            client_name: clientName,
-            client_first_name: clientName.split(' ')[0],
-            client_last_name: clientName.split(' ').slice(1).join(' '),
-            rating: selectedRating,
-            review_text: reviewText,
-            category_id: selectedCategory,
-            source: 'review-link',
-            is_verified: false,
-            is_featured: false,
-            is_visible: true, // Auto-visible
-            is_approved: true, // Auto-approved
-            review_date: new Date().toISOString(),
-            photos: photoUrls.length > 0 ? photoUrls : null,
-            moderation_notes: `Off-platform review from ${clientEmail}`
-          });
-
-        if (error) throw error;
+        // Submit review using PHP proxy
+        const reviewData = {
+          practitioner_id: practitionerId,
+          client_id: null, // Off-platform client
+          client_name: clientName,
+          client_first_name: clientName.split(' ')[0],
+          client_last_name: clientName.split(' ').slice(1).join(' '),
+          rating: selectedRating,
+          review_text: reviewText,
+          category_id: selectedCategory,
+          source: 'review-link',
+          is_verified: false,
+          is_featured: false,
+          is_visible: true, // Auto-visible
+          is_approved: true, // Auto-approved
+          review_date: new Date().toISOString(),
+          photos: photoUrls.length > 0 ? photoUrls : null,
+          moderation_notes: `Off-platform review from ${clientEmail}`
+        };
+        
+        console.log('Submitting review:', reviewData);
+        await apiCall('reviews', {}, 'POST', reviewData);
 
         showSuccess('Thank you! Your review has been submitted.');
         
