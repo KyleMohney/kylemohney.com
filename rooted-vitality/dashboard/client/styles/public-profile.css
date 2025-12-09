@@ -95,7 +95,7 @@
 
 .profile-age {
     font-size: 0.95rem;
-    color: #666;
+    color: var(--text-muted-secondary);
     margin: 0.25rem 0 0;
 }
 
@@ -183,7 +183,7 @@
 
 .wellness-answer {
     font-size: 1rem;
-    color: #555;
+    color: var(--text-muted-secondary);
     margin: 0;
     line-height: 1.6;
     font-family: var(--font-serif);
@@ -290,7 +290,7 @@
 }
 
 .error-message {
-    color: #555;
+    color: var(--text-muted-secondary);
     margin: 0 0 1rem 0;
     line-height: 1.5;
 }

@@ -36,7 +36,7 @@
 /* ========================================== */
 
 .my-projects-container {
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -62,7 +62,7 @@
 }
 
 .projects-hero__title {
-  color: var(--rooted-neutral);
+  color: var(--text-light);
   font-size: 3rem;
   font-weight: 700;
   margin: 0 0 15px 0;
@@ -71,7 +71,7 @@
 }
 
 .projects-hero__subtitle {
-  color: var(--rooted-neutral);
+  color: var(--text-light);
   font-size: 1.125rem;
   margin: 0;
   font-family: var(--font-serif);
@@ -363,7 +363,7 @@
 
 .open-to-match-description {
   font-size: 0.8rem;
-  color: #666;
+  color: var(--text-muted-secondary);
   margin: 0;
   line-height: 1.4;
 }
@@ -378,7 +378,7 @@
 }
 
 .sidebar-filters-section .sidebar-section__title {
-  color: #666;
+  color: var(--text-muted-secondary);
   margin: 0 0 0.75rem 0;
 }
 
@@ -399,7 +399,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: #666;
+  color: var(--text-muted-secondary);
   font-family: var(--font-sans);
 }
 
@@ -703,7 +703,7 @@
 .project-card__id {
   font-size: 0.8rem;
   font-weight: 500;
-  color: #999;
+  color: var(--text-muted-secondary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -743,11 +743,11 @@
 
 .project-card__status--hired {
   background-color: var(--rooted-primary);
-  color: var(--rooted-neutral);
+  color: var(--text-light);
 }
 
 .project-card__status--canceled {
-  background-color: var(--rooted-neutral);
+  background-color: var(--text-light);
   color: #9ca3af;
   border: 1.5px solid #d1d5db;
 }
@@ -818,7 +818,7 @@
 .detail-label {
   font-size: 0.85rem;
   font-weight: 500;
-  color: #999;
+  color: var(--text-muted-secondary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -841,7 +841,7 @@
 }
 
 .detail-value--browsing {
-  color: #999;
+  color: var(--text-muted-secondary);
 }
 
 .detail-grid {
@@ -900,7 +900,7 @@
 .category-badge {
   display: inline-block;
   padding: 0.5rem 0.75rem;
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   border: 1px solid var(--rooted-primary);
   border-radius: var(--radius-sm);
   font-size: 0.85rem;
@@ -924,7 +924,7 @@
 .subcategory-badge {
   display: inline-block;
   padding: 0.5rem 0.75rem;
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   border: 1px solid var(--rooted-primary);
   border-radius: var(--radius-sm);
   font-size: 0.85rem;

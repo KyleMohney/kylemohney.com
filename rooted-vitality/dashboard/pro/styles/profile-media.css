@@ -385,7 +385,7 @@
 
 .upload-dropzone p {
     margin: 0.5rem 0;
-    color: #666;
+    color: var(--text-muted-secondary);
     font-size: 0.95rem;
 }
 
@@ -409,7 +409,7 @@
 
 .dropzone-note {
     font-size: 0.85rem;
-    color: #999;
+    color: var(--text-muted-secondary);
     margin-top: 1rem !important;
 }
 
@@ -450,7 +450,7 @@
 }
 
 .preview-info p:last-child {
-    color: #999;
+    color: var(--text-muted-secondary);
     font-size: 0.85rem;
 }
 
@@ -482,7 +482,7 @@
 }
 
 #progress-percentage {
-    color: #666;
+    color: var(--text-muted-secondary);
     font-size: 0.9rem;
 }
 
@@ -650,7 +650,7 @@
     justify-content: center;
     background: transparent;
     border: none;
-    color: #999;
+    color: var(--text-muted-secondary);
     border-radius: 4px;
     font-size: 1.5rem;
     cursor: pointer;
@@ -721,3 +721,4 @@
         grid-template-columns: 1fr;
     }
 }
+

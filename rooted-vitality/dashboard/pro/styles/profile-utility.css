@@ -212,7 +212,7 @@
     align-items: center;
     justify-content: center;
     background: var(--rooted-primary);
-    color: var(--rooted-neutral);
+    color: var(--text-light);
     border-radius: 50%;
     font-size: 0.85rem;
     font-weight: 700;
@@ -813,7 +813,7 @@
     align-items: center;
     justify-content: center;
     background: var(--rooted-primary);
-    color: var(--rooted-neutral);
+    color: var(--text-light);
     border-radius: 50%;
     font-size: 0.85rem;
     font-weight: 700;
@@ -1290,7 +1290,7 @@
 }
 
 .insurance-custom-input::placeholder {
-    color: #999;
+    color: var(--text-muted-secondary);
 }
 
 .insurance-custom-input:focus {
@@ -1351,7 +1351,7 @@
 }
 
 .payment-custom-input::placeholder {
-    color: #999;
+    color: var(--text-muted-secondary);
 }
 
 .payment-custom-input:focus {
@@ -1359,3 +1359,4 @@
     border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.1);
 }
+

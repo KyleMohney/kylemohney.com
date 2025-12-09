@@ -92,7 +92,7 @@
 .progress-bar-wrapper {
     width: 100%;
     height: 8px;
-    background: var(--rooted-neutral);
+    background: var(--rooted-light);
     border-radius: 100px;
     overflow: hidden;
     margin-bottom: 1rem;
@@ -190,7 +190,7 @@
 /* ========================================== */
 
 .form-wizard-section {
-    background: var(--rooted-neutral);
+    background: var(--rooted-light);
     padding: 3rem 1rem;
     min-height: 600px;
 }
@@ -474,7 +474,7 @@ select {
     top: 1.5rem;
     right: 1.5rem;
     background: rgba(211, 47, 47, 0.9);
-    color: var(--rooted-neutral);
+    color: var(--text-light);
     border: none;
     padding: 0.5rem 1rem;
     border-radius: var(--radius-sm);
@@ -522,7 +522,7 @@ select {
 
 .btn-remove-file:hover {
     background: var(--rooted-danger);
-    color: var(--rooted-neutral);
+    color: var(--text-light);
 }
 
 .gallery-preview {
@@ -553,7 +553,7 @@ select {
     height: 28px;
     border-radius: 50%;
     background: rgba(211, 47, 47, 0.9);
-    color: var(--rooted-neutral);
+    color: var(--text-light);
     border: none;
     font-size: 1.25rem;
     font-weight: bold;
@@ -635,7 +635,7 @@ select {
 }
 
 .checkbox-label:hover {
-    background: var(--rooted-neutral);
+    background: var(--rooted-light);
     border-color: var(--rooted-primary);
 }
 
@@ -767,12 +767,12 @@ select {
 }
 
 .btn-secondary {
-    background: var(--rooted-neutral);
+    background: var(--rooted-light);
     color: var(--rooted-dark);
 }
 
 .btn-secondary:hover {
-    background: var(--rooted-neutral);
+    background: var(--rooted-light);
     opacity: 0.85;
 }
 
@@ -824,7 +824,7 @@ select {
 }
 .success-modal-content {
     position: relative;
-    background: var(--rooted-neutral);
+    background: var(--rooted-light);
     border-radius: 12px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
     max-width: 480px;
@@ -1130,7 +1130,7 @@ select {
 }
 
 .modal-content {
-    background-color: var(--rooted-neutral);
+    background-color: var(--text-light);
     border-radius: 12px;
     padding: 2.5rem;
     max-width: 500px;
@@ -1144,7 +1144,7 @@ select {
     width: 60px;
     height: 60px;
     background-color: var(--rooted-primary-dark);
-    color: var(--rooted-neutral);
+    color: var(--text-light);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -1192,7 +1192,7 @@ select {
 /* ========================================== */
 
 .membership-card {
-    background: var(--rooted-neutral);
+    background: var(--rooted-light);
     border: 2px solid var(--rooted-primary);
     border-radius: 12px;
     padding: 2rem;
@@ -1357,7 +1357,7 @@ select {
 }
 
 .checkbox-group label:hover {
-    background: var(--rooted-neutral);
+    background: var(--rooted-light);
     border-color: var(--rooted-primary);
 }
 

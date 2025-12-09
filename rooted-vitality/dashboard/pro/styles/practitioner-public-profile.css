@@ -1124,13 +1124,13 @@ body { font-family: var(--font-sans); color: var(--color-text); background: #fbf
 
 .credential-issuer {
     font-size: 0.85rem;
-    color: #666;
+    color: var(--text-muted-secondary);
     font-style: italic;
 }
 
 .credential-empty {
     font-size: 0.9rem;
-    color: #999;
+    color: var(--text-muted-secondary);
     font-style: italic;
     padding: 0.75rem 1rem;
 }
@@ -1461,7 +1461,7 @@ body { font-family: var(--font-sans); color: var(--color-text); background: #fbf
 
 .review-author {
     font-size: 0.85rem;
-    color: #999;
+    color: var(--text-muted-secondary);
     font-weight: 500;
 }
 

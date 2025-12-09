@@ -161,7 +161,7 @@
 
 .section-description {
     font-size: 0.9rem;
-    color: #666;
+    color: var(--text-muted-secondary);
     margin: 0;
     font-weight: 400;
 }
@@ -225,7 +225,7 @@
 
 .card-content .setting-description {
     margin-bottom: 1rem;
-    color: #666;
+    color: var(--text-muted-secondary);
     font-size: 0.9rem;
 }
 
@@ -260,7 +260,7 @@
     display: block;
     font-size: 0.85rem;
     font-weight: 600;
-    color: #666;
+    color: var(--text-muted-secondary);
     margin-bottom: 0.5rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -604,7 +604,7 @@
 
 .subscription-detail {
     font-size: 0.9rem;
-    color: #666;
+    color: var(--text-muted-secondary);
     margin: 0;
 }
 
@@ -834,3 +834,4 @@
 .btn-inline-cancel:hover {
     background-color: #e0e0e0;
 }
+

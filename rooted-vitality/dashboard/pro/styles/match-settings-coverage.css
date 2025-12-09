@@ -126,7 +126,7 @@
   width: 20px;
   height: 20px;
   background: var(--rooted-primary);
-  color: var(--rooted-neutral);
+  color: var(--text-light);
   border-radius: 50%;
   font-size: 0.75rem;
   font-weight: 700;
@@ -143,7 +143,7 @@
   top: auto;
   right: auto;
   background: var(--rooted-dark);
-  color: var(--rooted-neutral);
+  color: var(--text-light);
   padding: 1rem 1.25rem;
   border-radius: 6px;
   font-size: 0.85rem;
@@ -169,7 +169,7 @@
   flex-wrap: nowrap;
   gap: 1.5rem;
   padding: 0.75rem 1rem;
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   border-radius: 8px;
   border: 1px solid #e0dcd5;
   align-items: center;
@@ -213,7 +213,7 @@
   border-radius: 8px;
   padding: 1.25rem;
   margin-bottom: 1rem;
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
 }
 
 .housecalls-option-label {
@@ -341,7 +341,7 @@
   border-radius: 8px;
   padding: 1.25rem;
   margin-bottom: 1rem;
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
 }
 
 .virtualremote-option-label {
@@ -430,7 +430,7 @@
   border-radius: 8px;
   font-family: var(--font-sans);
   font-size: 0.95rem;
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   transition: all 0.2s ease;
   color: var(--rooted-dark);
 }
@@ -438,7 +438,7 @@
 .base-location-input:focus {
   outline: none;
   border-color: var(--rooted-primary);
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.1);
 }
 
@@ -583,7 +583,7 @@
   border-radius: 8px;
   font-family: var(--font-sans);
   font-size: 0.95rem;
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   transition: all 0.2s ease;
   color: var(--rooted-dark);
 }
@@ -591,13 +591,13 @@
 .zip-input:focus {
   outline: none;
   border-color: var(--rooted-primary);
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.1);
 }
 
 .btn-import-csv {
   padding: 0.875rem 1.25rem;
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   border: 1px solid #e0dcd5;
   border-radius: 8px;
   color: var(--rooted-dark);
@@ -610,7 +610,7 @@
 
 .btn-import-csv:hover {
   border-color: var(--rooted-primary);
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   transform: translateY(-1px);
   box-shadow: 0 2px 6px rgba(92, 154, 114, 0.15);
 }
@@ -625,7 +625,7 @@
   flex-wrap: wrap;
   gap: 0.5rem;
   padding: 0.75rem;
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   border: 1px solid #e0dcd5;
   border-radius: 8px;
   min-height: 44px;
@@ -675,7 +675,7 @@
 
 .zip-tag-remove:hover {
   background: var(--rooted-primary);
-  color: var(--rooted-neutral);
+  color: var(--text-light);
   transform: scale(1.1);
 }
 
@@ -703,7 +703,7 @@
   border-radius: 8px;
   font-family: var(--font-sans);
   font-size: 0.95rem;
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   transition: all 0.2s ease;
   color: var(--rooted-dark);
   font-weight: 600;
@@ -712,7 +712,7 @@
 .state-input:focus {
   outline: none;
   border-color: var(--rooted-primary);
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.1);
 }
 
@@ -723,7 +723,7 @@
 
 .btn-add-state {
   padding: 0.875rem 1.25rem;
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   border: 1px solid #e0dcd5;
   border-radius: 8px;
   color: var(--rooted-dark);
@@ -736,7 +736,7 @@
 
 .btn-add-state:hover {
   border-color: var(--rooted-primary);
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   transform: translateY(-1px);
   box-shadow: 0 2px 6px rgba(92, 154, 114, 0.15);
 }
@@ -747,7 +747,7 @@
   flex-wrap: wrap;
   gap: 0.5rem;
   padding: 0.75rem;
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   border: 1px solid #e0dcd5;
   border-radius: 8px;
   min-height: 44px;
@@ -800,7 +800,7 @@
 
 .state-tag-remove:hover {
   background: var(--rooted-primary);
-  color: var(--rooted-neutral);
+  color: var(--text-light);
   transform: scale(1.1);
 }
 
@@ -821,7 +821,7 @@
 }
 
 .coverage-map-placeholder {
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   border: 1px solid #e0dcd5;
   border-radius: 12px;
   height: 100%;
@@ -839,7 +839,7 @@
 .coverage-map-placeholder .leaflet-container {
   width: 100%;
   height: 100%;
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   border-radius: 12px;
 }
 
@@ -849,7 +849,7 @@
 }
 
 .coverage-map-placeholder .remote-coverage-label {
-  background: var(--rooted-neutral) !important;
+  background: var(--rooted-light) !important;
   border: none !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
   padding: 0.75rem 1rem !important;
@@ -896,7 +896,7 @@
 
 .btn-open-coverage-modal {
   padding: 0.85rem 1.5rem;
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   border: 1px solid #e0dcd5;
   color: var(--rooted-dark);
   border-radius: 8px;
@@ -909,7 +909,7 @@
 .btn-open-coverage-modal:hover {
   border-color: var(--rooted-primary);
   color: var(--rooted-primary);
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
 }
 
 /* Form Control */
@@ -919,7 +919,7 @@
   border-radius: 8px;
   font-family: var(--font-sans);
   font-size: 0.95rem;
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   transition: all 0.2s ease;
   box-sizing: border-box;
   color: var(--rooted-dark);
@@ -928,7 +928,7 @@
 .form-control:focus {
   outline: none;
   border-color: var(--rooted-primary);
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.1);
 }
 
@@ -1044,3 +1044,4 @@
 .hidden-state {
   display: none;
 }
+

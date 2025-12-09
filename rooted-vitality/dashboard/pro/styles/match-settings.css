@@ -55,7 +55,7 @@ NOTE: Additional modal and responsive styles interspersed throughout
 
 /* Background and visual styling for main container */
 .match-settings-main {
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
 }
 
 .match-settings-main::before {
@@ -76,7 +76,7 @@ NOTE: Additional modal and responsive styles interspersed throughout
 .nav-section-item {
   padding: 0.75rem 1rem;
   border-radius: 8px;
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   border: 1px solid #e0dcd5;
   cursor: pointer;
   font-size: 0.95rem;
@@ -95,7 +95,7 @@ NOTE: Additional modal and responsive styles interspersed throughout
 .nav-section-item.active {
   background: var(--rooted-primary);
   border-color: var(--rooted-primary);
-  color: var(--rooted-neutral);
+  color: var(--text-light);
   box-shadow: 0 2px 8px rgba(92, 154, 114, 0.2);
 }
 
@@ -278,7 +278,7 @@ NOTE: Additional modal and responsive styles interspersed throughout
   width: 36px;
   left: 4px;
   bottom: 4px;
-  background-color: var(--rooted-neutral);
+  background-color: var(--text-light);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: 50%;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
@@ -300,7 +300,7 @@ input:checked + .toggle-slider-large:before {
 
 /* Category Item Card */
 .category-item {
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   border: 1px solid #e0dcd5;
   border-radius: 10px;
   padding: 1.25rem;
@@ -370,7 +370,7 @@ input:checked + .toggle-slider-large:before {
 }
 
 .category-item.inactive .category-item-name {
-  color: #999;
+  color: var(--text-muted-secondary);
 }
 
 .category-item.inactive .category-item-meta {
@@ -413,7 +413,7 @@ input:checked + .toggle-slider-large:before {
   border-radius: 8px;
   padding: 1.25rem;
   margin-bottom: 1rem;
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
 }
 
 .coverage-option-label {
@@ -574,7 +574,7 @@ input:checked + .toggle-slider-large:before {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: var(--rooted-neutral);
+  background-color: var(--text-light);
   transition: 0.3s;
   border-radius: 28px;
   cursor: pointer;
@@ -587,7 +587,7 @@ input:checked + .toggle-slider-large:before {
   width: 22px;
   left: 3px;
   bottom: 3px;
-  background-color: var(--rooted-neutral);
+  background-color: var(--text-light);
   transition: 0.3s;
   border-radius: 50%;
 }
@@ -605,7 +605,7 @@ input:checked + .toggle-slider:before {
   padding: 0.5rem 1rem;
   border: 1px solid #e0dcd5;
   border-radius: 6px;
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   color: var(--rooted-dark);
   font-size: 0.85rem;
   font-weight: 600;
@@ -614,7 +614,7 @@ input:checked + .toggle-slider:before {
 }
 
 .category-btn:hover {
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   border-color: var(--rooted-primary);
   color: var(--rooted-primary);
 }
@@ -622,7 +622,7 @@ input:checked + .toggle-slider:before {
 .category-btn-remove {
   background: transparent;
   border: 1px solid #ccc;
-  color: #999;
+  color: var(--text-muted-secondary);
   font-size: 20px;
   line-height: 1;
   width: 32px;
@@ -637,8 +637,8 @@ input:checked + .toggle-slider:before {
 
 .category-btn-remove:hover {
   background: #f5f5f5;
-  border-color: #999;
-  color: #666;
+  border-color: var(--text-muted-secondary);
+  color: var(--text-muted-secondary);
 }
 
 /* ========================================== */
@@ -676,11 +676,11 @@ input:checked + .toggle-slider:before {
 .availability-table {
   width: 100%;
   border-collapse: collapse;
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
 }
 
 .availability-table thead {
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   border-bottom: 2px solid #e0dcd5;
 }
 
@@ -700,7 +700,7 @@ input:checked + .toggle-slider:before {
 }
 
 .availability-table tbody tr:hover {
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
 }
 
 .availability-table tbody tr:last-child {
@@ -765,7 +765,7 @@ input:checked + .toggle-slider:before {
   height: 20px;
   left: 2px;
   top: 2px;
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   border-radius: 50%;
   transition: left 0.3s ease;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -789,7 +789,7 @@ input:checked + .toggle-slider:before {
   font-size: 0.95rem;
   color: var(--rooted-dark);
   font-family: var(--font-sans);
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   transition: all 0.2s ease;
   cursor: pointer;
 }
@@ -797,12 +797,12 @@ input:checked + .toggle-slider:before {
 .time-input:focus {
   outline: none;
   border-color: var(--rooted-primary);
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.1);
 }
 
 .time-input:disabled {
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   color: #a8a39f;
   cursor: not-allowed;
   border-color: #e0dcd5;
@@ -823,19 +823,19 @@ input:checked + .toggle-slider:before {
   font-size: 0.9rem;
   color: var(--rooted-dark);
   font-family: var(--font-sans);
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   transition: all 0.2s ease;
 }
 
 .notes-input:focus {
   outline: none;
   border-color: var(--rooted-primary);
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.1);
 }
 
 .notes-input:disabled {
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   color: #a8a39f;
   cursor: not-allowed;
 }
@@ -994,7 +994,7 @@ input:checked + .toggle-slider:before {
   align-items: center;
   justify-content: center;
   background: var(--rooted-primary);
-  color: var(--rooted-neutral);
+  color: var(--text-light);
   border-radius: 50%;
   font-size: 0.85rem;
   font-weight: 700;
@@ -1038,7 +1038,7 @@ input:checked + .toggle-slider:before {
   height: 24px;
   min-width: 24px;
   background: var(--rooted-primary);
-  color: var(--rooted-neutral);
+  color: var(--text-light);
   border-radius: 50%;
   font-size: 0.8rem;
   font-weight: bold;
@@ -1090,7 +1090,7 @@ input:checked + .toggle-slider:before {
 /* Pause Form Container */
 .pause-form-container {
   padding: 1.5rem;
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   border: 1px solid #e0dcd5;
   border-radius: 8px;
   max-height: 0;
@@ -1145,7 +1145,7 @@ input:checked + .toggle-slider:before {
   font-size: 0.9rem;
   font-family: var(--font-sans);
   transition: all 0.2s ease;
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
 }
 
 .pause-form-input:focus,
@@ -1190,7 +1190,7 @@ input:checked + .toggle-slider:before {
 
 .pause-info-time {
   font-size: 0.85rem;
-  color: #666;
+  color: var(--text-muted-secondary);
   margin: 0.25rem 0 0 0;
 }
 
@@ -1266,7 +1266,7 @@ input:checked + .toggle-slider:before {
   border-radius: 8px;
   font-family: var(--font-sans);
   font-size: 0.95rem;
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   transition: all 0.2s ease;
   box-sizing: border-box;
   height: 44px;
@@ -1277,7 +1277,7 @@ input:checked + .toggle-slider:before {
 .search-input:focus {
   outline: none;
   border-color: var(--rooted-primary);
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.1);
 }
 
@@ -1289,7 +1289,7 @@ input:checked + .toggle-slider:before {
   position: absolute;
   top: 100%;
   left: 0;
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   border: 1px solid #e0dcd5;
   border-top: 1px solid #e0dcd5;
   border-radius: 0 0 8px 8px;
@@ -1318,7 +1318,7 @@ input:checked + .toggle-slider:before {
 }
 
 .autocomplete-item:hover {
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
 }
 
 .autocomplete-item-name {
@@ -1340,7 +1340,7 @@ input:checked + .toggle-slider:before {
 .btn-add-category {
   padding: 0.85rem 1.5rem;
   background: var(--rooted-primary);
-  color: var(--rooted-neutral);
+  color: var(--text-light);
   border: none;
   border-radius: 8px;
   font-weight: 600;
@@ -1373,7 +1373,7 @@ input:checked + .toggle-slider:before {
 .btn-browse-categories {
   padding: 0.85rem 1.5rem;
   background: var(--rooted-primary);
-  color: var(--rooted-neutral);
+  color: var(--text-light);
   border: none;
   border-radius: 8px;
   font-weight: 600;
@@ -1659,3 +1659,4 @@ input:checked + .toggle-slider:before {
   border: none;
   outline: none;
 }
+

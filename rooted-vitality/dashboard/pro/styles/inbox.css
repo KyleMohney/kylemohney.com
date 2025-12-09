@@ -44,9 +44,9 @@
     
     /* Message bubble backgrounds */
     --message-own-bg: linear-gradient(135deg, var(--rooted-primary) 0%, var(--rooted-primary-dark) 100%);
-    --message-other-bg: var(--rooted-neutral);
-    --message-own-text: var(--rooted-neutral);
-    --message-other-text: var(--rooted-dark);
+    --message-other-bg: var(--rooted-light);
+    --message-own-text: var(--text-light);
+    --message-other-text: var(--color-text);
     
     /* Custom Shadow Variations (inbox-specific) */
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
@@ -55,6 +55,17 @@
     
     /* Interaction Easing */
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark Mode Overrides for Inbox */
+@media (prefers-color-scheme: dark) {
+    :root {
+        /* Message bubble backgrounds - Dark Mode */
+        --message-own-bg: linear-gradient(135deg, var(--rooted-primary) 0%, var(--rooted-primary-dark) 100%);
+        --message-other-bg: #2a2622;  /* Dark background for other messages */
+        --message-own-text: var(--text-light);  /* Light text on dark green bubbles */
+        --message-other-text: var(--color-text);  /* Light text on dark backgrounds */
+    }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -106,7 +117,7 @@
     white-space: nowrap;
     padding: 8px 16px;
     font-size: 0.85rem;
-    background: var(--rooted-neutral);
+    background: var(--rooted-light);
     color: var(--text-primary);
     border: 1px solid var(--border-light);
     border-radius: 6px;
@@ -151,7 +162,7 @@
     width: 100%;
     flex: 1;
     min-height: calc(100vh - 80px);
-    background: var(--rooted-neutral);
+    background: var(--rooted-light);
     height: auto;
 }
 
@@ -172,7 +183,7 @@
 
 /* Sidebar Tabs */
 .sidebar-tab {
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   border: 2px solid transparent;
   border-radius: 12px;
   padding: 1.5rem;
@@ -193,7 +204,7 @@
 
 .sidebar-tab.active {
   border-color: var(--rooted-primary);
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   box-shadow: 0 4px 12px rgba(92, 154, 114, 0.15);
 }
 
@@ -217,7 +228,7 @@
   height: 24px;
   border-radius: 50%;
   background: var(--border-light);
-  color: #666;
+  color: var(--text-muted-secondary);
   font-size: 0.75rem;
   font-weight: bold;
   flex-shrink: 0;
@@ -226,12 +237,12 @@
 .sidebar-tab:hover .sidebar-tab__badge,
 .sidebar-tab.active .sidebar-tab__badge {
   background: var(--rooted-primary);
-  color: var(--rooted-neutral);
+  color: var(--text-light);
 }
 
 /* Sidebar Sections */
 .sidebar-section {
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   border-radius: 12px;
   padding: 1.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -240,7 +251,7 @@
 .sidebar-section__title {
   font-size: 0.85rem;
   font-weight: 700;
-  color: #666;
+  color: var(--text-muted-secondary);
   margin: 0 0 1rem 0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -257,7 +268,7 @@
 
 .sidebar-tips li {
   font-size: 0.85rem;
-  color: #555;
+  color: var(--text-muted-secondary);
   line-height: 1.5;
 }
 
@@ -282,7 +293,7 @@
   height: 24px;
   min-width: 24px;
   background: var(--rooted-primary);
-  color: var(--rooted-neutral);
+  color: var(--text-light);
   border-radius: 50%;
   font-size: 0.8rem;
   font-weight: bold;
@@ -306,7 +317,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: #666;
+  color: var(--text-muted-secondary);
   font-family: var(--font-sans);
 }
 
@@ -314,7 +325,7 @@
   padding: 0.6rem 0.75rem;
   border: 1px solid var(--border-light);
   border-radius: 6px;
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   color: var(--rooted-dark);
   font-size: 0.85rem;
   font-family: var(--font-sans);
@@ -324,7 +335,7 @@
 
 .filter-select:hover {
   border-color: var(--border-dark);
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
 }
 
 .filter-select:focus {
@@ -335,7 +346,7 @@
 
 .btn-clear-filters {
   padding: 0.6rem 1rem;
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   color: var(--rooted-primary);
   border: 1px solid var(--border-light);
   border-radius: 6px;
@@ -347,7 +358,7 @@
 }
 
 .btn-clear-filters:hover {
-  background: var(--rooted-neutral);
+  background: var(--rooted-light);
   border-color: var(--rooted-primary);
 }
 
@@ -359,7 +370,7 @@
 .inbox-search {
     padding: 12px 10px;
     border-bottom: 1px solid var(--border-light);
-    background: var(--rooted-neutral);
+    background: var(--rooted-light);
 }
 
 .search-input {
@@ -369,7 +380,7 @@
     border-radius: 20px;
     font-size: 0.9rem;
     color: var(--rooted-dark);
-    background: var(--rooted-neutral);
+    background: var(--rooted-light);
     transition: var(--transition);
     font-family: var(--font-sans);
 }
@@ -377,7 +388,7 @@
 .search-input:focus {
     outline: none;
     border-color: var(--rooted-primary);
-    background: var(--rooted-neutral);
+    background: var(--rooted-light);
     box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.1);
 }
 
@@ -393,7 +404,7 @@
 .inbox-list {
     display: flex;
     flex-direction: column;
-    background: var(--rooted-neutral);
+    background: var(--rooted-light);
     border: 1px solid var(--border-light);
     border-radius: 12px;
     overflow-y: auto;
@@ -576,7 +587,7 @@
 .inbox-content {
     display: flex;
     flex-direction: column;
-    background: var(--rooted-neutral);
+    background: var(--rooted-light);
     border: 1px solid var(--border-light);
     border-radius: 12px;
     overflow: hidden;
@@ -766,7 +777,7 @@
     width: 64px;
     height: 64px;
     border-radius: 50%;
-    background: var(--rooted-neutral);
+    background: var(--rooted-light);
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -839,7 +850,7 @@
 .lead-service-tag {
     display: inline-block;
     padding: 4px 10px;
-    background: rgba(251, 247, 236, 0.7);
+    background: rgba(var(--rooted-light-rgb), 0.7);
     border-radius: 12px;
     font-size: 0.75rem;
     font-weight: 600;
@@ -868,7 +879,7 @@
 
 .lead-action-primary {
     background: var(--rooted-primary);
-    color: var(--rooted-neutral);
+    color: var(--text-light);
     box-shadow: 0 2px 8px rgba(92, 154, 114, 0.2);
 }
 
@@ -883,13 +894,13 @@
 }
 
 .lead-action-secondary {
-    background: var(--rooted-neutral);
+    background: var(--rooted-light);
     color: var(--rooted-primary);
     border: 1px solid var(--rooted-primary);
 }
 
 .lead-action-secondary:hover {
-    background: rgba(251, 247, 236, 0.9);
+    background: rgba(var(--rooted-light-rgb), 0.9);
     transform: translateY(-2px);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -901,7 +912,7 @@
 /* ===== PROJECT DETAILS SECTION ===== */
 .lead-project-details {
     padding: 24px;
-    background: var(--rooted-neutral);
+    background: var(--rooted-light);
     border-bottom: 1px solid var(--border-light);
     max-height: 400px;
     overflow-y: auto;
@@ -1023,7 +1034,7 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
-    background: var(--rooted-neutral);
+    background: var(--rooted-light);
 }
 
 .message-group {
@@ -1070,14 +1081,14 @@
 
 .message-group.own .message-bubble {
     background: var(--message-own-bg);
-    color: var(--rooted-neutral) !important;
+    color: var(--text-light) !important;
     border-bottom-right-radius: 6px;
     margin-left: auto !important;
 }
 
 .message-group--sent .message-bubble {
     background: var(--message-own-bg);
-    color: var(--rooted-neutral) !important;
+    color: var(--text-light) !important;
     margin-left: auto !important;
     border-bottom-right-radius: 6px;
 }
@@ -1113,7 +1124,7 @@
     display: flex;
     gap: 0.75rem;
     padding: 12px 16px;
-    background: var(--rooted-neutral);
+    background: var(--rooted-light);
     border-top: 1px solid var(--border-light);
     box-shadow: var(--shadow-sm);
     align-items: flex-end;
@@ -1126,7 +1137,7 @@
     border-radius: 6px;
     font-size: 0.9rem;
     color: var(--rooted-dark);
-    background: var(--rooted-neutral);
+    background: var(--rooted-light);
     transition: all 0.2s ease;
     font-family: var(--font-sans);
     min-height: 36px;
@@ -1136,7 +1147,7 @@
 .message-input:focus {
     outline: none;
     border-color: var(--rooted-primary);
-    background: var(--rooted-neutral);
+    background: var(--rooted-light);
     box-shadow: 0 0 0 2px rgba(92, 154, 114, 0.1);
 }
 
@@ -1145,14 +1156,14 @@
 }
 
 .message-input:disabled {
-    background: var(--rooted-neutral);
+    background: var(--rooted-light);
     color: var(--color-text-muted);
     cursor: not-allowed;
     border-color: var(--border-light);
 }
 
 .message-input::placeholder {
-    color: #999;
+    color: var(--text-muted-secondary);
     opacity: 1;
 }
 
@@ -1164,7 +1175,7 @@
     height: 36px;
     border-radius: 6px;
     background: var(--rooted-primary);
-    color: var(--rooted-neutral);
+    color: var(--text-light);
     border: none;
     font-weight: 600;
     font-size: 0.8rem;
@@ -1175,7 +1186,7 @@
 }
 
 .message-send-btn span {
-    color: var(--rooted-neutral);
+    color: var(--text-light);
 }
 
 .message-send-btn:hover:not(:disabled) {
@@ -1365,7 +1376,7 @@
         width: 280px;
         height: calc(100vh - 80px);
         z-index: 1000;
-        background: var(--rooted-neutral);
+        background: var(--rooted-light);
         box-shadow: var(--shadow-lg);
     }
 
@@ -1445,7 +1456,7 @@
 }
 
 .modal-content {
-    background: var(--rooted-neutral);
+    background: var(--rooted-light);
     border-radius: 10px;
     max-width: 450px;
     width: 100%;
@@ -1485,7 +1496,7 @@
     background: none;
     border: none;
     font-size: 1.8rem;
-    color: #999;
+    color: var(--text-muted-secondary);
     cursor: pointer;
     padding: 0;
     width: 32px;
@@ -1536,7 +1547,7 @@
 
 .btn-primary {
     background: var(--rooted-primary);
-    color: var(--rooted-neutral);
+    color: var(--text-light);
 }
 
 .btn-primary:hover {
@@ -1556,7 +1567,7 @@
 
 .btn-danger {
     background: var(--rooted-danger);
-    color: var(--rooted-neutral);
+    color: var(--text-light);
 }
 
 .btn-danger:hover {
@@ -1571,7 +1582,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: var(--rooted-neutral);
+    background: var(--rooted-light);
     padding: 1.5rem;
     border-radius: 10px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
@@ -1697,5 +1708,8 @@ button.disabled {
     opacity: 0.6;
     pointer-events: none;
 }
+
+
+
 
 
