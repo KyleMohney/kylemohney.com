@@ -1426,18 +1426,20 @@
 
 /* Dark Mode Text & Message Bubble Fix */
 @media (prefers-color-scheme: dark) {
+    /* Client's own messages: white text on green bubble */
     .message--client .message__bubble {
-        background: var(--rooted-primary);
-        color: #ffffff;  /* White text on green bubble */
+        color: #ffffff !important;
     }
     
+    /* Practitioner's messages: black text on light background */
     .message--practitioner .message__bubble {
-        background: #2a2622;  /* Dark background */
-        color: #000000;       /* Black text for readability */
+        background: #e8e4d8 !important;
+        color: #000000 !important;
     }
     
+    /* Timestamp text */
     .message__time {
-        color: #999999;  /* Lighter grey for timestamp */
+        color: #999999 !important;
     }
 }
 
