@@ -854,3 +854,218 @@
     }
 }
 
+/* ========================================== */
+/* DARK MODE STYLING */
+/* ========================================== */
+
+@media (prefers-color-scheme: dark) {
+    .project-confirmation {
+        gap: 2rem;
+        padding: 2rem;
+    }
+
+    .project-details {
+        background: rgba(119, 136, 62, 0.1) !important;
+        border-color: #4a4540 !important;
+        color: #e8e4d8 !important;
+    }
+
+    .project-details h3 {
+        color: #ffffff !important;
+    }
+
+    .project-details p {
+        color: #e8e4d8 !important;
+    }
+
+    .project-details strong {
+        color: #d9cc94 !important;
+    }
+
+    .project-details span {
+        color: #e8e4d8 !important;
+    }
+
+    .btn-link {
+        color: #d9cc94 !important;
+    }
+
+    .btn-link:hover {
+        color: #e8c547 !important;
+    }
+
+    .detected-match-display {
+        background: rgba(119, 136, 62, 0.1) !important;
+        border-color: #4a4540 !important;
+        color: #e8e4d8 !important;
+    }
+
+    .match-info {
+        gap: 1rem;
+    }
+
+    .match-category,
+    .match-subcategory {
+        color: #e8e4d8 !important;
+    }
+
+    .match-category strong,
+    .match-subcategory strong {
+        color: #d9cc94 !important;
+    }
+
+    .confirmation-actions {
+        border-top-color: #4a4540 !important;
+    }
+
+    .confirmation-actions .btn-primary {
+        background: linear-gradient(135deg, #77883e 0%, #5f7030 100%) !important;
+        color: #ffffff !important;
+    }
+
+    .confirmation-actions .btn-primary:hover {
+        box-shadow: 0 6px 16px rgba(119, 136, 62, 0.4) !important;
+    }
+
+    .confirmation-actions .btn-secondary {
+        background: #3d3934 !important;
+        border-color: #4a4540 !important;
+        color: #e8e4d8 !important;
+    }
+
+    .confirmation-actions .btn-secondary:hover {
+        border-color: #77883e !important;
+        color: #d9cc94 !important;
+    }
+
+    .terms-section {
+        background: rgba(119, 136, 62, 0.08) !important;
+        color: #e8e4d8 !important;
+    }
+
+    .terms-section h4 {
+        color: #ffffff !important;
+    }
+
+    .terms-section p,
+    .terms-section label {
+        color: #e8e4d8 !important;
+    }
+
+    .terms-section input[type="checkbox"] {
+        accent-color: #77883e !important;
+    }
+
+    .terms-checkbox {
+        background: #3d3934 !important;
+        border-color: #4a4540 !important;
+    }
+
+    .terms-checkbox input[type="checkbox"] {
+        accent-color: #77883e !important;
+    }
+
+    .terms-checkbox label {
+        color: #e8e4d8 !important;
+    }
+
+    .terms-checkbox a {
+        color: #d9cc94 !important;
+    }
+
+    .terms-checkbox a:hover {
+        color: #e8c547 !important;
+    }
+
+    /* Match card styling */
+    .match-card,
+    .match-item {
+        background: #3d3934 !important;
+        border-color: #4a4540 !important;
+        color: #e8e4d8 !important;
+    }
+
+    .match-card:hover,
+    .match-item:hover {
+        border-color: #77883e !important;
+        background: #4a4540 !important;
+    }
+
+    .match-name,
+    .match-title {
+        color: #ffffff !important;
+    }
+
+    .match-subtitle {
+        color: #b8b3b0 !important;
+    }
+
+    /* Returning Member Modal */
+    .returning-member-content {
+        background: #2a2622 !important;
+        color: #e8e4d8 !important;
+    }
+
+    .returning-member-content h2 {
+        color: #ffffff !important;
+    }
+
+    .returning-member-content p {
+        color: #e8e4d8 !important;
+    }
+
+    /* Celebration Modal */
+    .celebration-content {
+        background: #2a2622 !important;
+        color: #e8e4d8 !important;
+    }
+
+    .celebration-content h2,
+    .celebration-heading {
+        color: #ffffff !important;
+    }
+
+    .celebration-content p {
+        color: #e8e4d8 !important;
+    }
+
+    .celebration-message {
+        background: rgba(119, 136, 62, 0.15) !important;
+        border-color: #77883e !important;
+        color: #d9cc94 !important;
+    }
+
+    /* Pending Modal */
+    .pending-content {
+        background: #2a2622 !important;
+        color: #e8e4d8 !important;
+    }
+
+    .pending-content h2 {
+        color: #ffffff !important;
+    }
+
+    .pending-content p {
+        color: #e8e4d8 !important;
+    }
+
+    /* Loading state */
+    .loading-spinner {
+        border-color: rgba(217, 204, 148, 0.2) !important;
+        border-top-color: #d9cc94 !important;
+    }
+
+    /* Step 4 - Match found display */
+    .step4-match-found {
+        background: rgba(119, 136, 62, 0.1) !important;
+        border-color: #77883e !important;
+    }
+
+    .step4-match-found h3 {
+        color: #ffffff !important;
+    }
+
+    .step4-match-found p {
+        color: #e8e4d8 !important;
+    }
+}

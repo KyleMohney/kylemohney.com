@@ -278,3 +278,48 @@
     }
 }
 
+/* ========================================== */
+/* DARK MODE STYLING */
+/* ========================================== */
+
+@media (prefers-color-scheme: dark) {
+    .onboarding-modal,
+    .onboarding-choice-content,
+    .celebration-modal {
+        background: #2a2622 !important;
+        color: #e8e4d8 !important;
+    }
+
+    .onboarding-close-btn {
+        color: #d9cc94 !important;
+    }
+
+    .onboarding-close-btn:hover {
+        color: #e8c547 !important;
+    }
+
+    .onboarding-progress {
+        border-bottom-color: #4a4540 !important;
+        background: #1a1714 !important;
+    }
+
+    .progress-bar {
+        background: #3d3934 !important;
+    }
+
+    .progress-fill {
+        background: #77883e !important;
+    }
+
+    .step-opening h2 {
+        color: #ffffff !important;
+    }
+
+    .step-subtitle {
+        color: #d9cc94 !important;
+    }
+
+    .step-logo {
+        opacity: 1 !important;
+    }
+}
