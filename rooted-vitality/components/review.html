@@ -447,35 +447,23 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../scripts/config.js"></script>
+  <script src="../scripts/supabaseClient.js"></script>
   <script>
-    // Initialize Supabase
-    const SUPABASE_URL = 'https://nguwgabvfwzwvpykxkdz.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ndXdnYWJ2Znd6d3ZweWt4a2R6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzIwOTA1OTIsImV4cCI6MjA0NzY2NjU5Mn0.Bpo9u3K_fFmj5yWJKjBnhUSfZAi-6PzJEwlZHQ9qEJI';
-    const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/';
-    
     // Debug logging
     console.log('Review page loading...');
     console.log('Current page URL:', window.location.href);
     console.log('Page origin:', window.location.origin);
     console.log('Page protocol:', window.location.protocol);
-    console.log('Supabase URL:', SUPABASE_URL);
     
-    // Detect if we're in local development with http
-    const isLocalHttp = window.location.protocol === 'http:' && 
-                        (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+    // Use the global supabaseClient from supabaseClient.js
+    // This is the same client used by all other Rooted Vitality pages
+    const supabaseClient = window.supabaseClient;
     
-    if (isLocalHttp) {
-      console.warn('⚠️ Mixed Content detected: http page accessing https API');
-      console.warn('Solution: Access page via https:// or configure your server to serve over https');
-      console.warn('Using CORS proxy as fallback for local development');
-    }
-    
-    let supabaseClient = null;
-    try {
-      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      console.log('Supabase client created successfully');
-    } catch (e) {
-      console.error('Failed to create Supabase client:', e);
+    if (!supabaseClient) {
+      console.error('Supabase client not initialized. Check that supabaseClient.js loaded correctly.');
+    } else {
+      console.log('Using global Supabase client from window.supabaseClient');
     }
 
     let selectedRating = 0;
@@ -623,7 +611,7 @@
           console.error('Supabase error:', error);
           throw error;
         }
-
+        
         if (!categories || categories.length === 0) {
           throw new Error('No categories available');
         }
@@ -716,10 +704,10 @@
           throw new Error('Supabase client not initialized');
         }
         
-        // Use Supabase client to count reviews
-        const { count, error } = await supabaseClient
+        // Use Supabase client to fetch reviews
+        const { data: reviews, error } = await supabaseClient
           .from('reviews')
-          .select('*', { count: 'exact', head: true })
+          .select('id')
           .eq('practitioner_id', practitionerId)
           .eq('source', 'review-link')
           .eq('is_visible', true);
@@ -729,6 +717,7 @@
           throw error;
         }
 
+        const count = reviews ? reviews.length : 0;
         console.log('Review count for this practitioner:', count);
 
         if (count >= 3) {
