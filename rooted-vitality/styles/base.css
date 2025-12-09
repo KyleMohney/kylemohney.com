@@ -159,8 +159,8 @@ Extracted from: styles_legacy.css (lines 1-890)
         --rooted-primary: #88a947;          /* Lighter green for contrast */
         --rooted-primary-dark: #9bb85f;     /* Even lighter for dark mode */
         --rooted-accent: #d9cc94;           /* Brighter yellow/gold */
-        --rooted-neutral: #2a2622;          /* Dark neutral background */
-        --rooted-sage: #2a2622;             /* Dark sage variant */
+        --rooted-neutral: #e8e4d8;          /* Light cream text for dark backgrounds */
+        --rooted-sage: #1a1714;             /* Dark background */
         --rooted-dark: #e8e4d8;             /* Light text */
         --rooted-light: #1a1714;            /* Dark background */
         
@@ -535,20 +535,20 @@ select:focus-visible {
 /* Status badge variants */
 .status-badge--hired {
     background: var(--rooted-primary);
-    color: var(--rooted-neutral);
+    color: #ffffff;
 }
 
 .status-badge--reviewed {
     background: var(--rooted-accent);
-    color: #4a3c2a;
+    color: #1a1714;
 }
 
 .status-badge--declined {
     background: #e8e4d8;
-    color: #666666;
+    color: #1a1714;
 }
 
 .status-badge--blocked {
     background: #7a7a7a;
-    color: var(--rooted-neutral);
+    color: #ffffff;
 }

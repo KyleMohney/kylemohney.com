@@ -205,7 +205,7 @@ Note: Page-specific selectors wrapped with logical body classes where applicable
 
 .tab-btn {
     padding: 0.7rem 2rem;
-    border: 2px solid #fbf7ec;
+    border: 2px solid var(--rooted-light);
     background: var(--color-white);
     color: var(--color-text-light);
     font-family: var(--font-sans);
@@ -282,7 +282,7 @@ Note: Page-specific selectors wrapped with logical body classes where applicable
     max-width: 500px;
     padding: 0.8rem 1.2rem;
     font-size: 1rem;
-    border: 2px solid #fbf7ec;
+    border: 2px solid var(--rooted-light);
     border-radius: 8px;
     background: var(--color-white);
     color: var(--color-text);
@@ -373,7 +373,7 @@ Note: Page-specific selectors wrapped with logical body classes where applicable
 /* ========================================== */
 body.dashboard-pro,
 body.dashboard-client {
-    background: #fbf7ec;
+    background: var(--rooted-light);
 }
 
 body.dashboard-pro .dashboard-wrapper,
@@ -434,7 +434,7 @@ body.signup .progress-section {
 }
 
 .signup-form {
-    background: #fbf7ec;
+    background: var(--rooted-light);
     border: 1px solid rgba(92, 154, 114, 0.15);
     border-radius: 12px;
     padding: 2.5rem;
@@ -478,7 +478,7 @@ body.signup .progress-section {
 .form-grid select:focus {
     outline: none;
     border-color: var(--rooted-primary, #77883e);
-    background: #fbf7ec;
+    background: var(--rooted-light);
     box-shadow: 0 0 0 3px rgba(92, 154, 114, 0.1);
 }
 
@@ -532,7 +532,7 @@ body.signup .progress-section {
     width: 100%;
     padding: 1rem 1.5rem;
     background: var(--rooted-primary, #77883e);
-    color: #fbf7ec;
+    color: var(--rooted-light);
     border: none;
     border-radius: 6px;
     font-weight: 700;
@@ -769,7 +769,7 @@ body.policy .container-narrow {
     align-items: center;
     justify-content: center;
     text-align: center;
-    background: #fbf7ec;
+    background: var(--rooted-light);
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     max-width: 600px;
@@ -796,7 +796,7 @@ JMNUY69
 /* PRACTITIONER DASHBOARD - Single Page Tabs */
 /* ========================================== */
 body.pro-dashboard {
-    background: #fbf7ec;
+    background: var(--rooted-light);
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -863,7 +863,7 @@ body.pro-dashboard main {
     width: 100%;
     border-collapse: collapse;
     margin-top: 1rem;
-    background: #fbf7ec;
+    background: var(--rooted-light);
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -886,12 +886,12 @@ body.pro-dashboard main {
 }
 
 .placeholder-table tr:hover {
-    background: #fbf7ec;
+    background: var(--rooted-light);
 }
 
 .placeholder-table .btn-accent {
     background: #77883e;
-    color: #fbf7ec;
+    color: var(--rooted-light);
     border: none;
     padding: 0.5rem 1rem;
     border-radius: 4px;
@@ -905,7 +905,7 @@ body.pro-dashboard main {
 }
 
 .placeholder-table .btn-neutral {
-    background: #fbf7ec;
+    background: var(--rooted-light);
     color: #2e2b28;
     border: 1px solid #d0ccc7;
     padding: 0.5rem 1rem;
@@ -923,7 +923,7 @@ body.pro-dashboard main {
 
 .placeholder-table .btn-danger {
     background: #d9534f;
-    color: #fbf7ec;
+    color: var(--rooted-light);
     border: 1px solid #c9302c;
     padding: 0.5rem 1rem;
     border-radius: 4px;
@@ -975,7 +975,7 @@ body.pro-dashboard main {
     display: flex;
     gap: 1rem;
     margin: 2rem 0 1.5rem;
-    border-bottom: 1px solid #fbf7ec;
+    border-bottom: 1px solid var(--rooted-light);
     padding-bottom: 1rem;
 }
 
@@ -1018,7 +1018,7 @@ body.pro-dashboard main {
 
 /* Client Cards */
 .client-card {
-    background: #fbf7ec;
+    background: var(--rooted-light);
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     padding: 1.5rem;
@@ -1069,12 +1069,12 @@ body.pro-dashboard main {
 
 .card-divider {
     height: 1px;
-    background: #fbf7ec;
+    background: var(--rooted-light);
     margin: 1rem 0;
 }
 
 .message-preview-box {
-    background: #fbf7ec;
+    background: var(--rooted-light);
     border-radius: 6px;
     padding: 1rem;
     position: relative;
@@ -1129,7 +1129,7 @@ body.pro-dashboard main {
 
 .card-actions .btn-accent {
     background: #77883e;
-    color: #fbf7ec;
+    color: var(--rooted-light);
 }
 
 .card-actions .btn-accent:hover {
@@ -1137,7 +1137,7 @@ body.pro-dashboard main {
 }
 
 .card-actions .btn-neutral {
-    background: #fbf7ec;
+    background: var(--rooted-light);
     color: #2e2b28;
     border: 1px solid #d0ccc7;
 }
@@ -1149,7 +1149,7 @@ body.pro-dashboard main {
 
 .card-actions .btn-danger {
     background: #d9534f;
-    color: #fbf7ec;
+    color: var(--rooted-light);
     border: 1px solid #c9302c;
 }
 
@@ -1206,4 +1206,5 @@ body.pro-dashboard main {
     color: var(--rooted-dark);
     font-weight: 500;
 }
+
 
