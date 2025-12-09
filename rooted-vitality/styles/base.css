@@ -320,6 +320,45 @@ select:focus-visible {
     }
 }
 
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --rooted-primary: #92c5a8;
+        --rooted-dark: #e8e8e8;
+        --color-text: #f0f0f0;
+        --glass-light: rgba(45, 52, 45, 0.8);
+    }
+    
+    body {
+        background: #1a1a1a;
+        color: #f0f0f0;
+    }
+    
+    input, textarea, select {
+        background: rgba(255, 255, 255, 0.08) !important;
+        color: #f0f0f0 !important;
+        border-color: rgba(212, 196, 124, 0.3);
+    }
+    
+    input::placeholder, textarea::placeholder {
+        color: rgba(240, 240, 240, 0.5) !important;
+    }
+    
+    .modal-overlay .modal-content {
+        background: #2a2a2a;
+        color: #f0f0f0;
+        border-color: rgba(212, 196, 124, 0.2);
+    }
+    
+    .modal-body {
+        background: #2a2a2a;
+    }
+    
+    label {
+        color: #f0f0f0;
+    }
+}
+
 /* High contrast */
 @media (prefers-contrast: high) {
     :root {

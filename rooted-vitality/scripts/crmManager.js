@@ -25,7 +25,7 @@ TABLE OF CONTENTS
 const CRM_PROVIDERS = {
   highlevel: {
     name: 'HighLevel',
-    icon: null,  // Logo to be added
+    icon: '../../../assets/highlevel.png',
     description: 'All-in-one CRM & sales platform',
     authType: 'oauth', // OAuth flow required
     features: ['contacts', 'deals', 'pipelines', 'messages'],
@@ -33,7 +33,7 @@ const CRM_PROVIDERS = {
   },
   servicetitan: {
     name: 'ServiceTitan',
-    icon: null,  // Logo to be added
+    icon: '../../../assets/ServiceTitan.png',
     description: 'Service-based business CRM',
     authType: 'oauth',
     features: ['contacts', 'jobs', 'pipelines'],
@@ -41,7 +41,7 @@ const CRM_PROVIDERS = {
   },
   mhelpdesk: {
     name: 'mHelpDesk',
-    icon: null,  // Logo to be added
+    icon: '../../../assets/mhelp.png',
     description: 'Help desk & ticketing system',
     authType: 'apikey',
     features: ['tickets', 'contacts', 'messages'],
@@ -49,7 +49,7 @@ const CRM_PROVIDERS = {
   },
   hubspot: {
     name: 'HubSpot',
-    icon: null,  // Logo to be added
+    icon: '../../../assets/hubspot.png',
     description: 'Marketing, sales & service platform',
     authType: 'oauth',
     features: ['contacts', 'deals', 'pipelines'],
@@ -57,7 +57,7 @@ const CRM_PROVIDERS = {
   },
   pipedrive: {
     name: 'Pipedrive',
-    icon: null,  // Logo to be added
+    icon: '../../../assets/pipedrive.png',
     description: 'Sales CRM for teams',
     authType: 'oauth',
     features: ['contacts', 'deals', 'pipelines'],
@@ -65,7 +65,7 @@ const CRM_PROVIDERS = {
   },
   salesforce: {
     name: 'Salesforce',
-    icon: null,  // Logo to be added
+    icon: '../../../assets/Salesfoce.png',
     description: 'Enterprise CRM platform',
     authType: 'oauth',
     features: ['contacts', 'opportunities', 'accounts'],
@@ -73,7 +73,7 @@ const CRM_PROVIDERS = {
   },
   zoho: {
     name: 'Zoho CRM',
-    icon: null,  // Logo to be added
+    icon: '../../../assets/zohocrm.png',
     description: 'Zoho CRM platform',
     authType: 'oauth',
     features: ['contacts', 'deals', 'pipelines'],
@@ -267,7 +267,7 @@ function renderCRMProviders() {
 
   const html = providers.map(([key, provider]) => `
     <div class="crm-provider-card" data-provider="${key}" onclick="openCRMConnectModal('${key}')">
-      <div class="crm-provider-icon">${provider.icon ? `<img src="${provider.icon}" alt="${provider.name}" />` : '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>'}</div>
+      <div class="crm-provider-icon">${provider.icon ? `<img src="${provider.icon}" alt="${provider.name}" />` : '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" role="img" aria-label="Link icon"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>'}</div>
       <div class="crm-provider-name">${provider.name}</div>
       <div class="crm-provider-status">
         ${provider.popular ? 'Popular' : 'Available'}

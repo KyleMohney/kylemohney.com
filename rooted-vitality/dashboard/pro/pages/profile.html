@@ -1008,9 +1008,6 @@
 
   <footer id="footer-inject"></footer>
 
-  <!-- Report Concern Widget Container -->
-  <div id="report-concern-inject"></div>
-
   <!-- Supabase JS Client Library -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
@@ -1034,12 +1031,12 @@
         localStorage.setItem('active_view', 'practitioner');
         // Force render header for practitioner
         await RootedVitality.renderHeader('practitioner', 'practitioner');
-        // Inject footer and report concern
+        // Inject footer and report concern modal
         if (typeof RootedVitality.injectFooter === 'function') {
           RootedVitality.injectFooter();
         }
-        if (typeof RootedVitality.injectReportConcern === 'function') {
-          RootedVitality.injectReportConcern();
+        if (typeof RootedVitality.injectReportConcernModal === 'function') {
+          RootedVitality.injectReportConcernModal();
         }
       }
     })();

@@ -679,7 +679,8 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
  */
 CREATE OR REPLACE FUNCTION create_practitioner_profile_signup(
   p_practitioner_serial TEXT,
-  p_practitioner_id UUID
+  p_practitioner_id UUID,
+  p_year_established INTEGER DEFAULT NULL
 )
 RETURNS UUID AS $$
 DECLARE
@@ -697,6 +698,7 @@ BEGIN
   INSERT INTO practitioner_profiles (
     id,
     practitioner_serial,
+    year_established,
     languages,
     profile_completeness_percent,
     created_at,
@@ -705,6 +707,7 @@ BEGIN
   VALUES (
     p_practitioner_id,
     p_practitioner_serial,
+    p_year_established,
     ARRAY[]::TEXT[],
     0,
     NOW(),

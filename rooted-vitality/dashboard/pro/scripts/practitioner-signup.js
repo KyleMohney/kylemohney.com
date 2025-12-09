@@ -339,7 +339,6 @@ async function skipMembership(event) {
             practice_state: state.formData.practice_state,
             zipcode: state.formData.zipcode,
             business_size: state.formData.business_size,
-            year_established: state.formData.year_established ? parseInt(state.formData.year_established) : null,
             status: 'registered',
             submitted_at: new Date().toISOString(),
             // Default values for availability
@@ -417,6 +416,9 @@ async function skipMembership(event) {
         }
         
         // Fetch the practitioner serial number and id
+        // Add small delay to ensure INSERT has propagated
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
         const { data: practitionerData, error: fetchError } = await window.supabaseClient
             .from('practitioners')
             .select('id, serial_number')
@@ -425,8 +427,10 @@ async function skipMembership(event) {
         
         if (fetchError) {
             // Continue anyway - related tables will be created later if needed
+            console.warn('[Practitioner Signup] Warning fetching practitioner data:', fetchError.message);
         } else if (!practitionerData) {
             // Continue anyway
+            console.warn('[Practitioner Signup] No practitioner data returned');
         } else {
             const practitionerSerial = practitionerData.serial_number;
             const practitionerId = practitionerData.id;
@@ -435,7 +439,8 @@ async function skipMembership(event) {
             const { data: profileData, error: profileError } = await window.supabaseClient
                 .rpc('create_practitioner_profile_signup', {
                     p_practitioner_serial: practitionerSerial,
-                    p_practitioner_id: practitionerId
+                    p_practitioner_id: practitionerId,
+                    p_year_established: state.formData.year_established ? parseInt(state.formData.year_established) : null
                 });
             
             if (profileError) {

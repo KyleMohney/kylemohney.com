@@ -1,0 +1,225 @@
+1. INTRODUCTION
+Rooted Vitality, Inc. ("Rooted Vitality," "we," "us," or "our") is committed to protecting your privacy and safeguarding your personal information. This Privacy Policy explains how we collect, use, disclose, and protect information about you when you access or use our website, mobile application, and related services (collectively, the "Platform").
+By accessing or using our Platform, you acknowledge that you have read, understood, and agree to be bound by this Privacy Policy and our Terms of Use. If you do not agree with this Privacy Policy, you must not use our Platform.
+Effective Date: This Privacy Policy is effective as of the date stated above and applies to all information collected by Rooted Vitality on or after such date.
+2. IMPORTANT CLARIFICATIONS ABOUT OUR SERVICES
+2.1 We Are Not a HIPAA Covered Entity
+IMPORTANT: Rooted Vitality is NOT a healthcare provider, health plan, healthcare clearinghouse, or business associate as defined under the Health Insurance Portability and Accountability Act of 1996 ("HIPAA"), 45 C.F.R. Parts 160 and 164. We are NOT a "Covered Entity" or "Business Associate" subject to HIPAA regulations.
+We operate as a directory and marketplace platform that connects consumers with independent wellness practitioners. We do not provide medical or healthcare services, and HIPAA regulations do not apply to our Platform operations.
+2.2 We Do Not Collect or Store Protected Health Information
+Rooted Vitality does NOT collect, store, transmit, or process Protected Health Information ("PHI") as defined under HIPAA. Specifically, we do NOT collect:
+Medical records or health history
+Diagnoses, treatment plans, or prescriptions
+Laboratory test results or medical imaging
+Health insurance information
+Communications between you and practitioners regarding your health
+Any other individually identifiable health information
+2.3 Practitioner-Client Relationships Occur Off-Platform
+Once you identify and connect with a practitioner through our Platform, all subsequent communications, consultations, treatment discussions, appointments, and health-related interactions occur directly between you and the practitioner OFF our Platform. We do not monitor, record, or have access to these communications or any health information exchanged between you and practitioners.
+2.4 Practitioners' HIPAA Obligations
+Individual practitioners listed on our Platform may be subject to HIPAA and other privacy regulations in their provision of healthcare services. Each practitioner is solely responsible for their own compliance with HIPAA and other applicable privacy laws in their direct interactions with clients. We strongly encourage you to review each practitioner's privacy practices and policies before engaging their services.
+2.5 HIPAA-Style Security Practices
+Although we are not required to comply with HIPAA, we have chosen to implement data protection and security practices that are modeled after HIPAA's Privacy and Security Rules as a best practice. This means we use industry-standard technical, physical, and administrative safeguards to protect the personal information we do collect, even though such information does not constitute PHI.
+3. INFORMATION WE COLLECT
+We collect several categories of information from and about users of our Platform. The information we collect is limited to what is necessary to operate our directory and marketplace services.
+3.1 Information You Provide Directly
+Account Registration Information: When you create an account, we collect:
+Full name
+Email address
+Password (encrypted and not accessible to us)
+Phone number (optional)
+Zip code or general location (to help match you with local practitioners)
+User type (consumer or practitioner)
+Profile Information: If you are a practitioner, you may provide:
+Professional credentials and certifications
+Business name and description
+Services offered and specializations
+Professional biography and photos
+Website and social media links
+Pricing information
+Communications: When you contact us or communicate through our Platform, we collect:
+Messages sent through our contact forms
+Customer service inquiries and support tickets
+Initial connection requests between consumers and practitioners (name and contact preferences only)
+Reviews and Feedback: You may choose to provide:
+Ratings and reviews of practitioners (collected anonymously when possible)
+Survey responses about your platform experience
+Testimonials (only with your explicit consent for public display)
+Payment Information: If you subscribe to paid features:
+Billing name and address
+Payment card information (processed securely through third-party payment processors; we do not store complete card numbers)
+Important Note: Payment for practitioner services is handled directly between you and the practitioner. We do not process, collect, or store payment information for practitioner services.
+3.2 Information Collected Automatically
+When you access or use our Platform, we automatically collect certain technical and usage information:
+Device information (device type, operating system, browser type and version)
+IP address and general geographic location (city/state level only)
+Usage data (pages viewed, time spent, features used, search queries)
+Referring website or source
+Date and time of access
+Crash reports and error logs (to improve platform stability)
+3.3 Cookies and Tracking Technologies
+We use cookies, web beacons, and similar tracking technologies to enhance your experience and collect information about how you use our Platform. Types of cookies we use include:
+Essential Cookies: Required for basic Platform functionality (account login, security, preferences)
+Analytics Cookies: Help us understand how users interact with our Platform (Google Analytics or similar)
+Functional Cookies: Remember your preferences and settings
+Advertising Cookies: Used for targeted advertising (only with your consent)
+You can control cookie preferences through your browser settings. However, disabling certain cookies may limit your ability to use some Platform features.
+3.4 Information From Third-Party Sources
+We may receive limited information from third-party sources, including:
+Social media platforms (if you choose to connect your social media account)
+Marketing partners and analytics providers
+Publicly available sources (for practitioner verification purposes only)
+4. HOW WE USE YOUR INFORMATION
+We use the information we collect for the following legitimate business purposes:
+4.1 Platform Operations and Service Delivery
+Create and manage your account
+Facilitate connections between consumers and practitioners
+Process subscription payments and maintain billing records
+Display practitioner profiles and directory listings
+Provide search and filtering functionality
+Deliver requested content, educational materials, and platform features
+4.2 Customer Support and Communications
+Respond to your inquiries and support requests
+Send transactional emails (account confirmations, password resets, billing notices)
+Provide customer service and technical support
+Send important notices about changes to our services, Terms, or Privacy Policy
+4.3 Platform Improvement and Analytics
+Analyze usage patterns and trends to improve Platform functionality
+Conduct research and development for new features
+Test and optimize Platform performance
+Identify and fix technical issues and bugs
+Generate aggregated, anonymized statistics and insights
+4.4 Safety, Security, and Fraud Prevention
+Verify identity and prevent fraudulent accounts
+Detect and prevent security threats, abuse, and unauthorized access
+Investigate violations of our Terms of Use
+Protect the rights, property, and safety of Rooted Vitality, our users, and the public
+Comply with legal obligations and respond to lawful requests
+4.5 Marketing and Promotional Communications (With Consent)
+Send newsletters and educational content about holistic wellness
+Promote new features, services, and platform updates
+Deliver targeted advertising based on your interests (only with consent)
+Conduct surveys and request feedback
+Opt-Out: You may opt out of marketing communications at any time by clicking the "unsubscribe" link in emails or adjusting your account preferences. Opting out of marketing communications will not affect transactional emails necessary for Platform operation.
+4.6 Legal and Compliance Purposes
+Comply with applicable federal, state, and local laws
+Respond to subpoenas, court orders, or legal processes
+Enforce our Terms of Use and other agreements
+Establish, exercise, or defend legal claims
+5. HOW WE SHARE YOUR INFORMATION
+We do not sell your personal information to third parties. We share information only in the limited circumstances described below:
+5.1 With Practitioners (Limited Contact Information Only)
+When you request to connect with a practitioner, we share only your name and preferred contact method (email or phone) to facilitate the initial connection. We do NOT share any health information, search history, or other personal details with practitioners. All subsequent communications and information sharing occur directly between you and the practitioner off our Platform.
+5.2 With Service Providers and Business Partners
+We share information with trusted third-party service providers who perform services on our behalf, including:
+Cloud hosting and data storage providers (AWS, Google Cloud, or similar)
+Payment processors (Stripe, PayPal, or similar)
+Email service providers
+Analytics and performance monitoring services
+Customer support and help desk platforms
+Marketing and advertising platforms (only with your consent)
+These service providers are contractually obligated to use your information only to provide services to us and are prohibited from using or disclosing your information for any other purpose.
+5.3 For Legal Compliance and Protection
+We may disclose your information when we believe in good faith that disclosure is necessary to:
+Comply with applicable laws, regulations, or legal processes
+Respond to subpoenas, court orders, or government requests
+Enforce our Terms of Use or other agreements
+Protect the rights, property, or safety of Rooted Vitality, our users, or the public
+Detect, prevent, or investigate fraud, security breaches, or illegal activity
+5.4 Business Transfers
+In the event of a merger, acquisition, reorganization, bankruptcy, or sale of all or substantially all of our assets, your information may be transferred to the acquiring entity or successor organization. We will provide notice before your information is transferred and becomes subject to a different privacy policy.
+5.5 With Your Consent
+We may share your information with third parties when you have given us explicit consent to do so, such as when you authorize us to share testimonials or participate in partner programs.
+5.6 Aggregated and De-Identified Information
+We may share aggregated, de-identified, or anonymized information that cannot reasonably be used to identify you. This may include statistical data, trends, and insights about Platform usage for research, marketing, or business development purposes.
+6. DATA SECURITY AND PROTECTION
+6.1 Security Measures
+We implement industry-standard technical, physical, and administrative safeguards to protect your personal information from unauthorized access, use, alteration, or disclosure. Our security measures include:
+Encryption of data in transit using SSL/TLS protocols (HTTPS)
+Encryption of sensitive data at rest
+Secure password hashing and storage
+Regular security assessments and vulnerability testing
+Access controls and authentication mechanisms
+Employee training on data privacy and security
+Firewalls and intrusion detection systems
+Regular data backups and disaster recovery procedures
+6.2 Limitations on Security
+While we strive to protect your personal information, no method of electronic transmission or storage is one hundred percent (100%) secure. We cannot guarantee absolute security of your data. You acknowledge and accept that you provide information at your own risk. If you become aware of any security breach or unauthorized access to your account, you must notify us immediately at [security@rootedvitality.com].
+6.3 Your Security Responsibilities
+You are responsible for:
+Maintaining the confidentiality of your account password
+Using a strong, unique password
+Logging out of your account when finished
+Not sharing your account credentials with others
+7. DATA RETENTION
+We retain your personal information for as long as necessary to fulfill the purposes for which it was collected, comply with legal obligations, resolve disputes, enforce our agreements, and as required or permitted by applicable law.
+7.1 Retention Periods
+Active Accounts: Information is retained while your account remains active
+Closed Accounts: After account closure, we retain certain information for up to seven (7) years to comply with legal, tax, and accounting obligations
+Transaction Records: Payment and billing records retained for seven (7) years
+Marketing Data: Retained until you opt out or for three (3) years of inactivity
+Aggregated Data: De-identified and aggregated data may be retained indefinitely for analytics and research
+7.2 Deletion of Information
+When information is no longer needed or upon your request (subject to legal retention requirements), we will delete or anonymize your personal information in accordance with our data retention policies and applicable law.
+8. YOUR PRIVACY RIGHTS AND CHOICES
+Depending on your location and applicable law, you may have certain rights regarding your personal information.
+8.1 Access and Portability
+You have the right to request access to the personal information we hold about you and to receive a copy of your data in a portable format. You may access most of your information directly through your account settings.
+8.2 Correction and Updates
+You have the right to correct, update, or modify inaccurate or incomplete personal information. You can update most information directly through your account settings or by contacting us.
+8.3 Deletion
+You have the right to request deletion of your personal information, subject to certain legal exceptions (such as records we must retain for tax, legal, or regulatory purposes). To request deletion, contact us at [privacy@rootedvitality.com]. We will respond within thirty (30) calendar days.
+8.4 Opt-Out of Marketing
+You may opt out of marketing emails at any time by clicking the "unsubscribe" link in any promotional email or by adjusting your account preferences. Please note that you cannot opt out of transactional emails necessary for Platform operation (such as account notifications, billing statements, or security alerts).
+8.5 Cookie Preferences
+You can manage cookie preferences through your browser settings or our cookie consent tool. Note that disabling certain cookies may affect Platform functionality.
+8.6 Do Not Track Signals
+Some web browsers have a "Do Not Track" feature. Currently, we do not respond to "Do Not Track" signals because there is no industry consensus on how to interpret and respond to such signals.
+8.7 California Privacy Rights (CCPA)
+If you are a California resident, you have additional rights under the California Consumer Privacy Act ("CCPA"):
+Right to know what personal information we collect, use, and disclose
+Right to request deletion of your personal information
+Right to opt out of the sale of personal information (we do not sell personal information)
+Right to non-discrimination for exercising your privacy rights
+To exercise these rights, contact us at [privacy@rootedvitality.com]. We will verify your identity before processing requests.
+8.8 European Union and UK Privacy Rights (GDPR)
+If you are located in the European Union or United Kingdom, you have rights under the General Data Protection Regulation ("GDPR"):
+Right to access, rectify, and erase your data
+Right to restrict or object to processing
+Right to data portability
+Right to withdraw consent at any time
+Right to lodge a complaint with your supervisory authority
+9. CHILDREN'S PRIVACY
+Our Platform is not intended for use by individuals under the age of eighteen (18). We do not knowingly collect personal information from children under eighteen (18) years of age. If we become aware that we have collected personal information from a child under eighteen (18) without verified parental consent, we will take steps to delete that information as quickly as possible.
+If you are a parent or guardian and believe that your child has provided personal information to us, please contact us immediately at [privacy@rootedvitality.com].
+10. INTERNATIONAL DATA TRANSFERS
+Rooted Vitality is based in the United States. If you access our Platform from outside the United States, your information may be transferred to, stored, and processed in the United States or other countries where our service providers operate. By using our Platform, you consent to the transfer of your information to countries outside your country of residence, which may have different data protection laws than your country.
+Where required by applicable law, we implement appropriate safeguards for cross-border data transfers, such as Standard Contractual Clauses approved by the European Commission.
+11. THIRD-PARTY WEBSITES AND SERVICES
+Our Platform may contain links to third-party websites, applications, or services that are not owned or controlled by Rooted Vitality, including practitioner websites and social media platforms. This Privacy Policy applies only to information collected by our Platform.
+We are not responsible for the privacy practices of third-party websites or services. We encourage you to review the privacy policies of any third-party sites you visit. When you click on a link to a third-party site or engage with practitioners off our Platform, you are subject to their privacy practices and policies.
+12. CHANGES TO THIS PRIVACY POLICY
+We may update this Privacy Policy from time to time to reflect changes in our practices, technology, legal requirements, or other operational considerations. When we make material changes, we will:
+Update the "Last Updated" date at the top of this Privacy Policy
+Provide notice by email to the address associated with your account at least thirty (30) calendar days before the changes take effect
+Post a prominent notice on our Platform homepage
+Display a notification when you log into your account
+Your continued use of the Platform after the effective date of the updated Privacy Policy constitutes your acceptance of the changes. If you do not agree to the updated Privacy Policy, you must discontinue use of the Platform.
+We encourage you to review this Privacy Policy periodically to stay informed about how we protect your information.
+
+13. CONTACT INFORMATION AND COMPLAINTS
+If you have any questions, concerns, or complaints about this Privacy Policy or our privacy practices, or if you wish to exercise your privacy rights, please contact us at:
+Rooted Vitality, Inc.
+Attention: Privacy Officer
+[Physical Street Address]
+[City, State ZIP Code]
+Email: privacy@rootedvitality.com
+Phone: [Phone Number]
+Response Time: We will respond to privacy inquiries within thirty (30) calendar days.
+13.1 Filing Complaints with Authorities
+If you are located in the European Union or United Kingdom, you have the right to lodge a complaint with your local data protection authority if you believe we have violated your privacy rights.
+If you are a California resident, you may contact the California Attorney General's Office regarding privacy complaints.
+
+ACKNOWLEDGMENT
+BY USING OUR PLATFORM, YOU ACKNOWLEDGE THAT YOU HAVE READ, UNDERSTOOD, AND AGREE TO THE TERMS OF THIS PRIVACY POLICY.
+* * *

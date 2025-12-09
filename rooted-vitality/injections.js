@@ -30,6 +30,28 @@ window.logout = function() {
   }
 };
 
+/**
+ * Open Contact Us Modal
+ */
+window.openContactModal = function() {
+    const modal = document.getElementById('contact-us-modal');
+    if (modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+};
+
+/**
+ * Close Contact Us Modal
+ */
+window.closeContactModal = function() {
+    const modal = document.getElementById('contact-us-modal');
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = 'auto';
+    }
+};
+
 // ======================================================
 const RootedVitality = {
     config: {
@@ -1977,6 +1999,8 @@ const RootedVitality = {
                     <nav class="rv-footer-nav">
                         <a href="${pathPrefix}index.html">Home</a>
                         <a href="${pathPrefix}help-center/">Help Center</a>
+                        <button id="report-concern-btn" class="rv-footer-link-btn" title="Report a technical issue or concern with the website">Report a Concern</button>
+                        <button id="contact-us-btn" class="rv-footer-link-btn" title="Contact Rooted Vitality">Contact Us</button>
                     </nav>
                 </div>
                 
@@ -1994,14 +2018,13 @@ const RootedVitality = {
                 </div>
             </div>
             
-            <!-- Bottom: Copyright & Help -->
+            <!-- Bottom: Copyright -->
             <div class="rv-footer-bottom">
                 <p class="rv-footer-copyright">Rooted Vitality © 2025 · All rights reserved</p>
-                <a href="${pathPrefix}index.html" class="rv-footer-help-btn" aria-label="Need help? Go to Help Center">Need Help?</a>
             </div>
             
             <!-- Decorative Plant SVG (positioned absolutely) -->
-            <svg class="rv-footer-plant" viewBox="0 0 200 400" preserveAspectRatio="xMaxYMid slice">
+            <svg class="rv-footer-plant" viewBox="0 0 200 400" preserveAspectRatio="xMaxYMid slice" aria-hidden="true" focusable="false">
                 <!-- Stem -->
                 <line x1="100" y1="200" x2="100" y2="350" stroke="#a8b8a8" stroke-width="8" stroke-linecap="round"/>
                 <!-- Roots -->
@@ -2032,16 +2055,15 @@ const RootedVitality = {
     },
 
     /**
-     * Inject Report a Concern Widget
-     * Universal widget for reporting issues/concerns on all pages
-     * Inserted before footer
-     * Usage: RootedVitality.injectReportConcern();
+     * Inject Report a Concern Modal (ONLY the modal, button is in footer)
+     * Universal modal for reporting issues/concerns on all pages
+     * Usage: RootedVitality.injectReportConcernModal();
      */
-    injectReportConcern: function() {
+    injectReportConcernModal: function() {
         
         
         // Prevent double injection
-        if (document.getElementById('report-concern-footer')) {
+        if (document.getElementById('report-concern-modal')) {
             return;
         }
         
@@ -2049,15 +2071,8 @@ const RootedVitality = {
             return;
         }
         
-        // The actual widget HTML will be loaded from external file
-        // For now, inject a simple version
+        // Only inject the modal HTML, NOT the button (button is now in footer)
         const reportConcernHTML = `
-        <div id="report-concern-footer" class="report-concern-footer">
-            <button id="report-concern-btn" class="report-concern-link" title="Report a technical issue or concern with the website">
-                Report a Concern
-            </button>
-        </div>
-
         <!-- Report Concern Modal -->
         <div id="report-concern-modal" class="modal-overlay">
             <div class="modal-content">
@@ -2171,21 +2186,9 @@ const RootedVitality = {
         </div>
         `;
         
-        // Insert into report-concern-inject container (positioned before footer in HTML)
-        const reportContainer = document.getElementById('report-concern-inject');
-        if (reportContainer) {
-            reportContainer.innerHTML = reportConcernHTML;
-        } else {
-            // Fallback: insert before footer if container doesn't exist
-            const footer = document.getElementById('footer-inject');
-            if (footer) {
-                footer.insertAdjacentHTML('beforebegin', reportConcernHTML);
-            } else {
-                // Last resort: insert at end of body
-                document.body.insertAdjacentHTML('beforeend', reportConcernHTML);
-            }
-        }
-        this.log('Report concern widget injected successfully');
+        // Insert modal at end of body
+        document.body.insertAdjacentHTML('beforeend', reportConcernHTML);
+        this.log('Report concern modal injected successfully');
         
         // Load and initialize the report concern system
         this.initializeReportConcernSystem();
@@ -2238,6 +2241,95 @@ const RootedVitality = {
         
         document.head.appendChild(script);
     },
+
+    /**
+     * Inject Contact Us Modal
+     * Universal modal for contact information
+     * Usage: RootedVitality.injectContactModal();
+     */
+    injectContactModal: function() {
+        
+        // Prevent double injection
+        if (document.getElementById('contact-us-modal')) {
+            return;
+        }
+        
+        if (!document.body) {
+            return;
+        }
+        
+        // Contact modal HTML
+        const contactModalHTML = `
+        <!-- Contact Us Modal -->
+        <div id="contact-us-modal" class="modal-overlay">
+            <div class="modal-content modal-sm">
+                <div class="modal-header">
+                    <h2>Contact Us</h2>
+                    <button class="modal-close-btn" id="contact-us-close-btn">×</button>
+                </div>
+                
+                <div class="modal-body">
+                    <div class="contact-info">
+                        <h3>Get in Touch</h3>
+                        <p class="contact-info__subtitle">We're here to help. Reach out to us anytime.</p>
+                        
+                        <div class="contact-method">
+                            <h4>Email</h4>
+                            <a href="mailto:support@rootedvitality.health" class="contact-link">
+                                support@rootedvitality.health
+                            </a>
+                        </div>
+                        
+                        <div class="contact-method">
+                            <h4>Phone & Chat Support</h4>
+                            <p class="contact-text">Coming soon</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        `;
+        
+        // Insert modal at end of body
+        document.body.insertAdjacentHTML('beforeend', contactModalHTML);
+        this.log('Contact modal injected successfully');
+        
+        // Initialize contact modal event listeners
+        this.initializeContactModal();
+    },
+
+    /**
+     * Initialize Contact Modal Event Listeners
+     */
+    initializeContactModal: function() {
+        // Prevent duplicate initialization
+        if (window.contactModalInitialized) {
+            return;
+        }
+        window.contactModalInitialized = true;
+        
+        // Contact button listener
+        const contactBtn = document.getElementById('contact-us-btn');
+        if (contactBtn) {
+            contactBtn.addEventListener('click', openContactModal);
+        }
+        
+        // Close button (X) listener
+        const closeBtn = document.getElementById('contact-us-close-btn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', closeContactModal);
+        }
+        
+        // Close modal when clicking outside
+        const modal = document.getElementById('contact-us-modal');
+        if (modal) {
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeContactModal();
+                }
+            });
+        }
+    },
     
     /**
      * Initialize all common functionality
@@ -2278,8 +2370,9 @@ const RootedVitality = {
         await this.renderHeader(headerRole, headerView);
         
         this.injectLoginModal();
-        this.injectReportConcern();
         this.injectFooter();
+        this.injectReportConcernModal();
+        this.injectContactModal();
         this.injectBackButton();
         this.trackPageView();
         
@@ -2304,60 +2397,3 @@ if (typeof module !== 'undefined' && module.exports) {
 }
 
 // End of injections.js — Rooted Vitality Global Utilities
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

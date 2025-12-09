@@ -601,8 +601,8 @@ function getOnboardingModalHTML(skipAuth = false, isReturningUser = false) {
                                     <h5>Your privacy is protected</h5>
                                     <p>Your personal and health information is private and confidential. Rooted Vitality only shares your information with practitioners you match with and accept. We never sell your data to third parties.</p>
 
-                                    <h5>Terms of Use & Privacy Policy</h5>
-                                    <p>By proceeding, you agree to our complete <a href="/terms-of-use" target="_blank" rel="noopener">Terms of Use</a> and <a href="/privacy-policy" target="_blank" rel="noopener">Privacy Policy</a>. Please review these documents carefully.</p>
+                                    <h5>Terms of Use, Privacy Policy & Informed Consent</h5>
+                                    <p>By proceeding, you agree to our <a href="/help-center/policies/terms-of-use.html" target="_blank" rel="noopener">Terms of Use</a>, <a href="/help-center/policies/privacy-policy.html" target="_blank" rel="noopener">Privacy Policy</a>, and <a href="/help-center/policies/informed-consent.html" target="_blank" rel="noopener">Informed Consent</a>. Please review these documents carefully.</p>
 
                                     <h5>Next step: Account creation</h5>
                                     <p>When you click Continue below, we will create your account, save your profile information, and send you a confirmation email to verify your email address. You'll be able to start connecting with practitioners right away.</p>

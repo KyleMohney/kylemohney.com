@@ -1,0 +1,306 @@
+/*
+╔════════════════════════════════════════════════════════════════════╗
+║  ROOTED VITALITY, INC.                                             ║
+║  File: help-center/styles/policies.css                            ║
+║  Purpose: Universal styles for all policy pages                   ║
+║  Holistic Wellness · Modern Connection Platform                    ║
+║  rootedvitality.com | 2025                                         ║
+╚════════════════════════════════════════════════════════════════════╝
+
+TABLE OF CONTENTS
+  1. CSS Variables & Brand Colors
+  2. Root & Base Styles
+  3. Container & Layout
+  4. Typography Hierarchy
+  5. Content Elements
+  6. Mobile-First Responsive Design (360px+)
+*/
+
+/* ========================================== */
+/* 1. CSS VARIABLES & BRAND COLORS */
+/* ========================================== */
+
+:root {
+    /* PRIMARY COLORS (from Rooted Vitality brand) */
+    --rooted-primary: #77883e;         /* Sage green - primary color */
+    --rooted-accent: #d4c47c;          /* Herbal gold - secondary accent */
+    --rooted-cream: #f8f5e2;           /* Warm cream - backgrounds */
+    --rooted-dark: #6b5b47;            /* Earth brown - text */
+    
+    /* SECONDARY COLORS */
+    --rooted-bright-green: #6b9820;    /* Bright accent green */
+    --rooted-olive: #5c5438;           /* Dark olive - alternative */
+    --rooted-light: #e8e4d6;           /* Light beige - borders */
+    --rooted-green-light: #ebf6e8;     /* Light sage - backgrounds */
+    --rooted-white: #ffffff;           /* Clean white */
+    
+    /* TYPOGRAPHY */
+    --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-body: 'Lora', Georgia, serif;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    
+    /* SPACING SYSTEM (8px base) */
+    --spacing-xs: 0.5rem;      /* 8px */
+    --spacing-sm: 1rem;        /* 16px */
+    --spacing-md: 1.5rem;      /* 24px */
+    --spacing-lg: 2rem;        /* 32px */
+    --spacing-xl: 3rem;        /* 48px */
+    --spacing-2xl: 4rem;       /* 64px */
+    
+    /* SIZING & LAYOUT */
+    --max-width: 900px;
+    --border-radius: 8px;
+    --transition-ease: 0.3s ease;
+    
+    /* LINE HEIGHTS */
+    --line-height-tight: 1.4;
+    --line-height-normal: 1.6;
+    --line-height-loose: 1.8;
+}
+
+/* ========================================== */
+/* 2. ROOT & BASE STYLES */
+/* ========================================== */
+
+html {
+    scroll-behavior: smooth;
+    font-family: var(--font-body);
+    color: var(--rooted-dark);
+    background-color: var(--rooted-white);
+    font-size: 16px;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-size: 1rem;
+    line-height: var(--line-height-normal);
+    color: var(--rooted-dark);
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+/* ============================================================================ */
+/* 2B. BACK TO HELP CENTER LINK */
+/* ============================================================================ */
+
+.article-back-link {
+    padding: 0.75rem 0;
+    margin: 0;
+}
+
+.article-back-link a {
+    font-size: 0.9rem;
+    color: var(--rooted-primary);
+    text-decoration: none;
+    border: none;
+    transition: color 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0;
+}
+
+.article-back-link a:hover {
+    color: var(--rooted-accent);
+}
+
+/* ============================================================================ */
+/* 3. POLICY LAYOUT & CONTAINERS */
+/* ============================================================================ */
+
+main {
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+.article-section {
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--rooted-light);
+}
+
+.article-section:last-of-type {
+    border-bottom: none;
+}
+
+.article-section .container {
+    padding: 0 var(--spacing-lg);
+}
+
+/* ============================================================================ */
+/* 4. HEADING HIERARCHY */
+/* ============================================================================ */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    line-height: var(--line-height-tight);
+    margin: 1rem 0 0.75rem 0;
+    color: var(--rooted-primary);
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin-top: 0;
+}
+
+h2 {
+    font-size: 2rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 3px solid var(--rooted-accent);
+}
+
+h3 {
+    font-size: 1.3rem;
+    color: var(--rooted-dark);
+    margin-top: 0.75rem;
+}
+
+h4,
+h5,
+h6 {
+    font-size: 1.1rem;
+}
+
+/* ============================================================================ */
+/* 5. CONTENT TYPOGRAPHY */
+/* ============================================================================ */
+
+p {
+    margin: 0.75rem 0;
+    line-height: var(--line-height-normal);
+    font-size: 1rem;
+}
+
+strong,
+b {
+    font-weight: 600;
+    color: var(--rooted-primary);
+}
+
+em,
+i {
+    font-style: italic;
+}
+
+/* Policy content links only - not footer/header */
+main a,
+.article-section a {
+    color: var(--rooted-primary);
+    text-decoration: none;
+    border-bottom: 1px solid var(--rooted-accent);
+    transition: color 0.2s ease;
+}
+
+main a:hover,
+.article-section a:hover {
+    color: var(--rooted-accent);
+}
+
+/* ============================================================================ */
+/* 6. LISTS & EMPHASIS */
+/* ============================================================================ */
+
+ul,
+ol {
+    margin: var(--spacing-md) 0;
+    padding-left: 2rem;
+    line-height: var(--line-height-loose);
+}
+
+li {
+    margin: var(--spacing-sm) 0;
+    color: var(--rooted-dark);
+}
+
+ul li::marker,
+ol li::marker {
+    color: var(--rooted-primary);
+    font-weight: 600;
+}
+
+blockquote {
+    margin: var(--spacing-lg) 0;
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: var(--rooted-cream);
+    border-left: 4px solid var(--rooted-primary);
+    font-style: italic;
+    color: var(--rooted-dark);
+}
+
+hr {
+    border: none;
+    border-top: 1px solid var(--rooted-light);
+    margin: var(--spacing-lg) 0;
+}
+
+/* ============================================================================ */
+/* 8. RESPONSIVE DESIGN */
+/* ============================================================================ */
+
+@media (max-width: 768px) {
+    .container {
+        padding: var(--spacing-lg);
+    }
+    
+    .article-section .container {
+        padding: var(--spacing-md);
+    }
+    
+    h1 {
+        font-size: 1.8rem;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+    }
+    
+    h3 {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    :root {
+        font-size: 14px;
+    }
+    
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    h2 {
+        font-size: 1.3rem;
+    }
+    
+    h3 {
+        font-size: 1.1rem;
+    }
+    
+    .container {
+        padding: var(--spacing-md);
+    }
+    
+    ul,
+    ol {
+        padding-left: 1.5rem;
+    }
+}

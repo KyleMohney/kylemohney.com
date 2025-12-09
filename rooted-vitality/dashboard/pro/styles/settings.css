@@ -1579,6 +1579,12 @@
     margin-bottom: 0.5rem;
 }
 
+/* Salesforce logo sizing */
+.crm-provider-card[data-provider="salesforce"] .crm-provider-icon img {
+    max-width: 100px;
+    height: auto;
+}
+
 .crm-provider-name {
     font-weight: 600;
     margin-bottom: 0.25rem;

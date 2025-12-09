@@ -31,6 +31,7 @@
   height: 100%;
   opacity: 0;
   transition: opacity 2.2s ease-in-out;
+  z-index: 5;
 }
 
 .slide.active {

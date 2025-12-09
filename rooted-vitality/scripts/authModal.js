@@ -43,6 +43,7 @@ window.initAuthModal = () => {
     const modalHTML = `
     <div id="rvAuthOverlay" class="rv-auth-overlay" inert aria-hidden="true">
         <div class="rv-auth-modal" role="dialog" aria-modal="true" aria-labelledby="rvAuthTitle">
+            <h2 id="rvAuthTitle" style="display: none;">Login</h2>
             <button class="rv-auth-close" aria-label="Close login modal">×</button>
             <h2 id="rvAuthTitle">Sign In to Rooted Vitality</h2>
             <p class="rv-auth-subtitle">Enter your email and password. Your experience will automatically match your account type.</p>

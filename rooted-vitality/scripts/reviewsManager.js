@@ -387,9 +387,15 @@ let reviewsManager = {
       div.className = 'photo-preview__item';
       div.innerHTML = `
         <img src="${photo.preview}" alt="Photo ${index + 1}">
-        <button type="button" class="photo-preview__remove" onclick="reviewsManager.removePhoto(${index})" title="Remove">ï¿½</button>
+        <button type="button" class="photo-preview__remove" aria-label="Remove photo ${index + 1}" title="Remove this photo"><span aria-hidden="true">×</span></button>
       `;
       preview.appendChild(div);
+      
+      // Add event listener to remove button (accessibility fix)
+      const removeBtn = div.querySelector('.photo-preview__remove');
+      if (removeBtn) {
+        removeBtn.addEventListener('click', () => this.removePhoto(index));
+      }
     });
   },
 
