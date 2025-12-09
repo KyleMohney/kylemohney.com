@@ -288,7 +288,6 @@ window.addEventListener('DOMContentLoaded', async () => {
       // ============ 6A. Create Notification Settings (ALL ENABLED) ============
       try {
         const clientSerial = newClient.serial_number;
-        console.log('[Signup] Creating notification settings for client:', clientSerial);
 
         await window.supabaseClient
           .from('client_notification_settings')
@@ -305,7 +304,6 @@ window.addEventListener('DOMContentLoaded', async () => {
           }])
           .select();
 
-        console.log('[Signup] ✓ Notification settings created for', clientSerial);
       } catch (settingsErr) {
         console.warn('[Signup] Warning: Could not create notification settings:', settingsErr);
         // Don't fail signup if settings creation fails - continue anyway
@@ -313,8 +311,6 @@ window.addEventListener('DOMContentLoaded', async () => {
 
       // ============ 6B. Create Welcome Notification via RPC (SECURITY DEFINER) ============
       try {
-        console.log('[Signup] Creating welcome notification for client:', newClient.serial_number);
-        
         const { data: notifData, error: notifError } = await window.supabaseClient
           .rpc('create_client_welcome_notification_signup', {
             p_client_serial: newClient.serial_number
@@ -328,7 +324,6 @@ window.addEventListener('DOMContentLoaded', async () => {
           throw new Error('Welcome notification creation returned no ID');
         }
         
-        console.log('[Signup] ✓ Welcome notification created:', notifData);
       } catch (notifErr) {
         console.error('[Signup] ERROR: Could not create welcome notification:', notifErr);
         // Warning: Don't fail signup if welcome notification fails, but log the error

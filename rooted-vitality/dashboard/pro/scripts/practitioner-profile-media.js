@@ -38,10 +38,7 @@ function debounceAutoSave(section) {
     else if (typeof saveProfileSection === 'function') {
         saveProfileSection(section || 'media');
     }
-    // If neither available, just log (graceful degradation)
-    else {
-        console.log('[Media] Auto-save requested (parent not ready)');
-    }
+    // If neither available, just do nothing (graceful degradation)
 }
 
 // Initialize video data when ProfileState is ready

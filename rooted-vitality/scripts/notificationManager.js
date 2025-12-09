@@ -46,8 +46,6 @@ async function notifyClientOfMatchResponse(options) {
       return;
     }
 
-    console.log(`[Notifications] INITIATING MATCH ${action.toUpperCase()} notification for client ${clientSerial}`);
-
     // Determine notification title and message based on action
     let title, message;
     if (action === 'accepted') {
@@ -63,7 +61,6 @@ async function notifyClientOfMatchResponse(options) {
 
     // Step 1: Create in-app notification via secure RPC function
     // Using RPC bypasses RLS policies and allows client user to create notifications
-    console.log('[Notifications] Creating in-app notification via RPC function');
     const { data: notifData, error: notifError } = await window.supabaseClient
       .rpc('create_match_response_notification', {
         p_client_serial: clientSerial,
@@ -78,8 +75,6 @@ async function notifyClientOfMatchResponse(options) {
       console.error('[Notifications] Error code:', notifError.code);
       console.error('[Notifications] Error message:', notifError.message);
     } else {
-      console.log('[Notifications] ✓ In-app notification created successfully:', notifData);
-
       // Trigger badge update if UI is loaded
       if (window.updateNotificationBadge) {
         window.updateNotificationBadge();
@@ -88,7 +83,6 @@ async function notifyClientOfMatchResponse(options) {
 
     // Step 1.5: Update match status for client's inbox if practitioner declined
     if (action === 'declined' && matchId) {
-      console.log('[Notifications] Updating match status to "not-hired" for client inbox');
       try {
         const { error: updateError } = await window.supabaseClient
           .from('project_practitioner_matches')
@@ -100,8 +94,6 @@ async function notifyClientOfMatchResponse(options) {
         
         if (updateError) {
           console.warn('[Notifications] Could not update match status for client:', updateError);
-        } else {
-          console.log('[Notifications] ✓ Match status updated to "not-hired" in client inbox');
         }
       } catch (err) {
         console.warn('[Notifications] Error updating match status:', err);
@@ -109,7 +101,6 @@ async function notifyClientOfMatchResponse(options) {
     }
 
     // Step 2: Check client notification preferences for this type via RPC
-    console.log('[Notifications] Fetching client notification preferences');
     const { data: preferences, error: prefError } = await window.supabaseClient
       .rpc('get_client_notification_preferences', {
         p_client_serial: clientSerial
@@ -136,7 +127,6 @@ async function notifyClientOfMatchResponse(options) {
       if (clientError) {
         console.warn('[Notifications] Could not fetch client contact info:', clientError);
       } else if (client) {
-        console.log(`[Notifications] Client preferences - Email: ${prefs.matches_email}, SMS: ${prefs.matches_sms}`);
         // Step 4: Send external notifications (email/SMS) via webhook
         await sendExternalNotifications({
           email: client.email,
@@ -203,13 +193,10 @@ async function sendExternalNotifications(options) {
       }
 
       // Log email send attempt
-      console.log(`[Notifications] SENDING EMAIL to ${email} - Subject: "${subject}"`);
-
       try {
         // Send email via Supabase Edge Function
         // Note: No Authorization header needed for browser requests (function is public)
         // The preflight (OPTIONS) request will fail if Authorization is included
-        console.log('[Notifications] Sending fetch request to edge function...');
         
         const emailResponse = await fetch(
           `${window.supabaseClient.supabaseUrl}/functions/v1/send-notification-email`,
@@ -229,7 +216,6 @@ async function sendExternalNotifications(options) {
 
         if (emailResponse.ok) {
           const emailData = await emailResponse.json();
-          console.log(`[Notifications] ✓ Email successfully sent to ${email}:`, emailData);
         } else {
           let errorText = '';
           try {
@@ -250,7 +236,6 @@ async function sendExternalNotifications(options) {
     }
 
     if (smsEnabled && phone) {
-      console.log(`[Notifications] SMS sending requested for ${phone} (not yet implemented)`);
       // TODO: Implement SMS sending via Twilio or similar service
     }
 
@@ -278,10 +263,7 @@ async function notifyPractitionerOfNewMatch(options) {
       return;
     }
 
-    console.log(`[Notifications] INITIATING NEW MATCH notification for practitioner ${practitionerSerial}`);
-
     // Step 1: Create in-app notification via RPC function (bypasses RLS)
-    console.log('[Notifications] Creating in-app notification via RPC function');
     const { data: notifData, error: notifError } = await window.supabaseClient
       .rpc('create_practitioner_new_match_notification', {
         p_practitioner_serial: practitionerSerial,
@@ -294,8 +276,6 @@ async function notifyPractitionerOfNewMatch(options) {
       console.error('[Notifications] Failed to create practitioner notification via RPC:', notifError);
       return;
     } else {
-      console.log('[Notifications] ✓ In-app notification created successfully:', notifData);
-
       // Trigger badge update if UI is loaded
       if (window.updateNotificationBadge) {
         window.updateNotificationBadge();
@@ -303,7 +283,6 @@ async function notifyPractitionerOfNewMatch(options) {
     }
 
     // Step 2: Check practitioner notification preferences for this type via RPC
-    console.log('[Notifications] Fetching practitioner notification preferences');
     const { data: preferences, error: prefError } = await window.supabaseClient
       .rpc('get_practitioner_notification_preferences', {
         p_practitioner_serial: practitionerSerial
@@ -330,8 +309,6 @@ async function notifyPractitionerOfNewMatch(options) {
       if (practError) {
         console.warn('[Notifications] Could not fetch practitioner contact info:', practError);
       } else if (practitioner) {
-        console.log(`[Notifications] Practitioner preferences - Email: ${prefs.matches_email}, SMS: ${prefs.matches_sms}`);
-        
         // Use practitioner-specific email template
         const emailHtml = EmailTemplates.practitionerNewMatch({
           practitionerName: 'Valued Practitioner',
@@ -378,8 +355,6 @@ async function notifyPractitionerOfMatchAcceptance(options) {
       return;
     }
 
-    console.log(`[Notifications] INITIATING MATCH ACCEPTANCE notification for practitioner ${practitionerSerial}`);
-
     // Check practitioner preferences first
     const { data: preferences, error: prefError } = await window.supabaseClient
       .from('practitioner_notification_settings')
@@ -415,9 +390,8 @@ async function notifyPractitionerOfMatchAcceptance(options) {
 
       if (error) {
         console.error('[Notifications] Failed to create practitioner acceptance notification:', error);
-      } else {
-        console.log(`[Notifications] ✓ In-app notification created for practitioner ${practitionerSerial}`);
       }
+    }
     }
 
     // Send email if enabled
@@ -431,8 +405,6 @@ async function notifyPractitionerOfMatchAcceptance(options) {
       if (proError) {
         console.warn('[Notifications] Could not fetch practitioner contact info:', proError);
       } else if (practitioner) {
-        console.log(`[Notifications] Practitioner preferences - Email: ${prefs.matches_email}, SMS: ${prefs.matches_sms}`);
-
         // Use practitioner-specific email template
         const emailHtml = EmailTemplates.practitionerMatchAccepted({
           practitionerName: 'Valued Practitioner',

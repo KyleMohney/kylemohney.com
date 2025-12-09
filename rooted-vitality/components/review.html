@@ -365,6 +365,7 @@
           type="text" 
           id="clientName" 
           name="clientName" 
+          autocomplete="name"
           required
           placeholder="First and last name"
         >
@@ -377,6 +378,7 @@
           type="email" 
           id="clientEmail" 
           name="clientEmail" 
+          autocomplete="email"
           required
           placeholder="your@email.com"
         >
@@ -450,12 +452,6 @@
   <script src="../scripts/config.js"></script>
   <script src="../scripts/supabaseClient.js"></script>
   <script>
-    // Debug logging
-    console.log('Review page loading...');
-    console.log('Current page URL:', window.location.href);
-    console.log('Page origin:', window.location.origin);
-    console.log('Page protocol:', window.location.protocol);
-    
     // Use the global supabaseClient from supabaseClient.js
     // This is the same client used by all other Rooted Vitality pages
     const supabaseClient = window.supabaseClient;
@@ -463,7 +459,6 @@
     if (!supabaseClient) {
       console.error('Supabase client not initialized. Check that supabaseClient.js loaded correctly.');
     } else {
-      console.log('Using global Supabase client from window.supabaseClient');
     }
 
     let selectedRating = 0;
@@ -472,8 +467,6 @@
     let practitionerId = null;
     let practitionerData = null;
     async function fetchWithFallback(url, options = {}) {
-      console.log('Fetching:', url);
-      
       try {
         // Try direct fetch first
         const response = await fetch(url, {
@@ -492,12 +485,9 @@
         
         return await response.json();
       } catch (error) {
-        console.log('Direct fetch failed, trying CORS proxy...');
-        
         // Try with CORS proxy
         try {
           const proxyUrl = CORS_PROXY + url;
-          console.log('Proxy URL:', proxyUrl);
           
           const response = await fetch(proxyUrl, {
             ...options,
@@ -533,26 +523,26 @@
         const params = new URLSearchParams(window.location.search);
         practitionerId = params.get('practitioner');
 
-        console.log('Practitioner ID from URL:', practitionerId);
-
         if (!practitionerId) {
           showError('Missing practitioner ID. Invalid review link.');
           return;
         }
 
         // Fetch practitioner info
-        console.log('Fetching practitioner info...');
         await fetchPractitionerInfo();
 
         // Load taxonomy categories
-        console.log('Loading categories...');
+        
         await loadCategories();
 
         // Check review count
-        console.log('Checking review limit...');
         await checkReviewLimit();
 
-        console.log('Initialization complete');
+        // Setup event listeners for form interactions
+        
+        setupEventListeners();
+
+        
       } catch (error) {
         console.error('Init error:', error);
         showError('Failed to load review form. Please try again.');
@@ -572,14 +562,20 @@
         star.addEventListener('mouseover', function() {
           const hoverRating = parseInt(this.dataset.rating);
           document.querySelectorAll('.star').forEach((s, idx) => {
-            s.classList.toggle('active', idx < hoverRating);
+            if (idx < hoverRating) {
+              s.classList.add('active');
+            } else {
+              s.classList.remove('active');
+            }
           });
         });
       });
 
       const starRating = document.getElementById('starRating');
       if (starRating) {
-        starRating.addEventListener('mouseout', updateStarDisplay);
+        starRating.addEventListener('mouseout', function() {
+          updateStarDisplay();
+        });
       }
 
       // Category selection handler
@@ -594,7 +590,6 @@
     // Load taxonomy categories
     async function loadCategories() {
       try {
-        console.log('Fetching categories from holistic_health_taxonomy...');
         
         if (!supabaseClient) {
           throw new Error('Supabase client not initialized');
@@ -616,7 +611,6 @@
           throw new Error('No categories available');
         }
 
-        console.log('Categories loaded:', categories.length);
         populateCategories(categories);
 
       } catch (error) {
@@ -639,14 +633,11 @@
         option.textContent = cat.name;
         select.appendChild(option);
       });
-
-      console.log('Categories populated in dropdown');
     }
 
     // Fetch practitioner info
     async function fetchPractitionerInfo() {
       try {
-        console.log('Fetching practitioner info for ID:', practitionerId);
         
         if (!supabaseClient) {
           throw new Error('Supabase client not initialized');
@@ -655,7 +646,7 @@
         // Use Supabase client to fetch practitioner
         const { data: practitioner, error } = await supabaseClient
           .from('practitioners')
-          .select('id, full_name, specialty, avatar_url')
+          .select('id, serial_number, legal_name, dba_name, legal_business_name')
           .eq('id', practitionerId)
           .single();
         
@@ -668,8 +659,14 @@
           throw new Error('Practitioner not found');
         }
         
-        practitionerData = practitioner;
-        console.log('Practitioner data loaded:', practitionerData);
+        // Also fetch profile to get logo/avatar and modalities
+        const { data: profile } = await supabaseClient
+          .from('practitioner_profiles')
+          .select('practice_logo_url, modalities')
+          .eq('practitioner_serial', practitioner.serial_number)
+          .single();
+        
+        practitionerData = { ...practitioner, ...profile };
 
       } catch (error) {
         console.error('Failed to load practitioner:', error);
@@ -683,22 +680,26 @@
       }
 
       // Display practitioner info
-      document.getElementById('practitionerName').textContent = practitionerData.full_name || 'Practitioner';
-      document.getElementById('practitionerSpecialty').textContent = practitionerData.specialty || 'Holistic Wellness';
+      const displayName = practitionerData.dba_name || practitionerData.legal_business_name || practitionerData.legal_name || 'Practitioner';
+      document.getElementById('practitionerName').textContent = displayName;
       
-      if (practitionerData.avatar_url) {
-        document.getElementById('practitionerAvatar').src = practitionerData.avatar_url;
+      // Display modalities or default message
+      let specialty = 'Holistic Wellness';
+      if (practitionerData.modalities && Array.isArray(practitionerData.modalities) && practitionerData.modalities.length > 0) {
+        specialty = practitionerData.modalities.slice(0, 3).join(', ');
+      }
+      document.getElementById('practitionerSpecialty').textContent = specialty;
+      
+      if (practitionerData.practice_logo_url) {
+        document.getElementById('practitionerAvatar').src = practitionerData.practice_logo_url;
       } else {
         document.getElementById('practitionerAvatar').src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect fill="%23ddd" width="100" height="100"/%3E%3Ctext x="50" y="50" text-anchor="middle" dy=".3em" fill="%23999" font-size="50"%3E👤%3C/text%3E%3C/svg%3E';
       }
-
-      console.log('Practitioner info displayed');
     }
 
     // Check review limit
     async function checkReviewLimit() {
       try {
-        console.log('Checking review limit for practitioner:', practitionerId);
         
         if (!supabaseClient) {
           throw new Error('Supabase client not initialized');
@@ -718,10 +719,8 @@
         }
 
         const count = reviews ? reviews.length : 0;
-        console.log('Review count for this practitioner:', count);
 
         if (count >= 3) {
-          console.log('Review limit reached - hiding form');
           document.getElementById('reviewForm').style.display = 'none';
           document.getElementById('reviewLimitWarning').classList.add('show');
           document.getElementById('submitBtn').disabled = true;
@@ -734,7 +733,11 @@
 
     function updateStarDisplay() {
       document.querySelectorAll('.star').forEach((s, idx) => {
-        s.classList.toggle('active', idx < selectedRating);
+        if (idx < selectedRating) {
+          s.classList.add('active');
+        } else {
+          s.classList.remove('active');
+        }
       });
     }
 
@@ -833,6 +836,7 @@
           .from('reviews')
           .insert({
             practitioner_id: practitionerId,
+            practitioner_serial: practitionerData.serial_number,
             client_id: null, // Off-platform client
             client_name: clientName,
             client_first_name: clientName.split(' ')[0],
@@ -840,7 +844,7 @@
             rating: selectedRating,
             review_text: reviewText,
             category_id: selectedCategory,
-            source: 'review-link',
+            source: 'external',
             is_verified: false,
             is_featured: false,
             is_visible: true, // Auto-visible
@@ -922,7 +926,6 @@
       const el = document.getElementById('successMessage');
       el.textContent = message;
       el.classList.add('show');
-      console.log('Success shown to user:', message);
     }
 
     // Check internet connectivity
@@ -935,7 +938,6 @@
     }
 
     // Start
-    console.log('Document ready, starting init...');
     if (checkConnectivity()) {
       init();
     }

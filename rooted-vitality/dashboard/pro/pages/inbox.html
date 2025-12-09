@@ -301,7 +301,6 @@ TABLE OF CONTENTS:
                     
                     // Setup real-time listener
                     await PractitionerNotifications.setupRealtimeListener(async (eventType, notification) => {
-                        console.log('[Inbox] Notification event:', eventType);
                         PractitionerNotifications.renderNotifications('.rv-notifications-list');
                         PractitionerNotifications.updateBadge();
                     });

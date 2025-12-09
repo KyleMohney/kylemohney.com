@@ -668,7 +668,6 @@ function setupStep5Handler(onboardingData, saveLocalData) {
                 // Save projectId to window and localStorage immediately
                 window.currentOnboardingData = onboardingData;
                 localStorage.setItem('rooted-onboarding-data', JSON.stringify(onboardingData));
-                console.log('[Onboarding Step 5] Project created with ID:', onboardingData.projectId);
 
                 // ========== STEP 3: LOAD MATCHES ==========
                 step5NextBtn.textContent = 'Finding matches...';
@@ -708,10 +707,6 @@ function setupStep6Handler(onboardingData) {
         closeOnboardingModal();
         // Use window.currentOnboardingData to get the latest projectId that was set in Step 5
         const projectId = window.currentOnboardingData?.projectId || onboardingData.projectId;
-        console.log('[Onboarding Step 6] Continue browsing clicked');
-        console.log('[Onboarding Step 6] window.currentOnboardingData:', window.currentOnboardingData);
-        console.log('[Onboarding Step 6] onboardingData:', onboardingData);
-        console.log('[Onboarding Step 6] projectId:', projectId);
         
         if (!projectId) {
             console.error('[Onboarding] No project ID available');
@@ -719,7 +714,6 @@ function setupStep6Handler(onboardingData) {
             return;
         }
         const url = `/rooted-vitality/dashboard/client/pages/find-practitioners.html?project_id=${projectId}`;
-        console.log('[Onboarding Step 6] Navigating to:', url);
         window.location.href = url;
     });
 }
@@ -781,8 +775,6 @@ function closeOnboardingModal() {
  * Called when navigating to Step 5 to show confirmation of details
  */
 function populateStep5Display(onboardingData) {
-    console.log('[onboardingUI] Populating Step 5 display with data:', onboardingData);
-    
     // Populate category
     const categorySpan = document.getElementById('confirm-category');
     if (categorySpan && onboardingData.category) {

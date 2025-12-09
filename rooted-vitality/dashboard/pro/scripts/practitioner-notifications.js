@@ -72,7 +72,6 @@ const PractitionerNotifications = (() => {
       }
 
       practitionerSerial = practitioner.serial_number;
-      console.log('[Practitioner Notifications] Initialized for practitioner:', practitionerSerial);
       isInitialized = true;
 
     } catch (error) {
@@ -120,7 +119,6 @@ const PractitionerNotifications = (() => {
       }
 
       notificationCache = data || [];
-      console.log('[Practitioner Notifications] Fetched:', notificationCache.length, 'notifications');
       return notificationCache;
 
     } catch (error) {
@@ -183,7 +181,6 @@ const PractitionerNotifications = (() => {
         notif.updated_at = new Date().toISOString();
       }
 
-      console.log('[Practitioner Notifications] Marked as read:', notificationId);
       return true;
 
     } catch (error) {
@@ -223,7 +220,6 @@ const PractitionerNotifications = (() => {
         n.updated_at = new Date().toISOString();
       });
 
-      console.log('[Practitioner Notifications] Marked all as read');
       return true;
 
     } catch (error) {
@@ -256,7 +252,6 @@ const PractitionerNotifications = (() => {
 
       // Update cache
       notificationCache = notificationCache.filter(n => n.id !== notificationId);
-      console.log('[Practitioner Notifications] Deleted:', notificationId);
       return true;
 
     } catch (error) {
@@ -288,7 +283,6 @@ const PractitionerNotifications = (() => {
       }
 
       const channelName = `prac-notif:${practitionerSerial}`;
-      console.log('[Practitioner Notifications] Setting up realtime listener:', channelName);
 
       realtimeChannel = supabaseClient
         .channel(channelName)
@@ -301,8 +295,6 @@ const PractitionerNotifications = (() => {
             filter: `practitioner_serial=eq.${practitionerSerial}`
           },
           (payload) => {
-            console.log('[Practitioner Notifications] Realtime event:', payload.eventType);
-
             // Handle INSERT (new notification)
             if (payload.eventType === 'INSERT' && payload.new) {
               notificationCache.unshift(payload.new);
@@ -330,7 +322,7 @@ const PractitionerNotifications = (() => {
           }
         )
         .subscribe((status) => {
-          console.log('[Practitioner Notifications] Realtime subscription status:', status);
+          // Subscription status updated
         });
 
     } catch (error) {
@@ -345,7 +337,6 @@ const PractitionerNotifications = (() => {
     try {
       if (realtimeChannel && supabaseClient) {
         await supabaseClient.removeChannel(realtimeChannel);
-        console.log('[Practitioner Notifications] Realtime subscription cleaned up');
       }
     } catch (error) {
       console.error('[Practitioner Notifications] Exception cleanup:', error);

@@ -57,10 +57,6 @@ class NotificationReliabilityManager {
     // Attempt to create notification with retries
     for (let attempt = 1; attempt <= this.retryAttempts; attempt++) {
       try {
-        console.log(
-          `[Notification Reliability] Attempt ${attempt}/${this.retryAttempts} to create ${type} notification for ${recipientSerial}`
-        );
-
         // Determine table name
         const tableName = userType === 'client' 
           ? 'client_notifications' 
@@ -93,10 +89,6 @@ class NotificationReliabilityManager {
         }
 
         // SUCCESS
-        console.log(
-          `✓ [NOTIFICATION SUCCESS] ${type} notification created for ${recipientSerial} - ID: ${data.id}`
-        );
-
         this.logSuccess(recipientSerial, type, data.id, attempt, options);
 
         // Trigger badge update
@@ -169,15 +161,10 @@ class NotificationReliabilityManager {
       }
 
       if (data) {
-        console.log(`[Notification Reliability] Settings exist for ${userSerial}`);
         return true;
       }
 
       // Settings don't exist - create with all defaults ON
-      console.log(
-        `[Notification Reliability] Creating default notification settings for ${userSerial}`
-      );
-
       const { error: insertError } = await window.supabaseClient
         .from(settingsTable)
         .insert([{
@@ -197,9 +184,6 @@ class NotificationReliabilityManager {
         return false;
       }
 
-      console.log(
-        `✓ [Notification Reliability] Created notification settings for ${userSerial} - ALL NOTIFICATIONS ENABLED`
-      );
       return true;
 
     } catch (error) {
@@ -223,7 +207,6 @@ class NotificationReliabilityManager {
       metadata
     };
     this.notificationLog.push(entry);
-    console.log('[Notification Log]', entry);
   }
 
   /**
@@ -282,7 +265,6 @@ window.NotificationReliabilityManager = NotificationReliabilityManager;
 // Create global instance
 if (!window.notificationReliability) {
   window.notificationReliability = new NotificationReliabilityManager();
-  console.log('[Notification Reliability] Module initialized');
 }
 
 /**
@@ -313,5 +295,3 @@ window.getNotificationDeliveryReport = () => {
 window.exportNotificationLogs = () => {
   return window.notificationReliability.exportLogs();
 };
-
-console.log('[Notification Reliability] All exports registered');

@@ -154,7 +154,6 @@ window.authManager = {
             
             // Check if we're in onboarding modal - if so, skip redirect
             if (window.skipAuthRedirect) {
-                console.log('[Rooted Vitality] In onboarding flow, skipping redirect');
                 return true;
             }
             
@@ -197,7 +196,6 @@ window.authManager = {
         }
         
         try {
-            console.log('[Rooted Vitality] PASSWORD RESET requested for:', email);
             const baseUrl = (typeof RootedVitality !== 'undefined' && RootedVitality.config.siteUrl) ? RootedVitality.config.siteUrl : '/rooted-vitality/';
             const { error } = await window.supabaseClient.auth.resetPasswordForEmail(email, {
                 redirectTo: `${window.location.origin}${baseUrl}reset.html`
@@ -209,8 +207,6 @@ window.authManager = {
                 return false;
             }
             
-            console.log('[Rooted Vitality] ✓ PASSWORD RESET EMAIL SENT to:', email);
-            console.log('[Rooted Vitality] Works for: Clients, Practitioners, All authenticated users');
             alert('Password reset link sent to your email. Please check your inbox.');
             return true;
         } catch (error) {
@@ -235,7 +231,6 @@ window.authManager = {
         }
         
         try {
-            console.log('[Rooted Vitality] EMAIL CHANGE requested for:', newEmail);
             const baseUrl = (typeof RootedVitality !== 'undefined' && RootedVitality.config.siteUrl) ? RootedVitality.config.siteUrl : '/rooted-vitality/';
             const { error } = await window.supabaseClient.auth.updateUser({
                 email: newEmail
@@ -247,8 +242,6 @@ window.authManager = {
                 return false;
             }
             
-            console.log('[Rooted Vitality] ✓ EMAIL CHANGE CONFIRMATION SENT to:', newEmail);
-            console.log('[Rooted Vitality] Works for: Clients, Practitioners, All authenticated users');
             alert('A confirmation link has been sent to your new email address. Please check your inbox to verify the change.');
             return true;
         } catch (error) {

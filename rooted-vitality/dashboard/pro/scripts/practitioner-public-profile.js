@@ -61,8 +61,7 @@ function showError(message) {
         // Fallback if toast fails
     }
     
-    // Fallback: Log to console and show error in UI
-    console.error('[practitioner-profile] Error:', message);
+    // Fallback: Show error in UI
     const errorEl = document.getElementById('profile-error');
     if (errorEl) {
         errorEl.classList.add('visible');
@@ -153,7 +152,6 @@ function detectUserRoleForHeader() {
 detectUserRoleForHeader();
 
 document.addEventListener('DOMContentLoaded', async () => {
-    
     try {
         // Get practitioner ID from URL parameters
         urlParams = new URLSearchParams(window.location.search);
@@ -241,6 +239,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 .eq('practitioner_serial', practitioner.serial_number)
                 .maybeSingle();
             
+
+            
             const credentialsDefaults = {
                 credentials: [],
                 badge_verified: false,
@@ -279,11 +279,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Load reviews
         await loadReviews();
+
+        
         // Load service categories from match settings
         await loadServiceCategories();
-        
+
         // Render profile
-        renderProfile();
+        try {
+            renderProfile();
+        } catch (renderError) {
+            console.error('[practitioner-public-profile] renderProfile error:', renderError);
+            throw renderError;
+        }
         // Setup Contact button
         await setupContactButton();
         
@@ -312,14 +319,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }, 200);
             }
         }
-        
-        // Reload reviews when page becomes visible (e.g., tab switch)
-        document.addEventListener('visibilitychange', async () => {
-            if (document.visibilityState === 'visible') {
-
-                await loadReviews();
-            }
-        });
         
     } catch (error) {
         console.error('[Profile] Initialization error:', error);
@@ -383,11 +382,19 @@ async function loadReviews() {
 }
 
 // Setup realtime listener for new reviews
+let reviewsRealtimeActive = false;
+
 function setupReviewsRealtimeListener() {
     if (!practitioner || !practitioner.serial_number) {
-
         return;
     }
+    
+    // Don't set up multiple listeners for the same practitioner
+    if (reviewsRealtimeActive) {
+        return;
+    }
+    
+    reviewsRealtimeActive = true;
     
     const channel = window.supabaseClient
         .channel(`reviews:${practitioner.serial_number}`)
@@ -863,7 +870,7 @@ function renderProfile() {
     renderVideo();
     renderAbout();
     renderPaymentsSection();
-    renderServicesCard();
+    renderServicesCard();  // Note: Not async, removed await
     renderCredentialsCard();
     renderContactCard();
     renderFAQ();
@@ -871,13 +878,21 @@ function renderProfile() {
     // Old grid section visibility logic removed - sections now display independently
     
     // Show connect section if it has content
-    const hasConnect = !document.getElementById('contact-links-list').textContent.trim() === '';
+    const contactLinksList = document.getElementById('contact-links-list');
+    const hasConnect = contactLinksList && contactLinksList.textContent.trim() !== '';
     if (hasConnect) {
         setVisible('connect-section', true);
     }
     
     renderMediaCard();
     renderReviewsCard();
+    
+    // Setup review filter listener (only once)
+    const ratingFilterSelect = document.getElementById('rating-filter');
+    if (ratingFilterSelect && !ratingFilterSelect.hasListener) {
+        ratingFilterSelect.addEventListener('change', renderReviewsCard);
+        ratingFilterSelect.hasListener = true;
+    }
     
     // ===== HANDLE BACK TO MATCHES BUTTON (from onboarding modal) =====
     const fromOnboarding = urlParams.get('from_onboarding') === 'true';
@@ -1077,10 +1092,7 @@ function renderVideo() {
 // Render Payments & Insurance Section
 function renderPaymentsSection() {
     try {
-        console.log('[renderPaymentsSection] practitioner data:', practitioner);
-        console.log('[renderPaymentsSection] payment_methods:', practitioner.payment_methods);
-        console.log('[renderPaymentsSection] custom_payment_methods:', practitioner.custom_payment_methods);
-        console.log('[renderPaymentsSection] insurance_providers:', practitioner.insurance_providers);
+
         
         let hasContent = false;
         
@@ -1091,7 +1103,7 @@ function renderPaymentsSection() {
             // Check if it's already an array
             if (Array.isArray(practitioner.payment_methods)) {
                 methods = practitioner.payment_methods.filter(m => m && typeof m === 'string');
-                console.log('[renderPaymentsSection] payment_methods is already an array:', methods);
+
             } else if (typeof practitioner.payment_methods === 'string') {
                 // Try to parse as JSON first (handles ["stripe", "square", "paypal"])
                 try {
@@ -1108,7 +1120,7 @@ function renderPaymentsSection() {
                 }
             }
             
-            console.log('[renderPaymentsSection] Parsed payment methods:', methods);
+
             
             if (methods.length > 0) {
                 // Format method names: capitalize words, replace hyphens with spaces
@@ -1129,7 +1141,7 @@ function renderPaymentsSection() {
         // ===== INSURANCE =====
         if (practitioner.insurance_providers && practitioner.insurance_providers.length > 0) {
             const providers = practitioner.insurance_providers;
-            console.log('[renderPaymentsSection] Providers:', providers);
+
             // Format provider names: capitalize words, replace hyphens with spaces
             const insuranceHtml = providers
                 .map(p => {
@@ -1149,7 +1161,7 @@ function renderPaymentsSection() {
 }
 
 // Render Services & Coverage Card - compact, information-dense
-async function renderServicesCard() {
+function renderServicesCard() {
     try {
         let hasContent = false;
         
@@ -1187,13 +1199,15 @@ async function renderServicesCard() {
 function renderCredentialsCard() {
     let hasContent = false;
     
+
+    
     // Prevent duplicate rendering - ensure credentials loaded once
     if (!practitioner.credentials) {
-        practitioner.credentials = [];    }
+        practitioner.credentials = [];
+    }
     
     // Ensure credentials is an array (defense against malformed data)
     if (!Array.isArray(practitioner.credentials)) {
-
         practitioner.credentials = Object.values(practitioner.credentials || {});
     }
     
@@ -1209,12 +1223,13 @@ function renderCredentialsCard() {
             const credKey = `${cred.credential_type}:${cred.title}:${cred.issuer || ''}`;
             
             // Skip badge pseudo-credentials - they're already in the hero section
-            if (cred.credential_type === 'Certification' && cred.title === 'Certified Practitioner') {
-
+            // Handle both uppercase and lowercase variants
+            if ((cred.credential_type === 'Certification' || cred.credential_type === 'certification') && 
+                cred.title === 'Certified Practitioner') {
                 return;
             }
-            if (cred.credential_type === 'License' && cred.title === 'Licensed Practitioner') {
-
+            if ((cred.credential_type === 'License' || cred.credential_type === 'license') && 
+                cred.title === 'Licensed Practitioner') {
                 return;
             }
             
@@ -1223,95 +1238,72 @@ function renderCredentialsCard() {
                 credentialIds.add(credKey);
             }
         });
-
     }
     
-    // ===== RENDER CREDENTIALS =====
+    // ===== RENDER CREDENTIALS IN 3 COLUMNS (ONLY IF DATA EXISTS) =====
     if (allCredentials.length > 0) {
-
         hasContent = true;
         
-        // Separate by type
-        const degrees = allCredentials.filter(c => c.credential_type === 'Degree');
-        const licenses = allCredentials.filter(c => c.credential_type === 'License');
-        const certs = allCredentials.filter(c => c.credential_type === 'Certification');
-        const other = allCredentials.filter(c => !['Degree', 'License', 'Certification'].includes(c.credential_type));
+        // Separate by type (handle both uppercase and lowercase variants)
+        const licenses = allCredentials.filter(c => 
+            c.credential_type === 'License' || c.credential_type === 'license'
+        );
+        const certs = allCredentials.filter(c => 
+            c.credential_type === 'Certification' || c.credential_type === 'certification'
+        );
+        const degrees = allCredentials.filter(c => 
+            c.credential_type === 'Degree' || c.credential_type === 'degree'
+        );
         
-        // Build HTML for each credential category
-        let credentialsHtml = '';
-        
-        // Degrees
-        if (degrees.length > 0) {
-            credentialsHtml += '<div class="credentials-category">';
-            credentialsHtml += '<div class="credentials-category-label">Degrees</div>';
-            degrees.forEach(cred => {
-                credentialsHtml += `
+        // Populate licenses column
+        const licensesListEl = document.getElementById('licenses-list');
+        if (licensesListEl) {
+            if (licenses.length > 0) {
+                licensesListEl.innerHTML = licenses.map(cred => `
                     <div class="credential-card">
                         <div class="credential-title">${escapeHtml(cred.title || '')}</div>
                         ${cred.issuer ? `<div class="credential-issuer">${escapeHtml(cred.issuer)}</div>` : ''}
                     </div>
-                `;
-            });
-            credentialsHtml += '</div>';
+                `).join('');
+                licensesListEl.closest('.credentials-column').style.display = 'block';
+            } else {
+                licensesListEl.closest('.credentials-column').style.display = 'none';
+            }
         }
         
-        // Licenses
-        if (licenses.length > 0) {
-            credentialsHtml += '<div class="credentials-category">';
-            credentialsHtml += '<div class="credentials-category-label">Licenses</div>';
-            licenses.forEach(cred => {
-                credentialsHtml += `
+        // Populate certifications column
+        const certificationsListEl = document.getElementById('certifications-list');
+        if (certificationsListEl) {
+            if (certs.length > 0) {
+                certificationsListEl.innerHTML = certs.map(cred => `
                     <div class="credential-card">
                         <div class="credential-title">${escapeHtml(cred.title || '')}</div>
                         ${cred.issuer ? `<div class="credential-issuer">${escapeHtml(cred.issuer)}</div>` : ''}
                     </div>
-                `;
-            });
-            credentialsHtml += '</div>';
+                `).join('');
+                certificationsListEl.closest('.credentials-column').style.display = 'block';
+            } else {
+                certificationsListEl.closest('.credentials-column').style.display = 'none';
+            }
         }
         
-        // Certifications
-        if (certs.length > 0) {
-            credentialsHtml += '<div class="credentials-category">';
-            credentialsHtml += '<div class="credentials-category-label">Certifications</div>';
-            certs.forEach(cred => {
-                credentialsHtml += `
+        // Populate degrees column
+        const degreesListEl = document.getElementById('degrees-list');
+        if (degreesListEl) {
+            if (degrees.length > 0) {
+                degreesListEl.innerHTML = degrees.map(cred => `
                     <div class="credential-card">
                         <div class="credential-title">${escapeHtml(cred.title || '')}</div>
                         ${cred.issuer ? `<div class="credential-issuer">${escapeHtml(cred.issuer)}</div>` : ''}
                     </div>
-                `;
-            });
-            credentialsHtml += '</div>';
+                `).join('');
+                degreesListEl.closest('.credentials-column').style.display = 'block';
+            } else {
+                degreesListEl.closest('.credentials-column').style.display = 'none';
+            }
         }
         
-        // Other
-        if (other.length > 0) {
-            credentialsHtml += '<div class="credentials-category">';
-            other.forEach(cred => {
-                credentialsHtml += `
-                    <div class="credential-card">
-                        <div class="credential-type">${escapeHtml(cred.credential_type || 'Credential')}</div>
-                        <div class="credential-title">${escapeHtml(cred.title || '')}</div>
-                        ${cred.issuer ? `<div class="credential-issuer">${escapeHtml(cred.issuer)}</div>` : ''}
-                    </div>
-                `;
-            });
-            credentialsHtml += '</div>';
-        }
-        
-        const credListEl = document.getElementById('card-credentials-list');
-        
-        if (credListEl) {
-            credListEl.innerHTML = credentialsHtml;
-        } else {
-            console.error('[Profile] card-credentials-list element NOT FOUND');
-        }
-
         setVisible('card-credentials-row', true);
-
-    } else {
-
     }
     
     if (hasContent) {
@@ -1354,20 +1346,55 @@ function renderContactCard() {
 
 }
 
-// Render Reviews Card - compact
+// Render Reviews Card - compact with filtering
 function renderReviewsCard() {
-    if (reviews.length === 0) {
-        setVisible('no-reviews-state', true);
-        setVisible('reviews-container', false);
+    try {
+        // Ensure container exists
+        const reviewsContainer = document.getElementById('reviews-container');
+        const noReviewsState = document.getElementById('no-reviews-state');
+        const reviewFilters = document.getElementById('review-filters');
+        
+        if (!reviewsContainer) {
+            console.warn('[renderReviewsCard] reviews-container element not found');
+            return;
+        }
+        
+        if (reviews.length === 0) {
+            setVisible('no-reviews-state', true);
+            setVisible('reviews-container', false);
+            setVisible('review-filters', false);
+            setVisible('reviews-section', true);
+            return;
+        }
+        
         setVisible('reviews-section', true);
+        setVisible('no-reviews-state', false);
+        setVisible('review-filters', reviews.length > 0);
+    
+    // Update review count badge
+    const countBadge = document.getElementById('review-count');
+    if (countBadge) {
+        countBadge.textContent = `(${reviews.length})`;
+    }
+    
+    // Get filter value
+    const ratingFilter = document.getElementById('rating-filter')?.value || '';
+    
+    // Filter reviews by rating
+    let filteredReviews = reviews;
+    if (ratingFilter) {
+        const minRating = parseInt(ratingFilter);
+        filteredReviews = reviews.filter(review => (review.rating || 5) >= minRating);
+    }
+    
+    // If no reviews match filter, show empty state
+    if (filteredReviews.length === 0) {
+        document.getElementById('reviews-container').innerHTML = '<div class="no-reviews-state"><p>No reviews match your filter.</p></div>';
         return;
     }
     
-    setVisible('reviews-section', true);
-    setVisible('no-reviews-state', false);
-    
-    const reviewsHtml = reviews
-        .slice(0, 3) // Show top 3 reviews
+    // Render filtered reviews (show all, not just 3)
+    const reviewsHtml = filteredReviews
         .map(review => {
             const stars = Array(review.rating || 5)
                 .fill(0)
@@ -1441,6 +1468,9 @@ function renderReviewsCard() {
                 }
             });
         });
+    }
+    } catch (error) {
+        console.error('[renderReviewsCard] Error rendering reviews:', error);
     }
 }
 

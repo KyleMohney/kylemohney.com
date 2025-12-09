@@ -318,9 +318,25 @@ DESIGN SYSTEM
                         <div id="card-specializations" class="tag-list"></div>
                     </div>
 
-                    <!-- Credentials Grid -->
+                    <!-- Credentials 3-Column Layout -->
                     <div id="card-credentials-row" class="credentials-group hidden">
-                        <div id="card-credentials-list" class="credentials-grid"></div>
+                        <div class="credentials-columns">
+                            <!-- Licenses Column -->
+                            <div class="credentials-column">
+                                <h3 class="credential-type-title">Licenses</h3>
+                                <div id="licenses-list" class="credential-items"></div>
+                            </div>
+                            <!-- Certifications Column -->
+                            <div class="credentials-column">
+                                <h3 class="credential-type-title">Certifications</h3>
+                                <div id="certifications-list" class="credential-items"></div>
+                            </div>
+                            <!-- Degrees Column -->
+                            <div class="credentials-column">
+                                <h3 class="credential-type-title">Degrees</h3>
+                                <div id="degrees-list" class="credential-items"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -372,9 +388,20 @@ DESIGN SYSTEM
                 <div class="section-container">
                     <div class="card">
                         <div class="card-header">
-                            <h2 class="card-title">Client Reviews</h2>
+                            <h2 class="card-title">Client Reviews <span id="review-count" class="review-count-badge"></span></h2>
                         </div>
                         <div class="card-content">
+                            <!-- Review Filters -->
+                            <div id="review-filters" class="review-filters-bar">
+                                <label for="rating-filter" class="filter-label">Filter:</label>
+                                <select id="rating-filter" class="filter-select">
+                                    <option value="">All Ratings</option>
+                                    <option value="5">★★★★★ 5 Stars</option>
+                                    <option value="4">★★★★ 4 Stars & Up</option>
+                                    <option value="3">★★★ 3 Stars & Up</option>
+                                    <option value="1">★ 1 Star & Up</option>
+                                </select>
+                            </div>
                             <div id="reviews-container" class="reviews-compact"></div>
                             <div id="no-reviews-state" class="no-reviews-state" style="display: none;">
                                 <p>No reviews yet. Schedule a session to be the first to leave a review!</p>

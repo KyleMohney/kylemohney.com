@@ -30,7 +30,6 @@ let myWellnessInitialized = false;
  */
 async function initializeMyWellness() {
   if (myWellnessInitialized) {
-    console.log('[My Wellness] Already initialized, skipping');
     return;
   }
   myWellnessInitialized = true;
@@ -437,7 +436,6 @@ function displayMatches(page) {
 function renderMatches() {
   // Prevent duplicate renders
   if (renderInProgress) {
-    console.log('[My Wellness] Render already in progress, skipping');
     return;
   }
   
@@ -1537,19 +1535,15 @@ function initProjectFormHandlers() {
   async function updateOpenToMatchToggle() {
     const toggle = document.getElementById('open-to-match-toggle');
     if (!toggle) {
-      console.log('[updateOpenToMatchToggle] Toggle element not found');
       return;
     }
     
     try {
       const currentUser = window.authManager?.getCurrentUser();
       if (!currentUser) {
-        console.log('[updateOpenToMatchToggle] No current user');
         toggle.checked = false;
         return;
       }
-      
-      console.log('[updateOpenToMatchToggle] Loading state for user:', currentUser.id);
       
       const { data: client, error } = await window.supabaseClient
         .from('clients')
@@ -1565,9 +1559,7 @@ function initProjectFormHandlers() {
       
       if (client) {
         toggle.checked = client.open_to_match || false;
-        console.log('[updateOpenToMatchToggle] Successfully loaded state:', client.open_to_match, '(toggle.checked now =', toggle.checked, ')');
       } else {
-        console.log('[updateOpenToMatchToggle] No client data returned');
         toggle.checked = false;
       }
     } catch (err) {
@@ -1651,7 +1643,6 @@ function attachProjectCollapseToggle() {
  */
 async function submitCreateProject(e) {
   e.preventDefault();
-  console.log('[submitCreateProject] Project creation submitted');
 }
 
 /**
@@ -1686,8 +1677,6 @@ async function submitCreateProjectAndFindMatches(e) {
       return;
     }
 
-    console.log('[submitCreateProjectAndFindMatches] Client profile:', { id: clientProfile.id, serial_number: clientProfile.serial_number });
-
     // Validate form
     const form = document.getElementById('create-project-form');
     if (!form || !form.checkValidity()) {
@@ -1706,25 +1695,10 @@ async function submitCreateProjectAndFindMatches(e) {
     const zipcode = formData.get('zipcode');
     const street = formData.get('street') || null;
 
-    console.log('[submitCreateProjectAndFindMatches] Form values:', {
-      urgency,
-      travelPreference,
-      categoryId,
-      description
-    });
-
     // Get category info from taxonomy (categoryId is the UUID)
     const taxonomyEntry = taxonomyData[categoryId];
     const categoryName = taxonomyEntry?.name || 'Wellness Journey';
     const categoryIdText = taxonomyEntry?.category_id; // This is the text ID needed for projects table
-
-    console.log('[submitCreateProjectAndFindMatches] Category lookup:', {
-      categoryId,
-      categoryIdText,
-      categoryName,
-      taxonomyKeys: Object.keys(taxonomyData || {}),
-      categoryFromTaxonomy: taxonomyEntry
-    });
 
     // Validate category exists
     if (!categoryId || !taxonomyEntry) {
@@ -1883,8 +1857,6 @@ async function submitCloseProject(e) {
  * Handle Open to Match toggle
  */
 async function handleOpenToMatchToggle(isChecked) {
-  console.log('[handleOpenToMatchToggle] Toggle changed to:', isChecked);
-  
   try {
     // Get current user (client)
     const currentUser = window.authManager?.getCurrentUser();
@@ -1895,8 +1867,6 @@ async function handleOpenToMatchToggle(isChecked) {
       if (toggle) toggle.checked = !isChecked;
       return;
     }
-
-    console.log('[handleOpenToMatchToggle] Saving for client ID:', currentUser.id);
 
     // Update the CLIENT in the database
     const { error } = await window.supabaseClient
@@ -1916,7 +1886,6 @@ async function handleOpenToMatchToggle(isChecked) {
       return;
     }
 
-    console.log('[handleOpenToMatchToggle] Successfully updated to:', isChecked);
     showNotification(isChecked ? 'Your care requests are now visible to practitioners' : 'Your care requests are hidden from practitioners', 'success');
 
   } catch (error) {

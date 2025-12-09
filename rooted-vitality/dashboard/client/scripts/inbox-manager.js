@@ -510,8 +510,6 @@ async function updateMatchStatus(matchId, newStatus) {
       return;
     }
 
-    console.log('[Inbox] Match status updated successfully to:', newStatus);
-
     // Update local match object
     if (selectedMatch && selectedMatch.id === matchId) {
       selectedMatch.status = newStatus;

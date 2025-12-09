@@ -48,7 +48,6 @@ async function loadPractitionerNotifications() {
   try {
     if (!practitionerId && typeof getPractitionerId === 'function') {
       practitionerId = getPractitionerId();
-      console.log('[Pro Notifications] Got practitioner ID from getPractitionerId():', practitionerId);
     }
 
     if (!practitionerId) {
@@ -69,7 +68,6 @@ async function loadPractitionerNotifications() {
     }
 
     const practitionerSerial = practitioner.serial_number;
-    console.log('[Pro Notifications] Got practitioner serial:', practitionerSerial);
 
     // Fetch all notifications (read and unread) - DO NOT mark as read automatically
     const { data: notifications, error } = await window.supabaseClient
@@ -83,8 +81,6 @@ async function loadPractitionerNotifications() {
       console.error('[Pro Notifications] Error loading notifications:', error);
       return;
     }
-
-    console.log('[Pro Notifications] Loaded notifications:', notifications?.length || 0);
 
     // Count unread notifications
     const unreadCount = notifications ? notifications.filter(n => !n.is_read).length : 0;
@@ -101,7 +97,6 @@ async function loadPractitionerNotifications() {
     }
 
     if (notificationBadge) {
-      console.log('[Pro Notifications] Found notification badge, updating with count:', unreadCount);
       if (unreadCount > 0) {
         notificationBadge.textContent = unreadCount;
         notificationBadge.classList.add('active');
@@ -127,7 +122,6 @@ async function loadPractitionerNotifications() {
       }
 
       if (notificationsList && notificationsList instanceof Element) {
-        console.log('[Pro Notifications] Found notifications list, populating with', notifications.length, 'notifications');
         notificationsList.innerHTML = '';
         
         // Display all notifications
@@ -217,7 +211,6 @@ async function setupNotificationsRealtimeListener() {
     }
 
     const practitionerSerial = practitioner.serial_number;
-    console.log('[Pro Notifications] Setting up realtime listener for:', practitionerSerial);
 
     const channel = window.supabaseClient
       .channel(`prac-notif:${practitionerSerial}`)
@@ -230,12 +223,9 @@ async function setupNotificationsRealtimeListener() {
           filter: `practitioner_serial=eq.${practitionerSerial}`
         },
         (payload) => {
-          console.log('[Pro Notifications] Realtime event received:', payload.eventType, payload);
-          
           // Handle new notifications (INSERT)
           if (payload.eventType === 'INSERT' && payload.new) {
             const newNotif = payload.new;
-            console.log('[Pro Notifications] New notification received:', newNotif.title);
 
             // Add to the notifications list if it exists
             const notificationsList = document.querySelector('.rv-notifications-list');
@@ -267,14 +257,11 @@ async function setupNotificationsRealtimeListener() {
           } 
           // Handle updates (when notification is marked as read on another page/tab)
           else if (payload.eventType === 'UPDATE' && payload.new) {
-            console.log('[Pro Notifications] Notification updated:', payload.new.id, 'is_read:', payload.new.is_read);
-            
             // Reload all notifications to reflect the updated read status
             loadPractitionerNotifications();
           } 
           // Handle deletes
           else if (payload.eventType === 'DELETE' && payload.old) {
-            console.log('[Pro Notifications] Notification deleted:', payload.old.id);
             // Reload notifications
             loadPractitionerNotifications();
           }
@@ -282,7 +269,6 @@ async function setupNotificationsRealtimeListener() {
       )
       .subscribe((status) => {
         if (status === 'SUBSCRIBED') {
-          console.log('[Pro Notifications] Real-time subscription established for:', practitionerSerial);
         } else if (status === 'CHANNEL_ERROR') {
           console.error('[Pro Notifications] Real-time channel error');
         }

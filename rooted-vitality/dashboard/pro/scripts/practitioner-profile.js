@@ -1031,7 +1031,7 @@ async function loadReviews() {
                     rating: review.rating || 5,
                     text: review.review_text || '',
                     date: new Date(review.created_at),
-                    source: 'platform',
+                    source: review.source || 'platform',
                     verified: true,
                     photos: review.photos || [],
                     categoryId: review.category_id || null,
@@ -1298,7 +1298,6 @@ async function initializeProfilePage() {
         
         // STEP 12: Mark initialization as complete - NOW allow auto-save
         ProfileState.isInitializing = false;
-        console.log('[Profile] Initialization complete - auto-save now enabled');
         
     } catch (error) {
         console.error('[Rooted Vitality] Error initializing profile page:', error);

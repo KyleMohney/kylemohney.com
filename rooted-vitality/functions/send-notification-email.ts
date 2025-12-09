@@ -27,11 +27,9 @@ const corsHeaders = {
 };
 
 serve(async (req: Request): Promise<Response> => {
-  console.log(`[Email] Received ${req.method} request from origin: ${req.headers.get('origin')}`);
   
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
-    console.log("[Email] Responding to CORS preflight request");
     return new Response("ok", {
       status: 200,
       headers: corsHeaders,
@@ -51,11 +49,9 @@ serve(async (req: Request): Promise<Response> => {
         }
       );
     }
-
-    console.log(`[Email] Sending ${type || 'notification'} email to: ${to}`);
+    }
 
     // Get RESEND_API_KEY from environment variables
-    // Set this in Supabase project settings
     // @ts-ignore - Deno global
     const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
@@ -102,12 +98,10 @@ serve(async (req: Request): Promise<Response> => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-
-    console.log(`[Email] Successfully sent to ${to}, message ID: ${resendData.id}`);
+      });
+    }
 
     // Log email to database for audit trail
-    // @ts-ignore - Deno global and Supabase env vars
-    const supabaseClient = createClient(
       // @ts-ignore
       Deno.env.get("SUPABASE_URL") || "",
       // @ts-ignore

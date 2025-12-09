@@ -226,13 +226,11 @@
                 
                 // If they explicitly chose client mode, don't redirect
                 if (viewPreference === 'client') {
-                  console.log('[Rooted Vitality] User in client view mode, allowing access to index');
                   return;
                 }
                 
                 // If they explicitly chose practitioner mode, redirect
                 if (viewPreference === 'practitioner') {
-                  console.log('[Rooted Vitality] User in practitioner view mode, redirecting');
                   window.location.href = '/rooted-vitality/dashboard/pro/pages/index.html';
                   return;
                 }
@@ -249,7 +247,6 @@
                 
                 // If they're a client, they stay on landing page (default)
                 if (client) {
-                  console.log('[Rooted Vitality] Client user detected, staying on index');
                   return;
                 }
                 
@@ -262,7 +259,6 @@
                     .single();
                   
                   if (practitioner && !practError) {
-                    console.log('[Rooted Vitality] Practitioner-only user detected, redirecting to dashboard');
                     window.location.href = '/rooted-vitality/dashboard/pro/pages/index.html';
                   }
                 }
@@ -452,7 +448,6 @@
   <script>
     async function handleHeroClick() {
       try {
-        console.log('[Landing] Hero button clicked!');
         
         // Check if user is signed in
         if (!window.supabaseClient) {
@@ -461,15 +456,12 @@
           return;
         }
 
-        console.log('[Landing] Supabase client available. Checking session...');
         const { data: { session } } = await window.supabaseClient.auth.getSession();
 
         if (session) {
           // RULE 3: Returning member, signed in = skip choice and signup
           // Go straight to project creation for returning member
-          console.log('[Landing] Rule 3: Signed-in user detected. Starting onboarding for returning user...');
           if (typeof window.initializeGuidedOnboarding === 'function') {
-            console.log('[Landing] Calling initializeGuidedOnboarding(true)...');
             window.initializeGuidedOnboarding(true);
           } else {
             console.error('[Landing] initializeGuidedOnboarding not available. Functions available:', Object.keys(window).filter(k => k.includes('onboard') || k.includes('Guided')));
@@ -478,9 +470,7 @@
         } else {
           // RULE 1 or 2: User not signed in - show choice modal
           // Let user choose: are they new (Rule 1) or returning (Rule 2)?
-          console.log('[Landing] Rule 1/2: No session detected. Showing new/returning choice modal...');
           if (typeof window.initializeGuidedOnboarding === 'function') {
-            console.log('[Landing] Calling initializeGuidedOnboarding(false, false)...');
             window.initializeGuidedOnboarding(false, false); // skipAuth=false, isReturningUser=false - shows Step 0
           } else {
             console.error('[Landing] initializeGuidedOnboarding not available. Functions available:', Object.keys(window).filter(k => k.includes('onboard') || k.includes('Guided')));

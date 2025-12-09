@@ -48,8 +48,6 @@ async function logPHIAccess(action, phiType, resourceType, resourceId, details =
 
     if (error) {
       console.error('[HIPAA Audit] Logging error (non-blocking):', error.message);
-    } else {
-      console.log(`[HIPAA Audit] Logged: ${action} ${phiType} on ${resourceType}`);
     }
   } catch (error) {
     console.error('[HIPAA Audit] Exception during logging (non-blocking):', error);
@@ -83,9 +81,7 @@ async function logAccessDenied(action, reason, resourceType, details = null) {
       p_user_agent: navigator.userAgent,
       p_status: 'denied',
       p_details: { reason, ...details }
-    });
-
-    console.log(`[HIPAA Audit] Access denied: ${reason}`);
+    };
   } catch (error) {
     console.error('[HIPAA Audit] Failed to log access denial:', error);
   }

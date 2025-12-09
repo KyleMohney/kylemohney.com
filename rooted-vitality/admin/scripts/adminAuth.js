@@ -34,7 +34,6 @@ async function initializeAdmin() {
   try {
     // Initialize Supabase
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    console.log('[Admin Auth] Supabase initialized');
 
     // Check session
     await checkAuthentication();
@@ -56,7 +55,6 @@ async function checkAuthentication() {
     // Check for OAuth callback
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('code')) {
-      console.log('[Admin Auth] OAuth callback detected, exchanging code for session...');
       // Supabase automatically handles this, just get the session
     }
 
@@ -70,7 +68,6 @@ async function checkAuthentication() {
 
     const session = data?.session;
     if (!session) {
-      console.log('[Admin Auth] No active session');
       redirectToAdminLogin();
       return;
     }
@@ -85,7 +82,6 @@ async function checkAuthentication() {
 
     const user = userData?.user;
     if (!user) {
-      console.log('[Admin Auth] User not found');
       redirectToAdminLogin();
       return;
     }
@@ -99,7 +95,6 @@ async function checkAuthentication() {
     }
 
     // Success - user is authorized admin
-    console.log('[Admin Auth] ✓ User authorized:', user.email);
     currentUser = user;
     showAdminPanel();
     initializeUI();
@@ -163,7 +158,6 @@ async function logoutAdmin() {
       return;
     }
 
-    console.log('[Admin Auth] ✓ User logged out');
     currentUser = null;
     window.location.href = '/rooted-vitality/';
   } catch (error) {

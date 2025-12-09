@@ -38,8 +38,6 @@ function initializeSearch() {
   if (searchBtn) {
     searchBtn.addEventListener('click', performSearch);
   }
-
-  console.log('[User Search] Initialized');
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -62,8 +60,6 @@ async function performSearch() {
     const searchBtn = document.getElementById('search-btn');
     searchBtn.disabled = true;
     searchBtn.textContent = 'Searching...';
-
-    console.log('[User Search] Searching for:', query);
 
     const supabase = getSupabaseClient();
     if (!supabase) {
@@ -106,7 +102,6 @@ async function performSearch() {
       })));
     }
 
-    console.log('[User Search] Results:', results);
     displaySearchResults(results);
   } catch (error) {
     console.error('[User Search] Error:', error);
@@ -200,8 +195,6 @@ async function viewUserDetails(userData) {
     const userId = userData.id;
     const userType = userData.userType;
 
-    console.log('[User Search] Loading details for user:', userId, 'Type:', userType);
-
     // Route to appropriate detail view based on user type
     if (userType === 'practitioner') {
       displayPractitionerDetail(userId);
@@ -222,7 +215,7 @@ async function viewUserDetails(userData) {
  * Display user details (legacy - kept for backward compatibility)
  */
 function displayUserDetails(user) {
-  console.log('[User Search] User details:', user);
+  // legacy - kept for backward compatibility
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -233,7 +226,7 @@ function displayUserDetails(user) {
  * Show notification
  */
 function showNotification(message, type = 'info') {
-  console.log(`[${type.toUpperCase()}] ${message}`);
+  // notification handling
 }
 
 /**
@@ -271,8 +264,6 @@ function initializeProjectSearch() {
   if (searchBtn) {
     searchBtn.addEventListener('click', performProjectSearch);
   }
-
-  console.log('[Project Search] Initialized');
 }
 
 /**
@@ -291,8 +282,6 @@ async function performProjectSearch() {
     const searchBtn = document.getElementById('search-projects-btn');
     searchBtn.disabled = true;
     searchBtn.textContent = 'Searching...';
-
-    console.log('[Project Search] Searching for:', query);
 
     // Call backend search function
     const supabase = getSupabaseClient();
@@ -324,7 +313,6 @@ async function performProjectSearch() {
     }
 
     const data = await response.json();
-    console.log('[Project Search] Results:', data.results);
 
     displayProjectResults(data.results || []);
   } catch (error) {

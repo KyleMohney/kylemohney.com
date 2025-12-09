@@ -652,9 +652,6 @@ async function saveSectionCredentials() {
             throw error;
         }
         
-        console.log('[Credentials] Saved successfully:', allCredentials.length, 'credentials');
-        console.log('[Credentials] Auto-set badges - Licensed:', !!credentialsToSave.badge_licensed, 'Certified:', !!credentialsToSave.badge_certified);
-        
         // Update ProfileState with new badge values so completeness calculation sees them
         if (credentialsToSave.badge_certified !== undefined) {
             ProfileState.practitionerData.badge_certified = credentialsToSave.badge_certified;

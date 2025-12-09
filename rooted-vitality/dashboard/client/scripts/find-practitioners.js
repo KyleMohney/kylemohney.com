@@ -190,11 +190,9 @@ async function loadPractitioners(project) {
       });
 
       // Try JavaScript fallback matching
-      console.log('[loadPractitioners] Attempting JavaScript fallback matching...');
       const fallbackMatches = await performJavaScriptMatchingFindPractitioners(project);
       
       if (fallbackMatches && fallbackMatches.length > 0) {
-        console.log('[loadPractitioners] Fallback matching succeeded with', fallbackMatches.length, 'matches');
         practitioners = fallbackMatches;
       } else {
         console.error('[loadPractitioners] Fallback matching also failed. Matching system unavailable.');

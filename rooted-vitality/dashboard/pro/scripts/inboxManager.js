@@ -1542,8 +1542,6 @@ function closeThreadView() {
 // Status will automatically flip to 'not-hired' via trigger
 async function archiveConversation(conversation) {
     try {
-        console.log('[Inbox] Archiving conversation:', conversation);
-        
         if (!conversation.matchId) {
             console.error('[Inbox] Missing matchId for archive operation');
             showToast('Error: Missing match ID', 'error');
@@ -1567,8 +1565,6 @@ async function archiveConversation(conversation) {
             showToast('Failed to archive conversation', 'error');
             return;
         }
-        
-        console.log('[Inbox] ✓ Conversation archived successfully');
         
         // Send notification to client that practitioner declined
         if (window.notifyClientOfMatchResponse) {
@@ -1600,8 +1596,6 @@ async function archiveConversation(conversation) {
 // WORKFLOW: Practitioner blocks = match status = declined + blocked in practitioner_blocks table
 async function blockConversation(conversation) {
     try {
-        console.log('[Inbox] Blocking conversation:', conversation);
-        
         if (!conversation.matchId) {
             console.error('[Inbox] Missing matchId for block operation');
             showToast('Error: Missing match ID', 'error');
@@ -1640,7 +1634,6 @@ async function blockConversation(conversation) {
             return;
         }
         
-        console.log('[Inbox] ✓ Client blocked successfully');
         showToast('Client blocked', 'success');
         
         // Remove from conversations list and close thread view

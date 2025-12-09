@@ -749,11 +749,9 @@ TABLE OF CONTENTS:
 
     function showConfirmDeclineModal() {
       const modal = document.getElementById('decline-modal');
-      console.log('[Pro Clients] Showing decline modal');
       modal.classList.remove('hidden');
       modal.classList.add('active');
       modal.onclick = (e) => {
-        console.log('[Pro Clients] Modal clicked, target:', e.target);
         if (e.target === modal) closeDeclineModal();
       };
     }
@@ -766,7 +764,6 @@ TABLE OF CONTENTS:
     }
 
     async function confirmDecline(event) {
-      console.log('[Pro Clients] confirmDecline called, pendingDeclineMatch:', pendingDeclineMatch);
       if (!pendingDeclineMatch) {
         console.error('[Pro Clients] No pending decline match');
         return;
@@ -789,11 +786,9 @@ TABLE OF CONTENTS:
 
     function showConfirmBlockModal() {
       const modal = document.getElementById('block-modal');
-      console.log('[Pro Clients] Showing block modal');
       modal.classList.remove('hidden');
       modal.classList.add('active');
       modal.onclick = (e) => {
-        console.log('[Pro Clients] Block modal clicked, target:', e.target);
         if (e.target === modal) closeBlockModal();
       };
     }
@@ -806,7 +801,6 @@ TABLE OF CONTENTS:
     }
 
     async function confirmBlock(event) {
-      console.log('[Pro Clients] confirmBlock called, pendingBlockClientSerial:', pendingBlockClientSerial);
       if (!pendingBlockClientSerial) {
         console.error('[Pro Clients] No pending block client serial');
         return;
@@ -831,7 +825,6 @@ TABLE OF CONTENTS:
       if (!pendingDeclineMatch) return;
       
       const match = pendingDeclineMatch;
-      console.log('[Pro Clients] Declining match:', match.id);
       const { error } = await window.supabaseClient
         .from('project_practitioner_matches')
         .update({
@@ -843,7 +836,6 @@ TABLE OF CONTENTS:
         .eq('id', match.id);
 
       if (!error) {
-        console.log('[Pro Clients] Match declined successfully');
         const currentUser = window.authManager.getCurrentUser();
         if (window.notifyClientOfMatchResponse) {
           await notifyClientOfMatchResponse({
@@ -860,7 +852,6 @@ TABLE OF CONTENTS:
         showToast('Declined', `You declined ${clientName}`, 'info');
         // Remove the card from the DOM
         const card = document.querySelector(`[data-match-id="${match.id}"]`)?.closest('.client-card');
-        console.log('[Pro Clients] Removing card:', card);
         if (card) card.remove();
         
         pendingDeclineMatch = null;
@@ -876,7 +867,6 @@ TABLE OF CONTENTS:
       try {
         if (!pendingBlockClientSerial) return;
 
-        console.log('[Pro Clients] Blocking client:', pendingBlockClientSerial);
         const clientSerial = pendingBlockClientSerial;
         const currentUser = window.authManager.getCurrentUser();
         const practitionerSerial = currentUser?.serial_number;
@@ -895,8 +885,6 @@ TABLE OF CONTENTS:
           return;
         }
 
-        console.log('[Pro Clients] Found', allMatches?.length || 0, 'matches to decline');
-
         if (allMatches && allMatches.length > 0) {
           const { error: updateError } = await window.supabaseClient
             .from('project_practitioner_matches')
@@ -909,7 +897,6 @@ TABLE OF CONTENTS:
             .in('id', allMatches.map(m => m.id));
 
           if (!updateError) {
-            console.log('[Pro Clients] All matches declined successfully');
             // Add to blocklist
             const practitionerId = getPractitionerId();
             if (!practitionerId) {
@@ -931,7 +918,6 @@ TABLE OF CONTENTS:
               });
 
             if (!blockError) {
-              console.log('[Pro Clients] Client blocked successfully');
               showToast('Blocked', 'Client blocked successfully', 'info');
               // Remove all cards for this client
               document.querySelectorAll(`.client-card`).forEach(card => {
@@ -1463,8 +1449,6 @@ TABLE OF CONTENTS:
         
         // Setup notifications realtime listener with callback
         await PractitionerNotifications.setupRealtimeListener(async (eventType, notification) => {
-          console.log('[Pro Clients] Notification event:', eventType, notification);
-          
           // Refresh notifications display and badge
           PractitionerNotifications.renderNotifications('.rv-notifications-list');
           PractitionerNotifications.updateBadge();

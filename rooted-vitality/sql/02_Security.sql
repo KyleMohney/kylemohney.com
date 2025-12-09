@@ -180,6 +180,16 @@ CREATE POLICY "Service role inserts reviews" ON reviews
 FOR INSERT
 WITH CHECK (auth.role() = 'service_role');
 
+-- INSERT: Anonymous users can submit off-platform reviews (auto-approved)
+CREATE POLICY "Anonymous users submit off-platform reviews" ON reviews
+FOR INSERT
+WITH CHECK (
+  source = 'external'
+  AND is_approved = true
+  AND is_visible = true
+  AND client_id IS NULL
+);
+
 -- ============================================================================
 -- SECTION 6: NOTIFICATIONS TABLE
 -- ============================================================================

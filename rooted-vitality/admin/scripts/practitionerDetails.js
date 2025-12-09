@@ -36,8 +36,6 @@ function toggleSection(event) {
  */
 async function displayPractitionerDetail(practitionerId) {
   try {
-    console.log('[Practitioner Detail] Loading practitioner:', practitionerId);
-    
     // Hide search results, show detail view
     document.getElementById('page-search-users').style.display = 'none';
     document.getElementById('page-practitioner-detail').style.display = 'block';
@@ -52,7 +50,6 @@ async function displayPractitionerDetail(practitionerId) {
     
     if (data) {
       renderPractitionerDetail(data);
-      console.log('[Practitioner Detail] Rendered successfully');
     }
   } catch (error) {
     console.error('[Practitioner Detail] Error:', error);

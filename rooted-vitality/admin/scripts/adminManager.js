@@ -28,15 +28,12 @@ let currentSelectedUser = null;
  */
 async function initializeDashboard() {
   try {
-    console.log('[Admin Manager] Initializing dashboard...');
-    
     const supabase = getSupabaseClient();
     if (!supabase) {
       throw new Error('Supabase client not initialized');
     }
 
     // Direct query method - Edge Function not deployed
-    console.log('[Admin Manager] Using direct query method');
     
     const [practCount, clientCount, projectCount, hiredCount] = await Promise.all([
       supabase
@@ -64,8 +61,6 @@ async function initializeDashboard() {
       hired: hiredCount.count || 0,
     };
 
-    console.log('[Admin Manager] Stats from direct query:', stats);
-
     const totalUsers = (stats.clients || 0) + (stats.practitioners || 0);
 
     // Update dashboard cards
@@ -74,8 +69,6 @@ async function initializeDashboard() {
     document.getElementById('stat-clients').textContent = (stats.clients || 0).toLocaleString();
     document.getElementById('stat-requests').textContent = (stats.projects || 0).toLocaleString();
     document.getElementById('stat-hired').textContent = (stats.hired || 0).toLocaleString();
-
-    console.log('[Admin Manager] Dashboard initialized');
   } catch (error) {
     console.error('[Admin Manager] Dashboard init error:', error);
   }
@@ -119,8 +112,6 @@ function displayUserDetails(user) {
       clientSection.style.display = 'block';
       // TODO: Populate client data
     }
-
-    console.log('[Admin Manager] User details displayed:', user.id);
   } catch (error) {
     console.error('[Admin Manager] Error displaying user details:', error);
   }
@@ -136,8 +127,6 @@ async function banUser() {
   if (!confirmed) return;
 
   try {
-    console.log('[Admin Manager] Banning user:', currentSelectedUser.id);
-    
     const supabase = getSupabaseClient();
     const table = currentSelectedUser.user_type === 'practitioner' ? 'practitioners' : 'clients';
 
@@ -151,7 +140,6 @@ async function banUser() {
     currentSelectedUser.status = 'banned';
     document.getElementById('detail-status').textContent = '🚫 Banned';
     showNotification('User banned successfully', 'success');
-    console.log('[Admin Manager] ✓ User banned');
   } catch (error) {
     console.error('[Admin Manager] Ban user error:', error);
     showNotification('Failed to ban user', 'error');
@@ -168,8 +156,6 @@ async function suspendUser() {
   if (!confirmed) return;
 
   try {
-    console.log('[Admin Manager] Suspending user:', currentSelectedUser.id);
-    
     const supabase = getSupabaseClient();
     const table = currentSelectedUser.user_type === 'practitioner' ? 'practitioners' : 'clients';
 
@@ -183,7 +169,6 @@ async function suspendUser() {
     currentSelectedUser.status = 'suspended';
     document.getElementById('detail-status').textContent = '⏸ Suspended';
     showNotification('User suspended successfully', 'success');
-    console.log('[Admin Manager] ✓ User suspended');
   } catch (error) {
     console.error('[Admin Manager] Suspend user error:', error);
     showNotification('Failed to suspend user', 'error');
@@ -199,8 +184,6 @@ async function suspendUser() {
  */
 async function viewBillingHistory() {
   if (!currentSelectedUser || currentSelectedUser.user_type !== 'practitioner') return;
-
-  console.log('[Admin Manager] Loading billing history:', currentSelectedUser.id);
   
   // TODO: Implement billing history modal/page
   showNotification('Billing history view coming soon', 'info');
@@ -211,8 +194,6 @@ async function viewBillingHistory() {
  */
 async function viewMatchHistory() {
   if (!currentSelectedUser || currentSelectedUser.user_type !== 'practitioner') return;
-
-  console.log('[Admin Manager] Loading match history:', currentSelectedUser.id);
   
   // TODO: Implement match history modal/page
   showNotification('Match history view coming soon', 'info');
@@ -223,8 +204,6 @@ async function viewMatchHistory() {
  */
 async function viewProjects() {
   if (!currentSelectedUser || currentSelectedUser.user_type !== 'client') return;
-
-  console.log('[Admin Manager] Loading projects:', currentSelectedUser.id);
   
   // TODO: Implement projects modal/page
   showNotification('Projects view coming soon', 'info');
@@ -270,8 +249,6 @@ function formatDate(dateStr) {
  * Show notification message
  */
 function showNotification(message, type = 'info') {
-  console.log(`[Notification] ${type.toUpperCase()}: ${message}`);
-  
   // TODO: Implement toast notification UI
   // For now, just use console and alert as fallback
   if (type === 'error') {

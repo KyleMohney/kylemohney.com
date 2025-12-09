@@ -187,7 +187,6 @@ function displayMatches(page) {
 function renderMatches() {
   // Prevent duplicate renders
   if (renderInProgress) {
-    console.log('[Inbox-UI] Render already in progress, skipping');
     return;
   }
   
@@ -871,7 +870,6 @@ function attachReviewButtonListeners() {
     btn.addEventListener('click', async (e) => {
       e.preventDefault();
       e.stopPropagation();
-      console.log('[Inbox-UI] Review button clicked');
 
       const matchId = btn.dataset.matchId;
       const practitionerId = btn.dataset.practitionerId;
@@ -894,11 +892,8 @@ function attachReviewButtonListeners() {
         }
       }
 
-      console.log('[Inbox-UI] Review data:', { matchId, practitionerId, practitionerName, projectId, clientId });
-
       if (window.reviewsManager && typeof window.reviewsManager.openReviewModal === 'function') {
         try {
-          console.log('[Inbox-UI] Checking for existing review...');
           const hasExistingReview = await window.reviewsManager.checkForExistingReview(
             projectId,
             practitionerId,
@@ -914,7 +909,6 @@ function attachReviewButtonListeners() {
           console.warn('[Inbox-UI] Error checking for existing review:', e);
         }
 
-        console.log('[Inbox-UI] Opening review modal...');
         window.reviewsManager.openReviewModal(
           matchId,
           practitionerId,
@@ -926,7 +920,6 @@ function attachReviewButtonListeners() {
         );
       } else {
         console.error('[Inbox-UI] reviewsManager not found or openReviewModal not available');
-        console.log('[Inbox-UI] window.reviewsManager:', window.reviewsManager);
       }
     });
   });
@@ -999,7 +992,6 @@ function renderPagination(totalPages) {
  */
 async function initializeInbox() {
   if (inboxInitialized) {
-    console.log('[Inbox] Already initialized, skipping');
     return;
   }
   inboxInitialized = true;

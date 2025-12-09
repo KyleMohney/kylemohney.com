@@ -90,8 +90,6 @@ const CRM_PROVIDERS = {
  */
 async function initializeCRMManager() {
   try {
-    console.log('[CRM Manager] Initializing...');
-    
     // Wait for authManager and Supabase client to be available
     let attempts = 0;
     while ((!window.authManager || !window.supabaseClient) && attempts < 50) {
@@ -118,7 +116,6 @@ async function initializeCRMManager() {
     
     if (successProvider) {
       const providerName = CRM_PROVIDERS[successProvider]?.name || successProvider;
-      console.log(`[CRM Manager] OAuth successful for ${successProvider}`);
       showNotification(`✓ ${providerName} connected successfully!`, 'success');
       // Clean up URL
       window.history.replaceState({}, document.title, window.location.pathname);
@@ -140,8 +137,6 @@ async function initializeCRMManager() {
     
     // Setup event listeners
     setupCRMEventListeners();
-    
-    console.log('[CRM Manager] Initialization complete');
   } catch (error) {
     console.error('[CRM Manager] Initialization failed:', error);
   }
@@ -173,7 +168,6 @@ async function loadConnectedCRMs(practitionerSerial) {
       return;
     }
 
-    console.log('[CRM Manager] Loaded connections:', data?.length || 0);
     renderConnectedCRMs(data || []);
     updateProviderCardStatus(data || []);
   } catch (error) {
@@ -290,8 +284,6 @@ function renderCRMProviders() {
  */
 async function syncCRMNow(provider) {
   try {
-    console.log(`[CRM Manager] Syncing ${provider}...`);
-    
     const practitioner = window.authManager?.getCurrentUser?.();
     if (!practitioner) return;
 
@@ -313,7 +305,6 @@ async function syncCRMNow(provider) {
     );
 
     if (response.ok) {
-      console.log(`[CRM Manager] ✓ Sync initiated for ${provider}`);
       showNotification('Sync initiated successfully', 'success');
       
       // Reload connections after a delay
@@ -334,7 +325,6 @@ async function syncCRMNow(provider) {
  */
 async function syncAllCRMs() {
   try {
-    console.log('[CRM Manager] Syncing all CRMs...');
     const practitioner = window.authManager?.getCurrentUser?.();
     if (!practitioner) return;
 
@@ -354,8 +344,6 @@ async function syncAllCRMs() {
     for (const integration of integrations) {
       await syncCRMNow(integration.provider);
     }
-
-    console.log('[CRM Manager] ✓ All syncs completed');
   } catch (error) {
     console.error('[CRM Manager] All-sync error:', error);
   }
@@ -372,8 +360,6 @@ function openCRMConnectModal(provider) {
   try {
     const providerConfig = CRM_PROVIDERS[provider];
     if (!providerConfig) return;
-
-    console.log(`[CRM Manager] Opening connection modal for ${provider}`);
 
     // Create modal
     const modal = document.createElement('div');
@@ -464,8 +450,6 @@ function closeCRMModal(provider) {
  */
 async function initiateCRMAuth(provider) {
   try {
-    console.log(`[CRM Manager] Initiating auth for ${provider}`);
-    
     const practitioner = window.authManager?.getCurrentUser?.();
     if (!practitioner) {
       showNotification('Not authenticated', 'error');
@@ -497,7 +481,6 @@ async function initiateCRMAuth(provider) {
         const data = await response.json();
         if (data.auth_url) {
           // Redirect to OAuth provider
-          console.log(`[CRM Manager] Redirecting to ${provider} OAuth...`);
           window.location.href = data.auth_url;
         }
       } else {
@@ -530,7 +513,6 @@ async function initiateCRMAuth(provider) {
       );
 
       if (response.ok) {
-        console.log(`[CRM Manager] ✓ ${provider} connected successfully`);
         showNotification(`${providerConfig.name} connected successfully`, 'success');
         closeCRMModal(provider);
         
@@ -551,7 +533,6 @@ async function initiateCRMAuth(provider) {
  * Open CRM settings (field mapping, sync options)
  */
 function openCRMSettings(provider) {
-  console.log(`[CRM Manager] Opening settings for ${provider}`);
   // TODO: Implement settings modal with field mapping UI
   showNotification('CRM settings coming soon', 'info');
 }
@@ -565,8 +546,6 @@ async function disconnectCRM(provider) {
   }
 
   try {
-    console.log(`[CRM Manager] Disconnecting ${provider}...`);
-    
     const practitioner = window.authManager?.getCurrentUser?.();
     if (!practitioner) return;
 
@@ -589,7 +568,6 @@ async function disconnectCRM(provider) {
     );
 
     if (response.ok) {
-      console.log(`[CRM Manager] ✓ ${provider} disconnected`);
       showNotification(`${CRM_PROVIDERS[provider]?.name || provider} disconnected`, 'success');
       
       // Reload connections
@@ -647,8 +625,6 @@ function setupSyncSettings() {
  */
 async function saveSyncSetting(key, value) {
   try {
-    console.log(`[CRM Manager] Saving setting: ${key} = ${value}`);
-    
     const practitioner = window.authManager?.getCurrentUser?.();
     if (!practitioner) return;
 
@@ -657,7 +633,6 @@ async function saveSyncSetting(key, value) {
 
     // Save to database
     // TODO: Create practitioner_crm_settings table if needed
-    console.log(`[CRM Manager] ✓ Setting saved: ${key}`);
   } catch (error) {
     console.error('[CRM Manager] Error saving setting:', error);
   }
@@ -719,8 +694,7 @@ function showNotification(message, type = 'info') {
   if (window.showNotification) {
     window.showNotification(message, type);
   } else {
-    // Fallback: log to console and show browser alert for critical messages
-    console.log(`[${type.toUpperCase()}] ${message}`);
+    // Fallback: log to browser alert for critical messages
     if (type === 'error') {
       alert(`Error: ${message}`);
     }

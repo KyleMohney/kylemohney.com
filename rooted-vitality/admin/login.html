@@ -232,7 +232,6 @@
     // Initialize Supabase
     function initializeSupabase() {
       supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      console.log('[Admin Login] Supabase initialized');
     }
 
     // Show error message
@@ -288,7 +287,6 @@
         }
 
         if (data?.session) {
-          console.log('[Admin Login] ✓ Login successful');
           // Redirect to admin panel
           window.location.href = '/rooted-vitality/admin/index.html';
         }

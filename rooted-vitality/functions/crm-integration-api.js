@@ -89,8 +89,6 @@ export async function handleCRMOAuthInit(req, res) {
       return res.status(400).json({ error: 'Unsupported provider' });
     }
 
-    console.log(`[CRM OAuth Init] Starting ${provider} OAuth for ${practitioner_serial}`);
-
     // Generate CSRF state token
     const state = generateRandomString(32);
     await cacheManager.set(
@@ -124,7 +122,6 @@ export async function handleCRMOAuthInit(req, res) {
         return res.status(400).json({ error: 'Provider not supported' });
     }
 
-    console.log(`[CRM OAuth Init] Generated auth URL for ${provider}`);
     res.json({ auth_url: authUrl });
 
   } catch (error) {
@@ -166,7 +163,6 @@ export async function handleCRMOAuthCallback(req, res) {
     }
 
     const { provider, practitioner_serial } = stateData;
-    console.log(`[CRM OAuth Callback] Processing callback for ${provider} - ${practitioner_serial}`);
 
     let tokens;
     let result;
@@ -205,7 +201,6 @@ export async function handleCRMOAuthCallback(req, res) {
       return res.redirect(`${settingsUrl}?section=integrations&error=save_failed`);
     }
 
-    console.log(`[CRM OAuth Callback] ✓ ${provider} integrated successfully`);
     
     // Redirect back to settings with success
     res.redirect(`${settingsUrl}?section=integrations&success=${provider}`);
@@ -307,7 +302,6 @@ async function saveHighLevelIntegration(practitioner_serial, tokens) {
       return { success: false, error: error.message };
     }
 
-    console.log('[HighLevel] ✓ Integration saved successfully');
     return { success: true };
 
   } catch (error) {
@@ -384,7 +378,6 @@ async function saveServiceTitanIntegration(practitioner_serial, tokens) {
       return { success: false, error: error.message };
     }
 
-    console.log('[ServiceTitan] ✓ Integration saved successfully');
     return { success: true };
 
   } catch (error) {
@@ -457,10 +450,9 @@ async function saveHubSpotIntegration(practitioner_serial, tokens) {
     if (error) {
       return { success: false, error: error.message };
     }
+    }
 
-    console.log('[HubSpot] ✓ Integration saved successfully');
     return { success: true };
-
   } catch (error) {
     console.error('[HubSpot Save] Error:', error);
     return { success: false, error: error.message };
@@ -530,7 +522,6 @@ async function savePipedriveIntegration(practitioner_serial, tokens) {
       return { success: false, error: error.message };
     }
 
-    console.log('[Pipedrive] ✓ Integration saved successfully');
     return { success: true };
 
   } catch (error) {
@@ -606,7 +597,6 @@ async function saveSalesforceIntegration(practitioner_serial, tokens) {
       return { success: false, error: error.message };
     }
 
-    console.log('[Salesforce] ✓ Integration saved successfully');
     return { success: true };
 
   } catch (error) {
@@ -681,7 +671,6 @@ async function saveZohoIntegration(practitioner_serial, tokens) {
       return { success: false, error: error.message };
     }
 
-    console.log('[Zoho] ✓ Integration saved successfully');
     return { success: true };
 
   } catch (error) {
@@ -712,8 +701,6 @@ export async function handleSaveCredentials(req, res) {
     if (provider !== 'mhelpdesk') {
       return res.status(400).json({ error: 'This provider requires OAuth' });
     }
-
-    console.log(`[CRM Save Credentials] Saving credentials for ${provider}`);
 
     // Test connection first
     const testResponse = await fetch('https://api.mhelpdesk.com/api/users', {
@@ -747,11 +734,10 @@ export async function handleSaveCredentials(req, res) {
       console.error('[mHelpDesk Save] Database error:', error);
       return res.status(500).json({ error: 'Failed to save credentials' });
     }
+      return res.status(500).json({ error: 'Failed to save credentials' });
+    }
 
-    console.log('[mHelpDesk] ✓ Credentials saved successfully');
     res.json({ success: true, message: 'mHelpDesk connected successfully' });
-
-  } catch (error) {
     console.error('[Save Credentials] Error:', error);
     res.status(500).json({ error: 'Failed to save credentials' });
   }
@@ -775,8 +761,6 @@ export async function handleCRMDisconnect(req, res) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    console.log(`[CRM Disconnect] Disconnecting ${provider} for ${practitioner_serial}`);
-
     const supabase = createAdminClient();
 
     // Soft delete (set is_active to false)
@@ -791,7 +775,6 @@ export async function handleCRMDisconnect(req, res) {
       return res.status(500).json({ error: 'Failed to disconnect' });
     }
 
-    console.log(`[CRM Disconnect] ✓ ${provider} disconnected`);
     res.json({ success: true, message: `${provider} disconnected` });
 
   } catch (error) {

@@ -100,7 +100,6 @@ const ProfileState = {
                 await saveSectionPhotosVideo();
             }
             
-            console.log('[ProfileState] Save complete');
         } catch (error) {
             console.error('[ProfileState] Save failed:', error);
             throw error;

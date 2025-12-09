@@ -59,33 +59,23 @@ async function initializeOnboarding() {
  * Falls back to loading from database if not available
  */
 async function ensureTaxonomyLoaded() {
-    console.log('[onboardingCore] ensureTaxonomyLoaded called');
-    
     // If global taxonomyData exists and has data, use it
     if (typeof taxonomyData !== 'undefined' && Object.keys(taxonomyData).length > 0) {
-        console.log('[onboardingCore] Using global taxonomyData');
         onboardingTaxonomyCache = taxonomyData;
         return;
     }
 
     // If already loading, wait for it
     if (taxonomyLoadPromise) {
-        console.log('[onboardingCore] Waiting for existing taxonomy load promise');
-        return taxonomyLoadPromise;
     }
 
     // If already cached locally, use it
     if (onboardingTaxonomyCache && Object.keys(onboardingTaxonomyCache).length > 0) {
-        console.log('[onboardingCore] Using cached taxonomy');
-        return;
     }
 
     // Load from database and cache
-    console.log('[onboardingCore] Loading taxonomy from database...');
     taxonomyLoadPromise = loadTaxonomyForOnboarding();
     await taxonomyLoadPromise;
-    console.log('[onboardingCore] Taxonomy loaded and cached');
-    taxonomyLoadPromise = null;
 }
 
 /**
@@ -142,44 +132,31 @@ async function loadTaxonomyForOnboarding() {
  * isReturningUser: if true, user chose "returning" but not yet logged in - show step 0, 0a then skip 3, 4
  */
 async function initializeGuidedOnboarding(skipAuth = false, isReturningUser = false) {
-    console.log('[onboardingCore] initializeGuidedOnboarding called with skipAuth=', skipAuth, 'isReturningUser=', isReturningUser);
-    
     // CRITICAL: Ensure taxonomy is loaded before creating modal
-    console.log('[onboardingCore] Ensuring taxonomy is loaded...');
     await ensureTaxonomyLoaded();
-    console.log('[onboardingCore] Taxonomy loaded successfully');
     
-    console.log('[onboardingCore] Creating modal element...');
     const modal = document.createElement('div');
     modal.id = 'guided-onboarding-modal';
 
     // Build HTML with all steps
-    console.log('[onboardingCore] Building modal HTML...');
     modal.innerHTML = getOnboardingModalHTML(skipAuth);
 
     // Add to DOM
-    console.log('[onboardingCore] Adding modal to DOM...');
     const existing = document.getElementById('guided-onboarding-modal');
     if (existing) existing.remove();
     document.body.appendChild(modal);
-    console.log('[onboardingCore] Modal added to DOM');
 
     // IMMEDIATELY populate all category dropdowns from loaded taxonomy
-    console.log('[onboardingCore] Populating category dropdowns...');
     populateCategoryDropdowns();
 
     // Inject styles from onboardingUI.js
-    console.log('[onboardingCore] Injecting styles...');
     injectOnboardingStyles();
 
     // Setup all event listeners from onboardingUI.js
-    console.log('[onboardingCore] Setting up event listeners...');
     setupOnboardingEventListeners(isReturningUser);
-    console.log('[onboardingCore] Modal fully initialized');
 
     // If user is already signed in (skipAuth=true), skip Step 0 and go directly to Step 1
     if (skipAuth) {
-        console.log('[onboardingCore] User already signed in, skipping Step 0 and going directly to Step 1');
         if (window.onboardingData) {
             window.onboardingData.path = 'guided';
         }

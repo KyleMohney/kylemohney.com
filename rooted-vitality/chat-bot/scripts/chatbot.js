@@ -49,8 +49,6 @@
                 ...practitionerData.knowledgeBase
             ];
 
-            console.log(`[Chatbot] Successfully loaded ${knowledgeBase.length} knowledge base entries from ${dataPath}`);
-            console.log('[Chatbot] Articles:', articlesData.knowledgeBase.length, 'General:', generalData.knowledgeBase.length, 'Client:', clientData.knowledgeBase.length, 'Practitioner:', practitionerData.knowledgeBase.length);
         } catch (error) {
             console.error('[Chatbot] Failed to load knowledge base:', error);
             console.error('[Chatbot] Using fallback knowledge base');
@@ -145,11 +143,9 @@
 
         // Return the best match if it has good score
         if (candidates.length > 0 && candidates[0].score >= 3) {
-            console.log('[Chatbot] Best match score:', candidates[0].score, 'Question:', candidates[0].entry.keywords[0], 'User asked:', userQuestion);
             return candidates[0].entry;
         }
         
-        console.log('[Chatbot] No good match found for:', userQuestion, '- Top candidate score was:', candidates.length > 0 ? candidates[0].score : 'none');
         return null;
     }
 
@@ -279,8 +275,6 @@
         
         const messagesContainer = document.querySelector('.chatbot-messages');
         
-        console.log('[Chatbot] User asked:', userMessage);
-        
         // Add user message
         const userMessageDiv = document.createElement('div');
         userMessageDiv.className = 'chatbot-message user';
@@ -291,7 +285,6 @@
         
         // Get bot response
         const response = getBotResponse(userMessage);
-        console.log('[Chatbot] Response:', response);
         
         // Add bot message
         const botMessageDiv = document.createElement('div');

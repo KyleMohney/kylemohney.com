@@ -48,8 +48,6 @@ async function handleLoginSubmit(e, saveLocalData) {
         });
 
         if (authError) throw authError;
-
-        console.log('[Onboarding] Login successful, advancing to Step 1 (Guided Path)');
         
         // Set flag to prevent redirect on auth state change
         window.skipAuthRedirect = true;
@@ -265,16 +263,12 @@ async function saveToDatabaseAfterVerification(onboardingData) {
  */
 async function loadMatchesForOnboarding(onboardingData) {
     try {
-        console.log('[Onboarding Matches] Starting match load...');
-        
         const container = document.getElementById('matches-container');
         if (!container) {
             console.error('[Onboarding Matches] Container not found in DOM');
             return;
         }
         
-        console.log('[Onboarding Matches] Container found');
-
         const currentUser = window.authManager?.getCurrentUser();
         if (!currentUser) {
             console.error('[Onboarding Matches] Not authenticated');
@@ -282,8 +276,6 @@ async function loadMatchesForOnboarding(onboardingData) {
             return;
         }
         
-        console.log('[Onboarding Matches] Current user:', currentUser.id);
-
         // Get client data
         const { data: clientData, error: clientError } = await window.supabaseClient
             .from('clients')
@@ -297,11 +289,8 @@ async function loadMatchesForOnboarding(onboardingData) {
             return;
         }
         
-        console.log('[Onboarding Matches] Client found:', clientData.serial_number);
-
         // Call matching algorithm via RPC
         let matchData;
-        console.log('[Onboarding Matches] Calling RPC with projectId:', onboardingData.projectId);
         
         const { data: rpcData, error: matchError } = await window.supabaseClient
             .rpc('match_practitioners', { p_project_id: onboardingData.projectId });
@@ -310,7 +299,6 @@ async function loadMatchesForOnboarding(onboardingData) {
             console.error('[Onboarding Matches] RPC match_practitioners error:', matchError);
             
             // Fallback to JavaScript-based matching
-            console.log('[Onboarding Matches] Attempting JavaScript fallback matching...');
             matchData = await performJavaScriptMatching(onboardingData);
             
             if (!matchData || matchData.length === 0) {
@@ -319,7 +307,6 @@ async function loadMatchesForOnboarding(onboardingData) {
                 return;
             }
         } else {
-            console.log('[Onboarding Matches] RPC succeeded, got', rpcData?.length || 0, 'matches');
             matchData = rpcData;
         }
 
@@ -328,8 +315,6 @@ async function loadMatchesForOnboarding(onboardingData) {
             .sort((a, b) => (b.match_score || 0) - (a.match_score || 0))
             .slice(0, 3);
 
-        console.log('[Onboarding Matches] Top 3 matches:', topMatches.length);
-        
         if (topMatches.length === 0) {
             console.error('[Onboarding Matches] No matches after filtering to top 3');
             container.innerHTML = '<p class="loading">No matching practitioners found. You can browse all practitioners in the dashboard.</p>';
@@ -337,7 +322,6 @@ async function loadMatchesForOnboarding(onboardingData) {
         }
 
         // [Fetch and render match cards - see original for full implementation]
-        console.log('[Onboarding Matches] Would render', topMatches.length, 'match cards here');
 
     } catch (error) {
         console.error('[Onboarding Matches] Error loading matches:', error);
@@ -357,8 +341,6 @@ async function loadMatchesForOnboarding(onboardingData) {
  */
 async function performJavaScriptMatching(onboardingData) {
     try {
-        console.log('[Fallback Matching] Starting with projectId:', onboardingData.projectId);
-        
         const { data: projectData, error: projectError } = await window.supabaseClient
             .from('projects')
             .select('*')
@@ -370,8 +352,6 @@ async function performJavaScriptMatching(onboardingData) {
             return [];
         }
         
-        console.log('[Fallback Matching] Project data:', projectData);
-
         // Get active practitioners
         const { data: practitioners, error: practError } = await window.supabaseClient
             .from('practitioners')
@@ -385,8 +365,6 @@ async function performJavaScriptMatching(onboardingData) {
             return [];
         }
         
-        console.log('[Fallback Matching] Found', practitioners.length, 'active practitioners');
-
         // Get active memberships
         const { data: memberships } = await window.supabaseClient
             .from('memberships')
@@ -394,20 +372,15 @@ async function performJavaScriptMatching(onboardingData) {
             .eq('status', 'active');
 
         const activePractitionerIds = new Set(memberships?.map(m => m.practitioner_id) || []);
-        console.log('[Fallback Matching] Active membership count:', activePractitionerIds.size);
 
         // Filter and score matches
         const matches = practitioners
             .filter(p => activePractitionerIds.has(p.id))
             .filter(p => {
                 const result = matchesPractitionerCriteria(p, projectData);
-                if (!result) {
-                    console.log('[Fallback Matching] Practitioner', p.serial_number, 'filtered out');
-                }
                 return result;
             })
             .map(p => {
-                console.log('[Fallback Matching] Match found:', p.serial_number);
                 return {
                     id: p.id,
                     serial_number: p.serial_number,
@@ -417,7 +390,6 @@ async function performJavaScriptMatching(onboardingData) {
                 };
             });
         
-        console.log('[Fallback Matching] Total matches:', matches.length);
         return matches;
 
     } catch (error) {
@@ -430,7 +402,6 @@ function matchesPractitionerCriteria(practitioner, project) {
     // Category match
     const categoryIds = practitioner.service_category_ids || [];
     if (!categoryIds.includes(project.category_id)) {
-        console.log('[Matching Criteria] Category mismatch. Practitioner categories:', categoryIds, 'Project category:', project.category_id);
         return false;
     }
 
@@ -443,7 +414,6 @@ function matchesPractitionerCriteria(practitioner, project) {
         const practSubs = practitioner.service_subcategory_names || [];
         const hasMatch = projectSubs.some(s => practSubs.includes(s));
         if (!hasMatch && projectSubs.length > 0) {
-            console.log('[Matching Criteria] Subcategory mismatch. Practitioner subs:', practSubs, 'Project subs:', projectSubs);
             return false;
         }
     }
@@ -451,15 +421,12 @@ function matchesPractitionerCriteria(practitioner, project) {
     // Travel preference match
     const travelPrefs = project.travel_preference || 'flexible';
     if (travelPrefs === 'in-person' && !practitioner.in_person_enabled) {
-        console.log('[Matching Criteria] In-person travel mismatch');
         return false;
     }
     if (travelPrefs === 'housecalls' && !practitioner.housecalls_enabled) {
-        console.log('[Matching Criteria] Housecalls travel mismatch');
         return false;
     }
     if (travelPrefs === 'virtual' && !practitioner.virtual_enabled) {
-        console.log('[Matching Criteria] Virtual travel mismatch');
         return false;
     }
 
@@ -468,7 +435,6 @@ function matchesPractitionerCriteria(practitioner, project) {
         if (project.zipcode !== practitioner.in_person_base_zipcode) {
             const inPersonZips = practitioner.in_person_zipcodes || [];
             if (!inPersonZips.includes(project.zipcode)) {
-                console.log('[Matching Criteria] In-person zipcode mismatch. Project zip:', project.zipcode, 'Practitioner zips:', inPersonZips);
                 return false;
             }
         }
@@ -476,19 +442,16 @@ function matchesPractitionerCriteria(practitioner, project) {
         if (project.zipcode !== practitioner.housecalls_base_zipcode) {
             const housecallZips = practitioner.housecalls_zipcodes || [];
             if (!housecallZips.includes(project.zipcode)) {
-                console.log('[Matching Criteria] Housecalls zipcode mismatch. Project zip:', project.zipcode, 'Practitioner zips:', housecallZips);
                 return false;
             }
         }
     } else if (travelPrefs === 'virtual') {
         const virtualStates = practitioner.virtual_states || [];
         if (virtualStates.length > 0 && !virtualStates.includes(project.state)) {
-            console.log('[Matching Criteria] Virtual state mismatch. Project state:', project.state, 'Practitioner states:', virtualStates);
             return false;
         }
     }
 
-    console.log('[Matching Criteria] ✓ Practitioner', practitioner.serial_number, 'MATCHES');
     return true;
 }
 
@@ -549,7 +512,6 @@ function clearOnboardingLocalStorage() {
  */
 async function loadMatchesForOnboarding(onboardingData) {
   try {
-    console.log('[Onboarding Matches] Starting match load for project:', onboardingData.projectId);
     
     const container = document.getElementById('matches-container');
     if (!container) {
@@ -557,7 +519,6 @@ async function loadMatchesForOnboarding(onboardingData) {
       return;
     }
     
-    console.log('[Onboarding Matches] Container found');
 
     // Get current user for client serial
     const { data: { user: currentUser } } = await window.supabaseClient.auth.getUser();
@@ -580,8 +541,6 @@ async function loadMatchesForOnboarding(onboardingData) {
       return;
     }
     
-    console.log('[Onboarding Matches] Client found:', clientData.serial_number);
-
     // Fetch the actual project data to see what was saved
     const { data: projectData, error: projectError } = await window.supabaseClient
       .from('projects')
@@ -592,18 +551,11 @@ async function loadMatchesForOnboarding(onboardingData) {
     if (projectError) {
       console.error('[Onboarding Matches] Error fetching project data:', projectError);
     } else {
-      console.log('[Onboarding Matches] Project data:', {
-        category_id: projectData.category_id,
-        subcategory_name: projectData.subcategory_name,
-        travel_preference: projectData.travel_preference,
-        zipcode: projectData.zipcode,
-        state: projectData.state
-      });
+      // debug only
     }
 
     // Call matching algorithm RPC with project ID
     let matchData;
-    console.log('[Onboarding Matches] Calling RPC match_practitioners with projectId:', onboardingData.projectId);
     
     const { data: rpcData, error: matchError } = await window.supabaseClient
       .rpc('match_practitioners', { p_project_id: onboardingData.projectId });
@@ -615,7 +567,6 @@ async function loadMatchesForOnboarding(onboardingData) {
       });
       
       // Fallback: Try JavaScript-based matching if RPC unavailable
-      console.log('[Onboarding Matches] Attempting JavaScript fallback matching...');
       matchData = await performJavaScriptMatching(onboardingData);
       
       if (!matchData || matchData.length === 0) {
@@ -623,26 +574,20 @@ async function loadMatchesForOnboarding(onboardingData) {
         container.innerHTML = '<p class="loading" style="color: #d32f2f;">Matching System Unavailable - The practitioner matching system is currently being deployed. Please try again in a few moments.</p>';
         return;
       }
-      console.log('[Onboarding Matches] Fallback matching succeeded with', matchData.length, 'matches');
-    } else {
-      console.log('[Onboarding Matches] RPC succeeded, got', rpcData?.length || 0, 'matches');
-      matchData = rpcData;
-    }
+      }
+      } else {
+        matchData = rpcData;
 
     // Get top 3 matches sorted by match_score (descending)
     const topMatches = (matchData || [])
       .sort((a, b) => (b.match_score || 0) - (a.match_score || 0))
       .slice(0, 3);
 
-    console.log('[Onboarding Matches] Top 3 matches:', topMatches.length);
-    
     if (topMatches.length === 0) {
       console.error('[Onboarding Matches] No matches after filtering');
       container.innerHTML = '<p class="loading">No matching practitioners found. You can browse all practitioners in the dashboard.</p>';
       return;
     }
-
-    console.log('[Onboarding Matches] Fetching profile data for', topMatches.length, 'practitioners');
     
     // Fetch profile data for all matches (including logo and profile info)
     const serialNumbers = topMatches.map(m => m.serial_number);

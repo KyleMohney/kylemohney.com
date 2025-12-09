@@ -1032,8 +1032,6 @@ const RootedVitality = {
                 return;
             }
             
-            console.log('[Rooted Vitality] Successfully marked notification as read. Data returned:', data);
-            
             // If on practitioner page and PractitionerNotifications module is available, update it
             if (window.PractitionerNotifications && typeof window.PractitionerNotifications.markAsRead === 'function') {
               await window.PractitionerNotifications.markAsRead(notifId);
@@ -1216,8 +1214,6 @@ const RootedVitality = {
                         filter: `practitioner_serial=eq.${practitionerSerial}`
                     },
                     async (payload) => {
-                        console.log('[Realtime] New match INSERT detected for:', practitionerSerial);
-                        
                         // Just refresh notifications UI - the actual notification was created
                         // by window.notifyPractitionerOfNewMatch() RPC in find-practitioners.js
                         this.loadNotifications();
@@ -1230,7 +1226,6 @@ const RootedVitality = {
                 )
                 .subscribe((status) => {
                     if (status === 'SUBSCRIBED') {
-                        console.log('[Realtime] Subscribed to new matches for:', practitionerSerial);
                     }
                 });
 
@@ -1316,8 +1311,6 @@ const RootedVitality = {
                             : `practitioner_serial=eq.${serial}`
                     },
                     async (payload) => {
-                        console.log('[Realtime] Notification change detected:', payload.eventType, 'is_read:', payload.new?.is_read);
-                        
                         // For new notifications (INSERT), immediately update badge and dropdown
                         if (payload.eventType === 'INSERT' && payload.new) {
                             // Update badge count immediately
@@ -1374,8 +1367,6 @@ const RootedVitality = {
                         } 
                         // For UPDATE events (mark as read/unread), update the UI directly without reloading
                         else if (payload.eventType === 'UPDATE' && payload.new) {
-                            console.log('[Realtime] Updating notification UI for:', payload.new.id, 'is_read:', payload.new.is_read);
-                            
                             // Find the notification element in the dropdown (if visible)
                             const notifElement = document.querySelector(`.rv-notifications-item[data-notif-id="${payload.new.id}"]`);
                             if (notifElement) {
@@ -1412,7 +1403,6 @@ const RootedVitality = {
                         }
                         // For DELETE events, remove from the list
                         else if (payload.eventType === 'DELETE' && payload.old) {
-                            console.log('[Realtime] Removing deleted notification:', payload.old.id);
                             const notifElement = document.querySelector(`.rv-notifications-item[data-notif-id="${payload.old.id}"]`);
                             if (notifElement) {
                                 notifElement.remove();
@@ -1634,8 +1624,6 @@ const RootedVitality = {
                         filter: `${whereField}=eq.${whereValue}`
                     },
                     (payload) => {
-                        console.log(`[Realtime] ${notificationTable} change detected:`, payload);
-                        
                         // Reload notifications to reflect changes in real-time
                         this.loadNotifications();
                         

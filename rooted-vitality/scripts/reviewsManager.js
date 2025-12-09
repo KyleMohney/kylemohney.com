@@ -116,8 +116,6 @@ let reviewsManager = {
   // ======================================================
 
   openReviewModal(matchId, practitionerId, practitionerName, projectId, clientFirstName, clientLastName, clientId) {
-    console.log('[Reviews] openReviewModal called with:', { matchId, practitionerId, practitionerName, projectId, clientFirstName, clientLastName, clientId });
-
     this.currentReview = {
       matchId,
       practitionerId,
@@ -130,34 +128,23 @@ let reviewsManager = {
       photos: []
     };
 
-    console.log('[Reviews] currentReview set:', this.currentReview);
-
     this.resetForm();
-    console.log('[Reviews] Form reset');
-
     // Check if review already exists
     this.checkForExistingReview(projectId, practitionerId, clientId);
 
     const nameEl = document.getElementById('review-practitioner-name');
     if (nameEl) {
       nameEl.textContent = this.currentReview.practitionerName;
-      console.log('[Reviews] Set practitioner name:', this.currentReview.practitionerName);
     } else {
       console.error('[Reviews] Name element not found');
     }
 
     const modal = document.getElementById('review-modal');
-    console.log('[Reviews] Modal element found:', !!modal);
-    console.log('[Reviews] Modal before classList operation:', modal?.className);
 
     if (modal) {
-      console.log('[Reviews] Removing modal--hidden and adding active class');
       modal.classList.remove('modal--hidden');
       modal.classList.add('active');
       document.body.style.overflow = 'hidden';
-      console.log('[Reviews] Modal class after changes:', modal.className);
-      console.log('[Reviews] Modal display:', window.getComputedStyle(modal).display);
-
     } else {
       console.error('[Reviews] Modal element not found!');
     }
@@ -166,12 +153,10 @@ let reviewsManager = {
   // Check if review already exists for this match
   async checkForExistingReview(projectId, practitionerId, clientId) {
     if (!projectId || !practitionerId || !clientId) {
-      console.log('[Reviews] Missing required params for checkForExistingReview:', { projectId, practitionerId, clientId });
       return;
     }
 
     try {
-      console.log('[Reviews] Checking for existing review via RPC function');
       const { data: existingReviewData, error } = await this.supabaseClient
         .rpc('get_existing_review', {
           p_project_serial: projectId,
@@ -187,7 +172,6 @@ let reviewsManager = {
       const existingReview = existingReviewData && existingReviewData[0] ? existingReviewData[0] : null;
 
       if (existingReview) {
-        console.log('[Reviews] Found existing review:', existingReview);
 
         const form = document.getElementById('review-form');
         const submitBtn = document.getElementById('btn-submit-review');
@@ -409,23 +393,19 @@ let reviewsManager = {
   // ======================================================
 
   async submitReview(e) {
-    console.log('[Reviews] submitReview called - form submission triggered');
     e.preventDefault();
 
     if (this.currentReview.rating === 0) {
-      console.log('[Reviews] No rating selected');
       alert('Please select a rating');
       return;
     }
 
     const reviewText = document.getElementById('review-text').value.trim();
     if (!reviewText) {
-      console.log('[Reviews] No review text entered');
       alert('Please enter a review comment');
       return;
     }
 
-    console.log('[Reviews] Starting review submission...');
     try {
 
 
@@ -595,19 +575,12 @@ let reviewsManager = {
         throw error;
       }
 
-      console.log('[Reviews] âœ… Review inserted successfully');
-      console.log('[Reviews] About to show success handler');
-      console.log('[Reviews] window.showSuccessModal exists?', typeof window.showSuccessModal);
-
       // FORCE ALERT FOR NOW
       alert('Thank you! Your review has been posted.');
-      console.log('[Reviews] Alert shown, closing modal now');
       this.closeReviewModal();
-      console.log('[Reviews] Modal should be closed');
       
       // Refresh the card display to show edit review button
       if (window.inboxUI && window.inboxUI.renderMatches) {
-        console.log('[Reviews] Refreshing card display');
         window.inboxUI.renderMatches();
       }
 

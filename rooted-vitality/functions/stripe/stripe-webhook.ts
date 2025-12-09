@@ -83,7 +83,6 @@ serve(async (req: Request) => {
         break;
 
       default:
-        console.log("Unhandled event type:", event.type);
         return new Response(JSON.stringify({ received: true }), { status: 200 });
     }
 
@@ -100,7 +99,6 @@ serve(async (req: Request) => {
         console.error("RPC error calling handle_stripe_webhook:", rpcError);
         // Still return 200 so Stripe doesn't retry
       } else {
-        console.log(`Webhook processed: ${eventType} for customer ${stripeCustomerId}`);
       }
     }
 
