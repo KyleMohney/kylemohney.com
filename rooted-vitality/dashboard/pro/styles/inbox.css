@@ -1710,7 +1710,7 @@ button.disabled {
     .message-group.other .message-bubble,
     .message-group--received .message-bubble {
         color: #000000 !important;
-        background: #e8e4d8;
+        background: #e8e4d8 !important;
     }
 }
 

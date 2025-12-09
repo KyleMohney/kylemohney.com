@@ -1426,12 +1426,12 @@
 
 /* Dark Mode Text & Message Bubble Fix */
 @media (prefers-color-scheme: dark) {
-    /* Client's own messages: white text on green bubble */
+    /* Client's own messages: dark text on green bubble */
     .message--client .message__bubble {
-        color: #ffffff !important;
+        color: #2a2622 !important;
     }
     
-    /* Practitioner's messages: black text on light background */
+    /* Practitioner's messages: black text on light cream background */
     .message--practitioner .message__bubble {
         background: #e8e4d8 !important;
         color: #000000 !important;
@@ -1439,7 +1439,7 @@
     
     /* Timestamp text */
     .message__time {
-        color: #999999 !important;
+        color: #888888 !important;
     }
 }
 
