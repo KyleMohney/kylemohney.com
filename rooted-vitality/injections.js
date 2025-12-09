@@ -161,7 +161,8 @@ const RootedVitality = {
      * Usage: RootedVitality.log('Custom message');
      */
     log: function(message, type = 'info') {
-        const style = 'color: #77883e; font-weight: bold;';
+        // Color styling removed for accessibility
+        console.log(message);
     },
     
     // ======================================================

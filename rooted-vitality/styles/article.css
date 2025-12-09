@@ -80,7 +80,7 @@ TABLE OF CONTENTS
   gap: 2rem;
   font-family: var(--font-inter);
   font-size: 0.95rem;
-  color: #999;
+  color: var(--text-muted-light);
   letter-spacing: 0.5px;
   flex-wrap: wrap;
 }
@@ -109,7 +109,7 @@ TABLE OF CONTENTS
 .article__featured-image figcaption {
   font-family: var(--font-inter);
   font-size: 0.9rem;
-  color: #999;
+  color: var(--text-muted-light);
   margin-top: 1rem;
   font-style: italic;
 }
@@ -134,7 +134,7 @@ TABLE OF CONTENTS
 
 .article__body p {
   margin-bottom: 1.6rem;
-  color: #3d3a37;
+  color: var(--rooted-dark);
 }
 
 .article__body strong {
@@ -248,9 +248,9 @@ TABLE OF CONTENTS
 .article__footer-meta {
   margin-top: 2rem;
   padding-top: 2rem;
-  border-top: 1px solid #e0d9d0;
+  border-top: 1px solid var(--border-light);
   text-align: center;
-  color: #999;
+  color: var(--text-muted-light);
 }
 
 .article__conclusion {
@@ -305,7 +305,7 @@ TABLE OF CONTENTS
 
 .article__cta p {
   font-family: var(--font-lora);
-  color: #555;
+  color: var(--color-text-light);
   margin-bottom: 2rem;
   line-height: 1.8;
   font-size: 1.05rem;
@@ -335,7 +335,7 @@ TABLE OF CONTENTS
   display: inline-block;
   padding: 0.9rem 1.8rem;
   background: var(--rooted-green);
-  color: #fbf7ec;
+  color: var(--rooted-light);
   text-decoration: none;
   border-radius: 8px;
   font-family: var(--font-inter);

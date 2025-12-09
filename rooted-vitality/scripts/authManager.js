@@ -288,21 +288,32 @@ window.authManager = {
      * @private
      */
     _showLogoutModal() {
-        // Simple inline HTML with onclick in the HTML itself
+        // Create logout modal using variables and event listeners
         const html = `
             <div id="logout-modal-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 10000;">
-                <div style="background: #fbf7ec; border-radius: 12px; padding: 2rem; max-width: 400px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15); text-align: center; z-index: 10001;">
+                <div style="background: var(--rooted-light); border-radius: 12px; padding: 2rem; max-width: 400px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15); text-align: center; z-index: 10001;">
                     <div style="margin-bottom: 1.5rem;">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#77883e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto; display: block;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--rooted-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto; display: block;"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     </div>
-                    <h2 style="margin: 0 0 0.5rem 0; font-size: 1.25rem; font-weight: 600; color: #2e2b28;">Signed Out</h2>
-                    <p style="margin: 0 0 1.5rem 0; color: #666; font-size: 0.95rem;">You have been successfully signed out.</p>
-                    <button onclick="document.getElementById('logout-modal-overlay').remove(); window.location.href='/rooted-vitality/index.html';" style="background: #77883e; color: #fbf7ec; border: none; border-radius: 6px; padding: 0.75rem 1.5rem; font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; width: 100%;">Continue</button>
+                    <h2 style="margin: 0 0 0.5rem 0; font-size: 1.25rem; font-weight: 600; color: var(--rooted-dark);">Signed Out</h2>
+                    <p style="margin: 0 0 1.5rem 0; color: var(--color-text-muted); font-size: 0.95rem;">You have been successfully signed out.</p>
+                    <button id="logout-continue-btn" style="background: var(--rooted-primary); color: var(--rooted-light); border: none; border-radius: 6px; padding: 0.75rem 1.5rem; font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; width: 100%;">Continue</button>
                 </div>
             </div>
         `;
         
         document.body.insertAdjacentHTML('beforeend', html);
+        
+        // Add click handler instead of inline onclick
+        const continueBtn = document.getElementById('logout-continue-btn');
+        const overlay = document.getElementById('logout-modal-overlay');
+        
+        if (continueBtn) {
+            continueBtn.addEventListener('click', () => {
+                overlay?.remove();
+                window.location.href = '/rooted-vitality/index.html';
+            });
+        }
     },
     
     // ======================================================

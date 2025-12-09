@@ -894,3 +894,82 @@ ARCHITECTURE:
     padding: 0.7rem 1rem;
   }
 }
+
+/* ========================================== */
+/* DYNAMIC MODAL STYLING (from modalManager.js) */
+/* ========================================== */
+
+/* Modal container - replaces inline style from modalManager */
+.modal-dynamic {
+  background: var(--rooted-light);
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 400px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  z-index: 10001;
+}
+
+/* Modal title styling */
+.modal-dynamic__title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--rooted-dark);
+}
+
+/* Modal description/subtitle */
+.modal-dynamic__subtitle {
+  margin: 0 0 1.5rem 0;
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+}
+
+/* Modal content section */
+.modal-dynamic__content {
+  margin: 0 0 1.5rem 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* Modal button section */
+.modal-dynamic__button {
+  background: var(--rooted-primary);
+  color: var(--rooted-light);
+  border: none;
+  border-radius: 6px;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.modal-dynamic__button:hover {
+  background: var(--rooted-primary-dark);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Modal with status indicators */
+.modal-dynamic--success { --status-accent: var(--status-success); }
+.modal-dynamic--warning { --status-accent: var(--status-warning); }
+.modal-dynamic--error { --status-accent: var(--status-danger); }
+.modal-dynamic--info { --status-accent: #3b82f6; }
+
+.modal-dynamic--success .modal-dynamic__title {
+  color: var(--status-success);
+}
+
+.modal-dynamic--warning .modal-dynamic__title {
+  color: var(--status-warning);
+}
+
+.modal-dynamic--error .modal-dynamic__title {
+  color: var(--status-danger);
+}
+
+.modal-dynamic--info .modal-dynamic__title {
+  color: #3b82f6;
+}
+
