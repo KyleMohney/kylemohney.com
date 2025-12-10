@@ -717,26 +717,54 @@
         color: #b8b3b0 !important;
     }
 
-    .checkbox-label {
+    /* DARK MODE OVERRIDE FOR SUBCATEGORY CARDS */
+    .subcategory-card {
+        background-color: #3d3934 !important;
         background: #3d3934 !important;
+        border: 1px solid #4a4540 !important;
         border-color: #4a4540 !important;
         color: #e8e4d8 !important;
     }
 
-    .checkbox-label:hover {
+    .subcategory-card:hover {
+        background-color: #4a4540 !important;
         background: #4a4540 !important;
         border-color: #77883e !important;
     }
 
-    .checkbox-label input[type="checkbox"] {
-        accent-color: #77883e !important;
+    .subcategory-card .checkbox-text {
+        color: #e8e4d8 !important;
+    }
+
+    .subcategory-card .checkbox-text div {
+        color: #b8b3b0 !important;
+    }
+
+    .checkbox-label:hover {
+        background-color: #4a4540 !important;
+        background: #4a4540 !important;
+        border: 2px solid #77883e !important;
+        border-color: #77883e !important;
     }
 
     .checkbox-label input[type="checkbox"]:checked + .checkbox-text {
         color: #d9cc94 !important;
+        font-weight: 600 !important;
     }
 
     .checkbox-text {
         color: #e8e4d8 !important;
+    }
+
+    .subcategories-list {
+        background: #2a2622 !important;
+        padding: 0.5rem !important;
+    }
+}
+
+/* Dark mode override for subcategory checkbox background */
+@media (prefers-color-scheme: dark) {
+    .subcategory-card input[type="checkbox"] {
+        background: #2a2622 !important;
     }
 }

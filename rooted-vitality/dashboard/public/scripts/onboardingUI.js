@@ -66,6 +66,9 @@ function setupOnboardingEventListeners(isReturningUser = false) {
     // Load existing data from localStorage or start fresh
     let onboardingData = JSON.parse(localStorage.getItem('rooted-onboarding-data')) || { path: null };
     
+    // Store isReturningUser flag for navigation logic
+    onboardingData.isReturningUser = isReturningUser;
+    
     // Store to window so it's accessible to other functions like populateStep5Display
     window.currentOnboardingData = onboardingData;
     
@@ -400,6 +403,27 @@ function setupStep4Handler(onboardingData, saveLocalData) {
 
     if (disclaimerCheckbox && privacyCheckbox && termsCheckbox && step4NextBtn && termsScrollContainer) {
         let hasScrolledToBottom = false;
+
+        // Setup visual feedback for checkboxes
+        const setupCheckboxStyleListeners = () => {
+          [disclaimerCheckbox, privacyCheckbox, termsCheckbox].forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+              if (this.checked) {
+                this.style.backgroundColor = '#77883e';
+                this.style.borderColor = '#77883e';
+                this.style.backgroundImage = `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="white"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>')`;
+                this.style.backgroundRepeat = 'no-repeat';
+                this.style.backgroundPosition = 'center';
+                this.style.backgroundSize = '16px 16px';
+              } else {
+                this.style.backgroundColor = '#ffffff';
+                this.style.borderColor = '#999';
+                this.style.backgroundImage = 'none';
+              }
+            });
+          });
+        };
+        setupCheckboxStyleListeners();
 
         // Detect scroll to bottom
         termsScrollContainer.addEventListener('scroll', () => {
@@ -1477,15 +1501,7 @@ function setupCategoryPickerForStep1() {
                 }
                 
                 return `
-                    <div class="subcategory-card" style="
-                        padding: 12px 16px;
-                        border: 1px solid #e0d5c7;
-                        border-radius: 8px;
-                        margin-bottom: 12px;
-                        background: #fbf7ec;
-                        transition: all 0.2s ease;
-                        cursor: pointer;
-                    " onmouseover="this.style.borderColor='#77883e'; this.style.backgroundColor='#f5f0e6'; this.style.boxShadow='0 2px 8px rgba(119,136,62,0.1)'" onmouseout="this.style.borderColor='#e0d5c7'; this.style.backgroundColor='#fbf7ec'; this.style.boxShadow='none'">
+                    <div class="subcategory-card" onmouseover="this.style.borderColor='#77883e'; this.style.boxShadow='0 2px 8px rgba(119,136,62,0.1)'" onmouseout="this.style.borderColor=''; this.style.boxShadow='none'">
                         <label style="
                             display: flex;
                             align-items: flex-start;
@@ -1494,21 +1510,51 @@ function setupCategoryPickerForStep1() {
                             margin: 0;
                         ">
                             <input type="checkbox" value="${subName}" name="subcategory" data-index="${idx}" style="
-                                margin-top: 3px;
-                                flex-shrink: 0;
-                                cursor: pointer;
-                            ">
+                                width: 24px !important;
+                                height: 24px !important;
+                                min-width: 24px !important;
+                                padding: 0 !important;
+                                margin: 0 !important;
+                                margin-top: 3px !important;
+                                border: 2px solid #999 !important;
+                                border-radius: 4px !important;
+                                background: #ffffff !important;
+                                -webkit-appearance: none !important;
+                                -moz-appearance: none !important;
+                                appearance: none !important;
+                                cursor: pointer !important;
+                                flex-shrink: 0 !important;
+                                box-sizing: border-box !important;
+                            " data-subcategory-checkbox="true">
                             <span class="checkbox-text" style="
                                 flex: 1;
                                 display: block;
                                 font-weight: 600;
-                                color: #333;
                                 font-size: 14px;
-                            ">${subName}${description ? `<div style="font-size: 13px; color: #777; line-height: 1.4; font-style: italic; margin-top: 4px; font-weight: normal;">${description}</div>` : ''}</span>
+                            ">${subName}${description ? `<div style="font-size: 13px; line-height: 1.4; font-style: italic; margin-top: 4px; font-weight: normal;">${description}</div>` : ''}</span>
                         </label>
                     </div>
                 `;
             }).join('');
+
+        // Add event listeners to checkboxes after they're rendered
+        const checkboxes = subcategoriesList.querySelectorAll('[data-subcategory-checkbox="true"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    this.style.backgroundColor = '#77883e';
+                    this.style.borderColor = '#77883e';
+                    this.style.backgroundImage = `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="white"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>')`;
+                    this.style.backgroundRepeat = 'no-repeat';
+                    this.style.backgroundPosition = 'center';
+                    this.style.backgroundSize = '16px 16px';
+                } else {
+                    this.style.backgroundColor = '#ffffff';
+                    this.style.borderColor = '#999';
+                    this.style.backgroundImage = 'none';
+                }
+            });
+        });
     }
 
     // Generate intelligent description from subcategory name if not in database

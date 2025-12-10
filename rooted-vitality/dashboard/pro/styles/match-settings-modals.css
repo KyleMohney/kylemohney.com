@@ -641,5 +641,79 @@
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   DARK MODE STYLES
+   ═════════════════════════════════════════════════════════════════════════ */
+
+@media (prefers-color-scheme: dark) {
+  /* Preferences modal - dark mode */
+  #preferences-modal .modal-section {
+    background-color: #1f1d1b !important;
+    border-color: #4a4540 !important;
+  }
+
+  #preferences-modal .scrollable-list {
+    background-color: #1a1714 !important;
+    border-color: #4a4540 !important;
+    color: #e8e4d8 !important;
+  }
+
+  #preferences-modal .scrollable-list label {
+    color: #e8e4d8 !important;
+  }
+
+  #preferences-modal .scrollable-list input[type="checkbox"] {
+    border: 2px solid #4a4540 !important;
+    background-color: #1a1714 !important;
+    background-image: none !important;
+    accent-color: #77883e !important;
+    width: 20px !important;
+    height: 20px !important;
+    min-width: 20px !important;
+    min-height: 20px !important;
+  }
+
+  #preferences-modal .scrollable-list .checkbox-item input[type="checkbox"]:checked {
+    background-color: #77883e !important;
+    border-color: #77883e !important;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="white"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>') !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-size: 14px 14px !important;
+    background-attachment: scroll !important;
+  }
+
+  #preferences-modal .pricing-fields-wrapper {
+    background-color: transparent !important;
+  }
+
+  #preferences-modal .pricing-field-group {
+    background-color: transparent !important;
+  }
+
+  #preferences-modal .input-wrapper {
+    background-color: #1a1714 !important;
+    border-color: #4a4540 !important;
+  }
+
+  #preferences-modal .input-wrapper input {
+    background-color: #1a1714 !important;
+    color: #e8e4d8 !important;
+    border-color: #4a4540 !important;
+  }
+
+  #preferences-modal .input-wrapper input::placeholder {
+    color: #7f7a6e !important;
+  }
+
+  #preferences-modal .input-prefix {
+    color: #bfb9ad !important;
+  }
+
+  #preferences-modal .pricing-field-label {
+    color: #e8e4d8 !important;
+  }
+}
+
 
 

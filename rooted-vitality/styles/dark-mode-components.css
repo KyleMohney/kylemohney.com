@@ -19,7 +19,9 @@
             rgba(26, 23, 20, 0.90) 100%
         ) !important;
         border-bottom: 1px solid #3d3934 !important;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important, inset 0 1px 0 rgba(119, 136, 62, 0.1) !important, 0 0 50px rgba(119, 136, 62, 0.1) !important;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important,
+            inset 0 1px 0 rgba(119, 136, 62, 0.1) !important,
+            0 0 50px rgba(119, 136, 62, 0.1) !important;
     }
 
     .rv-header-scrolled {
@@ -637,6 +639,163 @@
 
     .rv-auth-footer a:hover {
         color: #e8c547 !important;
+    }
+
+    /* ========================================== */
+    /* BEM-STYLE MODALS (modal__*) - DARK MODE */
+    /* ========================================== */
+
+    /* Modal overlay backdrop */
+    .modal__overlay {
+        background-color: rgba(0, 0, 0, 0.6) !important;
+    }
+
+    /* Modal content container */
+    .modal__content {
+        background-color: #2a2622 !important;
+        color: #e8e4d8 !important;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5) !important;
+    }
+
+    .modal__content--large {
+        background-color: #2a2622 !important;
+    }
+
+    /* Modal header */
+    .modal__header {
+        background: linear-gradient(135deg, #5f7030 0%, #396449 100%) !important;
+        color: #ffffff !important;
+        border-bottom-color: #4a4540 !important;
+    }
+
+    .modal__header h2,
+    .modal__header h3,
+    .modal__title {
+        color: #ffffff !important;
+    }
+
+    /* Modal close button */
+    .modal__close {
+        color: #e8e4d8 !important;
+        background: none !important;
+        border: none !important;
+    }
+
+    .modal__close:hover {
+        color: #ffffff !important;
+    }
+
+    /* Modal body */
+    .modal__body {
+        background-color: #2a2622 !important;
+        color: #e8e4d8 !important;
+    }
+
+    .modal__body p,
+    .modal__body span,
+    .modal__body label {
+        color: #e8e4d8 !important;
+    }
+
+    .modal__body h3,
+    .modal__body h4 {
+        color: #ffffff !important;
+    }
+
+    /* Modal footer */
+    .modal__footer {
+        background-color: #2a2622 !important;
+        border-top-color: #4a4540 !important;
+    }
+
+    /* Practitioner details in modals */
+    .practitioner-details {
+        color: #e8e4d8 !important;
+    }
+
+    .modal-section {
+        border-color: #4a4540 !important;
+    }
+
+    .modal-section__title {
+        color: #ffffff !important;
+    }
+
+    /* CRITICAL FIX: Override checkbox background-attachment globally in dark mode */
+    input[type="checkbox"]:checked {
+        background-attachment: scroll !important;
+    }
+
+    /* Travel type checkboxes - dark mode background */
+    [data-travel-checkbox="true"] {
+        background: #2a2622 !important;
+    }
+
+    /* Terms checkboxes - dark mode background */
+    [data-terms-checkbox="true"] {
+        background: #2a2622 !important;
+    }
+
+    /* Terms modal content - dark mode */
+    .terms-section {
+        background: rgba(119, 136, 62, 0.1) !important;
+    }
+
+    .terms-section h3,
+    .terms-content h4,
+    .terms-content h5 {
+        color: #ffffff !important;
+    }
+
+    .terms-scroll {
+        background: #2a2622 !important;
+        border-color: #4a4540 !important;
+        color: #e8e4d8 !important;
+    }
+
+    .terms-content p,
+    .terms-content ul {
+        color: #d4cfc3 !important;
+    }
+
+    .terms-content a {
+        color: #d9cc94 !important;
+    }
+
+    .terms-content a:hover {
+        color: #e8c547 !important;
+    }
+
+    .terms-checkboxes {
+        margin-top: 1.5rem;
+    }
+
+    .terms-checkbox span {
+        color: #e8e4d8 !important;
+    }
+
+    /* Modal form inputs */
+    .modal__body input[type="text"],
+    .modal__body input[type="email"],
+    .modal__body input[type="number"],
+    .modal__body select,
+    .modal__body textarea {
+        background-color: #3d3934 !important;
+        color: #ffffff !important;
+        border-color: #4a4540 !important;
+    }
+
+    .modal__body input::placeholder,
+    .modal__body textarea::placeholder {
+        color: #8f8b87 !important;
+    }
+
+    .modal__body input:focus,
+    .modal__body select:focus,
+    .modal__body textarea:focus {
+        background-color: #3d3934 !important;
+        border-color: #77883e !important;
+        box-shadow: 0 0 0 3px rgba(119, 136, 62, 0.2) !important;
     }
 
     /* ========================================== */

@@ -271,15 +271,15 @@ TABLE OF CONTENTS
             </div>
             <div class="travel-type-checkboxes">
               <label class="checkbox-item">
-                <input type="checkbox" id="travel-in-person" value="in-person" onchange="handleTravelTypeChange()" />
+                <input type="checkbox" id="travel-in-person" value="in-person" data-travel-checkbox="true" style="width: 24px !important; height: 24px !important; border: 2px solid #999 !important; background: #ffffff !important; appearance: none !important; -webkit-appearance: none !important; -moz-appearance: none !important; cursor: pointer !important; box-sizing: border-box !important; min-width: auto !important;" onchange="handleTravelTypeChange()" />
                 <span class="checkbox-label">In-Office</span>
               </label>
               <label class="checkbox-item">
-                <input type="checkbox" id="travel-house-calls" value="house-calls" onchange="handleTravelTypeChange()" />
+                <input type="checkbox" id="travel-house-calls" value="house-calls" data-travel-checkbox="true" style="width: 24px !important; height: 24px !important; border: 2px solid #999 !important; background: #ffffff !important; appearance: none !important; -webkit-appearance: none !important; -moz-appearance: none !important; cursor: pointer !important; box-sizing: border-box !important; min-width: auto !important;" onchange="handleTravelTypeChange()" />
                 <span class="checkbox-label">House Calls</span>
               </label>
               <label class="checkbox-item">
-                <input type="checkbox" id="travel-virtual" value="virtual" onchange="handleTravelTypeChange()" />
+                <input type="checkbox" id="travel-virtual" value="virtual" data-travel-checkbox="true" style="width: 24px !important; height: 24px !important; border: 2px solid #999 !important; background: #ffffff !important; appearance: none !important; -webkit-appearance: none !important; -moz-appearance: none !important; cursor: pointer !important; box-sizing: border-box !important; min-width: auto !important;" onchange="handleTravelTypeChange()" />
                 <span class="checkbox-label">Virtual / Remote</span>
               </label>
             </div>
@@ -637,7 +637,8 @@ TABLE OF CONTENTS
   <!-- ========================================== -->
 
   <!-- 4.1 PREFERENCES MODAL -->
-  <div id="preferences-modal" class="modal-overlay">
+  <div id="preferences-modal" class="modal">
+    <div class="modal-overlay"></div>
     <div class="modal-content">
       <div class="modal-header">
         <h2 id="preferences-modal-title">Preferences</h2>
@@ -712,7 +713,8 @@ TABLE OF CONTENTS
   </div>
 
   <!-- 4.2 BROWSE ALL CATEGORIES MODAL -->
-  <div id="membership-required-modal" class="modal-overlay">
+  <div id="membership-required-modal" class="modal">
+    <div class="modal-overlay"></div>
     <div class="modal-content">
       <div class="modal-header">
         <h2>Membership Required</h2>
@@ -743,7 +745,8 @@ TABLE OF CONTENTS
   </div>
 
   <!-- 4.3 BROWSE CATEGORIES MODAL -->
-  <div id="browse-categories-modal" class="modal-overlay">
+  <div id="browse-categories-modal" class="modal">
+    <div class="modal-overlay"></div>
     <div class="modal-content modal-large">
       <div class="modal-header">
         <div>
@@ -795,7 +798,8 @@ TABLE OF CONTENTS
   </div>
 
   <!-- 4.4 CREDENTIAL GATE MODAL -->
-  <div id="credential-gate-modal" class="modal-overlay credential-gate-modal">
+  <div id="credential-gate-modal" class="modal credential-gate-modal">
+    <div class="modal-overlay"></div>
     <div class="modal-content">
       <div class="modal-header">
         <h2>Verification Required</h2>
@@ -819,7 +823,8 @@ TABLE OF CONTENTS
   </div>
 
   <!-- 4.5 CONFIRMATION MODAL -->
-  <div id="confirm-modal" class="modal-overlay">
+  <div id="confirm-modal" class="modal">
+    <div class="modal-overlay"></div>
     <div class="modal-content">
       <div class="modal-header">
         <h2>Confirm Action</h2>

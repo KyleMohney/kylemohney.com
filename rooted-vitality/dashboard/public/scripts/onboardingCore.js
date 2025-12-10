@@ -588,16 +588,16 @@ function getOnboardingModalHTML(skipAuth = false, isReturningUser = false) {
 
                             <div class="terms-checkboxes">
                                 <label class="terms-checkbox">
-                                    <input type="checkbox" id="checkbox-disclaimer" name="disclaimer">
+                                    <input type="checkbox" id="checkbox-disclaimer" name="disclaimer" data-terms-checkbox="true" style="width: 24px !important; height: 24px !important; border: 2px solid #999 !important; background: #ffffff !important; appearance: none !important; -webkit-appearance: none !important; -moz-appearance: none !important; cursor: pointer !important; box-sizing: border-box !important; min-width: auto !important; margin-right: 8px !important;">
                                     <span>I understand Rooted Vitality is a wellness marketplace, not a medical service</span>
                                 </label>
                                 <label class="terms-checkbox">
-                                    <input type="checkbox" id="checkbox-privacy" name="privacy">
-                                    <span>I have read and agree to the Privacy Policy</span>
+                                    <input type="checkbox" id="checkbox-privacy" name="privacy" data-terms-checkbox="true" style="width: 24px !important; height: 24px !important; border: 2px solid #999 !important; background: #ffffff !important; appearance: none !important; -webkit-appearance: none !important; -moz-appearance: none !important; cursor: pointer !important; box-sizing: border-box !important; min-width: auto !important; margin-right: 8px !important;">
+                                    <span>I have read and agree to the <a href="/help-center/policies/privacy-policy.html" target="_blank" rel="noopener">Privacy Policy</a></span>
                                 </label>
                                 <label class="terms-checkbox">
-                                    <input type="checkbox" id="checkbox-terms" name="terms">
-                                    <span>I have read and agree to the Terms of Use and assume full responsibility for my wellness decisions</span>
+                                    <input type="checkbox" id="checkbox-terms" name="terms" data-terms-checkbox="true" style="width: 24px !important; height: 24px !important; border: 2px solid #999 !important; background: #ffffff !important; appearance: none !important; -webkit-appearance: none !important; -moz-appearance: none !important; cursor: pointer !important; box-sizing: border-box !important; min-width: auto !important; margin-right: 8px !important;">
+                                    <span>I have read and agree to the <a href="/help-center/policies/terms-of-use.html" target="_blank" rel="noopener">Terms of Use</a> and assume full responsibility for my wellness decisions</span>
                                 </label>
                             </div>
                         </div>
@@ -783,6 +783,9 @@ function handleBackButton(onboardingData) {
         goToStep(2, modal);
     } else if (currentStep === '5') {
         if (onboardingData.userId && !onboardingData.signupCompleted) {
+            goToStep(2, modal);
+        } else if (onboardingData.isReturningUser) {
+            // Returning users skip step 4 (terms modal) - go straight to step 2
             goToStep(2, modal);
         } else {
             goToStep(4, modal);
