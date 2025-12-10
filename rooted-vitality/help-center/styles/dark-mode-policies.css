@@ -1,0 +1,201 @@
+/*
+╔════════════════════════════════════════════════════════════════════╗
+║  ROOTED VITALITY, INC.                                             ║
+║  File: help-center/styles/dark-mode-policies.css                  ║
+║  Purpose: Dark mode overrides for policy pages                     ║
+║  Holistic Wellness · Modern Connection Platform                    ║
+║  rootedvitality.com | 2025                                         ║
+╚════════════════════════════════════════════════════════════════════╝
+
+This file provides comprehensive dark mode styling for help-center
+policy pages. It overrides light mode defaults and ensures proper
+contrast, readability, and visual hierarchy in dark mode.
+
+Load AFTER all other stylesheets for proper cascade.
+*/
+
+/* ============================================================================ */
+/* DARK MODE - HELP CENTER POLICIES */
+/* ============================================================================ */
+
+@media (prefers-color-scheme: dark) {
+    /* BASE ELEMENTS */
+    html,
+    body {
+        background-color: #1a1714;
+        color: #e8e4d8;
+    }
+
+    main {
+        background-color: #1a1714;
+    }
+
+    /* CONTAINERS */
+    .container {
+        background-color: transparent;
+    }
+
+    .article-section {
+        border-bottom-color: #4a4540;
+        background-color: rgba(42, 38, 34, 0.3);
+    }
+
+    .article-section:last-of-type {
+        border-bottom: none;
+    }
+
+    /* BACK LINK */
+    .article-back-link a {
+        color: #8fa44a;
+        transition: color 0.2s ease;
+    }
+
+    .article-back-link a:hover {
+        color: #d9cc94;
+    }
+
+    /* HEADINGS */
+    h1 {
+        color: #8fa44a;
+        border-bottom: 1px solid #4a4540;
+        padding-bottom: 0.5rem;
+    }
+
+    h2 {
+        color: #8fa44a;
+        border-bottom-color: #d9cc94;
+    }
+
+    h3 {
+        color: #d9cc94;
+    }
+
+    h4,
+    h5,
+    h6 {
+        color: #8fa44a;
+    }
+
+    /* TEXT CONTENT */
+    p {
+        color: #e8e4d8;
+    }
+
+    strong,
+    b {
+        color: #d9cc94;
+    }
+
+    em,
+    i {
+        color: #e8e4d8;
+    }
+
+    /* LINKS */
+    main a,
+    .article-section a {
+        color: #8fa44a;
+        border-bottom-color: #d9cc94;
+    }
+
+    main a:hover,
+    .article-section a:hover {
+        color: #d9cc94;
+    }
+
+    /* LISTS */
+    ul,
+    ol {
+        color: #e8e4d8;
+    }
+
+    li {
+        color: #e8e4d8;
+    }
+
+    ul li::marker,
+    ol li::marker {
+        color: #8fa44a;
+    }
+
+    /* BLOCKQUOTES */
+    blockquote {
+        background-color: #2a2622;
+        border-left-color: #8fa44a;
+        color: #e8e4d8;
+    }
+
+    /* HORIZONTAL RULES */
+    hr {
+        border-top-color: #4a4540;
+    }
+
+    /* CODE BLOCKS (if used) */
+    code {
+        background-color: #2a2622;
+        color: #d9cc94;
+        border: 1px solid #4a4540;
+    }
+
+    pre {
+        background-color: #2a2622;
+        color: #e8e4d8;
+        border: 1px solid #4a4540;
+    }
+
+    /* TABLES (if used in policies) */
+    table {
+        border-color: #4a4540;
+    }
+
+    th {
+        background-color: #3d3934;
+        color: #d9cc94;
+        border-color: #4a4540;
+    }
+
+    td {
+        color: #e8e4d8;
+        border-color: #4a4540;
+    }
+
+    tr:nth-child(even) {
+        background-color: rgba(42, 38, 34, 0.5);
+    }
+}
+
+/* ============================================================================ */
+/* DARK MODE - RESPONSIVE */
+/* ============================================================================ */
+
+@media (prefers-color-scheme: dark) and (max-width: 768px) {
+    .container {
+        background-color: transparent;
+    }
+
+    h1 {
+        font-size: 1.8rem;
+        border-bottom-color: #4a4540;
+    }
+
+    h2 {
+        border-bottom-color: #d9cc94;
+    }
+}
+
+@media (prefers-color-scheme: dark) and (max-width: 480px) {
+    h1 {
+        font-size: 1.5rem;
+        border-bottom-color: #4a4540;
+    }
+
+    h2 {
+        font-size: 1.3rem;
+        border-bottom-color: #d9cc94;
+    }
+
+    h3 {
+        font-size: 1.1rem;
+        color: #d9cc94;
+    }
+}
