@@ -19,12 +19,6 @@ Load AFTER all other stylesheets for proper cascade.
 /* ============================================================================ */
 
 @media (prefers-color-scheme: dark) {
-    /* Override CSS Variables for Dark Mode */
-    :root {
-        --color-text: #ffffff !important;
-        --color-text-light: #e8e4d8 !important;
-    }
-
     /* BASE ELEMENTS */
     html,
     body {
@@ -40,6 +34,11 @@ Load AFTER all other stylesheets for proper cascade.
     /* CONTAINER */
     .container {
         background-color: transparent;
+    }
+    
+        /* OVERRIDE CSS VARIABLES FOR DARK MODE */
+    :root {
+        --color-text: #ffffff;
     }
 
     /* ========================================== */
@@ -74,8 +73,9 @@ Load AFTER all other stylesheets for proper cascade.
     }
 
     /* ========================================== */
-    /* FEATURED HEROS SECTION - NO DARK MODE */
+    /* FEATURED HEROS - EXCLUDED FROM DARK MODE */
     /* ========================================== */
+    
     /* Top heros (client/practitioner) are excluded from dark mode
        They remain in light mode as originally designed */
 
