@@ -224,7 +224,7 @@ body::before {
     content: '';
     position: fixed;
     top: 50%;
-    left: 47%;
+    left: 48%;
     transform: translate(-50%, -50%);
     width: 1600px;
     height: 1600px;
