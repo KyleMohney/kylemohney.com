@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+	<title>Voice Acting Portfolio - Kyle Mohney</title>
+	<link rel="stylesheet" href="../styles.css">
+	<style>
+		.voice-portfolio-container {
+			max-width: 1200px;
+			margin: 48px auto;
+			padding: 0 24px;
+		}
+
+		.voice-intro {
+			text-align: center;
+			margin-bottom: 48px;
+			background: rgba(22, 163, 74, 0.1);
+			border: 2px solid #16a34a;
+			border-radius: 16px;
+			padding: 32px 24px;
+			box-shadow: 0 0 24px rgba(22, 163, 74, 0.15);
+		}
+
+		.voice-intro h2 {
+			color: #16a34a;
+			font-size: 1.8em;
+			font-weight: 800;
+			margin-bottom: 16px;
+		}
+
+		.voice-intro p {
+			color: #e0e7e9;
+			font-size: 1.1em;
+			line-height: 1.6;
+			margin-bottom: 24px;
+		}
+
+		.spotify-link-section {
+			display: flex;
+			justify-content: center;
+			gap: 16px;
+			margin-top: 24px;
+			flex-wrap: wrap;
+		}
+
+		.spotify-btn {
+			display: inline-flex;
+			align-items: center;
+			gap: 12px;
+			background: #1DB954;
+			color: #fff;
+			padding: 12px 28px;
+			border-radius: 24px;
+			text-decoration: none;
+			font-weight: 700;
+			font-size: 1em;
+			border: 2px solid #1DB954;
+			transition: all 0.3s ease;
+			box-shadow: 0 4px 12px rgba(29, 185, 84, 0.3);
+		}
+
+		.spotify-btn:hover {
+			background: #1ed760;
+			border-color: #1ed760;
+			box-shadow: 0 6px 20px rgba(29, 185, 84, 0.5);
+			transform: translateY(-2px);
+		}
+
+		.voice-samples-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+			gap: 32px;
+			margin-bottom: 48px;
+		}
+
+		.voice-card {
+			background: #232a36;
+			border: 2px solid #16a34a;
+			border-radius: 16px;
+			padding: 28px;
+			display: flex;
+			flex-direction: column;
+			gap: 16px;
+			transition: all 0.3s ease;
+			box-shadow: 0 4px 16px rgba(22, 163, 74, 0.2);
+		}
+
+		.voice-card:hover {
+			border-color: #98e58e;
+			box-shadow: 0 8px 32px rgba(22, 163, 74, 0.4), 0 0 24px rgba(152, 229, 142, 0.3);
+			transform: translateY(-4px);
+		}
+
+		.voice-card-title {
+			color: #98e58e;
+			font-size: 1.3em;
+			font-weight: 800;
+			margin: 0;
+		}
+
+		.voice-card-description {
+			color: #b4bcc4;
+			font-size: 0.95em;
+			line-height: 1.5;
+		}
+
+		.audio-player {
+			background: #181c24;
+			border-radius: 12px;
+			padding: 12px;
+			margin: 8px 0;
+		}
+
+		.audio-player audio {
+			width: 100%;
+			height: 40px;
+		}
+
+		.voice-link {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			color: #16a34a;
+			text-decoration: none;
+			font-weight: 700;
+			padding: 8px 16px;
+			border-radius: 8px;
+			border: 1px solid #16a34a;
+			transition: all 0.2s ease;
+			margin-top: 12px;
+			align-self: flex-start;
+		}
+
+		.voice-link:hover {
+			background: rgba(22, 163, 74, 0.1);
+			color: #98e58e;
+			border-color: #98e58e;
+		}
+
+		.voice-link-icon {
+			font-size: 1.2em;
+		}
+
+		.voice-categories {
+			display: flex;
+			gap: 12px;
+			flex-wrap: wrap;
+			margin-top: 16px;
+		}
+
+		.category-badge {
+			background: rgba(22, 163, 74, 0.2);
+			color: #98e58e;
+			padding: 4px 12px;
+			border-radius: 12px;
+			font-size: 0.85em;
+			font-weight: 600;
+			border: 1px solid #16a34a;
+		}
+
+		.voice-section-title {
+			font-size: 1.6em;
+			font-weight: 800;
+			color: #16a34a;
+			margin: 48px 0 32px 0;
+			padding-bottom: 16px;
+			border-bottom: 3px solid #16a34a;
+			text-transform: uppercase;
+			letter-spacing: 2px;
+		}
+
+		.subsection-title {
+			font-size: 1.3em;
+			font-weight: 700;
+			color: #98e58e;
+			margin: 32px 0 16px 0;
+			display: flex;
+			align-items: center;
+			gap: 12px;
+		}
+
+		.subsection-title::before {
+			content: '';
+			display: inline-block;
+			width: 8px;
+			height: 8px;
+			background: #16a34a;
+			border-radius: 50%;
+		}
+
+		summary.subsection-title {
+			cursor: pointer;
+			list-style: none;
+			user-select: none;
+			padding: 8px 12px;
+			border-radius: 8px;
+			transition: all 0.3s ease;
+			background: rgba(22, 163, 74, 0.05);
+		}
+
+		summary.subsection-title:hover {
+			background: rgba(22, 163, 74, 0.1);
+		}
+
+		details[open] > summary.subsection-title {
+			margin-bottom: 24px;
+		}
+
+		summary::-webkit-details-marker {
+			color: #16a34a;
+			font-size: 1.2em;
+			margin-right: 12px;
+		}
+
+		summary::marker {
+			color: #16a34a;
+			font-size: 1.2em;
+		}
+
+		.voice-card-title.placeholder {
+			color: #888b94;
+			opacity: 0.6;
+		}
+
+		.voice-card-title.active {
+			color: #98e58e;
+		}
+
+		/* Voice Portfolio Footer Color Override Only */
+		body .bottom-navigation {
+			background: linear-gradient(45deg, rgba(22, 163, 74, 0.1) 1px, transparent 1px), linear-gradient(-45deg, rgba(22, 163, 74, 0.05) 1px, transparent 1px), rgba(22, 163, 74, 0.08);
+			border-top-color: #16a34a;
+		}
+
+		body .bottom-nav-title {
+			color: #98e58e;
+		}
+
+		body .bottom-nav-link {
+			color: #b4bcc4;
+		}
+
+		body .bottom-nav-link:hover {
+			color: #98e58e;
+			background: rgba(22, 163, 74, 0.15);
+			border-color: #16a34a;
+		}
+
+		body .bottom-nav-link.active {
+			color: #98e58e;
+		}
+
+		body .article-quote {
+			color: #98e58e;
+		}
+
+		body .quote-author {
+			color: #b4bcc4;
+		}
+
+		@media (max-width: 768px) {
+			.voice-portfolio-container {
+				margin: 24px auto;
+				padding: 0 16px;
+			}
+
+			.voice-intro {
+				padding: 24px 16px;
+			}
+
+			.voice-intro h2 {
+				font-size: 1.4em;
+			}
+
+			.voice-samples-grid {
+				grid-template-columns: 1fr;
+				gap: 24px;
+			}
+		}
+	</style>
+</head>
+<body style="background: linear-gradient(135deg, #083f3f 0%, #0a2960 70%, #0d4a4a 100%); min-height: 100vh; position: relative; overflow-x: hidden;">
+
+<!-- Background effects -->
+<div style="content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none; background: radial-gradient(60vw 40vw at 10% 90%, rgba(152, 229, 142, 0.05) 0%, transparent 70%), radial-gradient(50vw 30vw at 90% 10%, rgba(152, 229, 142, 0.04) 0%, transparent 70%); opacity: 0.1;"></div>
+
+<!-- Left side green gas cloud effect -->
+<div style="position: fixed; left: 0; top: 0; width: 70vw; height: 100vh; background: radial-gradient(ellipse at 20% 30%, rgba(152, 229, 142, 0.08) 0%, transparent 50%), radial-gradient(ellipse at 30% 70%, rgba(140, 220, 130, 0.06) 0%, transparent 60%), radial-gradient(ellipse at 10% 50%, rgba(130, 210, 120, 0.04) 0%, transparent 70%); pointer-events: none; z-index: 0;"></div>
+
+<!-- Right side green gas cloud effect -->
+<div style="position: fixed; right: 0; top: 0; width: 70vw; height: 100vh; background: radial-gradient(ellipse at 80% 30%, rgba(152, 229, 142, 0.06) 0%, transparent 50%), radial-gradient(ellipse at 70% 70%, rgba(120, 200, 120, 0.04) 0%, transparent 60%), radial-gradient(ellipse at 90% 50%, rgba(100, 180, 100, 0.02) 0%, transparent 70%); pointer-events: none; z-index: 0;"></div>
+
+<!-- Animated Data Streams and Geometric Overlays -->
+<svg class="bg-streams" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:0;pointer-events:none;">
+	<defs>
+		<linearGradient id="streamGreen" x1="0" y1="0" x2="1" y2="1">
+			<stop offset="0%" stop-color="#16a34a33" />
+			<stop offset="100%" stop-color="#fff0" />
+		</linearGradient>
+		<linearGradient id="streamAccent" x1="0" y1="0" x2="1" y2="1">
+			<stop offset="0%" stop-color="#98e58e22" />
+			<stop offset="100%" stop-color="#fff0" />
+		</linearGradient>
+	</defs>
+	<path d="M 0 120 Q 320 180 640 120 T 1280 120" stroke="url(#streamGreen)" stroke-width="6" fill="none" opacity="0.18">
+		<animate attributeName="d" values="M 0 120 Q 320 180 640 120 T 1280 120; M 0 140 Q 320 160 640 140 T 1280 140; M 0 120 Q 320 180 640 120 T 1280 120" dur="8s" repeatCount="indefinite" />
+	</path>
+	<path d="M 0 320 Q 320 380 640 320 T 1280 320" stroke="url(#streamAccent)" stroke-width="5" fill="none" opacity="0.13">
+		<animate attributeName="d" values="M 0 320 Q 320 380 640 320 T 1280 320; M 0 340 Q 320 360 640 340 T 1280 340; M 0 320 Q 320 380 640 320 T 1280 320" dur="10s" repeatCount="indefinite" />
+	</path>
+	<rect x="0" y="0" width="100%" height="100%" fill="none" stroke="#16a34a22" stroke-width="1" opacity="0.08" />
+</svg>
+
+	<header class="universal-header">
+		<div class="header-left">
+			<img src="../assets/images/kyle.png" alt="Kyle Mohney" class="profile-pic">
+			<span class="header-name">
+				Kyle Mohney
+				<span class="header-name-glow"></span>
+			</span>
+		</div>
+		<nav>
+			<div class="nav-links" id="navLinks">
+				<a href="../index.html" class="nav-link">Home</a>
+				<a href="../resume.html" class="nav-link">Resume</a>
+				<a href="../about.html" class="nav-link">About</a>
+				<a href="../projects.html" class="nav-link">Projects</a>
+				<a href="../articles.html" class="nav-link">Articles</a>
+				<a href="../contact.html" class="nav-link">Contact</a>
+			</div>
+			<div class="header-icons">
+				<button class="header-icon-btn" id="settings-btn" title="Settings"><span>&#9881;</span></button>
+				<button class="header-icon-btn" id="help-btn" title="Help"><span>?</span></button>
+				<button class="header-icon-btn" id="lang-btn" title="Language">EN</button>
+			</div>
+			<div class="hamburger" id="hamburger" aria-label="Open navigation" tabindex="0">
+				<span></span>
+				<span></span>
+				<span></span>
+			</div>
+		</nav>
+	</header>
+
+	<!-- Modals for Settings and Help -->
+	<div id="settings-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(24,28,36,0.65); z-index:2000; align-items:center; justify-content:center;">
+		<div style="background:#232a36; padding:32px 40px; border-radius:18px; box-shadow:0 8px 32px rgba(0,0,0,0.25); min-width:320px; max-width:90vw; text-align:center;">
+			<h2 style="font-size:1.3em; font-weight:800; margin-bottom:18px;">Settings</h2>
+			<p style="font-size:1.08em; margin-bottom:18px;">Settings coming soon.</p>
+			<button onclick="closeModal('settings-modal')" style="background:#181c24; color:#e0e7e9; border:none; border-radius:6px; padding:8px 18px; font-weight:700; cursor:pointer;">Close</button>
+		</div>
+	</div>
+
+	<div id="help-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(24,28,36,0.65); z-index:2000; align-items:center; justify-content:center;">
+		<div style="background:#232a36; padding:32px 40px; border-radius:18px; box-shadow:0 8px 32px rgba(0,0,0,0.25); min-width:320px; max-width:90vw; text-align:center;">
+			<h2 style="font-size:1.3em; font-weight:800; margin-bottom:18px;">Help & Support</h2>
+			<p style="font-size:1.08em; margin-bottom:18px;">Help content coming soon.</p>
+			<button onclick="closeModal('help-modal')" style="background:#181c24; color:#e0e7e9; border:none; border-radius:6px; padding:8px 18px; font-weight:700; cursor:pointer;">Close</button>
+		</div>
+	</div>
+
+	<section class="page-title-wrap" aria-labelledby="voice-heading">
+		<div style="width:100%;display:flex;justify-content:center;align-items:center;margin-top:56px;margin-bottom:32px;">
+			<h1 id="voice-heading" style="text-align:center; font-size:2.2em; font-weight:800; letter-spacing:1px; display:flex; align-items:center; justify-content:center; gap:18px; background:#16a34a; color:#fff; border-radius:16px; box-shadow:0 2px 16px #16a34a; position:relative; padding:18px 0; width:100%; max-width:800px; margin:0 auto; z-index: 20;">
+				🎙️ VOICE ACTING PORTFOLIO
+			</h1>
+		</div>
+	</section>
+
+	<div class="voice-portfolio-container">
+		<!-- Introduction Section -->
+		<div class="voice-intro">
+			<h2>Welcome to My Voice Acting Portfolio</h2>
+			<p>
+				Explore my voice acting work, professional samples, and character performances. 
+				Each piece demonstrates versatility, clarity, and emotional depth in voice performance.
+			</p>
+			<div class="spotify-link-section">
+				<a href="https://open.spotify.com/artist/YOUR_SPOTIFY_ID" target="_blank" rel="noopener noreferrer" class="spotify-btn">
+					<span>🎵</span>
+					<span>Listen on Spotify</span>
+				</a>
+			</div>
+		</div>
+
+		<!-- AUDIOBOOK SECTION -->
+		<h2 class="voice-section-title">📚 Audiobook Narration</h2>
+		<p style="color: #b4bcc4; font-size: 1.05em; margin-bottom: 32px; line-height: 1.6;">
+			Professional audiobook narration featuring diverse character work and storytelling across fantasy, sci-fi, and dramatic narratives.
+		</p>
+
+		<!-- Heroes Subsection -->
+		<details open>
+			<summary class="subsection-title">🦸 Heroes & Protagonists</summary>
+			<div class="voice-samples-grid">
+				<div class="voice-card">
+					<h4 class="voice-card-title active">Angvald</h4>
+					<p class="voice-card-description">
+						Bold, determined protagonist with powerful heroic presence and emotional depth.
+					</p>
+					<div class="audio-player">
+						<audio controls>
+							<source src="./voice_assets/characters/angvald.mp3" type="audio/mpeg">
+							Your browser does not support the audio element.
+						</audio>
+					</div>
+					<div class="voice-categories">
+						<span class="category-badge">Audiobook</span>
+						<span class="category-badge">Hero</span>
+					</div>
+					<a href="./voice_assets/characters/angvald.mp3" download class="voice-link">
+						<span class="voice-link-icon">⬇️</span>
+						<span>Download</span>
+					</a>
+				</div>
+
+				<div class="voice-card">
+					<h4 class="voice-card-title active">Skar</h4>
+					<p class="voice-card-description">
+						Inspiring hero with powerful voice, conveying courage and conviction.
+					</p>
+					<div class="audio-player">
+						<audio controls>
+							<source src="./voice_assets/characters/skar.mp3" type="audio/mpeg">
+							Your browser does not support the audio element.
+						</audio>
+					</div>
+					<div class="voice-categories">
+						<span class="category-badge">Audiobook</span>
+						<span class="category-badge">Hero</span>
+					</div>
+					<a href="./voice_assets/characters/skar.mp3" download class="voice-link">
+						<span class="voice-link-icon">⬇️</span>
+						<span>Download</span>
+					</a>
+				</div>
+
+				<div class="voice-card">
+					<h4 class="voice-card-title active">Vargot</h4>
+					<p class="voice-card-description">
+						Seasoned warrior with commanding presence, strength, and authenticity.
+					</p>
+					<div class="audio-player">
+						<audio controls>
+							<source src="./voice_assets/characters/vargot.mp3" type="audio/mpeg">
+							Your browser does not support the audio element.
+						</audio>
+					</div>
+					<div class="voice-categories">
+						<span class="category-badge">Audiobook</span>
+						<span class="category-badge">Hero</span>
+					</div>
+					<a href="./voice_assets/characters/vargot.mp3" download class="voice-link">
+						<span class="voice-link-icon">⬇️</span>
+						<span>Download</span>
+					</a>
+				</div>
+
+				<div class="voice-card">
+					<h4 class="voice-card-title active">Sean Gorrik</h4>
+					<p class="voice-card-description">
+						Noble and dignified hero with refined noble accent and commanding eloquence.
+					</p>
+					<div class="audio-player">
+						<audio controls>
+							<source src="./voice_assets/characters/sean.mp3" type="audio/mpeg">
+							Your browser does not support the audio element.
+						</audio>
+					</div>
+					<div class="voice-categories">
+						<span class="category-badge">Audiobook</span>
+						<span class="category-badge">Hero</span>
+					</div>
+					<a href="./voice_assets/characters/sean.mp3" download class="voice-link">
+						<span class="voice-link-icon">⬇️</span>
+						<span>Download</span>
+					</a>
+				</div>
+
+				<div class="voice-card">
+					<h4 class="voice-card-title active">Wakefield</h4>
+					<p class="voice-card-description">
+						Noir-influenced detective with sharp wit, world-weary charm, and investigative gravitas.
+					</p>
+					<div class="audio-player">
+						<audio controls>
+							<source src="./voice_assets/characters/wakefield.mp3" type="audio/mpeg">
+							Your browser does not support the audio element.
+						</audio>
+					</div>
+					<div class="voice-categories">
+						<span class="category-badge">Audiobook</span>
+						<span class="category-badge">Hero</span>
+					</div>
+					<a href="./voice_assets/characters/wakefield.mp3" download class="voice-link">
+						<span class="voice-link-icon">⬇️</span>
+						<span>Download</span>
+					</a>
+				</div>
+
+				<div class="voice-card">
+					<h4 class="voice-card-title active">Aethelwine</h4>
+					<p class="voice-card-description">
+						Wise and articulate human wizard with scholarly gravitas and arcane authority.
+					</p>
+					<div class="audio-player">
+						<audio controls>
+							<source src="./voice_assets/characters/aethelwine.mp3" type="audio/mpeg">
+							Your browser does not support the audio element.
+						</audio>
+					</div>
+					<div class="voice-categories">
+						<span class="category-badge">Audiobook</span>
+						<span class="category-badge">Hero</span>
+					</div>
+					<a href="./voice_assets/characters/aethelwine.mp3" download class="voice-link">
+						<span class="voice-link-icon">⬇️</span>
+						<span>Download</span>
+					</a>
+				</div>
+
+				<div class="voice-card">
+					<h4 class="voice-card-title active">Beodda</h4>
+					<p class="voice-card-description">
+						Righteous and noble paladin with righteous conviction and protective strength.
+					</p>
+					<div class="audio-player">
+						<audio controls>
+							<source src="./voice_assets/characters/beodda.mp3" type="audio/mpeg">
+							Your browser does not support the audio element.
+						</audio>
+					</div>
+					<div class="voice-categories">
+						<span class="category-badge">Audiobook</span>
+						<span class="category-badge">Hero</span>
+					</div>
+					<a href="./voice_assets/characters/beodda.mp3" download class="voice-link">
+						<span class="voice-link-icon">⬇️</span>
+						<span>Download</span>
+					</a>
+				</div>
+
+				<div class="voice-card">
+					<h4 class="voice-card-title active">Mick</h4>
+					<p class="voice-card-description">
+						Quick-witted and cunning halfling rogue with charm, mischief, and clever heroism.
+					</p>
+					<div class="audio-player">
+						<audio controls>
+							<source src="./voice_assets/characters/mick.mp3" type="audio/mpeg">
+							Your browser does not support the audio element.
+						</audio>
+					</div>
+					<div class="voice-categories">
+						<span class="category-badge">Audiobook</span>
+						<span class="category-badge">Hero</span>
+					</div>
+					<a href="./voice_assets/characters/mick.mp3" download class="voice-link">
+						<span class="voice-link-icon">⬇️</span>
+						<span>Download</span>
+					</a>
+				</div>
+			</div>
+		</details>
+
+		<!-- Villains Subsection -->
+		<details open>
+			<summary class="subsection-title">😈 Villains & Antagonists</summary>
+			<div class="voice-samples-grid">
+				<div class="voice-card">
+					<h4 class="voice-card-title active">Baron Uld</h4>
+					<p class="voice-card-description">
+						Tyrannical dwarf antagonist with malevolent authority, cunning intelligence, and dwarven gravitas.
+					</p>
+					<div class="audio-player">
+						<audio controls>
+							<source src="./voice_assets/characters/uld.mp3" type="audio/mpeg">
+							Your browser does not support the audio element.
+						</audio>
+					</div>
+					<div class="voice-categories">
+						<span class="category-badge">Audiobook</span>
+						<span class="category-badge">Villain</span>
+					</div>
+					<a href="./voice_assets/characters/uld.mp3" download class="voice-link">
+						<span class="voice-link-icon">⬇️</span>
+						<span>Download</span>
+					</a>
+				</div>
+
+				<div class="voice-card">
+					<h4 class="voice-card-title active">Kenneth Lipton</h4>
+					<p class="voice-card-description">
+						Malevolent wizard with arcane menace, sophisticated evil, and dark magical authority.
+					</p>
+					<div class="audio-player">
+						<audio controls>
+							<source src="./voice_assets/characters/kenneth lipton.mp3" type="audio/mpeg">
+							Your browser does not support the audio element.
+						</audio>
+					</div>
+					<div class="voice-categories">
+						<span class="category-badge">Audiobook</span>
+						<span class="category-badge">Villain</span>
+					</div>
+					<a href="./voice_assets/characters/kenneth lipton.mp3" download class="voice-link">
+						<span class="voice-link-icon">⬇️</span>
+						<span>Download</span>
+					</a>
+				</div>
+
+				<div class="voice-card">
+					<h4 class="voice-card-title active">Hatchet</h4>
+					<p class="voice-card-description">
+						Brutal and dangerous antagonist with menacing presence and ruthless killer instinct.
+					</p>
+					<div class="audio-player">
+						<audio controls>
+							<source src="./voice_assets/characters/hatchet.mp3" type="audio/mpeg">
+							Your browser does not support the audio element.
+						</audio>
+					</div>
+					<div class="voice-categories">
+						<span class="category-badge">Audiobook</span>
+						<span class="category-badge">Villain</span>
+					</div>
+					<a href="./voice_assets/characters/hatchet.mp3" download class="voice-link">
+						<span class="voice-link-icon">⬇️</span>
+						<span>Download</span>
+					</a>
+				</div>
+
+				<div class="voice-card">
+					<h4 class="voice-card-title active">Knave</h4>
+					<p class="voice-card-description">
+						Evil assassin with sinister edge, cunning menace, and ruthless determination.
+					</p>
+					<div class="audio-player">
+						<audio controls>
+							<source src="./voice_assets/characters/knave.mp3" type="audio/mpeg">
+							Your browser does not support the audio element.
+						</audio>
+					</div>
+					<div class="voice-categories">
+						<span class="category-badge">Audiobook</span>
+						<span class="category-badge">Villain</span>
+					</div>
+					<a href="./voice_assets/characters/knave.mp3" download class="voice-link">
+						<span class="voice-link-icon">⬇️</span>
+						<span>Download</span>
+					</a>
+				</div>
+
+				<div class="voice-card">
+					<h4 class="voice-card-title active">Changeling</h4>
+					<p class="voice-card-description">
+						Shape-shifting antagonist with primal, animalistic menace and twisted druidic powers.
+					</p>
+					<div class="audio-player">
+						<audio controls>
+							<source src="./voice_assets/characters/changeling.mp3" type="audio/mpeg">
+							Your browser does not support the audio element.
+						</audio>
+					</div>
+					<div class="voice-categories">
+						<span class="category-badge">Audiobook</span>
+						<span class="category-badge">Villain</span>
+					</div>
+					<a href="./voice_assets/characters/changeling.mp3" download class="voice-link">
+						<span class="voice-link-icon">⬇️</span>
+						<span>Download</span>
+					</a>
+				</div>
+
+
+				<div class="voice-card">
+					<h4 class="voice-card-title active">Bandit Leader</h4>
+					<p class="voice-card-description">
+						Mercenary outlaw with dangerous cunning, authoritative menace, and criminal leadership presence.
+					</p>
+					<div class="audio-player">
+						<audio controls>
+							<source src="./voice_assets/characters/bandit leader.mp3" type="audio/mpeg">
+							Your browser does not support the audio element.
+						</audio>
+					</div>
+					<div class="voice-categories">
+						<span class="category-badge">Audiobook</span>
+						<span class="category-badge">Villain</span>
+					</div>
+					<a href="./voice_assets/characters/bandit leader.mp3" download class="voice-link">
+						<span class="voice-link-icon">⬇️</span>
+						<span>Download</span>
+					</a>
+				</div>
+			</div>
+		</details>
+
+		<!-- Monsters Subsection -->
+		<details open>
+			<summary class="subsection-title">🐲 Monsters & Creatures</summary>
+			<div class="voice-samples-grid">
+				<div class="voice-card">
+					<h4 class="voice-card-title active">Ogre</h4>
+					<p class="voice-card-description">
+						Menacing creature antagonist with brutal, guttural vocalizations and primal menace.
+					</p>
+					<div class="audio-player">
+						<audio controls>
+							<source src="./voice_assets/characters/ogre.mp3" type="audio/mpeg">
+							Your browser does not support the audio element.
+						</audio>
+					</div>
+					<div class="voice-categories">
+						<span class="category-badge">Audiobook</span>
+						<span class="category-badge">Creature</span>
+					</div>
+					<a href="./voice_assets/characters/ogre.mp3" download class="voice-link">
+						<span class="voice-link-icon">⬇️</span>
+						<span>Download</span>
+					</a>
+				</div>
+
+				<div class="voice-card">
+					<h4 class="voice-card-title active">Mist Monster</h4>
+					<p class="voice-card-description">
+						Ethereal yet sinister creature voice with otherworldly quality and psychological depth.
+					</p>
+					<div class="audio-player">
+						<audio controls>
+							<source src="./voice_assets/characters/mist monster.mp3" type="audio/mpeg">
+							Your browser does not support the audio element.
+						</audio>
+					</div>
+					<div class="voice-categories">
+						<span class="category-badge">Audiobook</span>
+						<span class="category-badge">Creature</span>
+					</div>
+					<a href="./voice_assets/characters/mist monster.mp3" download class="voice-link">
+						<span class="voice-link-icon">⬇️</span>
+						<span>Download</span>
+					</a>
+				</div>
+
+				<div class="voice-card">
+					<h4 class="voice-card-title active">Reuben Possessed</h4>
+					<p class="voice-card-description">
+						Corrupted and possessed version of Reuben with sinister transformation and otherworldly menace.
+					</p>
+					<div class="audio-player">
+						<audio controls>
+							<source src="./voice_assets/characters/rebuen posessed.mp3" type="audio/mpeg">
+							Your browser does not support the audio element.
+						</audio>
+					</div>
+					<div class="voice-categories">
+						<span class="category-badge">Audiobook</span>
+						<span class="category-badge">Monster</span>
+					</div>
+					<a href="./voice_assets/characters/rebuen posessed.mp3" download class="voice-link">
+						<span class="voice-link-icon">⬇️</span>
+						<span>Download</span>
+					</a>
+				</div>
+
+				<div class="voice-card">
+					<h4 class="voice-card-title active">Possessed Soldier</h4>
+					<p class="voice-card-description">
+						Militaristic entity corrupted by dark forces with haunting, possessed vocal quality.
+					</p>
+					<div class="audio-player">
+						<audio controls>
+							<source src="./voice_assets/characters/posessed soldier.mp3" type="audio/mpeg">
+							Your browser does not support the audio element.
+						</audio>
+					</div>
+					<div class="voice-categories">
+						<span class="category-badge">Audiobook</span>
+						<span class="category-badge">Monster</span>
+					</div>
+					<a href="./voice_assets/characters/posessed soldier.mp3" download class="voice-link">
+						<span class="voice-link-icon">⬇️</span>
+						<span>Download</span>
+					</a>
+				</div>
+			</div>
+		</details>
+
+		<!-- NPCs Subsection -->
+		<details open>
+			<summary class="subsection-title">🎭 NPCs & Supporting Characters</summary>
+			<div class="voice-samples-grid">
+				<div class="voice-card">
+					<h4 class="voice-card-title active">Arbiter Daniel</h4>
+					<p class="voice-card-description">
+						Heroic soldier NPC with authoritative presence and courageous determination.
+					</p>
+					<div class="audio-player">
+						<audio controls>
+							<source src="./voice_assets/characters/arbiter daniel.mp3" type="audio/mpeg">
+							Your browser does not support the audio element.
+						</audio>
+					</div>
+					<div class="voice-categories">
+						<span class="category-badge">Audiobook</span>
+						<span class="category-badge">NPC</span>
+					</div>
+					<a href="./voice_assets/characters/arbiter daniel.mp3" download class="voice-link">
+						<span class="voice-link-icon">⬇️</span>
+						<span>Download</span>
+					</a>
+				</div>
+
+				<div class="voice-card">
+					<h4 class="voice-card-title active">Burnside</h4>
+					<p class="voice-card-description">
+						Mason and builder NPC with practical expertise and grounded presence.
+					</p>
+					<div class="audio-player">
+						<audio controls>
+							<source src="./voice_assets/characters/burnside.mp3" type="audio/mpeg">
+							Your browser does not support the audio element.
+						</audio>
+					</div>
+					<div class="voice-categories">
+						<span class="category-badge">Audiobook</span>
+						<span class="category-badge">NPC</span>
+					</div>
+					<a href="./voice_assets/characters/burnside.mp3" download class="voice-link">
+						<span class="voice-link-icon">⬇️</span>
+						<span>Download</span>
+					</a>
+				</div>
+
+				<div class="voice-card">
+					<h4 class="voice-card-title active">Commoner</h4>
+					<p class="voice-card-description">
+						Scummy commoner NPC with rough edges, street-level attitude, and gritty realism.
+					</p>
+					<div class="audio-player">
+						<audio controls>
+							<source src="./voice_assets/characters/commoner.mp3" type="audio/mpeg">
+							Your browser does not support the audio element.
+						</audio>
+					</div>
+					<div class="voice-categories">
+						<span class="category-badge">Audiobook</span>
+						<span class="category-badge">NPC</span>
+					</div>
+					<a href="./voice_assets/characters/commoner.mp3" download class="voice-link">
+						<span class="voice-link-icon">⬇️</span>
+						<span>Download</span>
+					</a>
+				</div>
+
+				<div class="voice-card">
+					<h4 class="voice-card-title active">Genovalio</h4>
+					<p class="voice-card-description">
+						Highlander warrior NPC with bold presence, fierce determination, and heroic spirit.
+					</p>
+					<div class="audio-player">
+						<audio controls>
+							<source src="./voice_assets/characters/genovalio.mp3" type="audio/mpeg">
+							Your browser does not support the audio element.
+						</audio>
+					</div>
+					<div class="voice-categories">
+						<span class="category-badge">Audiobook</span>
+						<span class="category-badge">NPC</span>
+					</div>
+					<a href="./voice_assets/characters/genovalio.mp3" download class="voice-link">
+						<span class="voice-link-icon">⬇️</span>
+						<span>Download</span>
+					</a>
+				</div>
+
+				<div class="voice-card">
+					<h4 class="voice-card-title active">Jask</h4>
+					<p class="voice-card-description">
+						Leader of a good aligned local gang with charisma, strength, and moral conviction.
+					</p>
+					<div class="audio-player">
+						<audio controls>
+							<source src="./voice_assets/characters/jask.mp3" type="audio/mpeg">
+							Your browser does not support the audio element.
+						</audio>
+					</div>
+					<div class="voice-categories">
+						<span class="category-badge">Audiobook</span>
+						<span class="category-badge">NPC</span>
+					</div>
+					<a href="./voice_assets/characters/jask.mp3" download class="voice-link">
+						<span class="voice-link-icon">⬇️</span>
+						<span>Download</span>
+					</a>
+				</div>
+
+				<div class="voice-card">
+					<h4 class="voice-card-title active">Narrator</h4>
+					<p class="voice-card-description">
+						Engaging narrative voice for world-building exposition, scene transitions, and atmospheric storytelling.
+					</p>
+					<div class="audio-player">
+						<audio controls>
+							<source src="./voice_assets/characters/narrator.mp3" type="audio/mpeg">
+							Your browser does not support the audio element.
+						</audio>
+					</div>
+					<div class="voice-categories">
+						<span class="category-badge">Audiobook</span>
+						<span class="category-badge">NPC</span>
+					</div>
+					<a href="../assets/sounds/anthem.m4a" download class="voice-link">
+						<span class="voice-link-icon">⬇️</span>
+						<span>Download</span>
+					</a>
+				</div>
+
+				<div class="voice-card">
+					<h4 class="voice-card-title active">Elder Barrik</h4>
+					<p class="voice-card-description">
+						Wise and authoritative dwarven elder with gravitas, age, and ancient knowledge.
+					</p>
+					<div class="audio-player">
+						<audio controls>
+							<source src="./voice_assets/characters/elder barik.mp3" type="audio/mpeg">
+							Your browser does not support the audio element.
+						</audio>
+					</div>
+					<div class="voice-categories">
+						<span class="category-badge">Audiobook</span>
+						<span class="category-badge">NPC</span>
+					</div>
+					<a href="./voice_assets/characters/elder barik.mp3" download class="voice-link">
+						<span class="voice-link-icon">⬇️</span>
+						<span>Download</span>
+					</a>
+				</div>
+
+				<div class="voice-card">
+					<h4 class="voice-card-title active">Sloan</h4>
+					<p class="voice-card-description">
+						Quick-witted and enterprising gnome with sharp business acumen and charming personality.
+					</p>
+					<div class="audio-player">
+						<audio controls>
+							<source src="./voice_assets/characters/sloan.mp3" type="audio/mpeg">
+							Your browser does not support the audio element.
+						</audio>
+					</div>
+					<div class="voice-categories">
+						<span class="category-badge">Audiobook</span>
+						<span class="category-badge">NPC</span>
+					</div>
+					<a href="./voice_assets/characters/sloan.mp3" download class="voice-link">
+						<span class="voice-link-icon">⬇️</span>
+						<span>Download</span>
+					</a>
+				</div>
+
+				<div class="voice-card">
+					<h4 class="voice-card-title active">Lady Giselle</h4>
+					<p class="voice-card-description">
+						Ugly old noble woman with sharp features, imperious bearing, and ancient lineage.
+					</p>
+					<div class="audio-player">
+						<audio controls>
+							<source src="./voice_assets/characters/lady giselle.mp3" type="audio/mpeg">
+							Your browser does not support the audio element.
+						</audio>
+					</div>
+					<div class="voice-categories">
+						<span class="category-badge">Audiobook</span>
+						<span class="category-badge">NPC</span>
+					</div>
+					<a href="./voice_assets/characters/lady giselle.mp3" download class="voice-link">
+						<span class="voice-link-icon">⬇️</span>
+						<span>Download</span>
+					</a>
+				</div>
+
+				<div class="voice-card">
+					<h4 class="voice-card-title active">Lord Norbert</h4>
+					<p class="voice-card-description">
+						Distinguished and authoritative noble with commanding presence and noble lineage.
+					</p>
+					<div class="audio-player">
+						<audio controls>
+							<source src="./voice_assets/characters/lord norbert.mp3" type="audio/mpeg">
+							Your browser does not support the audio element.
+						</audio>
+					</div>
+					<div class="voice-categories">
+						<span class="category-badge">Audiobook</span>
+						<span class="category-badge">NPC</span>
+					</div>
+					<a href="./voice_assets/characters/lord norbert.mp3" download class="voice-link">
+						<span class="voice-link-icon">⬇️</span>
+						<span>Download</span>
+					</a>
+				</div>
+
+				<div class="voice-card">
+					<h4 class="voice-card-title active">Street Merchant</h4>
+					<p class="voice-card-description">
+						Adult commoner merchant with street-smart savvy, mercantile charm, and gritty realism.
+					</p>
+					<div class="audio-player">
+						<audio controls>
+							<source src="./voice_assets/characters/Street Urchin.mp3" type="audio/mpeg">
+							Your browser does not support the audio element.
+						</audio>
+					</div>
+					<div class="voice-categories">
+						<span class="category-badge">Audiobook</span>
+						<span class="category-badge">NPC</span>
+					</div>
+					<a href="./voice_assets/characters/Street Urchin.mp3" download class="voice-link">
+						<span class="voice-link-icon">⬇️</span>
+						<span>Download</span>
+					</a>
+				</div>
+
+				<div class="voice-card">
+					<h4 class="voice-card-title active">Reuben</h4>
+					<p class="voice-card-description">
+						Meek stuttering wizard with nervous disposition, arcane knowledge, and vulnerable humanity.
+					</p>
+					<div class="audio-player">
+						<audio controls>
+							<source src="./voice_assets/characters/reuben.mp3" type="audio/mpeg">
+							Your browser does not support the audio element.
+						</audio>
+					</div>
+					<div class="voice-categories">
+						<span class="category-badge">Audiobook</span>
+						<span class="category-badge">NPC</span>
+					</div>
+					<a href="./voice_assets/characters/reuben.mp3" download class="voice-link">
+						<span class="voice-link-icon">⬇️</span>
+						<span>Download</span>
+					</a>
+				</div>
+
+				<div class="voice-card">
+					<h4 class="voice-card-title active">Joss</h4>
+					<p class="voice-card-description">
+						Frightened tradesman with nervous energy, practical skills, and trembling vulnerability.
+					</p>
+					<div class="audio-player">
+						<audio controls>
+							<source src="./voice_assets/characters/joss.mp3" type="audio/mpeg">
+							Your browser does not support the audio element.
+						</audio>
+					</div>
+					<div class="voice-categories">
+						<span class="category-badge">Audiobook</span>
+						<span class="category-badge">NPC</span>
+					</div>
+					<a href="./voice_assets/characters/joss.mp3" download class="voice-link">
+						<span class="voice-link-icon">⬇️</span>
+						<span>Download</span>
+					</a>
+				</div>
+
+				<div class="voice-card">
+					<h4 class="voice-card-title active">Thrain</h4>
+					<p class="voice-card-description">
+						Dwarven NPC with authentic dwarven character and robust personality.
+					</p>
+					<div class="audio-player">
+						<audio controls>
+							<source src="./voice_assets/characters/thrain.mp3" type="audio/mpeg">
+							Your browser does not support the audio element.
+						</audio>
+					</div>
+					<div class="voice-categories">
+						<span class="category-badge">Audiobook</span>
+						<span class="category-badge">NPC</span>
+					</div>
+					<a href="./voice_assets/characters/thrain.mp3" download class="voice-link">
+						<span class="voice-link-icon">⬇️</span>
+						<span>Download</span>
+					</a>
+				</div>
+
+				<div class="voice-card">
+					<h4 class="voice-card-title active">Concerned Dwarf</h4>
+					<p class="voice-card-description">
+						Worried and anxious dwarven character with emotional depth and authentic concern.
+					</p>
+					<div class="audio-player">
+						<audio controls>
+							<source src="./voice_assets/characters/concerned dwarf.mp3" type="audio/mpeg">
+							 Your browser does not support the audio element.
+						</audio>
+					</div>
+					<div class="voice-categories">
+						<span class="category-badge">Audiobook</span>
+						<span class="category-badge">NPC</span>
+					</div>
+					<a href="./voice_assets/characters/concerned dwarf.mp3" download class="voice-link">
+						<span class="voice-link-icon">⬇️</span>
+						<span>Download</span>
+					</a>
+				</div>
+
+				<div class="voice-card">
+					<h4 class="voice-card-title active">Doorkeeper</h4>
+					<p class="voice-card-description">
+						Mysterous old gate guardian with ancient wisdom and weathered presence.
+					</p>
+					<div class="audio-player">
+						<audio controls>
+							<source src="./voice_assets/characters/doorkeeper.mp3" type="audio/mpeg">
+							Your browser does not support the audio element.
+						</audio>
+					</div>
+					<div class="voice-categories">
+						<span class="category-badge">Audiobook</span>
+						<span class="category-badge">NPC</span>
+					</div>
+					<a href="./voice_assets/characters/doorkeeper.mp3" download class="voice-link">
+						<span class="voice-link-icon">⬇️</span>
+						<span>Download</span>
+					</a>
+				</div>
+			</div>
+		</details>
+
+		<!-- THUMBTACK VOICE WORK SECTION -->
+		<h2 class="voice-section-title">🎙️ Thumbtack Voice Work</h2>
+		<p style="color: #b4bcc4; font-size: 1.05em; margin-bottom: 32px; line-height: 1.6;">
+			Commercial voice recordings and professional voice talent work produced for Thumbtack, showcasing professional delivery and brand-aligned messaging.
+		</p>
+
+		<div class="voice-samples-grid">
+			<div class="voice-card">
+				<h4 class="voice-card-title">1 Hour Training</h4>
+				<p class="voice-card-description">
+					Professional training module narration with clear delivery and instructional pacing.
+				</p>
+				<div class="audio-player">
+					<audio controls>
+						<source src="./voice_assets/1 Hour Training.wav" type="audio/wav">
+						Your browser does not support the audio element.
+					</audio>
+				</div>
+				<div class="voice-categories">
+					<span class="category-badge">Commercial</span>
+					<span class="category-badge">Thumbtack</span>
+				</div>
+				<a href="./voice_assets/1 Hour Training.wav" download class="voice-link">
+					<span class="voice-link-icon">⬇️</span>
+					<span>Download</span>
+				</a>
+			</div>
+
+			<div class="voice-card">
+				<h4 class="voice-card-title">Data Privacy Center</h4>
+				<p class="voice-card-description">
+					Professional announcement with authoritative tone and compliance messaging.
+				</p>
+				<div class="audio-player">
+					<audio controls>
+						<source src="./voice_assets/Data Privacy Center.wav" type="audio/wav">
+						Your browser does not support the audio element.
+					</audio>
+				</div>
+				<div class="voice-categories">
+					<span class="category-badge">Commercial</span>
+					<span class="category-badge">Thumbtack</span>
+				</div>
+				<a href="./voice_assets/Data Privacy Center.wav" download class="voice-link">
+					<span class="voice-link-icon">⬇️</span>
+					<span>Download</span>
+				</a>
+			</div>
+
+			<div class="voice-card">
+				<h4 class="voice-card-title">Holiday IVR</h4>
+				<p class="voice-card-description">
+					Friendly and professional holiday-themed IVR system greeting.
+				</p>
+				<div class="audio-player">
+					<audio controls>
+						<source src="./voice_assets/HolidayIVR.wav" type="audio/wav">
+						Your browser does not support the audio element.
+					</audio>
+				</div>
+				<div class="voice-categories">
+					<span class="category-badge">IVR</span>
+					<span class="category-badge">Thumbtack</span>
+				</div>
+				<a href="./voice_assets/HolidayIVR.wav" download class="voice-link">
+					<span class="voice-link-icon">⬇️</span>
+					<span>Download</span>
+				</a>
+			</div>
+
+			<div class="voice-card">
+				<h4 class="voice-card-title">Press 1 (Option 1)</h4>
+				<p class="voice-card-description">
+					IVR menu option with clear, professional call-to-action.
+				</p>
+				<div class="audio-player">
+					<audio controls>
+						<source src="./voice_assets/Press 1 1.2.wav" type="audio/wav">
+						Your browser does not support the audio element.
+					</audio>
+				</div>
+				<div class="voice-categories">
+					<span class="category-badge">IVR</span>
+					<span class="category-badge">Thumbtack</span>
+				</div>
+				<a href="./voice_assets/Press 1 1.2.wav" download class="voice-link">
+					<span class="voice-link-icon">⬇️</span>
+					<span>Download</span>
+				</a>
+			</div>
+
+			<div class="voice-card">
+				<h4 class="voice-card-title">Press 2 (Option 2)</h4>
+				<p class="voice-card-description">
+					IVR menu option with clear, professional call-to-action.
+				</p>
+				<div class="audio-player">
+					<audio controls>
+						<source src="./voice_assets/Press 2 1.2.wav" type="audio/wav">
+						Your browser does not support the audio element.
+					</audio>
+				</div>
+				<div class="voice-categories">
+					<span class="category-badge">IVR</span>
+					<span class="category-badge">Thumbtack</span>
+				</div>
+				<a href="./voice_assets/Press 2 1.2.wav" download class="voice-link">
+					<span class="voice-link-icon">⬇️</span>
+					<span>Download</span>
+				</a>
+			</div>
+
+			<div class="voice-card">
+				<h4 class="voice-card-title">Refund Disputes</h4>
+				<p class="voice-card-description">
+					Professional customer service messaging regarding refund dispute resolution.
+				</p>
+				<div class="audio-player">
+					<audio controls>
+						<source src="./voice_assets/Refund Disputes 1.2.wav" type="audio/wav">
+						Your browser does not support the audio element.
+					</audio>
+				</div>
+				<div class="voice-categories">
+					<span class="category-badge">Customer Service</span>
+					<span class="category-badge">Thumbtack</span>
+				</div>
+				<a href="./voice_assets/Refund Disputes 1.2.wav" download class="voice-link">
+					<span class="voice-link-icon">⬇️</span>
+					<span>Download</span>
+				</a>
+			</div>
+
+			<div class="voice-card">
+				<h4 class="voice-card-title">Refund 24 Hour TAT</h4>
+				<p class="voice-card-description">
+					Professional announcement regarding 24-hour refund turnaround time.
+				</p>
+				<div class="audio-player">
+					<audio controls>
+						<source src="./voice_assets/Refund24HourTAT.wav" type="audio/wav">
+						Your browser does not support the audio element.
+					</audio>
+				</div>
+				<div class="voice-categories">
+					<span class="category-badge">Customer Service</span>
+					<span class="category-badge">Thumbtack</span>
+				</div>
+				<a href="./voice_assets/Refund24HourTAT.wav" download class="voice-link">
+					<span class="voice-link-icon">⬇️</span>
+					<span>Download</span>
+				</a>
+			</div>
+		</div>
+
+		<!-- Footer Info -->
+		<div style="text-align: center; padding: 32px 0; margin-top: 48px; border-top: 2px solid #16a34a; border-radius: 8px;">
+			<h3 style="color: #98e58e; font-size: 1.2em; margin-bottom: 16px;">Interested in Voice Work?</h3>
+			<p style="color: #b4bcc4; margin-bottom: 24px;">
+				Contact me for inquiries about voice acting, audiobook narration, commercial work, or any audio production needs.
+			</p>
+			<a href="../contact.html" style="display: inline-block; background: #16a34a; color: #fff; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: 700; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);" onmouseover="this.style.background='#98e58e'; this.style.boxShadow='0 6px 20px rgba(152, 229, 142, 0.4)'" onmouseout="this.style.background='#16a34a'; this.style.boxShadow='0 4px 12px rgba(22, 163, 74, 0.3)'">
+				Get in Touch
+			</a>
+		</div>
+	</div>
+
+	<script>
+		// Hamburger menu
+		var hamburger = document.getElementById('hamburger');
+		var navLinks = document.getElementById('navLinks');
+		hamburger.addEventListener('click', function() {
+			navLinks.classList.toggle('open');
+		});
+		hamburger.addEventListener('keypress', function(e) {
+			if (e.key === 'Enter') navLinks.classList.toggle('open');
+		});
+
+		// Settings & Help modal logic
+		document.getElementById('settings-btn').onclick = function(e) {
+			e.stopPropagation();
+			document.getElementById('settings-modal').style.display = 'flex';
+		};
+		document.getElementById('help-btn').onclick = function(e) {
+			e.stopPropagation();
+			document.getElementById('help-modal').style.display = 'flex';
+		};
+		function closeModal(id) {
+			document.getElementById(id).style.display = 'none';
+		}
+		document.addEventListener('click', function(e) {
+			if (document.getElementById('settings-modal').style.display === 'flex') document.getElementById('settings-modal').style.display = 'none';
+			if (document.getElementById('help-modal').style.display === 'flex') document.getElementById('help-modal').style.display = 'none';
+		});
+		document.getElementById('settings-modal').onclick = function(e) { e.stopPropagation(); };
+		document.getElementById('help-modal').onclick = function(e) { e.stopPropagation(); };
+
+		// Language dropdown (simple toggle)
+		const langBtn = document.getElementById('lang-btn');
+		langBtn.addEventListener('click', function(e) {
+			e.stopPropagation();
+			// Example: cycle through languages
+			const langs = ['EN', 'ES', 'FR', 'DE', 'ZH'];
+			let current = langs.indexOf(langBtn.textContent.trim());
+			langBtn.textContent = langs[(current + 1) % langs.length];
+		});
+	</script>
+
+	<!-- Universal Bottom Navigation - Quick Navigation Only -->
+	<section class="bottom-navigation" style="margin-top: 0;">
+		<div class="bottom-nav-container">
+			<!-- Quick Navigation Only -->
+			<div class="bottom-nav-section">
+				<div class="bottom-nav-title">Quick Navigation</div>
+				<div class="bottom-nav-links">
+					<a href="../index.html" class="bottom-nav-link">Home</a>
+					<a href="../resume.html" class="bottom-nav-link">Resume</a>
+					<a href="../about.html" class="bottom-nav-link">About</a>
+					<a href="../projects.html" class="bottom-nav-link">Projects</a>
+					<a href="../articles.html" class="bottom-nav-link">Articles</a>
+					<a href="../contact.html" class="bottom-nav-link">Contact</a>
+				</div>
+			</div>
+
+			<!-- Inspirational Quote -->
+			<div class="bottom-nav-section">
+				<blockquote class="article-quote">
+					<span>"Acting is behaving truthfully under imaginary circumstances."</span><br>
+					<span class="quote-author">— Uta Hagen</span>
+				</blockquote>
+			</div>
+		</div>
+	</section>
+</body>
+</html>
